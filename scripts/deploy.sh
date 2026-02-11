@@ -9,7 +9,7 @@ bun run build
 echo "📦 Deploying to 'deploy' branch..."
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 DEPLOY_DIR=$(mktemp -d)
-cp -r dist/* "$DEPLOY_DIR/"
+cp -r dist/. "$DEPLOY_DIR/"
 
 # Back up node_modules so branch switch doesn't destroy it
 NODE_MODULES_BAK=$(mktemp -d)
@@ -24,7 +24,7 @@ fi
 
 # Clean current contents and copy built files
 find . -maxdepth 1 ! -name '.git' ! -name '.' -exec rm -rf {} +
-cp -r "$DEPLOY_DIR"/* .
+cp -r "$DEPLOY_DIR"/. .
 rm -rf "$DEPLOY_DIR"
 
 git add -A
