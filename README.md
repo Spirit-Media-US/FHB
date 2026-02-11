@@ -85,13 +85,25 @@ auto-fixed before the commit completes.
 
 ## Deployment
 
-### How It Works
+### Architecture Overview
 
-The site is hosted on **Cloudways** (PHP stack). Since there's no Node/Bun on
-the server, we build locally and push only the static output.
+The site is hosted on **Cloudways** (standard PHP stack on DigitalOcean). Since
+Cloudways PHP servers don't have Node.js or Bun installed, we can't build on
+the server. Instead, we use a **two-branch strategy**:
 
-- **`main` branch** — source code
-- **`deploy` branch** — built static files (what Cloudways pulls)
+- **`main` branch** — full source code (Astro, components, configs, etc.)
+- **`deploy` branch** — only the built static files from `./dist`
+
+Cloudways Git deployment is configured to pull from the `deploy` branch into
+the application's `public_html` directory. The workflow is:
+
+```
+Local: edit code → commit to main → run bun run deploy
+  ↓
+deploy.sh: builds site → pushes static files to deploy branch
+  ↓
+Cloudways: pull deploy branch → files land in public_html → site is live
+```
 
 ### Deploy to Production
 
@@ -101,33 +113,123 @@ bun run deploy
 
 This runs `scripts/deploy.sh`, which:
 
-1. Builds the site (`bun run build`)
-2. Switches to the `deploy` branch
-3. Replaces all files with the contents of `./dist`
-4. Commits and force-pushes to `origin/deploy`
-5. Switches back to `main`
+1. Runs `bun run build` (TypeScript check + Astro build)
+2. Copies `./dist` contents to a temp directory
+3. Backs up `node_modules` (so the branch switch doesn't destroy them)
+4. Switches to the `deploy` branch
+5. Cleans out all files and replaces them with the build output
+6. Commits with a timestamped message and force-pushes to `origin/deploy`
+7. Switches back to `main` and restores `node_modules`
 
 After pushing, go to **Cloudways → Application → Deployment via Git → Pull**
-to pull the latest.
+to pull the latest files onto the server.
 
-### Cloudways Configuration
+### Cloudways Git Integration Setup
 
-- **Server IP:** 161.35.131.217
-- **Git repo:** `git@github.com:Spirit-Media-US/FHB.git`
-- **Branch:** `deploy`
-- **Deployment path:** `public_html`
-- **SSH access:** RSA key at `~/.ssh/cloudways_rsa`
+This is the one-time setup that was done to connect Cloudways to GitHub.
+Documenting here for reference or if it needs to be reconfigured.
 
-### SSH into Cloudways
+#### 1. GitHub Repository
+
+The repo lives under the **Spirit-Media-US** organization on GitHub:
+`git@github.com:Spirit-Media-US/FHB.git`
+
+The `deploy` branch was created as an orphan branch containing only the
+static build output (HTML, CSS, assets). It has no shared history with `main`.
+
+#### 2. Cloudways Deploy Key
+
+Cloudways needs read access to the GitHub repo. This is done via a **deploy key**:
+
+1. In **Cloudways → Application → Deployment via Git**, Cloudways generates
+   an SSH public key
+2. That key was added to the GitHub repo at:
+   **GitHub → Spirit-Media-US/FHB → Settings → Deploy Keys**
+3. The key was given **read-only** access (Cloudways only needs to pull)
+
+#### 3. Cloudways Git Deployment Settings
+
+In **Cloudways → Application → Deployment via Git**:
+
+| Setting | Value |
+|---------|-------|
+| Git Repository | `git@github.com:Spirit-Media-US/FHB.git` |
+| Branch | `deploy` |
+| Deployment Path | `public_html` |
+
+After configuring, click **Pull** to deploy. Each subsequent deploy requires
+clicking Pull again (or setting up a webhook for auto-deploy).
+
+#### 4. Apache Configuration
+
+Cloudways PHP stack uses Apache behind Nginx. The default Cloudways app ships
+with an `index.php` that shows a "PHP Stack" landing page. Two things were
+done to ensure our static site is served correctly:
+
+- **Deleted `index.php`** from `public_html` on the server (it was overriding
+  our `index.html` because Apache defaults to serving PHP files first)
+- **Added `public/.htaccess`** with `DirectoryIndex index.html index.php` to
+  ensure Apache always prioritizes `index.html` even if an `index.php` is
+  ever recreated
+
+The `.htaccess` is in the `public/` folder of the source code, which Astro
+copies to `dist/` during build, and `deploy.sh` copies dotfiles to the
+`deploy` branch (using `cp -r dist/. "$DEPLOY_DIR/"` to include hidden files).
+
+### Cloudways Server Details
+
+| Detail | Value |
+|--------|-------|
+| Server IP | 161.35.131.217 |
+| Server Type | DigitalOcean — PHP Stack |
+| Master User | `master_zrtbnqxanz` |
+| App Code | `njcgwurpkq` |
+| App Path | `/home/master/applications/njcgwurpkq/` |
+| Public HTML | `/home/master/applications/njcgwurpkq/public_html/` |
+
+### SSH Access to Cloudways
+
+A 4096-bit RSA key was generated specifically for Cloudways (they don't accept
+ed25519 keys — minimum 1024-bit RSA required):
+
+- **Private key:** `~/.ssh/cloudways_rsa`
+- **Public key:** `~/.ssh/cloudways_rsa.pub`
+
+The public key was added in **Cloudways → Server → Security → SSH Keys**.
+
+To connect:
 
 ```bash
 ssh -i ~/.ssh/cloudways_rsa master_zrtbnqxanz@161.35.131.217
 ```
 
-The FHB application files live at:
+### Troubleshooting Deployment
+
+**Site shows "PHP Stack" page instead of FHB:**
+The default `index.php` is taking priority. Delete it:
+```bash
+ssh -i ~/.ssh/cloudways_rsa master_zrtbnqxanz@161.35.131.217 \
+  "rm /home/master/applications/njcgwurpkq/public_html/index.php"
 ```
-/home/master/applications/njcgwurpkq/public_html/
-```
+
+**Deploy script fails with "command not found":**
+The deploy script includes a PATH export for Homebrew binaries. If Bun or
+Astro can't be found, ensure `/opt/homebrew/bin` is in your shell PATH or
+update the PATH line in `scripts/deploy.sh`.
+
+**Cloudways Pull fails (permission denied):**
+The deploy key may have been removed from GitHub. Re-add it:
+GitHub → Spirit-Media-US/FHB → Settings → Deploy Keys → Add the key
+from Cloudways → Application → Deployment via Git.
+
+**`.htaccess` missing after deploy:**
+The deploy script uses `cp -r dist/. "$DEPLOY_DIR/"` (note the `.` after
+`dist/`) to copy hidden files. If this was changed to `dist/*`, dotfiles
+like `.htaccess` will be skipped. Verify the script uses the correct syntax.
+
+**CSS not loading on production:**
+The built CSS lives in `/_astro/` directory. Make sure the `_astro` folder
+was included in the deploy. Check the `deploy` branch on GitHub to verify.
 
 ## Environment Variables
 
