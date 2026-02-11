@@ -1,0 +1,9 @@
+# Lefthook pre-commit hooks
+# Note: "astro check" is slow (~30s+) — run manually before deploy
+
+pre-commit:
+  commands:
+    biome:
+      glob: "*.{js,ts,jsx,tsx,json,css,astro}"
+      run: bunx biome check --write --no-errors-on-unmatched {staged_files}
+      stage_fixed: true
