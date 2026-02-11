@@ -1,13 +1,20 @@
 {
-  "name": "fhb",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro check && astro build",
-    "preview": "astro preview",
-    "check": "biome check --write",
-    "prepare": "lefthook install",
-    "deploy": "bun run build && bun run scripts/deploy.ts"
-  }
+	"name": "fhb",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro check && astro build",
+		"preview": "astro preview",
+		"check": "biome check --write",
+		"prepare": "lefthook install",
+		"deploy": "bun run build && bun run scripts/deploy.ts"
+	},
+	"dependencies": {
+		"dotenv": "^17.2.4",
+		"ssh2-sftp-client": "^12.0.1"
+	},
+	"devDependencies": {
+		"@types/ssh2-sftp-client": "^9.0.6"
+	}
 }
