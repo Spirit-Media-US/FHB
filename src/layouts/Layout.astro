@@ -5,7 +5,11 @@ interface Props {
 	image?: string;
 }
 
-const { title, description = 'Welcome to FHB', image = '/og-image.png' } = Astro.props;
+const {
+	title,
+	description = "Welcome to Father's Heart Bible",
+	image = '/og-image.png',
+} = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
