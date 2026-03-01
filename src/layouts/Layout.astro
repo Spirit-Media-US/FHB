@@ -7,11 +7,12 @@ interface Props {
 
 const {
 	title,
-	description = "Welcome to Father's Heart Bible",
+	description = "A new Bible translation revealing our Father's heart — from Genesis to Revelation.",
 	image = '/og-image.png',
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const siteName = "Father's Heart Bible";
 ---
 
 <!doctype html>
@@ -22,6 +23,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="canonical" href={canonicalURL} />
 
+		<!-- Preconnect to Google Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
 		<title>{title}</title>
 		<meta name="description" content={description} />
 
@@ -31,6 +36,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:image" content={image} />
+		<meta property="og:site_name" content={siteName} />
 
 		<!-- Twitter -->
 		<meta name="twitter:card" content="summary_large_image" />
@@ -38,7 +44,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={image} />
 	</head>
-	<body>
+	<body class="min-h-screen flex flex-col">
 		<slot />
 	</body>
 </html>

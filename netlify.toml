@@ -1,0 +1,33 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--prefer-offline"
+
+# Cache node_modules and Astro build cache between deploys
+# This is the biggest credit saver — avoids reinstalling from scratch
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
+
+# Redirect www to non-www
+[[redirects]]
+  from = "https://www.spiritmediapublishing.com/*"
+  to = "https://spiritmediapublishing.com/:splat"
+  status = 301
+  force = true
