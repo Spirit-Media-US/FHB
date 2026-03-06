@@ -1,0 +1,21 @@
+export default {
+  name: 'siteSettings',
+  title: 'Site Settings',
+  type: 'document',
+  __experimental_actions: ['update', 'publish'],
+  fields: [
+    { name: 'siteName', title: 'Site Name', type: 'string' },
+    { name: 'tagline', title: 'Tagline', type: 'string' },
+    { name: 'heroHeadline', title: 'Hero Headline', type: 'string' },
+    { name: 'heroSubtext', title: 'Hero Subtext', type: 'text' },
+    { name: 'translatorName', title: 'Lead Translator Name', type: 'string' },
+    { name: 'translatorBio', title: 'Translator Bio / Why This Exists', type: 'array', of: [{ type: 'block' }] },
+    { name: 'heroImage', title: 'Hero Image', type: 'image', options: { hotspot: true } },
+    { name: 'bibleCoverImage', title: 'Bible Cover Mockup', type: 'image', options: { hotspot: true } },
+    { name: 'email', title: 'Contact Email', type: 'string' },
+    { name: 'facebook', title: 'Facebook URL', type: 'url' },
+    { name: 'instagram', title: 'Instagram URL', type: 'url' },
+    { name: 'youtube', title: 'YouTube URL', type: 'url' },
+    { name: 'partnerPageUrl', title: 'Partner / Giving Page URL', type: 'url' },
+  ],
+}
