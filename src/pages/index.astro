@@ -3,6 +3,25 @@ import Footer from '../components/Footer.astro';
 import Navbar from '../components/Navbar.astro';
 import Layout from '../layouts/Layout.astro';
 import '../styles/global.css';
+import { sanityClient } from '../lib/sanity.ts';
+
+// Fetch featured scripture passage for the comparison section
+const featuredScripture = await sanityClient.fetch(`
+  *[_type == "scripture" && featured == true] | order(order asc) [0] {
+    reference,
+    traditionalText,
+    fhbText
+  }
+`);
+
+// Fallback to John 3:16 if no featured scripture yet
+const scripture = featuredScripture || {
+	reference: 'John 3:16',
+	traditionalText:
+		'"For God so loved the world that He gave His only Son, that whoever believes in Him shall not perish but have eternal life."',
+	fhbText:
+		'"For our Father so loved the world that He gave His one and only Son, that whoever believes in Him shall not perish but have eternal life."',
+};
 ---
 
 <Layout title="Father's Heart Bible — A New Translation Revealing Our Father's Heart" description="The Father's Heart Bible is a new interpretive English translation designed to reveal God's identity as Father — and His heart toward His children — throughout Scripture.">
@@ -127,7 +146,7 @@ import '../styles/global.css';
 			</p>
 
 			<h2 class="text-3xl md:text-5xl font-light text-center mb-16" style="font-family: var(--font-serif); color: var(--color-ink);">
-				John 3:16
+				{scripture.reference}
 			</h2>
 
 			<div class="grid md:grid-cols-2 gap-12 md:gap-16">
@@ -137,7 +156,7 @@ import '../styles/global.css';
 						Traditional
 					</p>
 					<blockquote class="text-xl md:text-2xl italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-charcoal);">
-						"For <span style="color: var(--color-warm-gray);">God</span> so loved the world that He gave His only Son, that whoever believes in Him shall not perish but have eternal life."
+						{scripture.traditionalText}
 					</blockquote>
 				</div>
 
@@ -147,7 +166,7 @@ import '../styles/global.css';
 						Father's Heart Bible
 					</p>
 					<blockquote class="text-xl md:text-2xl italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">
-						"For <strong style="color: var(--color-accent-dark); font-style: italic;">our Father</strong> so loved the world that He gave His one and only Son, that whoever believes in Him shall not perish but have eternal life."
+						{scripture.fhbText}
 					</blockquote>
 				</div>
 			</div>
