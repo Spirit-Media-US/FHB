@@ -1,241 +1,62 @@
 ---
-import Footer from '../components/Footer.astro';
-import Navbar from '../components/Navbar.astro';
+import { sanityClient, urlFor } from '../lib/sanity';
 import Layout from '../layouts/Layout.astro';
-import '../styles/global.css';
-import { sanityClient } from '../lib/sanity.ts';
 
-// Fetch featured scripture passage for the comparison section
-const featuredScripture = await sanityClient.fetch(`
-  *[_type == "scripture" && featured == true] | order(order asc) [0] {
-    reference,
-    traditionalText,
-    fhbText
+// Fetch siteSettings from Sanity
+const siteSettings = await sanityClient.fetch(`
+  *[_type == "siteSettings"][0] {
+    siteName,
+    heroHeadline,
+    heroSubtext,
+    tagline,
+    heroImage,
+    logo
   }
 `);
 
-// Fallback to John 3:16 if no featured scripture yet
-const scripture = featuredScripture || {
-	reference: 'John 3:16',
-	traditionalText:
-		'"For God so loved the world that He gave His only Son, that whoever believes in Him shall not perish but have eternal life."',
-	fhbText:
-		'"For our Father so loved the world that He gave His one and only Son, that whoever believes in Him shall not perish but have eternal life."',
-};
+const {
+  siteName = "Fathers Heart Bible",
+  heroHeadline = "Revealing Our Father's Heart",
+  heroSubtext = "The Father's Heart Bible is a new interpretive English translation that faithfully renders the original texts while revealing God's identity as Father — and His heart toward His children — throughout Scripture.",
+  tagline = "A New Bible Translation",
+  heroImage,
+  logo
+} = siteSettings || {};
 ---
 
-<Layout title="Father's Heart Bible — A New Translation Revealing Our Father's Heart" description="The Father's Heart Bible is a new interpretive English translation designed to reveal God's identity as Father — and His heart toward His children — throughout Scripture.">
-	<Navbar />
+<Layout title={siteName}>
+  <main class="min-h-screen flex flex-col">
+    <!-- Hero Section -->
+    <section class="relative h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-blue-900 to-blue-800">
+      {heroImage && (
+        <img
+          src={urlFor(heroImage).url()}
+          alt="Hero Background"
+          class="absolute inset-0 w-full h-full object-cover opacity-30"
+        />
+      )}
+      <div class="relative z-10 text-center text-white px-4">
+        {logo && (
+          <img
+            src={urlFor(logo).url()}
+            alt="Fathers Heart Bible Logo"
+            class="h-24 mx-auto mb-8"
+          />
+        )}
+        <h1 class="text-5xl md:text-6xl font-bold mb-4">{heroHeadline}</h1>
+        <p class="text-2xl md:text-3xl mb-6 text-blue-100">{tagline}</p>
+        <p class="text-lg max-w-2xl mx-auto text-blue-50">{heroSubtext}</p>
+      </div>
+    </section>
 
-	<!-- ═══════════ HERO ═══════════ -->
-	<section class="relative min-h-screen flex items-center justify-center overflow-hidden" style="background: linear-gradient(160deg, var(--color-ink) 0%, var(--color-charcoal) 50%, #4A3F35 100%);">
-		<!-- Subtle warm glow -->
-		<div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full opacity-15 blur-3xl" style="background: radial-gradient(circle, var(--color-accent) 0%, transparent 70%);"></div>
-
-		<div class="relative z-10 text-center px-6 max-w-3xl mx-auto">
-			<!-- Small eyebrow -->
-			<p class="text-xs font-medium tracking-[0.2em] uppercase mb-8 animate-fade-in" style="font-family: var(--font-sans); color: var(--color-accent-light);">
-				A New Bible Translation
-			</p>
-
-			<!-- Main headline -->
-			<h1 class="text-4xl sm:text-5xl md:text-7xl font-light leading-[1.1] mb-8" style="font-family: var(--font-serif); color: var(--color-cream);">
-				Revealing Our<br/>Father's Heart
-			</h1>
-
-			<!-- Decorative line -->
-			<div class="w-16 h-px mx-auto mb-8" style="background-color: var(--color-accent);"></div>
-
-			<!-- Subheadline -->
-			<p class="text-lg md:text-xl leading-relaxed mb-12 max-w-xl mx-auto" style="font-family: var(--font-sans); color: var(--color-stone); font-weight: 300;">
-				The Father's Heart Bible is a new interpretive English translation that faithfully renders the original texts while revealing God's identity as Father — and His heart toward His children — throughout Scripture.
-			</p>
-
-			<!-- CTA -->
-			<div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-				<a href="/sample" class="inline-block px-8 py-3.5 text-sm font-semibold tracking-[0.1em] uppercase no-underline rounded-sm transition-all duration-300" style="font-family: var(--font-sans); background-color: var(--color-accent); color: var(--color-cream);">
-					Read the Preface
-				</a>
-				<a href="/partner" class="inline-block px-8 py-3.5 text-sm font-semibold tracking-[0.1em] uppercase no-underline rounded-sm border transition-all duration-300" style="font-family: var(--font-sans); border-color: var(--color-stone); color: var(--color-stone);">
-					Partner With Us
-				</a>
-			</div>
-		</div>
-
-		<!-- Scroll indicator -->
-		<div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-			<svg width="20" height="30" viewBox="0 0 20 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<rect x="1" y="1" width="18" height="28" rx="9" stroke="var(--color-warm-gray)" stroke-width="1.5" opacity="0.4"/>
-				<circle cx="10" cy="10" r="2.5" fill="var(--color-warm-gray)" opacity="0.6"/>
-			</svg>
-		</div>
-	</section>
-
-	<!-- ═══════════ THE WHY — KEVIN'S STORY ═══════════ -->
-	<section class="py-24 md:py-32" style="background-color: var(--color-cream);">
-		<div class="max-w-2xl mx-auto px-6">
-			<p class="text-xs font-medium tracking-[0.2em] uppercase mb-6 text-center" style="font-family: var(--font-sans); color: var(--color-warm-gray);">
-				Why This Translation Exists
-			</p>
-
-			<div class="space-y-6 text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-charcoal);">
-				<p class="text-xl md:text-2xl leading-relaxed" style="color: var(--color-ink);">
-					For over forty years, I read the Bible faithfully — and connected to God as a servant to a master rather than as a beloved son to a perfect and loving Father.
-				</p>
-
-				<p>
-					I was taught that Jesus was the way to heaven. But that is not what Jesus said. He said, <em>"I am the way, the truth, and the life. No one comes to the Father except through me"</em> (John 14:6).
-				</p>
-
-				<p>
-					The destination was never merely forgiveness. The destination was never merely heaven. <strong style="color: var(--color-ink);">The destination has always been the Father.</strong>
-				</p>
-
-				<p>
-					This changed everything for me. And I don't believe I'm alone.
-				</p>
-			</div>
-
-			<div class="mt-10 text-right">
-				<span class="text-sm italic" style="font-family: var(--font-serif); color: var(--color-warm-gray);">— Kevin White, Lead Translator</span>
-			</div>
-		</div>
-	</section>
-
-	<!-- ═══════════ A FATHER WHO... ═══════════ -->
-	<section class="py-24 md:py-32" style="background-color: var(--color-linen);">
-		<div class="max-w-4xl mx-auto px-6">
-			<p class="text-xs font-medium tracking-[0.2em] uppercase mb-4 text-center" style="font-family: var(--font-sans); color: var(--color-warm-gray);">
-				Beyond Name to Heart
-			</p>
-
-			<h2 class="text-3xl md:text-5xl font-light text-center mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">
-				Not Just His Name — His Heart
-			</h2>
-
-			<p class="text-center text-lg max-w-2xl mx-auto mb-16 leading-relaxed" style="font-family: var(--font-sans); color: var(--color-warm-gray); font-weight: 300;">
-				The Father's Heart Bible introduces readers to a Father whose heart is fully engaged with His children.
-			</p>
-
-			<div class="grid md:grid-cols-5 gap-8 md:gap-4">
-				{[
-					{ verb: 'Pursues', rest: 'His children with relentless love' },
-					{ verb: 'Delights', rest: 'in them with singing and joy' },
-					{ verb: 'Grieves', rest: 'when they wander' },
-					{ verb: 'Runs', rest: 'to embrace them when they return' },
-					{ verb: 'Invites', rest: 'them home with arms wide open' },
-				].map(item => (
-					<div class="text-center">
-						<p class="text-2xl md:text-3xl font-semibold mb-2" style={`font-family: var(--font-serif); color: var(--color-accent-dark);`}>
-							{item.verb}
-						</p>
-						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-warm-gray);">
-							{item.rest}
-						</p>
-					</div>
-				))}
-			</div>
-		</div>
-	</section>
-
-	<!-- ═══════════ SEE THE DIFFERENCE ═══════════ -->
-	<section class="py-24 md:py-32" style="background-color: var(--color-cream);">
-		<div class="max-w-4xl mx-auto px-6">
-			<p class="text-xs font-medium tracking-[0.2em] uppercase mb-4 text-center" style="font-family: var(--font-sans); color: var(--color-warm-gray);">
-				See the Difference
-			</p>
-
-			<h2 class="text-3xl md:text-5xl font-light text-center mb-16" style="font-family: var(--font-serif); color: var(--color-ink);">
-				{scripture.reference}
-			</h2>
-
-			<div class="grid md:grid-cols-2 gap-12 md:gap-16">
-				<!-- Traditional -->
-				<div class="text-center md:text-left">
-					<p class="text-xs font-medium tracking-[0.2em] uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-warm-gray);">
-						Traditional
-					</p>
-					<blockquote class="text-xl md:text-2xl italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-charcoal);">
-						{scripture.traditionalText}
-					</blockquote>
-				</div>
-
-				<!-- FHB -->
-				<div class="text-center md:text-left">
-					<p class="text-xs font-medium tracking-[0.2em] uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-accent-dark);">
-						Father's Heart Bible
-					</p>
-					<blockquote class="text-xl md:text-2xl italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">
-						{scripture.fhbText}
-					</blockquote>
-				</div>
-			</div>
-
-			<div class="mt-12 text-center">
-				<p class="text-base leading-relaxed max-w-xl mx-auto" style="font-family: var(--font-sans); color: var(--color-warm-gray); font-weight: 300;">
-					This is not adding to Scripture. It is revealing what the text itself communicates. Our Father loved. Our Father gave. Our Father initiated our salvation.
-				</p>
-			</div>
-		</div>
-	</section>
-
-	<!-- ═══════════ FEATURES ═══════════ -->
-	<section class="py-24 md:py-32" style="background-color: var(--color-linen);">
-		<div class="max-w-4xl mx-auto px-6">
-			<p class="text-xs font-medium tracking-[0.2em] uppercase mb-4 text-center" style="font-family: var(--font-sans); color: var(--color-warm-gray);">
-				The Project
-			</p>
-
-			<h2 class="text-3xl md:text-5xl font-light text-center mb-16" style="font-family: var(--font-serif); color: var(--color-ink);">
-				What Is the Father's Heart Bible?
-			</h2>
-
-			<div class="grid sm:grid-cols-2 gap-x-12 gap-y-10">
-				{[
-					{ title: 'Faithful to the Original Texts', desc: 'A meaning-based translation working directly from the original Hebrew, Aramaic, and Greek — informed by modern scholarship and the best manuscript evidence.' },
-					{ title: 'Reveals the Father\'s Heart', desc: 'Where Scripture reveals God acting as Father, this translation names Him — revealing what the text has always communicated.' },
-					{ title: 'Full Canon', desc: 'A complete Bible — Old and New Testaments — premium print edition designed for a lifetime of reading.' },
-					{ title: 'For a Fatherless Generation', desc: 'Bible engagement is rising among Gen Z — a generation disproportionately affected by fatherlessness and actively seeking identity, meaning, and belonging.' },
-				].map(item => (
-					<div>
-						<h3 class="text-lg font-semibold mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">
-							{item.title}
-						</h3>
-						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-warm-gray);">
-							{item.desc}
-						</p>
-					</div>
-				))}
-			</div>
-		</div>
-	</section>
-
-	<!-- ═══════════ COME HOME — FINAL CTA ═══════════ -->
-	<section class="py-24 md:py-36 relative overflow-hidden" style="background: linear-gradient(160deg, var(--color-ink) 0%, var(--color-charcoal) 60%, #4A3F35 100%);">
-		<!-- Warm glow -->
-		<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full opacity-10 blur-3xl" style="background: radial-gradient(circle, var(--color-accent) 0%, transparent 70%);"></div>
-
-		<div class="relative z-10 max-w-2xl mx-auto px-6 text-center">
-			<blockquote class="text-2xl sm:text-3xl md:text-4xl italic leading-snug mb-6" style="font-family: var(--font-serif); color: var(--color-cream);">
-				"Come home. You belong to me.<br/>You are my beloved child."
-			</blockquote>
-
-			<div class="w-12 h-px mx-auto mb-10" style="background-color: var(--color-accent);"></div>
-
-			<p class="text-base leading-relaxed mb-12 max-w-lg mx-auto" style="font-family: var(--font-sans); color: var(--color-stone); font-weight: 300;">
-				Join us in publishing the Father's Heart Bible — and sharing our Father's heart with a world that has never needed it more.
-			</p>
-
-			<div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-				<a href="/sample" class="inline-block px-8 py-3.5 text-sm font-semibold tracking-[0.1em] uppercase no-underline rounded-sm transition-all duration-300" style="font-family: var(--font-sans); background-color: var(--color-accent); color: var(--color-cream);">
-					Read the Preface
-				</a>
-				<a href="/partner" class="inline-block px-8 py-3.5 text-sm font-semibold tracking-[0.1em] uppercase no-underline rounded-sm border transition-all duration-300" style="font-family: var(--font-sans); border-color: var(--color-stone); color: var(--color-stone);">
-					Partner With Us
-				</a>
-			</div>
-		</div>
-	</section>
-
-	<Footer />
+    <!-- About Section -->
+    <section class="py-16 px-4 bg-white">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl font-bold mb-8 text-gray-900">Our Mission</h2>
+        <p class="text-lg text-gray-700 leading-relaxed">
+          We are committed to bringing people closer to God's Word through deep study, authentic community, and transformative biblical teaching.
+        </p>
+      </div>
+    </section>
+  </main>
 </Layout>
