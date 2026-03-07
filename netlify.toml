@@ -6,8 +6,6 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--prefer-offline"
 
-# Cache node_modules and Astro build cache between deploys
-# This is the biggest credit saver — avoids reinstalling from scratch
 [build.processing]
   skip_processing = false
 
@@ -25,9 +23,22 @@
 [build.processing.images]
   compress = true
 
+# Branch preview deployments — full build, no www redirect
+[context.deploy-preview]
+  command = "npm run build"
+
+[context.branch-deploy]
+  command = "npm run build"
+
 # Redirect www to non-www
 [[redirects]]
-  from = "https://www.spiritmediapublishing.com/*"
-  to = "https://spiritmediapublishing.com/:splat"
+  from = "https://www.fathersheartbible.com/*"
+  to = "https://fathersheartbible.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.fathersheartbible.org/*"
+  to = "https://fathersheartbible.org/:splat"
   status = 301
   force = true
