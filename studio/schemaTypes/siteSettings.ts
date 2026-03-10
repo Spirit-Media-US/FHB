@@ -15,6 +15,7 @@ export default {
     { name: 'bibleCoverImage', title: 'Bible Cover Mockup', type: 'image', options: { hotspot: true } },
     { name: 'email', title: 'Contact Email', type: 'string' },
     { name: 'phone', title: 'Contact Phone Number', type: 'string' },
+    { name: 'publisherName', title: 'Publisher Name', type: 'string' },
     { name: 'bookingUrl', title: 'Booking / Events URL', type: 'url' },
     { name: 'facebook', title: 'Facebook URL', type: 'url' },
     { name: 'instagram', title: 'Instagram URL', type: 'url' },
