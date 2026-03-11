@@ -10,13 +10,11 @@ interface NavLink {
 const siteSettings = await sanityClient.fetch(`
   *[_type == "siteSettings"][0] {
     siteName,
-    logo,
-    bookingUrl
+    logo
   }
 `);
 
 const siteName = siteSettings?.siteName || "Father's Heart Bible";
-const bookingUrl = siteSettings?.bookingUrl || '#';
 
 const navLinks: NavLink[] = [
 	{ label: 'About', href: '/about' },

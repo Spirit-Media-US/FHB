@@ -12,7 +12,6 @@ const pageData = await sanityClient.fetch(`
     metaDescription,
     heroHeadline,
     heroSubheading,
-    heroImage,
     body
   }
 `);
@@ -22,7 +21,6 @@ const {
   metaDescription = 'Read the preface to the Father\'s Heart Bible — why this translation exists and how it reveals the Father\'s heart throughout Scripture.',
   heroHeadline = 'Preface',
   heroSubheading = 'From the Lead Translator',
-  heroImage,
   body = []
 } = pageData || {};
 
@@ -30,14 +28,14 @@ const {
 function renderPortableText(blocks: any[]) {
   if (!blocks || !Array.isArray(blocks)) return '';
   
-  return blocks.map((block: any, idx: number) => {
+  return blocks.map((block: any) => {
     if (block._type === 'block') {
       const style = block.style || 'normal';
       
       // Render inline marks
       const renderSpans = (spans: any[]) => {
         if (!spans) return '';
-        return spans.map((span: any, i: number) => {
+        return spans.map((span: any) => {
           let text = span.text || '';
           
           // Apply inline formatting
