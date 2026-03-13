@@ -6,17 +6,18 @@ interface NavLink {
 	href: string;
 }
 
-// Fetch siteSettings for branding
+// Fetch siteSettings for branding and nav links
 const siteSettings = await sanityClient.fetch(`
   *[_type == "siteSettings"][0] {
     siteName,
-    logo
+    logo,
+    navLinks
   }
 `);
 
 const siteName = siteSettings?.siteName || "Father's Heart Bible";
 
-const navLinks: NavLink[] = [
+const navLinks: NavLink[] = siteSettings?.navLinks || [
 	{ label: 'About', href: '/about' },
 	{ label: 'Read the Preface', href: '/sample' },
 	{ label: 'Partner', href: '/partner' },

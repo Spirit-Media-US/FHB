@@ -21,5 +21,20 @@ export default {
     { name: 'instagram', title: 'Instagram URL', type: 'url' },
     { name: 'youtube', title: 'YouTube URL', type: 'url' },
     { name: 'partnerPageUrl', title: 'Partner / Giving Page URL', type: 'url' },
+    {
+      name: 'navLinks',
+      title: 'Navigation Links',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'label', title: 'Link Label', type: 'string' },
+            { name: 'href', title: 'Link URL', type: 'string' },
+          ],
+        },
+      ],
+    },
+    { name: 'footerQuote', title: 'Footer Quote', type: 'text' },
   ],
 }
