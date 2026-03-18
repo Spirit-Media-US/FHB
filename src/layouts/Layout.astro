@@ -1,4 +1,6 @@
 ---
+import { sanityClient, urlFor } from '../lib/sanity';
+
 interface Props {
 	title: string;
 	description?: string;
@@ -8,11 +10,28 @@ interface Props {
 const {
 	title,
 	description = "A new Bible translation revealing our Father's heart — from Genesis to Revelation.",
-	image = '/og-image.png',
+	image,
 } = Astro.props;
 
+// Fetch siteName and ogImage from Sanity
+const siteSettings = await sanityClient.fetch(`
+  *[_type == "siteSettings"][0] {
+    siteName,
+    heroImage
+  }
+`);
+
+const siteName = siteSettings?.siteName || "Father's Heart Bible";
+
+// Use provided image, or fallback to Sanity heroImage, or fallback to static OG image
+let ogImage = image;
+if (!ogImage && siteSettings?.heroImage) {
+	ogImage = urlFor(siteSettings.heroImage).width(1200).height(630).url();
+} else if (!ogImage) {
+	ogImage = '/og-image.png';
+}
+
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const siteName = "Father's Heart Bible";
 ---
 
 <!doctype html>
@@ -35,14 +54,14 @@ const siteName = "Father's Heart Bible";
 		<meta property="og:url" content={canonicalURL} />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
-		<meta property="og:image" content={image} />
+		<meta property="og:image" content={ogImage} />
 		<meta property="og:site_name" content={siteName} />
 
 		<!-- Twitter -->
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
-		<meta name="twitter:image" content={image} />
+		<meta name="twitter:image" content={ogImage} />
 	</head>
 	<body class="min-h-screen flex flex-col">
 		<slot />

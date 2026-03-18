@@ -11,11 +11,30 @@ export default {
     { name: 'translatorName', title: 'Lead Translator Name', type: 'string' },
     { name: 'translatorBio', title: 'Translator Bio / Why This Exists', type: 'array', of: [{ type: 'block' }] },
     { name: 'heroImage', title: 'Hero Image', type: 'image', options: { hotspot: true } },
+    { name: 'logo', title: 'Site Logo', type: 'image', options: { hotspot: true } },
     { name: 'bibleCoverImage', title: 'Bible Cover Mockup', type: 'image', options: { hotspot: true } },
     { name: 'email', title: 'Contact Email', type: 'string' },
+    { name: 'phone', title: 'Contact Phone Number', type: 'string' },
+    { name: 'publisherName', title: 'Publisher Name', type: 'string' },
+    { name: 'bookingUrl', title: 'Booking / Events URL', type: 'url' },
     { name: 'facebook', title: 'Facebook URL', type: 'url' },
     { name: 'instagram', title: 'Instagram URL', type: 'url' },
     { name: 'youtube', title: 'YouTube URL', type: 'url' },
     { name: 'partnerPageUrl', title: 'Partner / Giving Page URL', type: 'url' },
+    {
+      name: 'navLinks',
+      title: 'Navigation Links',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'label', title: 'Link Label', type: 'string' },
+            { name: 'href', title: 'Link URL', type: 'string' },
+          ],
+        },
+      ],
+    },
+    { name: 'footerQuote', title: 'Footer Quote', type: 'text' },
   ],
 }
