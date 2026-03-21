@@ -3,6 +3,19 @@
 
 pre-commit:
   commands:
+    behind-remote:
+      run: |
+        git fetch --quiet
+        LOCAL=$(git rev-parse @)
+        REMOTE=$(git rev-parse @{u} 2>/dev/null || echo "")
+        if [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ]; then
+          BASE=$(git merge-base @ @{u})
+          if [ "$LOCAL" = "$BASE" ]; then
+            echo "❌ BLOCKED: Your branch is behind the remote. Run 'git pull' before committing."
+            echo "   This prevents overwriting work from other sessions."
+            exit 1
+          fi
+        fi
     biome:
       glob: "*.{js,ts,jsx,tsx,json,css,astro}"
       run: bunx biome check --write --no-errors-on-unmatched {staged_files}
