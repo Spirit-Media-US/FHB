@@ -2,10 +2,21 @@
 import Footer from '../components/Footer.astro';
 import Navbar from '../components/Navbar.astro';
 import Layout from '../layouts/Layout.astro';
+import { sanityClient } from '../lib/sanity';
 import '../styles/global.css';
+
+// Fetch siteSettings for siteName
+const siteSettings = await sanityClient.fetch(`
+  *[_type == "siteSettings"][0] {
+    siteName
+  }
+`);
+
+const siteName = siteSettings?.siteName || "Father's Heart Bible";
+const pageTitle = `404 — Page Not Found · ${siteName}`;
 ---
 
-<Layout title="404 — Page Not Found · Father's Heart Bible">
+<Layout title={pageTitle}>
 	<Navbar />
 	<main class="min-h-screen flex items-center justify-center pt-20" style="background-color: var(--color-cream);">
 		<div class="text-center px-6">

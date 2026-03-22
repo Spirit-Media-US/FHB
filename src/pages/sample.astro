@@ -16,9 +16,16 @@ const pageData = await sanityClient.fetch(`
   }
 `);
 
+// Fetch siteSettings for dynamic titles if not in page content
+const siteSettings = await sanityClient.fetch(`
+  *[_type == "siteSettings"][0] {
+    siteName
+  }
+`);
+
 const {
-  title = 'Preface — Father\'s Heart Bible',
-  metaDescription = 'Read the preface to the Father\'s Heart Bible — why this translation exists and how it reveals the Father\'s heart throughout Scripture.',
+  title = `Preface — ${siteSettings?.siteName || "Father's Heart Bible"}`,
+  metaDescription = `Read the preface to the ${siteSettings?.siteName || "Father's Heart Bible"} — why this translation exists and how it reveals God's heart throughout Scripture.`,
   heroHeadline = 'Preface',
   heroSubheading = 'From the Lead Translator',
   body = []
