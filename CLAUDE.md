@@ -6,7 +6,7 @@ This site: Father's Heart Bible | Repo: github.com/Spirit-Media-US/FHB | Domain:
 
 ## Dev Commands
 
-- `npm run dev` — local preview at localhost:4321
+- `npm run dev` — local preview at localhost:4323
 - `npm run build` — runs `astro check && astro build`
 
 ## Notes
