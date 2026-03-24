@@ -35,3 +35,17 @@ pre-push:
       skip:
         - merge
         - rebase
+    large-files:
+      run: |
+        MAX=5242880
+        for file in $(git diff --cached --name-only); do
+          [ -f "$file" ] || continue
+          SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file" 2>/dev/null)
+          if [ "$SIZE" -gt "$MAX" ]; then
+            echo "❌ BLOCKED: $file is $(($SIZE / 1048576))MB — files over 5MB must go to R2 or Sanity, not git"
+            exit 1
+          fi
+        done
+      skip:
+        - merge
+        - rebase
