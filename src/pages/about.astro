@@ -7,11 +7,20 @@ import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
-const media = await sanityClient.fetch(`
-  *[_type == "siteSettings"][0] { kevinPortraitUrl, bookCoverUrl, communityUrl, donateUrl }
-`);
+const [pageData, media, kevinProfile] = await Promise.all([
+	sanityClient.fetch(`*[_type == "page" && slug == "about"][0] { seoTitle, seoDescription }`),
+	sanityClient.fetch(`*[_type == "siteSettings"][0] { kevinPortraitUrl, communityUrl, donateUrl }`),
+	sanityClient.fetch(
+		`*[_type == "personProfile"] | order(order asc)[0] { portraitUrl, portrait { asset->{ url } } }`,
+	),
+]);
 
-const kevinPortraitUrl = media?.kevinPortraitUrl || '';
+const seoTitle = pageData?.seoTitle || "About Kevin White | Father's Heart Bible";
+const seoDescription =
+	pageData?.seoDescription ||
+	"Learn the story behind the Father's Heart Bible and the vision to reveal God as Father through Scripture.";
+const kevinPortraitUrl =
+	kevinProfile?.portraitUrl || kevinProfile?.portrait?.asset?.url || media?.kevinPortraitUrl || '';
 const communityUrl = media?.communityUrl || '#join';
 const donateUrl = media?.donateUrl || '/partner';
 
@@ -45,8 +54,8 @@ const audience = [
 ---
 
 <Layout
-  title="About Kevin White | Father's Heart Bible"
-  description="Learn the story behind the Father's Heart Bible and the vision to reveal God as Father through Scripture."
+  title={seoTitle}
+  description={seoDescription}
 >
   <Navbar />
   <main class="pt-20">

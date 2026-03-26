@@ -4,8 +4,26 @@ import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
+import { sanityClient } from '../lib/sanity';
+
+// Fetch page SEO and scripture comparisons from Sanity
+const [pageData, sanityComparisons] = await Promise.all([
+	sanityClient.fetch(`*[_type == "page" && slug == "samples"][0] { seoTitle, seoDescription }`),
+	sanityClient.fetch(`*[_type == "scriptureComparison"] | order(order asc) {
+    reference, category, traditional, translationLabel, fhb, note, featured
+  }`),
+]);
+
+const seoTitle = pageData?.seoTitle || "Sample Passages | Father's Heart Bible";
+const seoDescription =
+	pageData?.seoDescription ||
+	"Explore sample passages from the Father's Heart Bible and experience how this new Bible translation reveals God as Father and brings beloved identity into clear view.";
+
+// Helper to get comparisons by category, falling back to hardcoded data if Sanity empty
+const byCategory = (cat: string) => sanityComparisons?.filter((c: any) => c.category === cat) ?? [];
 
 // Scripture comparison data — traditional vs FHB
+// Hardcoded fallbacks — used until Sanity is seeded
 // All strings use double quotes to safely handle apostrophes
 
 const john316 = {
@@ -104,8 +122,8 @@ const synthesis = [
 ---
 
 <Layout
-	title="Sample Passages | Father's Heart Bible"
-	description="Explore sample passages from the Father's Heart Bible and experience how this new Bible translation reveals God as Father and brings beloved identity into clear view."
+	title={seoTitle}
+	description={seoDescription}
 >
 	<Navbar />
 	<main class="pt-24">

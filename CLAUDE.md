@@ -196,6 +196,83 @@ Proceed to Phase 4 (Pages) only after confirming all above is implemented.
 
 ---
 
+---
+
+## Phase 4 — Pages (LOCKED)
+
+All 7 launch pages built and pushed to dev:
+
+| Phase | Route | Status |
+|-------|-------|--------|
+| 4A | `/` | ✅ dev |
+| 4B | `/the-fathers-heart-bible` | ✅ dev |
+| 4C | `/samples` | ✅ dev |
+| 4D | `/download` | ✅ dev |
+| 4E | `/join` | ✅ dev |
+| 4F | `/partner` | ✅ dev |
+| 4G | `/about` | ✅ dev |
+
+---
+
+## Phase 5 — Sanity CMS Wiring (LOCKED)
+
+### What Was Implemented
+
+**Schemas added/updated:**
+- `siteSettings` — expanded with media URLs, SEO defaults, communityUrl, donateUrl, ghlDownloadFormId, footerNavLinks, copyright, ogImage
+- `page` — added hero fields (eyebrow, heading, subheading, CTAs), SEO fields (seoTitle, seoDescription, ogImage, noindex)
+- `scriptureComparison` — added category, translationLabel, expanded preview
+- `resource` — NEW (covers book download: title, description, cover, formHeading, buttonText)
+- `personProfile` — NEW (Kevin's bio, portrait, long story)
+- `faq` — NEW (question, answer, category, order)
+
+**Astro wiring:**
+- All 7 pages fetch `page` document by slug for SEO title/description (with hardcoded fallbacks)
+- `download.astro` fetches featured `resource` document for form copy and cover image
+- `about.astro` fetches `personProfile` for portrait URL
+- `samples.astro` fetches all `scriptureComparison` documents grouped by category
+- `join.astro` uses `communityUrl` field (was `mightyNetworksUrl`)
+- `Layout.astro` supports `noindex` prop → adds `<meta name="robots" content="noindex, nofollow">`
+- `tsconfig.json` excludes `studio/` and `sanity.config.ts` from Astro TS checking
+
+**Netlify webhook:** 3 build hooks already exist in Netlify (from prior setup)
+
+### Kevin's Required Manual Steps
+
+1. **Deploy Sanity Studio schema** (run on Bethel in FHB directory):
+   ```bash
+   cd ~/Sites/FHB
+   bunx sanity login        # authenticate with sanity.io
+   bunx sanity deploy       # push updated schemas to Studio
+   ```
+
+2. **Create a Sanity write API token:**
+   - Go to: https://www.sanity.io/manage/project/rusi1hyi/api
+   - Click "Tokens" → "Add API token"
+   - Name it "FHB Seed / Write" and set permission to "Editor"
+   - Copy the token
+
+3. **Seed initial content:**
+   ```bash
+   SANITY_API_TOKEN=<your-write-token> node scripts/seed-sanity.mjs
+   ```
+   This creates all page SEO docs, Kevin's profile, the resource doc, and all 10 scripture comparisons.
+
+4. **Fill in siteSettings in Sanity Studio** (fathersheartbible.sanity.studio):
+   - `communityUrl` — Mighty Networks community URL
+   - `donateUrl` — giving/donation page URL
+   - `ghlDownloadFormId` — paste GHL form embed ID once created
+   - Media URLs — paste R2 URLs for hero video, book cover, portrait, people photos
+   - Publish the siteSettings document
+
+5. **Verify Sanity → Netlify webhook** is active:
+   - Go to: https://www.sanity.io/manage/project/rusi1hyi/api → Webhooks
+   - Should see a webhook pointing to Netlify build hook URL
+   - Netlify build hook URL: `https://api.netlify.com/build_hooks/69ac55086e54f35b43d2df8c`
+   - If no webhook exists, create one: HTTP POST, URL above, trigger on document publish
+
+---
+
 ## Rules
 
 - All work goes to the **dev** branch — never push directly to main

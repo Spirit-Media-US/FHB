@@ -7,29 +7,36 @@ import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
-// Fetch media from Sanity (optional — page renders without these)
-const media = await sanityClient.fetch(`
-  *[_type == "siteSettings"][0] {
-    heroVideoUrl,
-    heroPosterUrl,
-    bookCoverUrl,
-    peoplePhoto1Url,
-    peoplePhoto2Url,
-    peoplePhoto3Url
-  }
-`);
+// Fetch page content + media from Sanity (all values have hardcoded fallbacks)
+const [pageData, media] = await Promise.all([
+	sanityClient.fetch(`*[_type == "page" && slug == "home"][0] {
+    seoTitle, seoDescription
+  }`),
+	sanityClient.fetch(`*[_type == "siteSettings"][0] {
+    heroVideoUrl, heroPosterUrl, bookCoverUrl,
+    peoplePhoto1Url, peoplePhoto2Url, peoplePhoto3Url,
+    communityUrl
+  }`),
+]);
 
+const seoTitle =
+	pageData?.seoTitle ||
+	"Father's Heart Bible | A New Bible Translation Revealing the Father's Heart";
+const seoDescription =
+	pageData?.seoDescription ||
+	"Discover the Father's Heart Bible, a new Bible translation revealing God as Father and inviting readers into beloved identity. Download the free book and join the movement.";
 const heroVideoSrc = media?.heroVideoUrl || '';
 const heroPosterSrc = media?.heroPosterUrl || '';
 const bookCoverUrl = media?.bookCoverUrl || '';
 const photo1 = media?.peoplePhoto1Url || '';
 const photo2 = media?.peoplePhoto2Url || '';
 const photo3 = media?.peoplePhoto3Url || '';
+const communityUrl = media?.communityUrl || '/join';
 ---
 
 <Layout
-	title="Father's Heart Bible | A New Bible Translation Revealing the Father's Heart"
-	description="Discover the Father's Heart Bible, a new Bible translation revealing God as Father and inviting readers into beloved identity. Download the free book and join the movement."
+	title={seoTitle}
+	description={seoDescription}
 >
 	<Navbar />
 	<main>

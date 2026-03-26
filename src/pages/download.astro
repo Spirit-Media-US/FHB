@@ -7,17 +7,27 @@ import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
-const media = await sanityClient.fetch(`
-  *[_type == "siteSettings"][0] {
-    bookCoverUrl,
-    ghlDownloadFormId
-  }
-`);
+const [pageData, media, resourceData] = await Promise.all([
+	sanityClient.fetch(`*[_type == "page" && slug == "download"][0] { seoTitle, seoDescription }`),
+	sanityClient.fetch(
+		`*[_type == "siteSettings"][0] { bookCoverUrl, ghlDownloadFormId, communityUrl }`,
+	),
+	sanityClient.fetch(`*[_type == "resource" && featured == true] | order(order asc)[0] {
+    title, shortDescription, formHeading, formDescription, buttonText, coverImageUrl
+  }`),
+]);
 
-const bookCoverUrl = media?.bookCoverUrl || '';
-// GHL form ID for the download page — Kevin pastes embed code into FormEmbed slot
-// or sets ghlDownloadFormId in Sanity once form is created in GHL
+const seoTitle = pageData?.seoTitle || "Download the Free Book | Father's Heart Bible";
+const seoDescription =
+	pageData?.seoDescription ||
+	"Download Father's Heart — Beloved Identity, a free chapter from the Father's Heart Bible. Experience how this translation reveals God as a loving Father.";
+const bookCoverUrl = resourceData?.coverImageUrl || media?.bookCoverUrl || '';
 const ghlFormId = media?.ghlDownloadFormId || '';
+const communityUrl = media?.communityUrl || '/join';
+// Resource fields with fallbacks
+const formHeading = resourceData?.formHeading || 'Get Your Free Copy';
+const formDescription =
+	resourceData?.formDescription || 'Enter your name and email to receive the free download.';
 
 const benefits = [
 	{
@@ -62,8 +72,8 @@ const nextSteps = [
 ---
 
 <Layout
-	title="Download Father's Heart → Beloved Identity | Father's Heart Bible"
-	description="Download the free PDF of Father's Heart → Beloved Identity and discover the heart behind the Father's Heart Bible."
+	title={seoTitle}
+	description={seoDescription}
 >
 	<Navbar />
 	<main class="pt-24">

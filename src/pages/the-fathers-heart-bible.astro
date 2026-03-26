@@ -6,13 +6,19 @@ import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
-const media = await sanityClient.fetch(`
-  *[_type == "siteSettings"][0] {
-    bookCoverUrl
-  }
-`);
+const [pageData, media] = await Promise.all([
+	sanityClient.fetch(`*[_type == "page" && slug == "the-fathers-heart-bible"][0] {
+    seoTitle, seoDescription
+  }`),
+	sanityClient.fetch(`*[_type == "siteSettings"][0] { bookCoverUrl, communityUrl }`),
+]);
 
+const seoTitle = pageData?.seoTitle || "What Is the Father's Heart Bible? | Father's Heart Bible";
+const seoDescription =
+	pageData?.seoDescription ||
+	"Learn what the Father's Heart Bible is, why it exists, and how this new Bible translation reveals God as Father where Scripture reveals Him.";
 const bookCoverUrl = media?.bookCoverUrl || '';
+const communityUrl = media?.communityUrl || '/join';
 
 const distinctives = [
 	{
@@ -96,8 +102,8 @@ const shifts = [
 ---
 
 <Layout
-	title="What Is the Father's Heart Bible? | Father's Heart Bible"
-	description="Learn what the Father's Heart Bible is, why it exists, and how this new Bible translation reveals God as Father where Scripture reveals Him."
+	title={seoTitle}
+	description={seoDescription}
 >
 	<Navbar />
 	<main class="pt-24">

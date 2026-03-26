@@ -1,9 +1,23 @@
-import scripture from './scripture'
-import projectUpdate from './projectUpdate'
-import partner from './partner'
-import partnerTier from './partnerTier'
-import page from './page'
-import scriptureComparison from './scriptureComparison'
-import siteSettings from './siteSettings'
+import faq from './faq';
+import page from './page';
+import partner from './partner';
+import partnerTier from './partnerTier';
+import personProfile from './personProfile';
+import projectUpdate from './projectUpdate';
+import resource from './resource';
+import scripture from './scripture';
+import scriptureComparison from './scriptureComparison';
+import siteSettings from './siteSettings';
 
-export const schemaTypes = [scripture, projectUpdate, partner, partnerTier, page, scriptureComparison, siteSettings]
+export const schemaTypes = [
+	siteSettings,
+	page,
+	scriptureComparison,
+	scripture,
+	resource,
+	personProfile,
+	faq,
+	partner,
+	partnerTier,
+	projectUpdate,
+];

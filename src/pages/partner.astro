@@ -6,16 +6,18 @@ import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
-const media = await sanityClient.fetch(`
-  *[_type == "siteSettings"][0] {
-    bookCoverUrl,
-    donateUrl
-  }
-`);
+const [pageData, media] = await Promise.all([
+	sanityClient.fetch(`*[_type == "page" && slug == "partner"][0] { seoTitle, seoDescription }`),
+	sanityClient.fetch(`*[_type == "siteSettings"][0] { bookCoverUrl, donateUrl, communityUrl }`),
+]);
 
+const seoTitle = pageData?.seoTitle || "Partner With Us | Father's Heart Bible";
+const seoDescription =
+	pageData?.seoDescription ||
+	"Partner with the Father's Heart Bible project and help bring this transformational translation to the world. Your support makes a difference.";
 const bookCoverUrl = media?.bookCoverUrl || '';
-// Donation URL — Kevin sets in Sanity (GHL, Stripe, PayPal, etc.)
 const donateUrl = media?.donateUrl || '#donate';
+const communityUrl = media?.communityUrl || '/join';
 
 const whyMatters = [
 	{
@@ -83,8 +85,8 @@ const impactStats = [
 ---
 
 <Layout
-	title="Partner With Us | Father's Heart Bible"
-	description="Partner with the Father's Heart Bible and be part of what the Father is doing through Scripture, publication, and distribution."
+	title={seoTitle}
+	description={seoDescription}
 >
 	<Navbar />
 	<main class="pt-24">

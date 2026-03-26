@@ -6,12 +6,14 @@ interface Props {
 	title: string;
 	description?: string;
 	image?: string;
+	noindex?: boolean;
 }
 
 const {
 	title,
 	description = "A new Bible translation revealing our Father's heart — from Genesis to Revelation.",
 	image,
+	noindex = false,
 } = Astro.props;
 
 // Fetch siteName and ogImage from Sanity
@@ -42,6 +44,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="canonical" href={canonicalURL} />
+		{noindex && <meta name="robots" content="noindex, nofollow" />}
 
 		<!-- Preconnect to Google Fonts -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
