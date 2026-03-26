@@ -1,0 +1,44 @@
+---
+interface Props {
+	formId?: string;
+	headline?: string;
+	body?: string;
+}
+
+const { formId, headline, body } = Astro.props;
+---
+
+<div class="max-w-xl mx-auto">
+	{headline && (
+		<h2
+			class="text-3xl md:text-4xl font-light text-center mb-4"
+			style="font-family: var(--font-serif); color: var(--color-ink);"
+		>
+			{headline}
+		</h2>
+	)}
+	{body && (
+		<p
+			class="text-center mb-8 leading-relaxed"
+			style="font-family: var(--font-sans); color: var(--color-muted);"
+		>
+			{body}
+		</p>
+	)}
+
+	<!-- GHL embed slot — paste embed code here or pass formId -->
+	<div class="ghl-form-wrapper">
+		{formId ? (
+			<!-- GHL iframe embed -->
+			<iframe
+				src={`https://api.leadconnectorhq.com/widget/form/${formId}`}
+				style="width:100%;border:none;overflow:hidden;"
+				scrolling="no"
+				id={`ghl-form-${formId}`}
+				title="Contact Form"
+			></iframe>
+		) : (
+			<slot />
+		)}
+	</div>
+</div>

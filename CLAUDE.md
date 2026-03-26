@@ -144,8 +144,55 @@ src/
 
 - **Phase 1:** LOCKED
 - **Phase 2:** LOCKED
+- **Phase 3:** LOCKED
 
-Proceed to Phase 3 (Theme System) only after confirming all above is implemented.
+Proceed to Phase 4 (Pages) only after confirming all above is implemented.
+
+---
+
+---
+
+## Phase 3 — Theme System (LOCKED)
+
+### Color Tokens (`@theme` in global.css)
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--color-canvas` | `#F7F3EE` | Main page background |
+| `--color-soft` | `#FCFBF8` | Alternate section background |
+| `--color-ink` | `#1C1A17` | Primary text |
+| `--color-muted` | `#5F5A54` | Secondary text, nav links, footer text |
+| `--color-brand` | `#8A5A34` | Primary brand color, CTA background |
+| `--color-brand-dark` | `#6F4528` | Brand hover state |
+| `--color-gold` | `#C9A15D` | Accent lines, hero CTA, footer quote |
+| `--color-hairline` | `#E7DED2` | Borders, dividers |
+| `--color-deep` | `#241B17` | Footer background, dark sections |
+
+### Typography
+
+- `--font-serif`: Cormorant Garamond (headings, scripture, logo)
+- `--font-sans`: Source Sans 3 (body, nav, buttons)
+- Body: 17px mobile / 18px desktop, line-height 1.75
+
+### Components Built in Phase 3
+
+| Component | File | Description |
+|-----------|------|-------------|
+| Navbar | `Navbar.astro` | Sticky, transparent→solid on scroll, one "Download Free" CTA |
+| Footer | `Footer.astro` | bg-deep background, gold scripture quote, muted links |
+| HeroVideo | `HeroVideo.astro` | Autoplay video bg, warm overlay, headline + gold CTA |
+| Section | `Section.astro` | Variants: light, soft, scripture, cta-band, dark |
+| ScriptureBlock | `ScriptureBlock.astro` | Large serif, gold accent lines, centered, spacious |
+| CTASection | `CTASection.astro` | CTA band — brand or dark bg, gold primary button |
+| ImageGrid | `ImageGrid.astro` | Responsive grid — 2/3/4 cols, sm/md/lg gap |
+| FormEmbed | `FormEmbed.astro` | GHL form wrapper — formId prop or slot |
+
+### Phase 3 Rules
+
+- Do NOT build pages in Phase 3 — components only
+- No hardcoded content — all text via props or slots
+- HeroVideo requires R2 video URL — passed via videoSrc prop
+- FormEmbed requires GHL embed code from Kevin
 
 ---
 

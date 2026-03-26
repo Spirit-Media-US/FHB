@@ -1,0 +1,82 @@
+---
+interface Props {
+	videoSrc?: string;
+	posterSrc?: string;
+	headline?: string;
+	subheadline?: string;
+	ctaLabel?: string;
+	ctaHref?: string;
+}
+
+const {
+	videoSrc,
+	posterSrc,
+	headline = "A Translation That Reveals the Father's Heart",
+	subheadline = 'Experience Scripture as it was always meant to be heard — intimate, personal, and alive.',
+	ctaLabel = 'Download Free',
+	ctaHref = '/download',
+} = Astro.props;
+---
+
+<section
+	class="relative flex items-center justify-center overflow-hidden min-h-[420px] md:min-h-[65vh]"
+	style="background-color: var(--color-deep);"
+>
+	<!-- Background video -->
+	{videoSrc && (
+		<video
+			class="absolute inset-0 w-full h-full object-cover"
+			src={videoSrc}
+			poster={posterSrc}
+			autoplay
+			muted
+			loop
+			playsinline
+			aria-hidden="true"
+		/>
+	)}
+
+	<!-- Fallback poster if no video -->
+	{!videoSrc && posterSrc && (
+		<img
+			src={posterSrc}
+			alt=""
+			class="absolute inset-0 w-full h-full object-cover"
+			aria-hidden="true"
+		/>
+	)}
+
+	<!-- Warm dark overlay -->
+	<div
+		class="absolute inset-0"
+		style="background: linear-gradient(to bottom, rgba(36,27,23,0.55) 0%, rgba(36,27,23,0.7) 100%);"
+		aria-hidden="true"
+	></div>
+
+	<!-- Content -->
+	<div class="relative z-10 text-center px-6 max-w-3xl mx-auto">
+		<h1
+			class="text-4xl md:text-6xl font-light leading-tight mb-6"
+			style="font-family: var(--font-serif); color: #fff;"
+		>
+			{headline}
+		</h1>
+		{subheadline && (
+			<p
+				class="text-lg md:text-xl mb-10 leading-relaxed"
+				style="font-family: var(--font-sans); color: rgba(255,255,255,0.8);"
+			>
+				{subheadline}
+			</p>
+		)}
+		<a
+			href={ctaHref}
+			class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+			style="font-family: var(--font-sans); background-color: var(--color-gold); color: var(--color-deep);"
+			onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
+			onmouseout="this.style.backgroundColor='var(--color-gold)'; this.style.color='var(--color-deep)';"
+		>
+			{ctaLabel}
+		</a>
+	</div>
+</section>

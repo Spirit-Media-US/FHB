@@ -1,11 +1,24 @@
 ---
-// ImageGrid — scaffold (Phase 2)
-// Phase 3: Add cols prop, image type, captions, R2/Sanity URLs
 interface Props {
-	cols?: number;
+	cols?: 2 | 3 | 4;
+	gap?: 'sm' | 'md' | 'lg';
 }
-const { cols = 3 } = Astro.props;
+
+const { cols = 3, gap = 'md' } = Astro.props;
+
+const colsMap: Record<number, string> = {
+	2: 'grid-cols-1 sm:grid-cols-2',
+	3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+	4: 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-4',
+};
+
+const gapMap: Record<string, string> = {
+	sm: 'gap-4',
+	md: 'gap-6',
+	lg: 'gap-8',
+};
 ---
-<div class="image-grid">
-  <slot />
+
+<div class={`grid ${colsMap[cols]} ${gapMap[gap]}`}>
+	<slot />
 </div>

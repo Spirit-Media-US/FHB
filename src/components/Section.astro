@@ -1,11 +1,38 @@
 ---
-// Section — scaffold (Phase 2)
-// Phase 3: Add variants (light/dark), padding, max-width props
 interface Props {
 	id?: string;
+	variant?: 'light' | 'soft' | 'scripture' | 'cta-band' | 'dark';
+	class?: string;
 }
-const { id } = Astro.props;
+
+const { id, variant = 'light', class: className } = Astro.props;
+
+const bgMap: Record<string, string> = {
+	light: 'var(--color-canvas)',
+	soft: 'var(--color-soft)',
+	scripture: 'var(--color-soft)',
+	'cta-band': 'var(--color-brand)',
+	dark: 'var(--color-deep)',
+};
+
+const paddingMap: Record<string, string> = {
+	light: 'py-20 md:py-28',
+	soft: 'py-20 md:py-28',
+	scripture: 'py-24 md:py-32',
+	'cta-band': 'py-16 md:py-20',
+	dark: 'py-20 md:py-28',
+};
+
+const bg = bgMap[variant];
+const padding = paddingMap[variant];
 ---
-<section id={id}>
-  <slot />
+
+<section
+	id={id}
+	class={`${padding} ${className ?? ''}`}
+	style={`background-color: ${bg};`}
+>
+	<div class="max-w-6xl mx-auto px-6">
+		<slot />
+	</div>
 </section>
