@@ -18,10 +18,12 @@ const siteSettings = await sanityClient.fetch(`
 const siteName = siteSettings?.siteName || "Father's Heart Bible";
 
 const navLinks: NavLink[] = siteSettings?.navLinks || [
+	{ label: "The Father's Heart Bible", href: '/the-fathers-heart-bible' },
+	{ label: 'Samples', href: '/samples' },
+	{ label: 'Download', href: '/download' },
+	{ label: 'Join the Movement', href: '/join' },
+	{ label: 'Partner With Us', href: '/partner' },
 	{ label: 'About', href: '/about' },
-	{ label: 'Read the Preface', href: '/sample' },
-	{ label: 'Partner', href: '/partner' },
-	{ label: 'Contact', href: '/contact' },
 ];
 
 const currentPath = Astro.url.pathname;

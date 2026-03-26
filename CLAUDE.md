@@ -14,20 +14,140 @@ This site: Father's Heart Bible | Repo: github.com/Spirit-Media-US/FHB | Domain:
 - SSL must cover all four domain variants: fathersheartbible.org, www.fathersheartbible.org, fathersheartbible.com, www.fathersheartbible.com
 - Uses Biome for linting and Lefthook for git hooks
 
-## Status — as of 2026-03-24
+---
 
-### Completed & Live on Main
-- Site live at fathersheartbible.com + fathersheartbible.org (both domains active)
-- Pages: Home (index.astro), 404, Sample
-- Sanity CMS fully wired: all content dynamic via siteSettings (nav, footer, phone, email, social links, OG image)
-- All images served via urlFor() — no hardcoded image URLs
-- Hardcoded content audit passed (A+ grade — all content from Sanity)
-- Git hygiene: Lefthook hooks (block-main-push, large-file blocker, secret scanner), full .gitignore
-- Astro 5 + Tailwind v4
+## FHB SITE BUILD — PHASE 1 & 2 (LOCKED)
 
-### Still Pending
-- Additional pages beyond Home (Bible reading, devotionals, etc.) — scope TBD with Kevin
-- R2 bucket if audio/video assets are needed
+### PHASE 1 — INFRASTRUCTURE (LOCKED)
+
+This project uses the following stack. These rules are mandatory.
+
+**Repositories & Deployment**
+- GitHub organization: Spirit-Media-US
+- Repository contains code only — NO media files
+- Netlify is used for hosting
+- Auto-deploy from main branch
+
+**Domain & Edge**
+- Cloudflare handles: DNS, SSL, CDN, Security
+
+**Media Handling**
+- ALL images, video, and audio must be stored in Cloudflare R2
+- No media assets stored in repo
+- All media referenced via external URLs (R2 or Sanity)
+
+**CMS**
+- Sanity.io is used for content management
+- All editable content must be modeled in Sanity
+- Schemas must be defined before wiring
+
+**Forms / CRM**
+- GoHighLevel (GHL) is used for: forms, lead capture, tagging
+- Do NOT build custom backend form handlers
+
+**Monitoring**
+- UptimeRobot monitors site every 5 minutes
+
+**AI / Build Rules**
+- Claude is used for development assistance
+- This file (CLAUDE.md) must be followed at all times
+
+**Core Constraints**
+- No media in repo
+- Use Tailwind design tokens (no hardcoded colors)
+- Prefer Astro static rendering (minimal JS)
+- Build reusable components only (no duplicated layouts)
+
+---
+
+### PHASE 2 — STRUCTURE (LOCKED)
+
+This phase defines architecture only — NOT design.
+
+**Framework Setup**
+- Astro initialized
+- Tailwind CSS installed
+- Base layout created
+
+**Route Map (Pages)**
+
+| Route | File |
+|-------|------|
+| `/` | index.astro |
+| `/the-fathers-heart-bible` | the-fathers-heart-bible.astro |
+| `/samples` | samples.astro |
+| `/download` | download.astro |
+| `/join` | join.astro |
+| `/partner` | partner.astro |
+| `/about` | about.astro |
+
+**Navigation (Structure Only)**
+
+Top navigation must include:
+- Home
+- The Father's Heart Bible
+- Samples
+- Download
+- Join the Movement
+- Partner With Us
+- About
+
+**Footer (Structure Only)**
+
+Footer must include:
+- All primary navigation links
+- Contact link
+- Privacy Policy
+- Terms
+
+**Layout System**
+- BaseLayout.astro
+- Header component
+- Footer component
+
+No advanced styling at this stage.
+
+**Typography Foundation (Minimal Only)**
+- font-family for headings
+- font-family for body
+- base body size
+
+Do NOT implement full theme system yet.
+
+**Component Placeholders**
+
+Create empty structural components (scaffolds only — no styling beyond layout):
+- Hero
+- Section
+- CTA
+- ScriptureBlock
+- ImageGrid
+
+**File Structure**
+```
+src/
+  pages/
+  layouts/
+  components/
+  styles/
+```
+
+**Build Rules**
+- No page-specific styling yet
+- No color system yet
+- No design polish yet
+- Focus ONLY on structure and architecture
+
+---
+
+### STATUS
+
+- **Phase 1:** LOCKED
+- **Phase 2:** LOCKED
+
+Proceed to Phase 3 (Theme System) only after confirming all above is implemented.
+
+---
 
 ## Rules
 

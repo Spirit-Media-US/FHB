@@ -1,49 +1,22 @@
 ---
+import Footer from '../components/Footer.astro';
+import Hero from '../components/Hero.astro';
+import Navbar from '../components/Navbar.astro';
+// Phase 2 scaffold — Phase 3: Add hero, sections, content
 import Layout from '../layouts/Layout.astro';
+import { sanityClient } from '../lib/sanity';
+
+const siteSettings = await sanityClient.fetch(`
+  *[_type == "siteSettings"][0] { siteName, tagline }
+`);
+const siteName = siteSettings?.siteName || "Father's Heart Bible";
+const tagline = siteSettings?.tagline || "A new translation revealing God's heart as Father.";
 ---
-
-<Layout
-	title="Father's Heart Bible — Coming Soon"
-	description="A new Bible translation revealing our Father's heart — from Genesis to Revelation."
->
-	<main
-		class="min-h-screen flex flex-col items-center justify-center px-6 text-center"
-		style="background: linear-gradient(160deg, var(--color-ink) 0%, var(--color-charcoal) 60%, #4a3f35 100%);"
-	>
-		<!-- Warm glow -->
-		<div
-			class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full pointer-events-none"
-			style="background: radial-gradient(circle, rgba(184,148,79,0.12) 0%, transparent 70%);"
-		></div>
-
-		<div class="relative z-10 max-w-xl mx-auto">
-			<!-- Eyebrow -->
-			<p
-				class="text-xs font-medium tracking-[0.25em] uppercase mb-10"
-				style="font-family: var(--font-sans); color: var(--color-accent-light);"
-			>
-				Coming Soon
-			</p>
-
-			<!-- Site name -->
-			<h1
-				class="text-5xl sm:text-6xl md:text-7xl font-light leading-[1.1] mb-6"
-				style="font-family: var(--font-serif); color: var(--color-cream);"
-			>
-				Father's Heart Bible
-			</h1>
-
-			<!-- Divider -->
-			<div class="w-12 h-px mx-auto mb-8" style="background-color: var(--color-accent);"></div>
-
-			<!-- Tagline -->
-			<p
-				class="text-lg md:text-xl leading-relaxed font-light"
-				style="font-family: var(--font-serif); color: var(--color-stone); font-style: italic;"
-			>
-				A new translation revealing God's heart as Father —<br class="hidden sm:block" />
-				from Genesis to Revelation.
-			</p>
-		</div>
-	</main>
+<Layout title={siteName} description={tagline}>
+  <Navbar />
+  <main class="pt-24">
+    <Hero />
+    <!-- Phase 3: Add sections -->
+  </main>
+  <Footer />
 </Layout>

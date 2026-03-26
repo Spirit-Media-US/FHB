@@ -1,0 +1,13 @@
+---
+// ScriptureBlock — scaffold (Phase 2)
+// Phase 3: Add styling, reference display, translation label
+interface Props {
+	text: string;
+	reference?: string;
+}
+const { text, reference } = Astro.props;
+---
+<blockquote>
+  <p>{text}</p>
+  {reference && <cite>{reference}</cite>}
+</blockquote>

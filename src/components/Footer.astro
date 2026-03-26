@@ -18,13 +18,14 @@ const siteSettings = await sanityClient.fetch(`
 
 const year = new Date().getFullYear();
 const companyName = siteSettings?.siteName || "Father's Heart Bible";
-const publisher = siteSettings?.publisherName || "Spirit Media Inc";
+const publisher = siteSettings?.publisherName || 'Spirit Media Inc';
 const email = siteSettings?.email;
 const phone = siteSettings?.phone;
 const facebook = siteSettings?.facebook;
 const instagram = siteSettings?.instagram;
 const youtube = siteSettings?.youtube;
-const footerQuote = siteSettings?.footerQuote || "I will be their Father, and they will be my sons and daughters.";
+const footerQuote =
+	siteSettings?.footerQuote || 'I will be their Father, and they will be my sons and daughters.';
 ---
 
 <footer style="background-color: var(--color-ink);">
@@ -47,11 +48,16 @@ const footerQuote = siteSettings?.footerQuote || "I will be their Father, and th
 			<!-- Navigation & Contact -->
 			<div class="flex flex-col gap-4">
 				<div class="flex flex-col md:flex-row items-start md:items-center gap-6 text-sm" style="color: var(--color-warm-gray); font-family: var(--font-sans);">
-					<div class="flex gap-4">
+					<div class="flex flex-wrap gap-4">
+						<a href="/the-fathers-heart-bible" class="no-underline transition-colors duration-200 hover:text-[var(--color-stone)]" style="color: var(--color-warm-gray);">The Father's Heart Bible</a>
+						<a href="/samples" class="no-underline transition-colors duration-200 hover:text-[var(--color-stone)]" style="color: var(--color-warm-gray);">Samples</a>
+						<a href="/download" class="no-underline transition-colors duration-200 hover:text-[var(--color-stone)]" style="color: var(--color-warm-gray);">Download</a>
+						<a href="/join" class="no-underline transition-colors duration-200 hover:text-[var(--color-stone)]" style="color: var(--color-warm-gray);">Join the Movement</a>
+						<a href="/partner" class="no-underline transition-colors duration-200 hover:text-[var(--color-stone)]" style="color: var(--color-warm-gray);">Partner With Us</a>
 						<a href="/about" class="no-underline transition-colors duration-200 hover:text-[var(--color-stone)]" style="color: var(--color-warm-gray);">About</a>
-						<a href="/sample" class="no-underline transition-colors duration-200 hover:text-[var(--color-stone)]" style="color: var(--color-warm-gray);">Preface</a>
-						<a href="/partner" class="no-underline transition-colors duration-200 hover:text-[var(--color-stone)]" style="color: var(--color-warm-gray);">Partner</a>
 						<a href="/contact" class="no-underline transition-colors duration-200 hover:text-[var(--color-stone)]" style="color: var(--color-warm-gray);">Contact</a>
+						<a href="/privacy-policy" class="no-underline transition-colors duration-200 hover:text-[var(--color-stone)]" style="color: var(--color-warm-gray);">Privacy Policy</a>
+						<a href="/terms" class="no-underline transition-colors duration-200 hover:text-[var(--color-stone)]" style="color: var(--color-warm-gray);">Terms</a>
 					</div>
 				</div>
 			</div>
