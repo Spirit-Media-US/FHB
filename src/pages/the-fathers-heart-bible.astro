@@ -1,14 +1,609 @@
 ---
 import Footer from '../components/Footer.astro';
 import Navbar from '../components/Navbar.astro';
-// Phase 2 scaffold — Phase 3: Add content
+import ScriptureBlock from '../components/ScriptureBlock.astro';
+import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
+import { sanityClient } from '../lib/sanity';
+
+const media = await sanityClient.fetch(`
+  *[_type == "siteSettings"][0] {
+    bookCoverUrl
+  }
+`);
+
+const bookCoverUrl = media?.bookCoverUrl || '';
+
+const distinctives = [
+	{
+		title: 'Reveals the Father',
+		body: "Wherever Scripture reveals God's fatherly heart — in name, in covenant, in direct address — this translation makes it unmistakable.",
+	},
+	{
+		title: 'Heart-Language',
+		body: 'The warmth, compassion, and affection of God is not softened or hidden. You feel His heart in every passage.',
+	},
+	{
+		title: 'Trinitarian Clarity',
+		body: 'Distinctions between Father, Son, and Spirit are carefully preserved. This translation enriches Trinitarian understanding, not blurs it.',
+	},
+	{
+		title: 'Interpretive Translation',
+		body: 'This is not a loose paraphrase. It is a careful interpretive translation — grounded in the original text, rendered to reveal intention.',
+	},
+	{
+		title: 'Full Canon',
+		body: "From Genesis to Revelation, the Father's voice runs through every book. FHB traces that thread from beginning to end.",
+	},
+	{
+		title: 'Relational, Not Academic',
+		body: 'This Bible reads like an invitation, not a lecture. It was written for encounter, not information.',
+	},
+];
+
+const notItems = [
+	{
+		label: 'Not a paraphrase',
+		body: 'FHB is an interpretive translation — grounded in original texts, not loosely reworded for accessibility.',
+	},
+	{
+		label: 'Not a replacement',
+		body: 'FHB is not claiming to replace other faithful translations. It is a companion that draws out what Scripture has always contained.',
+	},
+	{
+		label: 'Not the only faithful translation',
+		body: 'We hold other translations with respect. FHB exists to add light, not to diminish the work of others.',
+	},
+	{
+		label: 'Not a new theology',
+		body: "The Father's Heart Bible is grounded in historic Christian and Trinitarian belief. It reveals what has always been there.",
+	},
+];
+
+const milestones = [
+	{
+		milestone: 'Full Canon',
+		detail: "Genesis to Revelation — every book translated with the Father's heart in view.",
+	},
+	{
+		milestone: 'Premium Edition',
+		detail: 'A flagship print Bible designed to be held, given, and treasured for a lifetime.',
+	},
+	{
+		milestone: 'Initial Print Run',
+		detail: 'A planned first edition made available to those who have been waiting and partnering.',
+	},
+	{
+		milestone: 'Future Expansion',
+		detail: 'Study editions, audio, and language translations as the movement grows.',
+	},
+];
+
+const audience = [
+	'You have read Scripture for years and sense something is still missing.',
+	'You long for deeper intimacy with God, not just more knowledge about Him.',
+	'You are awakening to your identity as a beloved child of the Father.',
+	'You want to hear His voice — not just His instructions.',
+	'You are hungry for a Bible that feels like an encounter, not a document.',
+	"You want to give someone a Bible that reveals the Father's love clearly.",
+];
+
+const shifts = [
+	{ from: 'Information', to: 'Relationship' },
+	{ from: 'Distance', to: 'Intimacy' },
+	{ from: 'Servant mindset', to: 'Beloved identity' },
+];
 ---
-<Layout title="The Father's Heart Bible" description="About the Father's Heart Bible translation.">
-  <Navbar />
-  <main class="pt-24">
-    <h1>The Father's Heart Bible</h1>
-    <!-- Phase 3: Add content -->
-  </main>
-  <Footer />
+
+<Layout
+	title="What Is the Father's Heart Bible? | Father's Heart Bible"
+	description="Learn what the Father's Heart Bible is, why it exists, and how this new Bible translation reveals God as Father where Scripture reveals Him."
+>
+	<Navbar />
+	<main class="pt-24">
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 1 — PAGE HERO
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
+				<div>
+					<p
+						class="text-xs font-semibold tracking-widest uppercase mb-4"
+						style="font-family: var(--font-sans); color: var(--color-gold);"
+					>
+						About This Translation
+					</p>
+					<h1
+						class="text-4xl md:text-5xl font-light leading-tight mb-6"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						What is the Father's Heart Bible?
+					</h1>
+					<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+						The Father's Heart Bible is a new interpretive English Bible translation that reveals
+						God as Father where Scripture reveals Him — in name, in covenant, in promise, and in
+						heart-language throughout the full canon.
+					</p>
+					<p class="leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+						It was written not only to translate His words, but to make His heart unmistakable to
+						every reader who opens its pages.
+					</p>
+					<div class="flex flex-col sm:flex-row gap-4">
+						<a
+							href="/samples"
+							class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+							style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+							onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+							onmouseout="this.style.backgroundColor='var(--color-brand)'"
+						>
+							Read Sample Passages
+						</a>
+						<a
+							href="/download"
+							class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+							style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
+							onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
+							onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
+						>
+							Download the Free Book
+						</a>
+					</div>
+				</div>
+				<div class="flex justify-center">
+					{bookCoverUrl ? (
+						<img
+							src={bookCoverUrl}
+							alt="The Father's Heart Bible"
+							class="w-56 md:w-72 rounded shadow-xl"
+						/>
+					) : (
+						<div
+							class="w-56 md:w-72 aspect-[2/3] rounded shadow-xl flex items-end justify-center p-8"
+							style="background-color: var(--color-brand);"
+						>
+							<p
+								class="text-center text-lg font-light italic"
+								style="font-family: var(--font-serif); color: rgba(255,255,255,0.9);"
+							>
+								The Father's Heart Bible
+							</p>
+						</div>
+					)}
+				</div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 2 — WHY THIS TRANSLATION EXISTS
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="max-w-2xl mx-auto">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-4"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Why It Exists
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light mb-8"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					Many have read Scripture faithfully — and still never felt like a child of God.
+				</h2>
+				<div class="space-y-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<p class="leading-relaxed">
+						Millions of believers have read the Bible their entire lives. They know the stories,
+						the covenants, the teachings of Jesus. Yet many relate to God not as a beloved child
+						to a loving Father, but as a servant to a distant master.
+					</p>
+					<p class="leading-relaxed">
+						This is not because Scripture says that. It is because something has been lost in
+						translation — the warmth of the Father's voice, the intimacy of His heart, the identity
+						He is always extending to His people.
+					</p>
+					<p class="leading-relaxed">
+						Jesus said it plainly: the destination has always been the Father. Every covenant,
+						every promise, every act of redemption is leading somewhere — to a people who know
+						God not by title, but by relationship.
+					</p>
+					<p class="leading-relaxed">
+						The Father's Heart Bible was written to make that encounter unmistakable.
+					</p>
+				</div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 3 — THE BIG SHIFT
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="scripture">
+			<div class="text-center max-w-3xl mx-auto">
+				<div class="w-10 h-0.5 mx-auto mb-10" style="background-color: var(--color-gold);"></div>
+				<h2
+					class="text-3xl md:text-5xl font-light leading-tight mb-8"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					The destination was never merely forgiveness or heaven. The destination has always been the Father.
+				</h2>
+				<p
+					class="text-lg leading-relaxed mb-12"
+					style="font-family: var(--font-sans); color: var(--color-muted);"
+				>
+					The Father's Heart Bible is built on one conviction: God has always been reaching toward
+					His children, not His servants. And Scripture has always been saying so.
+				</p>
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-left">
+					{shifts.map(({ from, to }) => (
+						<div class="flex flex-col gap-3">
+							<div
+								class="text-sm line-through"
+								style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.5;"
+							>
+								{from}
+							</div>
+							<div class="h-px w-8" style="background-color: var(--color-gold);"></div>
+							<div
+								class="text-lg font-medium"
+								style="font-family: var(--font-serif); color: var(--color-brand);"
+							>
+								{to}
+							</div>
+						</div>
+					))}
+				</div>
+				<div class="w-10 h-0.5 mx-auto mt-10" style="background-color: var(--color-gold);"></div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 4 — WHAT MAKES FHB DIFFERENT
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					What Makes It Different
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					Built to reveal, not just inform.
+				</h2>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+				{distinctives.map(({ title, body }) => (
+					<div
+						class="p-6 rounded"
+						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
+					>
+						<h3
+							class="text-lg font-medium mb-3"
+							style="font-family: var(--font-serif); color: var(--color-ink);"
+						>
+							{title}
+						</h3>
+						<p
+							class="text-sm leading-relaxed"
+							style="font-family: var(--font-sans); color: var(--color-muted);"
+						>
+							{body}
+						</p>
+					</div>
+				))}
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 5 — SAMPLE COMPARISON PREVIEW
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="text-center mb-14">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					See the Difference
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					Hear the Father's voice in Scripture.
+				</h2>
+			</div>
+
+			<div class="space-y-16 max-w-3xl mx-auto">
+
+				<!-- John 3:16 -->
+				<div>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-6 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">John 3:16</p>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
+							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
+							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.05rem;">
+								"For God so loved the world that he gave his one and only Son…"
+							</p>
+						</div>
+						<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
+							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.05rem;">
+								"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that he gave his one and only Son…"
+							</p>
+						</div>
+					</div>
+					<p class="text-sm mt-4 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">One word shifts the entire emotional posture of the reader.</p>
+				</div>
+
+				<div class="h-px w-16 mx-auto" style="background-color: var(--color-hairline);"></div>
+
+				<!-- Joel 2:28-29 -->
+				<div>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-6 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">Joel 2:28–29</p>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
+							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
+							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.05rem;">
+								"I will pour out my Spirit on all people. Your sons and daughters will prophesy…"
+							</p>
+						</div>
+						<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
+							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.05rem;">
+								"I will pour out my Spirit on all my <strong style="font-style: normal; color: var(--color-brand);">beloved sons and daughters</strong>…"
+							</p>
+						</div>
+					</div>
+					<p class="text-sm mt-4 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">Beloved sons and daughters — not simply people. The Father's affection is explicit.</p>
+				</div>
+
+				<div class="h-px w-16 mx-auto" style="background-color: var(--color-hairline);"></div>
+
+				<!-- Zephaniah 3:17 -->
+				<div>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-6 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">Zephaniah 3:17</p>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
+							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
+							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.05rem;">
+								"The Lord your God is with you, the Mighty Warrior who saves. He will take great delight in you…"
+							</p>
+						</div>
+						<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
+							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.05rem;">
+								"Your <strong style="font-style: normal; color: var(--color-brand);">Father</strong> is in your midst — the Mighty One who saves. He will rejoice over you with gladness, quiet you with His love…"
+							</p>
+						</div>
+					</div>
+					<p class="text-sm mt-4 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">A Father who rejoices over you — not a God who merely tolerates you.</p>
+				</div>
+
+			</div>
+
+			<div class="text-center mt-14">
+				<a
+					href="/samples"
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+					onmouseout="this.style.backgroundColor='var(--color-brand)'"
+				>
+					Read All Sample Passages
+				</a>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 6 — WHAT FHB IS NOT
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-start">
+				<div>
+					<p
+						class="text-xs font-semibold tracking-widest uppercase mb-4"
+						style="font-family: var(--font-sans); color: var(--color-gold);"
+					>
+						Clarity
+					</p>
+					<h2
+						class="text-3xl md:text-4xl font-light mb-6"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						What the Father's Heart Bible is not.
+					</h2>
+					<p class="leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						We want readers to hold this translation with confidence. Here is what FHB is not, so
+						you can pick it up knowing exactly what you have.
+					</p>
+				</div>
+				<div class="space-y-6">
+					{notItems.map(({ label, body }) => (
+						<div class="flex gap-4">
+							<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
+							<div>
+								<p class="font-semibold mb-1" style="font-family: var(--font-sans); color: var(--color-ink);">{label}</p>
+								<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{body}</p>
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 7 — WHAT IS COMING
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					The Road Ahead
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					A serious publishing project — built for the long haul.
+				</h2>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
+				{milestones.map(({ milestone, detail }) => (
+					<div class="p-6 rounded text-center" style="border: 1px solid var(--color-hairline);">
+						<div class="w-8 h-0.5 mx-auto mb-4" style="background-color: var(--color-gold);"></div>
+						<h3 class="text-lg font-medium mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">{milestone}</h3>
+						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{detail}</p>
+					</div>
+				))}
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 8 — WHO THIS IS FOR
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Is This For You?
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					This Bible was written for you — if you recognize yourself here.
+				</h2>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+				{audience.map((statement) => (
+					<div
+						class="flex gap-4 items-start p-5 rounded"
+						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
+					>
+						<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
+						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{statement}</p>
+					</div>
+				))}
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 9 — DOWNLOAD CTA
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
+				<div class="flex justify-center">
+					{bookCoverUrl ? (
+						<img
+							src={bookCoverUrl}
+							alt="Father's Heart → Beloved Identity — free PDF"
+							class="w-52 md:w-64 rounded shadow-xl"
+						/>
+					) : (
+						<div
+							class="w-52 md:w-64 aspect-[2/3] rounded shadow-xl flex items-end justify-center p-6"
+							style="background-color: var(--color-brand);"
+						>
+							<p class="text-center text-base font-light italic" style="font-family: var(--font-serif); color: rgba(255,255,255,0.9);">
+								Father's Heart →<br />Beloved Identity
+							</p>
+						</div>
+					)}
+				</div>
+				<div>
+					<p
+						class="text-xs font-semibold tracking-widest uppercase mb-4"
+						style="font-family: var(--font-sans); color: var(--color-gold);"
+					>
+						Your Best Next Step
+					</p>
+					<h2
+						class="text-3xl md:text-4xl font-light mb-4"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						Start with the free book.
+					</h2>
+					<p class="leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+						<em>Father's Heart → Beloved Identity</em> is a free PDF that opens the door into
+						the heart behind this translation. Concise, accessible, and designed to shift how
+						you read every page of Scripture.
+					</p>
+					<p class="leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+						No cost. No strings. Just an invitation to encounter the Father.
+					</p>
+					<a
+						href="/download"
+						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+						onmouseout="this.style.backgroundColor='var(--color-brand)'"
+					>
+						Download the Free Book
+					</a>
+				</div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 10 — FINAL CTA BAND
+		     ═══════════════════════════════════════════════════════════ -->
+		<section class="py-16 md:py-20" style="background-color: var(--color-deep);">
+			<div class="max-w-3xl mx-auto px-6 text-center">
+				<div class="w-10 h-0.5 mx-auto mb-8" style="background-color: var(--color-gold);"></div>
+				<p
+					class="text-xl italic mb-10"
+					style="font-family: var(--font-serif); color: rgba(255,255,255,0.8);"
+				>
+					The Father has been speaking all along. Come and hear Him.
+				</p>
+				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+					<a
+						href="/samples"
+						class="inline-flex items-center px-7 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+						style="font-family: var(--font-sans); background-color: var(--color-gold); color: var(--color-deep);"
+						onmouseover="this.style.filter='brightness(1.08)'"
+						onmouseout="this.style.filter='none'"
+					>
+						Read Sample Passages
+					</a>
+					<a
+						href="/download"
+						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
+						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
+						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
+					>
+						Download the Free Book
+					</a>
+					<a
+						href="/join"
+						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
+						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
+						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
+					>
+						Join the Movement
+					</a>
+				</div>
+			</div>
+		</section>
+
+	</main>
+	<Footer />
 </Layout>
