@@ -10,7 +10,10 @@ import { sanityClient } from '../lib/sanity';
 // Fetch page content + media from Sanity (all values have hardcoded fallbacks)
 const [pageData, media] = await Promise.all([
 	sanityClient.fetch(`*[_type == "page" && slug == "home"][0] {
-    seoTitle, seoDescription
+    seoTitle, seoDescription,
+    heroHeading, heroSubheading,
+    heroPrimaryCtaLabel, heroPrimaryCtaHref,
+    heroSecondaryCtaLabel, heroSecondaryCtaHref
   }`),
 	sanityClient.fetch(`*[_type == "siteSettings"][0] {
     heroVideoUrl, heroPosterUrl, bookCoverUrl,
@@ -24,7 +27,17 @@ const seoTitle =
 	"Father's Heart Bible | A New Bible Translation Revealing the Father's Heart";
 const seoDescription =
 	pageData?.seoDescription ||
-	"Discover the Father's Heart Bible, a new Bible translation revealing God as Father and inviting readers into beloved identity. Download the free book and join the movement.";
+	"Discover the Father's Heart Bible, a new Bible translation revealing God as Father where Scripture reveals Him. Download the free book, explore sample passages, join the movement, and be part of what the Father is doing.";
+const heroHeading =
+	pageData?.heroHeading ||
+	'You were never meant to relate to God as a servant\u2026 but as a beloved child.';
+const heroSubheading =
+	pageData?.heroSubheading ||
+	'The Father\u2019s Heart Bible reveals what Scripture has always been showing: the destination was never merely forgiveness or heaven. The destination has always been the Father.';
+const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Download the Free Book';
+const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '/download';
+const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Already have it? Start here';
+const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/join';
 const heroVideoSrc = media?.heroVideoUrl || '';
 const heroPosterSrc = media?.heroPosterUrl || '';
 const bookCoverUrl = media?.bookCoverUrl || '';
@@ -79,32 +92,32 @@ const communityUrl = media?.communityUrl || '/join';
 					class="text-4xl md:text-6xl font-light leading-tight mb-6"
 					style="font-family: var(--font-serif); color: #fff;"
 				>
-					You were never meant to relate to God as a servant, but as a beloved child.
+					{heroHeading}
 				</h1>
 				<p
 					class="text-lg md:text-xl mb-10 leading-relaxed"
 					style="font-family: var(--font-sans); color: rgba(255,255,255,0.8);"
 				>
-					A new Bible translation revealing the Father's heart — from Genesis to Revelation.
+					{heroSubheading}
 				</p>
 				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
 					<a
-						href="/download"
+						href={heroPrimaryCtaHref}
 						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
 						style="font-family: var(--font-sans); background-color: var(--color-gold); color: var(--color-deep);"
 						onmouseover="this.style.filter='brightness(1.08)'"
 						onmouseout="this.style.filter='none'"
 					>
-						Download the Free Book
+						{heroPrimaryCtaLabel}
 					</a>
 					<a
-						href="/the-fathers-heart-bible"
+						href={heroSecondaryCtaHref}
 						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline rounded border transition-all duration-200"
 						style="font-family: var(--font-sans); color: rgba(255,255,255,0.9); border-color: rgba(255,255,255,0.35);"
 						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
 						onmouseout="this.style.borderColor='rgba(255,255,255,0.35)'"
 					>
-						Already have it? Start here
+						{heroSecondaryCtaLabel}
 					</a>
 				</div>
 			</div>
@@ -123,12 +136,21 @@ const communityUrl = media?.communityUrl || '/join';
 					The destination has always been the Father.
 				</h2>
 				<p
+					class="text-lg leading-relaxed mb-6"
+					style="font-family: var(--font-sans); color: var(--color-muted);"
+				>
+					For over forty years, many believers have read the Bible faithfully and yet related to God
+					more as a servant to a master than as a beloved son or daughter to a loving Father. That
+					distance is not always obvious at first. It can hide beneath sincere devotion, sound
+					doctrine, years of ministry, and disciplined prayer.
+				</p>
+				<p
 					class="text-lg leading-relaxed"
 					style="font-family: var(--font-sans); color: var(--color-muted);"
 				>
-					Every covenant, every prophecy, every promise — all of it has been leading to one destination:
-					a people who know God not as a distant lord, but as a loving Father. The Father's Heart Bible
-					was written to make that reunion unmistakably clear.
+					The message of Scripture has always been moving toward something deeper. Not merely
+					forgiveness. Not merely heaven. Not merely religious correctness. The destination has
+					always been the Father.
 				</p>
 			</div>
 		</Section>
@@ -197,8 +219,8 @@ const communityUrl = media?.communityUrl || '/join';
 							class="text-xl md:text-2xl italic font-light leading-relaxed"
 							style="font-family: var(--font-serif); color: var(--color-ink);"
 						>
-							"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that he gave his one and only Son, that whoever
-							believes in him shall not perish but have eternal life."
+							"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that He gave His one and only Son, so that everyone
+							who trusts in Him would not be lost, but would live in the life of the age to come."
 						</p>
 						<footer class="mt-4">
 							<cite
@@ -216,8 +238,9 @@ const communityUrl = media?.communityUrl || '/join';
 				class="text-center mt-12 text-base leading-relaxed max-w-xl mx-auto"
 				style="font-family: var(--font-sans); color: var(--color-muted);"
 			>
-				One word changes everything. The Father's Heart Bible reveals what has always been there —
-				the heart behind the name.
+				In this passage, the One who loves and gives the Son is the Father. The Father&rsquo;s Heart
+				Bible makes that explicit, helping readers hear this verse not as the action of a distant
+				supreme being, but as the giving love of the Father Himself.
 			</p>
 		</Section>
 
@@ -268,9 +291,11 @@ const communityUrl = media?.communityUrl || '/join';
 						class="leading-relaxed mb-4"
 						style="font-family: var(--font-sans); color: var(--color-muted);"
 					>
-						The Father's Heart Bible is a new interpretive English translation that restores God's
-						identity as Father throughout Scripture. Everywhere the text reveals His fatherly heart —
-						in name, in covenant, in promise — this translation makes it unmistakable.
+						The Father&rsquo;s Heart Bible is a new interpretive English translation that seeks to reveal
+						God as Father where Scripture reveals Him. It is grounded in the conviction that from
+						Genesis to Revelation, the Bible tells one story: a Father creating children in His
+						image, pursuing them when they wander, and restoring them to Himself through His Son by
+						His Spirit.
 					</p>
 					<p
 						class="leading-relaxed mb-8"
@@ -309,14 +334,20 @@ const communityUrl = media?.communityUrl || '/join';
 		<Section variant="dark">
 			<div class="max-w-2xl mx-auto space-y-16">
 				<ScriptureBlock
-					text="Return to your Father with all your heart — for your Father is gracious and compassionate, slow to anger and abounding in love."
-					reference="Joel 2:12–13"
+					text="Tear open your hearts\u2026 return to your Father, for He is gracious and His compassion runs deep, He is slow to anger and overflowing with faithful love."
+					reference="Joel 2:13"
 					translation="Father's Heart Bible"
 				/>
 				<div class="w-px h-12 mx-auto" style="background-color: var(--color-gold); opacity: 0.3;"></div>
 				<ScriptureBlock
-					text="I will pour out my Spirit on all my beloved sons and daughters — even on my servants, both men and women."
-					reference="Joel 2:28–29"
+					text="Then our Father\u2019s heart went out for His land, and He had deep compassion on His children."
+					reference="Joel 2:18"
+					translation="Father's Heart Bible"
+				/>
+				<div class="w-px h-12 mx-auto" style="background-color: var(--color-gold); opacity: 0.3;"></div>
+				<ScriptureBlock
+					text="I will pour out My Spirit on all My beloved sons and daughters."
+					reference="Joel 2:28"
 					translation="Father's Heart Bible"
 				/>
 			</div>
@@ -346,15 +377,18 @@ const communityUrl = media?.communityUrl || '/join';
 						class="leading-relaxed mb-4"
 						style="font-family: var(--font-sans); color: var(--color-muted);"
 					>
-						This free PDF is your doorway into the heart behind the Father's Heart Bible.
-						Concise, accessible, and identity-shaping — it introduces you to the Father's voice
-						in Scripture and the journey ahead.
+						The best doorway into this message is the free book, Father&rsquo;s Heart &rarr; Beloved
+						Identity. This short, powerful resource was written to help readers understand the heart
+						behind the Father&rsquo;s Heart Bible in a simple and deeply personal way. It journeys
+						through Scripture to reveal what the Bible has always been declaring: God is Father, and
+						you are His beloved.
 					</p>
 					<p
 						class="leading-relaxed mb-8"
 						style="font-family: var(--font-sans); color: var(--color-muted);"
 					>
-						No cost. No strings. Just an invitation.
+						Inside, readers will discover why so many sincere believers still live with subtle distance,
+						striving, and uncertainty&mdash;and why the Father is inviting them into something better.
 					</p>
 					<a
 						href="/download"
@@ -469,9 +503,12 @@ const communityUrl = media?.communityUrl || '/join';
 					class="text-lg leading-relaxed mb-10"
 					style="font-family: var(--font-sans); color: var(--color-muted);"
 				>
-					There is a global awakening happening — a generation rediscovering their identity
-					as beloved sons and daughters. Hear His voice. Stand in prayer. Join what
-					the Father is building.
+					Around the world, people are awakening to the reality that God is not only to be
+					obeyed&mdash;He is also to be known as Father. Some are coming into this realization after
+					decades of faithful Christianity. Others are receiving it early. Still others are just
+					beginning to search for language around intimacy, identity, sonship, and the Father&rsquo;s
+					heart. The Father&rsquo;s Heart Movement is a place for those people to gather, grow,
+					pray, and participate.
 				</p>
 				<a
 					href="/join"
@@ -507,9 +544,11 @@ const communityUrl = media?.communityUrl || '/join';
 					class="text-lg leading-relaxed mb-10"
 					style="font-family: var(--font-sans); color: var(--color-muted);"
 				>
-					Your partnership makes it possible to publish and distribute this translation
-					into the hands of those who need to hear it. This is not a transaction — it is
-					participation in a movement.
+					The Father&rsquo;s Heart Bible is moving toward publication. Translation, editing,
+					production, and distribution all require support. If this message resonates with
+					you&mdash;if it feels timely, true, and needed&mdash;you can help bring it to others.
+					This is not support for a project. It is participation in what the Father appears to be
+					unfolding.
 				</p>
 				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
 					<a

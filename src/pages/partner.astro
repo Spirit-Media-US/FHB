@@ -7,7 +7,11 @@ import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
 const [pageData, media] = await Promise.all([
-	sanityClient.fetch(`*[_type == "page" && slug == "partner"][0] { seoTitle, seoDescription }`),
+	sanityClient.fetch(`*[_type == "page" && slug == "partner"][0] {
+    seoTitle, seoDescription,
+    heroHeading, heroSubheading,
+    heroPrimaryCtaLabel, heroPrimaryCtaHref
+  }`),
 	sanityClient.fetch(`*[_type == "siteSettings"][0] { bookCoverUrl, donateUrl, communityUrl }`),
 ]);
 
@@ -15,6 +19,10 @@ const seoTitle = pageData?.seoTitle || "Partner With Us | Father's Heart Bible";
 const seoDescription =
 	pageData?.seoDescription ||
 	"Partner with the Father's Heart Bible project and help bring this transformational translation to the world. Your support makes a difference.";
+const heroHeading = pageData?.heroHeading || 'Partner With Us';
+const heroSubheading = pageData?.heroSubheading || 'Be part of what the Father is doing.';
+const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Donate Now';
+const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '#donate';
 const bookCoverUrl = media?.bookCoverUrl || '';
 const donateUrl = media?.donateUrl || '#donate';
 const communityUrl = media?.communityUrl || '/join';
@@ -107,7 +115,7 @@ const impactStats = [
 						class="text-4xl md:text-5xl font-light leading-tight mb-6"
 						style="font-family: var(--font-serif); color: var(--color-ink);"
 					>
-						Be part of what the Father is doing.
+						{heroSubheading}
 					</h1>
 					<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
 						The Father's Heart Bible is being prepared for publication. Your support helps complete,
@@ -126,7 +134,7 @@ const impactStats = [
 						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 						onmouseout="this.style.backgroundColor='var(--color-brand)'"
 					>
-						Donate Now
+						{heroPrimaryCtaLabel}
 					</a>
 				</div>
 				<div class="flex justify-center">

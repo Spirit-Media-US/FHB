@@ -8,7 +8,11 @@ import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
 const [pageData, media, kevinProfile] = await Promise.all([
-	sanityClient.fetch(`*[_type == "page" && slug == "about"][0] { seoTitle, seoDescription }`),
+	sanityClient.fetch(`*[_type == "page" && slug == "about"][0] {
+    seoTitle, seoDescription,
+    heroHeading, heroSubheading,
+    heroPrimaryCtaLabel, heroPrimaryCtaHref
+  }`),
 	sanityClient.fetch(`*[_type == "siteSettings"][0] { kevinPortraitUrl, communityUrl, donateUrl }`),
 	sanityClient.fetch(
 		`*[_type == "personProfile"] | order(order asc)[0] { portraitUrl, portrait { asset->{ url } } }`,
@@ -19,6 +23,12 @@ const seoTitle = pageData?.seoTitle || "About Kevin White | Father's Heart Bible
 const seoDescription =
 	pageData?.seoDescription ||
 	"Learn the story behind the Father's Heart Bible and the vision to reveal God as Father through Scripture.";
+const heroHeading = pageData?.heroHeading || 'The story behind the Father’s Heart Bible';
+const heroSubheading =
+	pageData?.heroSubheading ||
+	'The Father’s Heart Bible was not born from novelty. It was born from a long journey through Scripture, ministry, longing, and awakening.';
+const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Download the Free Book';
+const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '/download';
 const kevinPortraitUrl =
 	kevinProfile?.portraitUrl || kevinProfile?.portrait?.asset?.url || media?.kevinPortraitUrl || '';
 const communityUrl = media?.communityUrl || '#join';
@@ -65,20 +75,19 @@ const audience = [
       <div class="max-w-3xl mx-auto text-center py-12 md:py-20">
         <p class="font-sans text-sm uppercase tracking-widest mb-4" style="color: var(--color-gold);">About</p>
         <h1 class="font-serif text-4xl md:text-6xl mb-6" style="color: var(--color-ink);">
-          The Story Behind the Father's Heart Bible
+          {heroHeading}
         </h1>
         <p class="font-sans text-lg md:text-xl mb-10 max-w-2xl mx-auto" style="color: var(--color-muted);">
-          The Father's Heart Bible began not as a publishing project, but as a personal awakening — a journey from
-          knowing about God to knowing Him as Father.
+          {heroSubheading}
         </p>
         <a
-          href="/download"
+          href={heroPrimaryCtaHref}
           class="inline-block font-sans font-semibold text-base px-8 py-4 rounded-sm transition-colors"
           style="background-color: var(--color-brand); color: #fff;"
           onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
           onmouseout="this.style.backgroundColor='var(--color-brand)'"
         >
-          Download the Free Book
+          {heroPrimaryCtaLabel}
         </a>
       </div>
 
@@ -104,22 +113,21 @@ const audience = [
 
         <div class="font-sans space-y-5 text-base md:text-lg" style="color: var(--color-muted); line-height: 1.85;">
           <p>
-            For decades, Kevin White read Scripture faithfully. He studied it, taught it, and built his life around it.
-            But for most of those years, he related to God the way many believers do — as a servant to a master. He knew
-            the doctrines. He believed the right things. And yet something felt distant.
+            For over forty years, Kevin White read the Bible faithfully. He loved Scripture, honored Jesus, and sought
+            to walk with God. But through much of that journey, he related to God more as a servant to a master than
+            as a beloved son to a Father.
           </p>
           <p>
-            That began to change when Kevin encountered what had always been present in the biblical text but had not yet
-            become real in his heart: the image of God as Father.
+            That shift did not happen all at once. It came through study, prayer, revelation, and the growing realization
+            that Jesus did not merely come to get people to heaven. He came to bring them to the Father.
           </p>
           <p>
-            It was not a new idea. It was an ancient one — woven through the Law, the Psalms, the Prophets, and
-            unmistakably central to the message of Jesus. But somewhere along the way, the relational heart of those
-            passages had been muted. The language felt formal. The distance felt normal.
+            Once that was seen, everything began to change. Passages that had long felt familiar began to open in new ways.
+            Scripture no longer read primarily as a system of truth to master or a command to perform. It began to read
+            like the story of a Father restoring His children to Himself.
           </p>
           <p>
-            The awakening Kevin experienced was not theological novelty. It was a return — to what Scripture had always
-            said, seen now with new eyes.
+            The Father&rsquo;s Heart Bible was born out of that realization.
           </p>
         </div>
       </div>
@@ -135,21 +143,16 @@ const audience = [
 
         <div class="font-sans space-y-5 text-base md:text-lg" style="color: var(--color-muted); line-height: 1.85;">
           <p>
-            Kevin began to wonder how many other believers were living the same way he had — faithful, sincere, and yet
-            somehow at arm's length from the God they were trying to serve.
+            The Father&rsquo;s Heart Bible exists because Kevin became convinced that many other believers were living
+            with the same gap he had known for years.
           </p>
           <p>
-            The relational dimension of Scripture is not hidden. It is not reserved for mystics or scholars. It is
-            present on almost every page. But the way we translate and read can either open that door or quietly keep it
-            closed.
+            They loved God. They served faithfully. They believed sincerely. But they often did not know how to rest in
+            the Father&rsquo;s heart. They read the Bible as true, but not always as tender. They heard salvation
+            clearly, but not always sonship. They knew doctrine, but not always belonging.
           </p>
           <p>
-            The Father's Heart Bible is an attempt to make that door easier to walk through — to bring the warmth, the
-            closeness, and the identity that God offers into clearer view, without adding to Scripture or departing from
-            it.
-          </p>
-          <p>
-            The goal is not correction. It is invitation.
+            The desire behind this project is simple: to help others see what Scripture has always been revealing.
           </p>
         </div>
       </div>

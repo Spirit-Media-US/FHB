@@ -2,7 +2,7 @@
  * populate-content.mjs
  *
  * Phase 5A: Populate launch content into Sanity.
- * Creates/updates all documents needed for a full visual review.
+ * Creates/updates all documents with approved spec copy.
  *
  * Run from ~/Sites/FHB:
  *   node scripts/populate-content.mjs
@@ -59,10 +59,10 @@ async function patch(id, fields) {
 
 const siteSettingsPatch = {
 	siteName: "Father's Heart Bible",
-	tagline: 'A New Bible Translation Revealing the Father\'s Heart',
-	seoTitle: "Father's Heart Bible | Revealing the Father's Heart Through Scripture",
+	tagline: "A New Bible Translation Revealing the Father's Heart",
+	seoTitle: "Father's Heart Bible | A New Bible Translation Revealing the Father's Heart",
 	seoDescription:
-		"A new Bible translation that makes God's fatherly heart unmistakable from Genesis to Revelation. Download the free book and join the movement.",
+		"Discover the Father's Heart Bible, a new Bible translation revealing God as Father where Scripture reveals Him. Download the free book, explore sample passages, join the movement, and be part of what the Father is doing.",
 	translatorName: 'Kevin White',
 	publisherName: "Father's Heart Bible LLC",
 	copyright: "Father's Heart Bible LLC. All rights reserved.",
@@ -102,14 +102,14 @@ const pages = [
 		title: 'Homepage',
 		seoTitle: "Father's Heart Bible | A New Bible Translation Revealing the Father's Heart",
 		seoDescription:
-			"Discover the Father's Heart Bible, a new Bible translation revealing God as Father and inviting readers into beloved identity. Download the free book and join the movement.",
-		heroHeading: "You were never meant to relate to God as a servant, but as a beloved child.",
+			"Discover the Father's Heart Bible, a new Bible translation revealing God as Father where Scripture reveals Him. Download the free book, explore sample passages, join the movement, and be part of what the Father is doing.",
+		heroHeading: "You were never meant to relate to God as a servant\u2026 but as a beloved child.",
 		heroSubheading:
-			"A new Bible translation revealing the Father's heart — from Genesis to Revelation.",
+			"The Father\u2019s Heart Bible reveals what Scripture has always been showing: the destination was never merely forgiveness or heaven. The destination has always been the Father.",
 		heroPrimaryCtaLabel: 'Download the Free Book',
 		heroPrimaryCtaHref: '/download',
-		heroSecondaryCtaLabel: 'Read Sample Passages',
-		heroSecondaryCtaHref: '/samples',
+		heroSecondaryCtaLabel: 'Already have it? Start here',
+		heroSecondaryCtaHref: '/join',
 	},
 	{
 		_id: 'page-the-fathers-heart-bible',
@@ -118,15 +118,14 @@ const pages = [
 		title: "The Father's Heart Bible",
 		seoTitle: "What Is the Father's Heart Bible? | Father's Heart Bible",
 		seoDescription:
-			"Learn what the Father's Heart Bible is, why it exists, and how this new Bible translation reveals God as Father where Scripture reveals Him.",
-		heroEyebrow: "What Is the Father's Heart Bible?",
-		heroHeading: 'A Translation That Reveals What Was Always True',
+			"Learn what the Father\u2019s Heart Bible is, why it exists, and how this new Bible translation reveals God as Father where Scripture reveals Him.",
+		heroHeading: "What is the Father\u2019s Heart Bible?",
 		heroSubheading:
-			"The Father's Heart Bible is an interpretive English translation that makes God's fatherly heart unmistakable — where Scripture itself reveals it.",
-		heroPrimaryCtaLabel: 'Download the Free Book',
-		heroPrimaryCtaHref: '/download',
-		heroSecondaryCtaLabel: 'Read Sample Passages',
-		heroSecondaryCtaHref: '/samples',
+			"The Father\u2019s Heart Bible is a new interpretive English Bible translation that reveals God as Father where Scripture reveals Him\u2014and helps readers encounter not only His name, but His heart.",
+		heroPrimaryCtaLabel: 'Read Sample Passages',
+		heroPrimaryCtaHref: '/samples',
+		heroSecondaryCtaLabel: 'Download the Free Book',
+		heroSecondaryCtaHref: '/download',
 	},
 	{
 		_id: 'page-samples',
@@ -135,44 +134,38 @@ const pages = [
 		title: 'Sample Passages',
 		seoTitle: "Sample Passages | Father's Heart Bible",
 		seoDescription:
-			"Explore sample passages from the Father's Heart Bible and experience how this new Bible translation reveals God as Father and brings beloved identity into clear view.",
-		heroEyebrow: 'Sample Passages',
-		heroHeading: 'Experience the difference.',
-		heroSubheading:
-			"Read side-by-side comparisons and let Scripture speak for itself. These are not new words — they are the same Word, with the Father's heart made clear.",
+			"Explore sample passages from the Father\u2019s Heart Bible and experience how this new Bible translation reveals God as Father and brings beloved identity into clear view.",
+		heroHeading: 'Sample Passages',
+		heroSubheading: 'Experience how Scripture reads when the Father is more clearly revealed.',
 		heroPrimaryCtaLabel: 'Download the Free Book',
 		heroPrimaryCtaHref: '/download',
+		heroSecondaryCtaLabel: 'Join the Movement',
+		heroSecondaryCtaHref: '/join',
 	},
 	{
 		_id: 'page-download',
 		_type: 'page',
 		slug: 'download',
 		title: 'Download',
-		seoTitle: "Download the Free Book | Father's Heart Bible",
+		seoTitle: "Download Father\u2019s Heart \u2192 Beloved Identity | Father's Heart Bible",
 		seoDescription:
-			"Download Father's Heart — Beloved Identity, a free chapter from the Father's Heart Bible. Experience how this translation reveals God as a loving Father.",
-		heroEyebrow: 'Free Download',
-		heroHeading: 'Start Here.',
-		heroSubheading:
-			"Father's Heart → Beloved Identity is your free introduction to a translation that changes how you read Scripture — and how you understand who you are.",
-		heroPrimaryCtaLabel: 'Download Now',
+			"Download the free PDF of Father\u2019s Heart \u2192 Beloved Identity and discover the heart behind the Father\u2019s Heart Bible.",
+		heroHeading: 'Download the Free Book',
+		heroSubheading: "Father\u2019s Heart \u2192 Beloved Identity",
+		heroPrimaryCtaLabel: 'Download the Free Book',
 		heroPrimaryCtaHref: '#form',
-		heroSecondaryCtaLabel: 'Read Sample Passages',
-		heroSecondaryCtaHref: '/samples',
 	},
 	{
 		_id: 'page-join',
 		_type: 'page',
 		slug: 'join',
 		title: 'Join the Movement',
-		seoTitle: "Join the Father's Heart Movement | Father's Heart Bible",
+		seoTitle: "Join the Father\u2019s Heart Movement | Father's Heart Bible",
 		seoDescription:
-			"Join a growing community of believers discovering God as Father through the Father's Heart Bible. Connect, grow, and belong.",
-		heroEyebrow: 'Join the Movement',
-		heroHeading: 'You Are Not Meant to Walk This Alone.',
-		heroSubheading:
-			"The Father's Heart Movement is a growing community of believers discovering what it means to live as beloved children — not servants.",
-		heroPrimaryCtaLabel: 'Join the Community',
+			"Join the Father\u2019s Heart Movement to grow in beloved identity, hear His voice, pray, and take part in publishing the Father\u2019s Heart Bible to the nations.",
+		heroHeading: "Join the Father\u2019s Heart Movement",
+		heroSubheading: "Be part of what the Father is doing.",
+		heroPrimaryCtaLabel: 'Join the Movement',
 		heroPrimaryCtaHref: '#join',
 		heroSecondaryCtaLabel: 'Download the Free Book',
 		heroSecondaryCtaHref: '/download',
@@ -184,11 +177,9 @@ const pages = [
 		title: 'Partner With Us',
 		seoTitle: "Partner With Us | Father's Heart Bible",
 		seoDescription:
-			"Partner with the Father's Heart Bible project and help bring this transformational translation to the world. Your support makes a difference.",
-		heroEyebrow: 'Partner With Us',
-		heroHeading: 'Be Part of What the Father Is Doing.',
-		heroSubheading:
-			"This is not a fundraising campaign. It is an invitation to participate in something the Father has been doing since the beginning — revealing Himself as a Father to His children.",
+			"Partner with the Father\u2019s Heart Bible and be part of what the Father is doing through Scripture, publication, and distribution.",
+		heroHeading: 'Partner With Us',
+		heroSubheading: 'Be part of what the Father is doing.',
 		heroPrimaryCtaLabel: 'Donate Now',
 		heroPrimaryCtaHref: '#donate',
 	},
@@ -199,17 +190,16 @@ const pages = [
 		title: 'About',
 		seoTitle: "About Kevin White | Father's Heart Bible",
 		seoDescription:
-			"Learn the story behind the Father's Heart Bible and the vision to reveal God as Father through Scripture.",
-		heroEyebrow: 'About',
-		heroHeading: 'The Story Behind the Father\'s Heart Bible',
+			"Learn the story behind the Father\u2019s Heart Bible and the vision to reveal God as Father through Scripture.",
+		heroHeading: 'The story behind the Father\u2019s Heart Bible',
 		heroSubheading:
-			"The Father's Heart Bible began not as a publishing project, but as a personal awakening — a journey from knowing about God to knowing Him as Father.",
+			"The Father\u2019s Heart Bible was not born from novelty. It was born from a long journey through Scripture, ministry, longing, and awakening.",
 		heroPrimaryCtaLabel: 'Download the Free Book',
 		heroPrimaryCtaHref: '/download',
 	},
 ];
 
-// ── 3. Scripture Comparisons ──────────────────────────────────────────────────
+// ── 3. Scripture Comparisons — exact approved FHB translations ────────────────
 
 const comparisons = [
 	{
@@ -218,10 +208,10 @@ const comparisons = [
 		reference: 'John 3:16',
 		category: 'featured',
 		traditional:
-			'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.',
-		translationLabel: 'NIV',
-		fhb: "For the Father so loved His children that He gave His only Son, so that everyone who believes in Him will not perish but will have eternal life as beloved sons and daughters.",
-		note: "Jesus is revealing the one sending Him — not a sovereign authority, but a Father who gives His Son out of love for His children.",
+			'For God so loved the world that He gave His one and only Son, that whoever believes in Him shall not perish but have eternal life.',
+		translationLabel: 'Standard',
+		fhb: 'For our Father so loved the world that He gave His one and only Son, so that everyone who trusts in Him would not be lost, but would live in the life of the age to come.',
+		note: 'In this passage, the One who loves and gives the Son is the Father. The Father\u2019s Heart Bible makes that explicit, helping readers hear this verse not as the action of a distant supreme being, but as the giving love of the Father Himself.',
 		featured: true,
 		order: 1,
 	},
@@ -231,10 +221,10 @@ const comparisons = [
 		reference: 'Joel 2:13',
 		category: 'joel',
 		traditional:
-			'Return to the Lord your God, for he is gracious and compassionate, slow to anger and abounding in love, and he relents from sending calamity.',
-		translationLabel: 'NIV',
-		fhb: 'Return to your Father with all your heart — for your Father is gracious and compassionate, slow to anger and abounding in love, and He relents from sending calamity.',
-		note: 'The prophet is not calling people back to a distant sovereign. He is calling them home to a Father.',
+			'Return to the LORD your God, for He is gracious and compassionate, slow to anger and abounding in love.',
+		translationLabel: 'Standard',
+		fhb: 'Tear open your hearts\u2026 return to your Father, for He is gracious and His compassion runs deep, He is slow to anger and overflowing with faithful love.',
+		note: "Joel\u2019s invitation is not simply a summons back to divine authority. It is a call to return to the Father\u2019s heart.",
 		order: 2,
 	},
 	{
@@ -242,10 +232,10 @@ const comparisons = [
 		_type: 'scriptureComparison',
 		reference: 'Joel 2:18',
 		category: 'joel',
-		traditional: 'Then the Lord was jealous for his land and took pity on his people.',
-		translationLabel: 'NIV',
-		fhb: "Then our Father's heart went out for his land, and he had compassion on his people.",
-		note: "The Father's heart going out — not cold sovereignty, but the tender, urgent love of a Father who cannot stay removed from His children.",
+		traditional: 'Then the LORD was jealous for His land and had pity on His people.',
+		translationLabel: 'Standard',
+		fhb: "Then our Father\u2019s heart went out for His land, and He had deep compassion on His children.",
+		note: 'This rendering makes the emotional movement of the passage more visible. The Father is not detached from His people\u2019s suffering. His heart is engaged.',
 		order: 3,
 	},
 	{
@@ -253,11 +243,10 @@ const comparisons = [
 		_type: 'scriptureComparison',
 		reference: 'Joel 2:28',
 		category: 'joel',
-		traditional:
-			'I will pour out my Spirit on all people. Your sons and daughters will prophesy, your old men will dream dreams, your young men will see visions.',
-		translationLabel: 'NIV',
-		fhb: 'I will pour out my Spirit on all my beloved sons and daughters. Your sons and daughters will prophesy, your old men will dream dreams, your young men will see visions.',
-		note: 'The outpouring is not simply demographic — it is the Father pouring Himself out on His beloved family.',
+		traditional: 'I will pour out My Spirit on all people\u2026',
+		translationLabel: 'Standard',
+		fhb: 'I will pour out My Spirit on all My beloved sons and daughters.',
+		note: 'The outpouring of the Spirit is not merely an event of power. It is familial, relational, and identity-forming.',
 		order: 4,
 	},
 	{
@@ -266,10 +255,10 @@ const comparisons = [
 		reference: 'Luke 15:20',
 		category: 'heart-language',
 		traditional:
-			'But while he was still a long way off, his father saw him and was filled with compassion for him; he ran to his son, threw his arms around him and kissed him.',
-		translationLabel: 'NIV',
-		fhb: 'But while he was still a long way off, his father saw him and his heart went out to him; he ran to his son, threw his arms around him and held him close.',
-		note: 'The Father in this parable does not wait to be convinced. His heart goes out the moment he sees his child returning.',
+			'While he was still a long way off, his father saw him and was filled with compassion for him; he ran to his son, threw his arms around him and kissed him.',
+		translationLabel: 'Standard',
+		fhb: 'While he was still a long way off, his father saw him, and his heart ran toward him before his feet did. He embraced him and covered him with kisses.',
+		note: 'The prodigal story has always been about the father\u2019s heart. The Father\u2019s Heart Bible seeks to let readers feel that movement more deeply.',
 		order: 5,
 	},
 	{
@@ -277,11 +266,10 @@ const comparisons = [
 		_type: 'scriptureComparison',
 		reference: 'Matthew 9:36',
 		category: 'heart-language',
-		traditional:
-			'When he saw the crowds, he had compassion on them, because they were harassed and helpless, like sheep without a shepherd.',
-		translationLabel: 'NIV',
-		fhb: "When he saw the crowds, his heart went out to them, because they were harassed and helpless — like children without a father's care.",
-		note: "Jesus doesn't observe the crowds analytically. His heart moves. FHB makes the tenderness of that moment vivid.",
+		traditional: 'When He saw the crowds, He had compassion on them\u2026',
+		translationLabel: 'Standard',
+		fhb: 'When He saw the crowds, His heart went out to them\u2026',
+		note: 'Where many readers hear a formal phrase, the Father\u2019s Heart Bible restores warmth, immediacy, and felt compassion.',
 		order: 6,
 	},
 	{
@@ -290,10 +278,10 @@ const comparisons = [
 		reference: 'Zephaniah 3:17',
 		category: 'heart-language',
 		traditional:
-			'The Lord your God is with you, the Mighty Warrior who saves. He will take great delight in you; in his love he will no longer rebuke you, but will rejoice over you with singing.',
-		translationLabel: 'NIV',
-		fhb: 'Your Father is in your midst — the Mighty One who saves. He will rejoice over you with gladness; He will quiet you with His love and exult over you with joyful singing.',
-		note: 'A Father who sings over His child. This is not religious transaction — this is the sound of delight.',
+			'The LORD your God is with you\u2026 He will take great delight in you\u2026 He will rejoice over you with singing.',
+		translationLabel: 'Standard',
+		fhb: 'The Father is living among you. He is a mighty Savior. His heart delights in you with gladness. His love quiets your fears. He rejoices over you with joyful songs.',
+		note: 'This passage reveals delight, comfort, and celebration. The Father\u2019s Heart Bible brings those relational elements to the front.',
 		order: 7,
 	},
 	{
@@ -302,10 +290,10 @@ const comparisons = [
 		reference: 'Romans 8:15\u201316',
 		category: 'identity',
 		traditional:
-			"The Spirit you received does not make you slaves, so that you live in fear again; rather, the Spirit you received brought about your adoption to sonship. And by him we cry, 'Abba, Father.' The Spirit himself testifies with our spirit that we are God's children.",
-		translationLabel: 'NIV',
-		fhb: "You did not receive a spirit of slavery to fall back into fear. You received the Spirit of beloved adoption — by whom we cry, 'Abba, Father.' And the Spirit himself confirms with our spirit that we are the Father's beloved children.",
-		note: "Paul's entire argument turns on identity. We are not slaves living in fear — we are beloved children living in the freedom of the Father's house.",
+			"You did not receive a spirit that makes you a slave again to fear, but you received the Spirit of adoption\u2026 The Spirit Himself testifies with our spirit that we are children of God.",
+		translationLabel: 'Standard',
+		fhb: "You did not receive a spirit of slavery that draws you back into fear, but you received the Spirit of adoption, by whom we cry out, \u2018Abba! Father!\u2019 The Holy Spirit Himself bears witness with our spirit that we are our Father\u2019s children.",
+		note: 'The point of adoption is not merely a change of status. It is a restoration of belonging.',
 		order: 8,
 	},
 	{
@@ -314,10 +302,10 @@ const comparisons = [
 		reference: 'John 1:12',
 		category: 'identity',
 		traditional:
-			'Yet to all who did receive him, to those who believed in his name, he gave the right to become children of God.',
-		translationLabel: 'NIV',
-		fhb: 'Yet to all who received him — to all who trusted in his name — he gave the right to become beloved children of the Father.',
-		note: 'To receive Jesus is to be received into the family. The right is not legal standing alone — it is belonging.',
+			'To all who did receive Him\u2026 He gave the right to become children of God.',
+		translationLabel: 'Standard',
+		fhb: 'To all who received Him and trusted in His name, He gave the right to become beloved children of their Father.',
+		note: 'This rendering brings forward the welcome, identity, and belonging at the heart of the verse.',
 		order: 9,
 	},
 	{
@@ -326,10 +314,10 @@ const comparisons = [
 		reference: 'Galatians 4:6',
 		category: 'identity',
 		traditional:
-			"Because you are his sons, God sent the Spirit of his Son into our hearts, the Spirit who calls out, 'Abba, Father.'",
-		translationLabel: 'NIV',
-		fhb: "Because you are His beloved children, your Father sent the Spirit of His Son into our hearts — the Spirit who cries out, 'Abba, Father.'",
-		note: 'The Spirit is not given to strangers. He is given to beloved children who have been brought home.',
+			"Because you are sons, God has sent the Spirit of His Son into our hearts, crying, \u2018Abba! Father!\u2019",
+		translationLabel: 'Standard',
+		fhb: "Because you are His children, our Father has sent the Spirit of His Son into your hearts, awakening the cry, \u2018Abba! Father!\u2019",
+		note: 'The Spirit is not merely informative. He awakens relational knowing and beloved identity.',
 		order: 10,
 	},
 ];
@@ -339,13 +327,13 @@ const comparisons = [
 const resource = {
 	_id: 'resource-beloved-identity',
 	_type: 'resource',
-	title: "Father's Heart \u2192 Beloved Identity",
+	title: "Father\u2019s Heart \u2192 Beloved Identity",
 	slug: { _type: 'slug', current: 'beloved-identity' },
 	shortDescription:
-		"Your free introduction to the Father's Heart Bible — experience how this translation reveals God as Father from your very first read.",
-	formHeading: 'Get Your Free Copy',
+		"A short, powerful introduction to the message behind the Father\u2019s Heart Bible and the revelation of beloved identity.",
+	formHeading: 'Receive the free PDF',
 	formDescription:
-		"Enter your name and email below. We'll send you the free chapter immediately.",
+		"Enter your information below to receive Father\u2019s Heart \u2192 Beloved Identity and hear about future resources, updates, and next steps connected to the Father\u2019s Heart Bible.",
 	buttonText: 'Download the Free Book',
 	featured: true,
 	order: 1,
@@ -357,44 +345,41 @@ const kevin = {
 	_id: 'person-kevin-white',
 	_type: 'personProfile',
 	name: 'Kevin White',
-	role: 'Lead Translator & Founder',
-	bio: "Kevin White spent decades reading Scripture faithfully before awakening to God as Father — not just as sovereign master. That personal encounter became the foundation of the Father's Heart Bible.",
+	role: 'Lead Translator and Vision Holder',
+	bio: "Kevin White is the lead translator and vision holder behind the Father\u2019s Heart Bible. After decades of reading Scripture faithfully, he became convinced that the Bible has always been revealing the Father more clearly than many readers have been taught to see. The Father\u2019s Heart Bible was born from that conviction.",
 	order: 1,
 };
 
 // ── Run ───────────────────────────────────────────────────────────────────────
 
 async function run() {
-	console.log("\n📖 FHB Phase 5A — Content Population\n");
+	console.log('\n\uD83D\uDCD6 FHB Phase 5A \u2014 Content Population\n');
 
-	console.log("1. Updating siteSettings...");
+	console.log('1. Updating siteSettings...');
 	await patch('site-settings', siteSettingsPatch);
 
-	console.log("\n2. Creating page documents...");
+	console.log('\n2. Creating page documents...');
 	for (const page of pages) {
 		await createOrReplace(page);
 	}
 
-	console.log("\n3. Creating scripture comparisons...");
+	console.log('\n3. Creating scripture comparisons...');
 	for (const comp of comparisons) {
 		await createOrReplace(comp);
 	}
 
-	console.log("\n4. Creating resource document...");
+	console.log('\n4. Creating resource document...');
 	await createOrReplace(resource);
 
-	console.log("\n5. Creating Kevin White profile...");
+	console.log('\n5. Creating Kevin White profile...');
 	await createOrReplace(kevin);
 
-	console.log("\n✅ Content population complete.");
-	console.log("\nNext steps:");
-	console.log("  1. Open Sanity Studio: fathersheartbible.sanity.studio");
-	console.log("  2. Review and publish all documents");
-	console.log("  3. Update siteSettings with live URLs: communityUrl, donateUrl, media URLs");
-	console.log("  4. Upload Kevin's portrait and book cover to Sanity media library");
+	console.log('\n\u2705 Content population complete.');
+	console.log('\nAll documents created/updated in Sanity.');
+	console.log('Open fathersheartbible.sanity.studio to review and publish.');
 }
 
 run().catch(err => {
-	console.error("Population failed:", err.message);
+	console.error('Population failed:', err.message);
 	process.exit(1);
 });

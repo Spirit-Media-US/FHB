@@ -8,7 +8,11 @@ import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
 const [pageData, media, resourceData] = await Promise.all([
-	sanityClient.fetch(`*[_type == "page" && slug == "download"][0] { seoTitle, seoDescription }`),
+	sanityClient.fetch(`*[_type == "page" && slug == "download"][0] {
+    seoTitle, seoDescription,
+    heroHeading, heroSubheading,
+    heroPrimaryCtaLabel, heroPrimaryCtaHref
+  }`),
 	sanityClient.fetch(
 		`*[_type == "siteSettings"][0] { bookCoverUrl, ghlDownloadFormId, communityUrl }`,
 	),
@@ -20,7 +24,11 @@ const [pageData, media, resourceData] = await Promise.all([
 const seoTitle = pageData?.seoTitle || "Download the Free Book | Father's Heart Bible";
 const seoDescription =
 	pageData?.seoDescription ||
-	"Download Father's Heart — Beloved Identity, a free chapter from the Father's Heart Bible. Experience how this translation reveals God as a loving Father.";
+	'Download the free PDF of Father’s Heart → Beloved Identity and discover the heart behind the Father’s Heart Bible.';
+const heroHeading = pageData?.heroHeading || 'Download the Free Book';
+const heroSubheading = pageData?.heroSubheading || 'Father’s Heart → Beloved Identity';
+const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Download the Free Book';
+const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '#form';
 const bookCoverUrl = resourceData?.coverImageUrl || media?.bookCoverUrl || '';
 const ghlFormId = media?.ghlDownloadFormId || '';
 const communityUrl = media?.communityUrl || '/join';
@@ -96,15 +104,11 @@ const nextSteps = [
 						class="text-4xl md:text-5xl font-light leading-tight mb-4"
 						style="font-family: var(--font-serif); color: var(--color-ink);"
 					>
-						Father's Heart →<br />Beloved Identity
+						{heroHeading}
 					</h1>
-					<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
-						A free PDF that journeys through Scripture to reveal what the Father has always been saying —
-						that you are not His servant, but His beloved child.
-					</p>
-					<p class="leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
-						This is the doorway into the heart behind the Father's Heart Bible. Concise, accessible,
-						and written to create encounter.
+										<p class="text-lg leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+						This free PDF is the best place to begin. It is a concise, powerful doorway into the
+						message behind the Father’s Heart Bible and the revelation of beloved identity.
 					</p>
 
 					<!-- GHL Form -->
@@ -168,35 +172,7 @@ const nextSteps = [
 								</p>
 							</div>
 						)}
-						<p
-							class="text-xs mt-4 text-center"
-							style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;"
-						>
-							Free. No spam. Unsubscribe any time.
-						</p>
-					</div>
-				</div>
-
-				<!-- Right: book cover -->
-				<div class="flex flex-col items-center gap-8 md:pt-8">
-					{bookCoverUrl ? (
-						<img
-							src={bookCoverUrl}
-							alt="Father's Heart → Beloved Identity — free PDF"
-							class="w-64 md:w-80 rounded shadow-2xl"
-						/>
-					) : (
-						<div
-							class="w-64 md:w-80 aspect-[2/3] rounded shadow-2xl flex flex-col items-center justify-end p-8"
-							style="background-color: var(--color-brand);"
-						>
-							<div class="w-12 h-0.5 mb-6" style="background-color: var(--color-gold);"></div>
-							<p
-								class="text-center text-2xl font-light italic leading-snug"
-								style="font-family: var(--font-serif); color: #fff;"
-							>
-								Father's Heart →<br />Beloved Identity
-							</p>
+		
 							<p
 								class="mt-4 text-sm tracking-widest uppercase"
 								style="font-family: var(--font-sans); color: rgba(255,255,255,0.6);"
