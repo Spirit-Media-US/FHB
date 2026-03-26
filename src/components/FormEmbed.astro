@@ -29,14 +29,16 @@ const { formId, headline, body } = Astro.props;
 	<!-- GHL embed slot — paste embed code here or pass formId -->
 	<div class="ghl-form-wrapper">
 		{formId ? (
-			<!-- GHL iframe embed -->
-			<iframe
-				src={`https://api.leadconnectorhq.com/widget/form/${formId}`}
-				style="width:100%;border:none;overflow:hidden;"
-				scrolling="no"
-				id={`ghl-form-${formId}`}
-				title="Contact Form"
-			></iframe>
+			<>
+				<iframe
+					src={`https://mail.spiritmediaone.com/widget/survey/${formId}`}
+					style="border:none;width:100%;"
+					scrolling="no"
+					id={formId}
+					title="survey"
+				></iframe>
+				<script src="https://mail.spiritmediaone.com/js/form_embed.js"></script>
+			</>
 		) : (
 			<slot />
 		)}
