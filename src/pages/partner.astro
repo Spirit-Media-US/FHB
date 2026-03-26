@@ -1,14 +1,516 @@
 ---
 import Footer from '../components/Footer.astro';
 import Navbar from '../components/Navbar.astro';
-// Phase 2 scaffold — Phase 3: Add content
+import ScriptureBlock from '../components/ScriptureBlock.astro';
+import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
+import { sanityClient } from '../lib/sanity';
+
+const media = await sanityClient.fetch(`
+  *[_type == "siteSettings"][0] {
+    bookCoverUrl,
+    donateUrl
+  }
+`);
+
+const bookCoverUrl = media?.bookCoverUrl || '';
+// Donation URL — Kevin sets in Sanity (GHL, Stripe, PayPal, etc.)
+const donateUrl = media?.donateUrl || '#donate';
+
+const whyMatters = [
+	{
+		heading: 'Complete the translation',
+		body: 'The full canon — Genesis to Revelation — requires sustained support to complete and bring to publication.',
+	},
+	{
+		heading: 'Produce physical editions',
+		body: 'Premium print Bibles that can be held, given, and treasured require real production investment.',
+	},
+	{
+		heading: 'Distribute more widely',
+		body: "Every gift helps place the Father's Heart Bible into the hands of those who are ready to receive it.",
+	},
+	{
+		heading: 'Expand future reach',
+		body: 'Audio, study editions, and language translations — future expressions of this work require a foundation to stand on.',
+	},
+];
+
+const scope = [
+	{
+		title: 'Translation',
+		body: "The ongoing interpretive work of rendering the full Biblical canon with the Father's heart in view.",
+	},
+	{
+		title: 'Publishing',
+		body: 'Editorial, design, and production preparation for the flagship premium print edition.',
+	},
+	{
+		title: 'Production',
+		body: 'Physical Bible printing, binding, and manufacturing to bring this translation into tangible form.',
+	},
+	{
+		title: 'Distribution',
+		body: 'Getting Bibles into the hands of readers — including those who could not otherwise access them.',
+	},
+	{
+		title: 'Future Reach',
+		body: "Study editions, audio, and translations that extend the Father's voice into more languages and formats.",
+	},
+];
+
+const whyDifferent = [
+	'Reveals the Father where Scripture reveals Him — from Genesis to Revelation.',
+	'Speaks directly to identity, intimacy, and belonging — the deep hunger of this generation.',
+	'Written not to inform but to create encounter — a Bible that changes how readers know God.',
+	'Rooted in the historic Christian and Trinitarian faith — trustworthy and spiritually serious.',
+];
+
+const impactStats = [
+	{
+		amount: '$33',
+		impact: "Helps put one Father's Heart Bible into the hands of a reader.",
+	},
+	{
+		amount: '$100',
+		impact: 'Helps place three Bibles where they are most needed.',
+	},
+	{
+		amount: '$500',
+		impact: 'Supports a meaningful portion of translation and production work.',
+	},
+];
 ---
-<Layout title="Partner With Us — Father's Heart Bible" description="Partner with the Father's Heart Bible ministry.">
-  <Navbar />
-  <main class="pt-24">
-    <h1>Partner With Us</h1>
-    <!-- Phase 3: Add content -->
-  </main>
-  <Footer />
+
+<Layout
+	title="Partner With Us | Father's Heart Bible"
+	description="Partner with the Father's Heart Bible and be part of what the Father is doing through Scripture, publication, and distribution."
+>
+	<Navbar />
+	<main class="pt-24">
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 1 — HERO
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
+				<div>
+					<p
+						class="text-xs font-semibold tracking-widest uppercase mb-4"
+						style="font-family: var(--font-sans); color: var(--color-gold);"
+					>
+						Partner With Us
+					</p>
+					<h1
+						class="text-4xl md:text-5xl font-light leading-tight mb-6"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						Be part of what the Father is doing.
+					</h1>
+					<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+						The Father's Heart Bible is being prepared for publication. Your support helps complete,
+						produce, and distribute this translation — placing the Father's voice into the hands of
+						readers around the world.
+					</p>
+					<p class="leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+						This is not a transaction. It is an invitation to participate in something the Father is
+						building.
+					</p>
+					<a
+						id="donate"
+						href={donateUrl}
+						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+						onmouseout="this.style.backgroundColor='var(--color-brand)'"
+					>
+						Donate Now
+					</a>
+				</div>
+				<div class="flex justify-center">
+					{bookCoverUrl ? (
+						<img
+							src={bookCoverUrl}
+							alt="The Father's Heart Bible"
+							class="w-56 md:w-72 rounded shadow-xl"
+						/>
+					) : (
+						<div
+							class="w-56 md:w-72 aspect-[2/3] rounded shadow-xl flex items-end justify-center p-8"
+							style="background-color: var(--color-brand);"
+						>
+							<p
+								class="text-center text-lg font-light italic"
+								style="font-family: var(--font-serif); color: rgba(255,255,255,0.9);"
+							>
+								The Father's Heart Bible
+							</p>
+						</div>
+					)}
+				</div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 2 — WHY YOUR SUPPORT MATTERS
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-start">
+				<div>
+					<p
+						class="text-xs font-semibold tracking-widest uppercase mb-4"
+						style="font-family: var(--font-sans); color: var(--color-gold);"
+					>
+						Why It Matters
+					</p>
+					<h2
+						class="text-3xl md:text-4xl font-light leading-tight mb-6"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						Your support makes the publishing possible.
+					</h2>
+					<p class="leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						The Father's Heart Bible requires real resources to complete, produce, and bring into the
+						world. Partner support is what makes it possible to take this from a vision to a Bible
+						in someone's hands.
+					</p>
+				</div>
+				<div class="space-y-6">
+					{whyMatters.map(({ heading, body }) => (
+						<div class="flex gap-4 items-start">
+							<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
+							<div>
+								<p class="font-semibold mb-1" style="font-family: var(--font-sans); color: var(--color-ink);">{heading}</p>
+								<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{body}</p>
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 3 — TANGIBLE IMPACT
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Tangible Impact
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					Every gift places the Father's Word in someone's hands.
+				</h2>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+				{impactStats.map(({ amount, impact }) => (
+					<div
+						class="p-8 rounded text-center"
+						style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
+					>
+						<p
+							class="text-4xl font-light mb-4"
+							style="font-family: var(--font-serif); color: var(--color-brand);"
+						>
+							{amount}
+						</p>
+						<div class="w-8 h-0.5 mx-auto mb-4" style="background-color: var(--color-gold);"></div>
+						<p
+							class="text-sm leading-relaxed"
+							style="font-family: var(--font-sans); color: var(--color-muted);"
+						>
+							{impact}
+						</p>
+					</div>
+				))}
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 4 — WHAT YOU ARE SUPPORTING
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Scope of the Work
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					What your partnership supports.
+				</h2>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
+				{scope.map(({ title, body }) => (
+					<div
+						class="p-6 rounded"
+						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
+					>
+						<div class="w-6 h-0.5 mb-4" style="background-color: var(--color-gold);"></div>
+						<h3
+							class="font-semibold mb-2"
+							style="font-family: var(--font-sans); color: var(--color-ink);"
+						>
+							{title}
+						</h3>
+						<p
+							class="text-sm leading-relaxed"
+							style="font-family: var(--font-sans); color: var(--color-muted);"
+						>
+							{body}
+						</p>
+					</div>
+				))}
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 5 — WHY THIS PROJECT IS DIFFERENT
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="scripture">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Why This Matters
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					This is not one more Bible project.
+				</h2>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
+				{whyDifferent.map((statement) => (
+					<div
+						class="flex gap-4 items-start p-5 rounded"
+						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
+					>
+						<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
+						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{statement}</p>
+					</div>
+				))}
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 6 — MOVEMENT-FIRST GIVING
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="max-w-2xl mx-auto">
+				<div class="w-10 h-0.5 mb-10" style="background-color: var(--color-gold);"></div>
+				<ScriptureBlock
+					text="You did not choose me, but I chose you and appointed you so that you might go and bear fruit — fruit that will last."
+					reference="John 15:16"
+					translation="Father's Heart Bible"
+				/>
+				<div class="mt-14 text-center">
+					<p
+						class="text-lg leading-relaxed mb-8"
+						style="font-family: var(--font-sans); color: var(--color-muted);"
+					>
+						Partnering with the Father's Heart Bible is a response to what the Father is already
+						doing — not an initiation of it. He is publishing His heart into the nations.
+						Your support helps carry that forward.
+					</p>
+					<a
+						href={donateUrl}
+						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+						onmouseout="this.style.backgroundColor='var(--color-brand)'"
+					>
+						Donate Now
+					</a>
+				</div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 7 — DONATE NOW
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="max-w-xl mx-auto text-center">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-4"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Give Now
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light mb-4"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					Partner in publishing the Father's Heart Bible.
+				</h2>
+				<p class="leading-relaxed mb-10" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Your gift — any amount — is a meaningful act of participation in this work.
+					Every dollar helps translate, produce, and place the Father's Word in someone's hands.
+				</p>
+				<div
+					class="p-8 md:p-12 rounded mb-8"
+					style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
+				>
+					<!-- Donation integration area — Kevin connects payment provider here -->
+					<p
+						class="text-sm mb-6"
+						style="font-family: var(--font-sans); color: var(--color-muted);"
+					>
+						Secure giving — all contributions go directly toward translation, production, and distribution.
+					</p>
+					<a
+						href={donateUrl}
+						class="inline-flex items-center justify-center w-full sm:w-auto px-10 py-4 text-base font-semibold no-underline rounded transition-all duration-200"
+						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff; min-width: 240px;"
+						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+						onmouseout="this.style.backgroundColor='var(--color-brand)'"
+					>
+						Donate Now
+					</a>
+					<p
+						class="text-xs mt-5"
+						style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;"
+					>
+						{/* donateUrl is set via Sanity siteSettings.donateUrl — connect payment provider */}
+						Questions? Contact us at <a href="/contact" style="color: var(--color-brand);">contact page</a>.
+					</p>
+				</div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 8 — SECONDARY PATHS
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+				<!-- Join -->
+				<div
+					class="p-8 rounded text-center"
+					style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
+				>
+					<p
+						class="text-xs font-semibold tracking-widest uppercase mb-3"
+						style="font-family: var(--font-sans); color: var(--color-gold);"
+					>
+						Community
+					</p>
+					<h3
+						class="text-2xl font-light mb-4"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						Join the Movement
+					</h3>
+					<p class="text-sm leading-relaxed mb-6" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Belonging comes before giving. Join the Father's Heart community and grow in identity
+						before taking any other step.
+					</p>
+					<a
+						href="/join"
+						class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+						onmouseout="this.style.backgroundColor='var(--color-brand)'"
+					>
+						Join the Movement
+					</a>
+				</div>
+				<!-- Download -->
+				<div
+					class="p-8 rounded text-center"
+					style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
+				>
+					<p
+						class="text-xs font-semibold tracking-widest uppercase mb-3"
+						style="font-family: var(--font-sans); color: var(--color-gold);"
+					>
+						Start Here
+					</p>
+					<h3
+						class="text-2xl font-light mb-4"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						Download the Free Book
+					</h3>
+					<p class="text-sm leading-relaxed mb-6" style="font-family: var(--font-sans); color: var(--color-muted);">
+						If you are new to the Father's Heart Bible, begin with the free book.
+						It is the best introduction to the heart behind everything we are building.
+					</p>
+					<a
+						href="/download"
+						class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+						style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
+						onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
+						onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
+					>
+						Download the Free Book
+					</a>
+				</div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 9 — FINAL CTA BAND
+		     ═══════════════════════════════════════════════════════════ -->
+		<section class="py-16 md:py-20" style="background-color: var(--color-deep);">
+			<div class="max-w-3xl mx-auto px-6 text-center">
+				<div class="w-10 h-0.5 mx-auto mb-8" style="background-color: var(--color-gold);"></div>
+				<p
+					class="text-xl italic mb-10"
+					style="font-family: var(--font-serif); color: rgba(255,255,255,0.8);"
+				>
+					The Father is publishing His heart into the nations. Come and be part of it.
+				</p>
+				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+					<a
+						href={donateUrl}
+						class="inline-flex items-center px-7 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+						style="font-family: var(--font-sans); background-color: var(--color-gold); color: var(--color-deep);"
+						onmouseover="this.style.filter='brightness(1.08)'"
+						onmouseout="this.style.filter='none'"
+					>
+						Donate Now
+					</a>
+					<a
+						href="/join"
+						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
+						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
+						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
+					>
+						Join the Movement
+					</a>
+					<a
+						href="/download"
+						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
+						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
+						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
+					>
+						Download the Free Book
+					</a>
+				</div>
+			</div>
+		</section>
+
+	</main>
+	<Footer />
 </Layout>
