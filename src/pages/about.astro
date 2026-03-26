@@ -1,14 +1,265 @@
 ---
+import CTASection from '../components/CTASection.astro';
 import Footer from '../components/Footer.astro';
 import Navbar from '../components/Navbar.astro';
-// Phase 2 scaffold — Phase 3: Add content
+import ScriptureBlock from '../components/ScriptureBlock.astro';
+import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
+import { sanityClient } from '../lib/sanity';
+
+const media = await sanityClient.fetch(`
+  *[_type == "siteSettings"][0] { kevinPortraitUrl, bookCoverUrl, communityUrl, donateUrl }
+`);
+
+const kevinPortraitUrl = media?.kevinPortraitUrl || '';
+const communityUrl = media?.communityUrl || '#join';
+const donateUrl = media?.donateUrl || '/partner';
+
+const foundations = [
+	{
+		heading: 'Trinitarian faith',
+		body: 'Rooted in the historic Christian belief in the Father, Son, and Holy Spirit — one God in three persons.',
+	},
+	{
+		heading: 'Scripture as foundation',
+		body: 'Every translation choice flows from careful engagement with the original biblical text.',
+	},
+	{
+		heading: 'Respect for faithful translations',
+		body: "The Father's Heart Bible does not replace existing translations. It stands alongside them, highlighting what has always been there.",
+	},
+	{
+		heading: 'Historic Christian orthodoxy',
+		body: 'Nothing in this work departs from the core beliefs the Church has held across centuries.',
+	},
+];
+
+const audience = [
+	'Believers longing for a deeper sense of belonging with God',
+	'Long-time Christians who sense there is something more available in Scripture',
+	'Those awakening to the reality of God as a loving Father',
+	'Readers hungry for identity, not just information',
+	'Anyone who has related to God primarily as servant to master',
+	'Those who want Scripture to feel personal and relational',
+];
 ---
-<Layout title="About — Father's Heart Bible" description="About the Father's Heart Bible and its mission.">
+
+<Layout
+  title="About Kevin White | Father's Heart Bible"
+  description="Learn the story behind the Father's Heart Bible and the vision to reveal God as Father through Scripture."
+>
   <Navbar />
-  <main class="pt-24">
-    <h1>About</h1>
-    <!-- Phase 3: Add content -->
+  <main class="pt-20">
+
+    {/* 1 — HERO */}
+    <Section variant="soft">
+      <div class="max-w-3xl mx-auto text-center py-12 md:py-20">
+        <p class="font-sans text-sm uppercase tracking-widest mb-4" style="color: var(--color-gold);">About</p>
+        <h1 class="font-serif text-4xl md:text-6xl mb-6" style="color: var(--color-ink);">
+          The Story Behind the Father's Heart Bible
+        </h1>
+        <p class="font-sans text-lg md:text-xl mb-10 max-w-2xl mx-auto" style="color: var(--color-muted);">
+          The Father's Heart Bible began not as a publishing project, but as a personal awakening — a journey from
+          knowing about God to knowing Him as Father.
+        </p>
+        <a
+          href="/download"
+          class="inline-block font-sans font-semibold text-base px-8 py-4 rounded-sm transition-colors"
+          style="background-color: var(--color-brand); color: #fff;"
+          onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+          onmouseout="this.style.backgroundColor='var(--color-brand)'"
+        >
+          Download the Free Book
+        </a>
+      </div>
+
+      {kevinPortraitUrl && (
+        <div class="max-w-sm mx-auto pb-12">
+          <img
+            src={kevinPortraitUrl}
+            alt="Kevin White, translator of the Father's Heart Bible"
+            class="rounded-sm w-full"
+            style="border: 1px solid var(--color-hairline);"
+          />
+        </div>
+      )}
+    </Section>
+
+    {/* 2 — KEVIN'S STORY */}
+    <Section variant="light">
+      <div class="max-w-2xl mx-auto">
+        <p class="font-sans text-sm uppercase tracking-widest mb-4" style="color: var(--color-gold);">The Story</p>
+        <h2 class="font-serif text-3xl md:text-4xl mb-8" style="color: var(--color-ink);">
+          A Journey to the Father
+        </h2>
+
+        <div class="font-sans space-y-5 text-base md:text-lg" style="color: var(--color-muted); line-height: 1.85;">
+          <p>
+            For decades, Kevin White read Scripture faithfully. He studied it, taught it, and built his life around it.
+            But for most of those years, he related to God the way many believers do — as a servant to a master. He knew
+            the doctrines. He believed the right things. And yet something felt distant.
+          </p>
+          <p>
+            That began to change when Kevin encountered what had always been present in the biblical text but had not yet
+            become real in his heart: the image of God as Father.
+          </p>
+          <p>
+            It was not a new idea. It was an ancient one — woven through the Law, the Psalms, the Prophets, and
+            unmistakably central to the message of Jesus. But somewhere along the way, the relational heart of those
+            passages had been muted. The language felt formal. The distance felt normal.
+          </p>
+          <p>
+            The awakening Kevin experienced was not theological novelty. It was a return — to what Scripture had always
+            said, seen now with new eyes.
+          </p>
+        </div>
+      </div>
+    </Section>
+
+    {/* 3 — WHY THIS BIBLE WAS BORN */}
+    <Section variant="soft">
+      <div class="max-w-2xl mx-auto">
+        <p class="font-sans text-sm uppercase tracking-widest mb-4" style="color: var(--color-gold);">The Vision</p>
+        <h2 class="font-serif text-3xl md:text-4xl mb-8" style="color: var(--color-ink);">
+          Why This Bible Was Born
+        </h2>
+
+        <div class="font-sans space-y-5 text-base md:text-lg" style="color: var(--color-muted); line-height: 1.85;">
+          <p>
+            Kevin began to wonder how many other believers were living the same way he had — faithful, sincere, and yet
+            somehow at arm's length from the God they were trying to serve.
+          </p>
+          <p>
+            The relational dimension of Scripture is not hidden. It is not reserved for mystics or scholars. It is
+            present on almost every page. But the way we translate and read can either open that door or quietly keep it
+            closed.
+          </p>
+          <p>
+            The Father's Heart Bible is an attempt to make that door easier to walk through — to bring the warmth, the
+            closeness, and the identity that God offers into clearer view, without adding to Scripture or departing from
+            it.
+          </p>
+          <p>
+            The goal is not correction. It is invitation.
+          </p>
+        </div>
+      </div>
+    </Section>
+
+    {/* 4 — WHAT THIS PROJECT STANDS ON */}
+    <Section variant="light">
+      <div class="max-w-3xl mx-auto">
+        <p class="font-sans text-sm uppercase tracking-widest mb-4" style="color: var(--color-gold);">The Foundation</p>
+        <h2 class="font-serif text-3xl md:text-4xl mb-10" style="color: var(--color-ink);">
+          What This Project Stands On
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {foundations.map((item) => (
+            <div
+              class="p-6 rounded-sm"
+              style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
+            >
+              <h3 class="font-serif text-xl mb-2" style="color: var(--color-ink);">{item.heading}</h3>
+              <p class="font-sans text-base" style="color: var(--color-muted);">{item.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Section>
+
+    {/* 5 — THE HEART BEHIND THE WORK */}
+    <ScriptureBlock
+      text='"I will be a Father to you, and you shall be my sons and daughters, says the Lord Almighty."'
+      reference="2 Corinthians 6:18"
+      translation="ESV"
+    />
+
+    <Section variant="soft">
+      <div class="max-w-2xl mx-auto text-center">
+        <p class="font-sans text-sm uppercase tracking-widest mb-4" style="color: var(--color-gold);">The Heart</p>
+        <h2 class="font-serif text-3xl md:text-4xl mb-6" style="color: var(--color-ink);">
+          This Is About More Than Translation
+        </h2>
+        <p class="font-sans text-lg" style="color: var(--color-muted); line-height: 1.85;">
+          At its core, the Father's Heart Bible is not a publishing project. It is a desire to help people know the
+          Father. To discover that their identity is not servant, but son or daughter. That they are not working to be
+          loved — they already are.
+        </p>
+        <p class="font-sans text-lg mt-5" style="color: var(--color-muted); line-height: 1.85;">
+          That is the heart behind every page.
+        </p>
+      </div>
+    </Section>
+
+    {/* 6 — THE ORGANIZATION */}
+    <Section variant="light">
+      <div class="max-w-2xl mx-auto">
+        <p class="font-sans text-sm uppercase tracking-widest mb-4" style="color: var(--color-gold);">The Work</p>
+        <h2 class="font-serif text-3xl md:text-4xl mb-8" style="color: var(--color-ink);">
+          A Real Project Moving Forward
+        </h2>
+
+        <div class="font-sans space-y-5 text-base md:text-lg" style="color: var(--color-muted); line-height: 1.85;">
+          <p>
+            The Father's Heart Bible is published under Father's Heart Bible LLC, a structured entity committed to
+            responsible, serious work on this translation.
+          </p>
+          <p>
+            The project is developed under the Spirit Media Publishing family — an organization dedicated to creating
+            resources that help people encounter God more deeply. This is not a personal experiment. It is a sustained
+            effort moving toward full publication.
+          </p>
+          <p>
+            The work is careful, unhurried, and accountable. We are building something meant to last.
+          </p>
+        </div>
+      </div>
+    </Section>
+
+    {/* 7 — WHO THIS IS FOR */}
+    <Section variant="soft">
+      <div class="max-w-3xl mx-auto">
+        <p class="font-sans text-sm uppercase tracking-widest mb-4 text-center" style="color: var(--color-gold);">Who This Is For</p>
+        <h2 class="font-serif text-3xl md:text-4xl mb-10 text-center" style="color: var(--color-ink);">
+          You May Have Been Waiting for This
+        </h2>
+
+        <ul class="space-y-4">
+          {audience.map((item) => (
+            <li class="flex items-start gap-4">
+              <span
+                class="mt-1 shrink-0 w-2 h-2 rounded-full"
+                style="background-color: var(--color-gold); margin-top: 10px;"
+              ></span>
+              <p class="font-sans text-base md:text-lg" style="color: var(--color-muted);">{item}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Section>
+
+    {/* 8 — NEXT STEP CTA */}
+    <CTASection
+      headline="Ready to Begin?"
+      body="Download the free book and take your first step into a translation that opens the heart of the Father."
+      primaryLabel="Download the Free Book"
+      primaryHref="/download"
+      secondaryLabel="Join the Movement"
+      secondaryHref={communityUrl}
+    />
+
+    {/* 9 — FINAL CTA BAND */}
+    <CTASection
+      headline="The Father's heart has always been toward you."
+      body="Download, join, or partner — every step is an invitation deeper."
+      primaryLabel="Download the Free Book"
+      primaryHref="/download"
+      secondaryLabel="Join the Movement"
+      secondaryHref={communityUrl}
+      dark={true}
+    />
+
   </main>
   <Footer />
 </Layout>
