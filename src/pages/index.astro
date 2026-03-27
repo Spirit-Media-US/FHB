@@ -80,7 +80,7 @@ const communityUrl = media?.communityUrl || '/join';
 						muted
 						playsinline
 						aria-hidden="true"
-						style="transition: opacity 1s ease; opacity: 1;"
+						style="transition: opacity 1.5s ease; opacity: 1;"
 					/>
 					<video
 						id="hero-video-b"
@@ -88,7 +88,7 @@ const communityUrl = media?.communityUrl || '/join';
 						muted
 						playsinline
 						aria-hidden="true"
-						style="transition: opacity 1s ease; opacity: 0;"
+						style="transition: opacity 1.5s ease; opacity: 0;"
 					/>
 				</>
 			)}
@@ -144,25 +144,61 @@ const communityUrl = media?.communityUrl || '/join';
 			const vA = document.getElementById('hero-video-a') as HTMLVideoElement | null;
 			const vB = document.getElementById('hero-video-b') as HTMLVideoElement | null;
 			if (vA && vB) {
+				const PLAYBACK_RATE = 0.75;
+				const FADE_DURATION = 1500; // ms — must match CSS transition
+				const FADE_BEFORE = 1.5;    // media seconds before end to begin fade
+
 				let heroIdx = 0;
 				let curr: HTMLVideoElement = vA;
 				let next: HTMLVideoElement = vB;
-				vA.playbackRate = 0.75;
-				// Preload next video
-				next.src = heroVideos[(heroIdx + 1) % heroVideos.length];
+				let fading = false;
 
-				function crossfade() {
+				vA.playbackRate = PLAYBACK_RATE;
+
+				// Preload the second video silently
+				next.src = heroVideos[1];
+				next.load();
+
+				function beginCrossfade() {
+					if (fading) return;
+					fading = true;
 					heroIdx = (heroIdx + 1) % heroVideos.length;
+
 					next.play().then(() => {
-						next.playbackRate = 0.75;
+						next.playbackRate = PLAYBACK_RATE;
+						// Both videos playing — cross-dissolve
 						next.style.opacity = '1';
 						curr.style.opacity = '0';
-						const tmp = curr; curr = next; next = tmp;
-						next.src = heroVideos[(heroIdx + 1) % heroVideos.length];
-					}).catch(() => { curr.play(); });
+
+						const outgoing = curr;
+						curr = next;
+						next = outgoing;
+
+						// After fade completes, reset outgoing and preload what comes after
+						setTimeout(() => {
+							next.pause();
+							next.currentTime = 0;
+							const preloadIdx = (heroIdx + 1) % heroVideos.length;
+							next.src = heroVideos[preloadIdx];
+							next.load();
+							fading = false;
+						}, FADE_DURATION + 200);
+					}).catch(() => {
+						curr.currentTime = 0;
+						curr.play();
+						fading = false;
+					});
 				}
-				vA.addEventListener('ended', crossfade);
-				vB.addEventListener('ended', crossfade);
+
+				function onTimeUpdate(this: HTMLVideoElement) {
+					if (this !== curr) return;
+					if (!fading && this.duration && this.currentTime >= this.duration - FADE_BEFORE) {
+						beginCrossfade();
+					}
+				}
+
+				vA.addEventListener('timeupdate', onTimeUpdate);
+				vB.addEventListener('timeupdate', onTimeUpdate);
 			}
 		</script>
 
