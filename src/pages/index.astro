@@ -42,7 +42,11 @@ const heroVideoSrc =
 	media?.heroVideoUrl ||
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
 const heroPosterSrc = media?.heroPosterUrl || '';
-const bookCoverUrl = media?.bookCoverUrl || '';
+const bookCoverUrl =
+	media?.bookCoverUrl ||
+	'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png';
+const fhbiCoverUrl =
+	'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
 const photo1 = media?.peoplePhoto1Url || '';
 const photo2 = media?.peoplePhoto2Url || '';
 const photo3 = media?.peoplePhoto3Url || '';
@@ -88,13 +92,13 @@ const communityUrl = media?.communityUrl || '/join';
 			<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-16 md:pb-24">
 				<h1
 					class="text-4xl md:text-6xl font-light leading-tight mb-6"
-					style="font-family: var(--font-serif); color: #fff;"
+					style="font-family: var(--font-serif); color: var(--color-deep);"
 				>
 					{heroHeading}
 				</h1>
 				<p
 					class="text-lg md:text-xl mb-10 leading-relaxed"
-					style="font-family: var(--font-sans); color: rgba(255,255,255,0.8);"
+					style="font-family: var(--font-sans); color: var(--color-deep);"
 				>
 					{heroSubheading}
 				</p>
@@ -421,10 +425,10 @@ const communityUrl = media?.communityUrl || '/join';
 
 				<!-- Book image -->
 				<div class="order-1 md:order-2 flex justify-center">
-					{bookCoverUrl ? (
+					{fhbiCoverUrl ? (
 						<div class="w-56 md:w-72 rounded shadow-xl overflow-hidden" style="background-color: var(--color-soft);">
 							<img
-								src={bookCoverUrl}
+								src={fhbiCoverUrl}
 								alt="Father's Heart → Beloved Identity — free PDF"
 								class="w-full block"
 							/>
