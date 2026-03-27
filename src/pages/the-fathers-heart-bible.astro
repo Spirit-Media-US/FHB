@@ -30,6 +30,8 @@ const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '/samples';
 const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Download the Free Book';
 const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/download';
 const bookCoverUrl = media?.bookCoverUrl || '';
+const fhbiCoverUrl =
+	'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
 const communityUrl = media?.communityUrl || '/join';
 
 const distinctives = [
@@ -468,22 +470,13 @@ const shifts = [
 		<Section variant="soft">
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
 				<div class="flex justify-center">
-					{bookCoverUrl ? (
+					<div class="w-52 md:w-64 rounded overflow-hidden shadow-xl" style="background-color: var(--color-soft);">
 						<img
-							src={bookCoverUrl}
+							src={fhbiCoverUrl}
 							alt="Father's Heart → Beloved Identity — free PDF"
-							class="w-52 md:w-64 rounded shadow-xl"
+							class="w-full block"
 						/>
-					) : (
-						<div
-							class="w-52 md:w-64 aspect-[2/3] rounded shadow-xl flex items-end justify-center p-6"
-							style="background-color: var(--color-brand);"
-						>
-							<p class="text-center text-base font-light italic" style="font-family: var(--font-serif); color: rgba(255,255,255,0.9);">
-								Father's Heart →<br />Beloved Identity
-							</p>
-						</div>
-					)}
+					</div>
 				</div>
 				<div>
 					<p
