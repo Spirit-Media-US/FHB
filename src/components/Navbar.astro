@@ -31,7 +31,7 @@ const currentPath = Astro.url.pathname;
 <header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
 	<nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
 		<!-- Logo -->
-		<a href="/" class="no-underline shrink-0 flex flex-col items-center gap-0.5">
+		<a href="/" id="nav-logo" class="no-underline shrink-0 flex flex-col items-center gap-0.5">
 			<img
 				src="https://cdn.sanity.io/images/rusi1hyi/production/bf8e5685f1b30a651457f26abfa2ca1fa30cd784-900x450.png"
 				alt={siteName}
@@ -123,7 +123,10 @@ const currentPath = Astro.url.pathname;
 
 	function setNavColors(scrolled: boolean) {
 		if (!header) return;
-		const links = header.querySelectorAll<HTMLElement>('a, span');
+		const logo = document.getElementById('nav-logo');
+		const links = Array.from(header.querySelectorAll<HTMLElement>('a, span')).filter(
+			el => el !== logo && !logo?.contains(el)
+		);
 		const bars = [bar1, bar2, bar3];
 		if (scrolled || !darkHero) {
 			// Solid background — use brand brown for links
