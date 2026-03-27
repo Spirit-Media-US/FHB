@@ -67,12 +67,12 @@ const communityUrl = media?.communityUrl || '/join';
 		>
 			{heroVideoSrc && (
 				<video
+					id="hero-video"
 					class="absolute inset-0 w-full h-full object-cover"
 					src={heroVideoSrc}
 					poster={heroPosterSrc || undefined}
 					autoplay
 					muted
-					loop
 					playsinline
 					aria-hidden="true"
 				/>
@@ -121,6 +121,27 @@ const communityUrl = media?.communityUrl || '/join';
 			</div>
 		</section>
 
+		<script>
+			const heroVideos = [
+				'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4',
+				'https://assets.spiritmediapublishing.com/fathers-heart-bible/women-reading-bible-outdoors.mp4',
+				'https://assets.spiritmediapublishing.com/fathers-heart-bible/farmer-reading-bible.mp4',
+				'https://assets.spiritmediapublishing.com/fathers-heart-bible/reading-bible-4k.mov',
+				'https://assets.spiritmediapublishing.com/fathers-heart-bible/flipping-through-bible-church.mov',
+				'https://assets.spiritmediapublishing.com/fathers-heart-bible/hands-holding-bible.mov',
+				'https://assets.spiritmediapublishing.com/fathers-heart-bible/bible-lake-reading-hero.mov',
+				'https://assets.spiritmediapublishing.com/fathers-heart-bible/hands-bible-worship-church.mov',
+			];
+			let heroIdx = 0;
+			const heroVideo = document.getElementById('hero-video');
+			if (heroVideo) {
+				heroVideo.addEventListener('ended', () => {
+					heroIdx = (heroIdx + 1) % heroVideos.length;
+					heroVideo.src = heroVideos[heroIdx];
+					heroVideo.play();
+				});
+			}
+		</script>
 
 		<!-- ═══════════════════════════════════════════════════════════
 		     SECTION 2 — BIG IDEA
@@ -173,7 +194,7 @@ const communityUrl = media?.communityUrl || '/join';
 				</h2>
 			</div>
 
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 max-w-4xl mx-auto">
+			<div class="relative grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 max-w-4xl mx-auto">
 				<!-- Standard rendering -->
 				<div class="text-center">
 					<p
