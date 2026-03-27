@@ -4,6 +4,7 @@ import FormEmbed from '../components/FormEmbed.astro';
 import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
+import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
@@ -82,12 +83,24 @@ const nextSteps = [
 <Layout
 	title={seoTitle}
 	description={seoDescription}
+	darkHero={true}
 >
 	<Navbar />
-	<main class="pt-20">
+	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 1 — HERO / OFFER
+		     SECTION 1 — HERO
+		     ═══════════════════════════════════════════════════════════ -->
+		<VideoHeroInner
+			videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/farmer-reading-bible.mp4"
+			heading={heroHeading}
+			subheading={heroSubheading}
+			primaryCtaLabel={heroPrimaryCtaLabel}
+			primaryCtaHref="#form"
+		/>
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 2 — OFFER / FORM
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="soft">
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-start">
