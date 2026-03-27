@@ -1,0 +1,460 @@
+---
+import Footer from '../components/Footer.astro';
+import Navbar from '../components/Navbar.astro';
+import ScriptureBlock from '../components/ScriptureBlock.astro';
+import Section from '../components/Section.astro';
+import Layout from '../layouts/Layout.astro';
+import { sanityClient } from '../lib/sanity';
+
+// Fetch page SEO and scripture comparisons from Sanity
+const [pageData, sanityComparisons] = await Promise.all([
+	sanityClient.fetch(`*[_type == "page" && slug == "samples"][0] {
+    seoTitle, seoDescription,
+    heroHeading, heroSubheading,
+    heroPrimaryCtaLabel, heroPrimaryCtaHref,
+    heroSecondaryCtaLabel, heroSecondaryCtaHref
+  }`),
+	sanityClient.fetch(`*[_type == "scriptureComparison"] | order(order asc) {
+    reference, category, traditional, translationLabel, fhb, note, featured
+  }`),
+]);
+
+const seoTitle = pageData?.seoTitle || "Sample Passages | Father's Heart Bible";
+const seoDescription =
+	pageData?.seoDescription ||
+	'Explore sample passages from the Father’s Heart Bible and experience how this new Bible translation reveals God as Father and brings beloved identity into clear view.';
+const heroHeading = pageData?.heroHeading || 'Sample Passages';
+const heroSubheading =
+	pageData?.heroSubheading ||
+	'Experience how Scripture reads when the Father is more clearly revealed.';
+const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Download the Free Book';
+const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '/download';
+const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Join the Movement';
+const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/join';
+
+// Helper to get comparisons by category, falling back to hardcoded data if Sanity empty
+const byCategory = (cat: string) => sanityComparisons?.filter((c: any) => c.category === cat) ?? [];
+
+// Scripture comparison data — traditional vs FHB
+// Hardcoded fallbacks — used until Sanity is seeded
+// All strings use double quotes to safely handle apostrophes
+
+const john316 = {
+	ref: 'John 3:16',
+	traditional:
+		'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.',
+	fhbBold: true,
+	note: 'Jesus is revealing the one sending Him — not a sovereign authority, but a Father who gives His Son out of love for His children.',
+};
+
+const joel = [
+	{
+		ref: 'Joel 2:13',
+		traditional:
+			'Return to the Lord your God, for he is gracious and compassionate, slow to anger and abounding in love, and he relents from sending calamity.',
+		fhb: 'Return to your Father with all your heart — for your Father is gracious and compassionate, slow to anger and abounding in love, and He relents from sending calamity.',
+		note: 'The prophet is not calling people back to a distant sovereign. He is calling them home to a Father.',
+	},
+	{
+		ref: 'Joel 2:18',
+		traditional: 'Then the Lord was jealous for his land and took pity on his people.',
+		fhb: "Then our Father's heart went out for his land, and he had compassion on his people.",
+		note: "The Father's heart going out — not cold sovereignty, but the tender, urgent love of a Father who cannot stay removed from His children.",
+	},
+	{
+		ref: 'Joel 2:28',
+		traditional:
+			'I will pour out my Spirit on all people. Your sons and daughters will prophesy, your old men will dream dreams, your young men will see visions.',
+		fhb: 'I will pour out my Spirit on all my beloved sons and daughters. Your sons and daughters will prophesy, your old men will dream dreams, your young men will see visions.',
+		note: 'The outpouring is not simply demographic — it is the Father pouring Himself out on His beloved family.',
+	},
+];
+
+const heartLanguage = [
+	{
+		ref: 'Luke 15:20',
+		traditional:
+			'But while he was still a long way off, his father saw him and was filled with compassion for him; he ran to his son, threw his arms around him and kissed him.',
+		fhb: 'But while he was still a long way off, his father saw him and his heart went out to him; he ran to his son, threw his arms around him and held him close.',
+		note: 'The Father in this parable does not wait to be convinced. His heart goes out the moment he sees his child returning.',
+	},
+	{
+		ref: 'Matthew 9:36',
+		traditional:
+			'When he saw the crowds, he had compassion on them, because they were harassed and helpless, like sheep without a shepherd.',
+		fhb: "When he saw the crowds, his heart went out to them, because they were harassed and helpless — like children without a father's care.",
+		note: "Jesus doesn't observe the crowds analytically. His heart moves. FHB makes the tenderness of that moment vivid.",
+	},
+	{
+		ref: 'Zephaniah 3:17',
+		traditional:
+			'The Lord your God is with you, the Mighty Warrior who saves. He will take great delight in you; in his love he will no longer rebuke you, but will rejoice over you with singing.',
+		fhb: 'Your Father is in your midst — the Mighty One who saves. He will rejoice over you with gladness; He will quiet you with His love and exult over you with joyful singing.',
+		note: 'A Father who sings over His child. This is not religious transaction — this is the sound of delight.',
+	},
+];
+
+const identity = [
+	{
+		ref: 'Romans 8:15–16',
+		traditional:
+			"The Spirit you received does not make you slaves, so that you live in fear again; rather, the Spirit you received brought about your adoption to sonship. And by him we cry, 'Abba, Father.' The Spirit himself testifies with our spirit that we are God's children.",
+		fhb: "You did not receive a spirit of slavery to fall back into fear. You received the Spirit of beloved adoption — by whom we cry, 'Abba, Father.' And the Spirit himself confirms with our spirit that we are the Father's beloved children.",
+		note: "Paul's entire argument turns on identity. We are not slaves living in fear — we are beloved children living in the freedom of the Father's house.",
+	},
+	{
+		ref: 'John 1:12',
+		traditional:
+			'Yet to all who did receive him, to those who believed in his name, he gave the right to become children of God.',
+		fhb: 'Yet to all who received him — to all who trusted in his name — he gave the right to become beloved children of the Father.',
+		note: 'To receive Jesus is to be received into the family. The right is not legal standing alone — it is belonging.',
+	},
+	{
+		ref: 'Galatians 4:6',
+		traditional:
+			"Because you are his sons, God sent the Spirit of his Son into our hearts, the Spirit who calls out, 'Abba, Father.'",
+		fhb: "Because you are His beloved children, your Father sent the Spirit of His Son into our hearts — the Spirit who cries out, 'Abba, Father.'",
+		note: 'The Spirit is not given to strangers. He is given to beloved children who have been brought home.',
+	},
+];
+
+const synthesis = [
+	{
+		title: 'Reveals the Father',
+		body: 'FHB makes explicit what Scripture itself reveals — the fatherly identity of God throughout both covenants. This is not added to the text. It is drawn from it.',
+	},
+	{
+		title: 'Heart-Language That Lands',
+		body: "God's compassion, delight, and tenderness are not softened into formal language. They are rendered so the reader feels them — as a child feels a father's love.",
+	},
+	{
+		title: 'Beloved Identity',
+		body: "Reader after reader says the same thing: 'I finally felt like a child of God.' That is the invitation FHB extends on every page.",
+	},
+];
+---
+
+<Layout
+	title={seoTitle}
+	description={seoDescription}
+>
+	<Navbar />
+	<main class="pt-20">
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 1 — PAGE HERO
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="max-w-2xl mx-auto text-center">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-4"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Sample Passages
+				</p>
+				<h1
+					class="text-4xl md:text-5xl font-light leading-tight mb-6"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					{heroHeading}
+				</h1>
+								<p class="text-lg leading-relaxed mb-10" style="font-family: var(--font-sans); color: var(--color-muted);">
+					{heroSubheading}
+				</p>
+				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+					<a
+						href={heroPrimaryCtaHref}
+						class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+						onmouseout="this.style.backgroundColor='var(--color-brand)'"
+					>
+						{heroPrimaryCtaLabel}
+					</a>
+					<a
+						href="/join"
+						class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+						style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
+						onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
+						onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
+					>
+						Join the Movement
+					</a>
+				</div>
+				<p class="mt-8 text-base leading-relaxed max-w-lg mx-auto" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.8;">
+					Each example shows a familiar rendering alongside the Father's Heart Bible rendering.
+					Read slowly. Let yourself feel the difference.
+				</p>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 3 — JOHN 3:16 (FEATURED)
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="scripture">
+			<div class="max-w-3xl mx-auto">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3 text-center"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Featured Sample
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light mb-10 text-center"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					{john316.ref}
+				</h2>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+					<div class="p-7 rounded" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+						<p class="text-xs tracking-widest uppercase mb-5" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
+						<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.1rem;">
+							"{john316.traditional}"
+						</p>
+					</div>
+					<div class="p-7 rounded" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+						<p class="text-xs tracking-widest uppercase mb-5" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
+						<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.1rem;">
+							"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."
+						</p>
+					</div>
+				</div>
+				<p class="text-sm text-center leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{john316.note}</p>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 4 — JOEL 2
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					The Father in the Prophets
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					Joel 2 — Return, compassion, outpouring.
+				</h2>
+			</div>
+			<div class="space-y-12 max-w-3xl mx-auto">
+				{joel.map(({ ref, traditional, fhb, note }) => (
+					<div>
+						<p class="text-xs font-semibold tracking-widest uppercase mb-5 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">{ref}</p>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+							<div class="p-6 rounded" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+								<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
+								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted);">"{traditional}"</p>
+							</div>
+							<div class="p-6 rounded" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+								<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
+								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">"{fhb}"</p>
+							</div>
+						</div>
+						<p class="text-sm mt-4 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">{note}</p>
+					</div>
+				))}
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 5 — HEART-LANGUAGE
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Heart-Language
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light mb-4"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					Not only who He is — but how He feels.
+				</h2>
+				<p class="max-w-xl mx-auto leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					FHB seeks to reveal the Father's heart, not merely formal theological titles.
+					These examples show what happens when tenderness and delight are given their full voice.
+				</p>
+			</div>
+			<div class="space-y-12 max-w-3xl mx-auto">
+				{heartLanguage.map(({ ref, traditional, fhb, note }) => (
+					<div>
+						<p class="text-xs font-semibold tracking-widest uppercase mb-5 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">{ref}</p>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+							<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
+								<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
+								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted);">"{traditional}"</p>
+							</div>
+							<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+								<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
+								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">"{fhb}"</p>
+							</div>
+						</div>
+						<p class="text-sm mt-4 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">{note}</p>
+					</div>
+				))}
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 6 — IDENTITY / SONSHIP
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Beloved Identity
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light mb-4"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					You are a child of the Father — not a servant in His house.
+				</h2>
+				<p class="max-w-xl mx-auto leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					These passages carry the thread of adoption, belonging, and beloved identity
+					that runs through the New Testament letters.
+				</p>
+			</div>
+			<div class="space-y-12 max-w-3xl mx-auto">
+				{identity.map(({ ref, traditional, fhb, note }) => (
+					<div>
+						<p class="text-xs font-semibold tracking-widest uppercase mb-5 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">{ref}</p>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+							<div class="p-6 rounded" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+								<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
+								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted);">"{traditional}"</p>
+							</div>
+							<div class="p-6 rounded" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+								<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
+								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">"{fhb}"</p>
+							</div>
+						</div>
+						<p class="text-sm mt-4 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">{note}</p>
+					</div>
+				))}
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 7 — WHAT THESE EXAMPLES REVEAL
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="scripture">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					The Pattern
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					What these examples reveal.
+				</h2>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+				{synthesis.map(({ title, body }) => (
+					<div class="text-center p-6">
+						<div class="w-8 h-0.5 mx-auto mb-5" style="background-color: var(--color-gold);"></div>
+						<h3
+							class="text-xl font-medium mb-4"
+							style="font-family: var(--font-serif); color: var(--color-ink);"
+						>
+							{title}
+						</h3>
+						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{body}</p>
+					</div>
+				))}
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 8 — TASTE, NOT THE WHOLE MEAL
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="max-w-2xl mx-auto text-center">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-4"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Just the Beginning
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light mb-6"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					These are only a few pages of what the Father has been saying all along.
+				</h2>
+				<p class="text-lg leading-relaxed mb-10" style="font-family: var(--font-sans); color: var(--color-muted);">
+					The full vision goes much deeper. The best next step is the free book —
+					a focused introduction to the Father's heart behind this translation.
+					Concise, accessible, and written to create encounter.
+				</p>
+				<a
+					href="/download"
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+					onmouseout="this.style.backgroundColor='var(--color-brand)'"
+				>
+					Download the Free Book
+				</a>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 9 — JOIN / PARTNER CTA BAND
+		     ═══════════════════════════════════════════════════════════ -->
+		<section class="py-16 md:py-20" style="background-color: var(--color-deep);">
+			<div class="max-w-3xl mx-auto px-6 text-center">
+				<div class="w-10 h-0.5 mx-auto mb-8" style="background-color: var(--color-gold);"></div>
+				<p
+					class="text-xl italic mb-10"
+					style="font-family: var(--font-serif); color: rgba(255,255,255,0.8);"
+				>
+					There is more. Come and find it.
+				</p>
+				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+					<a
+						href="/join"
+						class="inline-flex items-center px-7 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+						style="font-family: var(--font-sans); background-color: var(--color-gold); color: var(--color-deep);"
+						onmouseover="this.style.filter='brightness(1.08)'"
+						onmouseout="this.style.filter='none'"
+					>
+						Join the Movement
+					</a>
+					<a
+						href="/partner"
+						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
+						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
+						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
+					>
+						Partner With Us
+					</a>
+				</div>
+			</div>
+		</section>
+
+	</main>
+	<Footer />
+</Layout>

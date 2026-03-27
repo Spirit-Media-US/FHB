@@ -6,7 +6,6 @@ interface NavLink {
 	href: string;
 }
 
-// Fetch siteSettings for branding and nav links
 const siteSettings = await sanityClient.fetch(`
   *[_type == "siteSettings"][0] {
     siteName,
@@ -18,10 +17,12 @@ const siteSettings = await sanityClient.fetch(`
 const siteName = siteSettings?.siteName || "Father's Heart Bible";
 
 const navLinks: NavLink[] = siteSettings?.navLinks || [
+	{ label: "The Father's Heart Bible", href: '/the-fathers-heart-bible' },
+	{ label: 'Samples', href: '/samples' },
+	{ label: 'Download', href: '/download' },
+	{ label: 'Join the Movement', href: '/join' },
+	{ label: 'Partner With Us', href: '/partner' },
 	{ label: 'About', href: '/about' },
-	{ label: 'Read the Preface', href: '/sample' },
-	{ label: 'Partner', href: '/partner' },
-	{ label: 'Contact', href: '/contact' },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -29,19 +30,28 @@ const currentPath = Astro.url.pathname;
 
 <header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
 	<nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-		<a href="/" class="group flex items-center gap-2 no-underline">
-			<span class="text-xl md:text-2xl font-semibold tracking-tight transition-colors" style="font-family: var(--font-serif); color: var(--color-charcoal);">
-				{siteName}
-			</span>
+		<!-- Logo -->
+		<a href="/" id="nav-logo" class="no-underline shrink-0 flex flex-col items-center gap-0.5">
+			<img
+				src="https://cdn.sanity.io/images/rusi1hyi/production/bf8e5685f1b30a651457f26abfa2ca1fa30cd784-900x450.png"
+				alt={siteName}
+				class="h-20 w-auto"
+				style="filter: brightness(0) saturate(100%) invert(26%) sepia(30%) saturate(800%) hue-rotate(350deg) brightness(75%) contrast(90%);"
+			/>
+			<span
+				class="text-xs font-semibold tracking-widest uppercase text-center w-full"
+				style="font-family: var(--font-sans); color: var(--color-brand-dark);"
+			>Father's Heart Bible</span>
 		</a>
 
-		<ul class="hidden md:flex items-center gap-8 list-none m-0 p-0">
-			{navLinks.map(link => (
+		<!-- Desktop nav -->
+		<ul class="hidden lg:flex items-center gap-7 list-none m-0 p-0">
+			{navLinks.slice(0, 5).map(link => (
 				<li>
 					<a
 						href={link.href}
-						class="text-sm font-medium tracking-wide uppercase no-underline transition-colors duration-200"
-						style={`font-family: var(--font-sans); color: ${currentPath === link.href ? 'var(--color-accent-dark)' : 'var(--color-warm-gray)'}; letter-spacing: 0.08em;`}
+						class="text-sm font-medium no-underline transition-colors duration-200"
+						style={`font-family: var(--font-sans); color: var(--color-brand); letter-spacing: 0.04em;`}
 					>
 						{link.label}
 					</a>
@@ -49,33 +59,53 @@ const currentPath = Astro.url.pathname;
 			))}
 		</ul>
 
+		<!-- CTA button -->
+		<a
+			href="/download"
+			class="hidden lg:inline-flex items-center px-5 py-2 text-sm font-semibold no-underline transition-all duration-200 rounded"
+			style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff; letter-spacing: 0.03em;"
+			onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+			onmouseout="this.style.backgroundColor='var(--color-brand)'"
+		>
+			Download Free
+		</a>
+
 		<!-- Mobile hamburger -->
 		<button
 			id="mobile-menu-btn"
-			class="md:hidden flex flex-col gap-1.5 p-2 cursor-pointer bg-transparent border-none"
+			class="lg:hidden flex flex-col gap-1.5 p-2 cursor-pointer bg-transparent border-none"
 			aria-label="Toggle menu"
 			aria-expanded="false"
 		>
-			<span class="block w-6 h-0.5 transition-all duration-300 origin-center" style="background-color: var(--color-charcoal);" id="bar1"></span>
-			<span class="block w-6 h-0.5 transition-all duration-300" style="background-color: var(--color-charcoal);" id="bar2"></span>
-			<span class="block w-6 h-0.5 transition-all duration-300 origin-center" style="background-color: var(--color-charcoal);" id="bar3"></span>
+			<span class="block w-6 h-0.5 transition-all duration-300 origin-center" style="background-color: var(--color-ink);" id="bar1"></span>
+			<span class="block w-6 h-0.5 transition-all duration-300" style="background-color: var(--color-ink);" id="bar2"></span>
+			<span class="block w-6 h-0.5 transition-all duration-300 origin-center" style="background-color: var(--color-ink);" id="bar3"></span>
 		</button>
 	</nav>
 
 	<!-- Mobile menu -->
-	<div id="mobile-menu" class="md:hidden hidden" style="background-color: var(--color-cream);">
+	<div id="mobile-menu" class="lg:hidden hidden border-t" style="background-color: var(--color-canvas); border-color: var(--color-hairline);">
 		<ul class="flex flex-col items-center gap-6 py-8 list-none m-0 px-6">
 			{navLinks.map(link => (
 				<li>
 					<a
 						href={link.href}
-						class="text-sm font-medium tracking-wide uppercase no-underline transition-colors duration-200"
-						style={`font-family: var(--font-sans); color: ${currentPath === link.href ? 'var(--color-accent-dark)' : 'var(--color-warm-gray)'}; letter-spacing: 0.08em;`}
+						class="text-sm font-medium no-underline transition-colors duration-200"
+						style={`font-family: var(--font-sans); color: var(--color-brand); letter-spacing: 0.04em;`}
 					>
 						{link.label}
 					</a>
 				</li>
 			))}
+			<li>
+				<a
+					href="/download"
+					class="inline-flex items-center px-6 py-2.5 text-sm font-semibold no-underline rounded"
+					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+				>
+					Download Free
+				</a>
+			</li>
 		</ul>
 	</div>
 </header>
@@ -89,21 +119,41 @@ const currentPath = Astro.url.pathname;
 	const bar3 = document.getElementById('bar3');
 	let menuOpen = false;
 
-	// Scroll: add background on scroll
+	const darkHero = document.body.dataset.darkHero === 'true';
+
+	function setNavColors(scrolled: boolean) {
+		if (!header) return;
+		const logo = document.getElementById('nav-logo');
+		const links = Array.from(header.querySelectorAll<HTMLElement>('a, span')).filter(
+			el => el !== logo && !logo?.contains(el)
+		);
+		const bars = [bar1, bar2, bar3];
+		if (scrolled || !darkHero) {
+			// Solid background — use brand brown for links
+			links.forEach(el => { el.style.color = 'var(--color-brand)'; });
+			bars.forEach(el => { if (el) el.style.backgroundColor = 'var(--color-ink)'; });
+		} else {
+			// Transparent on dark hero — use white
+			links.forEach(el => { el.style.color = 'rgba(255,255,255,0.92)'; });
+			bars.forEach(el => { if (el) el.style.backgroundColor = 'rgba(255,255,255,0.85)'; });
+		}
+	}
+
 	function handleScroll() {
 		if (!header) return;
-		if (window.scrollY > 40) {
-			header.style.backgroundColor = 'var(--color-cream)';
-			header.style.boxShadow = '0 1px 12px rgba(30,27,24,0.06)';
+		const scrolled = window.scrollY > 40;
+		if (scrolled) {
+			header.style.backgroundColor = 'var(--color-canvas)';
+			header.style.boxShadow = '0 1px 12px rgba(28,26,23,0.08)';
 		} else {
 			header.style.backgroundColor = 'transparent';
 			header.style.boxShadow = 'none';
 		}
+		setNavColors(scrolled);
 	}
 	window.addEventListener('scroll', handleScroll, { passive: true });
 	handleScroll();
 
-	// Mobile menu toggle
 	menuBtn?.addEventListener('click', () => {
 		menuOpen = !menuOpen;
 		mobileMenu?.classList.toggle('hidden');

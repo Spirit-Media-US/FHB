@@ -1,0 +1,38 @@
+---
+interface Props {
+	id?: string;
+	variant?: 'light' | 'soft' | 'scripture' | 'cta-band' | 'dark';
+	class?: string;
+}
+
+const { id, variant = 'light', class: className } = Astro.props;
+
+const bgMap: Record<string, string> = {
+	light: 'var(--color-canvas)',
+	soft: 'var(--color-soft)',
+	scripture: 'var(--color-soft)',
+	'cta-band': 'var(--color-brand)',
+	dark: 'var(--color-deep)',
+};
+
+const paddingMap: Record<string, string> = {
+	light: 'py-14 md:py-20',
+	soft: 'py-14 md:py-20',
+	scripture: 'py-16 md:py-24',
+	'cta-band': 'py-12 md:py-16',
+	dark: 'py-14 md:py-20',
+};
+
+const bg = bgMap[variant];
+const padding = paddingMap[variant];
+---
+
+<section
+	id={id}
+	class={`${padding} ${className ?? ''}`}
+	style={`background-color: ${bg};`}
+>
+	<div class="max-w-6xl mx-auto px-6">
+		<slot />
+	</div>
+</section>

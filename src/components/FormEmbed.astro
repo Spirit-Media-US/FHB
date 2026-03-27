@@ -1,0 +1,46 @@
+---
+interface Props {
+	formId?: string;
+	headline?: string;
+	body?: string;
+}
+
+const { formId, headline, body } = Astro.props;
+---
+
+<div class="max-w-xl mx-auto">
+	{headline && (
+		<h2
+			class="text-3xl md:text-4xl font-light text-center mb-4"
+			style="font-family: var(--font-serif); color: var(--color-ink);"
+		>
+			{headline}
+		</h2>
+	)}
+	{body && (
+		<p
+			class="text-center mb-8 leading-relaxed"
+			style="font-family: var(--font-sans); color: var(--color-muted);"
+		>
+			{body}
+		</p>
+	)}
+
+	<!-- GHL embed slot — paste embed code here or pass formId -->
+	<div class="ghl-form-wrapper">
+		{formId ? (
+			<>
+				<iframe
+					src={`https://mail.spiritmediaone.com/widget/survey/${formId}`}
+					style="border:none;width:100%;"
+					scrolling="no"
+					id={formId}
+					title="survey"
+				></iframe>
+				<script src="https://mail.spiritmediaone.com/js/form_embed.js"></script>
+			</>
+		) : (
+			<slot />
+		)}
+	</div>
+</div>

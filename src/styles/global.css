@@ -3,22 +3,26 @@
 /* ── Fonts ── */
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap");
 
-/* ── Design Tokens ── */
-:root {
-	/* Neutral warm palette */
-	--color-cream: #faf8f5;
-	--color-linen: #f3efe9;
-	--color-stone: #d6cfc4;
-	--color-warm-gray: #9b9487;
-	--color-charcoal: #3d3833;
-	--color-ink: #1e1b18;
+/* ── Design Tokens (Tailwind v4 @theme) ── */
+@theme {
+	/* Backgrounds */
+	--color-canvas: #f7f3ee;
+	--color-soft: #fcfbf8;
 
-	/* Accent — warm gold, subtle */
-	--color-accent: #b8944f;
-	--color-accent-light: #d4b06a;
-	--color-accent-dark: #96783f;
+	/* Text */
+	--color-ink: #1c1a17;
+	--color-muted: #5f5a54;
 
-	/* Typography */
+	/* Brand */
+	--color-brand: #8a5a34;
+	--color-brand-dark: #6f4528;
+	--color-gold: #c9a15d;
+
+	/* Structure */
+	--color-hairline: #e7ded2;
+	--color-deep: #241b17;
+
+	/* Fonts */
 	--font-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
 	--font-sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
 }
@@ -26,15 +30,23 @@
 /* ── Base ── */
 html {
 	scroll-behavior: smooth;
+	scroll-padding-top: 5rem;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
 
 body {
 	font-family: var(--font-sans);
+	font-size: 17px;
 	color: var(--color-ink);
-	background-color: var(--color-cream);
-	line-height: 1.7;
+	background-color: var(--color-canvas);
+	line-height: 1.75;
+}
+
+@media (min-width: 768px) {
+	body {
+		font-size: 18px;
+	}
 }
 
 /* ── Typography ── */
@@ -46,16 +58,11 @@ h5,
 h6 {
 	font-family: var(--font-serif);
 	line-height: 1.2;
-	color: var(--color-charcoal);
+	color: var(--color-ink);
 }
 
 /* ── Selection ── */
 ::selection {
-	background-color: var(--color-accent-light);
-	color: var(--color-ink);
-}
-
-/* ── Scroll padding for fixed nav ── */
-html {
-	scroll-padding-top: 5rem;
+	background-color: var(--color-gold);
+	color: var(--color-deep);
 }

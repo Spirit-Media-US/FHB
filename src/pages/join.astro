@@ -1,0 +1,521 @@
+---
+import Footer from '../components/Footer.astro';
+import ImageGrid from '../components/ImageGrid.astro';
+import Navbar from '../components/Navbar.astro';
+import Section from '../components/Section.astro';
+import Layout from '../layouts/Layout.astro';
+import { sanityClient } from '../lib/sanity';
+
+const [pageData, media] = await Promise.all([
+	sanityClient.fetch(`*[_type == "page" && slug == "join"][0] {
+    seoTitle, seoDescription,
+    heroHeading, heroSubheading,
+    heroPrimaryCtaLabel, heroPrimaryCtaHref,
+    heroSecondaryCtaLabel, heroSecondaryCtaHref
+  }`),
+	sanityClient.fetch(`*[_type == "siteSettings"][0] {
+    communityUrl, mightyNetworksUrl,
+    peoplePhoto1Url, peoplePhoto2Url, peoplePhoto3Url, peoplePhoto4Url
+  }`),
+]);
+
+const seoTitle = pageData?.seoTitle || "Join the Movement | Father's Heart Bible";
+const seoDescription =
+	pageData?.seoDescription ||
+	'Join the Father’s Heart Movement to grow in beloved identity, hear His voice, pray, and take part in publishing the Father’s Heart Bible to the nations.';
+const heroHeading = pageData?.heroHeading || 'Join the Father’s Heart Movement';
+const heroSubheading = pageData?.heroSubheading || 'Be part of what the Father is doing.';
+const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Join the Movement';
+const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '#join';
+const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Download the Free Book';
+const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/download';
+// communityUrl field takes precedence; fall back to legacy mightyNetworksUrl
+const communityUrl = media?.communityUrl || media?.mightyNetworksUrl || '#join';
+const photo1 = media?.peoplePhoto1Url || '';
+const photo2 = media?.peoplePhoto2Url || '';
+const photo3 = media?.peoplePhoto3Url || '';
+const photo4 = media?.peoplePhoto4Url || '';
+
+const whyJoin = [
+	{
+		title: 'Grow in Beloved Identity',
+		body: "Resources and community designed to help you live from the truth that you are the Father's beloved child.",
+	},
+	{
+		title: 'Deepen Intimacy with the Father',
+		body: 'A space to draw near, hear His voice, and encounter Him — not just learn about Him.',
+	},
+	{
+		title: 'Pray and Intercede',
+		body: 'Join others in standing in prayer for the translation, the movement, and the nations it is reaching.',
+	},
+	{
+		title: 'Follow the Bible Project',
+		body: "Stay close to the progress of the full Father's Heart Bible — from translation to publication.",
+	},
+	{
+		title: 'Participate Globally',
+		body: 'Be part of a movement that is placing this Word into communities around the world.',
+	},
+];
+
+const communityAreas = [
+	{
+		title: 'Movement Hub',
+		body: "The center of the community — updates, announcements, and shared life around the Father's Heart Bible.",
+	},
+	{
+		title: 'Beloved Identity',
+		body: 'Resources to help you receive your identity as a son or daughter of the Father. Begin here.',
+	},
+	{
+		title: 'Prayer & Intercession',
+		body: "Gathered prayer for the translation, distribution, and those who have yet to hear the Father's voice.",
+	},
+	{
+		title: 'Distribution & Impact',
+		body: "Follow how the Father's Heart Bible is reaching individuals, communities, and nations.",
+	},
+	{
+		title: 'Translation Collaboration',
+		body: 'Engage with the ongoing work of translation — offering prayer, input, and support.',
+	},
+];
+
+const audience = [
+	'You are hungry for deeper intimacy with the Father — not just more theological information.',
+	'You are awakening to beloved identity and want to grow in that truth alongside others.',
+	"You long for a community centered on the Father's heart, not performance or platform.",
+	'You want to pray for something real — the Word going into the nations.',
+	"You want to follow the Father's Heart Bible project and be there when it arrives.",
+	'You want to participate in something larger than yourself.',
+];
+
+const howToBegin = [
+	{
+		step: '1',
+		heading: 'Join the community',
+		body: "Click the button below and create your free account in the Father's Heart Movement on Mighty Networks.",
+	},
+	{
+		step: '2',
+		heading: 'Begin with Beloved Identity',
+		body: 'Your first stop inside the community — a foundational resource to anchor everything that follows.',
+	},
+	{
+		step: '3',
+		heading: 'Participate and stay connected',
+		body: 'Engage through prayer, conversation, and the ongoing life of the movement. You belong here.',
+	},
+];
+---
+
+<Layout
+	title={seoTitle}
+	description={seoDescription}
+>
+	<Navbar />
+	<main class="pt-20">
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 1 — HERO
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="max-w-2xl mx-auto text-center">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-4"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					The Father's Heart Movement
+				</p>
+				<h1
+					class="text-4xl md:text-5xl font-light leading-tight mb-6"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					{heroHeading}
+				</h1>
+								<p class="text-lg leading-relaxed mb-10" style="font-family: var(--font-sans); color: var(--color-muted);">
+					{heroSubheading}
+				</p>
+				<a
+					href={heroPrimaryCtaHref}
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+					onmouseout="this.style.backgroundColor='var(--color-brand)'"
+				>
+					{heroPrimaryCtaLabel}
+				</a>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 2 — THE BIG PURPOSE
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-start max-w-4xl mx-auto">
+				<div>
+					<p
+						class="text-xs font-semibold tracking-widest uppercase mb-4"
+						style="font-family: var(--font-sans); color: var(--color-gold);"
+					>
+						Our Purpose
+					</p>
+					<h2
+						class="text-3xl md:text-4xl font-light leading-tight"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						A global Father's Heart movement.
+					</h2>
+				</div>
+				<div class="space-y-5">
+					{[
+						"Publishing the Father's Heart Bible for the nations",
+						"Awakening identity as beloved sons and daughters",
+						"Training people to hear the Father's voice",
+						"Placing His Word into every nation",
+					].map((point) => (
+						<div class="flex gap-4 items-start">
+							<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
+							<p class="leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{point}</p>
+						</div>
+					))}
+				</div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 3 — WHY JOIN
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Why Join
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					What happens when you join.
+				</h2>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
+				{whyJoin.map(({ title, body }) => (
+					<div
+						class="p-6 rounded"
+						style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
+					>
+						<div class="w-6 h-0.5 mb-4" style="background-color: var(--color-gold);"></div>
+						<h3 class="font-semibold mb-2 leading-snug" style="font-family: var(--font-sans); color: var(--color-ink);">{title}</h3>
+						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{body}</p>
+					</div>
+				))}
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 4 — WHAT YOU'LL FIND INSIDE
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Inside the Movement
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					What you will find when you arrive.
+				</h2>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
+				{communityAreas.map(({ title, body }) => (
+					<div
+						class="p-6 rounded"
+						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
+					>
+						<h3 class="font-semibold mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">{title}</h3>
+						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{body}</p>
+					</div>
+				))}
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 5 — WHO THIS IS FOR
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="scripture">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Is This For You?
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					You belong here — if you recognize yourself.
+				</h2>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+				{audience.map((statement) => (
+					<div
+						class="flex gap-4 items-start p-5 rounded"
+						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
+					>
+						<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
+						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{statement}</p>
+					</div>
+				))}
+			</div>
+			<div class="text-center mt-12">
+				<a
+					href={communityUrl}
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+					onmouseout="this.style.backgroundColor='var(--color-brand)'"
+				>
+					Join the Movement
+				</a>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 6 — RELATIONAL PHOTO SECTION
+		     ═══════════════════════════════════════════════════════════ -->
+		{(photo1 || photo2 || photo3 || photo4) ? (
+			<Section variant="light">
+				<div class="text-center mb-10">
+					<p
+						class="text-lg italic leading-relaxed max-w-xl mx-auto"
+						style="font-family: var(--font-serif); color: var(--color-muted);"
+					>
+						This movement is not merely information — it is lived, shared, received.
+					</p>
+				</div>
+				<ImageGrid cols={photo4 ? 4 : 3} gap="md">
+					{photo1 && (
+						<img src={`${photo1}?w=600&auto=format`} alt="Community in the Father's Heart Movement" class="w-full aspect-square object-cover rounded" />
+					)}
+					{photo2 && (
+						<img src={`${photo2}?w=600&auto=format`} alt="Readers encountering the Father's heart" class="w-full aspect-square object-cover rounded" />
+					)}
+					{photo3 && (
+						<img src={`${photo3}?w=600&auto=format`} alt="Belonging and identity in community" class="w-full aspect-square object-cover rounded" />
+					)}
+					{photo4 && (
+						<img src={`${photo4}?w=600&auto=format`} alt="Prayer and participation in the movement" class="w-full aspect-square object-cover rounded" />
+					)}
+				</ImageGrid>
+			</Section>
+		) : (
+			<Section variant="light">
+				<div class="max-w-xl mx-auto text-center">
+					<p
+						class="text-xl italic leading-relaxed"
+						style="font-family: var(--font-serif); color: var(--color-muted);"
+					>
+						This movement is not merely information — it is lived, shared, received.
+						Belonging to the Father means belonging to His family.
+					</p>
+				</div>
+			</Section>
+		)}
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 7 — HOW TO BEGIN
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div id="join" class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Getting Started
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					Three simple steps to begin.
+				</h2>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+				{howToBegin.map(({ step, heading, body }) => (
+					<div class="text-center p-6">
+						<div
+							class="w-9 h-9 rounded-full flex items-center justify-center mx-auto mb-5 text-sm font-semibold"
+							style="background-color: var(--color-brand); color: #fff; font-family: var(--font-sans);"
+						>
+							{step}
+						</div>
+						<h3 class="font-semibold mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">{heading}</h3>
+						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{body}</p>
+					</div>
+				))}
+			</div>
+			<div class="text-center mt-10">
+				<a
+					href={communityUrl}
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+					onmouseout="this.style.backgroundColor='var(--color-brand)'"
+				>
+					Join the Movement
+				</a>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 8 — SECONDARY CTA: DOWNLOAD
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center max-w-4xl mx-auto">
+				<div>
+					<p
+						class="text-xs font-semibold tracking-widest uppercase mb-4"
+						style="font-family: var(--font-sans); color: var(--color-gold);"
+					>
+						Not Ready to Join Yet?
+					</p>
+					<h2
+						class="text-3xl font-light mb-4"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						Start with the free book.
+					</h2>
+					<p class="leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+						<em>Father's Heart → Beloved Identity</em> is the best first step for those who want
+						to begin quietly. Read it at your own pace, and let the Father speak before you
+						take another step.
+					</p>
+					<a
+						href="/download"
+						class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+						onmouseout="this.style.backgroundColor='var(--color-brand)'"
+					>
+						Download the Free Book
+					</a>
+				</div>
+				<div
+					class="p-8 rounded text-center"
+					style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
+				>
+					<p
+						class="text-2xl italic leading-relaxed mb-4"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						"The destination has always been the Father."
+					</p>
+					<p
+						class="text-xs tracking-widest uppercase"
+						style="font-family: var(--font-sans); color: var(--color-muted);"
+					>
+						Father's Heart → Beloved Identity
+					</p>
+				</div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 9 — PARTNER INVITATION (LIGHT)
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="max-w-2xl mx-auto text-center">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-4"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Go Further
+				</p>
+				<h2
+					class="text-3xl font-light mb-6"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					Some will also choose to support the work.
+				</h2>
+				<p class="leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Partnership helps publish and distribute the Father's Heart Bible into the nations.
+					Giving is participation — an act of belonging to what the Father is doing,
+					not an obligation or transaction.
+				</p>
+				<a
+					href="/partner"
+					class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+					style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
+					onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
+					onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
+				>
+					Partner With Us
+				</a>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 10 — FINAL CTA BAND
+		     ═══════════════════════════════════════════════════════════ -->
+		<section class="py-16 md:py-20" style="background-color: var(--color-deep);">
+			<div class="max-w-3xl mx-auto px-6 text-center">
+				<div class="w-10 h-0.5 mx-auto mb-8" style="background-color: var(--color-gold);"></div>
+				<p
+					class="text-xl italic mb-10"
+					style="font-family: var(--font-serif); color: rgba(255,255,255,0.8);"
+				>
+					The Father is gathering His family. You are welcome here.
+				</p>
+				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+					<a
+						href={communityUrl}
+						class="inline-flex items-center px-7 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+						style="font-family: var(--font-sans); background-color: var(--color-gold); color: var(--color-deep);"
+						onmouseover="this.style.filter='brightness(1.08)'"
+						onmouseout="this.style.filter='none'"
+					>
+						Join the Movement
+					</a>
+					<a
+						href="/download"
+						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
+						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
+						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
+					>
+						Download the Free Book
+					</a>
+					<a
+						href="/partner"
+						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
+						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
+						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
+					>
+						Partner With Us
+					</a>
+				</div>
+			</div>
+		</section>
+
+	</main>
+	<Footer />
+</Layout>
