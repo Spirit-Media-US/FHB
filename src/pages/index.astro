@@ -92,13 +92,13 @@ const communityUrl = media?.communityUrl || '/join';
 			<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-16 md:pb-24">
 				<h1
 					class="text-4xl md:text-6xl font-light leading-tight mb-6"
-					style="font-family: var(--font-serif); color: var(--color-deep);"
+					style="font-family: var(--font-serif); color: #1a2d5a;"
 				>
 					{heroHeading}
 				</h1>
 				<p
 					class="text-lg md:text-xl mb-10 leading-relaxed"
-					style="font-family: var(--font-sans); color: var(--color-deep);"
+					style="font-family: var(--font-sans); color: #1a2d5a;"
 				>
 					{heroSubheading}
 				</p>
@@ -106,7 +106,7 @@ const communityUrl = media?.communityUrl || '/join';
 					<a
 						href={heroPrimaryCtaHref}
 						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
-						style="font-family: var(--font-sans); background-color: var(--color-gold); color: var(--color-deep);"
+						style="font-family: var(--font-sans); background-color: var(--color-gold); color: #1a2d5a;"
 						onmouseover="this.style.filter='brightness(1.08)'"
 						onmouseout="this.style.filter='none'"
 					>
@@ -115,9 +115,9 @@ const communityUrl = media?.communityUrl || '/join';
 					<a
 						href={heroSecondaryCtaHref}
 						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline rounded border transition-all duration-200"
-						style="font-family: var(--font-sans); color: rgba(255,255,255,0.9); border-color: rgba(255,255,255,0.35);"
-						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
-						onmouseout="this.style.borderColor='rgba(255,255,255,0.35)'"
+						style="font-family: var(--font-sans); color: #1a2d5a; border-color: rgba(26,45,90,0.4);"
+						onmouseover="this.style.borderColor='rgba(26,45,90,0.7)'"
+						onmouseout="this.style.borderColor='rgba(26,45,90,0.4)'"
 					>
 						{heroSecondaryCtaLabel}
 					</a>
@@ -131,12 +131,26 @@ const communityUrl = media?.communityUrl || '/join';
 				'https://assets.spiritmediapublishing.com/fathers-heart-bible/reading-bible-4k.mov',
 			];
 			let heroIdx = 0;
-			const heroVideo = document.getElementById('hero-video');
+			let transitioning = false;
+			const heroVideo = document.getElementById('hero-video') as HTMLVideoElement | null;
 			if (heroVideo) {
+				heroVideo.style.transition = 'opacity 0.8s ease';
+				heroVideo.playbackRate = 0.75;
+
+				heroVideo.addEventListener('canplay', () => {
+					heroVideo.playbackRate = 0.75;
+					if (transitioning) {
+						heroVideo.play();
+						heroVideo.style.opacity = '1';
+						transitioning = false;
+					}
+				});
+
 				heroVideo.addEventListener('ended', () => {
+					transitioning = true;
 					heroIdx = (heroIdx + 1) % heroVideos.length;
-					heroVideo.src = heroVideos[heroIdx];
-					heroVideo.play();
+					heroVideo.style.opacity = '0';
+					setTimeout(() => { heroVideo.src = heroVideos[heroIdx]; }, 400);
 				});
 			}
 		</script>

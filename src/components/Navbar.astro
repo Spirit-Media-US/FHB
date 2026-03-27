@@ -44,7 +44,7 @@ const currentPath = Astro.url.pathname;
 					<a
 						href={link.href}
 						class="text-sm font-medium no-underline transition-colors duration-200"
-						style={`font-family: var(--font-sans); color: ${currentPath === link.href ? 'var(--color-brand)' : 'var(--color-muted)'}; letter-spacing: 0.04em;`}
+						style={`font-family: var(--font-sans); color: var(--color-brand); letter-spacing: 0.04em;`}
 					>
 						{link.label}
 					</a>
@@ -84,7 +84,7 @@ const currentPath = Astro.url.pathname;
 					<a
 						href={link.href}
 						class="text-sm font-medium no-underline transition-colors duration-200"
-						style={`font-family: var(--font-sans); color: ${currentPath === link.href ? 'var(--color-brand)' : 'var(--color-muted)'}; letter-spacing: 0.04em;`}
+						style={`font-family: var(--font-sans); color: var(--color-brand); letter-spacing: 0.04em;`}
 					>
 						{link.label}
 					</a>
@@ -119,8 +119,8 @@ const currentPath = Astro.url.pathname;
 		const links = header.querySelectorAll<HTMLElement>('a, span');
 		const bars = [bar1, bar2, bar3];
 		if (scrolled || !darkHero) {
-			// Solid background — always use dark ink
-			links.forEach(el => { el.style.color = ''; }); // reset to CSS
+			// Solid background — use brand brown for links
+			links.forEach(el => { el.style.color = 'var(--color-brand)'; });
 			bars.forEach(el => { if (el) el.style.backgroundColor = 'var(--color-ink)'; });
 		} else {
 			// Transparent on dark hero — use white
