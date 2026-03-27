@@ -7,6 +7,7 @@ interface Props {
 	description?: string;
 	image?: string;
 	noindex?: boolean;
+	darkHero?: boolean;
 }
 
 const {
@@ -14,6 +15,7 @@ const {
 	description = "A new Bible translation revealing our Father's heart — from Genesis to Revelation.",
 	image,
 	noindex = false,
+	darkHero = false,
 } = Astro.props;
 
 // Fetch siteName and ogImage from Sanity
@@ -67,7 +69,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={ogImage} />
 	</head>
-	<body class="min-h-screen flex flex-col">
+	<body class="min-h-screen flex flex-col" data-dark-hero={darkHero ? 'true' : 'false'}>
 		<slot />
 	</body>
 </html>

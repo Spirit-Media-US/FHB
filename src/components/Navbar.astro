@@ -112,15 +112,34 @@ const currentPath = Astro.url.pathname;
 	const bar3 = document.getElementById('bar3');
 	let menuOpen = false;
 
+	const darkHero = document.body.dataset.darkHero === 'true';
+
+	function setNavColors(scrolled: boolean) {
+		if (!header) return;
+		const links = header.querySelectorAll<HTMLElement>('a, span');
+		const bars = [bar1, bar2, bar3];
+		if (scrolled || !darkHero) {
+			// Solid background — always use dark ink
+			links.forEach(el => { el.style.color = ''; }); // reset to CSS
+			bars.forEach(el => { if (el) el.style.backgroundColor = 'var(--color-ink)'; });
+		} else {
+			// Transparent on dark hero — use white
+			links.forEach(el => { el.style.color = 'rgba(255,255,255,0.92)'; });
+			bars.forEach(el => { if (el) el.style.backgroundColor = 'rgba(255,255,255,0.85)'; });
+		}
+	}
+
 	function handleScroll() {
 		if (!header) return;
-		if (window.scrollY > 40) {
+		const scrolled = window.scrollY > 40;
+		if (scrolled) {
 			header.style.backgroundColor = 'var(--color-canvas)';
 			header.style.boxShadow = '0 1px 12px rgba(28,26,23,0.08)';
 		} else {
 			header.style.backgroundColor = 'transparent';
 			header.style.boxShadow = 'none';
 		}
+		setNavColors(scrolled);
 	}
 	window.addEventListener('scroll', handleScroll, { passive: true });
 	handleScroll();
