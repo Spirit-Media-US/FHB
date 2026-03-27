@@ -70,16 +70,27 @@ const communityUrl = media?.communityUrl || '/join';
 			id="hero-section"
 		>
 			{heroVideoSrc && (
-				<video
-					id="hero-video"
-					class="absolute inset-0 w-full h-full object-cover"
-					src={heroVideoSrc}
-					poster={heroPosterSrc || undefined}
-					autoplay
-					muted
-					playsinline
-					aria-hidden="true"
-				/>
+				<>
+					<video
+						id="hero-video-a"
+						class="absolute inset-0 w-full h-full object-cover"
+						src={heroVideoSrc}
+						poster={heroPosterSrc || undefined}
+						autoplay
+						muted
+						playsinline
+						aria-hidden="true"
+						style="transition: opacity 1s ease; opacity: 1;"
+					/>
+					<video
+						id="hero-video-b"
+						class="absolute inset-0 w-full h-full object-cover"
+						muted
+						playsinline
+						aria-hidden="true"
+						style="transition: opacity 1s ease; opacity: 0;"
+					/>
+				</>
 			)}
 			{!heroVideoSrc && heroPosterSrc && (
 				<img
@@ -130,28 +141,28 @@ const communityUrl = media?.communityUrl || '/join';
 				'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4',
 				'https://assets.spiritmediapublishing.com/fathers-heart-bible/reading-bible-4k.mov',
 			];
-			let heroIdx = 0;
-			let transitioning = false;
-			const heroVideo = document.getElementById('hero-video') as HTMLVideoElement | null;
-			if (heroVideo) {
-				heroVideo.style.transition = 'opacity 0.8s ease';
-				heroVideo.playbackRate = 0.75;
+			const vA = document.getElementById('hero-video-a') as HTMLVideoElement | null;
+			const vB = document.getElementById('hero-video-b') as HTMLVideoElement | null;
+			if (vA && vB) {
+				let heroIdx = 0;
+				let curr: HTMLVideoElement = vA;
+				let next: HTMLVideoElement = vB;
+				vA.playbackRate = 0.75;
+				// Preload next video
+				next.src = heroVideos[(heroIdx + 1) % heroVideos.length];
 
-				heroVideo.addEventListener('canplay', () => {
-					heroVideo.playbackRate = 0.75;
-					if (transitioning) {
-						heroVideo.play();
-						heroVideo.style.opacity = '1';
-						transitioning = false;
-					}
-				});
-
-				heroVideo.addEventListener('ended', () => {
-					transitioning = true;
+				function crossfade() {
 					heroIdx = (heroIdx + 1) % heroVideos.length;
-					heroVideo.style.opacity = '0';
-					setTimeout(() => { heroVideo.src = heroVideos[heroIdx]; }, 400);
-				});
+					next.play().then(() => {
+						next.playbackRate = 0.75;
+						next.style.opacity = '1';
+						curr.style.opacity = '0';
+						const tmp = curr; curr = next; next = tmp;
+						next.src = heroVideos[(heroIdx + 1) % heroVideos.length];
+					}).catch(() => { curr.play(); });
+				}
+				vA.addEventListener('ended', crossfade);
+				vB.addEventListener('ended', crossfade);
 			}
 		</script>
 
