@@ -283,23 +283,20 @@ All 7 launch pages built and pushed to dev:
 
 ## Stitch MCP — AI Design Tool
 
-**What it is:** Google Stitch 2.0 is an AI-powered design tool available as an MCP server on Bethel. It generates full page designs and auto-creates design systems (colors, typography, component rules).
+Google Stitch 2.0 is an MCP server available in this project for AI-powered design work. It generates full page designs and auto-creates design systems (colors, typography, component rules). Configured at user scope in `~/.claude.json` — available automatically in all projects.
 
-**Config:** `/home/deploy/claude-config/mcp.json` — command: `npx @_davideast/stitch-mcp proxy`
+**When to use:** When Kevin asks for design work, new page layouts, or visual redesigns. Use Stitch first to get 80–90% of the design done visually, then implement in Astro/Tailwind.
 
-**Available tools:** 12 tools including `create_project`, `generate_screen_from_text`, `create_design_system`, `apply_design_system`, `edit_screens`, `generate_variants`, `list_projects`, `list_screens`, `get_screen`, `get_project`, `list_design_systems`, `update_design_system`
+**Available tools (prefixed `mcp__stitch__`):**
+`create_project`, `generate_screen_from_text`, `create_design_system`, `apply_design_system`, `edit_screens`, `generate_variants`, `list_projects`, `list_screens`, `get_screen`, `get_project`, `list_design_systems`, `update_design_system`
 
-### Standard Workflow
-
+**Workflow:**
 1. Screenshot or paste URL into Stitch as style reference
 2. Stitch generates full design + auto-creates design system
 3. Export design.md / design system from Stitch
-4. Hand off to Claude Code for implementation
-5. Zero Claude Code tokens spent on design iteration — visual work happens in Stitch first
+4. Hand off to Claude Code for Astro/Tailwind implementation
 
-### Rules
-
+**Rules:**
 - Use Gemini 3.1 Pro in Stitch (not 3.0 Flash)
-- Aim for 80–90% design completion in Stitch, then hand off to Claude Code
-- Stitch auto-generates a design.md — keep this with the project for consistency
-- This is the standard workflow for all new site builds and major redesigns
+- Stitch auto-generates a `design.md` — keep it in the project root for consistency
+- This is the standard SMP workflow for all new site builds and major redesigns
