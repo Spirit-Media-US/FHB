@@ -10,6 +10,7 @@ export default {
 		{ name: 'contact', title: 'Contact & Social' },
 		{ name: 'navigation', title: 'Navigation & Footer' },
 		{ name: 'integrations', title: 'Integrations' },
+		{ name: 'pageVideos', title: 'Page-Specific Videos' },
 	],
 	fields: [
 		// ── Identity ──────────────────────────────────────────────────────
@@ -273,6 +274,50 @@ export default {
 			group: 'navigation',
 		},
 
+		// ── Page-Specific Videos ──────────────────────────────────────────
+		{
+			name: 'indexHeroVideo',
+			title: 'Home Page Hero Video',
+			type: 'url',
+			description: 'Main hero video for the home page.',
+			group: 'pageVideos',
+		},
+		{
+			name: 'indexHeroVideo2',
+			title: 'Home Page Secondary Video',
+			type: 'url',
+			description: 'Secondary video used on home page (for parallax/additional section).',
+			group: 'pageVideos',
+		},
+		{
+			name: 'aboutPageVideo',
+			title: 'About Page Hero Video',
+			type: 'url',
+			description: 'Hero video for the About page.',
+			group: 'pageVideos',
+		},
+		{
+			name: 'partnerPageVideo',
+			title: 'Partner Page Hero Video',
+			type: 'url',
+			description: 'Hero video for the Partner/Give page.',
+			group: 'pageVideos',
+		},
+		{
+			name: 'joinPageVideo',
+			title: 'Join Page Hero Video',
+			type: 'url',
+			description: 'Hero video for the Join/Community page.',
+			group: 'pageVideos',
+		},
+		{
+			name: 'downloadPageVideo',
+			title: 'Download Page Hero Video',
+			type: 'url',
+			description: 'Hero video for the Download/Free Book page.',
+			group: 'pageVideos',
+		},
+
 		// ── Integrations ──────────────────────────────────────────────────
 		{
 			name: 'communityUrl',
@@ -293,6 +338,13 @@ export default {
 			title: 'Partner Page URL (legacy)',
 			type: 'url',
 			description: 'Legacy — use Donate URL instead.',
+			group: 'integrations',
+		},
+		{
+			name: 'mightyNetworksUrl',
+			title: 'Mighty Networks URL (legacy)',
+			type: 'url',
+			description: 'Legacy field. Use communityUrl instead.',
 			group: 'integrations',
 		},
 		{

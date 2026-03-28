@@ -100,21 +100,24 @@ const communityUrl = media?.communityUrl || '/join';
 					aria-hidden="true"
 				/>
 			)}
-			<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-16 md:pb-24">
+			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-16 md:pb-24" style="transition: color 1.2s ease, border-color 1.2s ease;">
 				<h1
+					id="hero-heading"
 					class="text-4xl md:text-6xl font-light leading-tight mb-6"
-					style="font-family: var(--font-serif); color: #7B1C2E;"
+					style="font-family: var(--font-serif); color: #7B1C2E; transition: color 1.2s ease;"
 				>
 					{heroHeading}
 				</h1>
 				<p
+					id="hero-sub"
 					class="text-lg md:text-xl mb-10 leading-relaxed"
-					style="font-family: var(--font-sans); color: #7B1C2E;"
+					style="font-family: var(--font-sans); color: #7B1C2E; transition: color 1.2s ease;"
 				>
 					{heroSubheading}
 				</p>
 				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
 					<a
+						id="hero-cta-primary"
 						href={heroPrimaryCtaHref}
 						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
 						style="font-family: var(--font-sans); background-color: var(--color-gold); color: #7B1C2E;"
@@ -124,6 +127,7 @@ const communityUrl = media?.communityUrl || '/join';
 						{heroPrimaryCtaLabel}
 					</a>
 					<a
+						id="hero-cta-secondary"
 						href={heroSecondaryCtaHref}
 						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline rounded border transition-all duration-200"
 						style="font-family: var(--font-sans); color: #7B1C2E; border-color: rgba(123,28,46,0.4);"
@@ -137,26 +141,67 @@ const communityUrl = media?.communityUrl || '/join';
 		</section>
 
 		<script>
+			const R2 = 'https://assets.spiritmediapublishing.com/fathers-heart-bible';
+			// dark = dark video → light text; light = bright video → dark text
 			const heroVideos = [
-				'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4',
-				'https://assets.spiritmediapublishing.com/fathers-heart-bible/reading-bible-4k.mov',
+				// — Light videos (dark text: wine red #7B1C2E) —
+				{ url: `${R2}/bible-lake-reading-hero.mp4`, theme: 'light' },
+				{ url: `${R2}/holy-bible.mp4`, theme: 'light' },
+				{ url: `${R2}/hands-holding-bible.mp4`, theme: 'light' },
+				{ url: `${R2}/mother-son-praying.mp4`, theme: 'light' },
+				// — Dark videos (light text: white) —
+				{ url: `${R2}/farmer-reading-bible.mp4`, theme: 'dark' },
+				{ url: `${R2}/women-reading-bible-outdoors.mp4`, theme: 'dark' },
+				{ url: `${R2}/bible-close-up.mp4`, theme: 'dark' },
+				{ url: `${R2}/read-book.mp4`, theme: 'dark' },
+				{ url: `${R2}/bible-open-pages.mp4`, theme: 'dark' },
+				{ url: `${R2}/woman-holding-bible-sky.mp4`, theme: 'dark' },
+				{ url: `${R2}/reading-bible-4k.mov`, theme: 'dark' },
 			];
+
+			function applyTheme(theme: string) {
+				const heading = document.getElementById('hero-heading');
+				const sub = document.getElementById('hero-sub');
+				const ctaPrimary = document.getElementById('hero-cta-primary');
+				const ctaSecondary = document.getElementById('hero-cta-secondary');
+				if (!heading || !sub || !ctaPrimary || !ctaSecondary) return;
+
+				if (theme === 'dark') {
+					// Dark video → light text
+					heading.style.color = '#FFFFFF';
+					sub.style.color = 'rgba(255,255,255,0.9)';
+					ctaPrimary.style.color = '#FFFFFF';
+					ctaSecondary.style.color = '#FFFFFF';
+					ctaSecondary.style.borderColor = 'rgba(255,255,255,0.5)';
+				} else {
+					// Light video → dark text
+					heading.style.color = '#7B1C2E';
+					sub.style.color = '#7B1C2E';
+					ctaPrimary.style.color = '#7B1C2E';
+					ctaSecondary.style.color = '#7B1C2E';
+					ctaSecondary.style.borderColor = 'rgba(123,28,46,0.4)';
+				}
+			}
+
 			const vA = document.getElementById('hero-video-a') as HTMLVideoElement | null;
 			const vB = document.getElementById('hero-video-b') as HTMLVideoElement | null;
 			if (vA && vB) {
 				const PLAYBACK_RATE = 0.75;
-				const FADE_DURATION = 1500; // ms — must match CSS transition
-				const FADE_BEFORE = 1.5;    // media seconds before end to begin fade
+				const FADE_DURATION = 1500;
+				const FADE_BEFORE = 1.5;
 
 				let heroIdx = 0;
 				let curr: HTMLVideoElement = vA;
 				let next: HTMLVideoElement = vB;
 				let fading = false;
 
+				// Set initial video and theme
+				vA.src = heroVideos[0].url;
 				vA.playbackRate = PLAYBACK_RATE;
+				applyTheme(heroVideos[0].theme);
 
-				// Preload the second video silently
-				next.src = heroVideos[1];
+				// Preload second video
+				next.src = heroVideos[1].url;
 				next.load();
 
 				function beginCrossfade() {
@@ -164,9 +209,11 @@ const communityUrl = media?.communityUrl || '/join';
 					fading = true;
 					heroIdx = (heroIdx + 1) % heroVideos.length;
 
+					// Apply theme at crossfade start so text transitions with the video
+					applyTheme(heroVideos[heroIdx].theme);
+
 					next.play().then(() => {
 						next.playbackRate = PLAYBACK_RATE;
-						// Both videos playing — cross-dissolve
 						next.style.opacity = '1';
 						curr.style.opacity = '0';
 
@@ -174,12 +221,11 @@ const communityUrl = media?.communityUrl || '/join';
 						curr = next;
 						next = outgoing;
 
-						// After fade completes, reset outgoing and preload what comes after
 						setTimeout(() => {
 							next.pause();
 							next.currentTime = 0;
 							const preloadIdx = (heroIdx + 1) % heroVideos.length;
-							next.src = heroVideos[preloadIdx];
+							next.src = heroVideos[preloadIdx].url;
 							next.load();
 							fading = false;
 						}, FADE_DURATION + 200);
