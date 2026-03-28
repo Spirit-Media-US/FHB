@@ -3,6 +3,7 @@ import Footer from '../components/Footer.astro';
 import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
+import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
@@ -29,6 +30,8 @@ const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '/samples';
 const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Download the Free Book';
 const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/download';
 const bookCoverUrl = media?.bookCoverUrl || '';
+const fhbiCoverUrl =
+	'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
 const communityUrl = media?.communityUrl || '/join';
 
 const distinctives = [
@@ -115,75 +118,23 @@ const shifts = [
 <Layout
 	title={seoTitle}
 	description={seoDescription}
+	darkHero={true}
 >
 	<Navbar />
-	<main class="pt-20">
+	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
 		     SECTION 1 — PAGE HERO
 		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="soft">
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
-				<div>
-					<p
-						class="text-xs font-semibold tracking-widest uppercase mb-4"
-						style="font-family: var(--font-sans); color: var(--color-gold);"
-					>
-						About This Translation
-					</p>
-					<h1
-						class="text-4xl md:text-5xl font-light leading-tight mb-6"
-						style="font-family: var(--font-serif); color: var(--color-ink);"
-					>
-						{heroHeading}
-					</h1>
-					<p class="text-lg leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
-						{heroSubheading}
-					</p>
-					<div class="flex flex-col sm:flex-row gap-4">
-						<a
-							href={heroPrimaryCtaHref}
-							class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
-							style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
-							onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
-							onmouseout="this.style.backgroundColor='var(--color-brand)'"
-						>
-							{heroPrimaryCtaLabel}
-						</a>
-						<a
-							href={heroSecondaryCtaHref}
-							class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
-							style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
-							onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
-							onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
-						>
-							{heroSecondaryCtaLabel}
-						</a>
-					</div>
-				</div>
-				<div class="flex justify-center">
-					{bookCoverUrl ? (
-						<img
-							src={bookCoverUrl}
-							alt="The Father's Heart Bible"
-							class="w-56 md:w-72 rounded shadow-xl"
-						/>
-					) : (
-						<div
-							class="w-56 md:w-72 aspect-[2/3] rounded shadow-xl flex items-end justify-center p-8"
-							style="background-color: var(--color-brand);"
-						>
-							<p
-								class="text-center text-lg font-light italic"
-								style="font-family: var(--font-serif); color: rgba(255,255,255,0.9);"
-							>
-								The Father's Heart Bible
-							</p>
-						</div>
-					)}
-				</div>
-			</div>
-		</Section>
+		<VideoHeroInner
+			videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/hands-holding-bible.mp4"
+			heading={heroHeading}
+			subheading={heroSubheading}
+			primaryCtaLabel={heroPrimaryCtaLabel}
+			primaryCtaHref={heroPrimaryCtaHref}
+			secondaryCtaLabel={heroSecondaryCtaLabel}
+			secondaryCtaHref={heroSecondaryCtaHref}
+		/>
 
 
 		<!-- ═══════════════════════════════════════════════════════════
@@ -519,22 +470,12 @@ const shifts = [
 		<Section variant="soft">
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
 				<div class="flex justify-center">
-					{bookCoverUrl ? (
-						<img
-							src={bookCoverUrl}
-							alt="Father's Heart → Beloved Identity — free PDF"
-							class="w-52 md:w-64 rounded shadow-xl"
-						/>
-					) : (
-						<div
-							class="w-52 md:w-64 aspect-[2/3] rounded shadow-xl flex items-end justify-center p-6"
-							style="background-color: var(--color-brand);"
-						>
-							<p class="text-center text-base font-light italic" style="font-family: var(--font-serif); color: rgba(255,255,255,0.9);">
-								Father's Heart →<br />Beloved Identity
-							</p>
-						</div>
-					)}
+					<img
+						src={fhbiCoverUrl}
+						alt="Father's Heart → Beloved Identity — free PDF"
+						class="w-52 md:w-64 block"
+						style="filter: drop-shadow(0 16px 32px rgba(0,0,0,0.22));"
+					/>
 				</div>
 				<div>
 					<p

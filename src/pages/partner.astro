@@ -3,6 +3,7 @@ import Footer from '../components/Footer.astro';
 import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
+import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
@@ -95,71 +96,21 @@ const impactStats = [
 <Layout
 	title={seoTitle}
 	description={seoDescription}
+	darkHero={true}
 >
 	<Navbar />
-	<main class="pt-20">
+	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
 		     SECTION 1 — HERO
 		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="soft">
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
-				<div>
-					<p
-						class="text-xs font-semibold tracking-widest uppercase mb-4"
-						style="font-family: var(--font-sans); color: var(--color-gold);"
-					>
-						Partner With Us
-					</p>
-					<h1
-						class="text-4xl md:text-5xl font-light leading-tight mb-6"
-						style="font-family: var(--font-serif); color: var(--color-ink);"
-					>
-						{heroSubheading}
-					</h1>
-					<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
-						The Father's Heart Bible is being prepared for publication. Your support helps complete,
-						produce, and distribute this translation — placing the Father's voice into the hands of
-						readers around the world.
-					</p>
-					<p class="leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
-						This is not a transaction. It is an invitation to participate in something the Father is
-						building.
-					</p>
-					<a
-						id="donate"
-						href={donateUrl}
-						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
-						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
-						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
-						onmouseout="this.style.backgroundColor='var(--color-brand)'"
-					>
-						{heroPrimaryCtaLabel}
-					</a>
-				</div>
-				<div class="flex justify-center">
-					{bookCoverUrl ? (
-						<img
-							src={bookCoverUrl}
-							alt="The Father's Heart Bible"
-							class="w-56 md:w-72 rounded shadow-xl"
-						/>
-					) : (
-						<div
-							class="w-56 md:w-72 aspect-[2/3] rounded shadow-xl flex items-end justify-center p-8"
-							style="background-color: var(--color-brand);"
-						>
-							<p
-								class="text-center text-lg font-light italic"
-								style="font-family: var(--font-serif); color: rgba(255,255,255,0.9);"
-							>
-								The Father's Heart Bible
-							</p>
-						</div>
-					)}
-				</div>
-			</div>
-		</Section>
+		<VideoHeroInner
+			videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/bible-lake-reading-hero.mp4"
+			heading={heroHeading}
+			subheading={heroSubheading}
+			primaryCtaLabel={heroPrimaryCtaLabel}
+			primaryCtaHref={donateUrl}
+		/>
 
 
 		<!-- ═══════════════════════════════════════════════════════════

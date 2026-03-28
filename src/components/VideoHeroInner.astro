@@ -1,0 +1,77 @@
+---
+interface Props {
+	videoSrc: string;
+	heading: string;
+	subheading?: string;
+	primaryCtaLabel?: string;
+	primaryCtaHref?: string;
+	secondaryCtaLabel?: string;
+	secondaryCtaHref?: string;
+}
+
+const {
+	videoSrc,
+	heading,
+	subheading,
+	primaryCtaLabel,
+	primaryCtaHref,
+	secondaryCtaLabel,
+	secondaryCtaHref,
+} = Astro.props;
+---
+
+<section
+	class="relative flex items-end justify-center overflow-hidden min-h-[840px] md:min-h-screen"
+	style="background-color: var(--color-deep); margin-top: -1px;"
+>
+	<video
+		class="absolute inset-0 w-full h-full object-cover"
+		src={videoSrc}
+		autoplay
+		muted
+		loop
+		playsinline
+		aria-hidden="true"
+		style="opacity: 1;"
+	/>
+	<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-16 md:pb-24">
+		<h1
+			class="text-4xl md:text-6xl font-light leading-tight mb-6"
+			style="font-family: var(--font-serif); color: #7B1C2E;"
+		>
+			{heading}
+		</h1>
+		{subheading && (
+			<p
+				class="text-lg md:text-xl mb-10 leading-relaxed"
+				style="font-family: var(--font-sans); color: #7B1C2E;"
+			>
+				{subheading}
+			</p>
+		)}
+		{primaryCtaLabel && primaryCtaHref && (
+			<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+				<a
+					href={primaryCtaHref}
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+					style="font-family: var(--font-sans); background-color: var(--color-gold); color: #7B1C2E;"
+					onmouseover="this.style.filter='brightness(1.08)'"
+					onmouseout="this.style.filter='none'"
+				>
+					{primaryCtaLabel}
+				</a>
+				{secondaryCtaLabel && secondaryCtaHref && (
+					<a
+						href={secondaryCtaHref}
+						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline rounded border transition-all duration-200"
+						style="font-family: var(--font-sans); color: #7B1C2E; border-color: rgba(123,28,46,0.4);"
+						onmouseover="this.style.borderColor='rgba(123,28,46,0.7)'"
+						onmouseout="this.style.borderColor='rgba(123,28,46,0.4)'"
+					>
+						{secondaryCtaLabel}
+					</a>
+				)}
+			</div>
+		)}
+	</div>
+</section>

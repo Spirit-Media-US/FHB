@@ -4,6 +4,7 @@ import Footer from '../components/Footer.astro';
 import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
+import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
@@ -66,33 +67,24 @@ const audience = [
 <Layout
   title={seoTitle}
   description={seoDescription}
+  darkHero={true}
 >
   <Navbar />
-  <main class="pt-20">
+  <main>
 
     {/* 1 — HERO */}
-    <Section variant="soft">
-      <div class="max-w-3xl mx-auto text-center py-12 md:py-20">
-        <p class="font-sans text-sm uppercase tracking-widest mb-4" style="color: var(--color-gold);">About</p>
-        <h1 class="font-serif text-4xl md:text-6xl mb-6" style="color: var(--color-ink);">
-          {heroHeading}
-        </h1>
-        <p class="font-sans text-lg md:text-xl mb-10 max-w-2xl mx-auto" style="color: var(--color-muted);">
-          {heroSubheading}
-        </p>
-        <a
-          href={heroPrimaryCtaHref}
-          class="inline-block font-sans font-semibold text-base px-8 py-4 rounded-sm transition-colors"
-          style="background-color: var(--color-brand); color: #fff;"
-          onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
-          onmouseout="this.style.backgroundColor='var(--color-brand)'"
-        >
-          {heroPrimaryCtaLabel}
-        </a>
-      </div>
+    <VideoHeroInner
+      videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/women-reading-bible-outdoors.mp4"
+      heading={heroHeading}
+      subheading={heroSubheading}
+      primaryCtaLabel={heroPrimaryCtaLabel}
+      primaryCtaHref={heroPrimaryCtaHref}
+    />
 
-      {kevinPortraitUrl && (
-        <div class="max-w-sm mx-auto pb-12">
+    {/* 2 — KEVIN PORTRAIT */}
+    {kevinPortraitUrl && (
+      <Section variant="soft">
+        <div class="max-w-sm mx-auto py-12">
           <img
             src={kevinPortraitUrl ? `${kevinPortraitUrl}?w=800&auto=format` : ''}
             alt="Kevin White, translator of the Father's Heart Bible"
@@ -100,8 +92,8 @@ const audience = [
             style="border: 1px solid var(--color-hairline);"
           />
         </div>
-      )}
-    </Section>
+      </Section>
+    )}
 
     {/* 2 — KEVIN'S STORY */}
     <Section variant="light">

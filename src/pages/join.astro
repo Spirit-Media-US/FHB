@@ -3,6 +3,7 @@ import Footer from '../components/Footer.astro';
 import ImageGrid from '../components/ImageGrid.astro';
 import Navbar from '../components/Navbar.astro';
 import Section from '../components/Section.astro';
+import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
@@ -113,41 +114,21 @@ const howToBegin = [
 <Layout
 	title={seoTitle}
 	description={seoDescription}
+	darkHero={true}
 >
 	<Navbar />
-	<main class="pt-20">
+	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
 		     SECTION 1 — HERO
 		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="soft">
-			<div class="max-w-2xl mx-auto text-center">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-4"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					The Father's Heart Movement
-				</p>
-				<h1
-					class="text-4xl md:text-5xl font-light leading-tight mb-6"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					{heroHeading}
-				</h1>
-								<p class="text-lg leading-relaxed mb-10" style="font-family: var(--font-sans); color: var(--color-muted);">
-					{heroSubheading}
-				</p>
-				<a
-					href={heroPrimaryCtaHref}
-					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
-					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
-					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
-					onmouseout="this.style.backgroundColor='var(--color-brand)'"
-				>
-					{heroPrimaryCtaLabel}
-				</a>
-			</div>
-		</Section>
+		<VideoHeroInner
+			videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/hands-bible-worship-church.mp4"
+			heading={heroHeading}
+			subheading={heroSubheading}
+			primaryCtaLabel={heroPrimaryCtaLabel}
+			primaryCtaHref={heroPrimaryCtaHref}
+		/>
 
 
 		<!-- ═══════════════════════════════════════════════════════════

@@ -4,6 +4,7 @@ import FormEmbed from '../components/FormEmbed.astro';
 import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
+import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
@@ -82,12 +83,24 @@ const nextSteps = [
 <Layout
 	title={seoTitle}
 	description={seoDescription}
+	darkHero={true}
 >
 	<Navbar />
-	<main class="pt-20">
+	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 1 — HERO / OFFER
+		     SECTION 1 — HERO
+		     ═══════════════════════════════════════════════════════════ -->
+		<VideoHeroInner
+			videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/farmer-reading-bible.mp4"
+			heading={heroHeading}
+			subheading={heroSubheading}
+			primaryCtaLabel={heroPrimaryCtaLabel}
+			primaryCtaHref="#form"
+		/>
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 2 — OFFER / FORM
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="soft">
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-start">
@@ -183,14 +196,12 @@ const nextSteps = [
 
 				<!-- Right: book cover + trust bullets -->
 				<div class="flex flex-col items-center gap-8 pt-4">
-					{bookCoverUrl && (
-						<img
-							src={bookCoverUrl}
-							alt="Father's Heart — Beloved Identity, free PDF"
-							class="w-full max-w-xs rounded-sm"
-							style="box-shadow: 0 8px 32px rgba(28,26,23,0.15);"
-						/>
-					)}
+					<img
+						src="https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png"
+						alt="Father's Heart → Beloved Identity — free PDF"
+						class="w-full max-w-xs block"
+						style="filter: drop-shadow(0 16px 32px rgba(0,0,0,0.22));"
+					/>
 					<div class="w-full max-w-sm space-y-4">
 						{[
 							"A complete journey from Genesis to the New Testament",

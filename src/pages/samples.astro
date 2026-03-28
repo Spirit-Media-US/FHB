@@ -3,6 +3,7 @@ import Footer from '../components/Footer.astro';
 import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
+import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
@@ -137,56 +138,23 @@ const synthesis = [
 <Layout
 	title={seoTitle}
 	description={seoDescription}
+	darkHero={true}
 >
 	<Navbar />
-	<main class="pt-20">
+	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
 		     SECTION 1 — PAGE HERO
 		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="soft">
-			<div class="max-w-2xl mx-auto text-center">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-4"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					Sample Passages
-				</p>
-				<h1
-					class="text-4xl md:text-5xl font-light leading-tight mb-6"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					{heroHeading}
-				</h1>
-								<p class="text-lg leading-relaxed mb-10" style="font-family: var(--font-sans); color: var(--color-muted);">
-					{heroSubheading}
-				</p>
-				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-					<a
-						href={heroPrimaryCtaHref}
-						class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
-						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
-						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
-						onmouseout="this.style.backgroundColor='var(--color-brand)'"
-					>
-						{heroPrimaryCtaLabel}
-					</a>
-					<a
-						href="/join"
-						class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
-						style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
-						onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
-						onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
-					>
-						Join the Movement
-					</a>
-				</div>
-				<p class="mt-8 text-base leading-relaxed max-w-lg mx-auto" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.8;">
-					Each example shows a familiar rendering alongside the Father's Heart Bible rendering.
-					Read slowly. Let yourself feel the difference.
-				</p>
-			</div>
-		</Section>
+		<VideoHeroInner
+			videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/flipping-through-bible-church.mov"
+			heading={heroHeading}
+			subheading={heroSubheading}
+			primaryCtaLabel={heroPrimaryCtaLabel}
+			primaryCtaHref={heroPrimaryCtaHref}
+			secondaryCtaLabel={heroSecondaryCtaLabel}
+			secondaryCtaHref={heroSecondaryCtaHref}
+		/>
 
 
 		<!-- ═══════════════════════════════════════════════════════════
