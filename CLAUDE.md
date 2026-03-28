@@ -278,3 +278,28 @@ All 7 launch pages built and pushed to dev:
 - All work goes to the **dev** branch — never push directly to main
 - Only merge dev to main when Kevin says "push to main"
 - Never push without local preview first
+
+---
+
+## Stitch MCP — AI Design Tool
+
+**What it is:** Google Stitch 2.0 is an AI-powered design tool available as an MCP server on Bethel. It generates full page designs and auto-creates design systems (colors, typography, component rules).
+
+**Config:** `/home/deploy/claude-config/mcp.json` — command: `npx @_davideast/stitch-mcp proxy`
+
+**Available tools:** 12 tools including `create_project`, `generate_screen_from_text`, `create_design_system`, `apply_design_system`, `edit_screens`, `generate_variants`, `list_projects`, `list_screens`, `get_screen`, `get_project`, `list_design_systems`, `update_design_system`
+
+### Standard Workflow
+
+1. Screenshot or paste URL into Stitch as style reference
+2. Stitch generates full design + auto-creates design system
+3. Export design.md / design system from Stitch
+4. Hand off to Claude Code for implementation
+5. Zero Claude Code tokens spent on design iteration — visual work happens in Stitch first
+
+### Rules
+
+- Use Gemini 3.1 Pro in Stitch (not 3.0 Flash)
+- Aim for 80–90% design completion in Stitch, then hand off to Claude Code
+- Stitch auto-generates a design.md — keep this with the project for consistency
+- This is the standard workflow for all new site builds and major redesigns
