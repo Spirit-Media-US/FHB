@@ -36,11 +36,11 @@ const currentPath = Astro.url.pathname;
 				src="https://cdn.sanity.io/images/rusi1hyi/production/bf8e5685f1b30a651457f26abfa2ca1fa30cd784-900x450.png"
 				alt={siteName}
 				class="h-20 w-auto"
-				style="filter: brightness(0) saturate(100%) invert(26%) sepia(30%) saturate(800%) hue-rotate(350deg) brightness(75%) contrast(90%);"
+				style="filter: brightness(0) saturate(100%) invert(5%) sepia(20%) saturate(500%) hue-rotate(290deg) brightness(20%) contrast(100%);"
 			/>
 			<span
-				class="text-xs font-semibold tracking-widest uppercase text-center w-full"
-				style="font-family: var(--font-sans); color: var(--color-brand-dark);"
+				class="text-xs font-semibold tracking-[0.15em] uppercase text-center w-full"
+				style="font-family: var(--font-body); color: var(--color-primary);"
 			>Father's Heart Bible</span>
 		</a>
 
@@ -50,8 +50,8 @@ const currentPath = Astro.url.pathname;
 				<li>
 					<a
 						href={link.href}
-						class="text-sm font-medium no-underline transition-colors duration-200"
-						style={`font-family: var(--font-sans); color: var(--color-brand); letter-spacing: 0.04em;`}
+						class="text-xs font-semibold uppercase no-underline transition-colors duration-200 tracking-[0.1em]"
+						style={`font-family: var(--font-body); color: var(--color-on-surface-variant);`}
 					>
 						{link.label}
 					</a>
@@ -62,10 +62,10 @@ const currentPath = Astro.url.pathname;
 		<!-- CTA button -->
 		<a
 			href="/download"
-			class="hidden lg:inline-flex items-center px-5 py-2 text-sm font-semibold no-underline transition-all duration-200 rounded"
-			style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff; letter-spacing: 0.03em;"
-			onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
-			onmouseout="this.style.backgroundColor='var(--color-brand)'"
+			class="hidden lg:inline-flex items-center px-5 py-2 text-xs font-semibold uppercase no-underline transition-all duration-200 tracking-[0.08em]"
+			style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary); border-radius: 0.125rem;"
+			onmouseover="this.style.opacity='0.9'"
+			onmouseout="this.style.opacity='1'"
 		>
 			Download Free
 		</a>
@@ -77,21 +77,21 @@ const currentPath = Astro.url.pathname;
 			aria-label="Toggle menu"
 			aria-expanded="false"
 		>
-			<span class="block w-6 h-0.5 transition-all duration-300 origin-center" style="background-color: var(--color-ink);" id="bar1"></span>
-			<span class="block w-6 h-0.5 transition-all duration-300" style="background-color: var(--color-ink);" id="bar2"></span>
-			<span class="block w-6 h-0.5 transition-all duration-300 origin-center" style="background-color: var(--color-ink);" id="bar3"></span>
+			<span class="block w-6 h-0.5 transition-all duration-300 origin-center" style="background-color: var(--color-on-surface);" id="bar1"></span>
+			<span class="block w-6 h-0.5 transition-all duration-300" style="background-color: var(--color-on-surface);" id="bar2"></span>
+			<span class="block w-6 h-0.5 transition-all duration-300 origin-center" style="background-color: var(--color-on-surface);" id="bar3"></span>
 		</button>
 	</nav>
 
 	<!-- Mobile menu -->
-	<div id="mobile-menu" class="lg:hidden hidden border-t" style="background-color: var(--color-canvas); border-color: var(--color-hairline);">
+	<div id="mobile-menu" class="lg:hidden hidden" style="background-color: var(--color-surface-lowest); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);">
 		<ul class="flex flex-col items-center gap-6 py-8 list-none m-0 px-6">
 			{navLinks.map(link => (
 				<li>
 					<a
 						href={link.href}
-						class="text-sm font-medium no-underline transition-colors duration-200"
-						style={`font-family: var(--font-sans); color: var(--color-brand); letter-spacing: 0.04em;`}
+						class="text-xs font-semibold uppercase no-underline transition-colors duration-200 tracking-[0.1em]"
+						style={`font-family: var(--font-body); color: var(--color-on-surface-variant);`}
 					>
 						{link.label}
 					</a>
@@ -100,8 +100,8 @@ const currentPath = Astro.url.pathname;
 			<li>
 				<a
 					href="/download"
-					class="inline-flex items-center px-6 py-2.5 text-sm font-semibold no-underline rounded"
-					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+					class="inline-flex items-center px-6 py-2.5 text-xs font-semibold uppercase no-underline tracking-[0.08em]"
+					style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary); border-radius: 0.125rem;"
 				>
 					Download Free
 				</a>
@@ -129,9 +129,9 @@ const currentPath = Astro.url.pathname;
 		);
 		const bars = [bar1, bar2, bar3];
 		if (scrolled || !darkHero) {
-			// Solid background — use brand brown for links
-			links.forEach(el => { el.style.color = 'var(--color-brand)'; });
-			bars.forEach(el => { if (el) el.style.backgroundColor = 'var(--color-ink)'; });
+			// Glass background — use primary/variant for links
+			links.forEach(el => { el.style.color = 'var(--color-on-surface-variant)'; });
+			bars.forEach(el => { if (el) el.style.backgroundColor = 'var(--color-on-surface)'; });
 		} else {
 			// Transparent on dark hero — use white
 			links.forEach(el => { el.style.color = 'rgba(255,255,255,0.92)'; });
@@ -143,10 +143,14 @@ const currentPath = Astro.url.pathname;
 		if (!header) return;
 		const scrolled = window.scrollY > 40;
 		if (scrolled) {
-			header.style.backgroundColor = 'var(--color-canvas)';
-			header.style.boxShadow = '0 1px 12px rgba(28,26,23,0.08)';
+			header.style.backgroundColor = 'rgba(255,255,255,0.7)';
+			header.style.backdropFilter = 'blur(20px)';
+			header.style.webkitBackdropFilter = 'blur(20px)';
+			header.style.boxShadow = '0 1px 40px rgba(26,28,28,0.05)';
 		} else {
 			header.style.backgroundColor = 'transparent';
+			header.style.backdropFilter = 'none';
+			header.style.webkitBackdropFilter = 'none';
 			header.style.boxShadow = 'none';
 		}
 		setNavColors(scrolled);
