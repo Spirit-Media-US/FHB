@@ -10,25 +10,19 @@ const { text, reference, translation, dark = false } = Astro.props;
 ---
 
 <div class="text-center max-w-2xl mx-auto">
-	<!-- Gold accent line -->
-	<div class="w-10 h-0.5 mx-auto mb-8" style="background-color: var(--color-gold);"></div>
-
 	<blockquote class="m-0">
 		<p
-			class="text-2xl md:text-4xl italic font-light leading-relaxed mb-6"
-			style={`font-family: var(--font-serif); color: ${dark ? 'rgba(255,255,255,0.92)' : 'var(--color-ink)'};`}
+			class="text-2xl md:text-4xl font-light leading-relaxed mb-6"
+			style={`font-family: var(--font-headline); color: ${dark ? 'rgba(255,255,255,0.92)' : 'var(--color-on-surface)'};`}
 		>
 			"{text}"
 		</p>
 		{reference && (
 			<footer>
-				<cite class="not-italic text-sm tracking-widest uppercase" style={`font-family: var(--font-sans); color: ${dark ? 'rgba(255,255,255,0.45)' : 'var(--color-muted)'};`}>
+				<cite class="not-italic text-xs tracking-[0.15em] uppercase" style={`font-family: var(--font-body); color: ${dark ? 'rgba(255,255,255,0.45)' : 'var(--color-on-surface-variant)'};`}>
 					— {reference}{translation ? ` · ${translation}` : ''}
 				</cite>
 			</footer>
 		)}
 	</blockquote>
-
-	<!-- Gold accent line -->
-	<div class="w-10 h-0.5 mx-auto mt-8" style="background-color: var(--color-gold);"></div>
 </div>

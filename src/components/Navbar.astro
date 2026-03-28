@@ -145,12 +145,12 @@ const currentPath = Astro.url.pathname;
 		if (scrolled) {
 			header.style.backgroundColor = 'rgba(255,255,255,0.7)';
 			header.style.backdropFilter = 'blur(20px)';
-			header.style.webkitBackdropFilter = 'blur(20px)';
+			(header.style as any)['-webkit-backdrop-filter'] = 'blur(20px)';
 			header.style.boxShadow = '0 1px 40px rgba(26,28,28,0.05)';
 		} else {
 			header.style.backgroundColor = 'transparent';
 			header.style.backdropFilter = 'none';
-			header.style.webkitBackdropFilter = 'none';
+			(header.style as any)['-webkit-backdrop-filter'] = 'none';
 			header.style.boxShadow = 'none';
 		}
 		setNavColors(scrolled);
