@@ -1,5 +1,5 @@
 ---
-import { sanityClient } from '../lib/sanity';
+import { sanityClient, urlFor } from '../lib/sanity';
 
 interface NavLink {
 	label: string;
@@ -15,6 +15,8 @@ const siteSettings = await sanityClient.fetch(`
 `);
 
 const siteName = siteSettings?.siteName || "Father's Heart Bible";
+const logoImage = siteSettings?.logo;
+const logoUrl = logoImage ? urlFor(logoImage).width(200).url() : null;
 
 const navLinks: NavLink[] = siteSettings?.navLinks || [
 	{ label: "The Father's Heart Bible", href: '/the-fathers-heart-bible' },
@@ -32,16 +34,18 @@ const currentPath = Astro.url.pathname;
 	<nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
 		<!-- Logo -->
 		<a href="/" id="nav-logo" class="no-underline shrink-0 flex flex-col items-center gap-0.5">
-			<img
-				src="https://cdn.sanity.io/images/rusi1hyi/production/bf8e5685f1b30a651457f26abfa2ca1fa30cd784-900x450.png"
-				alt={siteName}
-				class="h-20 w-auto"
-				style="filter: brightness(0) saturate(100%) invert(5%) sepia(20%) saturate(500%) hue-rotate(290deg) brightness(20%) contrast(100%);"
-			/>
+			{logoUrl && (
+				<img
+					src={logoUrl}
+					alt={siteName}
+					class="h-20 w-auto"
+					style="filter: brightness(0) saturate(100%) invert(5%) sepia(20%) saturate(500%) hue-rotate(290deg) brightness(20%) contrast(100%);"
+				/>
+			)}
 			<span
 				class="text-xs font-semibold tracking-[0.15em] uppercase text-center w-full"
 				style="font-family: var(--font-body); color: var(--color-primary);"
-			>Father's Heart Bible</span>
+			>{siteName}</span>
 		</a>
 
 		<!-- Desktop nav -->
