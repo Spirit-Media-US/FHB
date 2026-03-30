@@ -22,7 +22,7 @@ const {
 
 <section
 	class="relative flex items-end justify-center overflow-hidden min-h-[840px] md:min-h-screen"
-	style="background-color: var(--color-deep); margin-top: -1px;"
+	style="background-color: var(--color-inverse-surface); margin-top: -1px;"
 >
 	<video
 		class="absolute inset-0 w-full h-full object-cover"
@@ -36,15 +36,15 @@ const {
 	/>
 	<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-16 md:pb-24">
 		<h1
-			class="text-4xl md:text-6xl font-light leading-tight mb-6"
-			style="font-family: var(--font-serif); color: #7B1C2E;"
+			class="text-4xl md:text-7xl font-light leading-tight mb-6 tracking-tight"
+			style="font-family: var(--font-headline); color: var(--color-primary);"
 		>
 			{heading}
 		</h1>
 		{subheading && (
 			<p
 				class="text-lg md:text-xl mb-10 leading-relaxed"
-				style="font-family: var(--font-sans); color: #7B1C2E;"
+				style="font-family: var(--font-body); color: var(--color-on-surface-variant);"
 			>
 				{subheading}
 			</p>
@@ -53,20 +53,20 @@ const {
 			<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
 				<a
 					href={primaryCtaHref}
-					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
-					style="font-family: var(--font-sans); background-color: var(--color-gold); color: #7B1C2E;"
-					onmouseover="this.style.filter='brightness(1.08)'"
-					onmouseout="this.style.filter='none'"
+					class="inline-flex items-center px-8 py-3.5 text-sm font-semibold uppercase no-underline tracking-[0.08em] transition-all duration-200"
+					style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary); border-radius: 0.125rem;"
+					onmouseover="this.style.opacity='0.9'"
+					onmouseout="this.style.opacity='1'"
 				>
 					{primaryCtaLabel}
 				</a>
 				{secondaryCtaLabel && secondaryCtaHref && (
 					<a
 						href={secondaryCtaHref}
-						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline rounded border transition-all duration-200"
-						style="font-family: var(--font-sans); color: #7B1C2E; border-color: rgba(123,28,46,0.4);"
-						onmouseover="this.style.borderColor='rgba(123,28,46,0.7)'"
-						onmouseout="this.style.borderColor='rgba(123,28,46,0.4)'"
+						class="inline-flex items-center px-8 py-3.5 text-sm font-medium uppercase no-underline tracking-[0.08em] transition-all duration-200"
+						style="font-family: var(--font-body); color: var(--color-primary); border: 1px solid rgba(48,1,23,0.2); border-radius: 0.125rem;"
+						onmouseover="this.style.borderColor='rgba(48,1,23,0.5)'"
+						onmouseout="this.style.borderColor='rgba(48,1,23,0.2)'"
 					>
 						{secondaryCtaLabel}
 					</a>

@@ -38,15 +38,12 @@ const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Download the Free 
 const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '/download';
 const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Already have it? Start here';
 const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/join';
-const heroVideoSrc =
-	media?.heroVideoUrl ||
-	'https://assets.spiritmediapublishing.com/fathers-heart-bible/bible-lake-reading-hero.mp4';
+const heroVideoSrc = media?.heroVideoUrl || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
 const heroPosterSrc = media?.heroPosterUrl || '';
 const bookCoverUrl =
 	media?.bookCoverUrl ||
 	'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png';
-const fhbiCoverUrl =
-	'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
+const fhbiCoverUrl = media?.fhbiCoverUrl || 'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
 const photo1 = media?.peoplePhoto1Url || '';
 const photo2 = media?.peoplePhoto2Url || '';
 const photo3 = media?.peoplePhoto3Url || '';
@@ -75,7 +72,6 @@ const communityUrl = media?.communityUrl || '/join';
 						id="hero-video-a"
 						class="absolute inset-0 w-full h-full object-cover"
 						src={heroVideoSrc}
-						poster={heroPosterSrc || undefined}
 						autoplay
 						muted
 						playsinline
@@ -142,21 +138,20 @@ const communityUrl = media?.communityUrl || '/join';
 
 		<script>
 			const R2 = 'https://assets.spiritmediapublishing.com/fathers-heart-bible';
-			// dark = dark video → light text; light = bright video → dark text
 			const heroVideos = [
-				// — Light videos (dark text: wine red #7B1C2E) —
-				{ url: `${R2}/bible-lake-reading-hero.mp4`, theme: 'light' },
-				{ url: `${R2}/holy-bible.mp4`, theme: 'light' },
-				{ url: `${R2}/hands-holding-bible.mp4`, theme: 'light' },
-				{ url: `${R2}/mother-son-praying.mp4`, theme: 'light' },
-				// — Dark videos (light text: white) —
+				// — Dark videos (light text: white) — initial video is dark, so these play first
+				{ url: `${R2}/woman-holding-bible-sky.mp4`, theme: 'dark' },
 				{ url: `${R2}/farmer-reading-bible.mp4`, theme: 'dark' },
 				{ url: `${R2}/women-reading-bible-outdoors.mp4`, theme: 'dark' },
 				{ url: `${R2}/bible-close-up.mp4`, theme: 'dark' },
 				{ url: `${R2}/read-book.mp4`, theme: 'dark' },
 				{ url: `${R2}/bible-open-pages.mp4`, theme: 'dark' },
-				{ url: `${R2}/woman-holding-bible-sky.mp4`, theme: 'dark' },
 				{ url: `${R2}/reading-bible-4k.mov`, theme: 'dark' },
+				// — Light videos (dark text: wine red #7B1C2E) —
+				{ url: `${R2}/bible-lake-reading-hero.mp4`, theme: 'light' },
+				{ url: `${R2}/holy-bible.mp4`, theme: 'light' },
+				{ url: `${R2}/hands-holding-bible.mp4`, theme: 'light' },
+				{ url: `${R2}/mother-son-praying.mp4`, theme: 'light' },
 			];
 
 			function applyTheme(theme: string) {
@@ -167,14 +162,12 @@ const communityUrl = media?.communityUrl || '/join';
 				if (!heading || !sub || !ctaPrimary || !ctaSecondary) return;
 
 				if (theme === 'dark') {
-					// Dark video → light text
 					heading.style.color = '#FFFFFF';
 					sub.style.color = 'rgba(255,255,255,0.9)';
 					ctaPrimary.style.color = '#FFFFFF';
 					ctaSecondary.style.color = '#FFFFFF';
 					ctaSecondary.style.borderColor = 'rgba(255,255,255,0.5)';
 				} else {
-					// Light video → dark text
 					heading.style.color = '#7B1C2E';
 					sub.style.color = '#7B1C2E';
 					ctaPrimary.style.color = '#7B1C2E';
@@ -190,17 +183,15 @@ const communityUrl = media?.communityUrl || '/join';
 				const FADE_DURATION = 1500;
 				const FADE_BEFORE = 1.5;
 
+				// heroVideos[0] matches the HTML src — don't touch vA.src
 				let heroIdx = 0;
 				let curr: HTMLVideoElement = vA;
 				let next: HTMLVideoElement = vB;
 				let fading = false;
 
-				// Set initial video and theme
-				vA.src = heroVideos[0].url;
 				vA.playbackRate = PLAYBACK_RATE;
-				applyTheme(heroVideos[0].theme);
 
-				// Preload second video
+				// Preload the NEXT video in the list
 				next.src = heroVideos[1].url;
 				next.load();
 
@@ -209,7 +200,6 @@ const communityUrl = media?.communityUrl || '/join';
 					fading = true;
 					heroIdx = (heroIdx + 1) % heroVideos.length;
 
-					// Apply theme at crossfade start so text transitions with the video
 					applyTheme(heroVideos[heroIdx].theme);
 
 					next.play().then(() => {
