@@ -1,68 +1,51 @@
+/* ── Fonts: Cormorant Garamond (headings) + Source Sans 3 (body) ── */
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap");
+
 @import "tailwindcss";
 
-/* ── Fonts: Epilogue (headlines) + Manrope (body/labels) ── */
-@import url("https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Manrope:wght@300;400;500;600;700;800&display=swap");
-
-/* ── Design Tokens: Aether & Hearth (Modern Minimalist) ── */
+/* ── Design Tokens: Father's Heart Bible ── */
 @theme {
-	/* Surfaces — tonal layering, no borders */
-	--color-surface: #f9f9f9;
-	--color-surface-dim: #dadada;
-	--color-surface-low: #f3f3f3;
-	--color-surface-container: #eeeeee;
-	--color-surface-high: #e8e8e8;
-	--color-surface-highest: #e2e2e2;
-	--color-surface-lowest: #ffffff;
+	/* Surfaces */
+	--color-canvas: #f7f3ee;
+	--color-soft: #fcfbf8;
 
 	/* Text */
-	--color-on-surface: #1a1c1c;
-	--color-on-surface-variant: #514347;
+	--color-ink: #1c1a17;
+	--color-muted: #5f5a54;
 
-	/* Primary — deep berry, used sparingly */
-	--color-primary: #300117;
-	--color-primary-container: #4a152c;
-	--color-on-primary: #ffffff;
-	--color-on-primary-container: #c37a94;
+	/* Brand */
+	--color-brand: #8a5a34;
+	--color-brand-dark: #6f4528;
+	--color-gold: #c9a15d;
 
-	/* Secondary — cool slate */
-	--color-secondary: #546067;
-	--color-secondary-container: #d7e4ec;
-	--color-on-secondary: #ffffff;
-	--color-on-secondary-container: #5a666d;
+	/* Borders */
+	--color-hairline: #e7ded2;
 
-	/* Tertiary — deep dark (replaces black) */
-	--color-tertiary: #001904;
-	--color-tertiary-container: #00300d;
+	/* Dark sections */
+	--color-deep: #241b17;
 
 	/* Inverse — dark hero sections */
-	--color-inverse-surface: #2f3131;
-	--color-inverse-on-surface: #f1f1f1;
-	--color-inverse-primary: #ffb0cb;
+	--color-inverse-surface: #241b17;
+	--color-inverse-on-surface: #f7f3ee;
+	--color-inverse-primary: #c9a15d;
 
-	/* Outline — ghost borders only */
-	--color-outline: #847377;
-	--color-outline-variant: #d6c1c6;
+	/* Outline — for footer/muted UI */
+	--color-outline: #5f5a54;
+	--color-outline-variant: #e7ded2;
+
+	/* Selection */
+	--color-primary-container: #c9a15d;
+	--color-on-primary: #ffffff;
 
 	/* Error */
 	--color-error: #ba1a1a;
 	--color-on-error: #ffffff;
 
 	/* Fonts */
-	--font-headline: "Epilogue", system-ui, sans-serif;
-	--font-body: "Manrope", system-ui, sans-serif;
-
-	/* ── Legacy aliases (prevents breakage during migration) ── */
-	--color-canvas: #f9f9f9;
-	--color-soft: #f3f3f3;
-	--color-ink: #1a1c1c;
-	--color-muted: #514347;
-	--color-brand: #300117;
-	--color-brand-dark: #4a152c;
-	--color-gold: #d7e4ec;
-	--color-hairline: #d6c1c6;
-	--color-deep: #2f3131;
-	--font-serif: "Epilogue", system-ui, sans-serif;
-	--font-sans: "Manrope", system-ui, sans-serif;
+	--font-headline: "Cormorant Garamond", Georgia, serif;
+	--font-body: "Source Sans 3", system-ui, sans-serif;
+	--font-serif: "Cormorant Garamond", Georgia, serif;
+	--font-sans: "Source Sans 3", system-ui, sans-serif;
 }
 
 /* ── Base ── */
@@ -76,8 +59,8 @@ html {
 body {
 	font-family: var(--font-body);
 	font-size: 16px;
-	color: var(--color-on-surface);
-	background-color: var(--color-surface);
+	color: var(--color-ink);
+	background-color: var(--color-canvas);
 	line-height: 1.75;
 }
 
@@ -96,7 +79,7 @@ h5,
 h6 {
 	font-family: var(--font-headline);
 	line-height: 1.15;
-	color: var(--color-on-surface);
+	color: var(--color-ink);
 	letter-spacing: -0.02em;
 }
 
