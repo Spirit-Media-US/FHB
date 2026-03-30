@@ -9,6 +9,15 @@ This site: Father's Heart Bible | Repo: github.com/Spirit-Media-US/FHB | Domain:
 - `npm run dev` — local preview at localhost:4323
 - `npm run build` — runs `astro check && astro build`
 
+## Mandatory — Before Starting Work
+Always start Claude sessions from inside this directory:
+```
+cd ~/Sites/FHB && claude
+```
+Running Claude from ~/ or ~/Sites/ bypasses this project's CLAUDE.md. A pre-edit hook enforces this, but following the workflow prevents warnings and ensures all project rules are loaded.
+
+Then run: `git checkout dev && git pull origin dev`
+
 ## Notes
 
 - SSL must cover all four domain variants: fathersheartbible.org, www.fathersheartbible.org, fathersheartbible.com, www.fathersheartbible.com
