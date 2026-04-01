@@ -8,7 +8,7 @@ import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
 // Fetch page SEO and scripture comparisons from Sanity
-const [pageData, sanityComparisons] = await Promise.all([
+const [pageData, sanityComparisons, media] = await Promise.all([
 	sanityClient.fetch(`*[_type == "page" && slug == "samples"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
@@ -18,6 +18,7 @@ const [pageData, sanityComparisons] = await Promise.all([
 	sanityClient.fetch(`*[_type == "scriptureComparison"] | order(order asc) {
     reference, category, traditional, translationLabel, fhb, note, featured
   }`),
+	sanityClient.fetch(`*[_type == "siteSettings"][0] { samplesPageVideo }`),
 ]);
 
 const seoTitle = pageData?.seoTitle || "Sample Passages | Father's Heart Bible";
@@ -32,6 +33,7 @@ const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Download the Free 
 const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '/download';
 const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Join the Movement';
 const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/join';
+const samplesPageVideoUrl = media?.samplesPageVideo || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/flipping-through-bible-church.mov';
 
 // Helper to get comparisons by category, falling back to hardcoded data if Sanity empty
 const byCategory = (cat: string) => sanityComparisons?.filter((c: any) => c.category === cat) ?? [];
@@ -147,7 +149,7 @@ const synthesis = [
 		     SECTION 1 — PAGE HERO
 		     ═══════════════════════════════════════════════════════════ -->
 		<VideoHeroInner
-			videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/flipping-through-bible-church.mov"
+			videoSrc={samplesPageVideoUrl}
 			heading={heroHeading}
 			subheading={heroSubheading}
 			primaryCtaLabel={heroPrimaryCtaLabel}

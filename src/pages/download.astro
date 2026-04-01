@@ -6,7 +6,7 @@ import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
-import { sanityClient } from '../lib/sanity';
+import { sanityClient, urlFor } from '../lib/sanity';
 
 const [pageData, media, resourceData] = await Promise.all([
 	sanityClient.fetch(`*[_type == "page" && slug == "download"][0] {
@@ -15,7 +15,7 @@ const [pageData, media, resourceData] = await Promise.all([
     heroPrimaryCtaLabel, heroPrimaryCtaHref
   }`),
 	sanityClient.fetch(
-		`*[_type == "siteSettings"][0] { bookCoverUrl, ghlDownloadFormId, communityUrl }`,
+		`*[_type == "siteSettings"][0] { downloadPageVideo, bookCoverUrl, fhbCoverImage, ghlDownloadFormId, communityUrl }`,
 	),
 	sanityClient.fetch(`*[_type == "resource" && featured == true] | order(order asc)[0] {
     title, shortDescription, formHeading, formDescription, buttonText, coverImageUrl
@@ -33,6 +33,13 @@ const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '#form';
 const bookCoverUrl = resourceData?.coverImageUrl || media?.bookCoverUrl || '';
 const ghlFormId = media?.ghlDownloadFormId || '';
 const communityUrl = media?.communityUrl || '/join';
+const downloadPageVideoUrl = media?.downloadPageVideo || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/farmer-reading-bible.mp4';
+
+// FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
+const fhbCoverImageFromSanity = media?.fhbCoverImage;
+const fhbiCoverUrl = fhbCoverImageFromSanity
+	? urlFor(fhbCoverImageFromSanity).width(400).url()
+	: 'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
 // Resource fields with fallbacks
 const formHeading = resourceData?.formHeading || 'Get Your Free Copy';
 const formDescription =
@@ -92,7 +99,7 @@ const nextSteps = [
 		     SECTION 1 — HERO
 		     ═══════════════════════════════════════════════════════════ -->
 		<VideoHeroInner
-			videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/farmer-reading-bible.mp4"
+			videoSrc={downloadPageVideoUrl}
 			heading={heroHeading}
 			subheading={heroSubheading}
 			primaryCtaLabel={heroPrimaryCtaLabel}
@@ -197,7 +204,7 @@ const nextSteps = [
 				<!-- Right: book cover + trust bullets -->
 				<div class="flex flex-col items-center gap-8 pt-4">
 					<img
-						src="https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png"
+						src={fhbiCoverUrl}
 						alt="Father's Heart → Beloved Identity — free PDF"
 						class="w-full max-w-xs block"
 						style="filter: drop-shadow(0 16px 32px rgba(0,0,0,0.22));"

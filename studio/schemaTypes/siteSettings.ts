@@ -130,6 +130,14 @@ export default {
 			group: 'media',
 		},
 		{
+			name: 'fhbCoverImage',
+			title: 'FHB Beloved Identity Cover (Sanity Image)',
+			type: 'image',
+			options: { hotspot: true },
+			description: 'Cover for "Father\'s Heart → Beloved Identity" free book. Serve via Sanity CDN.',
+			group: 'media',
+		},
+		{
 			name: 'kevinPortraitUrl',
 			title: "Kevin's Portrait URL",
 			type: 'url',
@@ -290,10 +298,58 @@ export default {
 			group: 'pageVideos',
 		},
 		{
+			name: 'homePageHeroVideos',
+			title: 'Home Page Hero Video Rotation Array',
+			type: 'array',
+			description: 'Array of videos for the hero section rotation with theme data.',
+			group: 'pageVideos',
+			of: [
+				{
+					type: 'object',
+					fields: [
+						{
+							name: 'url',
+							title: 'Video URL (R2)',
+							type: 'url',
+							validation: (Rule: any) => Rule.required(),
+						},
+						{
+							name: 'theme',
+							title: 'Theme',
+							type: 'string',
+							description: 'Theme for this video: "dark" or "light" — determines text color',
+							options: {
+								list: [
+									{ title: 'Dark', value: 'dark' },
+									{ title: 'Light', value: 'light' },
+								],
+							},
+							validation: (Rule: any) => Rule.required(),
+						},
+					],
+					preview: { select: { title: 'url', subtitle: 'theme' } },
+				},
+			],
+		},
+		{
 			name: 'aboutPageVideo',
 			title: 'About Page Hero Video',
 			type: 'url',
 			description: 'Hero video for the About page.',
+			group: 'pageVideos',
+		},
+		{
+			name: 'samplesPageVideo',
+			title: 'Samples Page Hero Video',
+			type: 'url',
+			description: 'Hero video for the Samples/Passages page.',
+			group: 'pageVideos',
+		},
+		{
+			name: 'theThersHeartBiblePageVideo',
+			title: "The Father's Heart Bible Page Hero Video",
+			type: 'url',
+			description: 'Hero video for The Father\'s Heart Bible page.',
 			group: 'pageVideos',
 		},
 		{

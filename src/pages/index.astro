@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
-import { sanityClient } from '../lib/sanity';
+import { sanityClient, urlFor } from '../lib/sanity';
 
 // Fetch page content + media from Sanity (all values have hardcoded fallbacks)
 const [pageData, media] = await Promise.all([
@@ -16,7 +16,9 @@ const [pageData, media] = await Promise.all([
     heroSecondaryCtaLabel, heroSecondaryCtaHref
   }`),
 	sanityClient.fetch(`*[_type == "siteSettings"][0] {
-    heroVideoUrl, heroPosterUrl, bookCoverUrl,
+    heroVideoUrl, heroPosterUrl, bookCoverUrl, bibleCoverImage,
+    fhbCoverImage,
+    homePageHeroVideos,
     peoplePhoto1Url, peoplePhoto2Url, peoplePhoto3Url,
     communityUrl
   }`),
@@ -40,10 +42,21 @@ const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Already have i
 const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/join';
 const heroVideoSrc = media?.heroVideoUrl || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
 const heroPosterSrc = media?.heroPosterUrl || '';
-const bookCoverUrl =
-	media?.bookCoverUrl ||
-	'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png';
-const fhbiCoverUrl = media?.fhbiCoverUrl || 'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
+
+// Bible cover — prefer Sanity image, fall back to URL field, then hardcoded
+const bibleCoverImage = media?.bibleCoverImage;
+const bookCoverUrl = bibleCoverImage
+	? urlFor(bibleCoverImage).width(400).url()
+	: media?.bookCoverUrl || 'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png';
+
+// FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
+const fhbCoverSanity = media?.fhbCoverImage;
+const fhbiCoverUrl = fhbCoverSanity
+	? urlFor(fhbCoverSanity).width(400).url()
+	: 'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
+
+// Hero video array — prefer Sanity, fall back to hardcoded
+const heroVideosFromSanity = media?.homePageHeroVideos;
 const photo1 = media?.peoplePhoto1Url || '';
 const photo2 = media?.peoplePhoto2Url || '';
 const photo3 = media?.peoplePhoto3Url || '';
@@ -136,9 +149,10 @@ const communityUrl = media?.communityUrl || '/join';
 			</div>
 		</section>
 
-		<script>
+		<script define:vars={{ heroVideosFromSanity }} is:inline>
+			// Hero videos from Sanity (or hardcoded fallback)
 			const R2 = 'https://assets.spiritmediapublishing.com/fathers-heart-bible';
-			const heroVideos = [
+			const heroVideos = heroVideosFromSanity || [
 				// — Dark videos (light text: white) — initial video is dark, so these play first
 				{ url: `${R2}/woman-holding-bible-sky.mp4`, theme: 'dark' },
 				{ url: `${R2}/farmer-reading-bible.mp4`, theme: 'dark' },

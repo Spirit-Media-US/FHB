@@ -5,7 +5,7 @@ import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
-import { sanityClient } from '../lib/sanity';
+import { sanityClient, urlFor } from '../lib/sanity';
 
 const [pageData, media] = await Promise.all([
 	sanityClient.fetch(`*[_type == "page" && slug == "the-fathers-heart-bible"][0] {
@@ -14,7 +14,7 @@ const [pageData, media] = await Promise.all([
     heroPrimaryCtaLabel, heroPrimaryCtaHref,
     heroSecondaryCtaLabel, heroSecondaryCtaHref
   }`),
-	sanityClient.fetch(`*[_type == "siteSettings"][0] { bookCoverUrl, communityUrl }`),
+	sanityClient.fetch(`*[_type == "siteSettings"][0] { theThersHeartBiblePageVideo, bookCoverUrl, fhbCoverImage, communityUrl }`),
 ]);
 
 const seoTitle = pageData?.seoTitle || "What Is the Father's Heart Bible? | Father's Heart Bible";
@@ -30,8 +30,13 @@ const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '/samples';
 const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Download the Free Book';
 const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/download';
 const bookCoverUrl = media?.bookCoverUrl || '';
-const fhbiCoverUrl =
-	'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
+const biblePageVideoUrl = media?.theThersHeartBiblePageVideo || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/hands-holding-bible.mp4';
+
+// FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
+const fhbCoverImageFromSanity = media?.fhbCoverImage;
+const fhbiCoverUrl = fhbCoverImageFromSanity
+	? urlFor(fhbCoverImageFromSanity).width(400).url()
+	: 'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
 const communityUrl = media?.communityUrl || '/join';
 
 const distinctives = [
@@ -127,7 +132,7 @@ const shifts = [
 		     SECTION 1 — PAGE HERO
 		     ═══════════════════════════════════════════════════════════ -->
 		<VideoHeroInner
-			videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/hands-holding-bible.mp4"
+			videoSrc={biblePageVideoUrl}
 			heading={heroHeading}
 			subheading={heroSubheading}
 			primaryCtaLabel={heroPrimaryCtaLabel}

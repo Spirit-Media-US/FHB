@@ -15,6 +15,7 @@ const [pageData, media] = await Promise.all([
     heroSecondaryCtaLabel, heroSecondaryCtaHref
   }`),
 	sanityClient.fetch(`*[_type == "siteSettings"][0] {
+    joinPageVideo,
     communityUrl, mightyNetworksUrl,
     peoplePhoto1Url, peoplePhoto2Url, peoplePhoto3Url, peoplePhoto4Url
   }`),
@@ -32,6 +33,7 @@ const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Download the F
 const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/download';
 // communityUrl field takes precedence; fall back to legacy mightyNetworksUrl
 const communityUrl = media?.communityUrl || media?.mightyNetworksUrl || '#join';
+const joinPageVideoUrl = media?.joinPageVideo || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/mother-son-praying.mp4';
 const photo1 = media?.peoplePhoto1Url || '';
 const photo2 = media?.peoplePhoto2Url || '';
 const photo3 = media?.peoplePhoto3Url || '';
@@ -123,7 +125,7 @@ const howToBegin = [
 		     SECTION 1 — HERO
 		     ═══════════════════════════════════════════════════════════ -->
 		<VideoHeroInner
-			videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/mother-son-praying.mp4"
+			videoSrc={joinPageVideoUrl}
 			heading={heroHeading}
 			subheading={heroSubheading}
 			primaryCtaLabel={heroPrimaryCtaLabel}

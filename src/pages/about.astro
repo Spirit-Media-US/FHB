@@ -14,7 +14,7 @@ const [pageData, media, kevinProfile] = await Promise.all([
     heroHeading, heroSubheading,
     heroPrimaryCtaLabel, heroPrimaryCtaHref
   }`),
-	sanityClient.fetch(`*[_type == "siteSettings"][0] { kevinPortraitUrl, communityUrl, donateUrl }`),
+	sanityClient.fetch(`*[_type == "siteSettings"][0] { aboutPageVideo, kevinPortraitUrl, communityUrl, donateUrl }`),
 	sanityClient.fetch(
 		`*[_type == "personProfile"] | order(order asc)[0] { portraitUrl, portrait { asset->{ url } } }`,
 	),
@@ -34,6 +34,7 @@ const kevinPortraitUrl =
 	kevinProfile?.portraitUrl || kevinProfile?.portrait?.asset?.url || media?.kevinPortraitUrl || '';
 const communityUrl = media?.communityUrl || '#join';
 const donateUrl = media?.donateUrl || '/partner';
+const aboutPageVideoUrl = media?.aboutPageVideo || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/women-reading-bible-outdoors.mp4';
 
 const foundations = [
 	{
@@ -74,7 +75,7 @@ const audience = [
 
     {/* 1 — HERO */}
     <VideoHeroInner
-      videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/women-reading-bible-outdoors.mp4"
+      videoSrc={aboutPageVideoUrl}
       heading={heroHeading}
       subheading={heroSubheading}
       primaryCtaLabel={heroPrimaryCtaLabel}

@@ -13,7 +13,7 @@ const [pageData, media] = await Promise.all([
     heroHeading, heroSubheading,
     heroPrimaryCtaLabel, heroPrimaryCtaHref
   }`),
-	sanityClient.fetch(`*[_type == "siteSettings"][0] { bookCoverUrl, donateUrl, communityUrl }`),
+	sanityClient.fetch(`*[_type == "siteSettings"][0] { partnerPageVideo, bookCoverUrl, donateUrl, communityUrl }`),
 ]);
 
 const seoTitle = pageData?.seoTitle || "Partner With Us | Father's Heart Bible";
@@ -27,6 +27,7 @@ const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '#donate';
 const bookCoverUrl = media?.bookCoverUrl || '';
 const donateUrl = media?.donateUrl || '#donate';
 const communityUrl = media?.communityUrl || '/join';
+const partnerPageVideoUrl = media?.partnerPageVideo || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/bible-lake-reading-hero.mp4';
 
 const whyMatters = [
 	{
@@ -105,7 +106,7 @@ const impactStats = [
 		     SECTION 1 — HERO
 		     ═══════════════════════════════════════════════════════════ -->
 		<VideoHeroInner
-			videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/bible-lake-reading-hero.mp4"
+			videoSrc={partnerPageVideoUrl}
 			heading={heroHeading}
 			subheading={heroSubheading}
 			primaryCtaLabel={heroPrimaryCtaLabel}
