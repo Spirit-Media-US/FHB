@@ -168,7 +168,7 @@ const communityUrl = media?.communityUrl || '/join';
 				{ url: `${R2}/mother-son-praying.mp4`, theme: 'light' },
 			];
 
-			function applyTheme(theme: string) {
+			function applyTheme(theme) {
 				const heading = document.getElementById('hero-heading');
 				const sub = document.getElementById('hero-sub');
 				const ctaPrimary = document.getElementById('hero-cta-primary');
@@ -190,8 +190,8 @@ const communityUrl = media?.communityUrl || '/join';
 				}
 			}
 
-			const vA = document.getElementById('hero-video-a') as HTMLVideoElement | null;
-			const vB = document.getElementById('hero-video-b') as HTMLVideoElement | null;
+			const vA = document.getElementById('hero-video-a');
+			const vB = document.getElementById('hero-video-b');
 			if (vA && vB) {
 				const PLAYBACK_RATE = 0.75;
 				const FADE_DURATION = 1500;
@@ -199,8 +199,8 @@ const communityUrl = media?.communityUrl || '/join';
 
 				// heroVideos[0] matches the HTML src — don't touch vA.src
 				let heroIdx = 0;
-				let curr: HTMLVideoElement = vA;
-				let next: HTMLVideoElement = vB;
+				let curr = vA;
+				let next = vB;
 				let fading = false;
 
 				vA.playbackRate = PLAYBACK_RATE;
@@ -240,7 +240,7 @@ const communityUrl = media?.communityUrl || '/join';
 					});
 				}
 
-				function onTimeUpdate(this: HTMLVideoElement) {
+				function onTimeUpdate() {
 					if (this !== curr) return;
 					if (!fading && this.duration && this.currentTime >= this.duration - FADE_BEFORE) {
 						beginCrossfade();
