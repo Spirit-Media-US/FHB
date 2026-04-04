@@ -20,7 +20,8 @@ const [pageData, media] = await Promise.all([
     fhbCoverImage,
     homePageHeroVideos,
     peoplePhoto1Url, peoplePhoto2Url, peoplePhoto3Url,
-    communityUrl
+    communityUrl,
+    logo
   }`),
 ]);
 
@@ -31,15 +32,13 @@ const seoDescription =
 	pageData?.seoDescription ||
 	"Discover the Father's Heart Bible, a new Bible translation revealing God as Father where Scripture reveals Him. Download the free book, explore sample passages, join the movement, and be part of what the Father is doing.";
 const heroHeading =
-	pageData?.heroHeading ||
 	'You were never meant to relate to God as a servant\u2026 but as a beloved child.';
 const heroSubheading =
-	pageData?.heroSubheading ||
 	'The Father\u2019s Heart Bible reveals what Scripture has always been showing: the destination was never merely forgiveness or heaven. The destination has always been the Father.';
-const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Download the Free Book';
-const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '/download';
-const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Already have it? Start here';
-const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/join';
+const heroPrimaryCtaLabel = 'Download the Free Book';
+const heroPrimaryCtaHref = '/download';
+const heroSecondaryCtaLabel = 'Already have it? Start here';
+const heroSecondaryCtaHref = '/join';
 const heroVideoSrc = media?.heroVideoUrl || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
 const heroPosterSrc = media?.heroPosterUrl || '';
 
@@ -58,6 +57,7 @@ const photo1 = media?.peoplePhoto1Url || '';
 const photo2 = media?.peoplePhoto2Url || '';
 const photo3 = media?.peoplePhoto3Url || '';
 const communityUrl = media?.communityUrl || '/join';
+const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 ---
 
 <Layout
@@ -107,6 +107,11 @@ const communityUrl = media?.communityUrl || '/join';
 				/>
 			)}
 			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-16 md:pb-24" style="transition: color 1.2s ease;">
+				<img
+					src="/fhb-logo-white.png"
+					alt="Father's Heart Bible"
+					class="h-20 md:h-28 w-auto mx-auto mb-6"
+				/>
 				<h1
 					id="hero-heading"
 					class="text-4xl md:text-6xl font-medium leading-snug tracking-tight"
@@ -691,50 +696,6 @@ const communityUrl = media?.communityUrl || '/join';
 			</div>
 		</Section>
 
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 10 — FINAL CTA BAND
-		     ═══════════════════════════════════════════════════════════ -->
-		<section class="py-10 md:py-14" style="background-color: var(--color-deep);">
-			<div class="max-w-3xl mx-auto px-6 text-center">
-				<div class="w-10 h-0.5 mx-auto mb-6" style="background-color: var(--color-gold);"></div>
-				<h2
-					class="text-3xl md:text-4xl font-light mb-8"
-					style="font-family: var(--font-serif); color: #fff;"
-				>
-					Your next step with the Father.
-				</h2>
-				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-					<a
-						href="/download"
-						class="inline-flex items-center px-7 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
-						style="font-family: var(--font-sans); background-color: var(--color-gold); color: var(--color-deep);"
-						onmouseover="this.style.filter='brightness(1.08)'"
-						onmouseout="this.style.filter='none'"
-					>
-						Download the Free Book
-					</a>
-					<a
-						href="/join"
-						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
-						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
-						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
-						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
-					>
-						Join the Movement
-					</a>
-					<a
-						href="/partner"
-						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
-						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
-						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
-						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
-					>
-						Partner With Us
-					</a>
-				</div>
-			</div>
-		</section>
 
 	</main>
 	<Footer />
