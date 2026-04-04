@@ -8,6 +8,7 @@ interface Props {
 	image?: string;
 	noindex?: boolean;
 	darkHero?: boolean;
+	jsonLd?: Record<string, any>;
 }
 
 const {
@@ -16,6 +17,7 @@ const {
 	image,
 	noindex = false,
 	darkHero = false,
+	jsonLd,
 } = Astro.props;
 
 // Fetch siteName and ogImage from Sanity
@@ -28,13 +30,10 @@ const siteSettings = await sanityClient.fetch(`
 
 const siteName = siteSettings?.siteName || "Father's Heart Bible";
 
-// Use provided image, or fallback to Sanity heroImage, or fallback to static OG image
-let ogImage = image;
-if (!ogImage && siteSettings?.heroImage) {
-	ogImage = urlFor(siteSettings.heroImage).width(1200).height(630).url();
-} else if (!ogImage) {
-	ogImage = '/og-image.png';
-}
+// OG image — default to FHBcity mockup cover, allow per-page override
+const ogImage =
+	image ||
+	'https://cdn.sanity.io/images/rusi1hyi/production/8b5d1c39f892218c978d3e3caf5720e09833bbc4-1024x1024.png?w=1200&h=630&fit=crop';
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
@@ -54,6 +53,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 		<title>{title}</title>
 		<meta name="description" content={description} />
+		{!noindex && <meta name="robots" content="index, follow" />}
+		<meta name="author" content="Spirit Media Inc." />
+		<meta name="publisher" content="Spirit Media Inc." />
 
 		<!-- Open Graph -->
 		<meta property="og:type" content="website" />
@@ -62,12 +64,18 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta property="og:description" content={description} />
 		<meta property="og:image" content={ogImage} />
 		<meta property="og:site_name" content={siteName} />
+		<meta property="og:locale" content="en_US" />
 
 		<!-- Twitter -->
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={ogImage} />
+
+		<!-- JSON-LD Structured Data -->
+		{jsonLd && (
+			<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+		)}
 
 		<!-- Google Tag Manager -->
 		<script is:inline>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -78,5 +86,42 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 	</head>
 	<body class="min-h-screen flex flex-col" data-dark-hero={darkHero ? 'true' : 'false'}>
 		<slot />
+		<script>
+			// Scroll reveal observer
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('revealed');
+						observer.unobserve(entry.target);
+					}
+				});
+			}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+			document.querySelectorAll('[data-reveal], [data-stagger], [data-grow-line]').forEach((el) => observer.observe(el));
+
+			// Counter animation
+			const counterObserver = new IntersectionObserver((entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						const el = entry.target as HTMLElement;
+						const target = parseInt(el.dataset.counter || '0', 10);
+						const prefix = el.dataset.prefix || '';
+						let current = 0;
+						const duration = 1200;
+						const step = Math.max(1, Math.floor(target / (duration / 16)));
+						const tick = () => {
+							current = Math.min(current + step, target);
+							el.textContent = prefix + current;
+							if (current < target) requestAnimationFrame(tick);
+						};
+						requestAnimationFrame(tick);
+						counterObserver.unobserve(el);
+					}
+				});
+			}, { threshold: 0.3 });
+
+			document.querySelectorAll('[data-counter]').forEach((el) => counterObserver.observe(el));
+
+		</script>
 	</body>
 </html>

@@ -19,12 +19,14 @@ const {
 	dark = false,
 } = Astro.props;
 
-const bg = dark ? 'var(--color-inverse-surface)' : 'linear-gradient(135deg, var(--color-primary), var(--color-primary-container))';
+const bg = dark
+	? 'var(--color-inverse-surface)'
+	: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-container))';
 const headlineColor = '#fff';
 const bodyColor = dark ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.85)';
 ---
 
-<section class="py-20 md:py-28" style={dark ? `background-color: ${bg};` : `background: ${bg};`}>
+<section class="py-8 md:py-12 lg:py-16" style={dark ? `background-color: ${bg};` : `background: ${bg};`}>
 	<div class="max-w-3xl mx-auto px-6 text-center">
 		<h2
 			class="text-3xl md:text-5xl font-light mb-4 tracking-tight"
@@ -44,7 +46,7 @@ const bodyColor = dark ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.85)';
 			<a
 				href={primaryHref}
 				class="inline-flex items-center px-8 py-3.5 text-sm font-semibold uppercase no-underline tracking-[0.08em] transition-all duration-200"
-				style="font-family: var(--font-body); background-color: var(--color-surface-lowest); color: var(--color-primary); border-radius: 0.125rem;"
+				style="font-family: var(--font-body); background-color: var(--color-surface-lowest); color: var(--color-primary);"
 				onmouseover="this.style.opacity='0.9'"
 				onmouseout="this.style.opacity='1'"
 			>
@@ -54,7 +56,7 @@ const bodyColor = dark ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.85)';
 				<a
 					href={secondaryHref}
 					class="inline-flex items-center px-8 py-3.5 text-sm font-semibold uppercase no-underline tracking-[0.08em] transition-all duration-200"
-					style="font-family: var(--font-body); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 0.125rem;"
+					style="font-family: var(--font-body); color: #fff; border: 1px solid rgba(255,255,255,0.2);"
 					onmouseover="this.style.borderColor='rgba(255,255,255,0.5)'"
 					onmouseout="this.style.borderColor='rgba(255,255,255,0.2)'"
 				>

@@ -1,6 +1,7 @@
 ---
 import CTASection from '../components/CTASection.astro';
 import Footer from '../components/Footer.astro';
+import ImageGrid from '../components/ImageGrid.astro';
 import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
@@ -9,14 +10,16 @@ import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
 const [pageData, media, kevinProfile] = await Promise.all([
-	sanityClient.fetch(`*[_type == "page" && slug == "about"][0] {
+	sanityClient.fetch(`*[_type =="page" && slug =="about"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
     heroPrimaryCtaLabel, heroPrimaryCtaHref
   }`),
-	sanityClient.fetch(`*[_type == "siteSettings"][0] { kevinPortraitUrl, communityUrl, donateUrl }`),
 	sanityClient.fetch(
-		`*[_type == "personProfile"] | order(order asc)[0] { portraitUrl, portrait { asset->{ url } } }`,
+		`*[_type =="siteSettings"][0] { aboutPageVideo, kevinPortraitUrl, communityUrl, donateUrl }`,
+	),
+	sanityClient.fetch(
+		`*[_type =="personProfile"] | order(order asc)[0] { portraitUrl, portrait { asset->{ url } } }`,
 	),
 ]);
 
@@ -24,16 +27,18 @@ const seoTitle = pageData?.seoTitle || "About Kevin White | Father's Heart Bible
 const seoDescription =
 	pageData?.seoDescription ||
 	"Learn the story behind the Father's Heart Bible and the vision to reveal God as Father through Scripture.";
-const heroHeading = pageData?.heroHeading || 'The story behind the Father’s Heart Bible';
+const heroHeading = 'The story behind the Father’s Heart Bible';
 const heroSubheading =
-	pageData?.heroSubheading ||
 	'The Father’s Heart Bible was not born from novelty. It was born from a long journey through Scripture, ministry, longing, and awakening.';
-const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Download the Free Book';
-const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '/download';
+const heroPrimaryCtaLabel = 'Download the Free Book';
+const heroPrimaryCtaHref = '/download';
 const kevinPortraitUrl =
 	kevinProfile?.portraitUrl || kevinProfile?.portrait?.asset?.url || media?.kevinPortraitUrl || '';
 const communityUrl = media?.communityUrl || '#join';
 const donateUrl = media?.donateUrl || '/partner';
+const aboutPageVideoUrl =
+	media?.aboutPageVideo ||
+	'https://assets.spiritmediapublishing.com/fathers-heart-bible/women-reading-bible-outdoors.mp4';
 
 const foundations = [
 	{
@@ -68,13 +73,24 @@ const audience = [
   title={seoTitle}
   description={seoDescription}
   darkHero={true}
+  jsonLd={{
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/about" },
+      { "@type": "Person", "name": "Kevin White", "jobTitle": "Translator", "worksFor": { "@type": "Organization", "name": "Spirit Media Inc." } },
+      { "@type": "BreadcrumbList", "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
+        { "@type": "ListItem", "position": 2, "name": "About", "item": "https://fathersheartbible.com/about" }
+      ]}
+    ]
+  }}
 >
   <Navbar />
   <main>
 
     {/* 1 — HERO */}
     <VideoHeroInner
-      videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/women-reading-bible-outdoors.mp4"
+      videoSrc={aboutPageVideoUrl}
       heading={heroHeading}
       subheading={heroSubheading}
       primaryCtaLabel={heroPrimaryCtaLabel}
@@ -88,7 +104,7 @@ const audience = [
           <img
             src={kevinPortraitUrl ? `${kevinPortraitUrl}?w=800&auto=format` : ''}
             alt="Kevin White, translator of the Father's Heart Bible"
-            class="rounded-sm w-full"
+            class="w-full"
             style="border: 1px solid var(--color-hairline);"
           />
         </div>
@@ -161,7 +177,7 @@ const audience = [
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           {foundations.map((item) => (
             <div
-              class="p-6 rounded-sm"
+              class="p-6"
               style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
             >
               <h3 class="font-serif text-xl mb-2" style="color: var(--color-ink);">{item.heading}</h3>
@@ -263,6 +279,14 @@ const audience = [
       secondaryHref={communityUrl}
       dark={true}
     />
+
+    <Section variant="light">
+      <ImageGrid cols={3} gap="md">
+        <img src="https://cdn.sanity.io/images/rusi1hyi/production/610d3211f6931590f9b8681e3746f2389eee4c67-4898x3265.jpg?w=800&auto=format" alt="Studying in the library" class="w-full aspect-square object-cover" />
+        <img src="https://cdn.sanity.io/images/rusi1hyi/production/3214f667c147ad91e5e5e893f44b576a8878f647-1024x1536.png?w=800&auto=format" alt="The Father's Heart Bible cover" class="w-full aspect-square object-cover" />
+        <img src="https://cdn.sanity.io/images/rusi1hyi/production/7d971cfd5e9ab5307e5d321281f562459542b19c-4000x2661.jpg?w=800&auto=format" alt="Encountering Scripture" class="w-full aspect-square object-cover" />
+      </ImageGrid>
+    </Section>
 
   </main>
   <Footer />

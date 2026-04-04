@@ -6,18 +6,18 @@ import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
-import { sanityClient } from '../lib/sanity';
+import { sanityClient, urlFor } from '../lib/sanity';
 
 const [pageData, media, resourceData] = await Promise.all([
-	sanityClient.fetch(`*[_type == "page" && slug == "download"][0] {
+	sanityClient.fetch(`*[_type =="page" && slug =="download"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
     heroPrimaryCtaLabel, heroPrimaryCtaHref
   }`),
 	sanityClient.fetch(
-		`*[_type == "siteSettings"][0] { bookCoverUrl, ghlDownloadFormId, communityUrl }`,
+		`*[_type =="siteSettings"][0] { downloadPageVideo, bookCoverUrl, fhbCoverImage, ghlDownloadFormId, communityUrl }`,
 	),
-	sanityClient.fetch(`*[_type == "resource" && featured == true] | order(order asc)[0] {
+	sanityClient.fetch(`*[_type =="resource" && featured == true] | order(order asc)[0] {
     title, shortDescription, formHeading, formDescription, buttonText, coverImageUrl
   }`),
 ]);
@@ -25,14 +25,23 @@ const [pageData, media, resourceData] = await Promise.all([
 const seoTitle = pageData?.seoTitle || "Download the Free Book | Father's Heart Bible";
 const seoDescription =
 	pageData?.seoDescription ||
-	'Download the free PDF of Father’s Heart → Beloved Identity and discover the heart behind the Father’s Heart Bible.';
-const heroHeading = pageData?.heroHeading || 'Download the Free Book';
-const heroSubheading = pageData?.heroSubheading || 'Father’s Heart → Beloved Identity';
-const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Download the Free Book';
-const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '#form';
+	"Download the free PDF of Father's Heart → Beloved Identity and discover the heart behind the Father's Heart Bible.";
+const heroHeading = 'Download the Free Book';
+const heroSubheading = "Father's Heart \u2192 Beloved Identity";
+const heroPrimaryCtaLabel = 'Download the Free Book';
+const heroPrimaryCtaHref = '#form';
 const bookCoverUrl = resourceData?.coverImageUrl || media?.bookCoverUrl || '';
 const ghlFormId = media?.ghlDownloadFormId || '';
 const communityUrl = media?.communityUrl || '/join';
+const downloadPageVideoUrl =
+	media?.downloadPageVideo ||
+	'https://assets.spiritmediapublishing.com/fathers-heart-bible/farmer-reading-bible.mp4';
+
+// FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
+const fhbCoverImageFromSanity = media?.fhbCoverImage;
+const fhbiCoverUrl = fhbCoverImageFromSanity
+	? urlFor(fhbCoverImageFromSanity).width(400).url()
+	: 'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
 // Resource fields with fallbacks
 const formHeading = resourceData?.formHeading || 'Get Your Free Copy';
 const formDescription =
@@ -84,6 +93,16 @@ const nextSteps = [
 	title={seoTitle}
 	description={seoDescription}
 	darkHero={true}
+	jsonLd={{
+		"@context": "https://schema.org",
+		"@graph": [
+			{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/download" },
+			{ "@type": "BreadcrumbList", "itemListElement": [
+				{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
+				{ "@type": "ListItem", "position": 2, "name": "Download", "item": "https://fathersheartbible.com/download" }
+			]}
+		]
+	}}
 >
 	<Navbar />
 	<main>
@@ -92,7 +111,7 @@ const nextSteps = [
 		     SECTION 1 — HERO
 		     ═══════════════════════════════════════════════════════════ -->
 		<VideoHeroInner
-			videoSrc="https://assets.spiritmediapublishing.com/fathers-heart-bible/farmer-reading-bible.mp4"
+			videoSrc={downloadPageVideoUrl}
 			heading={heroHeading}
 			subheading={heroSubheading}
 			primaryCtaLabel={heroPrimaryCtaLabel}
@@ -103,118 +122,52 @@ const nextSteps = [
 		     SECTION 2 — OFFER / FORM
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="soft">
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-start">
-
-				<!-- Left: offer + form -->
-				<div>
-					<p
-						class="text-xs font-semibold tracking-widest uppercase mb-4"
-						style="font-family: var(--font-sans); color: var(--color-gold);"
-					>
-						Free PDF — Download Now
-					</p>
-					<h1
-						class="text-4xl md:text-5xl font-light leading-tight mb-4"
-						style="font-family: var(--font-serif); color: var(--color-ink);"
-					>
-						{heroHeading}
-					</h1>
-										<p class="text-lg leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
-						This free PDF is the best place to begin. It is a concise, powerful doorway into the
-						message behind the Father’s Heart Bible and the revelation of beloved identity.
-					</p>
-
-					<!-- GHL Form -->
-					<div
-						class="p-6 md:p-8 rounded"
-						style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
-					>
-						<p
-							class="text-xs font-semibold tracking-widest uppercase mb-5"
-							style="font-family: var(--font-sans); color: var(--color-gold);"
-						>
-							Enter your details to receive the free book
-						</p>
-						{ghlFormId ? (
-							<FormEmbed formId={ghlFormId} />
-						) : (
-							<!-- GHL form embed placeholder — Kevin pastes embed code here -->
-							<div class="ghl-form-placeholder space-y-4">
-								<div>
-									<label
-										class="block text-sm font-medium mb-1.5"
-										style="font-family: var(--font-sans); color: var(--color-ink);"
-									>
-										First Name
-									</label>
-									<input
-										type="text"
-										placeholder="Your first name"
-										class="w-full px-4 py-3 rounded text-base"
-										style="font-family: var(--font-sans); border: 1px solid var(--color-hairline); background-color: var(--color-soft); color: var(--color-ink); outline: none;"
-										disabled
-									/>
-								</div>
-								<div>
-									<label
-										class="block text-sm font-medium mb-1.5"
-										style="font-family: var(--font-sans); color: var(--color-ink);"
-									>
-										Email Address
-									</label>
-									<input
-										type="email"
-										placeholder="your@email.com"
-										class="w-full px-4 py-3 rounded text-base"
-										style="font-family: var(--font-sans); border: 1px solid var(--color-hairline); background-color: var(--color-soft); color: var(--color-ink); outline: none;"
-										disabled
-									/>
-								</div>
-								<a
-									href="#form"
-									class="block w-full text-center px-6 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
-									style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
-								>
-									Send Me the Free Book
-								</a>
-								<p
-									class="text-xs text-center"
-									style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.7;"
-								>
-									GHL form connects here · source:fhb tag
-								</p>
-							</div>
-						)}
-					</div>
-					<p
-						class="text-sm text-center italic leading-relaxed max-w-xs"
-						style="font-family: var(--font-serif); color: var(--color-muted);"
-					>
-						"The destination has always been the Father."
-					</p>
-				</div>
-
-				<!-- Right: book cover + trust bullets -->
-				<div class="flex flex-col items-center gap-8 pt-4">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center max-w-4xl mx-auto">
+				<!-- Book cover -->
+				<div class="flex justify-center" data-reveal="slide-left">
 					<img
-						src="https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png"
+						src={fhbiCoverUrl}
 						alt="Father's Heart → Beloved Identity — free PDF"
-						class="w-full max-w-xs block"
+						class="w-56 md:w-72 block"
 						style="filter: drop-shadow(0 16px 32px rgba(0,0,0,0.22));"
 					/>
-					<div class="w-full max-w-sm space-y-4">
-						{[
-							"A complete journey from Genesis to the New Testament",
-							"Reveals the Father's voice across all of Scripture",
-							"Changes how you read every page of the Bible",
-							"Completely free — no strings attached",
+				</div>
+				<!-- Description + CTA -->
+				<div data-reveal="slide-right">
+					<p
+						class="text-xs font-semibold tracking-widest uppercase mb-4"
+						style="font-family: var(--font-body); color: var(--color-primary);"
+					>
+						Free PDF
+					</p>
+					<h2
+						class="text-3xl md:text-4xl font-light leading-tight mb-4"
+						style="font-family: var(--font-headline); color: var(--color-ink);"
+					>
+						Father's Heart → Beloved Identity
+					</h2>
+					<p class="leading-relaxed mb-6" style="font-family: var(--font-body); color: var(--color-muted);">
+						This free PDF is the best place to begin. A concise, powerful doorway into the
+						message behind the Father's Heart Bible and the revelation of beloved identity.
+					</p>
+					<div class="space-y-3 mb-8">
+						{["A complete journey from Genesis to the New Testament","Reveals the Father's voice across all of Scripture","Changes how you read every page of the Bible","Completely free — no strings attached",
 						].map(item => (
 							<div class="flex items-start gap-3">
-								<span class="shrink-0 w-2 h-2 rounded-full mt-1.5" style="background-color: var(--color-gold);"></span>
-								<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{item}</p>
+								<span class="shrink-0 w-2 h-2 rounded-full mt-1.5" style="background-color: var(--color-primary);"></span>
+								<p class="text-sm leading-relaxed" style="font-family: var(--font-body); color: var(--color-muted);">{item}</p>
 							</div>
 						))}
 					</div>
+					<a
+						href="#form"
+						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
+						style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary);"
+						onmouseover="this.style.opacity='0.9'"
+						onmouseout="this.style.opacity='1'"
+					>
+						Download Free
+					</a>
 				</div>
 			</div>
 		</Section>
@@ -258,10 +211,59 @@ const nextSteps = [
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 3 — WHAT READERS WILL EXPERIENCE
+		     FORM (ANCHOR)
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="soft">
-			<div class="text-center mb-12">
+			<div id="form" class="max-w-xl mx-auto text-center">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-4"
+					style="font-family: var(--font-body); color: var(--color-primary);"
+				>
+					Ready to receive it?
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light mb-4"
+					style="font-family: var(--font-headline); color: var(--color-ink);"
+				>
+					Download the free book.
+				</h2>
+				<p class="leading-relaxed mb-8" style="font-family: var(--font-body); color: var(--color-muted);">
+					Enter your details below. Your PDF is sent immediately.
+				</p>
+				<div
+					class="p-6 md:p-10 text-left"
+					style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
+				>
+					{ghlFormId ? (
+						<FormEmbed formId={ghlFormId} />
+					) : (
+						<div class="ghl-form-placeholder space-y-4">
+							<div>
+								<label class="block text-sm font-medium mb-1.5" style="font-family: var(--font-body); color: var(--color-ink);">First Name</label>
+								<input type="text" placeholder="Your first name" class="w-full px-4 py-3 text-base" style="font-family: var(--font-body); border: 1px solid var(--color-hairline); background-color: var(--color-surface); color: var(--color-ink);" disabled />
+							</div>
+							<div>
+								<label class="block text-sm font-medium mb-1.5" style="font-family: var(--font-body); color: var(--color-ink);">Email Address</label>
+								<input type="email" placeholder="your@email.com" class="w-full px-4 py-3 text-base" style="font-family: var(--font-body); border: 1px solid var(--color-hairline); background-color: var(--color-surface); color: var(--color-ink);" disabled />
+							</div>
+							<button type="button" class="w-full px-6 py-3.5 text-base font-semibold" style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary);" disabled>
+								Send Me the Free Book
+							</button>
+						</div>
+					)}
+					<p class="text-xs mt-4 text-center" style="font-family: var(--font-body); color: var(--color-muted); opacity: 0.6;">
+						Free. No spam. Unsubscribe any time.
+					</p>
+				</div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     WHAT READERS WILL EXPERIENCE
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="text-center mb-8">
 				<p
 					class="text-xs font-semibold tracking-widest uppercase mb-3"
 					style="font-family: var(--font-sans); color: var(--color-gold);"
@@ -278,7 +280,7 @@ const nextSteps = [
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
 				{benefits.map(({ heading, body }) => (
 					<div
-						class="p-6 rounded"
+						class="p-6"
 						style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
 					>
 						<div class="w-6 h-0.5 mb-4" style="background-color: var(--color-gold);"></div>
@@ -318,90 +320,6 @@ const nextSteps = [
 		</Section>
 
 
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 5 — GHL FORM (ANCHOR)
-		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="light">
-			<div id="form" class="max-w-xl mx-auto text-center">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-4"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					Ready to receive it?
-				</p>
-				<h2
-					class="text-3xl md:text-4xl font-light mb-4"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					Download the free book.
-				</h2>
-				<p class="leading-relaxed mb-10" style="font-family: var(--font-sans); color: var(--color-muted);">
-					Enter your details below. Your PDF is sent immediately.
-					You will also hear about future resources and the publication of the full Father's Heart Bible.
-				</p>
-				<div
-					class="p-6 md:p-10 rounded text-left"
-					style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
-				>
-					{ghlFormId ? (
-						<FormEmbed formId={ghlFormId} />
-					) : (
-						<div class="ghl-form-placeholder space-y-4">
-							<div>
-								<label
-									class="block text-sm font-medium mb-1.5"
-									style="font-family: var(--font-sans); color: var(--color-ink);"
-								>
-									First Name
-								</label>
-								<input
-									type="text"
-									placeholder="Your first name"
-									class="w-full px-4 py-3 rounded text-base"
-									style="font-family: var(--font-sans); border: 1px solid var(--color-hairline); background-color: var(--color-canvas); color: var(--color-ink);"
-									disabled
-								/>
-							</div>
-							<div>
-								<label
-									class="block text-sm font-medium mb-1.5"
-									style="font-family: var(--font-sans); color: var(--color-ink);"
-								>
-									Email Address
-								</label>
-								<input
-									type="email"
-									placeholder="your@email.com"
-									class="w-full px-4 py-3 rounded text-base"
-									style="font-family: var(--font-sans); border: 1px solid var(--color-hairline); background-color: var(--color-canvas); color: var(--color-ink);"
-									disabled
-								/>
-							</div>
-							<button
-								type="button"
-								class="w-full px-6 py-3.5 text-base font-semibold rounded"
-								style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
-								disabled
-							>
-								Send Me the Free Book
-							</button>
-							<p
-								class="text-xs text-center"
-								style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.7;"
-							>
-								GHL form connects here · tag: source:fhb
-							</p>
-						</div>
-					)}
-					<p
-						class="text-xs mt-5 text-center"
-						style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;"
-					>
-						Free. No spam. Unsubscribe any time.
-					</p>
-				</div>
-			</div>
-		</Section>
 
 
 		<!-- ═══════════════════════════════════════════════════════════
@@ -422,7 +340,7 @@ const nextSteps = [
 					What happens next.
 				</h2>
 			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto" data-stagger>
 				{nextSteps.map(({ step, heading, body }) => (
 					<div class="text-center p-6">
 						<div
@@ -448,75 +366,6 @@ const nextSteps = [
 			</div>
 		</Section>
 
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 7 — JOIN THE MOVEMENT
-		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="light">
-			<div class="max-w-xl mx-auto text-center">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-4"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					Your Next Step
-				</p>
-				<h2
-					class="text-3xl md:text-4xl font-light mb-6"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					Be part of what the Father is doing.
-				</h2>
-				<p class="text-lg leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
-					After the book, the natural next step is community — joining those who are
-					awakening to the Father's heart and walking in beloved identity together.
-				</p>
-				<a
-					href="/join"
-					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
-					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
-					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
-					onmouseout="this.style.backgroundColor='var(--color-brand)'"
-				>
-					Join the Movement
-				</a>
-			</div>
-		</Section>
-
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 8 — FINAL CTA BAND
-		     ═══════════════════════════════════════════════════════════ -->
-		<section class="py-16 md:py-20" style="background-color: var(--color-deep);">
-			<div class="max-w-3xl mx-auto px-6 text-center">
-				<div class="w-10 h-0.5 mx-auto mb-8" style="background-color: var(--color-gold);"></div>
-				<p
-					class="text-xl italic mb-10"
-					style="font-family: var(--font-serif); color: rgba(255,255,255,0.8);"
-				>
-					The Father is waiting. The book is free. Begin here.
-				</p>
-				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-					<a
-						href="#form"
-						class="inline-flex items-center px-7 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
-						style="font-family: var(--font-sans); background-color: var(--color-gold); color: var(--color-deep);"
-						onmouseover="this.style.filter='brightness(1.08)'"
-						onmouseout="this.style.filter='none'"
-					>
-						Download the Free Book
-					</a>
-					<a
-						href="/join"
-						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
-						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
-						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
-						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
-					>
-						Join the Movement
-					</a>
-				</div>
-			</div>
-		</section>
 
 	</main>
 	<Footer />

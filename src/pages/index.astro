@@ -5,20 +5,23 @@ import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
-import { sanityClient } from '../lib/sanity';
+import { sanityClient, urlFor } from '../lib/sanity';
 
 // Fetch page content + media from Sanity (all values have hardcoded fallbacks)
 const [pageData, media] = await Promise.all([
-	sanityClient.fetch(`*[_type == "page" && slug == "home"][0] {
+	sanityClient.fetch(`*[_type =="page" && slug =="home"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
     heroPrimaryCtaLabel, heroPrimaryCtaHref,
     heroSecondaryCtaLabel, heroSecondaryCtaHref
   }`),
-	sanityClient.fetch(`*[_type == "siteSettings"][0] {
-    heroVideoUrl, heroPosterUrl, bookCoverUrl,
+	sanityClient.fetch(`*[_type =="siteSettings"][0] {
+    heroVideoUrl, heroPosterUrl, bookCoverUrl, bibleCoverImage,
+    fhbCoverImage,
+    homePageHeroVideos,
     peoplePhoto1Url, peoplePhoto2Url, peoplePhoto3Url,
-    communityUrl
+    communityUrl,
+    logo
   }`),
 ]);
 
@@ -29,31 +32,71 @@ const seoDescription =
 	pageData?.seoDescription ||
 	"Discover the Father's Heart Bible, a new Bible translation revealing God as Father where Scripture reveals Him. Download the free book, explore sample passages, join the movement, and be part of what the Father is doing.";
 const heroHeading =
-	pageData?.heroHeading ||
 	'You were never meant to relate to God as a servant\u2026 but as a beloved child.';
 const heroSubheading =
-	pageData?.heroSubheading ||
 	'The Father\u2019s Heart Bible reveals what Scripture has always been showing: the destination was never merely forgiveness or heaven. The destination has always been the Father.';
-const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Download the Free Book';
-const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '/download';
-const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Already have it? Start here';
-const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/join';
-const heroVideoSrc = media?.heroVideoUrl || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
+const heroPrimaryCtaLabel = 'Download the Free Book';
+const heroPrimaryCtaHref = '/download';
+const heroSecondaryCtaLabel = 'Already have it? Start here';
+const heroSecondaryCtaHref = '/join';
+const heroVideoSrc =
+	media?.heroVideoUrl ||
+	'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
 const heroPosterSrc = media?.heroPosterUrl || '';
+
+// Bible cover — use the transparent-background PNG
 const bookCoverUrl =
-	media?.bookCoverUrl ||
 	'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png';
-const fhbiCoverUrl = media?.fhbiCoverUrl || 'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
+
+// FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
+const fhbCoverSanity = media?.fhbCoverImage;
+const fhbiCoverUrl = fhbCoverSanity
+	? urlFor(fhbCoverSanity).width(400).url()
+	: 'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
+
+// Hero video array — prefer Sanity, fall back to hardcoded
+const heroVideosFromSanity = media?.homePageHeroVideos;
 const photo1 = media?.peoplePhoto1Url || '';
 const photo2 = media?.peoplePhoto2Url || '';
 const photo3 = media?.peoplePhoto3Url || '';
 const communityUrl = media?.communityUrl || '/join';
+const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 ---
 
 <Layout
 	title={seoTitle}
 	description={seoDescription}
 	darkHero={true}
+	jsonLd={{
+		"@context": "https://schema.org",
+		"@graph": [
+			{
+				"@type": "Organization",
+				"@id": "https://fathersheartbible.com/#organization",
+				"name": "Father's Heart Bible",
+				"url": "https://fathersheartbible.com",
+				"logo": "https://fathersheartbible.com/fhb-logo.png",
+				"publisher": { "@type": "Organization", "name": "Spirit Media Inc.", "url": "https://spiritmediapublishing.com" },
+				"description": "A new Bible translation revealing God as Father where Scripture reveals Him."
+			},
+			{
+				"@type": "WebSite",
+				"@id": "https://fathersheartbible.com/#website",
+				"url": "https://fathersheartbible.com",
+				"name": "Father's Heart Bible",
+				"publisher": { "@id": "https://fathersheartbible.com/#organization" }
+			},
+			{
+				"@type": "WebPage",
+				"@id": "https://fathersheartbible.com/",
+				"url": "https://fathersheartbible.com/",
+				"name": seoTitle,
+				"description": seoDescription,
+				"isPartOf": { "@id": "https://fathersheartbible.com/#website" },
+				"about": { "@id": "https://fathersheartbible.com/#organization" }
+			}
+		]
+	}}
 >
 	<Navbar />
 	<main>
@@ -62,7 +105,7 @@ const communityUrl = media?.communityUrl || '/join';
 		     SECTION 1 — HERO
 		     ═══════════════════════════════════════════════════════════ -->
 		<section
-			class="relative flex items-end justify-center overflow-hidden min-h-[840px] md:min-h-screen"
+			class="relative flex items-end justify-center overflow-hidden min-h-[500px] md:min-h-screen"
 			style="background-color: var(--color-deep); margin-top: -1px;"
 			id="hero-section"
 		>
@@ -96,39 +139,49 @@ const communityUrl = media?.communityUrl || '/join';
 					aria-hidden="true"
 				/>
 			)}
-			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-16 md:pb-24" style="transition: color 1.2s ease, border-color 1.2s ease;">
+			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-10 md:pb-16 lg:pb-24" style="transition: color 1.2s ease;">
+				<img
+					src="/fhb-logo-white.png"
+					alt="Father's Heart Bible"
+					class="h-14 md:h-20 lg:h-28 w-auto mx-auto mb-4 md:mb-6" data-hero-entrance
+				/>
 				<h1
 					id="hero-heading"
-					class="text-4xl md:text-6xl font-light leading-tight mb-6"
-					style="font-family: var(--font-serif); color: #FFFFFF; transition: color 1.2s ease;"
+					class="text-4xl md:text-6xl font-medium leading-snug tracking-tight"
+					style="font-family: var(--font-headline); color: #FFFFFF; transition: color 1.2s ease;" data-hero-entrance
 				>
 					{heroHeading}
 				</h1>
+			</div>
+		</section>
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     HERO SUBTEXT — Pulled out of the video hero
+		     ═══════════════════════════════════════════════════════════ -->
+		<section style="background-color: var(--color-canvas);" class="py-8 md:py-12 px-4 md:px-6">
+			<div class="max-w-2xl mx-auto text-center" data-reveal>
 				<p
-					id="hero-sub"
-					class="text-lg md:text-xl mb-10 leading-relaxed"
-					style="font-family: var(--font-sans); color: rgba(255,255,255,0.9); transition: color 1.2s ease;"
+					class="text-lg md:text-xl leading-relaxed mb-10"
+					style="font-family: var(--font-body); color: var(--color-muted);"
 				>
 					{heroSubheading}
 				</p>
 				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
 					<a
-						id="hero-cta-primary"
 						href={heroPrimaryCtaHref}
-						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
-						style="font-family: var(--font-sans); background-color: var(--color-gold); color: #FFFFFF;"
-						onmouseover="this.style.filter='brightness(1.08)'"
-						onmouseout="this.style.filter='none'"
+						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
+						style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary);"
+						onmouseover="this.style.opacity='0.9'"
+						onmouseout="this.style.opacity='1'"
 					>
 						{heroPrimaryCtaLabel}
 					</a>
 					<a
-						id="hero-cta-secondary"
 						href={heroSecondaryCtaHref}
-						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline rounded border transition-all duration-200"
-						style="font-family: var(--font-sans); color: #FFFFFF; border-color: rgba(255,255,255,0.5);"
-						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
-						onmouseout="this.style.borderColor='rgba(255,255,255,0.5)'"
+						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline border transition-all duration-200"
+						style="font-family: var(--font-body); color: var(--color-primary); border-color: var(--color-primary);"
+						onmouseover="this.style.backgroundColor='var(--color-primary)'; this.style.color='var(--color-on-primary)';"
+						onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-primary)';"
 					>
 						{heroSecondaryCtaLabel}
 					</a>
@@ -136,9 +189,10 @@ const communityUrl = media?.communityUrl || '/join';
 			</div>
 		</section>
 
-		<script>
+		<script define:vars={{ heroVideosFromSanity }} is:inline>
+			// Hero videos from Sanity (or hardcoded fallback)
 			const R2 = 'https://assets.spiritmediapublishing.com/fathers-heart-bible';
-			const heroVideos = [
+			const heroVideos = heroVideosFromSanity || [
 				// — Dark videos (light text: white) — initial video is dark, so these play first
 				{ url: `${R2}/woman-holding-bible-sky.mp4`, theme: 'dark' },
 				{ url: `${R2}/farmer-reading-bible.mp4`, theme: 'dark' },
@@ -147,37 +201,20 @@ const communityUrl = media?.communityUrl || '/join';
 				{ url: `${R2}/read-book.mp4`, theme: 'dark' },
 				{ url: `${R2}/bible-open-pages.mp4`, theme: 'dark' },
 				{ url: `${R2}/reading-bible-4k.mov`, theme: 'dark' },
-				// — Light videos (dark text: wine red #7B1C2E) —
+				// — Light videos (dark text: charcoal #1a1c1c) —
 				{ url: `${R2}/bible-lake-reading-hero.mp4`, theme: 'light' },
 				{ url: `${R2}/holy-bible.mp4`, theme: 'light' },
 				{ url: `${R2}/hands-holding-bible.mp4`, theme: 'light' },
 				{ url: `${R2}/mother-son-praying.mp4`, theme: 'light' },
 			];
 
-			function applyTheme(theme: string) {
-				const heading = document.getElementById('hero-heading');
-				const sub = document.getElementById('hero-sub');
-				const ctaPrimary = document.getElementById('hero-cta-primary');
-				const ctaSecondary = document.getElementById('hero-cta-secondary');
-				if (!heading || !sub || !ctaPrimary || !ctaSecondary) return;
+			function applyTheme(theme) {
+				// Title stays neon pink on all video backgrounds
 
-				if (theme === 'dark') {
-					heading.style.color = '#FFFFFF';
-					sub.style.color = 'rgba(255,255,255,0.9)';
-					ctaPrimary.style.color = '#FFFFFF';
-					ctaSecondary.style.color = '#FFFFFF';
-					ctaSecondary.style.borderColor = 'rgba(255,255,255,0.5)';
-				} else {
-					heading.style.color = '#7B1C2E';
-					sub.style.color = '#7B1C2E';
-					ctaPrimary.style.color = '#7B1C2E';
-					ctaSecondary.style.color = '#7B1C2E';
-					ctaSecondary.style.borderColor = 'rgba(123,28,46,0.4)';
-				}
 			}
 
-			const vA = document.getElementById('hero-video-a') as HTMLVideoElement | null;
-			const vB = document.getElementById('hero-video-b') as HTMLVideoElement | null;
+			const vA = document.getElementById('hero-video-a');
+			const vB = document.getElementById('hero-video-b');
 			if (vA && vB) {
 				const PLAYBACK_RATE = 0.75;
 				const FADE_DURATION = 1500;
@@ -185,8 +222,8 @@ const communityUrl = media?.communityUrl || '/join';
 
 				// heroVideos[0] matches the HTML src — don't touch vA.src
 				let heroIdx = 0;
-				let curr: HTMLVideoElement = vA;
-				let next: HTMLVideoElement = vB;
+				let curr = vA;
+				let next = vB;
 				let fading = false;
 
 				vA.playbackRate = PLAYBACK_RATE;
@@ -226,7 +263,7 @@ const communityUrl = media?.communityUrl || '/join';
 					});
 				}
 
-				function onTimeUpdate(this: HTMLVideoElement) {
+				function onTimeUpdate() {
 					if (this !== curr) return;
 					if (!fading && this.duration && this.currentTime >= this.duration - FADE_BEFORE) {
 						beginCrossfade();
@@ -253,7 +290,7 @@ const communityUrl = media?.communityUrl || '/join';
 					class="text-lg leading-relaxed mb-6"
 					style="font-family: var(--font-sans); color: var(--color-muted);"
 				>
-					For over forty years, many believers have read the Bible faithfully and yet related to God
+					Many believers have read the Bible faithfully and yet related to God
 					more as a servant to a master than as a beloved son or daughter to a loving Father. That
 					distance is not always obvious at first. It can hide beneath sincere devotion, sound
 					doctrine, years of ministry, and disciplined prayer.
@@ -274,7 +311,7 @@ const communityUrl = media?.communityUrl || '/join';
 		     SECTION 3 — SCRIPTURE FEATURE: JOHN 3:16
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="scripture">
-			<div class="text-center mb-12">
+			<div class="text-center mb-8">
 				<p
 					class="text-xs font-semibold tracking-widest uppercase mb-3"
 					style="font-family: var(--font-sans); color: var(--color-gold);"
@@ -302,8 +339,7 @@ const communityUrl = media?.communityUrl || '/join';
 						<p
 							class="text-xl md:text-2xl italic font-light leading-relaxed"
 							style="font-family: var(--font-serif); color: var(--color-muted);"
-						>
-							"For God so loved the world that he gave his one and only Son, that whoever believes
+						>"For God so loved the world that he gave his one and only Son, that whoever believes
 							in him shall not perish but have eternal life."
 						</p>
 						<footer class="mt-4">
@@ -332,8 +368,7 @@ const communityUrl = media?.communityUrl || '/join';
 						<p
 							class="text-xl md:text-2xl italic font-light leading-relaxed"
 							style="font-family: var(--font-serif); color: var(--color-ink);"
-						>
-							"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that He gave His one and only Son, so that everyone
+						>"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that He gave His one and only Son, so that everyone
 							who trusts in Him would not be lost, but would live in the life of the age to come."
 						</p>
 						<footer class="mt-4">
@@ -362,10 +397,10 @@ const communityUrl = media?.communityUrl || '/join';
 		<!-- ═══════════════════════════════════════════════════════════
 		     SECTION 4 — WHAT IS FHB
 		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="light">
+		<Section variant="soft">
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
 				<!-- Book image -->
-				<div class="flex justify-center">
+				<div class="flex justify-center" data-reveal="slide-left">
 					{bookCoverUrl ? (
 						<img
 							src={bookCoverUrl}
@@ -375,7 +410,7 @@ const communityUrl = media?.communityUrl || '/join';
 						/>
 					) : (
 						<div
-							class="w-64 md:w-80 aspect-[2/3] rounded flex items-end justify-center p-6"
+							class="w-64 md:w-80 aspect-[2/3] flex items-end justify-center p-6"
 							style="background-color: var(--color-brand);"
 						>
 							<p
@@ -389,7 +424,7 @@ const communityUrl = media?.communityUrl || '/join';
 				</div>
 
 				<!-- Content -->
-				<div>
+				<div data-reveal="slide-right">
 					<p
 						class="text-xs font-semibold tracking-widest uppercase mb-4"
 						style="font-family: var(--font-sans); color: var(--color-gold);"
@@ -421,7 +456,7 @@ const communityUrl = media?.communityUrl || '/join';
 					<div class="flex flex-col sm:flex-row gap-4">
 						<a
 							href="/samples"
-							class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+							class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline transition-all duration-200"
 							style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 							onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 							onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -430,7 +465,7 @@ const communityUrl = media?.communityUrl || '/join';
 						</a>
 						<a
 							href="/download"
-							class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+							class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline border transition-all duration-200"
 							style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
 							onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
 							onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
@@ -447,21 +482,21 @@ const communityUrl = media?.communityUrl || '/join';
 		     SECTION 5 — JOEL 2 SCRIPTURE FEATURE
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="dark">
-			<div class="max-w-2xl mx-auto space-y-16">
+			<div class="max-w-2xl mx-auto space-y-6">
 				<ScriptureBlock
 					text="Tear open your hearts\u2026 return to your Father, for He is gracious and His compassion runs deep, He is slow to anger and overflowing with faithful love."
 					reference="Joel 2:13"
 					translation="Father's Heart Bible"
 					dark={true}
 				/>
-				<div class="w-px h-12 mx-auto" style="background-color: var(--color-gold); opacity: 0.3;"></div>
+				<div class="w-px h-8 mx-auto" style="background-color: var(--color-inverse-primary); opacity: 0.3;" data-grow-line></div>
 				<ScriptureBlock
 					text="Then our Father\u2019s heart went out for His land, and He had deep compassion on His children."
 					reference="Joel 2:18"
 					translation="Father's Heart Bible"
 					dark={true}
 				/>
-				<div class="w-px h-12 mx-auto" style="background-color: var(--color-gold); opacity: 0.3;"></div>
+				<div class="w-px h-8 mx-auto" style="background-color: var(--color-inverse-primary); opacity: 0.3;" data-grow-line></div>
 				<ScriptureBlock
 					text="I will pour out My Spirit on all My beloved sons and daughters."
 					reference="Joel 2:28"
@@ -478,7 +513,7 @@ const communityUrl = media?.communityUrl || '/join';
 		<Section variant="soft">
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
 				<!-- Content -->
-				<div class="order-2 md:order-1">
+				<div class="order-2 md:order-1" data-reveal="slide-left">
 					<p
 						class="text-xs font-semibold tracking-widest uppercase mb-4"
 						style="font-family: var(--font-sans); color: var(--color-gold);"
@@ -510,7 +545,7 @@ const communityUrl = media?.communityUrl || '/join';
 					</p>
 					<a
 						href="/download"
-						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 						onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -520,7 +555,7 @@ const communityUrl = media?.communityUrl || '/join';
 				</div>
 
 				<!-- Book image -->
-				<div class="order-1 md:order-2 flex justify-center">
+				<div class="order-1 md:order-2 flex justify-center" data-reveal="slide-right">
 					{fhbiCoverUrl ? (
 						<img
 							src={fhbiCoverUrl}
@@ -530,7 +565,7 @@ const communityUrl = media?.communityUrl || '/join';
 					/>
 					) : (
 						<div
-							class="w-56 md:w-72 aspect-[2/3] rounded shadow-xl flex items-end justify-center p-6"
+							class="w-56 md:w-72 aspect-[2/3] shadow-xl flex items-end justify-center p-6"
 							style="background-color: var(--color-brand);"
 						>
 							<p
@@ -564,21 +599,21 @@ const communityUrl = media?.communityUrl || '/join';
 						<img
 							src={photo1}
 							alt="Reader with the Father's Heart Bible"
-							class="w-full aspect-square object-cover rounded"
+							class="w-full aspect-square object-cover"
 						/>
 					)}
 					{photo2 && (
 						<img
 							src={photo2}
 							alt="Community in reflection with Scripture"
-							class="w-full aspect-square object-cover rounded"
+							class="w-full aspect-square object-cover"
 						/>
 					)}
 					{photo3 && (
 						<img
 							src={photo3}
 							alt="Belonging and encounter with the Father's word"
-							class="w-full aspect-square object-cover rounded"
+							class="w-full aspect-square object-cover"
 						/>
 					)}
 				</ImageGrid>
@@ -631,7 +666,7 @@ const communityUrl = media?.communityUrl || '/join';
 				</p>
 				<a
 					href="/join"
-					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 					onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -672,7 +707,7 @@ const communityUrl = media?.communityUrl || '/join';
 				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
 					<a
 						href="/partner"
-						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 						onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -681,7 +716,7 @@ const communityUrl = media?.communityUrl || '/join';
 					</a>
 					<a
 						href="/partner#donate"
-						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline rounded border transition-all duration-200"
+						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline border transition-all duration-200"
 						style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
 						onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
 						onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
@@ -692,50 +727,6 @@ const communityUrl = media?.communityUrl || '/join';
 			</div>
 		</Section>
 
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 10 — FINAL CTA BAND
-		     ═══════════════════════════════════════════════════════════ -->
-		<section class="py-16 md:py-20" style="background-color: var(--color-deep);">
-			<div class="max-w-3xl mx-auto px-6 text-center">
-				<div class="w-10 h-0.5 mx-auto mb-10" style="background-color: var(--color-gold);"></div>
-				<h2
-					class="text-3xl md:text-4xl font-light mb-12"
-					style="font-family: var(--font-serif); color: #fff;"
-				>
-					Your next step with the Father.
-				</h2>
-				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-					<a
-						href="/download"
-						class="inline-flex items-center px-7 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
-						style="font-family: var(--font-sans); background-color: var(--color-gold); color: var(--color-deep);"
-						onmouseover="this.style.filter='brightness(1.08)'"
-						onmouseout="this.style.filter='none'"
-					>
-						Download the Free Book
-					</a>
-					<a
-						href="/join"
-						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
-						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
-						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
-						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
-					>
-						Join the Movement
-					</a>
-					<a
-						href="/partner"
-						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
-						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
-						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
-						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
-					>
-						Partner With Us
-					</a>
-				</div>
-			</div>
-		</section>
 
 	</main>
 	<Footer />

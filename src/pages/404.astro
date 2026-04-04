@@ -2,30 +2,20 @@
 import Footer from '../components/Footer.astro';
 import Navbar from '../components/Navbar.astro';
 import Layout from '../layouts/Layout.astro';
-import { sanityClient } from '../lib/sanity';
-import '../styles/global.css';
-
-// Fetch siteSettings for siteName
-const siteSettings = await sanityClient.fetch(`
-  *[_type == "siteSettings"][0] {
-    siteName
-  }
-`);
-
-const siteName = siteSettings?.siteName || "Father's Heart Bible";
-const pageTitle = `404 — Page Not Found · ${siteName}`;
 ---
 
-<Layout title={pageTitle}>
+<Layout title="404 — Page Not Found · Father's Heart Bible" noindex={true}>
 	<Navbar />
-	<main class="min-h-screen flex items-center justify-center pt-20" style="background-color: var(--color-cream);">
+	<main class="min-h-screen flex items-center justify-center pt-20" style="background-color: var(--color-canvas);">
 		<div class="text-center px-6">
-			<h1 class="text-7xl md:text-9xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-stone);">404</h1>
-			<p class="text-xl mb-8" style="font-family: var(--font-sans); color: var(--color-warm-gray);">This page doesn't exist — but you are not lost.</p>
+			<h1 class="text-5xl md:text-7xl lg:text-9xl font-light mb-4" style="font-family: var(--font-headline); color: var(--color-muted);">404</h1>
+			<p class="text-xl mb-8" style="font-family: var(--font-body); color: var(--color-muted);">This page doesn't exist — but you are not lost.</p>
 			<a
 				href="/"
-				class="inline-block px-8 py-3.5 text-sm font-semibold tracking-[0.1em] uppercase no-underline rounded-sm transition-all duration-300"
-				style="font-family: var(--font-sans); background-color: var(--color-accent); color: var(--color-cream);"
+				class="inline-block px-8 py-3.5 text-sm font-semibold tracking-[0.1em] uppercase no-underline transition-all duration-300"
+				style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary);"
+				onmouseover="this.style.opacity='0.9'"
+				onmouseout="this.style.opacity='1'"
 			>
 				Go Home
 			</a>
