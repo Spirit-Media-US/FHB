@@ -32,12 +32,12 @@ const { formId, headline, body } = Astro.props;
 			<>
 				<iframe
 					src={`https://mail.spiritmediaone.com/widget/survey/${formId}`}
-					style="border:none;width:100%;"
+					style="border:none;width:100%;min-height:400px;"
 					scrolling="no"
 					id={formId}
 					title="survey"
 				></iframe>
-				<script src="https://mail.spiritmediaone.com/js/form_embed.js"></script>
+				<script is:inline src="https://mail.spiritmediaone.com/js/form_embed.js"></script>
 			</>
 		) : (
 			<slot />
