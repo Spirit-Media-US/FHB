@@ -1,5 +1,6 @@
 ---
 import Footer from '../components/Footer.astro';
+import ImageGrid from '../components/ImageGrid.astro';
 import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
@@ -8,18 +9,17 @@ import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
 const [pageData, media] = await Promise.all([
-	sanityClient.fetch(`*[_type == "page" && slug == "partner"][0] {
+	sanityClient.fetch(`*[_type =="page" && slug =="partner"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
     heroPrimaryCtaLabel, heroPrimaryCtaHref
   }`),
-	sanityClient.fetch(`*[_type == "siteSettings"][0] { partnerPageVideo, bookCoverUrl, donateUrl, communityUrl }`),
+	sanityClient.fetch(`*[_type =="siteSettings"][0] { partnerPageVideo, bookCoverUrl, donateUrl, communityUrl }`),
 ]);
 
-const seoTitle = pageData?.seoTitle || "Partner With Us | Father's Heart Bible";
+const seoTitle = pageData?.seoTitle ||"Partner With Us | Father's Heart Bible";
 const seoDescription =
-	pageData?.seoDescription ||
-	"Partner with the Father's Heart Bible project and help bring this transformational translation to the world. Your support makes a difference.";
+	pageData?.seoDescription ||"Partner with the Father's Heart Bible project and help bring this transformational translation to the world. Your support makes a difference.";
 const heroHeading = 'Partner With Us';
 const heroSubheading = 'Be part of what the Father is doing.';
 const heroPrimaryCtaLabel = 'Donate Now';
@@ -40,7 +40,7 @@ const whyMatters = [
 	},
 	{
 		heading: 'Distribute more widely',
-		body: "Every gift helps place the Father's Heart Bible into the hands of those who are ready to receive it.",
+		body:"Every gift helps place the Father's Heart Bible into the hands of those who are ready to receive it.",
 	},
 	{
 		heading: 'Expand future reach',
@@ -51,7 +51,7 @@ const whyMatters = [
 const scope = [
 	{
 		title: 'Translation',
-		body: "The ongoing interpretive work of rendering the full Biblical canon with the Father's heart in view.",
+		body:"The ongoing interpretive work of rendering the full Biblical canon with the Father's heart in view.",
 	},
 	{
 		title: 'Publishing',
@@ -67,7 +67,7 @@ const scope = [
 	},
 	{
 		title: 'Future Reach',
-		body: "Study editions, audio, and translations that extend the Father's voice into more languages and formats.",
+		body:"Study editions, audio, and translations that extend the Father's voice into more languages and formats.",
 	},
 ];
 
@@ -81,7 +81,7 @@ const whyDifferent = [
 const impactStats = [
 	{
 		amount: '$33',
-		impact: "Helps put one Father's Heart Bible into the hands of a reader.",
+		impact:"Helps put one Father's Heart Bible into the hands of a reader.",
 	},
 	{
 		amount: '$100',
@@ -174,7 +174,7 @@ const impactStats = [
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
 				{impactStats.map(({ amount, impact }) => (
 					<div
-						class="p-8 rounded text-center"
+						class="p-8 text-center"
 						style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
 					>
 						<p
@@ -217,7 +217,7 @@ const impactStats = [
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
 				{scope.map(({ title, body }) => (
 					<div
-						class="p-6 rounded"
+						class="p-6"
 						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
 					>
 						<div class="w-6 h-0.5 mb-4" style="background-color: var(--color-gold);"></div>
@@ -260,7 +260,7 @@ const impactStats = [
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
 				{whyDifferent.map((statement) => (
 					<div
-						class="flex gap-4 items-start p-5 rounded"
+						class="flex gap-4 items-start p-5"
 						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
 					>
 						<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
@@ -318,7 +318,7 @@ const impactStats = [
 					Every dollar helps translate, produce, and place the Father's Word in someone's hands.
 				</p>
 				<div
-					class="p-8 md:p-12 rounded mb-8"
+					class="p-8 md:p-12 mb-8"
 					style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
 				>
 					<!-- Donation integration area — Kevin connects payment provider here -->
@@ -330,7 +330,7 @@ const impactStats = [
 					</p>
 					<a
 						href={donateUrl}
-						class="inline-flex items-center justify-center w-full sm:w-auto px-10 py-4 text-base font-semibold no-underline rounded transition-all duration-200"
+						class="inline-flex items-center justify-center w-full sm:w-auto px-10 py-4 text-base font-semibold no-underline transition-all duration-200"
 						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff; min-width: 240px;"
 						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 						onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -356,7 +356,7 @@ const impactStats = [
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
 				<!-- Join -->
 				<div
-					class="p-8 rounded text-center"
+					class="p-8 text-center"
 					style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
 				>
 					<p
@@ -377,7 +377,7 @@ const impactStats = [
 					</p>
 					<a
 						href="/join"
-						class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+						class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline transition-all duration-200"
 						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 						onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -387,7 +387,7 @@ const impactStats = [
 				</div>
 				<!-- Download -->
 				<div
-					class="p-8 rounded text-center"
+					class="p-8 text-center"
 					style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
 				>
 					<p
@@ -408,7 +408,7 @@ const impactStats = [
 					</p>
 					<a
 						href="/download"
-						class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+						class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline border transition-all duration-200"
 						style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
 						onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
 						onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
@@ -419,6 +419,14 @@ const impactStats = [
 			</div>
 		</Section>
 
+
+		<Section variant="light">
+			<ImageGrid cols={3} gap="md">
+				<img src="https://cdn.sanity.io/images/rusi1hyi/production/e436847896736938d3ec72ad0b86ba36340c33da-8113x5409.jpg?w=800&auto=format" alt="Reading in a quiet place" class="w-full aspect-square object-cover" />
+				<img src="https://cdn.sanity.io/images/rusi1hyi/production/8b5d1c39f892218c978d3e3caf5720e09833bbc4-1024x1024.png?w=800&auto=format" alt="Scripture in the city" class="w-full aspect-square object-cover" />
+				<img src="https://cdn.sanity.io/images/rusi1hyi/production/1df4e3a88fa72b18ccaf7adc7d495e1c8ca2b4fb-7641x5094.jpg?w=800&auto=format" alt="Sharing the Father's heart" class="w-full aspect-square object-cover" />
+			</ImageGrid>
+		</Section>
 
 	</main>
 	<Footer />

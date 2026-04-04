@@ -113,3 +113,39 @@ h6 {
 	background-color: var(--color-primary-container);
 	color: var(--color-on-primary);
 }
+
+/* ── Scroll Animations ── */
+[data-reveal] {
+	opacity: 0;
+	transform: translateY(24px);
+	transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+[data-reveal].revealed {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+[data-reveal="fade"] {
+	transform: none;
+}
+
+[data-reveal="fade"].revealed {
+	opacity: 1;
+}
+
+[data-reveal="slide-left"] {
+	transform: translateX(-24px);
+}
+
+[data-reveal="slide-left"].revealed {
+	transform: translateX(0);
+}
+
+[data-reveal="slide-right"] {
+	transform: translateX(24px);
+}
+
+[data-reveal="slide-right"].revealed {
+	transform: translateX(0);
+}

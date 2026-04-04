@@ -9,13 +9,13 @@ import { sanityClient, urlFor } from '../lib/sanity';
 
 // Fetch page content + media from Sanity (all values have hardcoded fallbacks)
 const [pageData, media] = await Promise.all([
-	sanityClient.fetch(`*[_type == "page" && slug == "home"][0] {
+	sanityClient.fetch(`*[_type =="page" && slug =="home"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
     heroPrimaryCtaLabel, heroPrimaryCtaHref,
     heroSecondaryCtaLabel, heroSecondaryCtaHref
   }`),
-	sanityClient.fetch(`*[_type == "siteSettings"][0] {
+	sanityClient.fetch(`*[_type =="siteSettings"][0] {
     heroVideoUrl, heroPosterUrl, bookCoverUrl, bibleCoverImage,
     fhbCoverImage,
     homePageHeroVideos,
@@ -26,11 +26,9 @@ const [pageData, media] = await Promise.all([
 ]);
 
 const seoTitle =
-	pageData?.seoTitle ||
-	"Father's Heart Bible | A New Bible Translation Revealing the Father's Heart";
+	pageData?.seoTitle ||"Father's Heart Bible | A New Bible Translation Revealing the Father's Heart";
 const seoDescription =
-	pageData?.seoDescription ||
-	"Discover the Father's Heart Bible, a new Bible translation revealing God as Father where Scripture reveals Him. Download the free book, explore sample passages, join the movement, and be part of what the Father is doing.";
+	pageData?.seoDescription ||"Discover the Father's Heart Bible, a new Bible translation revealing God as Father where Scripture reveals Him. Download the free book, explore sample passages, join the movement, and be part of what the Father is doing.";
 const heroHeading =
 	'You were never meant to relate to God as a servant\u2026 but as a beloved child.';
 const heroSubheading =
@@ -126,7 +124,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		     HERO SUBTEXT — Pulled out of the video hero
 		     ═══════════════════════════════════════════════════════════ -->
 		<section style="background-color: var(--color-canvas);" class="py-10 md:py-14 px-6">
-			<div class="max-w-2xl mx-auto text-center">
+			<div class="max-w-2xl mx-auto text-center" data-reveal>
 				<p
 					class="text-lg md:text-xl leading-relaxed mb-10"
 					style="font-family: var(--font-body); color: var(--color-muted);"
@@ -257,7 +255,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					class="text-lg leading-relaxed mb-6"
 					style="font-family: var(--font-sans); color: var(--color-muted);"
 				>
-					For over forty years, many believers have read the Bible faithfully and yet related to God
+					Many believers have read the Bible faithfully and yet related to God
 					more as a servant to a master than as a beloved son or daughter to a loving Father. That
 					distance is not always obvious at first. It can hide beneath sincere devotion, sound
 					doctrine, years of ministry, and disciplined prayer.
@@ -306,8 +304,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						<p
 							class="text-xl md:text-2xl italic font-light leading-relaxed"
 							style="font-family: var(--font-serif); color: var(--color-muted);"
-						>
-							"For God so loved the world that he gave his one and only Son, that whoever believes
+						>"For God so loved the world that he gave his one and only Son, that whoever believes
 							in him shall not perish but have eternal life."
 						</p>
 						<footer class="mt-4">
@@ -336,8 +333,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						<p
 							class="text-xl md:text-2xl italic font-light leading-relaxed"
 							style="font-family: var(--font-serif); color: var(--color-ink);"
-						>
-							"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that He gave His one and only Son, so that everyone
+						>"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that He gave His one and only Son, so that everyone
 							who trusts in Him would not be lost, but would live in the life of the age to come."
 						</p>
 						<footer class="mt-4">
@@ -379,7 +375,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						/>
 					) : (
 						<div
-							class="w-64 md:w-80 aspect-[2/3] rounded flex items-end justify-center p-6"
+							class="w-64 md:w-80 aspect-[2/3] flex items-end justify-center p-6"
 							style="background-color: var(--color-brand);"
 						>
 							<p
@@ -425,7 +421,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					<div class="flex flex-col sm:flex-row gap-4">
 						<a
 							href="/samples"
-							class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+							class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline transition-all duration-200"
 							style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 							onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 							onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -434,7 +430,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						</a>
 						<a
 							href="/download"
-							class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+							class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline border transition-all duration-200"
 							style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
 							onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
 							onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
@@ -514,7 +510,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					</p>
 					<a
 						href="/download"
-						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 						onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -534,7 +530,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					/>
 					) : (
 						<div
-							class="w-56 md:w-72 aspect-[2/3] rounded shadow-xl flex items-end justify-center p-6"
+							class="w-56 md:w-72 aspect-[2/3] shadow-xl flex items-end justify-center p-6"
 							style="background-color: var(--color-brand);"
 						>
 							<p
@@ -568,21 +564,21 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						<img
 							src={photo1}
 							alt="Reader with the Father's Heart Bible"
-							class="w-full aspect-square object-cover rounded"
+							class="w-full aspect-square object-cover"
 						/>
 					)}
 					{photo2 && (
 						<img
 							src={photo2}
 							alt="Community in reflection with Scripture"
-							class="w-full aspect-square object-cover rounded"
+							class="w-full aspect-square object-cover"
 						/>
 					)}
 					{photo3 && (
 						<img
 							src={photo3}
 							alt="Belonging and encounter with the Father's word"
-							class="w-full aspect-square object-cover rounded"
+							class="w-full aspect-square object-cover"
 						/>
 					)}
 				</ImageGrid>
@@ -635,7 +631,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				</p>
 				<a
 					href="/join"
-					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 					onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -676,7 +672,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
 					<a
 						href="/partner"
-						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 						onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -685,7 +681,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					</a>
 					<a
 						href="/partner#donate"
-						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline rounded border transition-all duration-200"
+						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline border transition-all duration-200"
 						style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
 						onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
 						onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"

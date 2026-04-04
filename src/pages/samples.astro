@@ -1,5 +1,6 @@
 ---
 import Footer from '../components/Footer.astro';
+import ImageGrid from '../components/ImageGrid.astro';
 import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
@@ -9,19 +10,19 @@ import { sanityClient } from '../lib/sanity';
 
 // Fetch page SEO and scripture comparisons from Sanity
 const [pageData, sanityComparisons, media] = await Promise.all([
-	sanityClient.fetch(`*[_type == "page" && slug == "samples"][0] {
+	sanityClient.fetch(`*[_type =="page" && slug =="samples"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
     heroPrimaryCtaLabel, heroPrimaryCtaHref,
     heroSecondaryCtaLabel, heroSecondaryCtaHref
   }`),
-	sanityClient.fetch(`*[_type == "scriptureComparison"] | order(order asc) {
+	sanityClient.fetch(`*[_type =="scriptureComparison"] | order(order asc) {
     reference, category, traditional, translationLabel, fhb, note, featured
   }`),
-	sanityClient.fetch(`*[_type == "siteSettings"][0] { samplesPageVideo }`),
+	sanityClient.fetch(`*[_type =="siteSettings"][0] { samplesPageVideo }`),
 ]);
 
-const seoTitle = pageData?.seoTitle || "Sample Passages | Father's Heart Bible";
+const seoTitle = pageData?.seoTitle ||"Sample Passages | Father's Heart Bible";
 const seoDescription =
 	pageData?.seoDescription ||
 	'Explore sample passages from the Father’s Heart Bible and experience how this new Bible translation reveals God as Father and brings beloved identity into clear view.';
@@ -60,8 +61,8 @@ const joel = [
 	{
 		ref: 'Joel 2:18',
 		traditional: 'Then the Lord was jealous for his land and took pity on his people.',
-		fhb: "Then our Father's heart went out for his land, and he had compassion on his people.",
-		note: "The Father's heart going out — not cold sovereignty, but the tender, urgent love of a Father who cannot stay removed from His children.",
+		fhb:"Then our Father's heart went out for his land, and he had compassion on his people.",
+		note:"The Father's heart going out — not cold sovereignty, but the tender, urgent love of a Father who cannot stay removed from His children.",
 	},
 	{
 		ref: 'Joel 2:28',
@@ -77,15 +78,15 @@ const heartLanguage = [
 		ref: 'Luke 15:20',
 		traditional:
 			'But while he was still a long way off, his father saw him and was filled with compassion for him; he ran to his son, threw his arms around him and kissed him.',
-		fhb: 'But while he was still a long way off, his father saw him and his heart went out to him; he ran to his son, threw his arms around him and held him close.',
+		fhb: 'But while he was still a long way off, his father saw him and his heart went out to him; he ran to his son, threw his arms around him and kissed him.',
 		note: 'The Father in this parable does not wait to be convinced. His heart goes out the moment he sees his child returning.',
 	},
 	{
 		ref: 'Matthew 9:36',
 		traditional:
 			'When he saw the crowds, he had compassion on them, because they were harassed and helpless, like sheep without a shepherd.',
-		fhb: "When he saw the crowds, his heart went out to them, because they were harassed and helpless — like children without a father's care.",
-		note: "Jesus doesn't observe the crowds analytically. His heart moves. FHB makes the tenderness of that moment vivid.",
+		fhb:"When he saw the crowds, his heart went out to them, because they were harassed and helpless — like children without a father's care.",
+		note:"Jesus doesn't observe the crowds analytically. His heart moves. FHB makes the tenderness of that moment vivid.",
 	},
 	{
 		ref: 'Zephaniah 3:17',
@@ -99,10 +100,9 @@ const heartLanguage = [
 const identity = [
 	{
 		ref: 'Romans 8:15–16',
-		traditional:
-			"The Spirit you received does not make you slaves, so that you live in fear again; rather, the Spirit you received brought about your adoption to sonship. And by him we cry, 'Abba, Father.' The Spirit himself testifies with our spirit that we are God's children.",
-		fhb: "You did not receive a spirit of slavery to fall back into fear. You received the Spirit of beloved adoption — by whom we cry, 'Abba, Father.' And the Spirit himself confirms with our spirit that we are the Father's beloved children.",
-		note: "Paul's entire argument turns on identity. We are not slaves living in fear — we are beloved children living in the freedom of the Father's house.",
+		traditional:"The Spirit you received does not make you slaves, so that you live in fear again; rather, the Spirit you received brought about your adoption to sonship. And by him we cry, 'Abba, Father.' The Spirit himself testifies with our spirit that we are God's children.",
+		fhb:"You did not receive a spirit of slavery to fall back into fear. You received the Spirit of beloved adoption — by whom we cry, 'Abba, Father.' And the Spirit himself confirms with our spirit that we are the Father's beloved children.",
+		note:"Paul's entire argument turns on identity. We are not slaves living in fear — we are beloved children living in the freedom of the Father's house.",
 	},
 	{
 		ref: 'John 1:12',
@@ -113,9 +113,8 @@ const identity = [
 	},
 	{
 		ref: 'Galatians 4:6',
-		traditional:
-			"Because you are his sons, God sent the Spirit of his Son into our hearts, the Spirit who calls out, 'Abba, Father.'",
-		fhb: "Because you are His beloved children, your Father sent the Spirit of His Son into our hearts — the Spirit who cries out, 'Abba, Father.'",
+		traditional:"Because you are his sons, God sent the Spirit of his Son into our hearts, the Spirit who calls out, 'Abba, Father.'",
+		fhb:"Because you are His beloved children, your Father sent the Spirit of His Son into our hearts — the Spirit who cries out, 'Abba, Father.'",
 		note: 'The Spirit is not given to strangers. He is given to beloved children who have been brought home.',
 	},
 ];
@@ -127,13 +126,26 @@ const synthesis = [
 	},
 	{
 		title: 'Heart-Language That Lands',
-		body: "God's compassion, delight, and tenderness are not softened into formal language. They are rendered so the reader feels them — as a child feels a father's love.",
+		body:"God's compassion, delight, and tenderness are not softened into formal language. They are rendered so the reader feels them — as a child feels a father's love.",
 	},
 	{
 		title: 'Beloved Identity',
-		body: "Reader after reader says the same thing: 'I finally felt like a child of God.' That is the invitation FHB extends on every page.",
+		body:"Reader after reader says the same thing: 'I finally felt like a child of God.' That is the invitation FHB extends on every page.",
 	},
 ];
+
+// Highlight "Father" / "your Father" / "our Father" in FHB passages
+function pinkFather(text: string): string {
+	return text
+		.replace(/\b((?:your |our |the |Abba, )?Father(?:'s)?(?:\s+heart)?)\b/gi, '<strong style="font-style: normal; color: var(--color-primary);">$1</strong>')
+		.replace(/\b((?:my |his |her )?beloved(?:\s+\w+)?)\b/gi, (match) => {
+			if (/beloved (adoption|children|child|sons|identity)/i.test(match)) return `<strong style="font-style: normal; color: var(--color-primary);">${match}</strong>`;
+			if (/my beloved/i.test(match)) return `<strong style="font-style: normal; color: var(--color-primary);">${match}</strong>`;
+			return match;
+		})
+		.replace(/\b(his heart(?:\s+went\s+out)?)\b/gi, '<strong style="font-style: normal; color: var(--color-primary);">$1</strong>')
+		.replace(/\b(a father's care)\b/gi, '<strong style="font-style: normal; color: var(--color-primary);">$1</strong>');
+}
 ---
 
 <Layout
@@ -176,16 +188,14 @@ const synthesis = [
 					{john316.ref}
 				</h2>
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-					<div class="p-7 rounded" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+					<div class="p-7" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
 						<p class="text-xs tracking-widest uppercase mb-5" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
-						<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.1rem;">
-							"{john316.traditional}"
+						<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.1rem;">"{john316.traditional}"
 						</p>
 					</div>
-					<div class="p-7 rounded" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+					<div class="p-7" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
 						<p class="text-xs tracking-widest uppercase mb-5" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
-						<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.1rem;">
-							"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."
+						<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.1rem;">"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."
 						</p>
 					</div>
 				</div>
@@ -217,13 +227,13 @@ const synthesis = [
 					<div>
 						<p class="text-xs font-semibold tracking-widest uppercase mb-5 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">{ref}</p>
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-							<div class="p-6 rounded" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+							<div class="p-6" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
 								<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
 								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted);">"{traditional}"</p>
 							</div>
-							<div class="p-6 rounded" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+							<div class="p-6" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
 								<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
-								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">"{fhb}"</p>
+								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);" set:html={`"${pinkFather(fhb)}"`} />
 							</div>
 						</div>
 						<p class="text-sm mt-4 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">{note}</p>
@@ -260,13 +270,13 @@ const synthesis = [
 					<div>
 						<p class="text-xs font-semibold tracking-widest uppercase mb-5 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">{ref}</p>
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-							<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
+							<div class="p-6" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
 								<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
 								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted);">"{traditional}"</p>
 							</div>
-							<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+							<div class="p-6" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
 								<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
-								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">"{fhb}"</p>
+								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);" set:html={`"${pinkFather(fhb)}"`} />
 							</div>
 						</div>
 						<p class="text-sm mt-4 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">{note}</p>
@@ -303,13 +313,13 @@ const synthesis = [
 					<div>
 						<p class="text-xs font-semibold tracking-widest uppercase mb-5 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">{ref}</p>
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-							<div class="p-6 rounded" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+							<div class="p-6" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
 								<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
 								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted);">"{traditional}"</p>
 							</div>
-							<div class="p-6 rounded" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+							<div class="p-6" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
 								<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
-								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">"{fhb}"</p>
+								<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);" set:html={`"${pinkFather(fhb)}"`} />
 							</div>
 						</div>
 						<p class="text-sm mt-4 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">{note}</p>
@@ -378,7 +388,7 @@ const synthesis = [
 				</p>
 				<a
 					href="/download"
-					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 					onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -404,7 +414,7 @@ const synthesis = [
 				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
 					<a
 						href="/join"
-						class="inline-flex items-center px-7 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+						class="inline-flex items-center px-7 py-3 text-sm font-semibold no-underline transition-all duration-200"
 						style="font-family: var(--font-sans); background-color: var(--color-gold); color: var(--color-deep);"
 						onmouseover="this.style.filter='brightness(1.08)'"
 						onmouseout="this.style.filter='none'"
@@ -413,7 +423,7 @@ const synthesis = [
 					</a>
 					<a
 						href="/partner"
-						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline border transition-all duration-200"
 						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
 						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
 						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
@@ -423,6 +433,14 @@ const synthesis = [
 				</div>
 			</div>
 		</section>
+
+		<Section variant="light">
+			<ImageGrid cols={3} gap="md">
+				<img src="https://cdn.sanity.io/images/rusi1hyi/production/587a9035f28b573088b54311d3835f314f37b384-7396x4000.jpg?w=800&auto=format" alt="Young woman reading Scripture" class="w-full aspect-square object-cover" />
+				<img src="https://cdn.sanity.io/images/rusi1hyi/production/486905a68a64d2bcddff4beddc856c0f45e93c2e-1024x1024.png?w=800&auto=format" alt="The Father's Heart Bible" class="w-full aspect-square object-cover" />
+				<img src="https://cdn.sanity.io/images/rusi1hyi/production/481b7f74d5d98726a64176ef4b1f474b4ef40dff-5472x3648.jpg?w=800&auto=format" alt="Discovering Scripture with joy" class="w-full aspect-square object-cover" />
+			</ImageGrid>
+		</Section>
 
 	</main>
 	<Footer />

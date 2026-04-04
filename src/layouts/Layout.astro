@@ -78,5 +78,17 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 	</head>
 	<body class="min-h-screen flex flex-col" data-dark-hero={darkHero ? 'true' : 'false'}>
 		<slot />
+		<script>
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('revealed');
+						observer.unobserve(entry.target);
+					}
+				});
+			}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+			document.querySelectorAll('[data-reveal]').forEach((el) => observer.observe(el));
+		</script>
 	</body>
 </html>

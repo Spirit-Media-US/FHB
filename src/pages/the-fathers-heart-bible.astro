@@ -1,5 +1,6 @@
 ---
 import Footer from '../components/Footer.astro';
+import ImageGrid from '../components/ImageGrid.astro';
 import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
@@ -8,16 +9,16 @@ import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
 
 const [pageData, media] = await Promise.all([
-	sanityClient.fetch(`*[_type == "page" && slug == "the-fathers-heart-bible"][0] {
+	sanityClient.fetch(`*[_type =="page" && slug =="the-fathers-heart-bible"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
     heroPrimaryCtaLabel, heroPrimaryCtaHref,
     heroSecondaryCtaLabel, heroSecondaryCtaHref
   }`),
-	sanityClient.fetch(`*[_type == "siteSettings"][0] { theThersHeartBiblePageVideo, bookCoverUrl, fhbCoverImage, communityUrl }`),
+	sanityClient.fetch(`*[_type =="siteSettings"][0] { theThersHeartBiblePageVideo, bookCoverUrl, fhbCoverImage, communityUrl }`),
 ]);
 
-const seoTitle = pageData?.seoTitle || "What Is the Father's Heart Bible? | Father's Heart Bible";
+const seoTitle = pageData?.seoTitle ||"What Is the Father's Heart Bible? | Father's Heart Bible";
 const seoDescription =
 	pageData?.seoDescription ||
 	'Learn what the Father\u2019s Heart Bible is, why it exists, and how this new Bible translation reveals God as Father where Scripture reveals Him.';
@@ -41,7 +42,7 @@ const communityUrl = media?.communityUrl || '/join';
 const distinctives = [
 	{
 		title: 'Reveals the Father',
-		body: "Wherever Scripture reveals God's fatherly heart — in name, in covenant, in direct address — this translation makes it unmistakable.",
+		body:"Wherever Scripture reveals God's fatherly heart — in name, in covenant, in direct address — this translation makes it unmistakable.",
 	},
 	{
 		title: 'Heart-Language',
@@ -57,7 +58,7 @@ const distinctives = [
 	},
 	{
 		title: 'Full Canon',
-		body: "From Genesis to Revelation, the Father's voice runs through every book. FHB traces that thread from beginning to end.",
+		body:"From Genesis to Revelation, the Father's voice runs through every book. FHB traces that thread from beginning to end.",
 	},
 	{
 		title: 'Relational, Not Academic',
@@ -80,14 +81,14 @@ const notItems = [
 	},
 	{
 		label: 'Not a new theology',
-		body: "The Father's Heart Bible is grounded in historic Christian and Trinitarian belief. It reveals what has always been there.",
+		body:"The Father's Heart Bible is grounded in historic Christian and Trinitarian belief. It reveals what has always been there.",
 	},
 ];
 
 const milestones = [
 	{
 		milestone: 'Full Canon',
-		detail: "Genesis to Revelation — every book translated with the Father's heart in view.",
+		detail:"Genesis to Revelation — every book translated with the Father's heart in view.",
 	},
 	{
 		milestone: 'Premium Edition',
@@ -108,8 +109,7 @@ const audience = [
 	'You long for deeper intimacy with God, not just more knowledge about Him.',
 	'You are awakening to your identity as a beloved child of the Father.',
 	'You want to hear His voice — not just His instructions.',
-	'You are hungry for a Bible that feels like an encounter, not a document.',
-	"You want to give someone a Bible that reveals the Father's love clearly.",
+	'You are hungry for a Bible that feels like an encounter, not a document.',"You want to give someone a Bible that reveals the Father's love clearly.",
 ];
 
 const shifts = [
@@ -246,7 +246,7 @@ const shifts = [
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 				{distinctives.map(({ title, body }) => (
 					<div
-						class="p-6 rounded"
+						class="p-6"
 						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
 					>
 						<h3
@@ -292,16 +292,14 @@ const shifts = [
 				<div>
 					<p class="text-xs font-semibold tracking-widest uppercase mb-6 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">John 3:16</p>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-						<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
+						<div class="p-6" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
 							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
-							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.05rem;">
-								"For God so loved the world that he gave his one and only Son…"
+							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.05rem;">"For God so loved the world that he gave his one and only Son…"
 							</p>
 						</div>
-						<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+						<div class="p-6" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
 							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
-							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.05rem;">
-								"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that he gave his one and only Son…"
+							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.05rem;">"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that he gave his one and only Son…"
 							</p>
 						</div>
 					</div>
@@ -314,16 +312,14 @@ const shifts = [
 				<div>
 					<p class="text-xs font-semibold tracking-widest uppercase mb-6 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">Joel 2:28–29</p>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-						<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
+						<div class="p-6" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
 							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
-							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.05rem;">
-								"I will pour out my Spirit on all people. Your sons and daughters will prophesy…"
+							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.05rem;">"I will pour out my Spirit on all people. Your sons and daughters will prophesy…"
 							</p>
 						</div>
-						<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+						<div class="p-6" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
 							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
-							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.05rem;">
-								"I will pour out my Spirit on all my <strong style="font-style: normal; color: var(--color-brand);">beloved sons and daughters</strong>…"
+							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.05rem;">"I will pour out my Spirit on all my <strong style="font-style: normal; color: var(--color-brand);">beloved sons and daughters</strong>…"
 							</p>
 						</div>
 					</div>
@@ -336,16 +332,14 @@ const shifts = [
 				<div>
 					<p class="text-xs font-semibold tracking-widest uppercase mb-6 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">Zephaniah 3:17</p>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-						<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
+						<div class="p-6" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
 							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
-							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.05rem;">
-								"The Lord your God is with you, the Mighty Warrior who saves. He will take great delight in you…"
+							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.05rem;">"The Lord your God is with you, the Mighty Warrior who saves. He will take great delight in you…"
 							</p>
 						</div>
-						<div class="p-6 rounded" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
+						<div class="p-6" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
 							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
-							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.05rem;">
-								"Your <strong style="font-style: normal; color: var(--color-brand);">Father</strong> is in your midst — the Mighty One who saves. He will rejoice over you with gladness, quiet you with His love…"
+							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.05rem;">"Your <strong style="font-style: normal; color: var(--color-brand);">Father</strong> is in your midst — the Mighty One who saves. He will rejoice over you with gladness, quiet you with His love…"
 							</p>
 						</div>
 					</div>
@@ -357,7 +351,7 @@ const shifts = [
 			<div class="text-center mt-14">
 				<a
 					href="/samples"
-					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 					onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -426,7 +420,7 @@ const shifts = [
 			</div>
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
 				{milestones.map(({ milestone, detail }) => (
-					<div class="p-6 rounded text-center" style="border: 1px solid var(--color-hairline);">
+					<div class="p-6 text-center" style="border: 1px solid var(--color-hairline);">
 						<div class="w-8 h-0.5 mx-auto mb-4" style="background-color: var(--color-gold);"></div>
 						<h3 class="text-lg font-medium mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">{milestone}</h3>
 						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{detail}</p>
@@ -457,7 +451,7 @@ const shifts = [
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
 				{audience.map((statement) => (
 					<div
-						class="flex gap-4 items-start p-5 rounded"
+						class="flex gap-4 items-start p-5"
 						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
 					>
 						<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
@@ -504,7 +498,7 @@ const shifts = [
 					</p>
 					<a
 						href="/download"
-						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 						onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -515,6 +509,14 @@ const shifts = [
 			</div>
 		</Section>
 
+
+		<Section variant="light">
+			<ImageGrid cols={3} gap="md">
+				<img src="https://cdn.sanity.io/images/rusi1hyi/production/27d9614f1213d74cea256e1ccacbd76a3b6a8cbe-6016x4016.jpg?w=800&auto=format" alt="Man reading the Bible" class="w-full aspect-square object-cover" />
+				<img src="https://cdn.sanity.io/images/rusi1hyi/production/f72dbb7ddd982eaff12409f279acb87d25aa9297-5604x3741.jpg?w=800&auto=format" alt="Couple reading Scripture together" class="w-full aspect-square object-cover" />
+				<img src="https://cdn.sanity.io/images/rusi1hyi/production/9618d5a555e40892802d587d0faa740a513035df-1024x1024.png?w=800&auto=format" alt="The Father's Heart Bible in nature" class="w-full aspect-square object-cover" />
+			</ImageGrid>
+		</Section>
 
 	</main>
 	<Footer />

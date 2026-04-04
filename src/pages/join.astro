@@ -8,20 +8,20 @@ import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
 const [pageData, media] = await Promise.all([
-	sanityClient.fetch(`*[_type == "page" && slug == "join"][0] {
+	sanityClient.fetch(`*[_type =="page" && slug =="join"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
     heroPrimaryCtaLabel, heroPrimaryCtaHref,
     heroSecondaryCtaLabel, heroSecondaryCtaHref
   }`),
-	sanityClient.fetch(`*[_type == "siteSettings"][0] {
+	sanityClient.fetch(`*[_type =="siteSettings"][0] {
     joinPageVideo,
     communityUrl, mightyNetworksUrl,
     peoplePhoto1Url, peoplePhoto2Url, peoplePhoto3Url, peoplePhoto4Url
   }`),
 ]);
 
-const seoTitle = pageData?.seoTitle || "Join the Movement | Father's Heart Bible";
+const seoTitle = pageData?.seoTitle ||"Join the Movement | Father's Heart Bible";
 const seoDescription =
 	pageData?.seoDescription ||
 	'Join the Father’s Heart Movement to grow in beloved identity, hear His voice, pray, and take part in publishing the Father’s Heart Bible to the nations.';
@@ -42,7 +42,7 @@ const photo4 = media?.peoplePhoto4Url || '';
 const whyJoin = [
 	{
 		title: 'Grow in Beloved Identity',
-		body: "Resources and community designed to help you live from the truth that you are the Father's beloved child.",
+		body:"Resources and community designed to help you live from the truth that you are the Father's beloved child.",
 	},
 	{
 		title: 'Deepen Intimacy with the Father',
@@ -54,7 +54,7 @@ const whyJoin = [
 	},
 	{
 		title: 'Follow the Bible Project',
-		body: "Stay close to the progress of the full Father's Heart Bible — from translation to publication.",
+		body:"Stay close to the progress of the full Father's Heart Bible — from translation to publication.",
 	},
 	{
 		title: 'Participate Globally',
@@ -65,7 +65,7 @@ const whyJoin = [
 const communityAreas = [
 	{
 		title: 'Movement Hub',
-		body: "The center of the community — updates, announcements, and shared life around the Father's Heart Bible.",
+		body:"The center of the community — updates, announcements, and shared life around the Father's Heart Bible.",
 	},
 	{
 		title: 'Beloved Identity',
@@ -73,11 +73,11 @@ const communityAreas = [
 	},
 	{
 		title: 'Prayer & Intercession',
-		body: "Gathered prayer for the translation, distribution, and those who have yet to hear the Father's voice.",
+		body:"Gathered prayer for the translation, distribution, and those who have yet to hear the Father's voice.",
 	},
 	{
 		title: 'Distribution & Impact',
-		body: "Follow how the Father's Heart Bible is reaching individuals, communities, and nations.",
+		body:"Follow how the Father's Heart Bible is reaching individuals, communities, and nations.",
 	},
 	{
 		title: 'Translation Collaboration',
@@ -87,10 +87,8 @@ const communityAreas = [
 
 const audience = [
 	'You are hungry for deeper intimacy with the Father — not just more theological information.',
-	'You are awakening to beloved identity and want to grow in that truth alongside others.',
-	"You long for a community centered on the Father's heart, not performance or platform.",
-	'You want to pray for something real — the Word going into the nations.',
-	"You want to follow the Father's Heart Bible project and be there when it arrives.",
+	'You are awakening to beloved identity and want to grow in that truth alongside others.',"You long for a community centered on the Father's heart, not performance or platform.",
+	'You want to pray for something real — the Word going into the nations.',"You want to follow the Father's Heart Bible project and be there when it arrives.",
 	'You want to participate in something larger than yourself.',
 ];
 
@@ -98,7 +96,7 @@ const howToBegin = [
 	{
 		step: '1',
 		heading: 'Join the community',
-		body: "Click the button below and create your free account in the Father's Heart Movement on Mighty Networks.",
+		body:"Click the button below and create your free account in the Father's Heart Movement on Mighty Networks.",
 	},
 	{
 		step: '2',
@@ -153,11 +151,7 @@ const howToBegin = [
 					</h2>
 				</div>
 				<div class="space-y-5">
-					{[
-						"Publishing the Father's Heart Bible for the nations",
-						"Awakening identity as beloved sons and daughters",
-						"Training people to hear the Father's voice",
-						"Placing His Word into every nation",
+					{["Publishing the Father's Heart Bible for the nations","Awakening identity as beloved sons and daughters","Training people to hear the Father's voice","Placing His Word into every nation",
 					].map((point) => (
 						<div class="flex gap-4 items-start">
 							<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
@@ -190,7 +184,7 @@ const howToBegin = [
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
 				{whyJoin.map(({ title, body }) => (
 					<div
-						class="p-6 rounded"
+						class="p-6"
 						style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
 					>
 						<div class="w-6 h-0.5 mb-4" style="background-color: var(--color-gold);"></div>
@@ -223,7 +217,7 @@ const howToBegin = [
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
 				{communityAreas.map(({ title, body }) => (
 					<div
-						class="p-6 rounded"
+						class="p-6"
 						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
 					>
 						<h3 class="font-semibold mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">{title}</h3>
@@ -255,7 +249,7 @@ const howToBegin = [
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
 				{audience.map((statement) => (
 					<div
-						class="flex gap-4 items-start p-5 rounded"
+						class="flex gap-4 items-start p-5"
 						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
 					>
 						<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
@@ -266,7 +260,7 @@ const howToBegin = [
 			<div class="text-center mt-12">
 				<a
 					href={communityUrl}
-					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 					onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -292,16 +286,16 @@ const howToBegin = [
 				</div>
 				<ImageGrid cols={photo4 ? 4 : 3} gap="md">
 					{photo1 && (
-						<img src={`${photo1}?w=600&auto=format`} alt="Community in the Father's Heart Movement" class="w-full aspect-square object-cover rounded" />
+						<img src={`${photo1}?w=600&auto=format`} alt="Community in the Father's Heart Movement" class="w-full aspect-square object-cover" />
 					)}
 					{photo2 && (
-						<img src={`${photo2}?w=600&auto=format`} alt="Readers encountering the Father's heart" class="w-full aspect-square object-cover rounded" />
+						<img src={`${photo2}?w=600&auto=format`} alt="Readers encountering the Father's heart" class="w-full aspect-square object-cover" />
 					)}
 					{photo3 && (
-						<img src={`${photo3}?w=600&auto=format`} alt="Belonging and identity in community" class="w-full aspect-square object-cover rounded" />
+						<img src={`${photo3}?w=600&auto=format`} alt="Belonging and identity in community" class="w-full aspect-square object-cover" />
 					)}
 					{photo4 && (
-						<img src={`${photo4}?w=600&auto=format`} alt="Prayer and participation in the movement" class="w-full aspect-square object-cover rounded" />
+						<img src={`${photo4}?w=600&auto=format`} alt="Prayer and participation in the movement" class="w-full aspect-square object-cover" />
 					)}
 				</ImageGrid>
 			</Section>
@@ -355,7 +349,7 @@ const howToBegin = [
 			<div class="text-center mt-10">
 				<a
 					href={communityUrl}
-					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 					onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -391,7 +385,7 @@ const howToBegin = [
 					</p>
 					<a
 						href="/download"
-						class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+						class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline transition-all duration-200"
 						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 						onmouseout="this.style.backgroundColor='var(--color-brand)'"
@@ -400,14 +394,13 @@ const howToBegin = [
 					</a>
 				</div>
 				<div
-					class="p-8 rounded text-center"
+					class="p-8 text-center"
 					style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
 				>
 					<p
 						class="text-2xl italic leading-relaxed mb-4"
 						style="font-family: var(--font-serif); color: var(--color-ink);"
-					>
-						"The destination has always been the Father."
+					>"The destination has always been the Father."
 					</p>
 					<p
 						class="text-xs tracking-widest uppercase"
@@ -444,7 +437,7 @@ const howToBegin = [
 				</p>
 				<a
 					href="/partner"
-					class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+					class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline border transition-all duration-200"
 					style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
 					onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
 					onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
@@ -470,7 +463,7 @@ const howToBegin = [
 				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
 					<a
 						href={communityUrl}
-						class="inline-flex items-center px-7 py-3 text-sm font-semibold no-underline rounded transition-all duration-200"
+						class="inline-flex items-center px-7 py-3 text-sm font-semibold no-underline transition-all duration-200"
 						style="font-family: var(--font-sans); background-color: var(--color-gold); color: var(--color-deep);"
 						onmouseover="this.style.filter='brightness(1.08)'"
 						onmouseout="this.style.filter='none'"
@@ -479,7 +472,7 @@ const howToBegin = [
 					</a>
 					<a
 						href="/download"
-						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline border transition-all duration-200"
 						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
 						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
 						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
@@ -488,7 +481,7 @@ const howToBegin = [
 					</a>
 					<a
 						href="/partner"
-						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline rounded border transition-all duration-200"
+						class="inline-flex items-center px-7 py-3 text-sm font-medium no-underline border transition-all duration-200"
 						style="font-family: var(--font-sans); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.3);"
 						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
 						onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"
@@ -498,6 +491,14 @@ const howToBegin = [
 				</div>
 			</div>
 		</section>
+
+		<Section variant="light">
+			<ImageGrid cols={3} gap="md">
+				<img src="https://cdn.sanity.io/images/rusi1hyi/production/43fae9501858985ac15a1067355869c337581b37-8256x5504.jpg?w=800&auto=format" alt="Enjoying the Father's word" class="w-full aspect-square object-cover" />
+				<img src="https://cdn.sanity.io/images/rusi1hyi/production/a08def3250a4837b53d956497fba0f64fed5edd9-5616x3744.jpg?w=800&auto=format" alt="Reading together in community" class="w-full aspect-square object-cover" />
+				<img src="https://cdn.sanity.io/images/rusi1hyi/production/99ddce3ed31043377463811483be1c114b349f62-4912x7360.jpg?w=800&auto=format" alt="Encountering the Father through Scripture" class="w-full aspect-square object-cover" />
+			</ImageGrid>
+		</Section>
 
 	</main>
 	<Footer />
