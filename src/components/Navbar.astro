@@ -19,7 +19,7 @@ const logoImage = siteSettings?.logo;
 const logoUrl = logoImage ? urlFor(logoImage).width(200).url() : null;
 
 const navLinks: NavLink[] = siteSettings?.navLinks || [
-	{ label: "The Father's Heart Bible", href: '/the-fathers-heart-bible' },
+	{ label: 'About FHB', href: '/the-fathers-heart-bible' },
 	{ label: 'Samples', href: '/samples' },
 	{ label: 'Download', href: '/download' },
 	{ label: 'Join the Movement', href: '/join' },
@@ -31,7 +31,7 @@ const currentPath = Astro.url.pathname;
 ---
 
 <header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-	<nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+	<nav class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
 		<!-- Logo -->
 		<a href="/" id="nav-logo" class="no-underline shrink-0 flex flex-col items-center gap-0.5">
 			{logoUrl && (

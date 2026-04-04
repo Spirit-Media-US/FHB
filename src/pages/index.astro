@@ -109,39 +109,44 @@ const communityUrl = media?.communityUrl || '/join';
 					aria-hidden="true"
 				/>
 			)}
-			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-16 md:pb-24" style="transition: color 1.2s ease, border-color 1.2s ease;">
+			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-16 md:pb-24" style="transition: color 1.2s ease;">
 				<h1
 					id="hero-heading"
-					class="text-4xl md:text-6xl font-light leading-tight mb-6"
-					style="font-family: var(--font-serif); color: #FFFFFF; transition: color 1.2s ease;"
+					class="text-4xl md:text-6xl font-medium leading-snug tracking-tight"
+					style="font-family: var(--font-headline); color: #FFFFFF; transition: color 1.2s ease;"
 				>
 					{heroHeading}
 				</h1>
+			</div>
+		</section>
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     HERO SUBTEXT — Pulled out of the video hero
+		     ═══════════════════════════════════════════════════════════ -->
+		<section style="background-color: var(--color-canvas);" class="py-16 md:py-20 px-6">
+			<div class="max-w-2xl mx-auto text-center">
 				<p
-					id="hero-sub"
-					class="text-lg md:text-xl mb-10 leading-relaxed"
-					style="font-family: var(--font-sans); color: rgba(255,255,255,0.9); transition: color 1.2s ease;"
+					class="text-lg md:text-xl leading-relaxed mb-10"
+					style="font-family: var(--font-body); color: var(--color-muted);"
 				>
 					{heroSubheading}
 				</p>
 				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
 					<a
-						id="hero-cta-primary"
 						href={heroPrimaryCtaHref}
-						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline rounded transition-all duration-200"
-						style="font-family: var(--font-sans); background-color: var(--color-gold); color: #FFFFFF;"
-						onmouseover="this.style.filter='brightness(1.08)'"
-						onmouseout="this.style.filter='none'"
+						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
+						style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary);"
+						onmouseover="this.style.opacity='0.9'"
+						onmouseout="this.style.opacity='1'"
 					>
 						{heroPrimaryCtaLabel}
 					</a>
 					<a
-						id="hero-cta-secondary"
 						href={heroSecondaryCtaHref}
-						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline rounded border transition-all duration-200"
-						style="font-family: var(--font-sans); color: #FFFFFF; border-color: rgba(255,255,255,0.5);"
-						onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'"
-						onmouseout="this.style.borderColor='rgba(255,255,255,0.5)'"
+						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline border transition-all duration-200"
+						style="font-family: var(--font-body); color: var(--color-primary); border-color: var(--color-primary);"
+						onmouseover="this.style.backgroundColor='var(--color-primary)'; this.style.color='var(--color-on-primary)';"
+						onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-primary)';"
 					>
 						{heroSecondaryCtaLabel}
 					</a>
@@ -161,7 +166,7 @@ const communityUrl = media?.communityUrl || '/join';
 				{ url: `${R2}/read-book.mp4`, theme: 'dark' },
 				{ url: `${R2}/bible-open-pages.mp4`, theme: 'dark' },
 				{ url: `${R2}/reading-bible-4k.mov`, theme: 'dark' },
-				// — Light videos (dark text: wine red #7B1C2E) —
+				// — Light videos (dark text: charcoal #1a1c1c) —
 				{ url: `${R2}/bible-lake-reading-hero.mp4`, theme: 'light' },
 				{ url: `${R2}/holy-bible.mp4`, theme: 'light' },
 				{ url: `${R2}/hands-holding-bible.mp4`, theme: 'light' },
@@ -169,25 +174,8 @@ const communityUrl = media?.communityUrl || '/join';
 			];
 
 			function applyTheme(theme) {
-				const heading = document.getElementById('hero-heading');
-				const sub = document.getElementById('hero-sub');
-				const ctaPrimary = document.getElementById('hero-cta-primary');
-				const ctaSecondary = document.getElementById('hero-cta-secondary');
-				if (!heading || !sub || !ctaPrimary || !ctaSecondary) return;
+				// Title stays neon pink on all video backgrounds
 
-				if (theme === 'dark') {
-					heading.style.color = '#FFFFFF';
-					sub.style.color = 'rgba(255,255,255,0.9)';
-					ctaPrimary.style.color = '#FFFFFF';
-					ctaSecondary.style.color = '#FFFFFF';
-					ctaSecondary.style.borderColor = 'rgba(255,255,255,0.5)';
-				} else {
-					heading.style.color = '#7B1C2E';
-					sub.style.color = '#7B1C2E';
-					ctaPrimary.style.color = '#7B1C2E';
-					ctaSecondary.style.color = '#7B1C2E';
-					ctaSecondary.style.borderColor = 'rgba(123,28,46,0.4)';
-				}
 			}
 
 			const vA = document.getElementById('hero-video-a');
