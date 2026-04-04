@@ -49,16 +49,41 @@ const currentPath = Astro.url.pathname;
 
 		<!-- Desktop nav -->
 		<ul class="hidden lg:flex items-center gap-4 xl:gap-7 list-none m-0 p-0">
-			{navLinks.slice(0, 5).map(link => (
-				<li>
-					<a
-						href={link.href}
-						class="text-xs font-semibold uppercase no-underline transition-colors duration-200 tracking-[0.1em]"
-						style={`font-family: var(--font-body); color: var(--color-on-surface-variant);`}
-					>
-						{link.label}
-					</a>
-				</li>
+			{navLinks.map(link => (
+				link.href === '/the-fathers-heart-bible' ? (
+					<li class="relative group">
+						<a
+							href={link.href}
+							class="text-xs font-semibold uppercase no-underline transition-colors duration-200 tracking-[0.1em]"
+							style={`font-family: var(--font-body); color: var(--color-on-surface-variant);`}
+						>
+							{link.label}
+						</a>
+						<div class="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+							<div class="py-2 px-1 min-w-[180px]" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-outline-variant); box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+								<a
+									href="/the-fathers-heart-bible/lead-translator"
+									class="block px-4 py-2 text-xs font-semibold uppercase no-underline tracking-[0.1em] transition-colors duration-200"
+									style={`font-family: var(--font-body); color: var(--color-on-surface-variant);`}
+									onmouseover="this.style.color='var(--color-primary)'"
+									onmouseout="this.style.color='var(--color-on-surface-variant)'"
+								>
+									Lead Translator
+								</a>
+							</div>
+						</div>
+					</li>
+				) : (
+					<li>
+						<a
+							href={link.href}
+							class="text-xs font-semibold uppercase no-underline transition-colors duration-200 tracking-[0.1em]"
+							style={`font-family: var(--font-body); color: var(--color-on-surface-variant);`}
+						>
+							{link.label}
+						</a>
+					</li>
+				)
 			))}
 		</ul>
 
@@ -91,7 +116,7 @@ const currentPath = Astro.url.pathname;
 	<div id="mobile-menu" class="lg:hidden hidden" style="background-color: var(--color-surface-lowest); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);">
 		<ul class="flex flex-col items-center gap-4 py-5 list-none m-0 px-6">
 			{navLinks.map(link => (
-				<li>
+				<li class="flex flex-col items-center gap-3">
 					<a
 						href={link.href}
 						class="text-xs font-semibold uppercase no-underline transition-colors duration-200 tracking-[0.1em]"
@@ -99,6 +124,15 @@ const currentPath = Astro.url.pathname;
 					>
 						{link.label}
 					</a>
+					{link.href === '/the-fathers-heart-bible' && (
+						<a
+							href="/the-fathers-heart-bible/lead-translator"
+							class="text-xs font-medium uppercase no-underline transition-colors duration-200 tracking-[0.1em]"
+							style={`font-family: var(--font-body); color: var(--color-muted); opacity: 0.7;`}
+						>
+							Lead Translator
+						</a>
+					)}
 				</li>
 			))}
 			<li>
