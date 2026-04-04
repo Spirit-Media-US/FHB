@@ -4,6 +4,7 @@ import Footer from '../../components/Footer.astro';
 import Navbar from '../../components/Navbar.astro';
 import ScriptureBlock from '../../components/ScriptureBlock.astro';
 import Section from '../../components/Section.astro';
+import VideoHeroInner from '../../components/VideoHeroInner.astro';
 import Layout from '../../layouts/Layout.astro';
 import { sanityClient } from '../../lib/sanity';
 
@@ -53,11 +54,14 @@ const audience = [
 	'Anyone who has related to God primarily as servant to master',
 	'Those who want Scripture to feel personal and relational',
 ];
+
+const heroVideoUrl = 'https://assets.spiritmediapublishing.com/fathers-heart-bible/read-book.mp4';
 ---
 
 <Layout
   title={seoTitle}
   description={seoDescription}
+  darkHero={true}
   jsonLd={{
     "@context": "https://schema.org",
     "@graph": [
@@ -77,37 +81,13 @@ const audience = [
     <!-- ═══════════════════════════════════════════════════════════
          SECTION 1 — HERO
          ═══════════════════════════════════════════════════════════ -->
-    <section style="background-color: var(--color-canvas);" class="pt-32 pb-8 md:pt-40 md:pb-12 px-4 md:px-6">
-      <div class="max-w-3xl mx-auto text-center" data-reveal>
-        <p
-          class="text-xs font-semibold tracking-widest uppercase mb-4"
-          style="font-family: var(--font-body); color: var(--color-primary);"
-        >
-          Lead Translator
-        </p>
-        <h1
-          class="text-4xl md:text-6xl font-medium leading-snug tracking-tight mb-6"
-          style="font-family: var(--font-headline); color: var(--color-ink);"
-        >
-          The story behind the Father's Heart Bible
-        </h1>
-        <p
-          class="text-lg md:text-xl leading-relaxed mb-10"
-          style="font-family: var(--font-body); color: var(--color-muted);"
-        >
-          The Father's Heart Bible was not born from novelty. It was born from a long journey through Scripture, ministry, longing, and awakening.
-        </p>
-        <a
-          href="/download"
-          class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
-          style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary);"
-          onmouseover="this.style.opacity='0.9'"
-          onmouseout="this.style.opacity='1'"
-        >
-          Download the Free Book
-        </a>
-      </div>
-    </section>
+    <VideoHeroInner
+      videoSrc={heroVideoUrl}
+      heading="A forty-year journey to the Father's heart"
+      subheading="The Father's Heart Bible was not born from novelty. It was born from a long journey through Scripture, ministry, longing, and awakening."
+      primaryCtaLabel="Download the Free Book"
+      primaryCtaHref="/download"
+    />
 
 
     <!-- ═══════════════════════════════════════════════════════════
