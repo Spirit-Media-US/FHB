@@ -130,7 +130,7 @@ const currentPath = Astro.url.pathname;
 		if (!header) return;
 		const logo = document.getElementById('nav-logo');
 		const ctaBtn = document.getElementById('nav-cta');
-		const links = Array.from(header.querySelectorAll<HTMLElement>('a, span')).filter(
+		const links = Array.from(header.querySelectorAll<HTMLElement>('nav a, nav span')).filter(
 			el => el !== logo && !logo?.contains(el) && el !== ctaBtn
 		);
 		const bars = [bar1, bar2, bar3];
