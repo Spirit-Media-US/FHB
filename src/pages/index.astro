@@ -43,11 +43,8 @@ const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/join';
 const heroVideoSrc = media?.heroVideoUrl || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
 const heroPosterSrc = media?.heroPosterUrl || '';
 
-// Bible cover — prefer Sanity image, fall back to URL field, then hardcoded
-const bibleCoverImage = media?.bibleCoverImage;
-const bookCoverUrl = bibleCoverImage
-	? urlFor(bibleCoverImage).width(400).url()
-	: media?.bookCoverUrl || 'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png';
+// Bible cover — use the transparent-background PNG
+const bookCoverUrl = 'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png';
 
 // FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
 const fhbCoverSanity = media?.fhbCoverImage;
@@ -123,7 +120,7 @@ const communityUrl = media?.communityUrl || '/join';
 		<!-- ═══════════════════════════════════════════════════════════
 		     HERO SUBTEXT — Pulled out of the video hero
 		     ═══════════════════════════════════════════════════════════ -->
-		<section style="background-color: var(--color-canvas);" class="py-16 md:py-20 px-6">
+		<section style="background-color: var(--color-canvas);" class="py-10 md:py-14 px-6">
 			<div class="max-w-2xl mx-auto text-center">
 				<p
 					class="text-lg md:text-xl leading-relaxed mb-10"
@@ -276,7 +273,7 @@ const communityUrl = media?.communityUrl || '/join';
 		     SECTION 3 — SCRIPTURE FEATURE: JOHN 3:16
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="scripture">
-			<div class="text-center mb-12">
+			<div class="text-center mb-8">
 				<p
 					class="text-xs font-semibold tracking-widest uppercase mb-3"
 					style="font-family: var(--font-sans); color: var(--color-gold);"
@@ -364,7 +361,7 @@ const communityUrl = media?.communityUrl || '/join';
 		<!-- ═══════════════════════════════════════════════════════════
 		     SECTION 4 — WHAT IS FHB
 		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="light">
+		<Section variant="soft">
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
 				<!-- Book image -->
 				<div class="flex justify-center">
@@ -449,21 +446,21 @@ const communityUrl = media?.communityUrl || '/join';
 		     SECTION 5 — JOEL 2 SCRIPTURE FEATURE
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="dark">
-			<div class="max-w-2xl mx-auto space-y-16">
+			<div class="max-w-2xl mx-auto space-y-6">
 				<ScriptureBlock
 					text="Tear open your hearts\u2026 return to your Father, for He is gracious and His compassion runs deep, He is slow to anger and overflowing with faithful love."
 					reference="Joel 2:13"
 					translation="Father's Heart Bible"
 					dark={true}
 				/>
-				<div class="w-px h-12 mx-auto" style="background-color: var(--color-gold); opacity: 0.3;"></div>
+				<div class="w-px h-8 mx-auto" style="background-color: var(--color-inverse-primary); opacity: 0.3;"></div>
 				<ScriptureBlock
 					text="Then our Father\u2019s heart went out for His land, and He had deep compassion on His children."
 					reference="Joel 2:18"
 					translation="Father's Heart Bible"
 					dark={true}
 				/>
-				<div class="w-px h-12 mx-auto" style="background-color: var(--color-gold); opacity: 0.3;"></div>
+				<div class="w-px h-8 mx-auto" style="background-color: var(--color-inverse-primary); opacity: 0.3;"></div>
 				<ScriptureBlock
 					text="I will pour out My Spirit on all My beloved sons and daughters."
 					reference="Joel 2:28"
@@ -698,11 +695,11 @@ const communityUrl = media?.communityUrl || '/join';
 		<!-- ═══════════════════════════════════════════════════════════
 		     SECTION 10 — FINAL CTA BAND
 		     ═══════════════════════════════════════════════════════════ -->
-		<section class="py-16 md:py-20" style="background-color: var(--color-deep);">
+		<section class="py-10 md:py-14" style="background-color: var(--color-deep);">
 			<div class="max-w-3xl mx-auto px-6 text-center">
-				<div class="w-10 h-0.5 mx-auto mb-10" style="background-color: var(--color-gold);"></div>
+				<div class="w-10 h-0.5 mx-auto mb-6" style="background-color: var(--color-gold);"></div>
 				<h2
-					class="text-3xl md:text-4xl font-light mb-12"
+					class="text-3xl md:text-4xl font-light mb-8"
 					style="font-family: var(--font-serif); color: #fff;"
 				>
 					Your next step with the Father.

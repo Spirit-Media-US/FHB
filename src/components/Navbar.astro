@@ -18,10 +18,10 @@ const siteName = siteSettings?.siteName || "Father's Heart Bible";
 const logoImage = siteSettings?.logo;
 const logoUrl = logoImage ? urlFor(logoImage).width(200).url() : null;
 
-const navLinks: NavLink[] = siteSettings?.navLinks || [
+const navLinks: NavLink[] = [
+	{ label: 'Home', href: '/' },
 	{ label: 'About FHB', href: '/the-fathers-heart-bible' },
 	{ label: 'Samples', href: '/samples' },
-	{ label: 'Download', href: '/download' },
 	{ label: 'Join the Movement', href: '/join' },
 	{ label: 'Partner With Us', href: '/partner' },
 	{ label: 'About', href: '/about' },
@@ -31,7 +31,7 @@ const currentPath = Astro.url.pathname;
 ---
 
 <header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-	<nav class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+	<nav class="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
 		<!-- Logo -->
 		<a href="/" id="nav-logo" class="no-underline shrink-0 flex flex-col items-center gap-0.5">
 			{logoUrl && (
@@ -65,13 +65,14 @@ const currentPath = Astro.url.pathname;
 
 		<!-- CTA button -->
 		<a
+			id="nav-cta"
 			href="/download"
 			class="hidden lg:inline-flex items-center px-5 py-2 text-xs font-semibold uppercase no-underline transition-all duration-200 tracking-[0.08em]"
 			style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary); border-radius: 0.125rem;"
-			onmouseover="this.style.opacity='0.9'"
-			onmouseout="this.style.opacity='1'"
+			onmouseover="this.style.opacity='0.85';"
+			onmouseout="this.style.opacity='1';"
 		>
-			Download Free
+			Free Book
 		</a>
 
 		<!-- Mobile hamburger -->
@@ -107,7 +108,7 @@ const currentPath = Astro.url.pathname;
 					class="inline-flex items-center px-6 py-2.5 text-xs font-semibold uppercase no-underline tracking-[0.08em]"
 					style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary); border-radius: 0.125rem;"
 				>
-					Download Free
+					Free Book
 				</a>
 			</li>
 		</ul>
@@ -128,8 +129,9 @@ const currentPath = Astro.url.pathname;
 	function setNavColors(scrolled: boolean) {
 		if (!header) return;
 		const logo = document.getElementById('nav-logo');
+		const ctaBtn = document.getElementById('nav-cta');
 		const links = Array.from(header.querySelectorAll<HTMLElement>('a, span')).filter(
-			el => el !== logo && !logo?.contains(el)
+			el => el !== logo && !logo?.contains(el) && el !== ctaBtn
 		);
 		const bars = [bar1, bar2, bar3];
 		if (scrolled || !darkHero) {
