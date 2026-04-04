@@ -15,15 +15,18 @@ const [pageData, media, kevinProfile] = await Promise.all([
     heroHeading, heroSubheading,
     heroPrimaryCtaLabel, heroPrimaryCtaHref
   }`),
-	sanityClient.fetch(`*[_type =="siteSettings"][0] { aboutPageVideo, kevinPortraitUrl, communityUrl, donateUrl }`),
+	sanityClient.fetch(
+		`*[_type =="siteSettings"][0] { aboutPageVideo, kevinPortraitUrl, communityUrl, donateUrl }`,
+	),
 	sanityClient.fetch(
 		`*[_type =="personProfile"] | order(order asc)[0] { portraitUrl, portrait { asset->{ url } } }`,
 	),
 ]);
 
-const seoTitle = pageData?.seoTitle ||"About Kevin White | Father's Heart Bible";
+const seoTitle = pageData?.seoTitle || "About Kevin White | Father's Heart Bible";
 const seoDescription =
-	pageData?.seoDescription ||"Learn the story behind the Father's Heart Bible and the vision to reveal God as Father through Scripture.";
+	pageData?.seoDescription ||
+	"Learn the story behind the Father's Heart Bible and the vision to reveal God as Father through Scripture.";
 const heroHeading = 'The story behind the Father’s Heart Bible';
 const heroSubheading =
 	'The Father’s Heart Bible was not born from novelty. It was born from a long journey through Scripture, ministry, longing, and awakening.';
@@ -33,7 +36,9 @@ const kevinPortraitUrl =
 	kevinProfile?.portraitUrl || kevinProfile?.portrait?.asset?.url || media?.kevinPortraitUrl || '';
 const communityUrl = media?.communityUrl || '#join';
 const donateUrl = media?.donateUrl || '/partner';
-const aboutPageVideoUrl = media?.aboutPageVideo || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/women-reading-bible-outdoors.mp4';
+const aboutPageVideoUrl =
+	media?.aboutPageVideo ||
+	'https://assets.spiritmediapublishing.com/fathers-heart-bible/women-reading-bible-outdoors.mp4';
 
 const foundations = [
 	{
@@ -46,7 +51,7 @@ const foundations = [
 	},
 	{
 		heading: 'Respect for faithful translations',
-		body:"The Father's Heart Bible does not replace existing translations. It stands alongside them, highlighting what has always been there.",
+		body: "The Father's Heart Bible does not replace existing translations. It stands alongside them, highlighting what has always been there.",
 	},
 	{
 		heading: 'Historic Christian orthodoxy',
@@ -68,6 +73,17 @@ const audience = [
   title={seoTitle}
   description={seoDescription}
   darkHero={true}
+  jsonLd={{
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/about" },
+      { "@type": "Person", "name": "Kevin White", "jobTitle": "Translator", "worksFor": { "@type": "Organization", "name": "Spirit Media Inc." } },
+      { "@type": "BreadcrumbList", "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
+        { "@type": "ListItem", "position": 2, "name": "About", "item": "https://fathersheartbible.com/about" }
+      ]}
+    ]
+  }}
 >
   <Navbar />
   <main>

@@ -19,12 +19,14 @@ const {
 	dark = false,
 } = Astro.props;
 
-const bg = dark ? 'var(--color-inverse-surface)' : 'linear-gradient(135deg, var(--color-primary), var(--color-primary-container))';
+const bg = dark
+	? 'var(--color-inverse-surface)'
+	: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-container))';
 const headlineColor = '#fff';
 const bodyColor = dark ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.85)';
 ---
 
-<section class="py-12 md:py-16" style={dark ? `background-color: ${bg};` : `background: ${bg};`}>
+<section class="py-8 md:py-12 lg:py-16" style={dark ? `background-color: ${bg};` : `background: ${bg};`}>
 	<div class="max-w-3xl mx-auto px-6 text-center">
 		<h2
 			class="text-3xl md:text-5xl font-light mb-4 tracking-tight"

@@ -16,11 +16,11 @@ const bgMap: Record<string, string> = {
 };
 
 const paddingMap: Record<string, string> = {
-	light: 'py-12 md:py-16',
-	soft: 'py-12 md:py-16',
-	scripture: 'py-14 md:py-20',
-	'cta-band': 'py-10 md:py-14',
-	dark: 'py-12 md:py-16',
+	light: 'py-8 md:py-12 lg:py-16',
+	soft: 'py-8 md:py-12 lg:py-16',
+	scripture: 'py-10 md:py-14 lg:py-20',
+	'cta-band': 'py-8 md:py-10 lg:py-14',
+	dark: 'py-8 md:py-12 lg:py-16',
 };
 
 const bg = bgMap[variant];
@@ -32,7 +32,7 @@ const padding = paddingMap[variant];
 	class={`${padding} ${className ?? ''}`}
 	style={`background-color: ${bg};`}
 >
-	<div class="max-w-6xl mx-auto px-6" data-reveal>
+	<div class="max-w-6xl mx-auto px-4 md:px-6" data-reveal>
 		<slot />
 	</div>
 </section>

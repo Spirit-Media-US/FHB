@@ -21,7 +21,7 @@ const [pageData, media] = await Promise.all([
   }`),
 ]);
 
-const seoTitle = pageData?.seoTitle ||"Join the Movement | Father's Heart Bible";
+const seoTitle = pageData?.seoTitle || "Join the Movement | Father's Heart Bible";
 const seoDescription =
 	pageData?.seoDescription ||
 	'Join the Father’s Heart Movement to grow in beloved identity, hear His voice, pray, and take part in publishing the Father’s Heart Bible to the nations.';
@@ -33,7 +33,9 @@ const heroSecondaryCtaLabel = 'Download the Free Book';
 const heroSecondaryCtaHref = '/download';
 // communityUrl field takes precedence; fall back to legacy mightyNetworksUrl
 const communityUrl = media?.communityUrl || media?.mightyNetworksUrl || '#join';
-const joinPageVideoUrl = media?.joinPageVideo || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/mother-son-praying.mp4';
+const joinPageVideoUrl =
+	media?.joinPageVideo ||
+	'https://assets.spiritmediapublishing.com/fathers-heart-bible/mother-son-praying.mp4';
 const photo1 = media?.peoplePhoto1Url || '';
 const photo2 = media?.peoplePhoto2Url || '';
 const photo3 = media?.peoplePhoto3Url || '';
@@ -42,7 +44,7 @@ const photo4 = media?.peoplePhoto4Url || '';
 const whyJoin = [
 	{
 		title: 'Grow in Beloved Identity',
-		body:"Resources and community designed to help you live from the truth that you are the Father's beloved child.",
+		body: "Resources and community designed to help you live from the truth that you are the Father's beloved child.",
 	},
 	{
 		title: 'Deepen Intimacy with the Father',
@@ -54,7 +56,7 @@ const whyJoin = [
 	},
 	{
 		title: 'Follow the Bible Project',
-		body:"Stay close to the progress of the full Father's Heart Bible — from translation to publication.",
+		body: "Stay close to the progress of the full Father's Heart Bible — from translation to publication.",
 	},
 	{
 		title: 'Participate Globally',
@@ -65,7 +67,7 @@ const whyJoin = [
 const communityAreas = [
 	{
 		title: 'Movement Hub',
-		body:"The center of the community — updates, announcements, and shared life around the Father's Heart Bible.",
+		body: "The center of the community — updates, announcements, and shared life around the Father's Heart Bible.",
 	},
 	{
 		title: 'Beloved Identity',
@@ -73,11 +75,11 @@ const communityAreas = [
 	},
 	{
 		title: 'Prayer & Intercession',
-		body:"Gathered prayer for the translation, distribution, and those who have yet to hear the Father's voice.",
+		body: "Gathered prayer for the translation, distribution, and those who have yet to hear the Father's voice.",
 	},
 	{
 		title: 'Distribution & Impact',
-		body:"Follow how the Father's Heart Bible is reaching individuals, communities, and nations.",
+		body: "Follow how the Father's Heart Bible is reaching individuals, communities, and nations.",
 	},
 	{
 		title: 'Translation Collaboration',
@@ -87,8 +89,10 @@ const communityAreas = [
 
 const audience = [
 	'You are hungry for deeper intimacy with the Father — not just more theological information.',
-	'You are awakening to beloved identity and want to grow in that truth alongside others.',"You long for a community centered on the Father's heart, not performance or platform.",
-	'You want to pray for something real — the Word going into the nations.',"You want to follow the Father's Heart Bible project and be there when it arrives.",
+	'You are awakening to beloved identity and want to grow in that truth alongside others.',
+	"You long for a community centered on the Father's heart, not performance or platform.",
+	'You want to pray for something real — the Word going into the nations.',
+	"You want to follow the Father's Heart Bible project and be there when it arrives.",
 	'You want to participate in something larger than yourself.',
 ];
 
@@ -96,7 +100,7 @@ const howToBegin = [
 	{
 		step: '1',
 		heading: 'Join the community',
-		body:"Click the button below and create your free account in the Father's Heart Movement on Mighty Networks.",
+		body: "Click the button below and create your free account in the Father's Heart Movement on Mighty Networks.",
 	},
 	{
 		step: '2',
@@ -115,6 +119,16 @@ const howToBegin = [
 	title={seoTitle}
 	description={seoDescription}
 	darkHero={true}
+	jsonLd={{
+		"@context": "https://schema.org",
+		"@graph": [
+			{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/join" },
+			{ "@type": "BreadcrumbList", "itemListElement": [
+				{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
+				{ "@type": "ListItem", "position": 2, "name": "Join the Movement", "item": "https://fathersheartbible.com/join" }
+			]}
+		]
+	}}
 >
 	<Navbar />
 	<main>
@@ -332,7 +346,7 @@ const howToBegin = [
 					Three simple steps to begin.
 				</h2>
 			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto" data-stagger>
 				{howToBegin.map(({ step, heading, body }) => (
 					<div class="text-center p-6">
 						<div

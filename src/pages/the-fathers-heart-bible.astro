@@ -15,10 +15,12 @@ const [pageData, media] = await Promise.all([
     heroPrimaryCtaLabel, heroPrimaryCtaHref,
     heroSecondaryCtaLabel, heroSecondaryCtaHref
   }`),
-	sanityClient.fetch(`*[_type =="siteSettings"][0] { theThersHeartBiblePageVideo, bookCoverUrl, fhbCoverImage, communityUrl }`),
+	sanityClient.fetch(
+		`*[_type =="siteSettings"][0] { theThersHeartBiblePageVideo, bookCoverUrl, fhbCoverImage, communityUrl }`,
+	),
 ]);
 
-const seoTitle = pageData?.seoTitle ||"What Is the Father's Heart Bible? | Father's Heart Bible";
+const seoTitle = pageData?.seoTitle || "What Is the Father's Heart Bible? | Father's Heart Bible";
 const seoDescription =
 	pageData?.seoDescription ||
 	'Learn what the Father\u2019s Heart Bible is, why it exists, and how this new Bible translation reveals God as Father where Scripture reveals Him.';
@@ -30,7 +32,9 @@ const heroPrimaryCtaHref = '/samples';
 const heroSecondaryCtaLabel = 'Download the Free Book';
 const heroSecondaryCtaHref = '/download';
 const bookCoverUrl = media?.bookCoverUrl || '';
-const biblePageVideoUrl = media?.theThersHeartBiblePageVideo || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/hands-holding-bible.mp4';
+const biblePageVideoUrl =
+	media?.theThersHeartBiblePageVideo ||
+	'https://assets.spiritmediapublishing.com/fathers-heart-bible/hands-holding-bible.mp4';
 
 // FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
 const fhbCoverImageFromSanity = media?.fhbCoverImage;
@@ -42,7 +46,7 @@ const communityUrl = media?.communityUrl || '/join';
 const distinctives = [
 	{
 		title: 'Reveals the Father',
-		body:"Wherever Scripture reveals God's fatherly heart — in name, in covenant, in direct address — this translation makes it unmistakable.",
+		body: "Wherever Scripture reveals God's fatherly heart — in name, in covenant, in direct address — this translation makes it unmistakable.",
 	},
 	{
 		title: 'Heart-Language',
@@ -58,7 +62,7 @@ const distinctives = [
 	},
 	{
 		title: 'Full Canon',
-		body:"From Genesis to Revelation, the Father's voice runs through every book. FHB traces that thread from beginning to end.",
+		body: "From Genesis to Revelation, the Father's voice runs through every book. FHB traces that thread from beginning to end.",
 	},
 	{
 		title: 'Relational, Not Academic',
@@ -81,14 +85,14 @@ const notItems = [
 	},
 	{
 		label: 'Not a new theology',
-		body:"The Father's Heart Bible is grounded in historic Christian and Trinitarian belief. It reveals what has always been there.",
+		body: "The Father's Heart Bible is grounded in historic Christian and Trinitarian belief. It reveals what has always been there.",
 	},
 ];
 
 const milestones = [
 	{
 		milestone: 'Full Canon',
-		detail:"Genesis to Revelation — every book translated with the Father's heart in view.",
+		detail: "Genesis to Revelation — every book translated with the Father's heart in view.",
 	},
 	{
 		milestone: 'Premium Edition',
@@ -109,7 +113,8 @@ const audience = [
 	'You long for deeper intimacy with God, not just more knowledge about Him.',
 	'You are awakening to your identity as a beloved child of the Father.',
 	'You want to hear His voice — not just His instructions.',
-	'You are hungry for a Bible that feels like an encounter, not a document.',"You want to give someone a Bible that reveals the Father's love clearly.",
+	'You are hungry for a Bible that feels like an encounter, not a document.',
+	"You want to give someone a Bible that reveals the Father's love clearly.",
 ];
 
 const shifts = [
@@ -123,6 +128,16 @@ const shifts = [
 	title={seoTitle}
 	description={seoDescription}
 	darkHero={true}
+	jsonLd={{
+		"@context": "https://schema.org",
+		"@graph": [
+			{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/the-fathers-heart-bible" },
+			{ "@type": "BreadcrumbList", "itemListElement": [
+				{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
+				{ "@type": "ListItem", "position": 2, "name": "About FHB", "item": "https://fathersheartbible.com/the-fathers-heart-bible" }
+			]}
+		]
+	}}
 >
 	<Navbar />
 	<main>
@@ -467,7 +482,7 @@ const shifts = [
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="soft">
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
-				<div class="flex justify-center">
+				<div class="flex justify-center" data-reveal="slide-left">
 					<img
 						src={fhbiCoverUrl}
 						alt="Father's Heart → Beloved Identity — free PDF"
@@ -475,7 +490,7 @@ const shifts = [
 						style="filter: drop-shadow(0 16px 32px rgba(0,0,0,0.22));"
 					/>
 				</div>
-				<div>
+				<div data-reveal="slide-right">
 					<p
 						class="text-xs font-semibold tracking-widest uppercase mb-4"
 						style="font-family: var(--font-sans); color: var(--color-gold);"

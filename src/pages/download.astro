@@ -22,17 +22,20 @@ const [pageData, media, resourceData] = await Promise.all([
   }`),
 ]);
 
-const seoTitle = pageData?.seoTitle ||"Download the Free Book | Father's Heart Bible";
+const seoTitle = pageData?.seoTitle || "Download the Free Book | Father's Heart Bible";
 const seoDescription =
-	pageData?.seoDescription ||"Download the free PDF of Father's Heart → Beloved Identity and discover the heart behind the Father's Heart Bible.";
+	pageData?.seoDescription ||
+	"Download the free PDF of Father's Heart → Beloved Identity and discover the heart behind the Father's Heart Bible.";
 const heroHeading = 'Download the Free Book';
-const heroSubheading ="Father's Heart \u2192 Beloved Identity";
+const heroSubheading = "Father's Heart \u2192 Beloved Identity";
 const heroPrimaryCtaLabel = 'Download the Free Book';
 const heroPrimaryCtaHref = '#form';
 const bookCoverUrl = resourceData?.coverImageUrl || media?.bookCoverUrl || '';
 const ghlFormId = media?.ghlDownloadFormId || '';
 const communityUrl = media?.communityUrl || '/join';
-const downloadPageVideoUrl = media?.downloadPageVideo || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/farmer-reading-bible.mp4';
+const downloadPageVideoUrl =
+	media?.downloadPageVideo ||
+	'https://assets.spiritmediapublishing.com/fathers-heart-bible/farmer-reading-bible.mp4';
 
 // FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
 const fhbCoverImageFromSanity = media?.fhbCoverImage;
@@ -58,12 +61,12 @@ const benefits = [
 		body: 'Your identity as a beloved child is not something you earn — it is something you receive.',
 	},
 	{
-		heading:"See Scripture through the Father's heart",
+		heading: "See Scripture through the Father's heart",
 		body: 'Learn to read the Bible as the story of a Father reaching toward His children from the very first page.',
 	},
 	{
 		heading: 'Enter the message behind FHB',
-		body:"This book is the doorway into everything the Father's Heart Bible was written to reveal.",
+		body: "This book is the doorway into everything the Father's Heart Bible was written to reveal.",
 	},
 ];
 
@@ -76,7 +79,7 @@ const nextSteps = [
 	{
 		step: '2',
 		heading: 'Read and encounter',
-		body:"Set aside a quiet hour. Let the Father's voice settle something deep.",
+		body: "Set aside a quiet hour. Let the Father's voice settle something deep.",
 	},
 	{
 		step: '3',
@@ -90,6 +93,16 @@ const nextSteps = [
 	title={seoTitle}
 	description={seoDescription}
 	darkHero={true}
+	jsonLd={{
+		"@context": "https://schema.org",
+		"@graph": [
+			{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/download" },
+			{ "@type": "BreadcrumbList", "itemListElement": [
+				{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
+				{ "@type": "ListItem", "position": 2, "name": "Download", "item": "https://fathersheartbible.com/download" }
+			]}
+		]
+	}}
 >
 	<Navbar />
 	<main>
@@ -111,7 +124,7 @@ const nextSteps = [
 		<Section variant="soft">
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center max-w-4xl mx-auto">
 				<!-- Book cover -->
-				<div class="flex justify-center">
+				<div class="flex justify-center" data-reveal="slide-left">
 					<img
 						src={fhbiCoverUrl}
 						alt="Father's Heart → Beloved Identity — free PDF"
@@ -120,7 +133,7 @@ const nextSteps = [
 					/>
 				</div>
 				<!-- Description + CTA -->
-				<div>
+				<div data-reveal="slide-right">
 					<p
 						class="text-xs font-semibold tracking-widest uppercase mb-4"
 						style="font-family: var(--font-body); color: var(--color-primary);"
@@ -327,7 +340,7 @@ const nextSteps = [
 					What happens next.
 				</h2>
 			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto" data-stagger>
 				{nextSteps.map(({ step, heading, body }) => (
 					<div class="text-center p-6">
 						<div

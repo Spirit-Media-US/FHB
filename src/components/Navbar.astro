@@ -38,7 +38,7 @@ const currentPath = Astro.url.pathname;
 				<img
 					src={logoUrl}
 					alt={siteName}
-					class="h-20 w-auto"
+					class="h-14 md:h-20 w-auto"
 					style="filter: brightness(0) saturate(100%) invert(5%) sepia(20%) saturate(500%) hue-rotate(290deg) brightness(20%) contrast(100%);"
 				/>
 			)}
@@ -49,7 +49,7 @@ const currentPath = Astro.url.pathname;
 		</a>
 
 		<!-- Desktop nav -->
-		<ul class="hidden lg:flex items-center gap-7 list-none m-0 p-0">
+		<ul class="hidden lg:flex items-center gap-4 xl:gap-7 list-none m-0 p-0">
 			{navLinks.slice(0, 5).map(link => (
 				<li>
 					<a
@@ -90,7 +90,7 @@ const currentPath = Astro.url.pathname;
 
 	<!-- Mobile menu -->
 	<div id="mobile-menu" class="lg:hidden hidden" style="background-color: var(--color-surface-lowest); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);">
-		<ul class="flex flex-col items-center gap-6 py-8 list-none m-0 px-6">
+		<ul class="flex flex-col items-center gap-4 py-5 list-none m-0 px-6">
 			{navLinks.map(link => (
 				<li>
 					<a

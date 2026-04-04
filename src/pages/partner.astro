@@ -14,12 +14,15 @@ const [pageData, media] = await Promise.all([
     heroHeading, heroSubheading,
     heroPrimaryCtaLabel, heroPrimaryCtaHref
   }`),
-	sanityClient.fetch(`*[_type =="siteSettings"][0] { partnerPageVideo, bookCoverUrl, donateUrl, communityUrl }`),
+	sanityClient.fetch(
+		`*[_type =="siteSettings"][0] { partnerPageVideo, bookCoverUrl, donateUrl, communityUrl }`,
+	),
 ]);
 
-const seoTitle = pageData?.seoTitle ||"Partner With Us | Father's Heart Bible";
+const seoTitle = pageData?.seoTitle || "Partner With Us | Father's Heart Bible";
 const seoDescription =
-	pageData?.seoDescription ||"Partner with the Father's Heart Bible project and help bring this transformational translation to the world. Your support makes a difference.";
+	pageData?.seoDescription ||
+	"Partner with the Father's Heart Bible project and help bring this transformational translation to the world. Your support makes a difference.";
 const heroHeading = 'Partner With Us';
 const heroSubheading = 'Be part of what the Father is doing.';
 const heroPrimaryCtaLabel = 'Donate Now';
@@ -27,7 +30,9 @@ const heroPrimaryCtaHref = '#donate';
 const bookCoverUrl = media?.bookCoverUrl || '';
 const donateUrl = media?.donateUrl || '#donate';
 const communityUrl = media?.communityUrl || '/join';
-const partnerPageVideoUrl = media?.partnerPageVideo || 'https://assets.spiritmediapublishing.com/fathers-heart-bible/bible-lake-reading-hero.mp4';
+const partnerPageVideoUrl =
+	media?.partnerPageVideo ||
+	'https://assets.spiritmediapublishing.com/fathers-heart-bible/bible-lake-reading-hero.mp4';
 
 const whyMatters = [
 	{
@@ -40,7 +45,7 @@ const whyMatters = [
 	},
 	{
 		heading: 'Distribute more widely',
-		body:"Every gift helps place the Father's Heart Bible into the hands of those who are ready to receive it.",
+		body: "Every gift helps place the Father's Heart Bible into the hands of those who are ready to receive it.",
 	},
 	{
 		heading: 'Expand future reach',
@@ -51,7 +56,7 @@ const whyMatters = [
 const scope = [
 	{
 		title: 'Translation',
-		body:"The ongoing interpretive work of rendering the full Biblical canon with the Father's heart in view.",
+		body: "The ongoing interpretive work of rendering the full Biblical canon with the Father's heart in view.",
 	},
 	{
 		title: 'Publishing',
@@ -67,7 +72,7 @@ const scope = [
 	},
 	{
 		title: 'Future Reach',
-		body:"Study editions, audio, and translations that extend the Father's voice into more languages and formats.",
+		body: "Study editions, audio, and translations that extend the Father's voice into more languages and formats.",
 	},
 ];
 
@@ -81,7 +86,7 @@ const whyDifferent = [
 const impactStats = [
 	{
 		amount: '$33',
-		impact:"Helps put one Father's Heart Bible into the hands of a reader.",
+		impact: "Helps put one Father's Heart Bible into the hands of a reader.",
 	},
 	{
 		amount: '$100',
@@ -98,6 +103,16 @@ const impactStats = [
 	title={seoTitle}
 	description={seoDescription}
 	darkHero={true}
+	jsonLd={{
+		"@context": "https://schema.org",
+		"@graph": [
+			{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/partner" },
+			{ "@type": "BreadcrumbList", "itemListElement": [
+				{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
+				{ "@type": "ListItem", "position": 2, "name": "Partner With Us", "item": "https://fathersheartbible.com/partner" }
+			]}
+		]
+	}}
 >
 	<Navbar />
 	<main>
@@ -171,8 +186,10 @@ const impactStats = [
 					Every gift places the Father's Word in someone's hands.
 				</h2>
 			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
-				{impactStats.map(({ amount, impact }) => (
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto" data-stagger>
+				{impactStats.map(({ amount, impact }) => {
+					const num = parseInt(amount.replace('$', ''), 10);
+					return (
 					<div
 						class="p-8 text-center"
 						style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
@@ -181,7 +198,7 @@ const impactStats = [
 							class="text-4xl font-light mb-4"
 							style="font-family: var(--font-serif); color: var(--color-brand);"
 						>
-							{amount}
+							<span data-counter={num} data-prefix="$">$0</span>
 						</p>
 						<div class="w-8 h-0.5 mx-auto mb-4" style="background-color: var(--color-gold);"></div>
 						<p
@@ -191,7 +208,8 @@ const impactStats = [
 							{impact}
 						</p>
 					</div>
-				))}
+				)})}
+
 			</div>
 		</Section>
 
