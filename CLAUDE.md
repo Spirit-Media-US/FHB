@@ -16,7 +16,7 @@ This site: Father's Heart Bible | Repo: github.com/Spirit-Media-US/FHB | Domain:
 ## Mandatory — Before Starting Work
 Always start Claude sessions from inside this directory:
 ```
-cd ~/Sites/FHB && claude
+cd /srv/sites/FHB && claude
 ```
 Running Claude from ~/ or ~/Sites/ bypasses this project's CLAUDE.md. A pre-edit hook enforces this, but following the workflow prevents warnings and ensures all project rules are loaded.
 
@@ -253,7 +253,7 @@ All 7 launch pages built and pushed to dev:
 
 1. **Deploy Sanity Studio schema** (run on Bethel in FHB directory):
    ```bash
-   cd ~/Sites/FHB
+   cd /srv/sites/FHB
    bunx sanity login        # authenticate with sanity.io
    bunx sanity deploy       # push updated schemas to Studio
    ```
