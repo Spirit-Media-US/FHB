@@ -44,9 +44,11 @@ const heroVideoSrc =
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
 const heroPosterSrc = media?.heroPosterUrl || '';
 
-// Bible cover — use the transparent-background PNG
-const bookCoverUrl =
-	'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png';
+// Bible cover — prefer Sanity image, fall back to hardcoded
+const bibleCoverImageFromSanity = media?.bibleCoverImage;
+const bookCoverUrl = bibleCoverImageFromSanity
+	? urlFor(bibleCoverImageFromSanity).width(400).url()
+	: 'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png';
 
 // FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
 const fhbCoverSanity = media?.fhbCoverImage;
