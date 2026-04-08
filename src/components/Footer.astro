@@ -1,4 +1,5 @@
 ---
+import MailtoLink from './MailtoLink.astro';
 import { sanityClient } from '../lib/sanity';
 
 const siteSettings = await sanityClient.fetch(`
@@ -39,7 +40,7 @@ const contactEmail = siteSettings?.email || 'hello@fathersheartbible.com';
 			<a href="/samples" class="no-underline" style="color: var(--color-inverse-on-surface); opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">Samples</a>
 			<a href="/join" class="no-underline" style="color: var(--color-inverse-on-surface); opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">Join</a>
 			<a href="/partner" class="no-underline" style="color: var(--color-inverse-on-surface); opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">Partner</a>
-			<a href={`mailto:${contactEmail}`} class="no-underline" style="color: var(--color-inverse-on-surface); opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">Contact</a>
+			<MailtoLink email={contactEmail} class="no-underline" style="color: var(--color-inverse-on-surface); opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">Contact</MailtoLink>
 		</div>
 
 		<!-- Copyright -->

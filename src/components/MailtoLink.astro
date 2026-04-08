@@ -1,0 +1,41 @@
+---
+/**
+ * MailtoLink — spam-safe email link component.
+ * The address is split into user + domain so it never appears as a
+ * plain mailto: in the HTML source. JS assembles it on click.
+ *
+ * Usage:
+ *   <MailtoLink email="info@spiritmedia.us" class="text-red hover:underline">
+ *     info@spiritmedia.us
+ *   </MailtoLink>
+ */
+interface Props {
+	email: string;
+	class?: string;
+	'aria-label'?: string;
+	[key: string]: any;
+}
+
+const { email, class: className, 'aria-label': ariaLabel, ...rest } = Astro.props;
+const [user, domain] = email.split('@');
+---
+
+<a
+  href="#"
+  class={className}
+  data-e={user}
+  data-d={domain}
+  aria-label={ariaLabel || `Email ${user} at ${domain}`}
+  role="link"
+  {...rest}
+><slot /></a>
+
+<script>
+  document.querySelectorAll<HTMLAnchorElement>('a[data-e][data-d]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const addr = el.dataset.e + '@' + el.dataset.d;
+      window.location.href = 'mailto:' + addr;
+    });
+  });
+</script>
