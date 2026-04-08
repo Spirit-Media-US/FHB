@@ -12,7 +12,7 @@ const [pageData, media, kevinProfile] = await Promise.all([
 	sanityClient.fetch(`*[_type =="page" && slug =="about"][0] {
     seoTitle, seoDescription
   }`),
-	sanityClient.fetch(`*[_type =="siteSettings"][0] { kevinPortraitUrl, communityUrl, donateUrl }`),
+	sanityClient.fetch(`*[_type =="siteSettings"][0] { kevinPortraitUrl, communityUrl, donateUrl, leadTranslatorPageVideo }`),
 	sanityClient.fetch(
 		`*[_type =="personProfile"] | order(order asc)[0] { portraitUrl, portrait { asset->{ url } } }`,
 	),
@@ -25,6 +25,9 @@ const seoDescription =
 const kevinPortraitUrl =
 	kevinProfile?.portraitUrl || kevinProfile?.portrait?.asset?.url || media?.kevinPortraitUrl || '';
 const communityUrl = media?.communityUrl || '#join';
+const heroVideoUrl =
+	media?.leadTranslatorPageVideo ||
+	'https://assets.spiritmediapublishing.com/fathers-heart-bible/read-book.mp4';
 
 const foundations = [
 	{
@@ -53,8 +56,6 @@ const audience = [
 	'Anyone who has related to God primarily as servant to master',
 	'Those who want Scripture to feel personal and relational',
 ];
-
-const heroVideoUrl = 'https://assets.spiritmediapublishing.com/fathers-heart-bible/read-book.mp4';
 ---
 
 <Layout
