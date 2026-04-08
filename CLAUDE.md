@@ -4,6 +4,10 @@
 
 This site: Father's Heart Bible | Repo: github.com/Spirit-Media-US/FHB | Domain: fathersheartbible.com / fathersheartbible.org | Sanity ID: rusi1hyi | R2 bucket: n/a
 
+**Migration protocol:** /home/deploy/bin/tools-api/pipelines/migration/CLAUDE.md
+**Sanity Studio:** Embedded at fathersheartbible.com/studio/ (static build)
+**Infrastructure:** Deploy webhook wired, CORS origins configured, studio deployed
+
 ## Dev Commands
 
 - `npm run dev` — local preview at localhost:4323
@@ -149,13 +153,12 @@ src/
 
 ---
 
-### STATUS
+### STATUS — as of 2026-04-08
 
 - **Phase 1:** LOCKED
 - **Phase 2:** LOCKED
 - **Phase 3:** LOCKED
-
-Proceed to Phase 4 (Pages) only after confirming all above is implemented.
+- **Site:** Live, completed migration
 
 ---
 
