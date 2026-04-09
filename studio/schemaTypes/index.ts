@@ -1,3 +1,4 @@
+import bibleTranslation from './bibleTranslation';
 import faq from './faq';
 import page from './page';
 import partner from './partner';
@@ -10,6 +11,7 @@ import scriptureComparison from './scriptureComparison';
 import siteSettings from './siteSettings';
 
 export const schemaTypes = [
+	bibleTranslation,
 	siteSettings,
 	page,
 	scriptureComparison,
