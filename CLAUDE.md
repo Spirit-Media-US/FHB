@@ -38,7 +38,7 @@ This project uses the following stack. These rules are mandatory.
 **Repositories & Deployment**
 - GitHub organization: Spirit-Media-US
 - Repository contains code only — NO media files
-- Netlify is used for hosting
+- Cloudflare Pages is used for hosting
 - Auto-deploy from main branch
 
 **Domain & Edge**
@@ -247,7 +247,7 @@ All 7 launch pages built and pushed to dev:
 - `Layout.astro` supports `noindex` prop → adds `<meta name="robots" content="noindex, nofollow">`
 - `tsconfig.json` excludes `studio/` and `sanity.config.ts` from Astro TS checking
 
-**Netlify webhook:** 3 build hooks already exist in Netlify (from prior setup)
+**Cloudflare Pages:** Auto-deploys on push to main (no webhook needed)
 
 ### Kevin's Required Manual Steps
 
@@ -277,11 +277,7 @@ All 7 launch pages built and pushed to dev:
    - Media URLs — paste R2 URLs for hero video, book cover, portrait, people photos
    - Publish the siteSettings document
 
-5. **Verify Sanity → Netlify webhook** is active:
-   - Go to: https://www.sanity.io/manage/project/rusi1hyi/api → Webhooks
-   - Should see a webhook pointing to Netlify build hook URL
-   - Netlify build hook URL: `https://api.netlify.com/build_hooks/69ac55086e54f35b43d2df8c`
-   - If no webhook exists, create one: HTTP POST, URL above, trigger on document publish
+5. **Sanity → Cloudflare Pages rebuild:** Cloudflare Pages auto-deploys on push to main. For Sanity content changes to trigger a rebuild, a deploy hook can be configured in Cloudflare Pages settings if needed.
 
 ---
 
