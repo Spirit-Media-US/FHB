@@ -373,6 +373,13 @@ export default {
 			description: 'Hero video for the Download/Free Book page.',
 			group: 'pageVideos',
 		},
+		{
+			name: 'leadTranslatorPageVideo',
+			title: 'Lead Translator Page Hero Video',
+			type: 'url',
+			description: 'Hero video for the Lead Translator page.',
+			group: 'pageVideos',
+		},
 
 		// ── Integrations ──────────────────────────────────────────────────
 		{

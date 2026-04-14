@@ -8,7 +8,7 @@ import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
 
-const [pageData, media] = await Promise.all([
+const [pageData, media, biblePageData] = await Promise.all([
 	sanityClient.fetch(`*[_type =="page" && slug =="the-fathers-heart-bible"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
@@ -17,6 +17,9 @@ const [pageData, media] = await Promise.all([
   }`),
 	sanityClient.fetch(
 		`*[_type =="siteSettings"][0] { theThersHeartBiblePageVideo, bookCoverUrl, fhbCoverImage, communityUrl }`,
+	),
+	sanityClient.fetch(
+		`*[_type =="biblePageContent"][0] { distinctives, notItems, milestones, audience, shifts }`,
 	),
 ]);
 
@@ -43,7 +46,7 @@ const fhbiCoverUrl = fhbCoverImageFromSanity
 	: 'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
 const communityUrl = media?.communityUrl || '/join';
 
-const distinctives = [
+const distinctives = biblePageData?.distinctives ?? [
 	{
 		title: 'Reveals the Father',
 		body: "Wherever Scripture reveals God's fatherly heart — in name, in covenant, in direct address — this translation makes it unmistakable.",
@@ -70,7 +73,7 @@ const distinctives = [
 	},
 ];
 
-const notItems = [
+const notItems = biblePageData?.notItems ?? [
 	{
 		label: 'Not a paraphrase',
 		body: 'FHB is an interpretive translation — grounded in original texts, not loosely reworded for accessibility.',
@@ -89,7 +92,7 @@ const notItems = [
 	},
 ];
 
-const milestones = [
+const milestones = biblePageData?.milestones ?? [
 	{
 		milestone: 'Full Canon',
 		detail: "Genesis to Revelation — every book translated with the Father's heart in view.",
@@ -108,7 +111,7 @@ const milestones = [
 	},
 ];
 
-const audience = [
+const audience = biblePageData?.audience ?? [
 	'You have read Scripture for years and sense something is still missing.',
 	'You long for deeper intimacy with God, not just more knowledge about Him.',
 	'You are awakening to your identity as a beloved child of the Father.',
@@ -117,7 +120,7 @@ const audience = [
 	"You want to give someone a Bible that reveals the Father's love clearly.",
 ];
 
-const shifts = [
+const shifts = biblePageData?.shifts ?? [
 	{ from: 'Information', to: 'Relationship' },
 	{ from: 'Distance', to: 'Intimacy' },
 	{ from: 'Servant mindset', to: 'Beloved identity' },

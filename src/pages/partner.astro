@@ -8,7 +8,7 @@ import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
-const [pageData, media] = await Promise.all([
+const [pageData, media, partnerData] = await Promise.all([
 	sanityClient.fetch(`*[_type =="page" && slug =="partner"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
@@ -16,6 +16,9 @@ const [pageData, media] = await Promise.all([
   }`),
 	sanityClient.fetch(
 		`*[_type =="siteSettings"][0] { partnerPageVideo, bookCoverUrl, donateUrl, communityUrl }`,
+	),
+	sanityClient.fetch(
+		`*[_type =="partnerContent"][0] { whyMatters, scope, whyDifferent, impactStats }`,
 	),
 ]);
 
@@ -34,7 +37,7 @@ const partnerPageVideoUrl =
 	media?.partnerPageVideo ||
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/bible-lake-reading-hero.mp4';
 
-const whyMatters = [
+const whyMatters = partnerData?.whyMatters ?? [
 	{
 		heading: 'Complete the translation',
 		body: 'The full canon — Genesis to Revelation — requires sustained support to complete and bring to publication.',
@@ -53,7 +56,7 @@ const whyMatters = [
 	},
 ];
 
-const scope = [
+const scope = partnerData?.scope ?? [
 	{
 		title: 'Translation',
 		body: "The ongoing interpretive work of rendering the full Biblical canon with the Father's heart in view.",
@@ -76,26 +79,17 @@ const scope = [
 	},
 ];
 
-const whyDifferent = [
+const whyDifferent = partnerData?.whyDifferent ?? [
 	'Reveals the Father where Scripture reveals Him — from Genesis to Revelation.',
 	'Speaks directly to identity, intimacy, and belonging — the deep hunger of this generation.',
 	'Written not to inform but to create encounter — a Bible that changes how readers know God.',
 	'Rooted in the historic Christian and Trinitarian faith — trustworthy and spiritually serious.',
 ];
 
-const impactStats = [
-	{
-		amount: '$33',
-		impact: "Helps put one Father's Heart Bible into the hands of a reader.",
-	},
-	{
-		amount: '$100',
-		impact: 'Helps place three Bibles where they are most needed.',
-	},
-	{
-		amount: '$500',
-		impact: 'Supports a meaningful portion of translation and production work.',
-	},
+const impactStats = partnerData?.impactStats ?? [
+	{ amount: '$33', impact: "Helps put one Father's Heart Bible into the hands of a reader." },
+	{ amount: '$100', impact: 'Helps place three Bibles where they are most needed.' },
+	{ amount: '$500', impact: 'Supports a meaningful portion of translation and production work.' },
 ];
 ---
 

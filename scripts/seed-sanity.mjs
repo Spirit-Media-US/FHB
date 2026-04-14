@@ -6,20 +6,20 @@
  *
  *   node scripts/seed-sanity.mjs
  *
- * Requires SANITY_API_TOKEN with write permissions.
- * Token is read from /home/deploy/.secrets or SANITY_API_TOKEN env var.
+ * Requires SANITY_TOKEN with write permissions.
+ * Token is read from /home/deploy/.secrets or SANITY_TOKEN env var.
  */
 
 import { createClient } from '@sanity/client';
 
-const token = process.env.SANITY_API_TOKEN;
+const token = process.env.SANITY_TOKEN;
 if (!token) {
-	console.error('❌ SANITY_API_TOKEN not set.');
+	console.error('❌ SANITY_TOKEN not set.');
 	console.error('   Create a write token at: https://www.sanity.io/manage/project/rusi1hyi/api');
-	console.error('   Then run: SANITY_API_TOKEN=<token> node scripts/seed-sanity.mjs');
+	console.error('   Then run: SANITY_TOKEN=<token> node scripts/seed-sanity.mjs');
 	process.exit(1);
 }
-// Note: SANITY_API_TOKEN must be a project API token (Tokens tab in Sanity Manage),
+// Note: SANITY_TOKEN must be a project API token (Tokens tab in Sanity Manage),
 // NOT the OAuth session token stored in /home/deploy/.secrets.
 // Create one at: https://www.sanity.io/manage/project/rusi1hyi/api → Tokens → Add API token
 

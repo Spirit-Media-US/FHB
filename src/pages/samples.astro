@@ -36,22 +36,19 @@ const samplesPageVideoUrl =
 	media?.samplesPageVideo ||
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/flipping-through-bible-church.mov';
 
-// Helper to get comparisons by category, falling back to hardcoded data if Sanity empty
+// Helper to get comparisons by category
 const byCategory = (cat: string) => sanityComparisons?.filter((c: any) => c.category === cat) ?? [];
 
-// Scripture comparison data — traditional vs FHB
-// Hardcoded fallbacks — used until Sanity is seeded
-// All strings use double quotes to safely handle apostrophes
-
-const john316 = {
+// Fallback data — used only if Sanity returns empty
+const JOHN316_FALLBACK = {
 	ref: 'John 3:16',
 	traditional:
 		'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.',
-	fhbBold: true,
+	fhb: 'For our Father so loved the world that He gave His one and only Son, so that everyone who trusts in Him would not be lost, but would live in the life of the age to come.',
 	note: 'Jesus is revealing the one sending Him — not a sovereign authority, but a Father who gives His Son out of love for His children.',
 };
 
-const joel = [
+const JOEL_FALLBACK = [
 	{
 		ref: 'Joel 2:13',
 		traditional:
@@ -74,7 +71,7 @@ const joel = [
 	},
 ];
 
-const heartLanguage = [
+const HEART_LANGUAGE_FALLBACK = [
 	{
 		ref: 'Luke 15:20',
 		traditional:
@@ -98,9 +95,9 @@ const heartLanguage = [
 	},
 ];
 
-const identity = [
+const IDENTITY_FALLBACK = [
 	{
-		ref: 'Romans 8:15–16',
+		ref: 'Romans 8:15\u201316',
 		traditional:
 			"The Spirit you received does not make you slaves, so that you live in fear again; rather, the Spirit you received brought about your adoption to sonship. And by him we cry, 'Abba, Father.' The Spirit himself testifies with our spirit that we are God's children.",
 		fhb: "You did not receive a spirit of slavery to fall back into fear. You received the Spirit of beloved adoption — by whom we cry, 'Abba, Father.' And the Spirit himself confirms with our spirit that we are the Father's beloved children.",
@@ -122,7 +119,7 @@ const identity = [
 	},
 ];
 
-const synthesis = [
+const SYNTHESIS_FALLBACK = [
 	{
 		title: 'Reveals the Father',
 		body: 'FHB makes explicit what Scripture itself reveals — the fatherly identity of God throughout both covenants. This is not added to the text. It is drawn from it.',
@@ -136,6 +133,34 @@ const synthesis = [
 		body: "Reader after reader says the same thing: 'I finally felt like a child of God.' That is the invitation FHB extends on every page.",
 	},
 ];
+
+// Map Sanity comparison to display shape
+function toDisplayItem(c: any) {
+	return { ref: c.reference, traditional: c.traditional, fhb: c.fhb, note: c.note };
+}
+
+const featuredRaw = byCategory('featured')[0];
+const john316 = featuredRaw
+	? {
+			ref: featuredRaw.reference,
+			traditional: featuredRaw.traditional,
+			fhb: featuredRaw.fhb,
+			note: featuredRaw.note,
+		}
+	: JOHN316_FALLBACK;
+
+const joelItems = byCategory('joel');
+const joel = joelItems.length > 0 ? joelItems.map(toDisplayItem) : JOEL_FALLBACK;
+
+const heartLanguageItems = byCategory('heart-language');
+const heartLanguage =
+	heartLanguageItems.length > 0 ? heartLanguageItems.map(toDisplayItem) : HEART_LANGUAGE_FALLBACK;
+
+const identityItems = byCategory('identity');
+const identity = identityItems.length > 0 ? identityItems.map(toDisplayItem) : IDENTITY_FALLBACK;
+
+// synthesis is not a scriptureComparison — keep hardcoded (no schema for it)
+const synthesis = SYNTHESIS_FALLBACK;
 
 // Highlight "Father" / "your Father" / "our Father" in FHB passages
 function pinkFather(text: string): string {
@@ -219,8 +244,7 @@ function pinkFather(text: string): string {
 					</div>
 					<div class="p-7" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
 						<p class="text-xs tracking-widest uppercase mb-5" style="font-family: var(--font-sans); color: var(--color-gold);">Father's Heart Bible</p>
-						<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.1rem;">"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."
-						</p>
+						<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink); font-size: 1.1rem;" set:html={`"${pinkFather(john316.fhb)}"`} />
 					</div>
 				</div>
 				<p class="text-sm text-center leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{john316.note}</p>
