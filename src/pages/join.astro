@@ -7,7 +7,7 @@ import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
-const [pageData, media] = await Promise.all([
+const [pageData, media, joinData] = await Promise.all([
 	sanityClient.fetch(`*[_type =="page" && slug =="join"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
@@ -19,6 +19,7 @@ const [pageData, media] = await Promise.all([
     communityUrl, mightyNetworksUrl,
     peoplePhoto1Url, peoplePhoto2Url, peoplePhoto3Url, peoplePhoto4Url
   }`),
+	sanityClient.fetch(`*[_type =="joinContent"][0] { communityAreas, audience, howToBegin }`),
 ]);
 
 const seoTitle = pageData?.seoTitle || "Join the Movement | Father's Heart Bible";
@@ -64,7 +65,7 @@ const whyJoin = [
 	},
 ];
 
-const communityAreas = [
+const communityAreas = joinData?.communityAreas ?? [
 	{
 		title: 'Movement Hub',
 		body: "The center of the community — updates, announcements, and shared life around the Father's Heart Bible.",
@@ -87,7 +88,7 @@ const communityAreas = [
 	},
 ];
 
-const audience = [
+const audience = joinData?.audience ?? [
 	'You are hungry for deeper intimacy with the Father — not just more theological information.',
 	'You are awakening to beloved identity and want to grow in that truth alongside others.',
 	"You long for a community centered on the Father's heart, not performance or platform.",
@@ -96,7 +97,7 @@ const audience = [
 	'You want to participate in something larger than yourself.',
 ];
 
-const howToBegin = [
+const howToBegin = joinData?.howToBegin ?? [
 	{
 		step: '1',
 		heading: 'Join the community',

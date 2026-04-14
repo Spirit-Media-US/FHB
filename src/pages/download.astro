@@ -8,7 +8,7 @@ import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
 
-const [pageData, media, resourceData] = await Promise.all([
+const [pageData, media, resourceData, downloadData] = await Promise.all([
 	sanityClient.fetch(`*[_type =="page" && slug =="download"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
@@ -20,6 +20,7 @@ const [pageData, media, resourceData] = await Promise.all([
 	sanityClient.fetch(`*[_type =="resource" && featured == true] | order(order asc)[0] {
     title, shortDescription, formHeading, formDescription, buttonText, coverImageUrl
   }`),
+	sanityClient.fetch(`*[_type =="downloadContent"][0] { benefits, nextSteps }`),
 ]);
 
 const seoTitle = pageData?.seoTitle || "Download the Free Book | Father's Heart Bible";
@@ -47,7 +48,7 @@ const formHeading = resourceData?.formHeading || 'Get Your Free Copy';
 const formDescription =
 	resourceData?.formDescription || 'Enter your name and email to receive the free download.';
 
-const benefits = [
+const benefits = downloadData?.benefits ?? [
 	{
 		heading: 'Discover what your Father thinks of you',
 		body: 'Not performance. Not obligation. The truth your Father has always wanted you to know.',
@@ -70,7 +71,7 @@ const benefits = [
 	},
 ];
 
-const nextSteps = [
+const nextSteps = downloadData?.nextSteps ?? [
 	{
 		step: '1',
 		heading: 'Receive the PDF',

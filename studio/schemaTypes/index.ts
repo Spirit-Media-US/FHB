@@ -1,7 +1,11 @@
+import biblePageContent from './biblePageContent';
 import bibleTranslation from './bibleTranslation';
+import downloadContent from './downloadContent';
 import faq from './faq';
+import joinContent from './joinContent';
 import page from './page';
 import partner from './partner';
+import partnerContent from './partnerContent';
 import partnerTier from './partnerTier';
 import personProfile from './personProfile';
 import projectUpdate from './projectUpdate';
@@ -22,4 +26,8 @@ export const schemaTypes = [
 	partner,
 	partnerTier,
 	projectUpdate,
+	partnerContent,
+	biblePageContent,
+	joinContent,
+	downloadContent,
 ];
