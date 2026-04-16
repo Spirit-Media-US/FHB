@@ -153,12 +153,16 @@ src/
 
 ---
 
-### STATUS — as of 2026-04-08
+### STATUS — as of 2026-04-16
 
-- **Phase 1:** LOCKED
-- **Phase 2:** LOCKED
-- **Phase 3:** LOCKED
-- **Site:** Live, completed migration
+- **Phase 1–5:** LOCKED
+- **Phase 6:** LOCKED (design refinement done)
+- **Phase 7:** QA complete — all fixes on dev branch
+- **Phase 8:** Partially complete — domain live, deploy webhook, UptimeRobot, portal dashboard all done
+- **Phase 8 BLOCKED:** 4 commits on dev awaiting merge to main (localhost SEO fix, blog/privacy/terms pages, EPERM build fix, blog nav link)
+- **Phase 9:** Not started (client delivery, Sanity invite, roadmap)
+- **Google Search Console:** Verification file on dev, needs main merge to go live
+- **Site:** Live on production (main), but production is behind dev by 4 commits
 
 ---
 
