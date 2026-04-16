@@ -3,21 +3,27 @@ import tailwindcss from '@tailwindcss/vite'
 import sitemap from '@astrojs/sitemap'
 
 export default defineConfig({
-	site: process.env.PUBLIC_SITE_URL || 'http://localhost:4323',
+	site: process.env.PUBLIC_SITE_URL || 'https://fathersheartbible.com',
 	output: 'static',
 	server: { port: 4323, host: true },
 	integrations: [sitemap({
 		serialize(item) {
-			if (item.url.endsWith('/')) {
-				return { ...item, changefreq: 'weekly', priority: 1.0, lastmod: new Date().toISOString() };
+			const now = new Date().toISOString();
+			const url = item.url;
+			// Homepage — highest priority
+			if (url.endsWith('.com/') || url.endsWith('.com')) {
+				return { ...item, changefreq: 'weekly', priority: 1.0, lastmod: now };
 			}
-			if (item.url.includes('/download')) {
-				return { ...item, changefreq: 'monthly', priority: 0.9, lastmod: new Date().toISOString() };
+			// Key landing pages
+			if (url.includes('/download') || url.includes('/samples') || url.includes('/join')) {
+				return { ...item, changefreq: 'monthly', priority: 0.9, lastmod: now };
 			}
-			if (item.url.includes('/samples')) {
-				return { ...item, changefreq: 'monthly', priority: 0.9, lastmod: new Date().toISOString() };
+			// Blog posts (future)
+			if (url.includes('/blog/') && !url.endsWith('/blog/')) {
+				return { ...item, changefreq: 'weekly', priority: 0.8, lastmod: now };
 			}
-			return { ...item, changefreq: 'monthly', priority: 0.7, lastmod: new Date().toISOString() };
+			// Default
+			return { ...item, changefreq: 'monthly', priority: 0.7, lastmod: now };
 		},
 	})],
 	vite: {
