@@ -1,0 +1,153 @@
+---
+import Footer from '../../components/Footer.astro';
+import Navbar from '../../components/Navbar.astro';
+import RelatedPosts from '../../components/RelatedPosts.astro';
+import ShareBar from '../../components/ShareBar.astro';
+import Layout from '../../layouts/Layout.astro';
+import { sanityClient, urlFor } from '../../lib/sanity';
+
+export async function getStaticPaths() {
+	const posts = await sanityClient.fetch(`*[_type == "blogPost"] { "slug": slug.current }`);
+	return posts.map((p: any) => ({ params: { slug: p.slug } }));
+}
+
+const { slug } = Astro.params;
+
+const post = await sanityClient.fetch(`*[_type == "blogPost" && slug.current == $slug][0]`, {
+	slug,
+});
+
+if (!post) {
+	return Astro.redirect('/blog');
+}
+
+function renderPortableText(blocks: any[]): string {
+	if (!Array.isArray(blocks)) return '';
+
+	return blocks
+		.map((block: any) => {
+			if (!block || block._type !== 'block') return '';
+
+			const children = Array.isArray(block.children) ? block.children : [];
+			const rawText = children.map((c: any) => c?.text || '').join('');
+			if (/^\{[\w]+\}\s*[—–-]\s*\{[\w]+\}$/.test(rawText.trim())) return '';
+
+			const textContent = children
+				.map((child: any) => {
+					if (!child) return '';
+					let text = child.text || '';
+					const marks = Array.isArray(child.marks) ? child.marks : [];
+					if (marks.length > 0) {
+						if (marks.includes('strong')) text = `<strong>${text}</strong>`;
+						if (marks.includes('em')) text = `<em>${text}</em>`;
+						const linkMark = marks.find(
+							(m: any) => m && typeof m === 'object' && m._type === 'link',
+						);
+						if (linkMark?.href) {
+							text = `<a href="${linkMark.href}" style="color: var(--color-brand);" class="hover:underline" target="_blank" rel="noopener noreferrer">${text}</a>`;
+						}
+					}
+					return text;
+				})
+				.join('');
+
+			const style = block.style || 'normal';
+			if (style === 'h2')
+				return `<h2 class="text-2xl font-bold mt-12 mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h2>`;
+			if (style === 'h3')
+				return `<h3 class="text-xl font-bold mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h3>`;
+			return `<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">${textContent}</p>`;
+		})
+		.join('');
+}
+
+const formatDate = (dateString: string) => {
+	const date = new Date(dateString);
+	return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+};
+
+const publishDate = formatDate(post.publishDate);
+const heroImage = post.heroImage
+	? urlFor(post.heroImage).width(1200).format('webp').url()
+	: '/fhb-logo.png';
+const author = post.author || 'Add Author Name Here';
+const tags = post.tags || [];
+
+const bodyHtml = renderPortableText(post.body);
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'BlogPosting',
+	headline: post.title,
+	description: post.excerpt || post.title,
+	image: heroImage,
+	author: { '@type': 'Person', name: author },
+	publisher: {
+		'@type': 'Organization',
+		name: "Father's Heart Bible",
+		url: 'https://fathersheartbible.com',
+	},
+	url: `https://fathersheartbible.com/blog/${post.slug.current}`,
+	datePublished: post.publishDate,
+};
+---
+
+<Layout
+  title={post.seoTitle || `${post.title} | Father's Heart Bible Blog`}
+  description={post.seoDescription || post.excerpt || "Read this article on the Father's Heart Bible blog."}
+  image={heroImage}
+  jsonLd={jsonLd}
+>
+  <Navbar />
+
+  <main id="main-content">
+    <!-- HERO IMAGE -->
+    <div class="w-full" style="margin-top: 80px;">
+      <img src={heroImage} alt={post.heroImage?.alt || post.title} class="w-full h-72 lg:h-[600px] object-cover" />
+    </div>
+
+    <!-- POST HEADER -->
+    <section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+      <div class="mx-auto max-w-3xl">
+        <a href="/blog" class="inline-flex items-center gap-1.5 text-sm font-semibold hover:opacity-80 transition-opacity mb-5 no-underline" style="color: var(--color-brand);">&larr; Back to Blog</a>
+        <h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{post.title}</h1>
+        {post.excerpt && <p class="mt-3 text-lg leading-relaxed max-w-2xl" style="font-family: var(--font-sans); color: var(--color-muted);">{post.excerpt}</p>}
+        <div class="flex items-center gap-3 mt-4 pb-8 text-sm border-b" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+          <span>By <span class="font-semibold" style="color: var(--color-ink);">{author}</span></span>
+          <span>&middot;</span>
+          <span>{publishDate}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAGS -->
+    {tags.length > 0 && (
+      <section class="px-6 pb-6 lg:px-8 border-b" style="background-color: var(--color-surface-low); border-color: var(--color-hairline);">
+        <div class="mx-auto max-w-3xl">
+          <div class="flex flex-wrap gap-2">
+            {tags.map((tag: string) => (
+              <a href={`/blog?tag=${encodeURIComponent(tag)}`} class="text-xs font-semibold rounded-full px-3 py-1 transition-colors no-underline" style="color: var(--color-muted); background-color: var(--color-surface);">
+                {tag}
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- POST CONTENT -->
+    <section class="px-6 py-10 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+      <div class="mx-auto max-w-3xl">
+        <div set:html={bodyHtml} class="space-y-4" />
+      </div>
+    </section>
+
+    <!-- SHARE BAR -->
+    <ShareBar title={post.title} url={`https://fathersheartbible.com/blog/${post.slug.current}`} />
+
+    <!-- RELATED POSTS -->
+    <RelatedPosts currentSlug={`/blog/${post.slug.current}`} currentTags={tags} />
+  </main>
+
+  <Footer />
+</Layout>

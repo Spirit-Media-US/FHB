@@ -1,6 +1,6 @@
 ---
-import MailtoLink from './MailtoLink.astro';
 import { sanityClient } from '../lib/sanity';
+import MailtoLink from './MailtoLink.astro';
 
 const siteSettings = await sanityClient.fetch(`
   *[_type == "siteSettings"][0] {
@@ -46,7 +46,12 @@ const contactEmail = siteSettings?.email || 'hello@fathersheartbible.com';
 		<!-- Copyright -->
 		<div class="flex flex-col md:flex-row items-center justify-between gap-2 text-sm pt-4" style="font-family: var(--font-body); color: var(--color-inverse-on-surface); opacity: 0.5; border-top: 1px solid rgba(241,241,241,0.1);">
 			<p>&copy; {year} Father's Heart Bible. All rights reserved.</p>
-			<p>Powered by <a href="https://spiritmediapublishing.com" target="_blank" rel="noopener noreferrer" class="no-underline transition-colors duration-200" style="color: var(--color-inverse-primary);" onmouseover="this.style.color='var(--color-inverse-on-surface)'" onmouseout="this.style.color='var(--color-inverse-primary)'">Spirit Media Publishing</a></p>
+			<div class="flex items-center gap-4">
+				<a href="/privacy" class="no-underline transition-colors duration-200 text-sm" style="color: var(--color-inverse-on-surface); opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">Privacy</a>
+				<a href="/terms" class="no-underline transition-colors duration-200 text-sm" style="color: var(--color-inverse-on-surface); opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">Terms</a>
+				<span style="opacity: 0.3;">·</span>
+				<p>Powered by <a href="https://spiritmediapublishing.com" target="_blank" rel="noopener noreferrer" class="no-underline transition-colors duration-200" style="color: var(--color-inverse-primary);" onmouseover="this.style.color='var(--color-inverse-on-surface)'" onmouseout="this.style.color='var(--color-inverse-primary)'">Spirit Media Publishing</a></p>
+			</div>
 		</div>
 	</div>
 </footer>

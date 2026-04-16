@@ -1,0 +1,71 @@
+---
+import { sanityClient, urlFor } from '../lib/sanity';
+
+interface Props {
+	currentSlug: string;
+	currentTags: string[];
+}
+const { currentSlug, currentTags = [] } = Astro.props;
+
+const allPosts = await sanityClient.fetch(
+	`*[_type == "blogPost" && slug.current != $slug] {
+    "slug": "/blog/" + slug.current,
+    title,
+    excerpt,
+    heroImage,
+    publishDate,
+    tags
+  }`,
+	{ slug: currentSlug.replace('/blog/', '') },
+);
+
+const formatDate = (dateString: string) => {
+	const date = new Date(dateString);
+	return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+};
+
+const related = allPosts
+	.map((p: any) => ({
+		...p,
+		score: (p.tags || []).filter((t: string) => currentTags.includes(t)).length,
+	}))
+	.filter((p: any) => p.score > 0)
+	.sort((a: any, b: any) => b.score - a.score)
+	.slice(0, 3);
+---
+
+{related.length > 0 && (
+<section class="px-6 py-12 lg:py-16 lg:px-8" style="background-color: var(--color-surface-low);">
+  <div class="mx-auto max-w-3xl">
+    <h2 class="text-2xl font-bold mb-8" style="font-family: var(--font-serif); color: var(--color-ink);">Related Posts</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {related.map((post: any) => (
+        <a href={post.slug} class="group rounded-2xl border overflow-hidden transition-shadow hover:shadow-md no-underline" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
+          <div class="h-36 overflow-hidden">
+            {post.heroImage ? (
+              <img
+                src={urlFor(post.heroImage).width(768).height(512).format('webp').url()}
+                alt={post.heroImage?.alt || post.title}
+                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            ) : (
+              <div class="w-full h-full flex items-center justify-center" style="background-color: var(--color-surface-low);">
+                <span class="text-sm" style="color: var(--color-muted);">No image</span>
+              </div>
+            )}
+          </div>
+          <div class="p-4">
+            <div class="flex flex-wrap gap-1 mb-2">
+              {(post.tags || []).filter((t: string) => currentTags.includes(t)).slice(0, 2).map((tag: string) => (
+                <span class="text-xs font-semibold rounded-full px-2 py-0.5" style="color: var(--color-brand); background-color: var(--color-surface-low);">{tag}</span>
+              ))}
+            </div>
+            <h3 class="text-base font-bold leading-snug transition-colors" style="font-family: var(--font-serif); color: var(--color-ink);">{post.title}</h3>
+            <p class="text-xs mt-2" style="color: var(--color-muted);">{post.publishDate ? formatDate(post.publishDate) : ''}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+)}
