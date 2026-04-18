@@ -27,6 +27,12 @@ Then run: `git checkout dev && git pull origin dev`
 - SSL must cover all four domain variants: fathersheartbible.org, www.fathersheartbible.org, fathersheartbible.com, www.fathersheartbible.com
 - Uses Biome for linting and Lefthook for git hooks
 
+## Perf — 2026-04-18 (dev, not yet on main)
+- Mobile PSI: 67 → 93 (LCP 17.3s → 2.7s, TBT 0, CLS 0)
+- Root cause: hero autoplay on 106MB R2 mp4 with no poster; huge unoptimized Sanity images (7008x4672, 7396x4000) competing with LCP
+- Fix: Sanity webp poster (`?w=768&fm=webp`) becomes the LCP with preload+fetchpriority, video deferred via `requestIdleCallback` with `preload=none`; all Sanity image URLs now transform through a `sanityTransform()` helper; fonts moved from `@import` to async `<link rel=preload>` swap-in; hero logo PNG downsized (48KB → 17KB in /public/fhb-logo-white-400.png)
+- Files: src/pages/index.astro, src/layouts/Layout.astro, src/styles/global.css, public/fhb-logo-white-400.png
+
 ---
 
 ## FHB SITE BUILD — PHASE 1 & 2 (LOCKED)
