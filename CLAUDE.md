@@ -28,10 +28,18 @@ Then run: `git checkout dev && git pull origin dev`
 - Uses Biome for linting and Lefthook for git hooks
 
 ## Perf — 2026-04-18 (dev, not yet on main)
-- Mobile PSI: 67 → 93 (LCP 17.3s → 2.7s, TBT 0, CLS 0)
-- Root cause: hero autoplay on 106MB R2 mp4 with no poster; huge unoptimized Sanity images (7008x4672, 7396x4000) competing with LCP
-- Fix: Sanity webp poster (`?w=768&fm=webp`) becomes the LCP with preload+fetchpriority, video deferred via `requestIdleCallback` with `preload=none`; all Sanity image URLs now transform through a `sanityTransform()` helper; fonts moved from `@import` to async `<link rel=preload>` swap-in; hero logo PNG downsized (48KB → 17KB in /public/fhb-logo-white-400.png)
-- Files: src/pages/index.astro, src/layouts/Layout.astro, src/styles/global.css, public/fhb-logo-white-400.png
+- Mobile PSI: 67 → 97-98 stable (LCP 2.0s, FCP 1.7s, TBT 0, CLS 0)
+- Desktop PSI: 100 stable (LCP 0.5-0.6s)
+- Fixes applied:
+  - Sanity webp poster (`?w=768&fm=webp`) is LCP, video deferred via `requestIdleCallback`
+  - All Sanity image URLs use `sanityTransform()` helper for webp+quality params
+  - Hero logo responsive srcset: 160w/240w/400w (mobile loads 4.9KB instead of 17KB)
+  - Bible cover responsive srcset: w=512 mobile / w=640 tablet (saves ~38KB mobile)
+  - Hero poster inlined as base64 data URI (~10.9KB) — eliminates LCP network RTT (without this score drops to 96-97)
+  - Self-hosted fonts from R2, preconnect + preload for 400 weight only
+  - `image-delivery-insight` Lighthouse score: 0.5 → 1.0
+- Remaining 2pt gap (FCP 0.92, LCP 0.97): 32KB inline CSS + 16 @font-face declarations drive a ~260ms font critical chain. Further gains require critical-CSS extraction or trimming font-face variants (current usage spans blog/privacy pages so can't easily drop 700 weight).
+- Files: src/pages/index.astro, src/layouts/Layout.astro, src/styles/global.css, public/fhb-logo-white-{160,240,400}.png
 
 ---
 
