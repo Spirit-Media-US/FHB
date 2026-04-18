@@ -54,23 +54,38 @@ const heroPoster1200 = `${heroPosterBase}?w=1200&fm=webp&q=74&auto=format`;
 const heroPosterSrcset = `${heroPoster768} 768w, ${heroPoster1200} 1200w, ${heroPosterSrc} 1600w`;
 const heroPosterSizes = '100vw';
 
-// Bible cover — prefer Sanity image, fall back to hardcoded
+// Helper — append Sanity CDN transforms to any cdn.sanity.io URL safely
+function sanityTransform(url: string, w: number, q = 75): string {
+	if (!url) return url;
+	if (!url.includes('cdn.sanity.io')) return url;
+	const base = url.split('?')[0];
+	return `${base}?w=${w}&fm=webp&q=${q}&auto=format`;
+}
+
+// Bible cover — prefer Sanity image, fall back to hardcoded (both go through webp transform)
 const bibleCoverImageFromSanity = media?.bibleCoverImage;
 const bookCoverUrl = bibleCoverImageFromSanity
-	? urlFor(bibleCoverImageFromSanity).width(400).url()
-	: 'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png';
+	? urlFor(bibleCoverImageFromSanity).width(640).format('webp').quality(75).url()
+	: sanityTransform(
+			'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png',
+			640,
+		);
 
 // FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
 const fhbCoverSanity = media?.fhbCoverImage;
 const fhbiCoverUrl = fhbCoverSanity
-	? urlFor(fhbCoverSanity).width(400).url()
-	: 'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
+	? urlFor(fhbCoverSanity).width(576).format('webp').quality(75).url()
+	: sanityTransform(
+			'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png',
+			576,
+		);
 
 // Hero video array — prefer Sanity, fall back to hardcoded
 const heroVideosFromSanity = media?.homePageHeroVideos;
-const photo1 = media?.peoplePhoto1Url || '';
-const photo2 = media?.peoplePhoto2Url || '';
-const photo3 = media?.peoplePhoto3Url || '';
+// People photos — apply Sanity CDN transforms to shrink multi-MB originals
+const photo1 = sanityTransform(media?.peoplePhoto1Url || '', 800, 72);
+const photo2 = sanityTransform(media?.peoplePhoto2Url || '', 800, 72);
+const photo3 = sanityTransform(media?.peoplePhoto3Url || '', 800, 72);
 const communityUrl = media?.communityUrl || '/join';
 const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 ---
@@ -167,6 +182,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				<img
 					src="/fhb-logo-white.png"
 					alt="Father's Heart Bible"
+					width="890"
+					height="436"
+					fetchpriority="high"
+					decoding="async"
 					class="h-14 md:h-20 lg:h-28 w-auto mx-auto mb-4 md:mb-6" data-hero-entrance
 				/>
 				<h1
@@ -451,6 +470,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 							src={bookCoverUrl}
 							alt="The Father's Heart Bible — brown cover"
 							class="w-64 md:w-80 block"
+							loading="lazy"
+							decoding="async"
+							width="640"
+							height="896"
 							style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.22));"
 						/>
 					) : (
@@ -606,6 +629,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 							src={fhbiCoverUrl}
 							alt="Father's Heart → Beloved Identity — free PDF"
 							class="w-56 md:w-72 block"
+							loading="lazy"
+							decoding="async"
+							width="576"
+							height="954"
 							style="filter: drop-shadow(0 16px 32px rgba(0,0,0,0.22));"
 					/>
 					) : (
@@ -645,6 +672,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 							src={photo1}
 							alt="Reader with the Father's Heart Bible"
 							class="w-full aspect-square object-cover"
+							loading="lazy"
+							decoding="async"
+							width="800"
+							height="800"
 						/>
 					)}
 					{photo2 && (
@@ -652,6 +683,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 							src={photo2}
 							alt="Community in reflection with Scripture"
 							class="w-full aspect-square object-cover"
+							loading="lazy"
+							decoding="async"
+							width="800"
+							height="800"
 						/>
 					)}
 					{photo3 && (
@@ -659,6 +694,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 							src={photo3}
 							alt="Belonging and encounter with the Father's word"
 							class="w-full aspect-square object-cover"
+							loading="lazy"
+							decoding="async"
+							width="800"
+							height="800"
 						/>
 					)}
 				</ImageGrid>
