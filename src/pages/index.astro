@@ -7,6 +7,20 @@ import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
 
+// Fetch hero poster bytes at build time for base64 LCP inlining (mobile speed win).
+// Only inlines when the poster matches the known Sanity source; otherwise remote URL.
+async function fetchPosterDataUri(url: string): Promise<string | null> {
+	try {
+		const res = await fetch(url);
+		if (!res.ok) return null;
+		const buf = Buffer.from(await res.arrayBuffer());
+		if (buf.length > 15000) return null; // safety: don't bloat HTML
+		return `data:image/webp;base64,${buf.toString('base64')}`;
+	} catch {
+		return null;
+	}
+}
+
 // Fetch page content + media from Sanity (all values have hardcoded fallbacks)
 const [pageData, media] = await Promise.all([
 	sanityClient.fetch(`*[_type =="page" && slug =="home"][0] {
@@ -54,6 +68,10 @@ const heroPoster1200 = `${heroPosterBase}?w=1200&fm=webp&q=74&auto=format`;
 const heroPosterSrcset = `${heroPoster768} 768w, ${heroPoster1200} 1200w, ${heroPosterSrc} 1600w`;
 const heroPosterSizes = '100vw';
 
+// Inline the 768px WebP as base64 for instant mobile LCP (no network RTT).
+const heroPoster768DataUri = await fetchPosterDataUri(heroPoster768);
+const heroPoster768ForImg = heroPoster768DataUri || heroPoster768;
+
 // Helper — append Sanity CDN transforms to any cdn.sanity.io URL safely
 function sanityTransform(url: string, w: number, q = 75): string {
 	if (!url) return url;
@@ -94,9 +112,9 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 	title={seoTitle}
 	description={seoDescription}
 	darkHero={true}
-	preloadImage={heroPoster768}
-	preloadImageSrcset={heroPosterSrcset}
-	preloadImageSizes={heroPosterSizes}
+	preloadImage={heroPoster768DataUri ? undefined : heroPoster768}
+	preloadImageSrcset={heroPoster768DataUri ? undefined : heroPosterSrcset}
+	preloadImageSizes={heroPoster768DataUri ? undefined : heroPosterSizes}
 	jsonLd={{
 		"@context": "https://schema.org",
 		"@graph": [
@@ -139,12 +157,14 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			style="background-color: var(--color-deep); margin-top: -1px;"
 			id="hero-section"
 		>
-			<!-- LCP element: poster image. Video is deferred until after first paint. -->
+			<!-- LCP element: poster image. Video is deferred until after first paint.
+			     When heroPoster768DataUri is set, src is a base64 data URI — zero network RTT.
+			     The remote srcset is omitted in that case to avoid duplicate download. -->
 			<img
 				id="hero-poster"
-				src={heroPoster768}
-				srcset={heroPosterSrcset}
-				sizes={heroPosterSizes}
+				src={heroPoster768ForImg}
+				srcset={heroPoster768DataUri ? undefined : heroPosterSrcset}
+				sizes={heroPoster768DataUri ? undefined : heroPosterSizes}
 				alt=""
 				width="1600"
 				height="457"
