@@ -81,13 +81,24 @@ function sanityTransform(url: string, w: number, q = 75): string {
 }
 
 // Bible cover — prefer Sanity image, fall back to hardcoded (both go through webp transform)
+// Responsive widths: mobile=512 (w-64 at DPR2), tablet=640 (w-80 at DPR2)
 const bibleCoverImageFromSanity = media?.bibleCoverImage;
 const bookCoverUrl = bibleCoverImageFromSanity
-	? urlFor(bibleCoverImageFromSanity).width(640).format('webp').quality(75).url()
+	? urlFor(bibleCoverImageFromSanity).width(512).format('webp').quality(72).url()
+	: sanityTransform(
+			'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png',
+			512,
+			72,
+		);
+const bookCoverUrl640 = bibleCoverImageFromSanity
+	? urlFor(bibleCoverImageFromSanity).width(640).format('webp').quality(72).url()
 	: sanityTransform(
 			'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png',
 			640,
+			72,
 		);
+const bookCoverSrcset = `${bookCoverUrl} 512w, ${bookCoverUrl640} 640w`;
+const bookCoverSizes = '(max-width: 767px) 256px, 320px';
 
 // FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
 const fhbCoverSanity = media?.fhbCoverImage;
@@ -200,10 +211,12 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			)}
 			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-10 md:pb-16 lg:pb-24" style="transition: color 1.2s ease;">
 				<img
-					src="/fhb-logo-white-400.png"
+					src="/fhb-logo-white-240.png"
+					srcset="/fhb-logo-white-160.png 160w, /fhb-logo-white-240.png 240w, /fhb-logo-white-400.png 400w"
+					sizes="(max-width: 767px) 160px, (max-width: 1023px) 240px, 400px"
 					alt="Father's Heart Bible"
-					width="400"
-					height="195"
+					width="240"
+					height="117"
 					fetchpriority="high"
 					decoding="async"
 					class="h-14 md:h-20 lg:h-28 w-auto mx-auto mb-4 md:mb-6" data-hero-entrance
@@ -488,12 +501,14 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					{bookCoverUrl ? (
 						<img
 							src={bookCoverUrl}
+							srcset={bookCoverSrcset}
+							sizes={bookCoverSizes}
 							alt="The Father's Heart Bible — brown cover"
 							class="w-64 md:w-80 block"
 							loading="lazy"
 							decoding="async"
-							width="640"
-							height="896"
+							width="512"
+							height="768"
 							style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.22));"
 						/>
 					) : (
