@@ -6,6 +6,7 @@ export default defineConfig({
 	site: process.env.PUBLIC_SITE_URL || 'https://fathersheartbible.com',
 	output: 'static',
 	server: { port: 4323, host: true },
+	build: { inlineStylesheets: 'always' },
 	integrations: [
 		sitemap({
 			filter: (page) => !page.includes('/privacy') && !page.includes('/terms'),
