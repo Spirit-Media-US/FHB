@@ -42,7 +42,17 @@ const heroSecondaryCtaHref = '/join';
 const heroVideoSrc =
 	media?.heroVideoUrl ||
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
-const heroPosterSrc = media?.heroPosterUrl || '';
+const heroPosterRaw =
+	media?.heroPosterUrl ||
+	'https://cdn.sanity.io/images/rusi1hyi/production/02221f907ae9855026e325f5ae27158f83531a1e-6000x1713.jpg';
+// Transform the poster via Sanity CDN params for mobile-first responsive delivery.
+// Keeps everything on Sanity (no re-upload). ?w=<>&fm=webp&q=<> works on any Sanity image URL.
+const heroPosterBase = heroPosterRaw.split('?')[0];
+const heroPosterSrc = `${heroPosterBase}?w=1600&fm=webp&q=75&auto=format`;
+const heroPoster768 = `${heroPosterBase}?w=768&fm=webp&q=72&auto=format`;
+const heroPoster1200 = `${heroPosterBase}?w=1200&fm=webp&q=74&auto=format`;
+const heroPosterSrcset = `${heroPoster768} 768w, ${heroPoster1200} 1200w, ${heroPosterSrc} 1600w`;
+const heroPosterSizes = '100vw';
 
 // Bible cover — prefer Sanity image, fall back to hardcoded
 const bibleCoverImageFromSanity = media?.bibleCoverImage;
@@ -69,6 +79,9 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 	title={seoTitle}
 	description={seoDescription}
 	darkHero={true}
+	preloadImage={heroPoster768}
+	preloadImageSrcset={heroPosterSrcset}
+	preloadImageSizes={heroPosterSizes}
 	jsonLd={{
 		"@context": "https://schema.org",
 		"@graph": [
@@ -111,35 +124,44 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			style="background-color: var(--color-deep); margin-top: -1px;"
 			id="hero-section"
 		>
+			<!-- LCP element: poster image. Video is deferred until after first paint. -->
+			<img
+				id="hero-poster"
+				src={heroPoster768}
+				srcset={heroPosterSrcset}
+				sizes={heroPosterSizes}
+				alt=""
+				width="1600"
+				height="457"
+				fetchpriority="high"
+				decoding="async"
+				class="absolute inset-0 w-full h-full object-cover"
+				aria-hidden="true"
+				style="transition: opacity 1.5s ease; opacity: 1;"
+			/>
 			{heroVideoSrc && (
 				<>
 					<video
 						id="hero-video-a"
 						class="absolute inset-0 w-full h-full object-cover"
-						src={heroVideoSrc}
-						autoplay
+						data-hero-src={heroVideoSrc}
+						poster={heroPoster768}
 						muted
 						playsinline
+						preload="none"
 						aria-hidden="true"
-						style="transition: opacity 1.5s ease; opacity: 1;"
+						style="transition: opacity 1.5s ease; opacity: 0;"
 					/>
 					<video
 						id="hero-video-b"
 						class="absolute inset-0 w-full h-full object-cover"
 						muted
 						playsinline
+						preload="none"
 						aria-hidden="true"
 						style="transition: opacity 1.5s ease; opacity: 0;"
 					/>
 				</>
-			)}
-			{!heroVideoSrc && heroPosterSrc && (
-				<img
-					src={heroPosterSrc}
-					alt=""
-					class="absolute inset-0 w-full h-full object-cover"
-					aria-hidden="true"
-				/>
 			)}
 			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-10 md:pb-16 lg:pb-24" style="transition: color 1.2s ease;">
 				<img
@@ -217,22 +239,43 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 
 			const vA = document.getElementById('hero-video-a');
 			const vB = document.getElementById('hero-video-b');
+			const poster = document.getElementById('hero-poster');
 			if (vA && vB) {
 				const PLAYBACK_RATE = 0.75;
 				const FADE_DURATION = 1500;
 				const FADE_BEFORE = 1.5;
 
-				// heroVideos[0] matches the HTML src — don't touch vA.src
 				let heroIdx = 0;
 				let curr = vA;
 				let next = vB;
 				let fading = false;
+				let started = false;
 
-				vA.playbackRate = PLAYBACK_RATE;
+				function startVideos() {
+					if (started) return;
+					started = true;
+					vA.src = vA.dataset.heroSrc || heroVideos[0].url;
+					vA.load();
+					vA.playbackRate = PLAYBACK_RATE;
+					vA.play().then(() => {
+						// Fade video in, fade poster out — poster stays as fallback
+						vA.style.opacity = '1';
+						if (poster) {
+							setTimeout(() => { poster.style.opacity = '0'; }, 300);
+						}
+						// Preload the NEXT video once playback begins
+						next.src = heroVideos[1].url;
+						next.load();
+					}).catch(() => { /* autoplay blocked — poster remains */ });
+				}
 
-				// Preload the NEXT video in the list
-				next.src = heroVideos[1].url;
-				next.load();
+				// Defer video start until after first paint + a small idle window so
+				// it never competes with the LCP.
+				if ('requestIdleCallback' in window) {
+					requestIdleCallback(startVideos, { timeout: 2500 });
+				} else {
+					window.addEventListener('load', () => setTimeout(startVideos, 600));
+				}
 
 				function beginCrossfade() {
 					if (fading) return;
