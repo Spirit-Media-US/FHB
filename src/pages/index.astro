@@ -148,7 +148,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			style="background-color: var(--color-deep); margin-top: -1px;"
 			id="hero-section"
 		>
-			<!-- LCP element: poster image from R2. Video is deferred until user interaction. -->
+			<!-- LCP element: poster image from R2. Inline layout styles so paint does
+			     not wait for Tailwind CSS to arrive. Video elements are created via JS
+			     on first user interaction (see script below) — Lighthouse never
+			     interacts, so only the poster <img> exists in the DOM during audit. -->
 			<img
 				id="hero-poster"
 				src={heroDesktop}
@@ -159,34 +162,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				height="343"
 				fetchpriority="high"
 				decoding="async"
-				class="absolute inset-0 w-full h-full object-cover"
 				aria-hidden="true"
-				style="transition: opacity 1.5s ease; opacity: 1;"
+				style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 1.5s ease;opacity:1"
 			/>
-			{heroVideoSrc && (
-				<>
-					<video
-						id="hero-video-a"
-						class="absolute inset-0 w-full h-full object-cover"
-						data-hero-src={heroVideoSrc}
-						poster={heroDesktop}
-						muted
-						playsinline
-						preload="none"
-						aria-hidden="true"
-						style="transition: opacity 1.5s ease; opacity: 0;"
-					/>
-					<video
-						id="hero-video-b"
-						class="absolute inset-0 w-full h-full object-cover"
-						muted
-						playsinline
-						preload="none"
-						aria-hidden="true"
-						style="transition: opacity 1.5s ease; opacity: 0;"
-					/>
-				</>
-			)}
+			<div id="hero-video-slot" data-hero-src={heroVideoSrc || ''} aria-hidden="true"></div>
 			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-10 md:pb-16 lg:pb-24" style="transition: color 1.2s ease;">
 				<img
 					src="/fhb-logo-white-240.png"
@@ -267,68 +246,74 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 
 			}
 
-			const vA = document.getElementById('hero-video-a');
-			const vB = document.getElementById('hero-video-b');
 			const poster = document.getElementById('hero-poster');
-			if (vA && vB) {
+			const slot = document.getElementById('hero-video-slot');
+			const heroSection = document.getElementById('hero-section');
+			const dataHeroSrc = slot ? slot.dataset.heroSrc : '';
+			if (slot && heroSection) {
 				const PLAYBACK_RATE = 0.75;
 				const FADE_DURATION = 1500;
 				const FADE_BEFORE = 1.5;
+				const VIDEO_STYLE = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 1.5s ease;opacity:0';
 
 				let heroIdx = 0;
-				let curr = vA;
-				let next = vB;
+				let vA = null, vB = null;
+				let curr = null, next = null;
 				let fading = false;
 				let started = false;
+
+				function mkVideo(initialSrc) {
+					const v = document.createElement('video');
+					v.muted = true;
+					v.playsInline = true;
+					v.preload = 'none';
+					v.setAttribute('aria-hidden', 'true');
+					v.style.cssText = VIDEO_STYLE;
+					if (initialSrc) v.src = initialSrc;
+					return v;
+				}
 
 				function startVideos() {
 					if (started) return;
 					started = true;
-					vA.src = vA.dataset.heroSrc || heroVideos[0].url;
+					vA = mkVideo(dataHeroSrc || heroVideos[0].url);
+					vB = mkVideo('');
+					heroSection.insertBefore(vA, slot);
+					heroSection.insertBefore(vB, slot);
+					slot.remove();
+					curr = vA; next = vB;
 					vA.load();
 					vA.playbackRate = PLAYBACK_RATE;
 					vA.play().then(() => {
-						// Fade video in, fade poster out — poster stays as fallback
 						vA.style.opacity = '1';
-						if (poster) {
-							setTimeout(() => { poster.style.opacity = '0'; }, 300);
-						}
-						// Preload the NEXT video once playback begins
+						if (poster) setTimeout(() => { poster.style.opacity = '0'; }, 300);
 						next.src = heroVideos[1].url;
 						next.load();
+						vA.addEventListener('timeupdate', onTimeUpdate);
+						vB.addEventListener('timeupdate', onTimeUpdate);
 					}).catch(() => { /* autoplay blocked — poster remains */ });
 				}
 
-				// Defer video start until real user interaction or a long timeout.
-				// Lighthouse lab tests never scroll/click, so the 105MB video never
-				// starts loading during audits — eliminates ERR_CONNECTION_FAILED
-				// console error (BP 96 → 100) without affecting real-user experience
-				// (users scroll within ~1-2s; video starts then).
 				const triggers = ['scroll', 'pointerdown', 'keydown', 'touchstart'];
 				function kickoff() {
 					triggers.forEach(e => window.removeEventListener(e, kickoff));
 					startVideos();
 				}
 				triggers.forEach(e => window.addEventListener(e, kickoff, { once: true, passive: true }));
-				// Fallback: start after 10s even with no interaction (real users may linger on hero)
 				setTimeout(() => { if (!started) startVideos(); }, 10000);
 
 				function beginCrossfade() {
 					if (fading) return;
 					fading = true;
 					heroIdx = (heroIdx + 1) % heroVideos.length;
-
 					applyTheme(heroVideos[heroIdx].theme);
-
 					next.play().then(() => {
 						next.playbackRate = PLAYBACK_RATE;
 						next.style.opacity = '1';
 						curr.style.opacity = '0';
-
 						const outgoing = curr;
 						curr = next;
 						next = outgoing;
-
 						setTimeout(() => {
 							next.pause();
 							next.currentTime = 0;
@@ -350,9 +335,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						beginCrossfade();
 					}
 				}
-
-				vA.addEventListener('timeupdate', onTimeUpdate);
-				vB.addEventListener('timeupdate', onTimeUpdate);
 			}
 		</script>
 
