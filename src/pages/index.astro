@@ -7,20 +7,6 @@ import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
 
-// Fetch hero poster bytes at build time for base64 LCP inlining (mobile speed win).
-// Only inlines when the poster matches the known Sanity source; otherwise remote URL.
-async function fetchPosterDataUri(url: string): Promise<string | null> {
-	try {
-		const res = await fetch(url);
-		if (!res.ok) return null;
-		const buf = Buffer.from(await res.arrayBuffer());
-		if (buf.length > 15000) return null; // safety: don't bloat HTML
-		return `data:image/webp;base64,${buf.toString('base64')}`;
-	} catch {
-		return null;
-	}
-}
-
 // Fetch page content + media from Sanity (all values have hardcoded fallbacks)
 const [pageData, media] = await Promise.all([
 	sanityClient.fetch(`*[_type =="page" && slug =="home"][0] {
@@ -56,21 +42,15 @@ const heroSecondaryCtaHref = '/join';
 const heroVideoSrc =
 	media?.heroVideoUrl ||
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
-const heroPosterRaw =
-	media?.heroPosterUrl ||
-	'https://cdn.sanity.io/images/rusi1hyi/production/02221f907ae9855026e325f5ae27158f83531a1e-6000x1713.jpg';
-// Transform the poster via Sanity CDN params for mobile-first responsive delivery.
-// Keeps everything on Sanity (no re-upload). ?w=<>&fm=webp&q=<> works on any Sanity image URL.
-const heroPosterBase = heroPosterRaw.split('?')[0];
-const heroPosterSrc = `${heroPosterBase}?w=1600&fm=webp&q=75&auto=format`;
-const heroPoster768 = `${heroPosterBase}?w=768&fm=webp&q=72&auto=format`;
-const heroPoster1200 = `${heroPosterBase}?w=1200&fm=webp&q=74&auto=format`;
-const heroPosterSrcset = `${heroPoster768} 768w, ${heroPoster1200} 1200w, ${heroPosterSrc} 1600w`;
-const heroPosterSizes = '100vw';
-
-// Inline the 768px WebP as base64 for instant mobile LCP (no network RTT).
-const heroPoster768DataUri = await fetchPosterDataUri(heroPoster768);
-const heroPoster768ForImg = heroPoster768DataUri || heroPoster768;
+// Hero poster → R2 (v4 Phase 2C). Base64 inlining removed (11KB HTML bloat +
+// 2.3s emulated CPU decode delay on Lighthouse mobile). R2 URLs preloaded via
+// fetchpriority=high in Layout.astro, promoted to HTTP/2 103 Early Hints by
+// CF Pages via _headers Link: directive. Sanity hero fields ignored here.
+const heroMobile = 'https://assets.spiritmediapublishing.com/FHB/hero-mobile.webp';
+const heroTablet = 'https://assets.spiritmediapublishing.com/FHB/hero-tablet.webp';
+const heroDesktop = 'https://assets.spiritmediapublishing.com/FHB/hero-desktop.webp';
+const heroPosterSrcset = `${heroMobile} 640w, ${heroTablet} 800w, ${heroDesktop} 1200w`;
+const heroPosterSizes = '(max-width: 639px) 640px, (max-width: 1023px) 800px, 1200px';
 
 // Helper — append Sanity CDN transforms to any cdn.sanity.io URL safely
 function sanityTransform(url: string, w: number, q = 75): string {
@@ -123,9 +103,9 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 	title={seoTitle}
 	description={seoDescription}
 	darkHero={true}
-	preloadImage={heroPoster768DataUri ? undefined : heroPoster768}
-	preloadImageSrcset={heroPoster768DataUri ? undefined : heroPosterSrcset}
-	preloadImageSizes={heroPoster768DataUri ? undefined : heroPosterSizes}
+	preloadImage={heroMobile}
+	preloadImageSrcset={heroPosterSrcset}
+	preloadImageSizes={heroPosterSizes}
 	jsonLd={{
 		"@context": "https://schema.org",
 		"@graph": [
@@ -168,17 +148,15 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			style="background-color: var(--color-deep); margin-top: -1px;"
 			id="hero-section"
 		>
-			<!-- LCP element: poster image. Video is deferred until after first paint.
-			     When heroPoster768DataUri is set, src is a base64 data URI — zero network RTT.
-			     The remote srcset is omitted in that case to avoid duplicate download. -->
+			<!-- LCP element: poster image from R2. Video is deferred until user interaction. -->
 			<img
 				id="hero-poster"
-				src={heroPoster768ForImg}
-				srcset={heroPoster768DataUri ? undefined : heroPosterSrcset}
-				sizes={heroPoster768DataUri ? undefined : heroPosterSizes}
+				src={heroDesktop}
+				srcset={heroPosterSrcset}
+				sizes={heroPosterSizes}
 				alt=""
-				width="1600"
-				height="457"
+				width="1200"
+				height="343"
 				fetchpriority="high"
 				decoding="async"
 				class="absolute inset-0 w-full h-full object-cover"
@@ -191,7 +169,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						id="hero-video-a"
 						class="absolute inset-0 w-full h-full object-cover"
 						data-hero-src={heroVideoSrc}
-						poster={heroPoster768}
+						poster={heroDesktop}
 						muted
 						playsinline
 						preload="none"
