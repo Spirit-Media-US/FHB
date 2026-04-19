@@ -293,7 +293,11 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			const slot = document.getElementById('hero-video-slot');
 			const heroSection = document.getElementById('hero-section');
 			const dataHeroSrc = slot ? slot.dataset.heroSrc : '';
-			if (slot && heroSection) {
+			// Desktop-only: hero section is `hidden lg:flex`, so mobile DOM contains
+			// the nodes but never shows them. Without this guard, mobile scroll fires
+			// `startVideos()` via the fallback 10s timer + scroll listener and fetches
+			// multi-MB .mp4 files from R2 — tanks mobile Perf (TBT / late network).
+			if (slot && heroSection && window.matchMedia('(min-width: 1024px)').matches) {
 				const PLAYBACK_RATE = 0.75;
 				const FADE_DURATION = 1500;
 				const FADE_BEFORE = 1.5;
