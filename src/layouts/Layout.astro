@@ -62,7 +62,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<link rel="preload" as="font" type="font/woff2" href="https://assets.spiritmediapublishing.com/fonts/epilogue/epilogue-500.woff2" crossorigin />
 		<link rel="preload" as="font" type="font/woff2" href="https://assets.spiritmediapublishing.com/fonts/manrope/manrope-400.woff2" crossorigin />
 
-		<!-- Preload hero LCP image (scoped per-page) -->
+		<!-- Preload hero LCP image (scoped per-page). Gated to desktop (≥1024px)
+		     per performance-gate rule #15 — mobile uses text-first hero, no image. -->
 		{preloadImage && (
 			<link
 				rel="preload"
@@ -71,6 +72,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 				imagesrcset={preloadImageSrcset}
 				imagesizes={preloadImageSizes}
 				fetchpriority="high"
+				media="(min-width: 1024px)"
 			/>
 		)}
 
@@ -100,7 +102,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 				.items-center{align-items:center}.items-end{align-items:flex-end}
 				.justify-between{justify-content:space-between}.justify-center{justify-content:center}
 				.text-center{text-align:center}
-				.gap-0\.5{gap:.125rem}.gap-1\.5{gap:.375rem}.gap-4{gap:1rem}
+				.gap-0\.5{gap:.125rem}.gap-1\.5{gap:.375rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}
 				.max-w-2xl{max-width:42rem}.max-w-3xl{max-width:48rem}.max-w-6xl{max-width:72rem}
 				.min-h-screen{min-height:100vh}.min-h-\[500px\]{min-height:500px}
 				.m-0{margin:0}.mx-auto{margin-left:auto;margin-right:auto}.mb-4{margin-bottom:1rem}.mb-10{margin-bottom:2.5rem}
@@ -131,7 +133,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 				.border{border-width:1px}
 				@media(min-width:640px){.sm\:flex-row{flex-direction:row}}
 				@media(min-width:768px){.md\:min-h-screen{min-height:100vh}.md\:pb-16{padding-bottom:4rem}.md\:mb-6{margin-bottom:1.5rem}.md\:py-12{padding-top:3rem;padding-bottom:3rem}.md\:text-6xl{font-size:3.75rem;line-height:1}.md\:text-xl{font-size:1.25rem;line-height:1.75rem}.md\:h-20{height:5rem}.md\:px-6{padding-left:1.5rem;padding-right:1.5rem}}
-				@media(min-width:1024px){.lg\:flex{display:flex}.lg\:hidden{display:none}.lg\:inline-flex{display:inline-flex}.lg\:h-28{height:7rem}.lg\:pb-24{padding-bottom:6rem}}
+				@media(min-width:1024px){.lg\:block{display:block}.lg\:flex{display:flex}.lg\:hidden{display:none}.lg\:inline-flex{display:inline-flex}.lg\:h-28{height:7rem}.lg\:pb-24{padding-bottom:6rem}.lg\:min-h-screen{min-height:100vh}}
 				@media(min-width:1280px){.xl\:gap-7{gap:1.75rem}}
 			}
 		</style>
