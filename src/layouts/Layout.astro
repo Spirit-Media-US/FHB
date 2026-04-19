@@ -61,6 +61,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<link rel="preload" as="font" type="font/woff2" href="https://assets.spiritmediapublishing.com/fonts/epilogue/epilogue-400.woff2" crossorigin />
 		<link rel="preload" as="font" type="font/woff2" href="https://assets.spiritmediapublishing.com/fonts/manrope/manrope-400.woff2" crossorigin />
 
+		<!-- Deferred @font-face declarations (weights not needed for above-the-fold render).
+		     Loaded via media=print swap to avoid blocking first paint; all fonts still
+		     have font-display: swap so they fall back to system during the tiny window. -->
+		<link rel="stylesheet" href="/deferred.css" media="print" onload="this.media='all'" />
+		<noscript><link rel="stylesheet" href="/deferred.css" /></noscript>
+
 		<!-- Preload hero LCP image (scoped per-page) -->
 		{preloadImage && (
 			<link
