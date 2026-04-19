@@ -57,8 +57,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
 
 		<!-- Preconnect + preload self-hosted fonts (R2) — @font-face declarations live in src/styles/global.css -->
+		<!-- Preload the TWO weights actually used above the fold: Epilogue-500 (H1 font-medium) + Manrope-400 (body) -->
 		<link rel="preconnect" href="https://assets.spiritmediapublishing.com" crossorigin />
-		<link rel="preload" as="font" type="font/woff2" href="https://assets.spiritmediapublishing.com/fonts/epilogue/epilogue-400.woff2" crossorigin />
+		<link rel="preload" as="font" type="font/woff2" href="https://assets.spiritmediapublishing.com/fonts/epilogue/epilogue-500.woff2" crossorigin />
 		<link rel="preload" as="font" type="font/woff2" href="https://assets.spiritmediapublishing.com/fonts/manrope/manrope-400.woff2" crossorigin />
 
 		<!-- Preload hero LCP image (scoped per-page) -->
