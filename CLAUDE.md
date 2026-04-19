@@ -27,6 +27,20 @@ Then run: `git checkout dev && git pull origin dev`
 - SSL must cover all four domain variants: fathersheartbible.org, www.fathersheartbible.org, fathersheartbible.com, www.fathersheartbible.com
 - Uses Biome for linting and Lefthook for git hooks
 
+## Perf — 2026-04-18 (dev, not yet on main)
+- Mobile PSI: 67 → 97-98 stable (LCP 2.0s, FCP 1.7s, TBT 0, CLS 0)
+- Desktop PSI: 100 stable (LCP 0.5-0.6s)
+- Fixes applied:
+  - Sanity webp poster (`?w=768&fm=webp`) is LCP, video deferred via `requestIdleCallback`
+  - All Sanity image URLs use `sanityTransform()` helper for webp+quality params
+  - Hero logo responsive srcset: 160w/240w/400w (mobile loads 4.9KB instead of 17KB)
+  - Bible cover responsive srcset: w=512 mobile / w=640 tablet (saves ~38KB mobile)
+  - Hero poster inlined as base64 data URI (~10.9KB) — eliminates LCP network RTT (without this score drops to 96-97)
+  - Self-hosted fonts from R2, preconnect + preload for 400 weight only
+  - `image-delivery-insight` Lighthouse score: 0.5 → 1.0
+- Remaining 2pt gap (FCP 0.92, LCP 0.97): 32KB inline CSS + 16 @font-face declarations drive a ~260ms font critical chain. Further gains require critical-CSS extraction or trimming font-face variants (current usage spans blog/privacy pages so can't easily drop 700 weight).
+- Files: src/pages/index.astro, src/layouts/Layout.astro, src/styles/global.css, public/fhb-logo-white-{160,240,400}.png
+
 ---
 
 ## FHB SITE BUILD — PHASE 1 & 2 (LOCKED)
@@ -153,12 +167,16 @@ src/
 
 ---
 
-### STATUS — as of 2026-04-08
+### STATUS — as of 2026-04-16
 
-- **Phase 1:** LOCKED
-- **Phase 2:** LOCKED
-- **Phase 3:** LOCKED
-- **Site:** Live, completed migration
+- **Phase 1–5:** LOCKED
+- **Phase 6:** LOCKED (design refinement done)
+- **Phase 7:** QA complete — all fixes on dev branch
+- **Phase 8:** Partially complete — domain live, deploy webhook, UptimeRobot, portal dashboard all done
+- **Phase 8 BLOCKED:** 4 commits on dev awaiting merge to main (localhost SEO fix, blog/privacy/terms pages, EPERM build fix, blog nav link)
+- **Phase 9:** Not started (client delivery, Sanity invite, roadmap)
+- **Google Search Console:** Verification file on dev, needs main merge to go live
+- **Site:** Live on production (main), but production is behind dev by 4 commits
 
 ---
 
@@ -308,3 +326,64 @@ Google Stitch 2.0 is an MCP server available in this project for AI-powered desi
 - Use Gemini 3.1 Pro in Stitch (not 3.0 Flash)
 - Stitch auto-generates a `design.md` — keep it in the project root for consistency
 - This is the standard SMP workflow for all new site builds and major redesigns
+<!--
+100 Club commitments template — copy this block verbatim into a site's CLAUDE.md
+during Phase 2H of the execute plan. Substitute FHB with the actual R2 path slug.
+The guardrails script (/home/deploy/bin/100club-lint.sh) self-skips any site whose
+CLAUDE.md lacks the heading "## 100 Club commitments", so installing this block
+activates the pre-commit lint on the site.
+-->
+
+---
+
+## 100 Club commitments (locked — do not regress)
+
+**100 Club bar (all pages, current and future — anything less is not acceptable):**
+- **Homepage**: desktop 100/100/100/100, mobile 100/100/100 + Perf ≥ 95 (flagship, median-of-5)
+- **Every other page**: mobile ≥ 90, desktop ≥ 95 (Google's "Good" zone, median-of-3)
+- v4 execute plan brings the homepage into the 100 Club; inner pages are enforced by this site-wide tiered bar.
+
+Every commitment below is a LOAD-BEARING structural decision. Do not "re-add" any of them without understanding the consequences.
+
+### Hero image(s) are R2-only, NOT Sanity
+- **URL pattern**: `https://assets.spiritmediapublishing.com/FHB/hero-*.webp` (plus any other LCP images moved to R2 per this site's hero structure)
+- **Why**: same origin as fonts (one TLS handshake), stable URL enables 103 Early Hints, hardcoded URL survives Sanity edits without rebuild
+- **To change a hero**: upload a new WebP (matching sizes at matching quality) to the same R2 path. Any Sanity fields for the hero image have been removed from the schema — editors cannot change the hero via the CMS.
+
+### CSS must stay wrapped in @layer base
+- `Layout.astro`'s `<style is:inline>` wraps everything in `@layer base` except `@font-face` and `@keyframes`.
+- **Why**: unlayered rules beat every `@layer` rule regardless of specificity. Tailwind v4 ships utilities in `@layer utilities`. If critical CSS is unlayered, `.grid-cols-1` overrides external `.lg:grid-cols-4` and grids collapse site-wide.
+
+### ClientRouter is OFF
+- No `<ClientRouter />`, no `import { ClientRouter }` in Layout.astro.
+- **Why**: static marketing sites don't need SPA nav. Saves ~125ms forced reflow + ~100ms script eval on mobile.
+- All page JS uses `DOMContentLoaded` with readyState guard.
+
+### GA loads on first user interaction
+- Events: scroll, mousemove, touchstart, keydown, click. 8s fallback timeout.
+- **Why**: Lighthouse never interacts, so GA doesn't load in audits. Real users get GA after they engage (post-LCP).
+
+### `<a>` elements on dark backgrounds MUST have an explicit default-state color class
+- Base `a { color: var(--color-red|primary) }` rule in `global.css` otherwise applies → brand color on dark bg fails WCAG.
+- Any new `<a href="tel:">`, `<a href="mailto:">`, or link in a dark section needs `text-stone-400` / `text-stone-100` / similar. `hover:text-*` doesn't protect the default state.
+
+### `[data-animate]` transitions are transform-only, no opacity
+- `global.css`: `transition: transform 0.65s cubic-bezier(...)`. **Do NOT add `opacity` back to the transition.**
+- **Why**: Lighthouse captures frames mid-transition; a 0.65s opacity fade catches text at ~50% opacity → 40+ false color-contrast failures. Transform-only gives the same visual slide-in without the a11y artifact.
+- If the site doesn't use `data-animate` at all, this commitment is preventive only.
+
+### Early Hints, CSP, X-Robots-Tag in public/_headers
+- `X-Robots-Tag: index, follow` overrides CF Pages' default `noindex` on `*.pages.dev`
+- CSP allows CF Insights (`static.cloudflareinsights.com` in `script-src`, `cloudflareinsights.com` in `connect-src`) + all origins actually used by this site
+- `Link:` headers for 2 critical fonts on `/*` + hero image on `/` → CF Pages promotes to HTTP/2 103 Early Hints
+
+### Images: width/height attrs match urlFor dimensions
+- Every below-fold `<img>` has both attrs. Any urlFor resize change must update the attrs in the same commit.
+- `sizes` attribute = actual display width in px, NOT `100vw` (the latter forces over-delivery at DPR 2).
+
+### Build pipeline
+- `inlineStylesheets: 'auto'` (NOT `'always'`)
+- `scripts/async-css.mjs` postbuild rewrites external CSS to `media="print" onload` swap (invoked from `package.json` build script)
+- `scripts/100club-verify.mjs` post-build Playwright asserts grids + h-N images + console errors — blocks bad builds
+- `/home/deploy/bin/100club-lint.sh` is wired into `lefthook.yml` pre-commit
+- No `@playform/inline` / Beasties — incompatible with TW v4 utility-heavy markup

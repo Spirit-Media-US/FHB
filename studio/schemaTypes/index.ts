@@ -1,5 +1,6 @@
 import biblePageContent from './biblePageContent';
 import bibleTranslation from './bibleTranslation';
+import blogPost from './blogPost';
 import downloadContent from './downloadContent';
 import faq from './faq';
 import joinContent from './joinContent';
@@ -15,6 +16,7 @@ import scriptureComparison from './scriptureComparison';
 import siteSettings from './siteSettings';
 
 export const schemaTypes = [
+	blogPost,
 	bibleTranslation,
 	siteSettings,
 	page,

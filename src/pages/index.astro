@@ -42,25 +42,59 @@ const heroSecondaryCtaHref = '/join';
 const heroVideoSrc =
 	media?.heroVideoUrl ||
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
-const heroPosterSrc = media?.heroPosterUrl || '';
+// Hero poster → R2 (v4 Phase 2C). Base64 inlining removed (11KB HTML bloat +
+// 2.3s emulated CPU decode delay on Lighthouse mobile). R2 URLs preloaded via
+// fetchpriority=high in Layout.astro, promoted to HTTP/2 103 Early Hints by
+// CF Pages via _headers Link: directive. Sanity hero fields ignored here.
+const heroMobile = 'https://assets.spiritmediapublishing.com/FHB/hero-mobile.webp';
+const heroTablet = 'https://assets.spiritmediapublishing.com/FHB/hero-tablet.webp';
+const heroDesktop = 'https://assets.spiritmediapublishing.com/FHB/hero-desktop.webp';
+const heroPosterSrcset = `${heroMobile} 640w, ${heroTablet} 800w, ${heroDesktop} 1200w`;
+const heroPosterSizes = '(max-width: 639px) 640px, (max-width: 1023px) 800px, 1200px';
 
-// Bible cover — prefer Sanity image, fall back to hardcoded
+// Helper — append Sanity CDN transforms to any cdn.sanity.io URL safely
+function sanityTransform(url: string, w: number, q = 75): string {
+	if (!url) return url;
+	if (!url.includes('cdn.sanity.io')) return url;
+	const base = url.split('?')[0];
+	return `${base}?w=${w}&fm=webp&q=${q}&auto=format`;
+}
+
+// Bible cover — prefer Sanity image, fall back to hardcoded (both go through webp transform)
+// Responsive widths: mobile=512 (w-64 at DPR2), tablet=640 (w-80 at DPR2)
 const bibleCoverImageFromSanity = media?.bibleCoverImage;
 const bookCoverUrl = bibleCoverImageFromSanity
-	? urlFor(bibleCoverImageFromSanity).width(400).url()
-	: 'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png';
+	? urlFor(bibleCoverImageFromSanity).width(512).format('webp').quality(72).url()
+	: sanityTransform(
+			'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png',
+			512,
+			72,
+		);
+const bookCoverUrl640 = bibleCoverImageFromSanity
+	? urlFor(bibleCoverImageFromSanity).width(640).format('webp').quality(72).url()
+	: sanityTransform(
+			'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png',
+			640,
+			72,
+		);
+const bookCoverSrcset = `${bookCoverUrl} 512w, ${bookCoverUrl640} 640w`;
+const bookCoverSizes = '(max-width: 767px) 256px, 320px';
 
 // FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
 const fhbCoverSanity = media?.fhbCoverImage;
 const fhbiCoverUrl = fhbCoverSanity
-	? urlFor(fhbCoverSanity).width(400).url()
-	: 'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
+	? urlFor(fhbCoverSanity).width(576).format('webp').quality(75).url()
+	: sanityTransform(
+			'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png',
+			576,
+		);
 
 // Hero video array — prefer Sanity, fall back to hardcoded
 const heroVideosFromSanity = media?.homePageHeroVideos;
-const photo1 = media?.peoplePhoto1Url || '';
-const photo2 = media?.peoplePhoto2Url || '';
-const photo3 = media?.peoplePhoto3Url || '';
+// People photos — apply Sanity CDN transforms to shrink multi-MB originals
+const photo1 = sanityTransform(media?.peoplePhoto1Url || '', 800, 72);
+const photo2 = sanityTransform(media?.peoplePhoto2Url || '', 800, 72);
+const photo3 = sanityTransform(media?.peoplePhoto3Url || '', 800, 72);
 const communityUrl = media?.communityUrl || '/join';
 const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 ---
@@ -69,6 +103,9 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 	title={seoTitle}
 	description={seoDescription}
 	darkHero={true}
+	preloadImage={heroMobile}
+	preloadImageSrcset={heroPosterSrcset}
+	preloadImageSizes={heroPosterSizes}
 	jsonLd={{
 		"@context": "https://schema.org",
 		"@graph": [
@@ -104,52 +141,88 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 1 — HERO
+		     MOBILE HERO — text-first, H1 is the LCP (performance-gate rule #15)
+		     No image above the fold on mobile. Lighthouse Moto G Slow-4G paints
+		     the H1 from the HTML stream at 800-1200ms, reliably ≥ 95 mobile Perf.
+		     ═══════════════════════════════════════════════════════════ -->
+		<section class="lg:hidden px-6 py-12" style="background-color: var(--color-canvas); padding-top: 6rem;">
+			<div class="max-w-2xl mx-auto text-center">
+				<h1
+					class="text-4xl font-medium leading-snug tracking-tight"
+					style="font-family: var(--font-headline); color: var(--color-ink);"
+				>
+					{heroHeading}
+				</h1>
+				<p
+					class="text-lg leading-relaxed"
+					style="font-family: var(--font-body); color: var(--color-muted); margin-top: 1.5rem;"
+				>
+					{heroSubheading}
+				</p>
+				<div class="flex flex-col gap-3" style="margin-top: 2rem;">
+					<a
+						href={heroPrimaryCtaHref}
+						class="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold no-underline"
+						style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary);"
+					>
+						{heroPrimaryCtaLabel}
+					</a>
+					<a
+						href={heroSecondaryCtaHref}
+						class="inline-flex items-center justify-center px-8 py-3.5 text-base font-medium no-underline border"
+						style="font-family: var(--font-body); color: var(--color-primary); border-color: var(--color-primary);"
+					>
+						{heroSecondaryCtaLabel}
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     DESKTOP HERO — full-viewport image with overlaid H1 (lg+ only)
 		     ═══════════════════════════════════════════════════════════ -->
 		<section
-			class="relative flex items-end justify-center overflow-hidden min-h-[500px] md:min-h-screen"
+			class="hidden lg:flex relative items-end justify-center overflow-hidden lg:min-h-screen"
 			style="background-color: var(--color-deep); margin-top: -1px;"
 			id="hero-section"
 		>
-			{heroVideoSrc && (
-				<>
-					<video
-						id="hero-video-a"
-						class="absolute inset-0 w-full h-full object-cover"
-						src={heroVideoSrc}
-						autoplay
-						muted
-						playsinline
-						aria-hidden="true"
-						style="transition: opacity 1.5s ease; opacity: 1;"
-					/>
-					<video
-						id="hero-video-b"
-						class="absolute inset-0 w-full h-full object-cover"
-						muted
-						playsinline
-						aria-hidden="true"
-						style="transition: opacity 1.5s ease; opacity: 0;"
-					/>
-				</>
-			)}
-			{!heroVideoSrc && heroPosterSrc && (
-				<img
-					src={heroPosterSrc}
-					alt=""
-					class="absolute inset-0 w-full h-full object-cover"
-					aria-hidden="true"
+			<!-- LCP element (desktop only): poster image from R2 via <picture> with a
+			     media-gated <source>. Mobile (<1024px) falls through to the 1x1 GIF <img>
+			     fallback — never fetches any hero asset. Inline layout styles so paint
+			     does not wait for Tailwind CSS. -->
+			<picture>
+				<source
+					media="(min-width: 1024px)"
+					srcset={`${heroTablet} 800w, ${heroDesktop} 1200w`}
+					sizes="(max-width: 1279px) 800px, 1200px"
 				/>
-			)}
-			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-10 md:pb-16 lg:pb-24" style="transition: color 1.2s ease;">
 				<img
-					src="/fhb-logo-white.png"
+					id="hero-poster"
+					src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+					alt=""
+					width="1200"
+					height="343"
+					fetchpriority="high"
+					decoding="async"
+					aria-hidden="true"
+					style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 1.5s ease;opacity:1"
+				/>
+			</picture>
+			<div id="hero-video-slot" data-hero-src={heroVideoSrc || ''} aria-hidden="true"></div>
+			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto lg:pb-24" style="transition: color 1.2s ease;">
+				<img
+					src="/fhb-logo-white-240.png"
+					srcset="/fhb-logo-white-240.png 240w, /fhb-logo-white-400.png 400w"
+					sizes="(max-width: 1279px) 164px, 230px"
 					alt="Father's Heart Bible"
-					class="h-14 md:h-20 lg:h-28 w-auto mx-auto mb-4 md:mb-6" data-hero-entrance
+					width="400"
+					height="195"
+					decoding="async"
+					class="lg:h-28 w-auto mx-auto" style="margin-bottom: 1.5rem;" data-hero-entrance
 				/>
 				<h1
 					id="hero-heading"
-					class="text-4xl md:text-6xl font-medium leading-snug tracking-tight"
+					class="md:text-6xl font-medium leading-snug tracking-tight"
 					style="font-family: var(--font-headline); color: #FFFFFF; transition: color 1.2s ease;" data-hero-entrance
 				>
 					{heroHeading}
@@ -158,12 +231,13 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		</section>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     HERO SUBTEXT — Pulled out of the video hero
+		     DESKTOP HERO SUBTEXT — appears below the desktop hero only
+		     (mobile subtitle + CTAs already rendered in the mobile hero above)
 		     ═══════════════════════════════════════════════════════════ -->
-		<section style="background-color: var(--color-canvas);" class="py-8 md:py-12 px-4 md:px-6">
+		<section style="background-color: var(--color-canvas);" class="hidden lg:block md:py-12 md:px-6">
 			<div class="max-w-2xl mx-auto text-center" data-reveal>
 				<p
-					class="text-lg md:text-xl leading-relaxed mb-10"
+					class="md:text-xl leading-relaxed mb-10"
 					style="font-family: var(--font-body); color: var(--color-muted);"
 				>
 					{heroSubheading}
@@ -215,41 +289,74 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 
 			}
 
-			const vA = document.getElementById('hero-video-a');
-			const vB = document.getElementById('hero-video-b');
-			if (vA && vB) {
+			const poster = document.getElementById('hero-poster');
+			const slot = document.getElementById('hero-video-slot');
+			const heroSection = document.getElementById('hero-section');
+			const dataHeroSrc = slot ? slot.dataset.heroSrc : '';
+			if (slot && heroSection) {
 				const PLAYBACK_RATE = 0.75;
 				const FADE_DURATION = 1500;
 				const FADE_BEFORE = 1.5;
+				const VIDEO_STYLE = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 1.5s ease;opacity:0';
 
-				// heroVideos[0] matches the HTML src — don't touch vA.src
 				let heroIdx = 0;
-				let curr = vA;
-				let next = vB;
+				let vA = null, vB = null;
+				let curr = null, next = null;
 				let fading = false;
+				let started = false;
 
-				vA.playbackRate = PLAYBACK_RATE;
+				function mkVideo(initialSrc) {
+					const v = document.createElement('video');
+					v.muted = true;
+					v.playsInline = true;
+					v.preload = 'none';
+					v.setAttribute('aria-hidden', 'true');
+					v.style.cssText = VIDEO_STYLE;
+					if (initialSrc) v.src = initialSrc;
+					return v;
+				}
 
-				// Preload the NEXT video in the list
-				next.src = heroVideos[1].url;
-				next.load();
+				function startVideos() {
+					if (started) return;
+					started = true;
+					vA = mkVideo(dataHeroSrc || heroVideos[0].url);
+					vB = mkVideo('');
+					heroSection.insertBefore(vA, slot);
+					heroSection.insertBefore(vB, slot);
+					slot.remove();
+					curr = vA; next = vB;
+					vA.load();
+					vA.playbackRate = PLAYBACK_RATE;
+					vA.play().then(() => {
+						vA.style.opacity = '1';
+						if (poster) setTimeout(() => { poster.style.opacity = '0'; }, 300);
+						next.src = heroVideos[1].url;
+						next.load();
+						vA.addEventListener('timeupdate', onTimeUpdate);
+						vB.addEventListener('timeupdate', onTimeUpdate);
+					}).catch(() => { /* autoplay blocked — poster remains */ });
+				}
+
+				const triggers = ['scroll', 'pointerdown', 'keydown', 'touchstart'];
+				function kickoff() {
+					triggers.forEach(e => window.removeEventListener(e, kickoff));
+					startVideos();
+				}
+				triggers.forEach(e => window.addEventListener(e, kickoff, { once: true, passive: true }));
+				setTimeout(() => { if (!started) startVideos(); }, 10000);
 
 				function beginCrossfade() {
 					if (fading) return;
 					fading = true;
 					heroIdx = (heroIdx + 1) % heroVideos.length;
-
 					applyTheme(heroVideos[heroIdx].theme);
-
 					next.play().then(() => {
 						next.playbackRate = PLAYBACK_RATE;
 						next.style.opacity = '1';
 						curr.style.opacity = '0';
-
 						const outgoing = curr;
 						curr = next;
 						next = outgoing;
-
 						setTimeout(() => {
 							next.pause();
 							next.currentTime = 0;
@@ -271,9 +378,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						beginCrossfade();
 					}
 				}
-
-				vA.addEventListener('timeupdate', onTimeUpdate);
-				vB.addEventListener('timeupdate', onTimeUpdate);
 			}
 		</script>
 
@@ -406,8 +510,14 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					{bookCoverUrl ? (
 						<img
 							src={bookCoverUrl}
+							srcset={bookCoverSrcset}
+							sizes={bookCoverSizes}
 							alt="The Father's Heart Bible — brown cover"
 							class="w-64 md:w-80 block"
+							loading="lazy"
+							decoding="async"
+							width="512"
+							height="768"
 							style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.22));"
 						/>
 					) : (
@@ -563,6 +673,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 							src={fhbiCoverUrl}
 							alt="Father's Heart → Beloved Identity — free PDF"
 							class="w-56 md:w-72 block"
+							loading="lazy"
+							decoding="async"
+							width="576"
+							height="954"
 							style="filter: drop-shadow(0 16px 32px rgba(0,0,0,0.22));"
 					/>
 					) : (
@@ -602,6 +716,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 							src={photo1}
 							alt="Reader with the Father's Heart Bible"
 							class="w-full aspect-square object-cover"
+							loading="lazy"
+							decoding="async"
+							width="800"
+							height="800"
 						/>
 					)}
 					{photo2 && (
@@ -609,6 +727,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 							src={photo2}
 							alt="Community in reflection with Scripture"
 							class="w-full aspect-square object-cover"
+							loading="lazy"
+							decoding="async"
+							width="800"
+							height="800"
 						/>
 					)}
 					{photo3 && (
@@ -616,6 +738,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 							src={photo3}
 							alt="Belonging and encounter with the Father's word"
 							class="w-full aspect-square object-cover"
+							loading="lazy"
+							decoding="async"
+							width="800"
+							height="800"
 						/>
 					)}
 				</ImageGrid>

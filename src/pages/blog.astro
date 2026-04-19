@@ -1,0 +1,273 @@
+---
+import Footer from '../components/Footer.astro';
+import Navbar from '../components/Navbar.astro';
+import Layout from '../layouts/Layout.astro';
+import { sanityClient } from '../lib/sanity';
+
+const rawSanityPosts = await sanityClient.fetch(`
+  *[_type == "blogPost"] | order(publishDate desc) {
+    "slug": "/blog/" + slug.current,
+    title,
+    excerpt,
+    "image": coalesce(heroImage.asset->url + "?w=800&auto=format", "/fhb-logo.png"),
+    "imagePosition": "center center",
+    "author": coalesce(author, "Add Author Name Here"),
+    "date": publishDate,
+    tags
+  }
+`);
+
+const MONTHS = [
+	'January',
+	'February',
+	'March',
+	'April',
+	'May',
+	'June',
+	'July',
+	'August',
+	'September',
+	'October',
+	'November',
+	'December',
+];
+const sanityPostsFormatted = rawSanityPosts.map((p: any) => {
+	const d = new Date(p.date);
+	return { ...p, date: `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}` };
+});
+const SANITY_POSTS_JSON = JSON.stringify(sanityPostsFormatted);
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'Blog',
+	name: "Father's Heart Bible Blog",
+	url: 'https://fathersheartbible.com/blog',
+	description: "Articles, insights, and updates from the Father's Heart Bible.",
+	publisher: {
+		'@type': 'Organization',
+		name: "Father's Heart Bible",
+		url: 'https://fathersheartbible.com',
+	},
+};
+---
+
+<Layout
+  title="Father's Heart Bible Blog"
+  description="Articles, insights, and updates from the Father's Heart Bible."
+  jsonLd={jsonLd}
+>
+  <Navbar />
+
+  <main id="main-content">
+
+    <!-- HERO -->
+    <section class="px-6 py-20 lg:py-28 lg:px-8 overflow-hidden" style="background-color: var(--color-surface-low); margin-top: 80px;">
+      <div class="mx-auto max-w-7xl">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div data-reveal>
+            <p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">Blog</p>
+            <h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Welcome to<br />Our Blog</h1>
+            <p class="mt-6 text-lg leading-relaxed max-w-xl" style="font-family: var(--font-sans); color: var(--color-muted);">Insights, updates, and resources.</p>
+          </div>
+          <div class="hidden lg:grid grid-cols-3 gap-3" aria-hidden="true" data-reveal>
+            {rawSanityPosts.slice(0, 9).map((post: any, i: number) => {
+              const positions = [
+                'center center', 'center top',    'center center',
+                'center top',    'center center', 'center bottom',
+                'center center', 'center top',   'center center',
+              ];
+              return (
+                <div class="relative rounded-2xl overflow-hidden aspect-square">
+                  <img src={post.image} alt="" class="w-full h-full object-cover" style={`object-position: ${positions[i]};`} />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEARCH + FILTER (sticky) -->
+    <section class="border-b px-6 py-4 lg:px-8 sticky top-0 z-10" style="background-color: var(--color-surface); border-color: var(--color-hairline); box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
+      <div class="mx-auto max-w-7xl flex flex-col gap-3">
+        <!-- Search row -->
+        <div class="flex items-center gap-3">
+          <div class="relative flex-1">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style="color: var(--color-muted);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            <input
+              id="blog-search"
+              type="search"
+              placeholder="Search by keyword, topic, or tag..."
+              class="w-full pl-9 pr-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
+              style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);"
+            />
+          </div>
+          <p id="results-count" class="text-sm whitespace-nowrap shrink-0" style="color: var(--color-muted); font-family: var(--font-sans);"></p>
+        </div>
+        <!-- Filter chips -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-semibold uppercase tracking-wider shrink-0" style="color: var(--color-muted); font-family: var(--font-sans);">Filter:</span>
+          <button data-tag="all" class="tag-chip active px-3 py-1 rounded-full text-xs font-semibold border transition-colors" style="background-color: var(--color-primary); color: var(--color-on-primary); border-color: var(--color-primary); font-family: var(--font-sans);">All</button>
+          <button data-tag="Category 1" class="tag-chip px-3 py-1 rounded-full text-xs font-semibold border transition-colors" style="border-color: var(--color-outline-variant); color: var(--color-muted); font-family: var(--font-sans);">Category 1</button>
+          <button data-tag="Category 2" class="tag-chip px-3 py-1 rounded-full text-xs font-semibold border transition-colors" style="border-color: var(--color-outline-variant); color: var(--color-muted); font-family: var(--font-sans);">Category 2</button>
+          <button data-tag="Category 3" class="tag-chip px-3 py-1 rounded-full text-xs font-semibold border transition-colors" style="border-color: var(--color-outline-variant); color: var(--color-muted); font-family: var(--font-sans);">Category 3</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- POSTS GRID -->
+    <section class="py-12 lg:py-20 px-6 lg:px-8" style="background-color: var(--color-surface-low);">
+      <div class="max-w-7xl mx-auto">
+        <div id="posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+
+        <!-- Empty state -->
+        <div id="no-results" class="hidden text-center py-20">
+          <p class="text-2xl mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">No posts found</p>
+          <p class="text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">Try a different keyword or <button onclick="clearSearch()" class="font-semibold hover:underline" style="color: var(--color-brand);">clear the search</button>.</p>
+        </div>
+
+        <!-- PAGINATION -->
+        <div id="pagination" class="mt-12 flex items-center justify-center gap-2"></div>
+      </div>
+    </section>
+
+    <script id="sanity-posts-data" type="application/json" set:html={SANITY_POSTS_JSON}></script>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+const SANITY_POSTS = JSON.parse(document.getElementById('sanity-posts-data')?.textContent || '[]');
+
+const POSTS_PER_PAGE = 6;
+const POSTS = [...SANITY_POSTS];
+
+let currentPage = 1;
+let filteredPosts = [...POSTS];
+let activeTag = 'all';
+let activeSearch = '';
+
+function applyFilters() {
+  filteredPosts = POSTS.filter(p => {
+    const matchesTag = activeTag === 'all' || (p.tags && p.tags.includes(activeTag));
+    const q = activeSearch.toLowerCase();
+    const matchesSearch = !q || p.title.toLowerCase().includes(q) ||
+      (p.excerpt && p.excerpt.toLowerCase().includes(q)) ||
+      (p.tags && p.tags.some((t: string) => t.toLowerCase().includes(q))) ||
+      (p.author && p.author.toLowerCase().includes(q));
+    return matchesTag && matchesSearch;
+  });
+  currentPage = 1;
+  renderPosts();
+}
+
+function renderPosts() {
+  const grid = document.getElementById('posts-grid')!;
+  const noResults = document.getElementById('no-results')!;
+  const count = document.getElementById('results-count')!;
+  const start = (currentPage - 1) * POSTS_PER_PAGE;
+  const pagePosts = filteredPosts.slice(start, start + POSTS_PER_PAGE);
+
+  if (filteredPosts.length === 0) {
+    grid.innerHTML = '';
+    noResults.classList.remove('hidden');
+    count.textContent = '0 posts';
+  } else {
+    noResults.classList.add('hidden');
+    count.textContent = filteredPosts.length === POSTS.length
+      ? `${POSTS.length} posts`
+      : `${filteredPosts.length} of ${POSTS.length} posts`;
+    grid.innerHTML = pagePosts.map(post => `
+      <a href="${post.slug}" class="group rounded-2xl border overflow-hidden transition-shadow hover:shadow-md" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
+        <div class="h-48 overflow-hidden">
+          <img src="${post.image}" alt="${post.title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style="object-position: ${post.imagePosition};" />
+        </div>
+        <div class="p-6">
+          <div class="flex flex-wrap gap-1.5 mb-3">
+            ${(post.tags || []).slice(0, 2).map((t: string) => `<span class="text-xs font-semibold rounded-full px-2.5 py-0.5" style="color: var(--color-muted); background-color: var(--color-surface-low);">${t}</span>`).join('')}
+          </div>
+          <h3 class="text-xl font-bold mb-2 leading-snug" style="font-family: var(--font-serif); color: var(--color-brand);">${post.title}</h3>
+          <p class="text-sm mb-4 leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">${post.excerpt || ''}</p>
+          <div class="flex items-center justify-between text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+            <span>${post.author} · ${post.date}</span>
+            <span class="font-semibold group-hover:underline" style="color: var(--color-brand);">Read →</span>
+          </div>
+        </div>
+      </a>
+    `).join('');
+  }
+
+  renderPagination();
+}
+
+function renderPagination() {
+  const pagination = document.getElementById('pagination')!;
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+
+  if (totalPages <= 1) {
+    pagination.innerHTML = '';
+    return;
+  }
+
+  let html = '';
+  html += `<button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-4 py-2 rounded-lg border text-sm font-semibold transition-colors" style="border-color: var(--color-outline-variant); color: ${currentPage === 1 ? 'var(--color-muted)' : 'var(--color-ink)'}; opacity: ${currentPage === 1 ? '0.4' : '1'}; cursor: ${currentPage === 1 ? 'not-allowed' : 'pointer'};">← Prev</button>`;
+  for (let i = 1; i <= totalPages; i++) {
+    html += `<button onclick="goToPage(${i})" class="w-9 h-9 rounded-lg text-sm font-semibold transition-colors" style="${i === currentPage ? 'background-color: var(--color-primary); color: var(--color-on-primary);' : 'border: 1px solid var(--color-outline-variant); color: var(--color-ink);'} cursor: pointer;">${i}</button>`;
+  }
+  html += `<button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-4 py-2 rounded-lg border text-sm font-semibold transition-colors" style="border-color: var(--color-outline-variant); color: ${currentPage === totalPages ? 'var(--color-muted)' : 'var(--color-ink)'}; opacity: ${currentPage === totalPages ? '0.4' : '1'}; cursor: ${currentPage === totalPages ? 'not-allowed' : 'pointer'};">Next →</button>`;
+
+  pagination.innerHTML = html;
+}
+
+(window as any).goToPage = function goToPage(page: number) {
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  renderPosts();
+  document.getElementById('posts-grid')!.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+(window as any).clearSearch = function clearSearch() {
+  (document.getElementById('blog-search') as HTMLInputElement).value = '';
+  activeSearch = '';
+  activeTag = 'all';
+  document.querySelectorAll('.tag-chip').forEach(b => {
+    (b as HTMLElement).style.backgroundColor = 'transparent';
+    (b as HTMLElement).style.color = 'var(--color-muted)';
+    (b as HTMLElement).style.borderColor = 'var(--color-outline-variant)';
+  });
+  const allBtn = document.querySelector('[data-tag="all"]') as HTMLElement;
+  allBtn.style.backgroundColor = 'var(--color-primary)';
+  allBtn.style.color = 'var(--color-on-primary)';
+  allBtn.style.borderColor = 'var(--color-primary)';
+  applyFilters();
+};
+
+// Search
+document.getElementById('blog-search')!.addEventListener('input', (e) => {
+  activeSearch = (e.target as HTMLInputElement).value.trim();
+  applyFilters();
+});
+
+// Tag chips
+document.querySelectorAll('.tag-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeTag = btn.getAttribute('data-tag')!;
+    document.querySelectorAll('.tag-chip').forEach(b => {
+      (b as HTMLElement).style.backgroundColor = 'transparent';
+      (b as HTMLElement).style.color = 'var(--color-muted)';
+      (b as HTMLElement).style.borderColor = 'var(--color-outline-variant)';
+    });
+    (btn as HTMLElement).style.backgroundColor = 'var(--color-primary)';
+    (btn as HTMLElement).style.color = 'var(--color-on-primary)';
+    (btn as HTMLElement).style.borderColor = 'var(--color-primary)';
+    applyFilters();
+  });
+});
+
+// Initial render
+renderPosts();
+</script>
