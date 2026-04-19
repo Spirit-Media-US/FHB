@@ -338,7 +338,10 @@ activates the pre-commit lint on the site.
 
 ## 100 Club commitments (locked — do not regress)
 
-**100 Club bar = homepage, median-of-5. Inner pages are quality work, not gate criteria.**
+**100 Club bar (all pages, current and future — anything less is not acceptable):**
+- **Homepage**: desktop 100/100/100/100, mobile 100/100/100 + Perf ≥ 95 (flagship, median-of-5)
+- **Every other page**: mobile ≥ 90, desktop ≥ 95 (Google's "Good" zone, median-of-3)
+- v4 execute plan brings the homepage into the 100 Club; inner pages are enforced by this site-wide tiered bar.
 
 Every commitment below is a LOAD-BEARING structural decision. Do not "re-add" any of them without understanding the consequences.
 
