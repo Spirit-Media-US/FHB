@@ -186,22 +186,28 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			style="background-color: var(--color-deep); margin-top: -1px;"
 			id="hero-section"
 		>
-			<!-- LCP element (desktop only): poster image from R2. Inline layout styles so
-			     paint does not wait for Tailwind CSS. Video elements are created via JS
-			     on first user interaction (Lighthouse never interacts). -->
-			<img
-				id="hero-poster"
-				src={heroDesktop}
-				srcset={heroPosterSrcset}
-				sizes={heroPosterSizes}
-				alt=""
-				width="1200"
-				height="343"
-				fetchpriority="high"
-				decoding="async"
-				aria-hidden="true"
-				style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 1.5s ease;opacity:1"
-			/>
+			<!-- LCP element (desktop only): poster image from R2 via <picture> with a
+			     media-gated <source>. Mobile (<1024px) falls through to the 1x1 GIF <img>
+			     fallback — never fetches any hero asset. Inline layout styles so paint
+			     does not wait for Tailwind CSS. -->
+			<picture>
+				<source
+					media="(min-width: 1024px)"
+					srcset={`${heroTablet} 800w, ${heroDesktop} 1200w`}
+					sizes="(max-width: 1279px) 800px, 1200px"
+				/>
+				<img
+					id="hero-poster"
+					src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+					alt=""
+					width="1200"
+					height="343"
+					fetchpriority="high"
+					decoding="async"
+					aria-hidden="true"
+					style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 1.5s ease;opacity:1"
+				/>
+			</picture>
 			<div id="hero-video-slot" data-hero-src={heroVideoSrc || ''} aria-hidden="true"></div>
 			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto lg:pb-24" style="transition: color 1.2s ease;">
 				<img
