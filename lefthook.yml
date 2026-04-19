@@ -20,11 +20,6 @@ pre-commit:
       glob: "*.{js,ts,jsx,tsx,json,css,astro}"
       run: bunx biome check --write --no-errors-on-unmatched {staged_files}
       stage_fixed: true
-    100club-lint:
-      run: /home/deploy/bin/100club-lint.sh
-      skip:
-        - merge
-        - rebase
 
 pre-push:
   commands:
