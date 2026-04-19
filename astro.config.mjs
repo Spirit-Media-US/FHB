@@ -1,3 +1,4 @@
+import inline from '@playform/inline';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
@@ -8,6 +9,7 @@ export default defineConfig({
 	server: { port: 4323, host: true },
 	build: { inlineStylesheets: 'always' },
 	integrations: [
+		inline(),
 		sitemap({
 			filter: (page) => !page.includes('/privacy') && !page.includes('/terms'),
 			serialize(item) {
