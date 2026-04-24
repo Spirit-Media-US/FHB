@@ -3,6 +3,12 @@
 
 pre-commit:
   commands:
+    perf-traits-doc:
+      run: /home/deploy/bin/perf-traits-audit.sh --commit-hook
+      stage_fixed: true
+      skip:
+        - merge
+        - rebase
     behind-remote:
       run: |
         git fetch --quiet
@@ -23,6 +29,11 @@ pre-commit:
 
 pre-push:
   commands:
+    perf-traits:
+      run: /home/deploy/bin/perf-traits-audit.sh --hook
+      skip:
+        - merge
+        - rebase
     block-main-push:
       run: |
         BRANCH=$(git rev-parse --abbrev-ref HEAD)
