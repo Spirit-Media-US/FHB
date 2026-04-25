@@ -27,76 +27,14 @@ Then run: `git checkout dev && git pull origin dev`
 - SSL must cover all four domain variants: fathersheartbible.org, www.fathersheartbible.org, fathersheartbible.com, www.fathersheartbible.com
 - Uses Biome for linting and Lefthook for git hooks
 
-## Perf — 2026-04-18 (dev, not yet on main)
-- Mobile PSI: 67 → 97-98 stable (LCP 2.0s, FCP 1.7s, TBT 0, CLS 0)
-- Desktop PSI: 100 stable (LCP 0.5-0.6s)
-- Fixes applied:
-  - Sanity webp poster (`?w=768&fm=webp`) is LCP, video deferred via `requestIdleCallback`
-  - All Sanity image URLs use `sanityTransform()` helper for webp+quality params
-  - Hero logo responsive srcset: 160w/240w/400w (mobile loads 4.9KB instead of 17KB)
-  - Bible cover responsive srcset: w=512 mobile / w=640 tablet (saves ~38KB mobile)
-  - Hero poster inlined as base64 data URI (~10.9KB) — eliminates LCP network RTT (without this score drops to 96-97)
-  - Self-hosted fonts from R2, preconnect + preload for 400 weight only
-  - `image-delivery-insight` Lighthouse score: 0.5 → 1.0
-- Remaining 2pt gap (FCP 0.92, LCP 0.97): 32KB inline CSS + 16 @font-face declarations drive a ~260ms font critical chain. Further gains require critical-CSS extraction or trimming font-face variants (current usage spans blog/privacy pages so can't easily drop 700 weight).
-- Files: src/pages/index.astro, src/layouts/Layout.astro, src/styles/global.css, public/fhb-logo-white-{160,240,400}.png
+## Status — as of 2026-04-25
 
----
+- Site live on main at fathersheartbible.com / .org
+- Phases 1–7 done. Phase 8 partial: 4 commits on dev awaiting merge (localhost SEO fix, blog/privacy/terms pages, EPERM build fix, blog nav link). Google Search Console verification file lives on dev — needs main merge to go live.
+- Phase 9 (client delivery, Sanity invite, roadmap) not started.
+- **Perf**: mobile PSI 97–98 stable (LCP ~2.0s), desktop 100 stable. Hero is `requestIdleCallback`-deferred Sanity webp poster; hero poster inlined as base64 data URI to eliminate LCP RTT; self-hosted fonts from R2 with preload for 400 weight only. Remaining 2pt gap is the 32KB inline CSS + 16 @font-face critical chain.
 
-## FHB SITE BUILD — PHASE 1 & 2 (LOCKED)
-
-### PHASE 1 — INFRASTRUCTURE (LOCKED)
-
-This project uses the following stack. These rules are mandatory.
-
-**Repositories & Deployment**
-- GitHub organization: Spirit-Media-US
-- Repository contains code only — NO media files
-- Cloudflare Pages is used for hosting
-- Auto-deploy from main branch
-
-**Domain & Edge**
-- Cloudflare handles: DNS, SSL, CDN, Security
-
-**Media Handling**
-- ALL images, video, and audio must be stored in Cloudflare R2
-- No media assets stored in repo
-- All media referenced via external URLs (R2 or Sanity)
-
-**CMS**
-- Sanity.io is used for content management
-- All editable content must be modeled in Sanity
-- Schemas must be defined before wiring
-
-**Forms / CRM**
-- GoHighLevel (GHL) is used for: forms, lead capture, tagging
-- Do NOT build custom backend form handlers
-
-**Monitoring**
-- UptimeRobot monitors site every 5 minutes
-
-**AI / Build Rules**
-- Claude is used for development assistance
-- This file (CLAUDE.md) must be followed at all times
-
-**Core Constraints**
-- No media in repo
-- Use Tailwind design tokens (no hardcoded colors)
-- Prefer Astro static rendering (minimal JS)
-- Build reusable components only (no duplicated layouts)
-
----
-
-### PHASE 2 — STRUCTURE (LOCKED)
-
-This phase defines architecture only — NOT design.
-
-**Framework Setup**
-- Astro initialized
-- Tailwind CSS installed
-- Base layout created
-
-**Route Map (Pages)**
+## Routes & Nav (FHB-specific)
 
 | Route | File |
 |-------|------|
@@ -108,81 +46,9 @@ This phase defines architecture only — NOT design.
 | `/partner` | partner.astro |
 | `/about` | about.astro |
 
-**Navigation (Structure Only)**
+Nav order: Home, The Father's Heart Bible, Samples, Download, Join the Movement, Partner With Us, About.
 
-Top navigation must include:
-- Home
-- The Father's Heart Bible
-- Samples
-- Download
-- Join the Movement
-- Partner With Us
-- About
-
-**Footer (Structure Only)**
-
-Footer must include:
-- All primary navigation links
-- Contact link
-- Privacy Policy
-- Terms
-
-**Layout System**
-- BaseLayout.astro
-- Header component
-- Footer component
-
-No advanced styling at this stage.
-
-**Typography Foundation (Minimal Only)**
-- font-family for headings
-- font-family for body
-- base body size
-
-Do NOT implement full theme system yet.
-
-**Component Placeholders**
-
-Create empty structural components (scaffolds only — no styling beyond layout):
-- Hero
-- Section
-- CTA
-- ScriptureBlock
-- ImageGrid
-
-**File Structure**
-```
-src/
-  pages/
-  layouts/
-  components/
-  styles/
-```
-
-**Build Rules**
-- No page-specific styling yet
-- No color system yet
-- No design polish yet
-- Focus ONLY on structure and architecture
-
----
-
-### STATUS — as of 2026-04-16
-
-- **Phase 1–5:** LOCKED
-- **Phase 6:** LOCKED (design refinement done)
-- **Phase 7:** QA complete — all fixes on dev branch
-- **Phase 8:** Partially complete — domain live, deploy webhook, UptimeRobot, portal dashboard all done
-- **Phase 8 BLOCKED:** 4 commits on dev awaiting merge to main (localhost SEO fix, blog/privacy/terms pages, EPERM build fix, blog nav link)
-- **Phase 9:** Not started (client delivery, Sanity invite, roadmap)
-- **Google Search Console:** Verification file on dev, needs main merge to go live
-- **Site:** Live on production (main), but production is behind dev by 4 commits
-
----
-
----
-
-## Phase 3 — Theme System (LOCKED)
+## Theme System (LOCKED)
 
 ### Color Tokens (`@theme` in global.css)
 
@@ -217,38 +83,9 @@ src/
 | ImageGrid | `ImageGrid.astro` | Responsive grid — 2/3/4 cols, sm/md/lg gap |
 | FormEmbed | `FormEmbed.astro` | GHL form wrapper — formId prop or slot |
 
-### Phase 3 Rules
+## Sanity CMS (LOCKED)
 
-- Do NOT build pages in Phase 3 — components only
-- No hardcoded content — all text via props or slots
-- HeroVideo requires R2 video URL — passed via videoSrc prop
-- FormEmbed requires GHL embed code from Kevin
-
----
-
----
-
-## Phase 4 — Pages (LOCKED)
-
-All 7 launch pages built and pushed to dev:
-
-| Phase | Route | Status |
-|-------|-------|--------|
-| 4A | `/` | ✅ dev |
-| 4B | `/the-fathers-heart-bible` | ✅ dev |
-| 4C | `/samples` | ✅ dev |
-| 4D | `/download` | ✅ dev |
-| 4E | `/join` | ✅ dev |
-| 4F | `/partner` | ✅ dev |
-| 4G | `/about` | ✅ dev |
-
----
-
-## Phase 5 — Sanity CMS Wiring (LOCKED)
-
-### What Was Implemented
-
-**Schemas added/updated:**
+**Schemas:**
 - `siteSettings` — expanded with media URLs, SEO defaults, communityUrl, donateUrl, ghlDownloadFormId, footerNavLinks, copyright, ogImage
 - `page` — added hero fields (eyebrow, heading, subheading, CTAs), SEO fields (seoTitle, seoDescription, ogImage, noindex)
 - `scriptureComparison` — added category, translationLabel, expanded preview
@@ -265,125 +102,9 @@ All 7 launch pages built and pushed to dev:
 - `Layout.astro` supports `noindex` prop → adds `<meta name="robots" content="noindex, nofollow">`
 - `tsconfig.json` excludes `studio/` and `sanity.config.ts` from Astro TS checking
 
-**Cloudflare Pages:** Auto-deploys on push to main (no webhook needed)
-
-### Kevin's Required Manual Steps
-
-1. **Deploy Sanity Studio schema** (run on Bethel in FHB directory):
-   ```bash
-   cd /srv/sites/FHB
-   bunx sanity login        # authenticate with sanity.io
-   bunx sanity deploy       # push updated schemas to Studio
-   ```
-
-2. **Create a Sanity write API token:**
-   - Go to: https://www.sanity.io/manage/project/rusi1hyi/api
-   - Click "Tokens" → "Add API token"
-   - Name it "FHB Seed / Write" and set permission to "Editor"
-   - Copy the token
-
-3. **Seed initial content:**
-   ```bash
-   SANITY_API_TOKEN=<your-write-token> node scripts/seed-sanity.mjs
-   ```
-   This creates all page SEO docs, Kevin's profile, the resource doc, and all 10 scripture comparisons.
-
-4. **Fill in siteSettings in Sanity Studio** (fathersheartbible.sanity.studio):
-   - `communityUrl` — Mighty Networks community URL
-   - `donateUrl` — giving/donation page URL
-   - `ghlDownloadFormId` — paste GHL form embed ID once created
-   - Media URLs — paste R2 URLs for hero video, book cover, portrait, people photos
-   - Publish the siteSettings document
-
-5. **Sanity → Cloudflare Pages rebuild:** Cloudflare Pages auto-deploys on push to main. For Sanity content changes to trigger a rebuild, a deploy hook can be configured in Cloudflare Pages settings if needed.
-
----
 
 ## Rules
 
 - All work goes to the **dev** branch — never push directly to main
 - Only merge dev to main when Kevin says "push to main"
 - Never push without local preview first
-
----
-
-## Stitch MCP — AI Design Tool
-
-Google Stitch 2.0 is an MCP server available in this project for AI-powered design work. It generates full page designs and auto-creates design systems (colors, typography, component rules). Configured at user scope in `~/.claude.json` — available automatically in all projects.
-
-**When to use:** When Kevin asks for design work, new page layouts, or visual redesigns. Use Stitch first to get 80–90% of the design done visually, then implement in Astro/Tailwind.
-
-**Available tools (prefixed `mcp__stitch__`):**
-`create_project`, `generate_screen_from_text`, `create_design_system`, `apply_design_system`, `edit_screens`, `generate_variants`, `list_projects`, `list_screens`, `get_screen`, `get_project`, `list_design_systems`, `update_design_system`
-
-**Workflow:**
-1. Screenshot or paste URL into Stitch as style reference
-2. Stitch generates full design + auto-creates design system
-3. Export design.md / design system from Stitch
-4. Hand off to Claude Code for Astro/Tailwind implementation
-
-**Rules:**
-- Use Gemini 3.1 Pro in Stitch (not 3.0 Flash)
-- Stitch auto-generates a `design.md` — keep it in the project root for consistency
-- This is the standard SMP workflow for all new site builds and major redesigns
-<!--
-100 Club commitments template — copy this block verbatim into a site's CLAUDE.md
-during Phase 2H of the execute plan. Substitute FHB with the actual R2 path slug.
-The guardrails script (/home/deploy/bin/100club-lint.sh) self-skips any site whose
-CLAUDE.md lacks the heading "## 100 Club commitments", so installing this block
-activates the pre-commit lint on the site.
--->
-
----
-
-## 100 Club commitments (locked — do not regress)
-
-**100 Club bar (all pages, current and future — anything less is not acceptable):**
-- **Homepage**: desktop 100/100/100/100, mobile 100/100/100 + Perf ≥ 95 (flagship, median-of-5)
-- **Every other page**: mobile ≥ 90, desktop ≥ 95 (Google's "Good" zone, median-of-3)
-- v4 execute plan brings the homepage into the 100 Club; inner pages are enforced by this site-wide tiered bar.
-
-Every commitment below is a LOAD-BEARING structural decision. Do not "re-add" any of them without understanding the consequences.
-
-### Hero image(s) are R2-only, NOT Sanity
-- **URL pattern**: `https://assets.spiritmediapublishing.com/FHB/hero-*.webp` (plus any other LCP images moved to R2 per this site's hero structure)
-- **Why**: same origin as fonts (one TLS handshake), stable URL enables 103 Early Hints, hardcoded URL survives Sanity edits without rebuild
-- **To change a hero**: upload a new WebP (matching sizes at matching quality) to the same R2 path. Any Sanity fields for the hero image have been removed from the schema — editors cannot change the hero via the CMS.
-
-### CSS must stay wrapped in @layer base
-- `Layout.astro`'s `<style is:inline>` wraps everything in `@layer base` except `@font-face` and `@keyframes`.
-- **Why**: unlayered rules beat every `@layer` rule regardless of specificity. Tailwind v4 ships utilities in `@layer utilities`. If critical CSS is unlayered, `.grid-cols-1` overrides external `.lg:grid-cols-4` and grids collapse site-wide.
-
-### ClientRouter is OFF
-- No `<ClientRouter />`, no `import { ClientRouter }` in Layout.astro.
-- **Why**: static marketing sites don't need SPA nav. Saves ~125ms forced reflow + ~100ms script eval on mobile.
-- All page JS uses `DOMContentLoaded` with readyState guard.
-
-### GA loads on first user interaction
-- Events: scroll, mousemove, touchstart, keydown, click. 8s fallback timeout.
-- **Why**: Lighthouse never interacts, so GA doesn't load in audits. Real users get GA after they engage (post-LCP).
-
-### `<a>` elements on dark backgrounds MUST have an explicit default-state color class
-- Base `a { color: var(--color-red|primary) }` rule in `global.css` otherwise applies → brand color on dark bg fails WCAG.
-- Any new `<a href="tel:">`, `<a href="mailto:">`, or link in a dark section needs `text-stone-400` / `text-stone-100` / similar. `hover:text-*` doesn't protect the default state.
-
-### `[data-animate]` transitions are transform-only, no opacity
-- `global.css`: `transition: transform 0.65s cubic-bezier(...)`. **Do NOT add `opacity` back to the transition.**
-- **Why**: Lighthouse captures frames mid-transition; a 0.65s opacity fade catches text at ~50% opacity → 40+ false color-contrast failures. Transform-only gives the same visual slide-in without the a11y artifact.
-- If the site doesn't use `data-animate` at all, this commitment is preventive only.
-
-### Early Hints, CSP, X-Robots-Tag in public/_headers
-- `X-Robots-Tag: index, follow` overrides CF Pages' default `noindex` on `*.pages.dev`
-- CSP allows CF Insights (`static.cloudflareinsights.com` in `script-src`, `cloudflareinsights.com` in `connect-src`) + all origins actually used by this site
-- `Link:` headers for 2 critical fonts on `/*` + hero image on `/` → CF Pages promotes to HTTP/2 103 Early Hints
-
-### Images: width/height attrs match urlFor dimensions
-- Every below-fold `<img>` has both attrs. Any urlFor resize change must update the attrs in the same commit.
-- `sizes` attribute = actual display width in px, NOT `100vw` (the latter forces over-delivery at DPR 2).
-
-### Build pipeline
-- `inlineStylesheets: 'auto'` (NOT `'always'`)
-- `scripts/async-css.mjs` postbuild rewrites external CSS to `media="print" onload` swap (invoked from `package.json` build script)
-- `scripts/100club-verify.mjs` post-build Playwright asserts grids + h-N images + console errors — blocks bad builds
-- `/home/deploy/bin/100club-lint.sh` is wired into `lefthook.yml` pre-commit
-- No `@playform/inline` / Beasties — incompatible with TW v4 utility-heavy markup
