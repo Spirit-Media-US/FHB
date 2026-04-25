@@ -80,10 +80,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<!-- Hand-rolled critical CSS (v4 Phase 2D). Paired with inlineStylesheets:'auto' +
 		     async-css.mjs which defers the full Tailwind bundle. Everything inside @layer base
 		     — Tailwind utilities also live in @layer utilities, so above-fold layout survives
-		     the cascade once the external sheet arrives. @font-face lives in global.css (loaded
-		     async); above-fold text renders with system-ui fallback, swaps when fonts arrive. -->
+		     the cascade once the external sheet arrives. The two LCP-critical @font-face decls
+		     (Epilogue 500 + Manrope 400) are inline below with font-display:optional — matches
+		     spirit-media-publishing pattern. The rest of the @font-face decls live in global.css
+		     (loaded async). -->
 		<style is:inline>
 			@keyframes heroEntrance{to{opacity:1;transform:scale(1)}}
+			@font-face{font-family:'Epilogue';font-style:normal;font-weight:500;font-display:optional;src:url('https://assets.spiritmediapublishing.com/fonts/epilogue/epilogue-500.woff2') format('woff2')}
+			@font-face{font-family:'Manrope';font-style:normal;font-weight:400;font-display:optional;src:url('https://assets.spiritmediapublishing.com/fonts/manrope/manrope-400.woff2') format('woff2')}
 			@layer base{
 				:root{--color-canvas:#f9f9f9;--color-soft:#f3f3f3;--color-deep:#2f3131;--color-primary:#b60057;--color-primary-container:#e4006f;--color-on-primary:#f9f9f9;--color-muted:#5b3f46;--color-ink:#1a1c1c;--color-on-surface:#1a1c1c;--color-on-surface-variant:#5b3f46;--color-surface-lowest:#ffffff;--color-outline-variant:#e4bdc4;--font-headline:"Epilogue",system-ui,sans-serif;--font-body:"Manrope",system-ui,sans-serif;--font-serif:"Epilogue",system-ui,sans-serif;--font-sans:"Manrope",system-ui,sans-serif}
 				*,*::before,*::after{box-sizing:border-box;border:0 solid}
