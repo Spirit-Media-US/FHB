@@ -138,22 +138,12 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     MOBILE HERO — image fills the section as background (object-cover),
-		     dark scrim for text legibility, H1 + subhead + CTAs overlaid.
-		     Image (640×183, 6.7KB) preloaded via Layout + Early Hints.
-		     Mobile target: ≥ 95 Perf (image becomes LCP; verify on PSI).
+		     MOBILE HERO — single-paint pattern: image + scrim are combined
+		     in `background` shorthand on the section (gradient layered above
+		     the image). No separate <img> or overlay div, so the browser
+		     paints the section in one pass once the preloaded WebP arrives.
 		     ═══════════════════════════════════════════════════════════ -->
-		<section class="lg:hidden relative flex items-center justify-center overflow-hidden px-6" style="background-color: var(--color-deep); min-height: 600px; padding-top: 6rem; padding-bottom: 4rem;">
-			<img
-				src={heroMobile}
-				width="640"
-				height="183"
-				alt=""
-				fetchpriority="high"
-				decoding="async"
-				style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;"
-			/>
-			<div aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(36,27,23,0.55) 0%,rgba(36,27,23,0.75) 100%);"></div>
+		<section class="lg:hidden relative flex items-center justify-center overflow-hidden px-6" style={`background-color: var(--color-deep); background-image: linear-gradient(180deg, rgba(36,27,23,0.55) 0%, rgba(36,27,23,0.75) 100%), url('${heroMobile}'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 600px; padding-top: 6rem; padding-bottom: 4rem;`}>
 			<div class="relative z-10 max-w-2xl mx-auto text-center">
 				<h1
 					class="text-4xl font-medium leading-snug tracking-tight"
