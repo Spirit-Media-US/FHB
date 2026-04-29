@@ -201,7 +201,10 @@ const currentPath = Astro.url.pathname;
 	}
 	window.addEventListener('scroll', handleScroll, { passive: true });
 	window.addEventListener('resize', handleScroll, { passive: true });
-	handleScroll();
+	// Defer initial paint so the inline <script> doesn't block HTML parse —
+	// brief flash of default bar/link colors on darkHero pages, but FCP/LCP
+	// for the hero is no longer gated by ~300ms of synchronous DOM work.
+	requestAnimationFrame(handleScroll);
 
 	menuBtn?.addEventListener('click', () => {
 		menuOpen = !menuOpen;
