@@ -9,9 +9,8 @@ interface Props {
 	noindex?: boolean;
 	darkHero?: boolean;
 	jsonLd?: Record<string, any>;
-	preloadImage?: string;
-	preloadImageSrcset?: string;
-	preloadImageSizes?: string;
+	preloadImageMobile?: string;
+	preloadImageDesktop?: string;
 }
 
 const {
@@ -21,9 +20,8 @@ const {
 	noindex = false,
 	darkHero = false,
 	jsonLd,
-	preloadImage,
-	preloadImageSrcset,
-	preloadImageSizes,
+	preloadImageMobile,
+	preloadImageDesktop,
 } = Astro.props;
 
 // Fetch siteName and ogImage from Sanity
@@ -63,16 +61,24 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<link rel="preload" as="font" type="font/woff2" href="https://assets.spiritmediapublishing.com/fonts/epilogue/epilogue-500.woff2" crossorigin />
 		<link rel="preload" as="font" type="font/woff2" href="https://assets.spiritmediapublishing.com/fonts/manrope/manrope-400.woff2" crossorigin />
 
-		<!-- Preload hero LCP image (scoped per-page). Active on all viewports —
-		     mobile hero now uses the image as a full-bleed background; the
-		     imagesrcset selects 640w on mobile, 800w on tablet, 1200w on desktop. -->
-		{preloadImage && (
+		<!-- Preload hero LCP image — separate mobile + desktop with media gates.
+		     Avoids DPR-aware imagesrcset upscaling that pulled the 1200w image
+		     on retina mobile (Moto G PSI). Each viewport fetches one file only. -->
+		{preloadImageMobile && (
 			<link
 				rel="preload"
 				as="image"
-				href={preloadImage}
-				imagesrcset={preloadImageSrcset}
-				imagesizes={preloadImageSizes}
+				href={preloadImageMobile}
+				media="(max-width: 1023px)"
+				fetchpriority="high"
+			/>
+		)}
+		{preloadImageDesktop && (
+			<link
+				rel="preload"
+				as="image"
+				href={preloadImageDesktop}
+				media="(min-width: 1024px)"
 				fetchpriority="high"
 			/>
 		)}

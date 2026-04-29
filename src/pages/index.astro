@@ -49,8 +49,6 @@ const heroVideoSrc =
 const heroMobile = 'https://assets.spiritmediapublishing.com/FHB/hero-mobile.webp';
 const heroTablet = 'https://assets.spiritmediapublishing.com/FHB/hero-tablet.webp';
 const heroDesktop = 'https://assets.spiritmediapublishing.com/FHB/hero-desktop.webp';
-const heroPosterSrcset = `${heroMobile} 640w, ${heroTablet} 800w, ${heroDesktop} 1200w`;
-const heroPosterSizes = '(max-width: 639px) 640px, (max-width: 1023px) 800px, 1200px';
 
 // Helper — append Sanity CDN transforms to any cdn.sanity.io URL safely
 function sanityTransform(url: string, w: number, q = 75): string {
@@ -103,9 +101,8 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 	title={seoTitle}
 	description={seoDescription}
 	darkHero={true}
-	preloadImage={heroMobile}
-	preloadImageSrcset={heroPosterSrcset}
-	preloadImageSizes={heroPosterSizes}
+	preloadImageMobile={heroMobile}
+	preloadImageDesktop={heroDesktop}
 	jsonLd={{
 		"@context": "https://schema.org",
 		"@graph": [
