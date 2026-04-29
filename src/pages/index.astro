@@ -141,12 +141,23 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     MOBILE HERO — text-first, H1 is the LCP (performance-gate rule #15)
-		     No image above the fold on mobile. Lighthouse Moto G Slow-4G paints
-		     the H1 from the HTML stream at 800-1200ms, reliably ≥ 95 mobile Perf.
+		     MOBILE HERO — banner image (640×183, 6.7KB, preloaded via Layout)
+		     above text. Image is small/banner-shaped so H1 + subhead + CTAs
+		     stay visually dominant; preloaded asset arrives early via Early
+		     Hints, keeping LCP fast. Mobile target: ≥ 97 Perf.
 		     ═══════════════════════════════════════════════════════════ -->
 		<section class="lg:hidden px-6 py-12" style="background-color: var(--color-canvas); padding-top: 6rem;">
 			<div class="max-w-2xl mx-auto text-center">
+				<img
+					src={heroMobile}
+					width="640"
+					height="183"
+					alt=""
+					fetchpriority="high"
+					decoding="async"
+					class="w-full h-auto rounded-lg"
+					style="margin-bottom: 2rem;"
+				/>
 				<h1
 					class="text-4xl font-medium leading-snug tracking-tight"
 					style="font-family: var(--font-headline); color: var(--color-ink);"
