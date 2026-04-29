@@ -63,8 +63,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<link rel="preload" as="font" type="font/woff2" href="https://assets.spiritmediapublishing.com/fonts/epilogue/epilogue-500.woff2" crossorigin />
 		<link rel="preload" as="font" type="font/woff2" href="https://assets.spiritmediapublishing.com/fonts/manrope/manrope-400.woff2" crossorigin />
 
-		<!-- Preload hero LCP image (scoped per-page). Gated to desktop (≥1024px)
-		     per performance-gate rule #15 — mobile uses text-first hero, no image. -->
+		<!-- Preload hero LCP image (scoped per-page). Active on all viewports —
+		     mobile hero now uses the image as a full-bleed background; the
+		     imagesrcset selects 640w on mobile, 800w on tablet, 1200w on desktop. -->
 		{preloadImage && (
 			<link
 				rel="preload"
@@ -73,7 +74,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 				imagesrcset={preloadImageSrcset}
 				imagesizes={preloadImageSizes}
 				fetchpriority="high"
-				media="(min-width: 1024px)"
 			/>
 		)}
 
