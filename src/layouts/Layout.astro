@@ -64,16 +64,16 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<!-- Preload hero LCP image — separate mobile + desktop with media gates.
 		     Avoids DPR-aware imagesrcset upscaling that pulled the 1200w image
 		     on retina mobile (Moto G PSI). Each viewport fetches one file only.
-		     Mobile hero image is post-LCP (deferred via rIC in index.astro) so
-		     no fetchpriority — keeps it from competing with font preloads in
-		     the LCP window. Desktop hero image is the LCP candidate so retains
-		     fetchpriority="high". -->
+		     Both mobile + desktop hero images are LCP-critical and get
+		     fetchpriority="high" so the preload scanner promotes them ahead
+		     of the rest of the load. -->
 		{preloadImageMobile && (
 			<link
 				rel="preload"
 				as="image"
 				href={preloadImageMobile}
 				media="(max-width: 1023px)"
+				fetchpriority="high"
 			/>
 		)}
 		{preloadImageDesktop && (
