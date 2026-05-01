@@ -138,12 +138,17 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     MOBILE HERO — single-paint pattern: image + scrim are combined
-		     in `background` shorthand on the section (gradient layered above
-		     the image). No separate <img> or overlay div, so the browser
-		     paints the section in one pass once the preloaded WebP arrives.
+		     MOBILE HERO — bg-image deferred via JS after LCP. Initial paint
+		     is gradient + dark fill only, so H1 (in metric-adjusted fallback
+		     font, paints instantly under font-display:optional) becomes the
+		     LCP element. CSS bg-image LCP candidates carry an 832ms element-
+		     render-delay on PSI mobile because they can't use the preload-
+		     scanner fast path; deferring to rIC keeps the image as visual
+		     brand intent without paying the LCP cost.
 		     ═══════════════════════════════════════════════════════════ -->
-		<section class="lg:hidden relative flex items-center justify-center overflow-hidden px-6" style={`background-color: var(--color-deep); background-image: linear-gradient(180deg, rgba(36,27,23,0.55) 0%, rgba(36,27,23,0.75) 100%), url('${heroMobile}'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 600px; padding-top: 6rem; padding-bottom: 4rem;`}>
+		<section class="lg:hidden relative flex items-center justify-center overflow-hidden px-6" style="background-color: var(--color-deep); min-height: 600px; padding-top: 6rem; padding-bottom: 4rem;">
+			<div id="mobile-hero-bg" aria-hidden="true" data-bg={heroMobile} style="position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0;transition:opacity 1s ease;"></div>
+			<div aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(36,27,23,0.55) 0%,rgba(36,27,23,0.75) 100%);pointer-events:none;"></div>
 			<div class="relative z-10 max-w-2xl mx-auto text-center">
 				<h1
 					class="text-4xl font-medium leading-snug tracking-tight"
@@ -175,6 +180,28 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				</div>
 			</div>
 		</section>
+
+		<script is:inline>
+			// Defer mobile hero bg-image to post-LCP. H1 is the LCP element on
+			// mobile; injecting the bg-image via rIC keeps the image off the LCP
+			// critical path. Image is preloaded via Layout (cache-warm), so the
+			// post-LCP swap is essentially free.
+			(() => {
+				const bg = document.getElementById('mobile-hero-bg');
+				if (!bg) return;
+				const url = bg.dataset.bg;
+				if (!url) return;
+				const apply = () => {
+					bg.style.backgroundImage = `url('${url}')`;
+					requestAnimationFrame(() => { bg.style.opacity = '1'; });
+				};
+				if ('requestIdleCallback' in window) {
+					requestIdleCallback(apply, { timeout: 1500 });
+				} else {
+					addEventListener('load', () => setTimeout(apply, 200), { once: true });
+				}
+			})();
+		</script>
 
 		<!-- ═══════════════════════════════════════════════════════════
 		     DESKTOP HERO — full-viewport image with overlaid H1 (lg+ only)
