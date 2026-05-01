@@ -27,12 +27,12 @@ Then run: `git checkout dev && git pull origin dev`
 - SSL must cover all four domain variants: fathersheartbible.org, www.fathersheartbible.org, fathersheartbible.com, www.fathersheartbible.com
 - Uses Biome for linting and Lefthook for git hooks
 
-## Status — as of 2026-04-25
+## Status — as of 2026-05-01
 
 - Site live on main at fathersheartbible.com / .org
-- Phases 1–7 done. Phase 8 partial: 4 commits on dev awaiting merge (localhost SEO fix, blog/privacy/terms pages, EPERM build fix, blog nav link). Google Search Console verification file lives on dev — needs main merge to go live.
+- Phases 1–7 done. Phase 8 partial: blog/privacy/terms pages + nav fixes + perf rebuild on dev awaiting merge. Google Search Console verification file lives on dev — needs main merge to go live.
 - Phase 9 (client delivery, Sanity invite, roadmap) not started.
-- **Perf**: mobile PSI 97–98 stable (LCP ~2.0s), desktop 100 stable. Hero is `requestIdleCallback`-deferred Sanity webp poster; hero poster inlined as base64 data URI to eliminate LCP RTT; self-hosted fonts from R2 with preload for 400 weight only. Remaining 2pt gap is the 32KB inline CSS + 16 @font-face critical chain.
+- **Perf** (dev preview, 2026-05-01): mobile PSI **99 stable** across 5 runs (LCP 2.2s simulated / 1.28s observed, CLS 0.024, TBT 0ms), desktop 100 median. Mobile hero is text-LCP — H1 in metric-adjusted Epilogue/Manrope fallback paints from inline critical CSS, no image. Desktop hero unchanged (full video carousel with R2 webp poster, fetchpriority=high preload + Early Hints). The hero video script has a top-level matchMedia gate so mobile pays zero CPU for the desktop-only carousel. Manrope fallback declared for weights 400/500/600 to absorb late font swaps without CLS. The 1pt LCP gap is Lighthouse's slow-4G simulated LCP being ~2.2s; dropping to 100 would require trimming HTML below ~30KB.
 
 ## Routes & Nav (FHB-specific)
 
