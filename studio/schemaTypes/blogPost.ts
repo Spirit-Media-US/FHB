@@ -43,7 +43,7 @@ export default {
 			name: 'author',
 			title: 'Author',
 			type: 'string',
-			initialValue: 'Add Author Name Here',
+			initialValue: 'Kevin White',
 		},
 		{
 			name: 'publishDate',
