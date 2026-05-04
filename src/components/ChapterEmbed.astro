@@ -53,7 +53,7 @@ const sup = (n: number) => SUPERSCRIPTS[n] ?? `^${n}`;
 				Father's Heart Bible
 			</p>
 			<h2 class="mt-1 text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
-				{book} {chapter}
+				{`${book} ${chapter}`}
 			</h2>
 		</header>
 
@@ -83,7 +83,7 @@ const sup = (n: number) => SUPERSCRIPTS[n] ?? `^${n}`;
 						return (
 							<li id={`fhb-fn-${book.toLowerCase()}-${chapter}-${fn}`} class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
 								<span class="font-semibold mr-2" style="color: #a04060;">{sup(fn ?? 0)}</span>
-								<span class="font-semibold" style="color: var(--color-ink);">{book} {chapter}:{v.verse}</span>
+								<span class="font-semibold" style="color: var(--color-ink);">{`${book} ${chapter}:${v.verse}`}</span>
 								<span> — {v.footnote}</span>
 							</li>
 						);
@@ -91,6 +91,10 @@ const sup = (n: number) => SUPERSCRIPTS[n] ?? `^${n}`;
 				</ol>
 			</footer>
 		)}
+
+		<p class="mt-6 pt-4 text-xs leading-relaxed border-t" style="border-color: #f4c0d0; color: #a04060; font-family: var(--font-sans);">
+			Scripture from the Father&rsquo;s Heart Bible. © 2026 Spirit Media Publishing. All rights reserved.
+		</p>
 	</aside>
 ) : (
 	<aside class="my-8 p-4 rounded-xl text-sm" style="background-color: #fef3c7; border: 1px solid #f59e0b; color: #92400e; font-family: var(--font-sans);">
