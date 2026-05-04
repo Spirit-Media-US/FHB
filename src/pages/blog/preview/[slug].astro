@@ -1,4 +1,5 @@
 ---
+import BlogCTA from '../../../components/BlogCTA.astro';
 import ChapterEmbed from '../../../components/ChapterEmbed.astro';
 import Footer from '../../../components/Footer.astro';
 import Navbar from '../../../components/Navbar.astro';
@@ -170,6 +171,7 @@ const bodySegments = segmentBody(post.body || []);
             ? <ChapterEmbed book={seg.book} chapter={seg.chapter} />
             : <div set:html={seg.html} />
         )}
+        <BlogCTA />
       </div>
     </section>
 
