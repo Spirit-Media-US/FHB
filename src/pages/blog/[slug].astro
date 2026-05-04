@@ -57,6 +57,10 @@ function renderPortableText(blocks: any[]): string {
 				return `<h2 class="text-2xl font-bold mt-12 mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h2>`;
 			if (style === 'h3')
 				return `<h3 class="text-xl font-bold mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h3>`;
+			// Blockquote = inline FHB verse quote. Pink card matching the
+			// chapter-embed palette so FHB renderings always read FHB-pink.
+			if (style === 'blockquote')
+				return `<blockquote class="my-6 px-6 py-5 lg:px-8 rounded-2xl text-lg leading-relaxed" style="background-color: #fdf2f5; border: 1px solid #f9d6e0; font-family: var(--font-serif); color: var(--color-ink);">${textContent}</blockquote>`;
 			return `<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">${textContent}</p>`;
 		})
 		.join('');
