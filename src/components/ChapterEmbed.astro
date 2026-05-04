@@ -1,0 +1,103 @@
+---
+// Renders an FHB chapter inline in a blog post, styled as a soft pink card
+// with numbered superscript footnote markers and footnote text in fine
+// print at the bottom of the card.
+//
+// Triggered by an `fhbChapter` block in a blogPost body (book + chapter),
+// e.g. {_type: 'fhbChapter', book: 'Genesis', chapter: 3}.
+//
+// Chapter data lives at src/data/fhb-chapters/{Book}-{N}.json — copied
+// from /home/deploy/bin/tools-api/pipelines/translation/output/drafts/.
+
+interface Props {
+	book: string;
+	chapter: number | string;
+}
+
+const { book, chapter } = Astro.props;
+
+let chapterData: any = null;
+try {
+	chapterData = await import(`../data/fhb-chapters/${book}-${chapter}.json`);
+	chapterData = chapterData.default || chapterData;
+} catch {
+	chapterData = null;
+}
+
+if (!chapterData) {
+	// Render a quiet warning rather than crashing the page
+}
+
+const verses = chapterData?.verses ?? [];
+const versesWithFootnotes = verses
+	.map((v: any, idx: number) => ({ ...v, _fnIndex: v.footnote ? idx : -1 }))
+	.filter((v: any) => v.footnote);
+// Build verse → footnote-number map (1-based, in verse order)
+const footnoteOrder: number[] = [];
+verses.forEach((v: any) => {
+	if (v.footnote) footnoteOrder.push(v.verse);
+});
+const footnoteNumberFor = (verseNum: number) => {
+	const i = footnoteOrder.indexOf(verseNum);
+	return i === -1 ? null : i + 1;
+};
+
+const SUPERSCRIPTS = ['', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹', '¹⁰', '¹¹', '¹²'];
+const sup = (n: number) => SUPERSCRIPTS[n] ?? `^${n}`;
+---
+
+{chapterData ? (
+	<aside class="fhb-chapter-card my-12 px-6 py-8 lg:px-10 lg:py-10 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+		<header class="mb-6">
+			<p class="text-xs font-semibold uppercase tracking-widest" style="color: #a04060; font-family: var(--font-sans);">
+				Father's Heart Bible
+			</p>
+			<h2 class="mt-1 text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+				{`${book} ${chapter}`}
+			</h2>
+		</header>
+
+		<div class="space-y-3">
+			{verses.map((v: any) => {
+				const fn = footnoteNumberFor(v.verse);
+				return (
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">
+						<span class="inline-block mr-2 align-baseline text-sm font-semibold" style="color: #a04060;">{v.verse}</span>
+						<span set:html={v.fhb_text} />
+						{fn !== null && (
+							<sup class="ml-0.5" style="color: #a04060; font-weight: 600;"><a href={`#fhb-fn-${book.toLowerCase()}-${chapter}-${fn}`} style="color: inherit; text-decoration: none;">{sup(fn)}</a></sup>
+						)}
+					</p>
+				);
+			})}
+		</div>
+
+		{versesWithFootnotes.length > 0 && (
+			<footer class="mt-8 pt-6 border-t" style="border-color: #f4c0d0;">
+				<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: #a04060; font-family: var(--font-sans);">
+					Footnotes
+				</p>
+				<ol class="space-y-2" style="list-style: none; padding-left: 0;">
+					{versesWithFootnotes.map((v: any) => {
+						const fn = footnoteNumberFor(v.verse);
+						return (
+							<li id={`fhb-fn-${book.toLowerCase()}-${chapter}-${fn}`} class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+								<span class="font-semibold mr-2" style="color: #a04060;">{sup(fn ?? 0)}</span>
+								<span class="font-semibold" style="color: var(--color-ink);">{`${book} ${chapter}:${v.verse}`}</span>
+								<span> — {v.footnote}</span>
+							</li>
+						);
+					})}
+				</ol>
+			</footer>
+		)}
+
+		<p class="mt-6 pt-4 text-xs leading-relaxed border-t" style="border-color: #f4c0d0; color: #a04060; font-family: var(--font-sans);">
+			Scripture from the Father&rsquo;s Heart Bible. © 2026 Spirit Media Publishing. All rights reserved.
+		</p>
+	</aside>
+) : (
+	<aside class="my-8 p-4 rounded-xl text-sm" style="background-color: #fef3c7; border: 1px solid #f59e0b; color: #92400e; font-family: var(--font-sans);">
+		Chapter data missing for {book} {chapter}. Add <code>src/data/fhb-chapters/{book}-{chapter}.json</code>.
+	</aside>
+)}

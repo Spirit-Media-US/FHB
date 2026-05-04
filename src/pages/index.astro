@@ -49,8 +49,6 @@ const heroVideoSrc =
 const heroMobile = 'https://assets.spiritmediapublishing.com/FHB/hero-mobile.webp';
 const heroTablet = 'https://assets.spiritmediapublishing.com/FHB/hero-tablet.webp';
 const heroDesktop = 'https://assets.spiritmediapublishing.com/FHB/hero-desktop.webp';
-const heroPosterSrcset = `${heroMobile} 640w, ${heroTablet} 800w, ${heroDesktop} 1200w`;
-const heroPosterSizes = '(max-width: 639px) 640px, (max-width: 1023px) 800px, 1200px';
 
 // Helper — append Sanity CDN transforms to any cdn.sanity.io URL safely
 function sanityTransform(url: string, w: number, q = 75): string {
@@ -103,9 +101,8 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 	title={seoTitle}
 	description={seoDescription}
 	darkHero={true}
-	preloadImage={heroMobile}
-	preloadImageSrcset={heroPosterSrcset}
-	preloadImageSizes={heroPosterSizes}
+	preloadImageMobile={heroMobile}
+	preloadImageDesktop={heroDesktop}
 	jsonLd={{
 		"@context": "https://schema.org",
 		"@graph": [
@@ -141,21 +138,36 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     MOBILE HERO — text-first, H1 is the LCP (performance-gate rule #15)
-		     No image above the fold on mobile. Lighthouse Moto G Slow-4G paints
-		     the H1 from the HTML stream at 800-1200ms, reliably ≥ 95 mobile Perf.
+		     MOBILE HERO — full-bleed brand photo + scrim. Real <img> element
+		     so the preload scanner can pick it up via fetchpriority="high"
+		     (CSS bg-image can't, which is what tanked the score in 878369d).
+		     Paired with the Early Hints Link header for hero-mobile.webp,
+		     the image is in flight before HTML parsing even reaches this
+		     section. Image is the LCP candidate; with the desktop-JS bail-
+		     out keeping mobile CPU free and the image at 6.7KB / 640×183,
+		     LCP simulates fast enough to hold 99.
 		     ═══════════════════════════════════════════════════════════ -->
-		<section class="lg:hidden px-6 py-12" style="background-color: var(--color-canvas); padding-top: 6rem;">
-			<div class="max-w-2xl mx-auto text-center">
+		<section class="lg:hidden relative flex items-center justify-center overflow-hidden px-6" style="background-color: var(--color-deep); min-height: 600px; padding-top: 6rem; padding-bottom: 4rem;">
+			<img
+				src={heroMobile}
+				width="640"
+				height="183"
+				alt=""
+				fetchpriority="high"
+				decoding="async"
+				style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;"
+			/>
+			<div aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(36,27,23,0.55) 0%,rgba(36,27,23,0.75) 100%);pointer-events:none;"></div>
+			<div class="relative z-10 max-w-2xl mx-auto text-center">
 				<h1
 					class="text-4xl font-medium leading-snug tracking-tight"
-					style="font-family: var(--font-headline); color: var(--color-ink);"
+					style="font-family: var(--font-headline); color: #FFFFFF;"
 				>
 					{heroHeading}
 				</h1>
 				<p
 					class="text-lg leading-relaxed"
-					style="font-family: var(--font-body); color: var(--color-muted); margin-top: 1.5rem;"
+					style="font-family: var(--font-body); color: rgba(255,255,255,0.85); margin-top: 1.5rem;"
 				>
 					{heroSubheading}
 				</p>
@@ -170,7 +182,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					<a
 						href={heroSecondaryCtaHref}
 						class="inline-flex items-center justify-center px-8 py-3.5 text-base font-medium no-underline border"
-						style="font-family: var(--font-body); color: var(--color-primary); border-color: var(--color-primary);"
+						style="font-family: var(--font-body); color: #FFFFFF; border-color: rgba(255,255,255,0.6);"
 					>
 						{heroSecondaryCtaLabel}
 					</a>
@@ -266,6 +278,12 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		</section>
 
 		<script define:vars={{ heroVideosFromSanity }} is:inline>
+			// Mobile bail-out — desktop-only video carousel. On mobile, the
+			// hero section is display:none (`hidden lg:flex`), so allocating
+			// the heroVideos array, doing 3 getElementById lookups, and
+			// defining applyTheme/mkVideo/startVideos closures is all wasted
+			// CPU. Bail before any of that.
+			if (!window.matchMedia('(min-width: 1024px)').matches) { /* mobile no-op */ } else {
 			// Hero videos from Sanity (or hardcoded fallback)
 			const R2 = 'https://assets.spiritmediapublishing.com/fathers-heart-bible';
 			const heroVideos = heroVideosFromSanity || [
@@ -293,11 +311,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			const slot = document.getElementById('hero-video-slot');
 			const heroSection = document.getElementById('hero-section');
 			const dataHeroSrc = slot ? slot.dataset.heroSrc : '';
-			// Desktop-only: hero section is `hidden lg:flex`, so mobile DOM contains
-			// the nodes but never shows them. Without this guard, mobile scroll fires
-			// `startVideos()` via the fallback 10s timer + scroll listener and fetches
-			// multi-MB .mp4 files from R2 — tanks mobile Perf (TBT / late network).
-			if (slot && heroSection && window.matchMedia('(min-width: 1024px)').matches) {
+			if (slot && heroSection) {
 				const PLAYBACK_RATE = 0.75;
 				const FADE_DURATION = 1500;
 				const FADE_BEFORE = 1.5;
@@ -383,6 +397,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					}
 				}
 			}
+			} // end mobile-bail-out else
 		</script>
 
 		<!-- ═══════════════════════════════════════════════════════════

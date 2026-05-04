@@ -163,21 +163,23 @@ const currentPath = Astro.url.pathname;
 	function setNavColors(scrolled: boolean) {
 		if (!header) return;
 		const logo = document.getElementById('nav-logo');
+		const logoText = logo?.querySelector<HTMLElement>('span');
 		const ctaBtn = document.getElementById('nav-cta');
 		const links = Array.from(header.querySelectorAll<HTMLElement>('nav a, nav span')).filter(
 			el => el !== logo && !logo?.contains(el) && el !== ctaBtn
 		);
 		const bars = [bar1, bar2, bar3];
-		// Mobile (<1024px) never has the dark-photo hero — treat as !darkHero regardless.
-		const darkBgVisible = darkHero && window.innerWidth >= 1024;
+		const darkBgVisible = darkHero;
 		if (scrolled || !darkBgVisible) {
-			// Glass/canvas background — use primary/variant for links
+			// Glass/canvas background — use primary/variant for links + bars + logo text
 			links.forEach(el => { el.style.color = 'var(--color-on-surface-variant)'; });
 			bars.forEach(el => { if (el) el.style.backgroundColor = 'var(--color-on-surface)'; });
+			if (logoText) logoText.style.color = 'var(--color-primary)';
 		} else {
-			// Transparent on dark hero (desktop only) — use white
+			// Transparent over dark hero — white text + bars + logo text
 			links.forEach(el => { el.style.color = 'rgba(255,255,255,0.92)'; });
 			bars.forEach(el => { if (el) el.style.backgroundColor = 'rgba(255,255,255,0.85)'; });
+			if (logoText) logoText.style.color = 'rgba(255,255,255,0.92)';
 		}
 	}
 
@@ -199,7 +201,10 @@ const currentPath = Astro.url.pathname;
 	}
 	window.addEventListener('scroll', handleScroll, { passive: true });
 	window.addEventListener('resize', handleScroll, { passive: true });
-	handleScroll();
+	// Defer initial paint so the inline <script> doesn't block HTML parse —
+	// brief flash of default bar/link colors on darkHero pages, but FCP/LCP
+	// for the hero is no longer gated by ~300ms of synchronous DOM work.
+	requestAnimationFrame(handleScroll);
 
 	menuBtn?.addEventListener('click', () => {
 		menuOpen = !menuOpen;

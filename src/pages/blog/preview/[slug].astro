@@ -1,23 +1,30 @@
 ---
-import BlogCTA from '../../components/BlogCTA.astro';
-import ChapterEmbed from '../../components/ChapterEmbed.astro';
-import Footer from '../../components/Footer.astro';
-import Navbar from '../../components/Navbar.astro';
-import RelatedPosts from '../../components/RelatedPosts.astro';
-import ShareBar from '../../components/ShareBar.astro';
-import Layout from '../../layouts/Layout.astro';
-import { sanityClient, urlFor } from '../../lib/sanity';
+import BlogCTA from '../../../components/BlogCTA.astro';
+import ChapterEmbed from '../../../components/ChapterEmbed.astro';
+import Footer from '../../../components/Footer.astro';
+import Navbar from '../../../components/Navbar.astro';
+import ShareBar from '../../../components/ShareBar.astro';
+import Layout from '../../../layouts/Layout.astro';
+import { previewClient, urlFor } from '../../../lib/sanity';
 
+// Dev-only route. Generates pages only when PUBLIC_PREVIEW_DRAFTS=1 is set
+// at build time (deploy-preview.sh sets it on the dev branch). Production
+// builds (deploy-live.sh) don't set it, so getStaticPaths returns [] and
+// no preview pages are emitted into dist/.
 export async function getStaticPaths() {
-	const posts = await sanityClient.fetch(`*[_type == "blogPost"] { "slug": slug.current }`);
+	if (import.meta.env.PUBLIC_PREVIEW_DRAFTS !== '1') return [];
+	const posts = await previewClient.fetch(
+		`*[_type == "blogPost" && defined(slug.current)] { "slug": slug.current }`,
+	);
 	return posts.map((p: any) => ({ params: { slug: p.slug } }));
 }
 
 const { slug } = Astro.params;
 
-const post = await sanityClient.fetch(`*[_type == "blogPost" && slug.current == $slug][0]`, {
-	slug,
-});
+const post = await previewClient.fetch(
+	`*[_type == "blogPost" && slug.current == $slug][0]`,
+	{ slug },
+);
 
 if (!post) {
 	return Astro.redirect('/blog');
@@ -68,6 +75,7 @@ function renderPortableText(blocks: any[]): string {
 }
 
 const formatDate = (dateString: string) => {
+	if (!dateString) return 'Draft';
 	const date = new Date(dateString);
 	return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 };
@@ -79,10 +87,6 @@ const heroImage = post.heroImage
 const author = post.author || 'Kevin White';
 const tags = post.tags || [];
 
-// Body is rendered block-by-block so we can interleave custom block types
-// (currently `fhbChapter` → <ChapterEmbed>). Runs of regular `block` items
-// are batched into single HTML fragments to preserve normal portable-text
-// behavior; `fhbChapter` items break the run and render the component.
 type BodySegment =
 	| { kind: 'html'; html: string }
 	| { kind: 'chapter'; book: string; chapter: number };
@@ -109,35 +113,24 @@ function segmentBody(blocks: any[]): BodySegment[] {
 }
 
 const bodySegments = segmentBody(post.body || []);
-
-const jsonLd = {
-	'@context': 'https://schema.org',
-	'@type': 'BlogPosting',
-	headline: post.title,
-	description: post.excerpt || post.title,
-	image: heroImage,
-	author: { '@type': 'Person', name: author },
-	publisher: {
-		'@type': 'Organization',
-		name: "Father's Heart Bible",
-		url: 'https://fathersheartbible.com',
-	},
-	url: `https://fathersheartbible.com/blog/${post.slug.current}`,
-	datePublished: post.publishDate,
-};
 ---
 
 <Layout
-  title={post.seoTitle || `${post.title} | Father's Heart Bible Blog`}
-  description={post.seoDescription || post.excerpt || "Read this article on the Father's Heart Bible blog."}
+  title={`[DRAFT] ${post.title} | Father's Heart Bible Blog`}
+  description={post.seoDescription || post.excerpt || "Draft preview."}
   image={heroImage}
-  jsonLd={jsonLd}
+  noindex={true}
 >
   <Navbar />
 
   <main id="main-content">
+    <!-- DRAFT BANNER -->
+    <div style="background-color: #fef3c7; border-bottom: 1px solid #f59e0b; padding: 0.75rem 1.5rem; margin-top: 80px; text-align: center; font-family: var(--font-sans); font-size: 0.875rem; color: #92400e;">
+      <strong>DRAFT PREVIEW</strong> — This post is a Sanity draft, not published. Visible on dev preview only.
+    </div>
+
     <!-- HERO IMAGE -->
-    <div class="w-full" style="margin-top: 80px;">
+    <div class="w-full">
       <img src={heroImage} alt={post.heroImage?.alt || post.title} class="w-full h-72 lg:h-[600px] object-cover" />
     </div>
 
@@ -161,9 +154,9 @@ const jsonLd = {
         <div class="mx-auto max-w-3xl">
           <div class="flex flex-wrap gap-2">
             {tags.map((tag: string) => (
-              <a href={`/blog?tag=${encodeURIComponent(tag)}`} class="text-xs font-semibold rounded-full px-3 py-1 transition-colors no-underline" style="color: var(--color-muted); background-color: var(--color-surface);">
+              <span class="text-xs font-semibold rounded-full px-3 py-1" style="color: var(--color-muted); background-color: var(--color-surface);">
                 {tag}
-              </a>
+              </span>
             ))}
           </div>
         </div>
@@ -182,11 +175,8 @@ const jsonLd = {
       </div>
     </section>
 
-    <!-- SHARE BAR -->
-    <ShareBar title={post.title} url={`https://fathersheartbible.com/blog/${post.slug.current}`} />
-
-    <!-- RELATED POSTS -->
-    <RelatedPosts currentSlug={`/blog/${post.slug.current}`} currentTags={tags} />
+    <!-- SHARE BAR (disabled in preview — links would 404) -->
+    <ShareBar title={post.title} url={`https://fathersheartbible.com/blog/${post.slug?.current || slug}`} />
   </main>
 
   <Footer />
