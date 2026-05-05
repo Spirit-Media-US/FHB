@@ -1,4 +1,7 @@
 ---
+import DonationForm from '../components/donations/DonationForm.astro';
+import DonorFeed from '../components/donations/DonorFeed.astro';
+import ProgressBar from '../components/donations/ProgressBar.astro';
 import Footer from '../components/Footer.astro';
 import ImageGrid from '../components/ImageGrid.astro';
 import Navbar from '../components/Navbar.astro';
@@ -119,8 +122,26 @@ const impactStats = partnerData?.impactStats ?? [
 			heading={heroHeading}
 			subheading={heroSubheading}
 			primaryCtaLabel={heroPrimaryCtaLabel}
-			primaryCtaHref={donateUrl}
+			primaryCtaHref="#donate"
 		/>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 1.5 — DONATION FLOW (progress + form + feed)
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light" id="donate">
+			<div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-start">
+				<!-- Left column: progress + donor feed -->
+				<div class="lg:col-span-2 space-y-8" data-reveal>
+					<ProgressBar campaign="fhb" />
+					<DonorFeed campaign="fhb" />
+				</div>
+				<!-- Right column: donation form -->
+				<div class="lg:col-span-3" data-reveal>
+					<DonationForm />
+				</div>
+			</div>
+		</Section>
 
 
 		<!-- ═══════════════════════════════════════════════════════════

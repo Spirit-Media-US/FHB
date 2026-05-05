@@ -1,0 +1,326 @@
+---
+// Donation form + embedded Stripe Checkout.
+// Donor never leaves /partner/ — the Stripe form mounts inline in the
+// #donation-stripe-mount div. On completion, Stripe fires the return_url
+// which loads the page back with ?session_id=... and the inline success
+// state takes over.
+---
+
+<div id="donation-form-root" class="donation-form" style="background-color: var(--color-surface); border: 1px solid var(--color-outline-variant); border-radius: 16px; padding: 28px;">
+
+	<!-- STEP 1: amount + donor info — the form the donor fills in first -->
+	<div id="donation-step-form">
+		<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">
+			Make a Gift
+		</p>
+		<h2 class="text-2xl md:text-3xl font-light leading-tight mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">
+			Partner with the Father&rsquo;s Heart Bible
+		</h2>
+
+		<!-- One-time / Monthly toggle -->
+		<div class="flex gap-2 mb-5" role="tablist">
+			<button type="button" data-frequency="one_time" data-active="true"
+				class="frequency-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+				style="font-family: var(--font-sans);">
+				One-time
+			</button>
+			<button type="button" data-frequency="recurring"
+				class="frequency-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+				style="font-family: var(--font-sans);">
+				Monthly
+			</button>
+		</div>
+
+		<!-- Suggested amounts -->
+		<div class="grid grid-cols-3 gap-2 mb-3">
+			<button type="button" data-amount="33" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$33</button>
+			<button type="button" data-amount="100" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$100</button>
+			<button type="button" data-amount="500" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$500</button>
+			<button type="button" data-amount="1000" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$1,000</button>
+			<button type="button" data-amount="5000" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$5,000</button>
+			<button type="button" data-amount="custom" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">Custom</button>
+		</div>
+
+		<!-- Custom amount input -->
+		<div id="custom-amount-row" style="display: none;" class="mb-3">
+			<label class="block text-sm mb-1" style="color: var(--color-muted); font-family: var(--font-sans);">Custom amount (USD)</label>
+			<div class="relative">
+				<span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--color-muted); font-family: var(--font-sans);">$</span>
+				<input type="number" id="custom-amount-input" min="1" max="10000" step="1" placeholder="0"
+					class="w-full pl-7 pr-4 py-3 rounded-lg border text-base"
+					style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
+			</div>
+		</div>
+
+		<!-- Donor info -->
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+			<input type="text" id="donor-first-name" placeholder="First name" required
+				class="px-4 py-3 rounded-lg border text-base"
+				style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
+			<input type="text" id="donor-last-name" placeholder="Last name" required
+				class="px-4 py-3 rounded-lg border text-base"
+				style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
+		</div>
+		<input type="email" id="donor-email" placeholder="Email" required
+			class="w-full px-4 py-3 rounded-lg border text-base mb-3"
+			style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
+
+		<!-- Optional public message -->
+		<details class="mb-3" style="border-radius: 8px;">
+			<summary class="cursor-pointer text-sm py-2" style="color: var(--color-muted); font-family: var(--font-sans);">
+				Add a public message (optional)
+			</summary>
+			<input type="text" id="donor-public-name" placeholder="Display name (defaults to your name)" maxlength="100"
+				class="w-full mt-2 px-4 py-3 rounded-lg border text-sm"
+				style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
+			<textarea id="donor-public-message" rows="3" placeholder="Why are you giving?" maxlength="500"
+				class="w-full mt-2 px-4 py-3 rounded-lg border text-sm"
+				style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);"></textarea>
+		</details>
+
+		<!-- Visibility + cover-fees -->
+		<div class="space-y-2 mb-5">
+			<label class="flex items-start gap-2 cursor-pointer">
+				<input type="checkbox" id="donor-is-public" checked class="mt-1" />
+				<span class="text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">Show my name + amount + comment publicly</span>
+			</label>
+			<label class="flex items-start gap-2 cursor-pointer">
+				<input type="checkbox" id="donor-cover-fees" class="mt-1" />
+				<span class="text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">Cover the ~3% processing fee so 100% reaches FHB</span>
+			</label>
+		</div>
+
+		<button type="button" id="donation-continue"
+			class="w-full px-6 py-3.5 rounded-lg text-base font-semibold transition-opacity hover:opacity-90"
+			style="background-color: var(--color-brand); color: #ffffff; font-family: var(--font-sans);">
+			Continue to payment
+		</button>
+
+		<p id="donation-form-error" style="display: none; margin-top: 12px; padding: 8px 12px; background-color: #fee; color: #c00; border-radius: 8px; font-family: var(--font-sans); font-size: 0.875rem;"></p>
+	</div>
+
+	<!-- STEP 2: embedded Stripe Checkout mounts here — donor pays inline -->
+	<div id="donation-step-stripe" style="display: none;">
+		<div class="flex items-center justify-between mb-4">
+			<p id="donation-summary-line" class="text-sm" style="color: var(--color-muted); font-family: var(--font-sans);"></p>
+			<button type="button" id="donation-back" class="text-sm" style="color: var(--color-brand); font-family: var(--font-sans);">&larr; Edit</button>
+		</div>
+		<div id="donation-stripe-mount"></div>
+	</div>
+
+	<!-- STEP 3: success state (rendered when ?session_id=... is in URL on return) -->
+	<div id="donation-step-success" style="display: none; text-align: center; padding: 16px;">
+		<p style="font-size: 3rem;">💛</p>
+		<h2 class="text-2xl md:text-3xl font-light leading-tight mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">
+			Thank you.
+		</h2>
+		<p class="leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+			Your gift was received. A receipt is on its way to your inbox.
+		</p>
+		<p class="leading-relaxed mt-2" style="font-family: var(--font-sans); color: var(--color-muted);">
+			You just helped move the Father&rsquo;s Heart Bible closer to readers across the world.
+		</p>
+		<button type="button" id="donation-make-another"
+			class="mt-6 inline-flex px-6 py-3 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
+			style="background-color: var(--color-brand); color: #ffffff; font-family: var(--font-sans);">
+			Make another gift
+		</button>
+	</div>
+</div>
+
+<style>
+	.frequency-btn {
+		background-color: var(--color-surface-low);
+		color: var(--color-muted);
+		border: 1px solid var(--color-outline-variant);
+	}
+	.frequency-btn[data-active="true"] {
+		background-color: var(--color-brand);
+		color: #ffffff;
+		border-color: var(--color-brand);
+	}
+	.amount-btn {
+		background-color: var(--color-surface-low);
+		color: var(--color-ink);
+		border: 1px solid var(--color-outline-variant);
+	}
+	.amount-btn[data-active="true"] {
+		background-color: var(--color-brand);
+		color: #ffffff;
+		border-color: var(--color-brand);
+	}
+</style>
+
+<script>
+	import { loadStripe } from '@stripe/stripe-js';
+
+	// Publishable key — public, safe in source. Live key for production donations.
+	const STRIPE_PK = 'pk_live_51MX6GXIZWVjKTV59eSCSw9DGhLjLGYx5B50VVmErOooiJgLKM9rGLYt5toXa6d4aize8TJe4t3QAp7NJW7GPEOTp00mAjvGWgf';
+	const TOOLS_API = 'https://tools-api.spiritmediapublishing.com';
+	const FEE_RATE = 0.029;
+	const FEE_FIXED_CENTS = 30;
+
+	let stripePromise: Promise<any> | null = null;
+	let checkoutInstance: any = null;
+	let selectedAmountDollars = 0;
+	let frequency: 'one_time' | 'recurring' = 'one_time';
+
+	function init() {
+		const root = document.getElementById('donation-form-root');
+		if (!root) return;
+		if ((root as any)._initted) return;
+		(root as any)._initted = true;
+
+		// Frequency toggle
+		root.querySelectorAll<HTMLButtonElement>('.frequency-btn').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				root.querySelectorAll<HTMLButtonElement>('.frequency-btn').forEach((b) => (b.dataset.active = 'false'));
+				btn.dataset.active = 'true';
+				frequency = (btn.dataset.frequency as any) || 'one_time';
+			});
+		});
+
+		// Amount selection
+		root.querySelectorAll<HTMLButtonElement>('.amount-btn').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				root.querySelectorAll<HTMLButtonElement>('.amount-btn').forEach((b) => (b.dataset.active = 'false'));
+				btn.dataset.active = 'true';
+				const v = btn.dataset.amount || '';
+				const customRow = document.getElementById('custom-amount-row');
+				if (v === 'custom') {
+					if (customRow) customRow.style.display = '';
+					selectedAmountDollars = 0;
+					(document.getElementById('custom-amount-input') as HTMLInputElement)?.focus();
+				} else {
+					if (customRow) customRow.style.display = 'none';
+					selectedAmountDollars = parseInt(v, 10) || 0;
+				}
+			});
+		});
+
+		// Continue → Stripe
+		document.getElementById('donation-continue')?.addEventListener('click', onContinue);
+		document.getElementById('donation-back')?.addEventListener('click', () => {
+			document.getElementById('donation-step-stripe')!.style.display = 'none';
+			document.getElementById('donation-step-form')!.style.display = '';
+			if (checkoutInstance) {
+				try { checkoutInstance.destroy(); } catch {}
+				checkoutInstance = null;
+			}
+		});
+		document.getElementById('donation-make-another')?.addEventListener('click', () => {
+			// Clear ?session_id from URL and reset form
+			const url = new URL(window.location.href);
+			url.searchParams.delete('session_id');
+			window.history.replaceState({}, '', url.toString());
+			document.getElementById('donation-step-success')!.style.display = 'none';
+			document.getElementById('donation-step-form')!.style.display = '';
+		});
+
+		// On load — if returning from Stripe with session_id, show success state
+		const params = new URLSearchParams(window.location.search);
+		if (params.get('session_id')) {
+			document.getElementById('donation-step-form')!.style.display = 'none';
+			document.getElementById('donation-step-success')!.style.display = '';
+			// Trigger an immediate progress refresh so totals reflect new donation
+			window.dispatchEvent(new Event('donations:refresh'));
+			setTimeout(() => {
+				// Scroll the donation form into view so the thank-you is centered
+				root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}, 50);
+		}
+	}
+
+	async function onContinue() {
+		const errEl = document.getElementById('donation-form-error')!;
+		errEl.style.display = 'none';
+
+		// Resolve amount
+		const customInput = document.getElementById('custom-amount-input') as HTMLInputElement | null;
+		let dollars = selectedAmountDollars;
+		if (customInput && customInput.parentElement?.parentElement?.parentElement?.style.display !== 'none' && (document.querySelector('.amount-btn[data-active="true"]') as HTMLElement)?.dataset.amount === 'custom') {
+			dollars = parseInt(customInput.value || '0', 10);
+		}
+		if (!dollars || dollars < 1) {
+			errEl.textContent = 'Please choose or enter an amount.';
+			errEl.style.display = '';
+			return;
+		}
+		if (dollars > 10000) {
+			errEl.textContent = 'For gifts above $10,000, please contact office@smgives.org.';
+			errEl.style.display = '';
+			return;
+		}
+
+		const firstName = (document.getElementById('donor-first-name') as HTMLInputElement).value.trim();
+		const lastName = (document.getElementById('donor-last-name') as HTMLInputElement).value.trim();
+		const email = (document.getElementById('donor-email') as HTMLInputElement).value.trim();
+		if (!firstName || !lastName || !email) {
+			errEl.textContent = 'Please fill in your name and email.';
+			errEl.style.display = '';
+			return;
+		}
+
+		const publicName = (document.getElementById('donor-public-name') as HTMLInputElement).value.trim() || `${firstName} ${lastName}`;
+		const publicMessage = (document.getElementById('donor-public-message') as HTMLTextAreaElement).value.trim();
+		const isPublic = (document.getElementById('donor-is-public') as HTMLInputElement).checked;
+		const coverFees = (document.getElementById('donor-cover-fees') as HTMLInputElement).checked;
+
+		// If donor opts to cover fees, gross up the amount so net = chosen amount.
+		// Stripe charges 2.9% + $0.30 (or NPO discounted rate). Use 2.9 + 0.30 as estimate.
+		let amountCents = dollars * 100;
+		let feeCoveredCents = 0;
+		if (coverFees) {
+			const gross = Math.round((amountCents + FEE_FIXED_CENTS) / (1 - FEE_RATE));
+			feeCoveredCents = gross - amountCents;
+			amountCents = gross;
+		}
+
+		// Move to step 2
+		document.getElementById('donation-step-form')!.style.display = 'none';
+		document.getElementById('donation-step-stripe')!.style.display = '';
+		const summary = document.getElementById('donation-summary-line')!;
+		summary.textContent = `${frequency === 'recurring' ? 'Monthly' : 'One-time'}: $${(amountCents/100).toFixed(2)}`;
+
+		// Create Checkout Session
+		try {
+			const res = await fetch(`${TOOLS_API}/api/donations/checkout`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					campaign: 'fhb',
+					amount_cents: amountCents,
+					is_recurring: frequency === 'recurring',
+					donor_name: `${firstName} ${lastName}`,
+					donor_email: email,
+					public_name: publicName,
+					public_message: publicMessage,
+					is_public: isPublic,
+					cover_fees: coverFees,
+					fee_covered_cents: feeCoveredCents,
+				}),
+			});
+			const data = await res.json();
+			if (!res.ok || !data.client_secret) {
+				throw new Error(data.error || 'Could not start checkout');
+			}
+
+			if (!stripePromise) stripePromise = loadStripe(STRIPE_PK);
+			const stripe = await stripePromise;
+			if (!stripe) throw new Error('Stripe failed to load');
+
+			checkoutInstance = await stripe.initEmbeddedCheckout({
+				clientSecret: data.client_secret,
+			});
+			checkoutInstance.mount('#donation-stripe-mount');
+		} catch (e: any) {
+			document.getElementById('donation-step-stripe')!.style.display = 'none';
+			document.getElementById('donation-step-form')!.style.display = '';
+			errEl.textContent = e?.message || 'Something went wrong starting checkout. Please try again.';
+			errEl.style.display = '';
+		}
+	}
+
+	document.addEventListener('astro:page-load', init);
+	if (document.readyState !== 'loading') init();
+</script>
