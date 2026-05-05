@@ -31,8 +31,10 @@ const seoDescription =
 	"Partner with the Father's Heart Bible project and help bring this transformational translation to the world. Your support makes a difference.";
 const heroHeading = 'Partner With Us';
 const heroSubheading = 'Be part of what the Father is doing.';
-const heroPrimaryCtaLabel = 'Donate Now';
-const heroPrimaryCtaHref = '#donate';
+// Donate Now button removed from hero — donation form is in the next section,
+// no need to send the donor scrolling past it to a CTA that's already visible.
+const heroPrimaryCtaLabel = '';
+const heroPrimaryCtaHref = '';
 const bookCoverUrl = media?.bookCoverUrl || '';
 const donateUrl = media?.donateUrl || '#donate';
 const communityUrl = media?.communityUrl || '/join';
@@ -115,14 +117,12 @@ const impactStats = partnerData?.impactStats ?? [
 	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 1 — HERO
+		     SECTION 1 — HERO (no CTA — donation form is right below)
 		     ═══════════════════════════════════════════════════════════ -->
 		<VideoHeroInner
 			videoSrc={partnerPageVideoUrl}
 			heading={heroHeading}
 			subheading={heroSubheading}
-			primaryCtaLabel={heroPrimaryCtaLabel}
-			primaryCtaHref="#donate"
 		/>
 
 

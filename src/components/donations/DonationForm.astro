@@ -10,7 +10,8 @@
 
 	<!-- STEP 1: amount + donor info — the form the donor fills in first -->
 	<div id="donation-step-form">
-		<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">
+		<p class="text-xs font-semibold tracking-widest uppercase mb-2 inline-flex items-center gap-2" style="color: var(--color-brand); font-family: var(--font-sans);">
+			<span aria-hidden="true" style="font-size: 1rem;">💛</span>
 			Make a Gift
 		</p>
 		<h2 class="text-2xl md:text-3xl font-light leading-tight mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">
@@ -78,16 +79,26 @@
 				style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);"></textarea>
 		</details>
 
-		<!-- Visibility + cover-fees -->
-		<div class="space-y-2 mb-5">
+		<!-- Visibility + cover-fees (cover-fees default ON — donor sees impact and can opt out) -->
+		<div class="space-y-2 mb-4">
 			<label class="flex items-start gap-2 cursor-pointer">
 				<input type="checkbox" id="donor-is-public" checked class="mt-1" />
 				<span class="text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">Show my name + amount + comment publicly</span>
 			</label>
 			<label class="flex items-start gap-2 cursor-pointer">
-				<input type="checkbox" id="donor-cover-fees" class="mt-1" />
-				<span class="text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">Cover the ~3% processing fee so 100% reaches FHB</span>
+				<input type="checkbox" id="donor-cover-fees" checked class="mt-1" />
+				<span class="text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">Cover the processing fee so 100% reaches FHB</span>
 			</label>
+		</div>
+
+		<!-- Live impact display — updates as donor changes amount or fee toggle -->
+		<div id="donation-impact" class="mb-5 p-3 rounded-lg" style="background-color: #fdf2f5; border: 1px solid #f9d6e0; font-family: var(--font-sans); font-size: 0.875rem; line-height: 1.5; display: none;">
+			<p style="margin:0; color: var(--color-ink);">
+				<span style="color: var(--color-muted);">You'll give</span>
+				<strong id="impact-gross" style="color: var(--color-ink);">$0</strong>.
+				<span style="color: var(--color-muted);">FHB receives</span>
+				<strong id="impact-net" style="color: var(--color-brand);">$0</strong><span id="impact-suffix" style="color: var(--color-muted);">.</span>
+			</p>
 		</div>
 
 		<button type="button" id="donation-continue"
@@ -165,6 +176,55 @@
 	let selectedAmountDollars = 0;
 	let frequency: 'one_time' | 'recurring' = 'one_time';
 
+	function fmt(c: number) {
+		return `$${(c / 100).toLocaleString('en-US', { minimumFractionDigits: c % 100 === 0 ? 0 : 2, maximumFractionDigits: 2 })}`;
+	}
+
+	function getCurrentAmountCents(): number {
+		const activeBtn = document.querySelector('.amount-btn[data-active="true"]') as HTMLElement | null;
+		if (activeBtn?.dataset.amount === 'custom') {
+			const input = document.getElementById('custom-amount-input') as HTMLInputElement | null;
+			const dollars = parseInt(input?.value || '0', 10);
+			return Number.isFinite(dollars) && dollars > 0 ? dollars * 100 : 0;
+		}
+		return selectedAmountDollars * 100;
+	}
+
+	function updateImpact() {
+		const impact = document.getElementById('donation-impact');
+		const grossEl = document.getElementById('impact-gross');
+		const netEl = document.getElementById('impact-net');
+		const suffixEl = document.getElementById('impact-suffix');
+		if (!impact || !grossEl || !netEl || !suffixEl) return;
+
+		const intendedCents = getCurrentAmountCents();
+		if (!intendedCents) {
+			impact.style.display = 'none';
+			return;
+		}
+
+		const coverFees = (document.getElementById('donor-cover-fees') as HTMLInputElement | null)?.checked ?? true;
+
+		let grossCents: number;
+		let netCents: number;
+		if (coverFees) {
+			// Donor covers fees — gross up so FHB gets the full intended amount
+			grossCents = Math.round((intendedCents + FEE_FIXED_CENTS) / (1 - FEE_RATE));
+			netCents = intendedCents;
+		} else {
+			// Donor pays the chosen amount; FHB gets it minus fee
+			grossCents = intendedCents;
+			netCents = Math.max(0, intendedCents - Math.round(intendedCents * FEE_RATE) - FEE_FIXED_CENTS);
+		}
+
+		grossEl.textContent = fmt(grossCents);
+		netEl.textContent = fmt(netCents);
+		suffixEl.textContent = coverFees
+			? ' — the full amount, no fees taken out.'
+			: ' after the processing fee.';
+		impact.style.display = '';
+	}
+
 	function init() {
 		const root = document.getElementById('donation-form-root');
 		if (!root) return;
@@ -177,6 +237,7 @@
 				root.querySelectorAll<HTMLButtonElement>('.frequency-btn').forEach((b) => (b.dataset.active = 'false'));
 				btn.dataset.active = 'true';
 				frequency = (btn.dataset.frequency as any) || 'one_time';
+				updateImpact();
 			});
 		});
 
@@ -195,8 +256,15 @@
 					if (customRow) customRow.style.display = 'none';
 					selectedAmountDollars = parseInt(v, 10) || 0;
 				}
+				updateImpact();
 			});
 		});
+
+		// Custom amount input — update impact live as donor types
+		(document.getElementById('custom-amount-input') as HTMLInputElement)?.addEventListener('input', updateImpact);
+
+		// Cover-fees toggle — update impact live
+		(document.getElementById('donor-cover-fees') as HTMLInputElement)?.addEventListener('change', updateImpact);
 
 		// Continue → Stripe
 		document.getElementById('donation-continue')?.addEventListener('click', onContinue);
