@@ -8,7 +8,10 @@ interface Props {
 	image?: string;
 	noindex?: boolean;
 	darkHero?: boolean;
-	jsonLd?: Record<string, any>;
+	// jsonLd accepts a single schema.org object OR an array. The Organization
+	// schema for Spirit Media Publishing is appended automatically on every
+	// page so AI engines and search crawlers always see the publisher entity.
+	jsonLd?: Record<string, any> | Record<string, any>[];
 	preloadImageMobile?: string;
 	preloadImageDesktop?: string;
 	// Open Graph article metadata — set pageType="article" on blog post pages
@@ -52,6 +55,26 @@ const ogImage =
 	'https://cdn.sanity.io/images/rusi1hyi/production/8b5d1c39f892218c978d3e3caf5720e09833bbc4-1024x1024.png?w=1200&h=630&fit=crop';
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// Site-wide Organization schema — Spirit Media Publishing as the publisher.
+// Always emitted alongside any page-specific JSON-LD so AI engines and
+// search crawlers consistently see the publisher entity.
+const ORGANIZATION_SCHEMA = {
+	'@context': 'https://schema.org',
+	'@type': 'Organization',
+	'@id': 'https://spiritmediapublishing.com/#organization',
+	name: 'Spirit Media Publishing',
+	url: 'https://spiritmediapublishing.com',
+	logo: 'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png?w=400&fm=webp',
+	sameAs: [
+		'https://www.linkedin.com/company/spirit-media-publishing',
+		'https://kevinwhite.us',
+	],
+};
+
+// Combine page-specific JSON-LD with the site-wide Organization
+const pageJsonLd = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 ---
 
 <!doctype html>
@@ -207,10 +230,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={ogImage} />
 
-		<!-- JSON-LD Structured Data -->
-		{jsonLd && (
-			<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-		)}
+		<!-- JSON-LD Structured Data — page-specific schemas + site-wide Organization -->
+		{allJsonLd.map((schema) => (
+			<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+		))}
 	</head>
 	<body class="min-h-screen flex flex-col" data-dark-hero={darkHero ? 'true' : 'false'}>
 		<slot />
