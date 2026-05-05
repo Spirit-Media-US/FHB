@@ -110,21 +110,71 @@ function segmentBody(blocks: any[]): BodySegment[] {
 
 const bodySegments = segmentBody(post.body || []);
 
-const jsonLd = {
+// Kevin White's author entity, with sameAs links to his real-world properties.
+// Inlined as a Person schema on every blog post so AI engines / search crawlers
+// can resolve "Kevin White" as the same author across the web (E-E-A-T signal).
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: "Lead Translator, Father's Heart Bible | CEO, Spirit Media Publishing",
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://www.amazon.com/Fathers-Heart-Beloved-Identity-Heavenly-ebook/dp/B0GQJQLMTC',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+const postUrl = `https://fathersheartbible.com/blog/${post.slug.current}`;
+
+const blogPostingSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'BlogPosting',
 	headline: post.title,
-	description: post.excerpt || post.title,
+	description: post.excerpt || post.seoDescription || post.title,
 	image: heroImage,
-	author: { '@type': 'Person', name: author },
+	author: KEVIN_WHITE_AUTHOR,
 	publisher: {
 		'@type': 'Organization',
-		name: "Father's Heart Bible",
-		url: 'https://fathersheartbible.com',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
 	},
-	url: `https://fathersheartbible.com/blog/${post.slug.current}`,
+	url: postUrl,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
 	datePublished: post.publishDate,
+	dateModified: post.publishDate,
+	inLanguage: 'en-US',
+	isPartOf: {
+		'@type': 'Blog',
+		'@id': 'https://fathersheartbible.com/blog/#blog',
+		name: "Father's Heart Bible Blog",
+		url: 'https://fathersheartbible.com/blog/',
+	},
+	keywords: tags.join(', '),
+	articleSection: tags[0] || undefined,
 };
+
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{ '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://fathersheartbible.com/blog/' },
+		{ '@type': 'ListItem', position: 3, name: post.title, item: postUrl },
+	],
+};
+
+const jsonLd = [blogPostingSchema, breadcrumbSchema];
 ---
 
 <Layout
@@ -132,6 +182,11 @@ const jsonLd = {
   description={post.seoDescription || post.excerpt || "Read this article on the Father's Heart Bible blog."}
   image={heroImage}
   jsonLd={jsonLd}
+  pageType="article"
+  articleAuthor={author}
+  articlePublishedTime={post.publishDate}
+  articleSection={tags[0]}
+  articleTags={tags}
 >
   <Navbar />
 
