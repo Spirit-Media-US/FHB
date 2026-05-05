@@ -40,11 +40,17 @@ const SANITY_POSTS_JSON = JSON.stringify(sanityPostsFormatted);
 const jsonLd = {
 	'@context': 'https://schema.org',
 	'@type': 'Blog',
+	headline: "Father's Heart Bible Blog — Hearing Our Father's Voice in Scripture",
 	name: "Father's Heart Bible Blog",
 	url: 'https://fathersheartbible.com/blog',
-	description: "Articles, insights, and updates from the Father's Heart Bible.",
+	description: "The Father's Heart Bible blog — articles on hearing the Father's voice across Scripture, the orphan spirit and sonship, and what changes when you read every verse with the Father's heart in view.",
 	publisher: {
 		'@type': 'Organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	about: {
+		'@type': 'Thing',
 		name: "Father's Heart Bible",
 		url: 'https://fathersheartbible.com',
 	},
@@ -52,8 +58,8 @@ const jsonLd = {
 ---
 
 <Layout
-  title="Father's Heart Bible Blog"
-  description="Articles, insights, and updates from the Father's Heart Bible."
+  title="Father's Heart Bible Blog — Hearing Our Father's Voice in Scripture"
+  description="The Father's Heart Bible blog — articles on hearing the Father's voice across Scripture, the orphan spirit and sonship, and what changes when you read every verse with the Father's heart in view."
   jsonLd={jsonLd}
 >
   <Navbar />
@@ -66,8 +72,8 @@ const jsonLd = {
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div data-reveal>
             <p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">Blog</p>
-            <h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Welcome to<br />Our Blog</h1>
-            <p class="mt-6 text-lg leading-relaxed max-w-xl" style="font-family: var(--font-sans); color: var(--color-muted);">Insights, updates, and resources.</p>
+            <h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Hearing Our Father&rsquo;s Voice in Scripture</h1>
+            <p class="mt-6 text-lg leading-relaxed max-w-xl" style="font-family: var(--font-sans); color: var(--color-muted);">Articles on the Father&rsquo;s heart across the canon — translation methodology, the orphan spirit and sonship, and what changes when you read every page with the Father&rsquo;s voice in your ear.</p>
           </div>
           <div class="hidden lg:grid grid-cols-3 gap-3" aria-hidden="true" data-reveal>
             {rawSanityPosts.slice(0, 9).map((post: any, i: number) => {
