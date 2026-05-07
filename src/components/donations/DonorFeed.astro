@@ -1,0 +1,104 @@
+---
+// Donor feed — most recent public donations with name, amount, message.
+// Re-renders whenever ProgressBar fires the donations:updated event.
+
+interface Props {
+	campaign?: string;
+}
+const { campaign = 'fhb' } = Astro.props;
+
+let initial: any = { recent: [] };
+try {
+	const res = await fetch(
+		`https://tools-api.spiritmediapublishing.com/api/donations/public?campaign=${campaign}`,
+	);
+	if (res.ok) initial = await res.json();
+} catch {}
+
+const fmt = (c: number) => `$${(c / 100).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+const dateAgo = (iso: string) => {
+	if (!iso) return '';
+	const then = new Date(iso).getTime();
+	const days = Math.max(0, Math.floor((Date.now() - then) / 86_400_000));
+	if (days === 0) return 'today';
+	if (days === 1) return '1 day ago';
+	if (days < 30) return `${days} days ago`;
+	const months = Math.floor(days / 30);
+	if (months === 1) return '1 month ago';
+	return `${months} months ago`;
+};
+---
+
+<div data-donor-feed class="space-y-4">
+	{initial.recent.length === 0 ? (
+		<p style="color: var(--color-muted); font-family: var(--font-sans);">Be the first to partner with us.</p>
+	) : (
+		<>
+			<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="color: var(--color-brand); font-family: var(--font-sans);">
+				Recent Supporters
+			</p>
+			<ul class="space-y-3" data-donor-list style="list-style: none; padding: 0; margin: 0;">
+				{initial.recent.map((d: any) => (
+					<li style="background-color: var(--color-surface); border: 1px solid var(--color-outline-variant); border-radius: 12px; padding: 16px 20px;">
+						<div class="flex items-baseline justify-between gap-3">
+							<p class="font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">{d.public_name}</p>
+							<p class="text-sm font-semibold whitespace-nowrap" style="font-family: var(--font-sans); color: var(--color-brand);">{fmt(d.amount_cents)}</p>
+						</div>
+						{d.public_message && (
+							<p class="mt-2 leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 0.95rem;">
+								{d.public_message}
+							</p>
+						)}
+						<p class="mt-2 text-xs" style="color: var(--color-muted); font-family: var(--font-sans); opacity: 0.7;">{dateAgo(d.completed_at)}</p>
+					</li>
+				))}
+			</ul>
+		</>
+	)}
+</div>
+
+<script>
+	function fmtMoney(cents: number) {
+		return `$${(cents / 100).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+	}
+	function dateAgo(iso: string) {
+		if (!iso) return '';
+		const days = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000));
+		if (days === 0) return 'today';
+		if (days === 1) return '1 day ago';
+		if (days < 30) return `${days} days ago`;
+		const months = Math.floor(days / 30);
+		return months === 1 ? '1 month ago' : `${months} months ago`;
+	}
+	function escapeHtml(s: string) {
+		return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c));
+	}
+
+	function render(recent: any[]) {
+		const root = document.querySelector('[data-donor-feed]');
+		if (!root) return;
+		if (!recent || recent.length === 0) {
+			root.innerHTML = `<p style="color: var(--color-muted); font-family: var(--font-sans);">Be the first to partner with us.</p>`;
+			return;
+		}
+		root.innerHTML = `
+			<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="color: var(--color-brand); font-family: var(--font-sans);">Recent Supporters</p>
+			<ul class="space-y-3" style="list-style: none; padding: 0; margin: 0;">
+				${recent.map((d: any) => `
+					<li style="background-color: var(--color-surface); border: 1px solid var(--color-outline-variant); border-radius: 12px; padding: 16px 20px;">
+						<div class="flex items-baseline justify-between gap-3">
+							<p class="font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">${escapeHtml(d.public_name)}</p>
+							<p class="text-sm font-semibold whitespace-nowrap" style="font-family: var(--font-sans); color: var(--color-brand);">${fmtMoney(d.amount_cents)}</p>
+						</div>
+						${d.public_message ? `<p class="mt-2 leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 0.95rem;">${escapeHtml(d.public_message)}</p>` : ''}
+						<p class="mt-2 text-xs" style="color: var(--color-muted); font-family: var(--font-sans); opacity: 0.7;">${dateAgo(d.completed_at)}</p>
+					</li>
+				`).join('')}
+			</ul>
+		`;
+	}
+
+	window.addEventListener('donations:updated', (e: any) => {
+		render(e.detail?.recent || []);
+	});
+</script>
