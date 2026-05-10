@@ -52,6 +52,13 @@ export default {
 			validation: (Rule: any) => Rule.required(),
 		},
 		{
+			name: 'dateModified',
+			title: 'Date Modified',
+			type: 'datetime',
+			description:
+				'Last meaningful content update — surfaces in BlogPosting JSON-LD as dateModified. Optional; falls back to publishDate when empty.',
+		},
+		{
 			name: 'tags',
 			title: 'Tags',
 			type: 'array',
@@ -95,6 +102,38 @@ export default {
 								],
 							},
 						],
+					},
+				},
+			],
+		},
+		{
+			name: 'faqs',
+			title: 'FAQs',
+			type: 'array',
+			description:
+				'Optional Q&A pairs surfaced as FAQPage JSON-LD on the post. Pulls each H2 question and its self-contained answer block — AI engines extract these as direct citations.',
+			of: [
+				{
+					type: 'object',
+					name: 'faqItem',
+					title: 'FAQ Item',
+					fields: [
+						{
+							name: 'question',
+							title: 'Question',
+							type: 'string',
+							validation: (Rule: any) => Rule.required().min(8).max(180),
+						},
+						{
+							name: 'answer',
+							title: 'Answer',
+							type: 'text',
+							rows: 6,
+							validation: (Rule: any) => Rule.required().min(40),
+						},
+					],
+					preview: {
+						select: { title: 'question', subtitle: 'answer' },
 					},
 				},
 			],
