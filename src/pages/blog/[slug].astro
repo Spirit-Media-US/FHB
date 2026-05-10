@@ -23,6 +23,17 @@ if (!post) {
 	return Astro.redirect('/blog');
 }
 
+// Slugify heading text for jump-link anchors. Lowercases, strips punctuation,
+// collapses whitespace to single hyphens. Keep this in sync with preview/[slug].astro.
+function slugifyHeading(s: string): string {
+	return s
+		.toLowerCase()
+		.replace(/[‘’“”]/g, '')
+		.replace(/[^\w\s-]/g, '')
+		.trim()
+		.replace(/\s+/g, '-');
+}
+
 function renderPortableText(blocks: any[]): string {
 	if (!Array.isArray(blocks)) return '';
 
@@ -34,6 +45,18 @@ function renderPortableText(blocks: any[]): string {
 			const rawText = children.map((c: any) => c?.text || '').join('');
 			if (/^\{[\w]+\}\s*[—–-]\s*\{[\w]+\}$/.test(rawText.trim())) return '';
 
+			// Build a lookup of link markDefs by _key so we can resolve string marks
+			// like "ld9595c9aee7" back to their href. Sanity portable text stores
+			// annotations as keyed entries in the block's markDefs; the child span's
+			// `marks` array contains the _key as a string, not the object itself.
+			const markDefs = Array.isArray(block.markDefs) ? block.markDefs : [];
+			const linkByKey: Record<string, string> = {};
+			for (const md of markDefs) {
+				if (md && md._type === 'link' && md._key && md.href) {
+					linkByKey[md._key] = md.href;
+				}
+			}
+
 			const textContent = children
 				.map((child: any) => {
 					if (!child) return '';
@@ -42,11 +65,12 @@ function renderPortableText(blocks: any[]): string {
 					if (marks.length > 0) {
 						if (marks.includes('strong')) text = `<strong>${text}</strong>`;
 						if (marks.includes('em')) text = `<em>${text}</em>`;
-						const linkMark = marks.find(
-							(m: any) => m && typeof m === 'object' && m._type === 'link',
-						);
-						if (linkMark?.href) {
-							text = `<a href="${linkMark.href}" style="color: var(--color-brand);" class="hover:underline" target="_blank" rel="noopener noreferrer">${text}</a>`;
+						const linkKey = marks.find((m: any) => typeof m === 'string' && linkByKey[m]);
+						if (linkKey) {
+							const href = linkByKey[linkKey];
+							const isExternal = /^https?:\/\//i.test(href);
+							const targetAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+							text = `<a href="${href}" style="color: var(--color-brand);" class="hover:underline"${targetAttrs}>${text}</a>`;
 						}
 					}
 					return text;
@@ -54,8 +78,10 @@ function renderPortableText(blocks: any[]): string {
 				.join('');
 
 			const style = block.style || 'normal';
-			if (style === 'h2')
-				return `<h2 class="text-2xl font-bold mt-12 mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h2>`;
+			if (style === 'h2') {
+				const id = slugifyHeading(rawText);
+				return `<h2 id="${id}" class="text-2xl font-bold mt-12 mb-4 scroll-mt-24" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h2>`;
+			}
 			if (style === 'h3')
 				return `<h3 class="text-xl font-bold mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h3>`;
 			// Blockquote = inline FHB verse quote. Pink card matching the
