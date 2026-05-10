@@ -8,15 +8,20 @@ import { createImageUrlBuilder } from '@sanity/image-url';
 // keep the CDN for speed.
 const USE_CDN = process.env.SANITY_USE_CDN !== 'false';
 
+// PREVIEW_DRAFTS=true makes the default sanityClient render Sanity drafts
+// overlaid on published docs (drafts win when both exist). Used by the dev
+// branch build so editors can preview unpublished content at dev URLs.
+// Production builds (main) leave this unset and only see published docs.
+const PREVIEW_DRAFTS = process.env.PREVIEW_DRAFTS === 'true';
+const SANITY_TOKEN = process.env.SANITY_TOKEN || process.env.SANITY_API_TOKEN || '';
+
 export const sanityClient = createClient({
 	projectId: 'rusi1hyi',
 	dataset: 'production',
-	useCdn: USE_CDN,
 	apiVersion: '2024-01-01',
+	useCdn: PREVIEW_DRAFTS ? false : USE_CDN,
+	...(PREVIEW_DRAFTS ? { perspective: 'drafts' as const, token: SANITY_TOKEN } : {}),
 });
-
-const SANITY_TOKEN =
-	process.env.SANITY_TOKEN || process.env.SANITY_API_TOKEN || '';
 
 export const previewClient = createClient({
 	projectId: 'rusi1hyi',
