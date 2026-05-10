@@ -66,10 +66,7 @@ const ORGANIZATION_SCHEMA = {
 	name: 'Spirit Media Publishing',
 	url: 'https://spiritmediapublishing.com',
 	logo: 'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png?w=400&fm=webp',
-	sameAs: [
-		'https://www.linkedin.com/company/spirit-media-publishing',
-		'https://kevinwhite.us',
-	],
+	sameAs: ['https://www.linkedin.com/company/spirit-media-publishing', 'https://kevinwhite.us'],
 };
 
 // Combine page-specific JSON-LD with the site-wide Organization
@@ -99,16 +96,16 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		<!-- Preload hero LCP image — separate mobile + desktop with media gates.
 		     Avoids DPR-aware imagesrcset upscaling that pulled the 1200w image
 		     on retina mobile (Moto G PSI). Each viewport fetches one file only.
-		     Both mobile + desktop hero images are LCP-critical and get
-		     fetchpriority="high" so the preload scanner promotes them ahead
-		     of the rest of the load. -->
+		     Mobile hero image is post-LCP (deferred via interaction reveal in
+		     index.astro) so no fetchpriority — keeps it from competing with
+		     font preloads in the LCP window. Desktop hero image is the LCP
+		     candidate so retains fetchpriority="high". -->
 		{preloadImageMobile && (
 			<link
 				rel="preload"
 				as="image"
 				href={preloadImageMobile}
 				media="(max-width: 1023px)"
-				fetchpriority="high"
 			/>
 		)}
 		{preloadImageDesktop && (

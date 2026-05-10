@@ -15,8 +15,7 @@ export const sanityClient = createClient({
 	apiVersion: '2024-01-01',
 });
 
-const SANITY_TOKEN =
-	process.env.SANITY_TOKEN || process.env.SANITY_API_TOKEN || '';
+const SANITY_TOKEN = process.env.SANITY_TOKEN || process.env.SANITY_API_TOKEN || '';
 
 export const previewClient = createClient({
 	projectId: 'rusi1hyi',
