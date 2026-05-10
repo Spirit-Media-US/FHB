@@ -1,16 +1,24 @@
 ---
+// Dev-only preview route. Mirrors src/pages/blog/[slug].astro but reads from
+// `previewClient` (perspective: 'drafts') so editors can review unpublished
+// changes at https://dev.fathersheartbible.pages.dev/blog/preview/<slug>/.
+//
+// Generated only when PUBLIC_PREVIEW_DRAFTS=1 is set at build time
+// (deploy-preview.sh sets it on the dev branch). Production builds
+// (deploy-live.sh) leave it unset, so getStaticPaths returns [] and no
+// preview pages are emitted into prod dist/.
+//
+// Keep this file structurally identical to ../[slug].astro — when one changes,
+// update the other.
 import BlogCTA from '../../../components/BlogCTA.astro';
 import ChapterEmbed from '../../../components/ChapterEmbed.astro';
 import Footer from '../../../components/Footer.astro';
 import Navbar from '../../../components/Navbar.astro';
+import RelatedPosts from '../../../components/RelatedPosts.astro';
 import ShareBar from '../../../components/ShareBar.astro';
 import Layout from '../../../layouts/Layout.astro';
 import { previewClient, urlFor } from '../../../lib/sanity';
 
-// Dev-only route. Generates pages only when PUBLIC_PREVIEW_DRAFTS=1 is set
-// at build time (deploy-preview.sh sets it on the dev branch). Production
-// builds (deploy-live.sh) don't set it, so getStaticPaths returns [] and
-// no preview pages are emitted into dist/.
 export async function getStaticPaths() {
 	if (import.meta.env.PUBLIC_PREVIEW_DRAFTS !== '1') return [];
 	const posts = await previewClient.fetch(
@@ -21,10 +29,9 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 
-const post = await previewClient.fetch(
-	`*[_type == "blogPost" && slug.current == $slug][0]`,
-	{ slug },
-);
+const post = await previewClient.fetch(`*[_type == "blogPost" && slug.current == $slug][0]`, {
+	slug,
+});
 
 if (!post) {
 	return Astro.redirect('/blog');
@@ -65,8 +72,6 @@ function renderPortableText(blocks: any[]): string {
 				return `<h2 class="text-2xl font-bold mt-12 mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h2>`;
 			if (style === 'h3')
 				return `<h3 class="text-xl font-bold mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h3>`;
-			// Blockquote = inline FHB verse quote. Pink card matching the
-			// chapter-embed palette so FHB renderings always read FHB-pink.
 			if (style === 'blockquote')
 				return `<blockquote class="my-6 px-6 py-5 lg:px-8 rounded-2xl text-lg leading-relaxed" style="background-color: #fdf2f5; border: 1px solid #f9d6e0; font-family: var(--font-serif); color: var(--color-ink);">${textContent}</blockquote>`;
 			return `<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">${textContent}</p>`;
@@ -75,12 +80,15 @@ function renderPortableText(blocks: any[]): string {
 }
 
 const formatDate = (dateString: string) => {
-	if (!dateString) return 'Draft';
 	const date = new Date(dateString);
 	return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 };
 
 const publishDate = formatDate(post.publishDate);
+const modifiedDate =
+	post.dateModified && post.dateModified.slice(0, 10) !== post.publishDate
+		? formatDate(post.dateModified)
+		: null;
 const heroImage = post.heroImage
 	? urlFor(post.heroImage).width(1200).format('webp').url()
 	: '/fhb-logo.png';
@@ -113,27 +121,109 @@ function segmentBody(blocks: any[]): BodySegment[] {
 }
 
 const bodySegments = segmentBody(post.body || []);
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: "Lead Translator, Father's Heart Bible | CEO, Spirit Media Publishing",
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://www.amazon.com/Fathers-Heart-Beloved-Identity-Heavenly-ebook/dp/B0GQJQLMTC',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+const postUrl = `https://fathersheartbible.com/blog/${post.slug.current}`;
+
+const dateModified = post.dateModified || post.publishDate;
+
+const blogPostingSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BlogPosting',
+	headline: post.title,
+	description: post.excerpt || post.seoDescription || post.title,
+	image: heroImage,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: postUrl,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
+	datePublished: post.publishDate,
+	dateModified,
+	inLanguage: 'en-US',
+	isPartOf: {
+		'@type': 'Blog',
+		'@id': 'https://fathersheartbible.com/blog/#blog',
+		name: "Father's Heart Bible Blog",
+		url: 'https://fathersheartbible.com/blog/',
+	},
+	keywords: tags.join(', '),
+	articleSection: tags[0] || undefined,
+};
+
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{ '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://fathersheartbible.com/blog/' },
+		{ '@type': 'ListItem', position: 3, name: post.title, item: postUrl },
+	],
+};
+
+const faqs = Array.isArray(post.faqs) ? post.faqs : [];
+const faqSchema =
+	faqs.length > 0
+		? {
+				'@context': 'https://schema.org',
+				'@type': 'FAQPage',
+				mainEntity: faqs
+					.filter((f: any) => f?.question && f?.answer)
+					.map((f: any) => ({
+						'@type': 'Question',
+						name: f.question,
+						acceptedAnswer: { '@type': 'Answer', text: f.answer },
+					})),
+			}
+		: null;
+
+const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
 ---
 
 <Layout
-  title={`[DRAFT] ${post.title} | Father's Heart Bible Blog`}
-  description={post.seoDescription || post.excerpt || "Draft preview."}
+  title={`[PREVIEW] ${post.seoTitle || `${post.title} | Father's Heart Bible Blog`}`}
+  description={post.seoDescription || post.excerpt || "Read this article on the Father's Heart Bible blog."}
   image={heroImage}
-  noindex={true}
+  jsonLd={jsonLd}
   pageType="article"
   articleAuthor={author}
   articlePublishedTime={post.publishDate}
   articleSection={tags[0]}
   articleTags={tags}
+  noindex={true}
 >
   <Navbar />
 
-  <main id="main-content">
-    <!-- DRAFT BANNER -->
-    <div style="background-color: #fef3c7; border-bottom: 1px solid #f59e0b; padding: 0.75rem 1.5rem; margin-top: 80px; text-align: center; font-family: var(--font-sans); font-size: 0.875rem; color: #92400e;">
-      <strong>DRAFT PREVIEW</strong> — This post is a Sanity draft, not published. Visible on dev preview only.
-    </div>
+  <!-- Preview banner so it's unmistakable this is a draft view -->
+  <div style="background-color: #fef3c7; border-bottom: 1px solid #fcd34d; padding: 12px 24px; margin-top: 80px; font-family: var(--font-sans); color: #78350f; text-align: center; font-size: 14px; font-weight: 600;">
+    🟡 DRAFT PREVIEW — this URL renders the unpublished Sanity draft.
+  </div>
 
+  <main id="main-content">
     <!-- HERO IMAGE -->
     <div class="w-full">
       <img src={heroImage} alt={post.heroImage?.alt || post.title} class="w-full h-72 lg:h-[600px] object-cover" style="object-position: center top;" />
@@ -145,10 +235,16 @@ const bodySegments = segmentBody(post.body || []);
         <a href="/blog/" class="inline-flex items-center gap-1.5 text-sm font-semibold hover:opacity-80 transition-opacity mb-5 no-underline" style="color: var(--color-brand);">&larr; Back to Blog</a>
         <h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{post.title}</h1>
         {post.excerpt && <p class="mt-3 text-lg leading-relaxed max-w-2xl" style="font-family: var(--font-sans); color: var(--color-muted);">{post.excerpt}</p>}
-        <div class="flex items-center gap-3 mt-4 pb-8 text-sm border-b" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+        <div class="flex items-center gap-3 mt-4 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
           <span>By <span class="font-semibold" style="color: var(--color-ink);">{author}</span></span>
           <span>&middot;</span>
           <span>{publishDate}</span>
+          {modifiedDate && (
+            <>
+              <span>&middot;</span>
+              <span>Updated {modifiedDate}</span>
+            </>
+          )}
         </div>
       </div>
     </section>
@@ -159,9 +255,9 @@ const bodySegments = segmentBody(post.body || []);
         <div class="mx-auto max-w-3xl">
           <div class="flex flex-wrap gap-2">
             {tags.map((tag: string) => (
-              <span class="text-xs font-semibold rounded-full px-3 py-1" style="color: var(--color-muted); background-color: var(--color-surface);">
+              <a href={`/blog?tag=${encodeURIComponent(tag)}`} class="text-xs font-semibold rounded-full px-3 py-1 transition-colors no-underline" style="color: var(--color-muted); background-color: var(--color-surface);">
                 {tag}
-              </span>
+              </a>
             ))}
           </div>
         </div>
@@ -180,8 +276,11 @@ const bodySegments = segmentBody(post.body || []);
       </div>
     </section>
 
-    <!-- SHARE BAR (disabled in preview — links would 404) -->
-    <ShareBar title={post.title} url={`https://fathersheartbible.com/blog/${post.slug?.current || slug}`} />
+    <!-- SHARE BAR -->
+    <ShareBar title={post.title} url={`https://fathersheartbible.com/blog/${post.slug.current}`} />
+
+    <!-- RELATED POSTS -->
+    <RelatedPosts currentSlug={`/blog/${post.slug.current}`} currentTags={tags} />
   </main>
 
   <Footer />
