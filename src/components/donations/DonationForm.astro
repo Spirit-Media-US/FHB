@@ -377,7 +377,9 @@
 			const stripe = await stripePromise;
 			if (!stripe) throw new Error('Stripe failed to load');
 
-			checkoutInstance = await stripe.initEmbeddedCheckout({
+			// Stripe.js v9 renamed initEmbeddedCheckout → createEmbeddedCheckoutPage.
+			// Same options ({clientSecret}) and same returned instance (.mount(selector)).
+			checkoutInstance = await stripe.createEmbeddedCheckoutPage({
 				clientSecret: data.client_secret,
 			});
 			checkoutInstance.mount('#donation-stripe-mount');
