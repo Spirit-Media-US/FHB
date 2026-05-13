@@ -218,10 +218,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			style="background-color: var(--color-deep); margin-top: -1px;"
 			id="hero-section"
 		>
-			<!-- LCP element (desktop only): poster image from R2 via <picture> with a
-			     media-gated <source>. Mobile (<1024px) falls through to the 1x1 GIF <img>
-			     fallback — never fetches any hero asset. Inline layout styles so paint
-			     does not wait for Tailwind CSS. -->
+			<!-- LCP element (desktop only): poster image from R2 via picture element
+			     with a media-gated source. Mobile (<1024px) falls through to the 1x1
+			     GIF image fallback — never fetches any hero asset. Inline layout
+			     styles so paint does not wait for Tailwind CSS. -->
 			<picture>
 				<source
 					media="(min-width: 1024px)"

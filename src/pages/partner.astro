@@ -36,7 +36,9 @@ const heroSubheading = 'Be part of what the Father is doing.';
 const heroPrimaryCtaLabel = '';
 const heroPrimaryCtaHref = '';
 const bookCoverUrl = media?.bookCoverUrl || '';
-const donateUrl = media?.donateUrl || '#donate';
+// Always scroll to the embedded Stripe form in Section 1.5 — never depend on
+// the Sanity donateUrl field (it was the legacy Givebutter URL pre-migration).
+const donateUrl = '#donate';
 const communityUrl = media?.communityUrl || '/join';
 const partnerPageVideoUrl =
 	media?.partnerPageVideo ||
