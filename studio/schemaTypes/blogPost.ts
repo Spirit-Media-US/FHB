@@ -150,6 +150,20 @@ export default {
 			type: 'string',
 			description: 'For search engine results (optimal length: 150-160 characters)',
 		},
+		{
+			name: 'aeoApprovedBy',
+			title: 'AEO Editorial Approval — Approved By',
+			type: 'string',
+			description:
+				'Name of the editor who applied the §8 three-part filter (does not drift from what we teach, does not sensationalize, would have published without AEO in mind). Required for AEO gate per smp-aeo-readiness-standard.md row F2.',
+		},
+		{
+			name: 'aeoApprovedAt',
+			title: 'AEO Editorial Approval — Approved At',
+			type: 'datetime',
+			description:
+				'When the editorial approval was recorded. Stale (>12 months) or missing fails the AEO audit. Bump on every substantive rewrite.',
+		},
 	],
 	preview: {
 		select: { title: 'title', subtitle: 'author', date: 'publishDate' },
