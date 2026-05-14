@@ -39,27 +39,44 @@ const SANITY_POSTS_JSON = JSON.stringify(sanityPostsFormatted);
 
 const jsonLd = {
 	'@context': 'https://schema.org',
-	'@type': 'Blog',
-	headline: "Father's Heart Bible Blog — Hearing Our Father's Voice in Scripture",
-	name: "Father's Heart Bible Blog",
-	url: 'https://fathersheartbible.com/blog',
-	description: "The Father's Heart Bible blog — articles on hearing the Father's voice across Scripture, the orphan spirit and sonship, and what changes when you read every verse with the Father's heart in view.",
-	publisher: {
-		'@type': 'Organization',
-		name: 'Spirit Media Publishing',
-		url: 'https://spiritmediapublishing.com',
-	},
-	about: {
-		'@type': 'Thing',
-		name: "Father's Heart Bible",
-		url: 'https://fathersheartbible.com',
-	},
+	'@graph': [
+		{
+			'@type': 'Blog',
+			headline: "Father's Heart Bible Blog — Hearing Our Father's Voice in Scripture",
+			name: "Father's Heart Bible Blog",
+			url: 'https://fathersheartbible.com/blog',
+			description:
+				"The Father's Heart Bible blog — articles on hearing the Father's voice across Scripture, the orphan spirit and sonship, and what changes when you read every verse with the Father's heart in view.",
+			publisher: {
+				'@type': 'Organization',
+				name: 'Spirit Media Publishing',
+				url: 'https://spiritmediapublishing.com',
+			},
+			about: {
+				'@type': 'Thing',
+				name: "Father's Heart Bible",
+				url: 'https://fathersheartbible.com',
+			},
+		},
+		{
+			'@type': 'BreadcrumbList',
+			itemListElement: [
+				{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+				{
+					'@type': 'ListItem',
+					position: 2,
+					name: 'Blog',
+					item: 'https://fathersheartbible.com/blog',
+				},
+			],
+		},
+	],
 };
 ---
 
 <Layout
   title="Father's Heart Bible Blog — Hearing Our Father's Voice in Scripture"
-  description="The Father's Heart Bible blog — articles on hearing the Father's voice across Scripture, the orphan spirit and sonship, and what changes when you read every verse with the Father's heart in view."
+  description="Articles on hearing the Father's voice across Scripture — orphan spirit and sonship, and what shifts when every verse is read with the Father's heart in view."
   jsonLd={jsonLd}
 >
   <Navbar />
