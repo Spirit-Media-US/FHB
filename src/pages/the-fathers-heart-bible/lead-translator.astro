@@ -12,7 +12,9 @@ const [pageData, media, kevinProfile] = await Promise.all([
 	sanityClient.fetch(`*[_type =="page" && slug =="about"][0] {
     seoTitle, seoDescription
   }`),
-	sanityClient.fetch(`*[_type =="siteSettings"][0] { kevinPortraitUrl, communityUrl, donateUrl, leadTranslatorPageVideo }`),
+	sanityClient.fetch(
+		`*[_type =="siteSettings"][0] { kevinPortraitUrl, communityUrl, donateUrl, leadTranslatorPageVideo }`,
+	),
 	sanityClient.fetch(
 		`*[_type =="personProfile"] | order(order asc)[0] { portraitUrl, portrait { asset->{ url } } }`,
 	),
@@ -21,7 +23,7 @@ const [pageData, media, kevinProfile] = await Promise.all([
 const seoTitle = pageData?.seoTitle || "Lead Translator — Kevin White | Father's Heart Bible";
 const seoDescription =
 	pageData?.seoDescription ||
-	"Learn the story behind the Father's Heart Bible and the vision to reveal God as Father through Scripture.";
+	"Learn the story behind the Father's Heart Bible and translator Kevin White's vision: a translation that reveals God as Father through every Scripture passage.";
 const kevinPortraitUrl =
 	kevinProfile?.portraitUrl || kevinProfile?.portrait?.asset?.url || media?.kevinPortraitUrl || '';
 const communityUrl = media?.communityUrl || '#join';
@@ -66,7 +68,20 @@ const audience = [
     "@context": "https://schema.org",
     "@graph": [
       { "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/the-fathers-heart-bible/lead-translator" },
-      { "@type": "Person", "name": "Kevin White", "jobTitle": "Lead Translator", "worksFor": { "@type": "Organization", "name": "Spirit Media Inc." } },
+      {
+        "@type": "Person",
+        "name": "Kevin White",
+        "jobTitle": "Lead Translator",
+        "description": "Kevin White is the lead translator of the Father's Heart Bible, a translation centered on revealing God's heart as Father through every passage. Founder of Spirit Media Publishing.",
+        "image": "https://fathersheartbible.com/kevin-white.jpg",
+        "worksFor": { "@type": "Organization", "name": "Spirit Media Publishing", "url": "https://spiritmediapublishing.com" },
+        "url": "https://fathersheartbible.com/the-fathers-heart-bible/lead-translator/",
+        "sameAs": [
+          "TODO_KEVIN_LINKEDIN_URL",
+          "TODO_KEVIN_TWITTER_OR_X_URL",
+          "TODO_KEVIN_YOUTUBE_OR_SUBSTACK_URL"
+        ]
+      },
       { "@type": "BreadcrumbList", "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
         { "@type": "ListItem", "position": 2, "name": "About FHB", "item": "https://fathersheartbible.com/the-fathers-heart-bible" },

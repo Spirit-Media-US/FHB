@@ -4,7 +4,17 @@ import Navbar from '../components/Navbar.astro';
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="404 — Page Not Found · Father's Heart Bible" noindex={true}>
+<Layout
+	title="404 — Page Not Found · Father's Heart Bible"
+	noindex={true}
+	jsonLd={{
+		"@context": "https://schema.org",
+		"@type": "BreadcrumbList",
+		"itemListElement": [
+			{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" }
+		]
+	}}
+>
 	<Navbar />
 	<main class="min-h-screen flex items-center justify-center pt-20" style="background-color: var(--color-canvas);">
 		<div class="text-center px-6">
