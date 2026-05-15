@@ -29,6 +29,14 @@ export default defineConfig({
 				if (url.includes('/blog/')) {
 					return { ...item, changefreq: 'weekly', priority: 0.8, lastmod: now };
 				}
+				// Bible reader index
+				if (url.endsWith('/read/') || url.endsWith('/read')) {
+					return { ...item, changefreq: 'weekly', priority: 0.9, lastmod: now };
+				}
+				// Bible chapters
+				if (url.includes('/read/')) {
+					return { ...item, changefreq: 'monthly', priority: 0.85, lastmod: now };
+				}
 				// Default
 				return { ...item, changefreq: 'monthly', priority: 0.7, lastmod: now };
 			},

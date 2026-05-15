@@ -1,0 +1,126 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import Footer from '../../components/Footer.astro';
+import Navbar from '../../components/Navbar.astro';
+import Layout from '../../layouts/Layout.astro';
+
+// The reader is sourced from the build-time manifest written by
+// scripts/sync-translations.mjs. Books with locked chapters render
+// active links; the rest of the canon is shown grayed-out as "Coming."
+const MANIFEST_PATH = path.resolve(process.cwd(), 'src/content/bible/_manifest.json');
+const BIBLE_STRUCTURE_PATH =
+	'/home/deploy/bin/tools-api/pipelines/translation/bible_structure.json';
+
+let manifest: any = { books: {} };
+if (fs.existsSync(MANIFEST_PATH)) {
+	manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+}
+const structure = JSON.parse(fs.readFileSync(BIBLE_STRUCTURE_PATH, 'utf8'));
+
+function slugifyBook(book: string) {
+	return book.toLowerCase().replace(/\s+/g, '-');
+}
+
+const allBooks = structure.order.map((book: string) => {
+	const slug = slugifyBook(book);
+	const entry = manifest.books?.[slug];
+	return {
+		book,
+		slug,
+		testament: structure.testament.OT.includes(book) ? 'OT' : 'NT',
+		totalChapters: structure.chapters[book] || 0,
+		lockedChapters: entry?.lockedChapters ?? [],
+		available: !!(entry && entry.lockedChapters && entry.lockedChapters.length > 0),
+	};
+});
+
+const otBooks = allBooks.filter((b: any) => b.testament === 'OT');
+const ntBooks = allBooks.filter((b: any) => b.testament === 'NT');
+
+const totalLocked = allBooks.reduce((sum: number, b: any) => sum + b.lockedChapters.length, 0);
+const totalBooks = allBooks.filter((b: any) => b.available).length;
+
+const seoTitle = "Read the Father's Heart Bible | FHB";
+const seoDescription =
+	"Read the Father's Heart Bible chapter by chapter — a new Bible translation that reveals our Father's heart from Genesis to Revelation.";
+---
+
+<Layout title={seoTitle} description={seoDescription}>
+	<Navbar />
+
+	<main id="main-content" class="pt-32 pb-20">
+		<section class="max-w-5xl mx-auto px-6">
+			<header class="text-center mb-12">
+				<p class="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] font-semibold">Read</p>
+				<h1 class="font-serif text-4xl md:text-5xl font-bold text-[var(--color-ink)] mt-2">
+					The Father's Heart Bible
+				</h1>
+				<p class="mt-4 text-lg text-[var(--color-muted)] max-w-2xl mx-auto">
+					{totalLocked > 0
+						? `${totalLocked} chapter${totalLocked === 1 ? '' : 's'} across ${totalBooks} book${totalBooks === 1 ? '' : 's'} ready to read. More coming as each chapter is finalized.`
+						: 'The reader is open. The first locked chapters appear here as soon as they are finalized.'}
+				</p>
+			</header>
+
+			{totalLocked === 0 && (
+				<div class="bg-[var(--color-soft)] border border-[var(--color-hairline)] rounded-2xl p-8 text-center mb-12">
+					<p class="font-serif text-2xl text-[var(--color-ink)] mb-2">First chapters coming soon</p>
+					<p class="text-[var(--color-muted)] max-w-xl mx-auto">
+						Translation work is underway across the whole canon. Each chapter is reviewed and locked before it appears here, so what you read is the Father's Heart Bible exactly as the translator finalized it.
+					</p>
+					<p class="mt-6">
+						<a href="/join/" class="inline-block bg-[var(--color-primary)] text-white px-6 py-3 rounded-lg font-semibold no-underline hover:bg-[var(--color-primary-dark)] transition-colors">
+							Get notified when chapters release
+						</a>
+					</p>
+				</div>
+			)}
+
+			<div class="grid md:grid-cols-2 gap-10">
+				<div>
+					<h2 class="font-serif text-2xl font-bold text-[var(--color-ink)] mb-4">Old Testament</h2>
+					<ul class="space-y-2 list-none p-0">
+						{otBooks.map((b: any) => (
+							b.available ? (
+								<li>
+									<a href={`/read/${b.slug}/`} class="flex items-center justify-between py-2 px-3 rounded hover:bg-[var(--color-soft)] no-underline">
+										<span class="text-[var(--color-ink)] font-semibold">{b.book}</span>
+										<span class="text-xs text-[var(--color-muted)]">{b.lockedChapters.length} of {b.totalChapters}</span>
+									</a>
+								</li>
+							) : (
+								<li class="flex items-center justify-between py-2 px-3 text-[var(--color-muted)]">
+									<span>{b.book}</span>
+									<span class="text-xs italic">Coming</span>
+								</li>
+							)
+						))}
+					</ul>
+				</div>
+				<div>
+					<h2 class="font-serif text-2xl font-bold text-[var(--color-ink)] mb-4">New Testament</h2>
+					<ul class="space-y-2 list-none p-0">
+						{ntBooks.map((b: any) => (
+							b.available ? (
+								<li>
+									<a href={`/read/${b.slug}/`} class="flex items-center justify-between py-2 px-3 rounded hover:bg-[var(--color-soft)] no-underline">
+										<span class="text-[var(--color-ink)] font-semibold">{b.book}</span>
+										<span class="text-xs text-[var(--color-muted)]">{b.lockedChapters.length} of {b.totalChapters}</span>
+									</a>
+								</li>
+							) : (
+								<li class="flex items-center justify-between py-2 px-3 text-[var(--color-muted)]">
+									<span>{b.book}</span>
+									<span class="text-xs italic">Coming</span>
+								</li>
+							)
+						))}
+					</ul>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<Footer />
+</Layout>
