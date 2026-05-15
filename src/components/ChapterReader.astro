@@ -1,0 +1,217 @@
+---
+// FHB chapter reader. Renders verse-by-verse from the synced JSON shape:
+//   { book, chapter, testament, rulesVersion, lockedAt, verses: [...] }
+//
+// Copy protection: applies user-select:none to the verse text container
+// and registers JS handlers blocking copy, cut, contextmenu, selectstart,
+// dragstart, and Ctrl+C / Ctrl+A within the reader. Navigation, headings,
+// and UI chrome remain selectable so screen readers stay healthy.
+
+interface Verse {
+	verse: number;
+	text: string;
+	footnote: string | null;
+	footnoteCategory?: string | null;
+}
+
+interface Props {
+	book: string;
+	chapter: number;
+	testament: string;
+	rulesVersion?: string;
+	lockedAt?: string | null;
+	updatedAt?: string;
+	verses: Verse[];
+}
+
+const { book, chapter, testament, rulesVersion, lockedAt, updatedAt, verses } = Astro.props;
+
+// Footnotes: gather verses that have one, attach a stable letter anchor.
+const annotated = verses.map((v) => ({ ...v, footnoteLetter: null as string | null }));
+let letterIdx = 0;
+const letters = 'abcdefghijklmnopqrstuvwxyz';
+for (const v of annotated) {
+	if (v.footnote && v.footnote.trim().length > 0) {
+		v.footnoteLetter = letters[letterIdx] || `n${letterIdx + 1}`;
+		letterIdx++;
+	}
+}
+const footnotes = annotated
+	.filter((v) => v.footnoteLetter)
+	.map((v) => ({ letter: v.footnoteLetter, verse: v.verse, text: v.footnote }));
+
+const lockStamp = lockedAt
+	? new Date(lockedAt).toLocaleDateString('en-US', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+		})
+	: updatedAt
+		? new Date(updatedAt).toLocaleDateString('en-US', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric',
+			})
+		: '';
+---
+
+<article class="chapter-reader">
+	<header class="chapter-header">
+		<p class="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] font-semibold">
+			{testament === 'OT' ? 'Old Testament' : 'New Testament'} · {book}
+		</p>
+		<h1 class="font-serif text-4xl md:text-5xl font-bold text-[var(--color-ink)] mt-2">
+			{book} {chapter}
+		</h1>
+		<p class="mt-3 text-sm text-[var(--color-muted)]">
+			Father's Heart Bible{rulesVersion ? ` · v${rulesVersion}` : ''}
+			{lockStamp ? ` · Locked ${lockStamp}` : ''}
+		</p>
+	</header>
+
+	<div class="verse-text" data-fhb-protected="true">
+		{annotated.map(v => (
+			<p class="verse">
+				<sup class="verse-num">{v.verse}</sup>
+				<span class="verse-body">
+					{v.text}
+					{v.footnoteLetter && (
+						<a href={`#fn-${v.footnoteLetter}`} class="footnote-anchor" aria-label={`Footnote ${v.footnoteLetter}`}>
+							[{v.footnoteLetter}]
+						</a>
+					)}
+				</span>
+			</p>
+		))}
+	</div>
+
+	{footnotes.length > 0 && (
+		<aside class="footnotes mt-12 pt-6 border-t border-[var(--color-hairline)]" data-fhb-protected="true">
+			<h2 class="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] font-semibold mb-4">
+				Footnotes
+			</h2>
+			<ol class="text-sm text-[var(--color-muted)] space-y-2 list-none p-0">
+				{footnotes.map(fn => (
+					<li id={`fn-${fn.letter}`} class="flex gap-3">
+						<span class="font-mono text-[var(--color-primary)] shrink-0">[{fn.letter}]</span>
+						<span><strong>v.{fn.verse}</strong> — {fn.text}</span>
+					</li>
+				))}
+			</ol>
+		</aside>
+	)}
+
+	<p class="mt-10 text-xs text-[var(--color-muted)] italic">
+		This translation is the work of the Father's Heart Bible project. Copying is restricted while the canon is being finalized. To share, please link to this page.
+	</p>
+</article>
+
+<style>
+	.chapter-reader {
+		max-width: 42rem;
+		margin: 0 auto;
+		padding: 2rem 1.5rem 4rem;
+	}
+	.chapter-header {
+		margin-bottom: 2.5rem;
+		text-align: center;
+	}
+	.verse-text {
+		font-family: var(--font-serif);
+		font-size: 1.125rem;
+		line-height: 1.85;
+		color: var(--color-ink);
+		/* The actual no-copy CSS */
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+		-webkit-touch-callout: none;
+	}
+	@media (min-width: 768px) {
+		.verse-text { font-size: 1.25rem; }
+	}
+	.verse {
+		margin: 0 0 0.85rem 0;
+		text-indent: 0;
+	}
+	.verse-num {
+		font-family: var(--font-body);
+		font-size: 0.7em;
+		color: var(--color-muted);
+		margin-right: 0.4em;
+		vertical-align: super;
+		font-weight: 600;
+	}
+	.verse-body {
+		display: inline;
+	}
+	.footnote-anchor {
+		color: var(--color-primary);
+		text-decoration: none;
+		font-size: 0.75em;
+		margin-left: 0.2em;
+		vertical-align: super;
+	}
+	.footnote-anchor:hover { text-decoration: underline; }
+	.footnotes {
+		/* Footnotes are also protected from copy. */
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		user-select: none;
+	}
+</style>
+
+<script>
+	// Browser copy-protection for FHB chapter text.
+	//
+	// This deters casual copy-paste. It does NOT stop a determined reader
+	// who opens dev tools, saves the page, or screenshots. That's an
+	// intentional trade-off: AI citation engines need to be able to fetch
+	// and parse the rendered HTML to cite FHB, so we don't try to obfuscate
+	// the DOM. Browser-level protection is the right ceiling.
+	function installProtection() {
+		const targets = document.querySelectorAll('[data-fhb-protected="true"]');
+		if (!targets.length) return;
+
+		const block = (e: Event) => {
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		};
+
+		for (const node of Array.from(targets)) {
+			(node as HTMLElement).addEventListener('copy', block);
+			(node as HTMLElement).addEventListener('cut', block);
+			(node as HTMLElement).addEventListener('contextmenu', block);
+			(node as HTMLElement).addEventListener('selectstart', block);
+			(node as HTMLElement).addEventListener('dragstart', block);
+		}
+
+		// Keyboard-shortcut blocking, scoped to when the reader has focus
+		// or the pointer is inside a protected region.
+		const isInProtected = (target: EventTarget | null) => {
+			if (!(target instanceof Node)) return false;
+			for (const n of Array.from(targets)) {
+				if (n.contains(target)) return true;
+			}
+			return false;
+		};
+
+		document.addEventListener('keydown', (e) => {
+			const ctrlOrCmd = e.ctrlKey || e.metaKey;
+			if (!ctrlOrCmd) return;
+			const key = e.key.toLowerCase();
+			if (['c', 'a', 'x', 's', 'p'].includes(key) && isInProtected(e.target)) {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+		});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', installProtection);
+	} else {
+		installProtection();
+	}
+</script>

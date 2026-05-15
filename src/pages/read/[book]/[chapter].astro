@@ -1,0 +1,115 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import ChapterReader from '../../../components/ChapterReader.astro';
+import Footer from '../../../components/Footer.astro';
+import Navbar from '../../../components/Navbar.astro';
+import Layout from '../../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+	const MANIFEST_PATH = path.resolve(process.cwd(), 'src/content/bible/_manifest.json');
+	const BIBLE_DIR = path.resolve(process.cwd(), 'src/content/bible');
+	if (!fs.existsSync(MANIFEST_PATH)) return [];
+	const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+	const paths = [];
+	for (const slug of Object.keys(manifest.books || {})) {
+		const entry = manifest.books[slug];
+		for (const ch of entry.lockedChapters) {
+			const padded = String(ch).padStart(3, '0');
+			const dataPath = path.join(BIBLE_DIR, slug, `${padded}.json`);
+			if (!fs.existsSync(dataPath)) continue;
+			const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+			paths.push({
+				params: { book: slug, chapter: String(ch) },
+				props: {
+					data,
+					bookSlug: slug,
+					bookName: entry.book,
+					totalChapters: entry.totalChapters,
+					lockedChapters: entry.lockedChapters,
+				},
+			});
+		}
+	}
+	return paths;
+}
+
+const { data, bookSlug, bookName, totalChapters, lockedChapters } = Astro.props;
+const chapter = data.chapter;
+
+// Prev/next based on the locked set so users only navigate to chapters that
+// actually exist. Wraps within the book; doesn't jump across book boundaries.
+const idx = lockedChapters.indexOf(chapter);
+const prev = idx > 0 ? lockedChapters[idx - 1] : null;
+const next = idx < lockedChapters.length - 1 ? lockedChapters[idx + 1] : null;
+
+const seoTitle = `${bookName} ${chapter} — Father's Heart Bible`;
+const seoDescription = `${bookName} ${chapter} in the Father's Heart Bible — read this chapter as the Father's voice was meant to be heard.`;
+const canonical = `https://fathersheartbible.com/read/${bookSlug}/${chapter}/`;
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: `${bookName} ${chapter} — Father's Heart Bible`,
+	inLanguage: 'en',
+	about: { '@type': 'Book', name: bookName, bookFormat: 'EBook' },
+	isPartOf: { '@type': 'Book', name: "Father's Heart Bible" },
+	author: { '@type': 'Person', name: 'Kevin White' },
+	publisher: {
+		'@type': 'Organization',
+		name: "Father's Heart Bible",
+		url: 'https://fathersheartbible.com',
+	},
+	url: canonical,
+	datePublished: data.lockedAt || data.updatedAt,
+	dateModified: data.updatedAt,
+};
+---
+
+<Layout title={seoTitle} description={seoDescription} jsonLd={jsonLd}>
+	<Fragment slot="head">
+		<link rel="canonical" href={canonical} />
+	</Fragment>
+
+	<Navbar />
+
+	<main id="main-content" class="pt-28 pb-12">
+		<div class="max-w-3xl mx-auto px-6">
+			<nav class="text-sm mb-2 flex items-center gap-3 text-[var(--color-muted)]">
+				<a href="/read/" class="no-underline hover:text-[var(--color-primary)]">All books</a>
+				<span aria-hidden="true">/</span>
+				<a href={`/read/${bookSlug}/`} class="no-underline hover:text-[var(--color-primary)]">{bookName}</a>
+				<span aria-hidden="true">/</span>
+				<span>{chapter}</span>
+			</nav>
+		</div>
+
+		<ChapterReader
+			book={data.book}
+			chapter={data.chapter}
+			testament={data.testament}
+			rulesVersion={data.rulesVersion}
+			lockedAt={data.lockedAt}
+			updatedAt={data.updatedAt}
+			verses={data.verses}
+		/>
+
+		<nav class="max-w-3xl mx-auto px-6 mt-6 flex items-center justify-between text-sm">
+			{prev ? (
+				<a href={`/read/${bookSlug}/${prev}/`} class="text-[var(--color-primary)] font-semibold no-underline hover:underline">
+					← {bookName} {prev}
+				</a>
+			) : <span />}
+			<a href={`/read/${bookSlug}/`} class="text-[var(--color-muted)] no-underline hover:text-[var(--color-primary)]">
+				{bookName} chapters
+			</a>
+			{next ? (
+				<a href={`/read/${bookSlug}/${next}/`} class="text-[var(--color-primary)] font-semibold no-underline hover:underline">
+					{bookName} {next} →
+				</a>
+			) : <span />}
+		</nav>
+	</main>
+
+	<Footer />
+</Layout>
