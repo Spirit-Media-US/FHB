@@ -132,15 +132,14 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 			@keyframes heroEntrance{to{opacity:1;transform:scale(1)}}
 			@font-face{font-family:'Epilogue';font-style:normal;font-weight:500;font-display:optional;src:url('https://assets.spiritmediapublishing.com/fonts/epilogue/epilogue-500.woff2') format('woff2')}
 			@font-face{font-family:'Manrope';font-style:normal;font-weight:400;font-display:optional;src:url('https://assets.spiritmediapublishing.com/fonts/manrope/manrope-400.woff2') format('woff2')}
-			/* Metric-adjusted fallbacks — eliminate FCP→LCP gap from font-swap re-paint.
-			   Liberation/DejaVu/Arial as local sans base, metrics tuned to Epilogue/Manrope.
-			   When the real font isn't ready (font-display:optional locks fallback after 100ms),
-			   the page paints with the fallback at the same dimensions as the real font, so
-			   Lighthouse doesn't see a re-paint when the real font would otherwise arrive. */
-			@font-face{font-family:'Epilogue fallback';font-style:normal;font-weight:500;src:local('Liberation Sans'),local('DejaVu Sans'),local('Arial'),local('Helvetica');size-adjust:100.8%;ascent-override:95%;descent-override:22%;line-gap-override:0%}
-			@font-face{font-family:'Manrope fallback';font-style:normal;font-weight:400;src:local('Liberation Sans'),local('DejaVu Sans'),local('Arial'),local('Helvetica');size-adjust:100.8%;ascent-override:95%;descent-override:22%;line-gap-override:0%}
-			@font-face{font-family:'Manrope fallback';font-style:normal;font-weight:500;src:local('Liberation Sans'),local('DejaVu Sans'),local('Arial'),local('Helvetica');size-adjust:100.8%;ascent-override:95%;descent-override:22%;line-gap-override:0%}
-			@font-face{font-family:'Manrope fallback';font-style:normal;font-weight:600;src:local('Liberation Sans'),local('DejaVu Sans'),local('Arial'),local('Helvetica');size-adjust:100.8%;ascent-override:95%;descent-override:22%;line-gap-override:0%}
+			/* Metric-adjusted fallbacks — measured against the live Epilogue/Manrope
+			   woff2 files via font-fallback-calibrate.mjs on 2026-05-18. Earlier
+			   approximated values (100.8% / 95% / 22%) caused a bimodal mobile PSI
+			   flip between 90 and 99 (font-swap CLS re-paint on the 90-class runs). */
+			@font-face{font-family:'Epilogue fallback';font-style:normal;font-weight:500;src:local('Liberation Sans'),local('DejaVu Sans'),local('Arial'),local('Helvetica');size-adjust:98.60%;ascent-override:80.12%;descent-override:23.83%;line-gap-override:0%}
+			@font-face{font-family:'Manrope fallback';font-style:normal;font-weight:400;src:local('Liberation Sans'),local('DejaVu Sans'),local('Arial'),local('Helvetica');size-adjust:98.55%;ascent-override:108.17%;descent-override:30.44%;line-gap-override:0%}
+			@font-face{font-family:'Manrope fallback';font-style:normal;font-weight:500;src:local('Liberation Sans'),local('DejaVu Sans'),local('Arial'),local('Helvetica');size-adjust:98.55%;ascent-override:108.17%;descent-override:30.44%;line-gap-override:0%}
+			@font-face{font-family:'Manrope fallback';font-style:normal;font-weight:600;src:local('Liberation Sans'),local('DejaVu Sans'),local('Arial'),local('Helvetica');size-adjust:98.55%;ascent-override:108.17%;descent-override:30.44%;line-gap-override:0%}
 			@layer base{
 				:root{--color-canvas:#f9f9f9;--color-soft:#f3f3f3;--color-deep:#2f3131;--color-primary:#b60057;--color-primary-container:#e4006f;--color-on-primary:#f9f9f9;--color-muted:#5b3f46;--color-ink:#1a1c1c;--color-on-surface:#1a1c1c;--color-on-surface-variant:#5b3f46;--color-surface-lowest:#ffffff;--color-outline-variant:#e4bdc4;--font-headline:"Epilogue","Epilogue fallback",system-ui,sans-serif;--font-body:"Manrope","Manrope fallback",system-ui,sans-serif;--font-serif:"Epilogue","Epilogue fallback",system-ui,sans-serif;--font-sans:"Manrope","Manrope fallback",system-ui,sans-serif}
 				*,*::before,*::after{box-sizing:border-box;border:0 solid}
