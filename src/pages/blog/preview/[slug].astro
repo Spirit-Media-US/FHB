@@ -121,7 +121,8 @@ const tags = post.tags || [];
 
 type BodySegment =
 	| { kind: 'html'; html: string }
-	| { kind: 'chapter'; book: string; chapter: number };
+	| { kind: 'chapter'; book: string; chapter: number }
+	| { kind: 'image'; src: string; alt: string; caption?: string };
 
 function segmentBody(blocks: any[]): BodySegment[] {
 	const segments: BodySegment[] = [];
@@ -136,6 +137,10 @@ function segmentBody(blocks: any[]): BodySegment[] {
 		if (b?._type === 'fhbChapter') {
 			flush();
 			segments.push({ kind: 'chapter', book: b.book, chapter: b.chapter });
+		} else if (b?._type === 'image' && b?.asset) {
+			flush();
+			const src = urlFor(b).width(1000).format('webp').url();
+			segments.push({ kind: 'image', src, alt: b.alt || '', caption: b.caption });
 		} else {
 			buf.push(b);
 		}
@@ -294,7 +299,12 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
         {bodySegments.map((seg) =>
           seg.kind === 'chapter'
             ? <ChapterEmbed book={seg.book} chapter={seg.chapter} />
-            : <div set:html={seg.html} />
+            : seg.kind === 'image'
+              ? <figure class="my-8">
+                  <img src={seg.src} alt={seg.alt} class="w-full max-w-md mx-auto rounded-lg shadow-sm" loading="lazy" decoding="async" />
+                  {seg.caption && <figcaption class="mt-3 text-center text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">{seg.caption}</figcaption>}
+                </figure>
+              : <div set:html={seg.html} />
         )}
         <BlogCTA />
       </div>
