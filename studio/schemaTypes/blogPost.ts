@@ -151,6 +151,39 @@ export default {
 						},
 					},
 				},
+				{
+					type: 'object',
+					name: 'pullQuote',
+					title: 'Pull Quote',
+					description:
+						'A pulled sentence rendered in magazine-style: full-width centered on mobile, float-left on desktop. Use to break up long sections with a single powerful line.',
+					fields: [
+						{
+							name: 'quote',
+							title: 'Quote',
+							type: 'text',
+							rows: 3,
+							validation: (Rule: any) => Rule.required().min(15).max(300),
+						},
+						{
+							name: 'attribution',
+							title: 'Attribution (optional)',
+							type: 'string',
+							description:
+								'e.g., "James Jordan" or "Salt&Light tribute" — appears below the quote in small caps.',
+						},
+					],
+					preview: {
+						select: { quote: 'quote', attribution: 'attribution' },
+						prepare(s: any) {
+							const q = (s.quote || '').slice(0, 80);
+							return {
+								title: `“${q}${s.quote && s.quote.length > 80 ? '…' : ''}”`,
+								subtitle: s.attribution || '',
+							};
+						},
+					},
+				},
 			],
 		},
 		{
