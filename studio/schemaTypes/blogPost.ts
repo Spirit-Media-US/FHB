@@ -104,6 +104,86 @@ export default {
 						],
 					},
 				},
+				{
+					type: 'image',
+					title: 'Inline Image',
+					options: { hotspot: true },
+					fields: [
+						{
+							name: 'alt',
+							title: 'Alt Text',
+							type: 'string',
+							description:
+								'Required for accessibility + AEO milestone #16. Describe what the image shows and why it matters.',
+						},
+						{
+							name: 'caption',
+							title: 'Caption',
+							type: 'string',
+							description: 'Optional caption rendered below the image.',
+						},
+					],
+				},
+				{
+					type: 'object',
+					name: 'fhbChapter',
+					title: 'FHB Chapter Embed',
+					description:
+						'Primary-source embed (Gold-Level milestone #18). Renders an FHB-translated chapter card via src/components/ChapterEmbed.astro.',
+					fields: [
+						{
+							name: 'book',
+							title: 'Book',
+							type: 'string',
+							validation: (Rule: any) => Rule.required(),
+						},
+						{
+							name: 'chapter',
+							title: 'Chapter',
+							type: 'number',
+							validation: (Rule: any) => Rule.required().integer().min(1),
+						},
+					],
+					preview: {
+						select: { book: 'book', chapter: 'chapter' },
+						prepare(s: any) {
+							return { title: `FHB ${s.book} ${s.chapter}` };
+						},
+					},
+				},
+				{
+					type: 'object',
+					name: 'pullQuote',
+					title: 'Pull Quote',
+					description:
+						'A pulled sentence rendered in magazine-style: full-width centered on mobile, float-left on desktop. Use to break up long sections with a single powerful line.',
+					fields: [
+						{
+							name: 'quote',
+							title: 'Quote',
+							type: 'text',
+							rows: 3,
+							validation: (Rule: any) => Rule.required().min(15).max(300),
+						},
+						{
+							name: 'attribution',
+							title: 'Attribution (optional)',
+							type: 'string',
+							description:
+								'e.g., "James Jordan" or "Salt&Light tribute" — appears below the quote in small caps.',
+						},
+					],
+					preview: {
+						select: { quote: 'quote', attribution: 'attribution' },
+						prepare(s: any) {
+							const q = (s.quote || '').slice(0, 80);
+							return {
+								title: `“${q}${s.quote && s.quote.length > 80 ? '…' : ''}”`,
+								subtitle: s.attribution || '',
+							};
+						},
+					},
+				},
 			],
 		},
 		{
