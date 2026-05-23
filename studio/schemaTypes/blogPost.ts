@@ -65,9 +65,11 @@ export default {
 			of: [{ type: 'string' }],
 			options: {
 				list: [
-					{ title: 'Category 1', value: 'Category 1' },
-					{ title: 'Category 2', value: 'Category 2' },
-					{ title: 'Category 3', value: 'Category 3' },
+					{ title: 'Identity', value: 'Identity' },
+					{ title: 'Legacy', value: 'Legacy' },
+					{ title: 'Scripture', value: 'Scripture' },
+					{ title: 'Healing', value: 'Healing' },
+					{ title: 'Translation', value: 'Translation' },
 				],
 			},
 		},
