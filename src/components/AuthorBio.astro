@@ -7,21 +7,22 @@
 // author registry grows, switch on `author` and look up the matching
 // entry. For non-Kevin authors, the component renders nothing (so we
 // don't ship a generic placeholder card).
-import { sanityClient } from '../lib/sanity';
-
 interface Props {
 	author: string;
 }
 const { author } = Astro.props;
 
 // Author registry — extend when FHB welcomes more bylines.
+// `photoUrl` is a direct Sanity CDN URL; the renderer appends size + format
+// params at request time. Set per-author so the lead-translator page's portrait
+// can differ from the blog author-bio card (different framing requirements).
 const AUTHORS: Record<
 	string,
 	{
 		displayName: string;
 		role: string;
 		bio: string;
-		photoQuery: string; // GROQ field on siteSettings
+		photoUrl: string;
 		profileUrl: string;
 	}
 > = {
@@ -29,19 +30,14 @@ const AUTHORS: Record<
 		displayName: 'Kevin White',
 		role: "Lead Translator, Father's Heart Bible · Founder, Spirit Media Publishing",
 		bio: "Kevin is the lead translator of the Father's Heart Bible, a translation centered on revealing God's heart as Father through every passage. He pastors readers toward the love of our Father — in plain English — and writes here about Scripture, sonship, and the modern Father-heart movement.",
-		photoQuery: 'kevinPortraitUrl',
+		photoUrl:
+			'https://cdn.sanity.io/images/rusi1hyi/production/565f785ee2ed1aa17d785c5613c640a2f44360dd-1920x1935.jpg',
 		profileUrl: '/the-fathers-heart-bible/lead-translator/',
 	},
 };
 
 const entry = AUTHORS[author];
-let photoUrl: string | null = null;
-if (entry) {
-	const settings = await sanityClient.fetch<{ [k: string]: string }>(
-		`*[_type=="siteSettings"][0]{${entry.photoQuery}}`,
-	);
-	photoUrl = settings?.[entry.photoQuery] || null;
-}
+const photoUrl = entry?.photoUrl || null;
 ---
 
 {entry && (
