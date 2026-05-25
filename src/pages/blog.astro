@@ -101,7 +101,7 @@ const jsonLd = {
               ];
               return (
                 <div class="relative rounded-2xl overflow-hidden aspect-square">
-                  <img src={post.image} alt="" class="w-full h-full object-cover" style={`object-position: ${positions[i]};`} />
+                  <img src={post.image} alt="" width="400" height="400" loading="lazy" decoding="async" class="w-full h-full object-cover" style={`object-position: ${positions[i]};`} />
                 </div>
               );
             })}
@@ -145,7 +145,10 @@ const jsonLd = {
     <!-- POSTS GRID -->
     <section class="py-12 lg:py-20 px-6 lg:px-8" style="background-color: var(--color-surface-low);">
       <div class="max-w-7xl mx-auto">
-        <div id="posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        <!-- min-height reserves vertical space so the grid doesn't shift surrounding content
+             when JS-rendered post cards populate. 2-row reserve = ~640px on mobile single-col,
+             absorbs both first paginated page and shorter result sets without overshoot. -->
+        <div id="posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style="min-height: 640px;"></div>
 
         <!-- Empty state -->
         <div id="no-results" class="hidden text-center py-20">
@@ -207,8 +210,8 @@ function renderPosts() {
       : `${filteredPosts.length} of ${POSTS.length} posts`;
     grid.innerHTML = pagePosts.map(post => `
       <a href="${post.slug}" class="group rounded-2xl border overflow-hidden transition-shadow hover:shadow-md" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
-        <div class="h-48 overflow-hidden">
-          <img src="${post.image}" alt="${post.title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style="object-position: ${post.imagePosition};" />
+        <div class="h-48 overflow-hidden" style="aspect-ratio: 16/9;">
+          <img src="${post.image}" alt="${post.title}" width="800" height="450" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style="object-position: ${post.imagePosition};" />
         </div>
         <div class="p-6">
           <div class="flex flex-wrap gap-1.5 mb-3">
