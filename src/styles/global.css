@@ -153,11 +153,18 @@
 	--color-on-error: #f9f9f9;
 	--color-error-container: #ffdad6;
 
-	/* ── Fonts ── */
-	--font-headline: "Epilogue", system-ui, sans-serif;
-	--font-body: "Manrope", system-ui, sans-serif;
-	--font-serif: "Epilogue", system-ui, sans-serif;
-	--font-sans: "Manrope", system-ui, sans-serif;
+	/* ── Fonts ──
+	   Include the metric-adjusted fallbacks ("Epilogue fallback" / "Manrope fallback")
+	   in the stack. Without these, when Tailwind v4 deferred CSS loads and overrides
+	   the inline critical-CSS :root vars, the font stack switches mid-paint, the
+	   size-adjusted fallback drops out, system-ui takes over with different metrics,
+	   and CLS spikes (0.6+ on text-heavy pages like /read/ and /blog/). The matching
+	   @font-face fallback declarations live in src/layouts/Layout.astro inline critical
+	   CSS — keep both surfaces in sync. */
+	--font-headline: "Epilogue", "Epilogue fallback", system-ui, sans-serif;
+	--font-body: "Manrope", "Manrope fallback", system-ui, sans-serif;
+	--font-serif: "Epilogue", "Epilogue fallback", system-ui, sans-serif;
+	--font-sans: "Manrope", "Manrope fallback", system-ui, sans-serif;
 }
 
 /* ── Base ── */
