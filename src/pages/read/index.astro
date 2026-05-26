@@ -9,8 +9,7 @@ import Layout from '../../layouts/Layout.astro';
 // scripts/sync-translations.mjs. Books with locked chapters render
 // active links; the rest of the canon is shown grayed-out as "Coming."
 const MANIFEST_PATH = path.resolve(process.cwd(), 'src/content/bible/_manifest.json');
-const BIBLE_STRUCTURE_PATH =
-	'/home/deploy/bin/tools-api/pipelines/translation/bible_structure.json';
+const BIBLE_STRUCTURE_PATH = path.resolve(process.cwd(), 'src/lib/bible_structure.json');
 
 let manifest: any = { books: {} };
 if (fs.existsSync(MANIFEST_PATH)) {

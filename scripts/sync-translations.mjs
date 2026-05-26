@@ -19,20 +19,9 @@ const ROOT = path.resolve(__dirname, '..');
 
 const TOOLS_API_ROOT = '/home/deploy/bin/tools-api/pipelines/translation';
 const LOCKED_DIR = path.join(TOOLS_API_ROOT, 'output/locked');
-const STRUCTURE_PATH = path.join(TOOLS_API_ROOT, 'bible_structure.json');
+const STRUCTURE_PATH = path.join(ROOT, 'src/lib/bible_structure.json');
 const OUT_DIR = path.join(ROOT, 'src/content/bible');
 const MANIFEST_PATH = path.join(OUT_DIR, '_manifest.json');
-
-if (!fs.existsSync(STRUCTURE_PATH)) {
-	console.log(`[sync-translations] No structure file at ${STRUCTURE_PATH} (Bethel-only path) — writing empty manifest so reader renders empty-state.`);
-	rmDir(OUT_DIR);
-	ensureDir(OUT_DIR);
-	fs.writeFileSync(
-		MANIFEST_PATH,
-		JSON.stringify({ syncedAt: new Date().toISOString(), source: 'unavailable', books: {} }, null, 2),
-	);
-	process.exit(0);
-}
 
 function slugifyBook(book) {
 	return book.toLowerCase().replace(/\s+/g, '-');
