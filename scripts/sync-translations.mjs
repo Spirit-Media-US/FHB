@@ -19,7 +19,7 @@ const ROOT = path.resolve(__dirname, '..');
 
 const TOOLS_API_ROOT = '/home/deploy/bin/tools-api/pipelines/translation';
 const LOCKED_DIR = path.join(TOOLS_API_ROOT, 'output/locked');
-const STRUCTURE_PATH = path.join(TOOLS_API_ROOT, 'bible_structure.json');
+const STRUCTURE_PATH = path.join(ROOT, 'src/lib/bible_structure.json');
 const OUT_DIR = path.join(ROOT, 'src/content/bible');
 const MANIFEST_PATH = path.join(OUT_DIR, '_manifest.json');
 
