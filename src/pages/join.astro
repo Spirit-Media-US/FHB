@@ -32,8 +32,10 @@ const heroPrimaryCtaLabel = 'Join the Movement';
 const heroPrimaryCtaHref = '#join';
 const heroSecondaryCtaLabel = 'Download the Free Book';
 const heroSecondaryCtaHref = '/download/';
-// communityUrl field takes precedence; fall back to legacy mightyNetworksUrl
-const communityUrl = media?.communityUrl || media?.mightyNetworksUrl || '#join';
+// communityUrl field takes precedence; fall back to legacy mightyNetworksUrl,
+// then to the FH Family community at join.fathersheartbible.com.
+const communityUrl =
+	media?.communityUrl || media?.mightyNetworksUrl || 'https://join.fathersheartbible.com';
 const joinPageVideoUrl =
 	media?.joinPageVideo ||
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/mother-son-praying.mp4';
