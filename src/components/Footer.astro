@@ -12,7 +12,9 @@ const siteSettings = await sanityClient.fetch(`
 const year = new Date().getFullYear();
 const footerQuote =
 	siteSettings?.footerQuote || 'I will be their Father, and they will be my sons and daughters.';
-const contactEmail = siteSettings?.email || 'hello@fathersheartbible.com';
+// Global footer Contact routes to SMP support (Kevin's call 2026-05-29).
+// Sanity siteSettings.email is reserved for other contact surfaces (forms, etc.).
+const contactEmail = 'hello@spiritmediapublishing.com';
 ---
 
 <footer style="background-color: var(--color-inverse-surface);">
