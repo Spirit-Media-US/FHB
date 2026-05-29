@@ -418,33 +418,82 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		</script>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 2 — BIG IDEA
+		     SECTION 2 — WHAT IS FHB
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="soft">
-			<div class="text-center max-w-2xl mx-auto">
-				<h2
-					class="text-4xl md:text-5xl font-light mb-6"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					The destination has always been the Father.
-				</h2>
-				<p
-					class="text-lg leading-relaxed mb-6"
-					style="font-family: var(--font-sans); color: var(--color-muted);"
-				>
-					Many believers have read the Bible faithfully and yet related to God
-					more as a servant to a master than as a beloved son or daughter to a loving Father. That
-					distance is not always obvious at first. It can hide beneath sincere devotion, sound
-					doctrine, years of ministry, and disciplined prayer.
-				</p>
-				<p
-					class="text-lg leading-relaxed"
-					style="font-family: var(--font-sans); color: var(--color-muted);"
-				>
-					The message of Scripture has always been moving toward something deeper. Not merely
-					forgiveness. Not merely heaven. Not merely religious correctness. The destination has
-					always been the Father.
-				</p>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
+				<!-- Book image -->
+				<div class="flex justify-center" data-reveal="slide-left">
+					{bookCoverUrl ? (
+						<img
+							src={bookCoverUrl}
+							srcset={bookCoverSrcset}
+							sizes={bookCoverSizes}
+							alt="The Father's Heart Bible — brown cover"
+							class="w-64 md:w-80 block"
+							loading="lazy"
+							decoding="async"
+							width="512"
+							height="768"
+							style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.22));"
+						/>
+					) : (
+						<div
+							class="w-64 md:w-80 aspect-[2/3] flex items-end justify-center p-6"
+							style="background-color: var(--color-brand);"
+						>
+							<p
+								class="text-center text-lg font-light italic"
+								style="font-family: var(--font-serif); color: rgba(255,255,255,0.9);"
+							>
+								The Father's Heart Bible
+							</p>
+						</div>
+					)}
+				</div>
+
+				<!-- Content -->
+				<div data-reveal="slide-right">
+					<p
+						class="text-xs font-semibold tracking-widest uppercase mb-4"
+						style="font-family: var(--font-sans); color: var(--color-gold);"
+					>
+						What Is the Father's Heart Bible?
+					</p>
+					<h2
+						class="text-3xl md:text-4xl font-light leading-tight mb-6"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						A translation that reveals not only His name — but His heart.
+					</h2>
+					<p
+						class="leading-relaxed mb-4"
+						style="font-family: var(--font-sans); color: var(--color-muted);"
+					>
+						The Father&rsquo;s Heart Bible is a new interpretive English translation that seeks to reveal
+						God as Father where Scripture reveals Him. It is grounded in the conviction that from
+						Genesis to Revelation, the Bible tells one story: a Father creating children in His
+						image, pursuing them when they wander, and restoring them to Himself through His Son by
+						His Spirit.
+					</p>
+					<p
+						class="leading-relaxed mb-8"
+						style="font-family: var(--font-sans); color: var(--color-muted);"
+					>
+						This is not only a Bible to study. It is a Bible to receive.
+					</p>
+					<div class="flex flex-col sm:flex-row gap-4">
+						<a
+							href="/samples/"
+							class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline transition-all duration-200"
+							style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+							onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+							onmouseout="this.style.backgroundColor='var(--color-brand)'"
+						>
+							Read Sample Passages
+						</a>
+					</div>
+				</div>
 			</div>
 		</Section>
 
@@ -537,82 +586,33 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 4 — WHAT IS FHB
+		     SECTION 4 — BIG IDEA
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="soft">
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
-				<!-- Book image -->
-				<div class="flex justify-center" data-reveal="slide-left">
-					{bookCoverUrl ? (
-						<img
-							src={bookCoverUrl}
-							srcset={bookCoverSrcset}
-							sizes={bookCoverSizes}
-							alt="The Father's Heart Bible — brown cover"
-							class="w-64 md:w-80 block"
-							loading="lazy"
-							decoding="async"
-							width="512"
-							height="768"
-							style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.22));"
-						/>
-					) : (
-						<div
-							class="w-64 md:w-80 aspect-[2/3] flex items-end justify-center p-6"
-							style="background-color: var(--color-brand);"
-						>
-							<p
-								class="text-center text-lg font-light italic"
-								style="font-family: var(--font-serif); color: rgba(255,255,255,0.9);"
-							>
-								The Father's Heart Bible
-							</p>
-						</div>
-					)}
-				</div>
-
-				<!-- Content -->
-				<div data-reveal="slide-right">
-					<p
-						class="text-xs font-semibold tracking-widest uppercase mb-4"
-						style="font-family: var(--font-sans); color: var(--color-gold);"
-					>
-						What Is the Father's Heart Bible?
-					</p>
-					<h2
-						class="text-3xl md:text-4xl font-light leading-tight mb-6"
-						style="font-family: var(--font-serif); color: var(--color-ink);"
-					>
-						A translation that reveals not only His name — but His heart.
-					</h2>
-					<p
-						class="leading-relaxed mb-4"
-						style="font-family: var(--font-sans); color: var(--color-muted);"
-					>
-						The Father&rsquo;s Heart Bible is a new interpretive English translation that seeks to reveal
-						God as Father where Scripture reveals Him. It is grounded in the conviction that from
-						Genesis to Revelation, the Bible tells one story: a Father creating children in His
-						image, pursuing them when they wander, and restoring them to Himself through His Son by
-						His Spirit.
-					</p>
-					<p
-						class="leading-relaxed mb-8"
-						style="font-family: var(--font-sans); color: var(--color-muted);"
-					>
-						This is not only a Bible to study. It is a Bible to receive.
-					</p>
-					<div class="flex flex-col sm:flex-row gap-4">
-						<a
-							href="/samples/"
-							class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline transition-all duration-200"
-							style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
-							onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
-							onmouseout="this.style.backgroundColor='var(--color-brand)'"
-						>
-							Read Sample Passages
-						</a>
-					</div>
-				</div>
+			<div class="text-center max-w-2xl mx-auto">
+				<h2
+					class="text-4xl md:text-5xl font-light mb-6"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					The destination has always been the Father.
+				</h2>
+				<p
+					class="text-lg leading-relaxed mb-6"
+					style="font-family: var(--font-sans); color: var(--color-muted);"
+				>
+					Many believers have read the Bible faithfully and yet related to God
+					more as a servant to a master than as a beloved son or daughter to a loving Father. That
+					distance is not always obvious at first. It can hide beneath sincere devotion, sound
+					doctrine, years of ministry, and disciplined prayer.
+				</p>
+				<p
+					class="text-lg leading-relaxed"
+					style="font-family: var(--font-sans); color: var(--color-muted);"
+				>
+					The message of Scripture has always been moving toward something deeper. Not merely
+					forgiveness. Not merely heaven. Not merely religious correctness. The destination has
+					always been the Father.
+				</p>
 			</div>
 		</Section>
 
