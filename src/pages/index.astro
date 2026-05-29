@@ -85,10 +85,13 @@ const bookCoverUrl640 = bibleCoverImageFromSanity
 const bookCoverSrcset = `${bookCoverUrl} 512w, ${bookCoverUrl640} 640w`;
 const bookCoverSizes = '(max-width: 767px) 256px, 320px';
 
-// FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
+// FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded.
+// .bg('f3f3f3') bakes the section's "soft" background color into the
+// rendered file so the transparent PNG areas don't show checkerboard
+// markers against the parent <Section variant="soft"> bg.
 const fhbCoverSanity = media?.fhbCoverImage;
 const fhbiCoverUrl = fhbCoverSanity
-	? urlFor(fhbCoverSanity).width(576).format('webp').quality(75).url()
+	? urlFor(fhbCoverSanity).width(576).format('webp').quality(75).bg('f3f3f3').url()
 	: sanityTransform(
 			'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png',
 			576,
