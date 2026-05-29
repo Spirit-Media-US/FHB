@@ -64,21 +64,22 @@ function sanityTransform(url: string, w: number, q = 75): string {
 	return `${base}?w=${w}&fm=webp&q=${q}&auto=format`;
 }
 
-// Bible cover — prefer Sanity image, fall back to hardcoded (both go through webp transform)
-// Responsive widths: mobile=512 (w-64 at DPR2), tablet=640 (w-80 at DPR2)
-// .bg('f3f3f3') bakes the parent <Section variant="soft"> background into
-// the rendered file so transparent PNG areas (image is a 1024x1536 PNG
-// with alpha channel) don't show checkerboard artifacts.
+// Bible cover — prefer Sanity image, fall back to hardcoded (both go through webp transform).
+// Responsive widths: mobile=512 (w-64 at DPR2), tablet=640 (w-80 at DPR2).
+// The Sanity asset is an RGBA PNG with transparent corners (Photoshop-style
+// transparency-indicator checkerboard removed 2026-05-29). Sanity preserves
+// the alpha channel through WebP, so the parent section background shows
+// through naturally — no .bg() needed, no edge mismatch.
 const bibleCoverImageFromSanity = media?.bibleCoverImage;
 const bookCoverUrl = bibleCoverImageFromSanity
-	? urlFor(bibleCoverImageFromSanity).width(512).format('webp').quality(72).bg('f3f3f3').url()
+	? urlFor(bibleCoverImageFromSanity).width(512).format('webp').quality(72).auto('format').url()
 	: sanityTransform(
 			'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png',
 			512,
 			72,
 		);
 const bookCoverUrl640 = bibleCoverImageFromSanity
-	? urlFor(bibleCoverImageFromSanity).width(640).format('webp').quality(72).bg('f3f3f3').url()
+	? urlFor(bibleCoverImageFromSanity).width(640).format('webp').quality(72).auto('format').url()
 	: sanityTransform(
 			'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png',
 			640,
@@ -88,12 +89,12 @@ const bookCoverSrcset = `${bookCoverUrl} 512w, ${bookCoverUrl640} 640w`;
 const bookCoverSizes = '(max-width: 767px) 256px, 320px';
 
 // FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded.
-// .bg('f3f3f3') bakes the section's "soft" background color into the
-// rendered file so the transparent PNG areas don't show checkerboard
-// markers against the parent <Section variant="soft"> bg.
+// The Sanity asset is a true RGBA PNG with alpha=0 corners, so Sanity
+// preserves the alpha through WebP and the section background shows
+// through naturally — no .bg() needed.
 const fhbCoverSanity = media?.fhbCoverImage;
 const fhbiCoverUrl = fhbCoverSanity
-	? urlFor(fhbCoverSanity).width(576).format('webp').quality(75).bg('f3f3f3').url()
+	? urlFor(fhbCoverSanity).width(576).format('webp').quality(75).auto('format').url()
 	: sanityTransform(
 			'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png',
 			576,

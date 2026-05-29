@@ -51,11 +51,11 @@ const biblePageVideoUrl =
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/hands-holding-bible.mp4';
 
 // FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
-// .bg('f3f3f3') bakes the parent Section variant="soft" background into
-// the rendered file so the transparent PNG doesn't show through.
+// The Sanity asset is a true RGBA PNG (alpha-channel transparency);
+// Sanity preserves the alpha so the section bg shows through naturally.
 const fhbCoverImageFromSanity = media?.fhbCoverImage;
 const fhbiCoverUrl = fhbCoverImageFromSanity
-	? urlFor(fhbCoverImageFromSanity).width(400).bg('f3f3f3').url()
+	? urlFor(fhbCoverImageFromSanity).width(400).auto('format').url()
 	: 'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
 const communityUrl = media?.communityUrl || '/join';
 
