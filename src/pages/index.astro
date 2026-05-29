@@ -31,18 +31,21 @@ const seoTitle =
 const seoDescription =
 	pageData?.seoDescription ||
 	"Discover the Father's Heart Bible, a new Bible translation revealing God as Father where Scripture reveals Him. Download the free book, explore sample passages, join the movement, and be part of what the Father is doing.";
-const heroHeading =
-	'You were never meant to relate to God as a servant\u2026 but as a beloved child.';
+// June 2026 \u2014 Public Reading Month launch. Two-line announcement headline
+// hardcoded for the campaign window; post-July-1, restore the prior Sanity-
+// driven heroHeading ("You were never meant to relate to God as a servant\u2026
+// but as a beloved child.").
+const heroHeadingLine1 = 'Father\u2019s Heart Bible is Here!';
+const heroHeadingLine2 = 'Be among the first to read it.';
 const heroSubheading =
 	'The Father\u2019s Heart Bible reveals what Scripture has always been showing: the destination was never merely forgiveness or heaven. The destination has always been the Father.';
-// June 2026 — Public Review Month campaign. Primary CTA pushes visitors
-// into the review experience inside FH Family. Secondary keeps the free
-// book funnel alive for visitors not ready to join. After July 1 these
-// flip back via Sanity heroPrimaryCta* fields.
-const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Help Review FHB →';
+// Primary CTA points readers directly at the review experience inside FH
+// Family. The secondary "Download the Free Book" CTA is intentionally NOT
+// rendered during the June campaign so this primary CTA carries the hero
+// alone; the Free Book CTA remains in the dedicated Free Download section
+// further down on this page.
+const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Read FHB →';
 const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || 'https://join.fathersheartbible.com/';
-const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Download the Free Book';
-const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/download/';
 const heroVideoSrc =
 	media?.heroVideoUrl ||
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
@@ -160,7 +163,8 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					class="text-4xl font-medium leading-snug tracking-tight"
 					style="font-family: var(--font-headline); color: #FFFFFF;"
 				>
-					{heroHeading}
+					<span class="block">{heroHeadingLine1}</span>
+					<span class="block">{heroHeadingLine2}</span>
 				</h1>
 				<p
 					class="text-lg leading-relaxed"
@@ -175,13 +179,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary);"
 					>
 						{heroPrimaryCtaLabel}
-					</a>
-					<a
-						href={heroSecondaryCtaHref}
-						class="inline-flex items-center justify-center px-8 py-3.5 text-base font-medium no-underline border"
-						style="font-family: var(--font-body); color: #FFFFFF; border-color: rgba(255,255,255,0.6);"
-					>
-						{heroSecondaryCtaLabel}
 					</a>
 				</div>
 			</div>
@@ -261,7 +258,8 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					class="md:text-6xl font-medium leading-snug tracking-tight"
 					style="font-family: var(--font-headline); color: #FFFFFF; transition: color 1.2s ease;" data-hero-entrance
 				>
-					{heroHeading}
+					<span class="block">{heroHeadingLine1}</span>
+					<span class="block">{heroHeadingLine2}</span>
 				</h1>
 			</div>
 		</section>
@@ -287,15 +285,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						onmouseout="this.style.opacity='1'"
 					>
 						{heroPrimaryCtaLabel}
-					</a>
-					<a
-						href={heroSecondaryCtaHref}
-						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline border transition-all duration-200"
-						style="font-family: var(--font-body); color: var(--color-primary); border-color: var(--color-primary);"
-						onmouseover="this.style.backgroundColor='var(--color-primary)'; this.style.color='var(--color-on-primary)';"
-						onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-primary)';"
-					>
-						{heroSecondaryCtaLabel}
 					</a>
 				</div>
 			</div>
@@ -618,15 +607,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						>
 							Read Sample Passages
 						</a>
-						<a
-							href="/download/"
-							class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline border transition-all duration-200"
-							style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
-							onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
-							onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
-						>
-							Download the Free Book
-						</a>
 					</div>
 				</div>
 			</div>
@@ -884,15 +864,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						onmouseout="this.style.backgroundColor='var(--color-brand)'"
 					>
 						Partner With Us
-					</a>
-					<a
-						href="/partner#donate"
-						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline border transition-all duration-200"
-						style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
-						onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
-						onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
-					>
-						Donate Now
 					</a>
 				</div>
 			</div>
