@@ -31,14 +31,20 @@ const seoTitle =
 const seoDescription =
 	pageData?.seoDescription ||
 	"Discover the Father's Heart Bible, a new Bible translation revealing God as Father where Scripture reveals Him. Download the free book, explore sample passages, join the movement, and be part of what the Father is doing.";
-const heroHeading =
-	'You were never meant to relate to God as a servant\u2026 but as a beloved child.';
+// June 2026 \u2014 Public Reading Month launch. Two-line announcement headline
+// hardcoded for the campaign window; post-July-1, restore the prior Sanity-
+// driven heroHeading ("You were never meant to relate to God as a servant\u2026
+// but as a beloved child.").
+const heroHeadingLine1 = 'Father\u2019s Heart Bible is Here!';
 const heroSubheading =
-	'The Father\u2019s Heart Bible reveals what Scripture has always been showing: the destination was never merely forgiveness or heaven. The destination has always been the Father.';
-const heroPrimaryCtaLabel = 'Download the Free Book';
-const heroPrimaryCtaHref = '/download/';
-const heroSecondaryCtaLabel = 'Already have it? Start here';
-const heroSecondaryCtaHref = '/join/';
+	'Be among the first to read Father\u2019s Heart Bible. The first ever English bible revealing our Father\u2019s voice and His heart for you.';
+// Primary CTA points readers directly at the review experience inside FH
+// Family. The secondary "Download the Free Book" CTA is intentionally NOT
+// rendered during the June campaign so this primary CTA carries the hero
+// alone; the Free Book CTA remains in the dedicated Free Download section
+// further down on this page.
+const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Read FHB →';
+const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || 'https://join.fathersheartbible.com/';
 const heroVideoSrc =
 	media?.heroVideoUrl ||
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
@@ -58,18 +64,22 @@ function sanityTransform(url: string, w: number, q = 75): string {
 	return `${base}?w=${w}&fm=webp&q=${q}&auto=format`;
 }
 
-// Bible cover — prefer Sanity image, fall back to hardcoded (both go through webp transform)
-// Responsive widths: mobile=512 (w-64 at DPR2), tablet=640 (w-80 at DPR2)
+// Bible cover — prefer Sanity image, fall back to hardcoded (both go through webp transform).
+// Responsive widths: mobile=512 (w-64 at DPR2), tablet=640 (w-80 at DPR2).
+// The Sanity asset is an RGBA PNG with transparent corners (Photoshop-style
+// transparency-indicator checkerboard removed 2026-05-29). Sanity preserves
+// the alpha channel through WebP, so the parent section background shows
+// through naturally — no .bg() needed, no edge mismatch.
 const bibleCoverImageFromSanity = media?.bibleCoverImage;
 const bookCoverUrl = bibleCoverImageFromSanity
-	? urlFor(bibleCoverImageFromSanity).width(512).format('webp').quality(72).url()
+	? urlFor(bibleCoverImageFromSanity).width(512).format('webp').quality(72).auto('format').url()
 	: sanityTransform(
 			'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png',
 			512,
 			72,
 		);
 const bookCoverUrl640 = bibleCoverImageFromSanity
-	? urlFor(bibleCoverImageFromSanity).width(640).format('webp').quality(72).url()
+	? urlFor(bibleCoverImageFromSanity).width(640).format('webp').quality(72).auto('format').url()
 	: sanityTransform(
 			'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png',
 			640,
@@ -78,10 +88,13 @@ const bookCoverUrl640 = bibleCoverImageFromSanity
 const bookCoverSrcset = `${bookCoverUrl} 512w, ${bookCoverUrl640} 640w`;
 const bookCoverSizes = '(max-width: 767px) 256px, 320px';
 
-// FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
+// FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded.
+// The Sanity asset is a true RGBA PNG with alpha=0 corners, so Sanity
+// preserves the alpha through WebP and the section background shows
+// through naturally — no .bg() needed.
 const fhbCoverSanity = media?.fhbCoverImage;
 const fhbiCoverUrl = fhbCoverSanity
-	? urlFor(fhbCoverSanity).width(576).format('webp').quality(75).url()
+	? urlFor(fhbCoverSanity).width(576).format('webp').quality(75).auto('format').url()
 	: sanityTransform(
 			'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png',
 			576,
@@ -153,10 +166,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			<div aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(36,27,23,0.55) 0%,rgba(36,27,23,0.75) 100%);pointer-events:none;"></div>
 			<div class="relative z-10 max-w-2xl mx-auto text-center">
 				<h1
-					class="text-4xl font-medium leading-snug tracking-tight"
+					class="text-[2.475rem] font-medium leading-snug tracking-tight"
 					style="font-family: var(--font-headline); color: #FFFFFF;"
 				>
-					{heroHeading}
+					{heroHeadingLine1}
 				</h1>
 				<p
 					class="text-lg leading-relaxed"
@@ -171,13 +184,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary);"
 					>
 						{heroPrimaryCtaLabel}
-					</a>
-					<a
-						href={heroSecondaryCtaHref}
-						class="inline-flex items-center justify-center px-8 py-3.5 text-base font-medium no-underline border"
-						style="font-family: var(--font-body); color: #FFFFFF; border-color: rgba(255,255,255,0.6);"
-					>
-						{heroSecondaryCtaLabel}
 					</a>
 				</div>
 			</div>
@@ -254,10 +260,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				/>
 				<h1
 					id="hero-heading"
-					class="md:text-6xl font-medium leading-snug tracking-tight"
+					class="md:text-[4.125rem] font-medium leading-snug tracking-tight"
 					style="font-family: var(--font-headline); color: #FFFFFF; transition: color 1.2s ease;" data-hero-entrance
 				>
-					{heroHeading}
+					{heroHeadingLine1}
 				</h1>
 			</div>
 		</section>
@@ -283,15 +289,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						onmouseout="this.style.opacity='1'"
 					>
 						{heroPrimaryCtaLabel}
-					</a>
-					<a
-						href={heroSecondaryCtaHref}
-						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline border transition-all duration-200"
-						style="font-family: var(--font-body); color: var(--color-primary); border-color: var(--color-primary);"
-						onmouseover="this.style.backgroundColor='var(--color-primary)'; this.style.color='var(--color-on-primary)';"
-						onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-primary)';"
-					>
-						{heroSecondaryCtaLabel}
 					</a>
 				</div>
 			</div>
@@ -421,33 +418,82 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		</script>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 2 — BIG IDEA
+		     SECTION 2 — WHAT IS FHB
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="soft">
-			<div class="text-center max-w-2xl mx-auto">
-				<h2
-					class="text-4xl md:text-5xl font-light mb-6"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					The destination has always been the Father.
-				</h2>
-				<p
-					class="text-lg leading-relaxed mb-6"
-					style="font-family: var(--font-sans); color: var(--color-muted);"
-				>
-					Many believers have read the Bible faithfully and yet related to God
-					more as a servant to a master than as a beloved son or daughter to a loving Father. That
-					distance is not always obvious at first. It can hide beneath sincere devotion, sound
-					doctrine, years of ministry, and disciplined prayer.
-				</p>
-				<p
-					class="text-lg leading-relaxed"
-					style="font-family: var(--font-sans); color: var(--color-muted);"
-				>
-					The message of Scripture has always been moving toward something deeper. Not merely
-					forgiveness. Not merely heaven. Not merely religious correctness. The destination has
-					always been the Father.
-				</p>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
+				<!-- Book image -->
+				<div class="flex justify-center" data-reveal="slide-left">
+					{bookCoverUrl ? (
+						<img
+							src={bookCoverUrl}
+							srcset={bookCoverSrcset}
+							sizes={bookCoverSizes}
+							alt="The Father's Heart Bible — brown cover"
+							class="w-64 md:w-80 block"
+							loading="lazy"
+							decoding="async"
+							width="512"
+							height="768"
+							style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.22));"
+						/>
+					) : (
+						<div
+							class="w-64 md:w-80 aspect-[2/3] flex items-end justify-center p-6"
+							style="background-color: var(--color-brand);"
+						>
+							<p
+								class="text-center text-lg font-light italic"
+								style="font-family: var(--font-serif); color: rgba(255,255,255,0.9);"
+							>
+								The Father's Heart Bible
+							</p>
+						</div>
+					)}
+				</div>
+
+				<!-- Content -->
+				<div data-reveal="slide-right">
+					<p
+						class="text-xs font-semibold tracking-widest uppercase mb-4"
+						style="font-family: var(--font-sans); color: var(--color-gold);"
+					>
+						What Is the Father's Heart Bible?
+					</p>
+					<h2
+						class="text-3xl md:text-4xl font-light leading-tight mb-6"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						A translation that reveals not only His name — but His heart.
+					</h2>
+					<p
+						class="leading-relaxed mb-4"
+						style="font-family: var(--font-sans); color: var(--color-muted);"
+					>
+						The Father&rsquo;s Heart Bible is a new interpretive English translation that seeks to reveal
+						God as Father where Scripture reveals Him. It is grounded in the conviction that from
+						Genesis to Revelation, the Bible tells one story: a Father creating children in His
+						image, pursuing them when they wander, and restoring them to Himself through His Son by
+						His Spirit.
+					</p>
+					<p
+						class="leading-relaxed mb-8"
+						style="font-family: var(--font-sans); color: var(--color-muted);"
+					>
+						This is not only a Bible to study. It is a Bible to receive.
+					</p>
+					<div class="flex flex-col sm:flex-row gap-4">
+						<a
+							href="https://join.fathersheartbible.com/"
+							class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline transition-all duration-200"
+							style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
+							onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
+							onmouseout="this.style.backgroundColor='var(--color-brand)'"
+						>
+							Read FHB →
+						</a>
+					</div>
+				</div>
 			</div>
 		</Section>
 
@@ -540,91 +586,33 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 4 — WHAT IS FHB
+		     SECTION 4 — BIG IDEA
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="soft">
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
-				<!-- Book image -->
-				<div class="flex justify-center" data-reveal="slide-left">
-					{bookCoverUrl ? (
-						<img
-							src={bookCoverUrl}
-							srcset={bookCoverSrcset}
-							sizes={bookCoverSizes}
-							alt="The Father's Heart Bible — brown cover"
-							class="w-64 md:w-80 block"
-							loading="lazy"
-							decoding="async"
-							width="512"
-							height="768"
-							style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.22));"
-						/>
-					) : (
-						<div
-							class="w-64 md:w-80 aspect-[2/3] flex items-end justify-center p-6"
-							style="background-color: var(--color-brand);"
-						>
-							<p
-								class="text-center text-lg font-light italic"
-								style="font-family: var(--font-serif); color: rgba(255,255,255,0.9);"
-							>
-								The Father's Heart Bible
-							</p>
-						</div>
-					)}
-				</div>
-
-				<!-- Content -->
-				<div data-reveal="slide-right">
-					<p
-						class="text-xs font-semibold tracking-widest uppercase mb-4"
-						style="font-family: var(--font-sans); color: var(--color-gold);"
-					>
-						What Is the Father's Heart Bible?
-					</p>
-					<h2
-						class="text-3xl md:text-4xl font-light leading-tight mb-6"
-						style="font-family: var(--font-serif); color: var(--color-ink);"
-					>
-						A translation that reveals not only His name — but His heart.
-					</h2>
-					<p
-						class="leading-relaxed mb-4"
-						style="font-family: var(--font-sans); color: var(--color-muted);"
-					>
-						The Father&rsquo;s Heart Bible is a new interpretive English translation that seeks to reveal
-						God as Father where Scripture reveals Him. It is grounded in the conviction that from
-						Genesis to Revelation, the Bible tells one story: a Father creating children in His
-						image, pursuing them when they wander, and restoring them to Himself through His Son by
-						His Spirit.
-					</p>
-					<p
-						class="leading-relaxed mb-8"
-						style="font-family: var(--font-sans); color: var(--color-muted);"
-					>
-						This is not only a Bible to study. It is a Bible to receive.
-					</p>
-					<div class="flex flex-col sm:flex-row gap-4">
-						<a
-							href="/samples/"
-							class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline transition-all duration-200"
-							style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
-							onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
-							onmouseout="this.style.backgroundColor='var(--color-brand)'"
-						>
-							Read Sample Passages
-						</a>
-						<a
-							href="/download/"
-							class="inline-flex items-center px-6 py-3 text-sm font-medium no-underline border transition-all duration-200"
-							style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
-							onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
-							onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
-						>
-							Download the Free Book
-						</a>
-					</div>
-				</div>
+			<div class="text-center max-w-2xl mx-auto">
+				<h2
+					class="text-4xl md:text-5xl font-light mb-6"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					The destination has always been the Father.
+				</h2>
+				<p
+					class="text-lg leading-relaxed mb-6"
+					style="font-family: var(--font-sans); color: var(--color-muted);"
+				>
+					Many believers have read the Bible faithfully and yet related to God
+					more as a servant to a master than as a beloved son or daughter to a loving Father. That
+					distance is not always obvious at first. It can hide beneath sincere devotion, sound
+					doctrine, years of ministry, and disciplined prayer.
+				</p>
+				<p
+					class="text-lg leading-relaxed"
+					style="font-family: var(--font-sans); color: var(--color-muted);"
+				>
+					The message of Scripture has always been moving toward something deeper. Not merely
+					forgiveness. Not merely heaven. Not merely religious correctness. The destination has
+					always been the Father.
+				</p>
 			</div>
 		</Section>
 
@@ -832,13 +820,13 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					pray, and participate.
 				</p>
 				<a
-					href="/join/"
+					href="https://join.fathersheartbible.com/"
 					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 					style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
 					onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
 					onmouseout="this.style.backgroundColor='var(--color-brand)'"
 				>
-					Join the Movement
+					Join the FH Family
 				</a>
 			</div>
 		</Section>
@@ -880,15 +868,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						onmouseout="this.style.backgroundColor='var(--color-brand)'"
 					>
 						Partner With Us
-					</a>
-					<a
-						href="/partner#donate"
-						class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline border transition-all duration-200"
-						style="font-family: var(--font-sans); color: var(--color-brand); border-color: var(--color-brand);"
-						onmouseover="this.style.backgroundColor='var(--color-brand)'; this.style.color='#fff';"
-						onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-brand)';"
-					>
-						Donate Now
 					</a>
 				</div>
 			</div>

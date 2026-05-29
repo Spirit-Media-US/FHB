@@ -39,9 +39,11 @@ const downloadPageVideoUrl =
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/farmer-reading-bible.mp4';
 
 // FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
+// The Sanity asset is a true RGBA PNG (alpha-channel transparency);
+// Sanity preserves the alpha so the section bg shows through naturally.
 const fhbCoverImageFromSanity = media?.fhbCoverImage;
 const fhbiCoverUrl = fhbCoverImageFromSanity
-	? urlFor(fhbCoverImageFromSanity).width(400).url()
+	? urlFor(fhbCoverImageFromSanity).width(400).auto('format').url()
 	: 'https://cdn.sanity.io/images/rusi1hyi/production/3ab3f8d98e6ac0913d382922f0983efe6cb5535f-1278x2118.png';
 // Resource fields with fallbacks
 const formHeading = resourceData?.formHeading || 'Get Your Free Copy';
