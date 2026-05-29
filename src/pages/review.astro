@@ -1,0 +1,386 @@
+---
+import Footer from '../components/Footer.astro';
+import Navbar from '../components/Navbar.astro';
+import Section from '../components/Section.astro';
+import Layout from '../layouts/Layout.astro';
+import { sanityClient } from '../lib/sanity';
+
+// /review — Public Review Month landing page.
+//
+// Promoted by the homepage hero through June. Purpose-led: explains why the
+// public is being invited to review FHB translations, what the Wall of
+// Contributors is, and the time-bound nature of the campaign. Single signup
+// CTA at the bottom routes to join.fathersheartbible.com.
+
+const settings = await sanityClient.fetch(
+	`*[_type =="siteSettings"][0] { communityUrl, partnerPageVideo }`,
+);
+
+const communityUrl = settings?.communityUrl || 'https://join.fathersheartbible.com';
+
+const seoTitle = "Public Review Month — Father's Heart Bible";
+const seoDescription =
+	'June 2026: the Father’s Heart Bible opens for public review. Read it, react to it, suggest changes — and add your name to the Wall of Contributors. Help bring FHB to the world.';
+const canonical = 'https://fathersheartbible.com/review/';
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'Event',
+	name: 'Father’s Heart Bible — Public Review Month',
+	startDate: '2026-06-01',
+	endDate: '2026-06-30',
+	eventStatus: 'https://schema.org/EventScheduled',
+	eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+	location: {
+		'@type': 'VirtualLocation',
+		url: communityUrl,
+	},
+	organizer: {
+		'@type': 'Organization',
+		name: "Father's Heart Bible",
+		url: 'https://fathersheartbible.com',
+	},
+	description: seoDescription,
+	url: canonical,
+};
+---
+
+<Layout title={seoTitle} description={seoDescription} jsonLd={jsonLd}>
+	<Fragment slot="head">
+		<link rel="canonical" href={canonical} />
+	</Fragment>
+
+	<Navbar />
+
+	<main id="main-content">
+		<!-- HERO ────────────────────────────────────────────────────── -->
+		<section class="review-hero">
+			<div class="hero-inner">
+				<p class="eyebrow">June 2026 · Public Review Month</p>
+				<h1>
+					Help us bring the Father&rsquo;s Heart Bible to the world.
+				</h1>
+				<p class="hero-lede">
+					Through June, the Father&rsquo;s Heart Bible opens for the public to
+					review &mdash; chapter by chapter, day by day. Read it. React to it.
+					Suggest changes where you see them. Then we lock the translation on
+					July&nbsp;1.
+				</p>
+				<p class="hero-sub">
+					Every contribution &mdash; every reaction, every suggestion &mdash;
+					adds your name to the Wall of Contributors. The first family to ever
+					read the FHB.
+				</p>
+				<a class="hero-cta" href={communityUrl}>Join the family to begin &rarr;</a>
+				<p class="hero-meta">No charge. No commitment beyond the review.</p>
+			</div>
+		</section>
+
+		<!-- WHAT YOU'RE JOINING ─────────────────────────────────────── -->
+		<Section variant="light">
+			<header class="block-head">
+				<p class="block-eyebrow">What you&rsquo;re joining right now</p>
+				<h2>Three things, one family.</h2>
+			</header>
+
+			<div class="three-up">
+				<div class="block">
+					<p class="block-icon" aria-hidden="true">&#x1F4D6;</p>
+					<h3>Public Review of the FHB</h3>
+					<p>
+						Through June 30, the family is reading every book of the
+						Father&rsquo;s Heart Bible as the first translators ever to do
+						so. You read, react, suggest, discuss. We listen. Then we lock the
+						translations on July&nbsp;1.
+					</p>
+				</div>
+				<div class="block">
+					<p class="block-icon" aria-hidden="true">&#x1FAA7;</p>
+					<h3>The Wall of Contributors</h3>
+					<p>
+						Everyone who contributes &mdash; a reaction, a suggestion, a thought
+						&mdash; gets their name on the wall. In July, the wall goes public
+						here on fathersheartbible.com &mdash; a permanent testimony of the
+						family who brought FHB to the world.
+					</p>
+				</div>
+				<div class="block">
+					<p class="block-icon" aria-hidden="true">&#x1F54A;</p>
+					<h3>A community that outlasts the project</h3>
+					<p>
+						After the translations lock, FH Family stays. Daily conversation,
+						prayer, testimony, the Father&rsquo;s heart together &mdash; long
+						past June.
+					</p>
+				</div>
+			</div>
+		</Section>
+
+		<!-- HOW IT WORKS ─────────────────────────────────────────────── -->
+		<Section variant="soft">
+			<header class="block-head">
+				<p class="block-eyebrow">How the review works</p>
+				<h2>Simple. Live. In your own time.</h2>
+			</header>
+
+			<ol class="how-list">
+				<li>
+					<span class="step-num">1</span>
+					<div>
+						<h3>Join FH Family</h3>
+						<p>
+							A magic link in your email. No password. Free to join, always.
+						</p>
+					</div>
+				</li>
+				<li>
+					<span class="step-num">2</span>
+					<div>
+						<h3>Open the chapter</h3>
+						<p>
+							Each book opens for review on its own day. Genesis first. The
+							family is notified when a new one lands. You read it like any
+							Bible &mdash; verse by verse.
+						</p>
+					</div>
+				</li>
+				<li>
+					<span class="step-num">3</span>
+					<div>
+						<h3>React. Suggest. Discuss.</h3>
+						<p>
+							Did a verse land? Tap &#x2764;&#xFE0F;. Read something that feels
+							off? Tap a category &mdash; <em>Grammar, Modernize, Accuracy,
+							Clarity, Beautiful, Question</em> &mdash; and tell us what you
+							see. Other reviewers&rsquo; thoughts are right there too.
+						</p>
+					</div>
+				</li>
+				<li>
+					<span class="step-num">4</span>
+					<div>
+						<h3>July&nbsp;1: we lock the translation</h3>
+						<p>
+							The review window closes. We apply what we learned. The Wall of
+							Contributors goes public here. The Father&rsquo;s Heart Bible
+							goes out to the world &mdash; with your name behind it.
+						</p>
+					</div>
+				</li>
+			</ol>
+		</Section>
+
+		<!-- CLOSING CTA ──────────────────────────────────────────────── -->
+		<Section variant="light">
+			<div class="closing">
+				<h2>The first family to ever read it.</h2>
+				<p>
+					June&nbsp;1 through June&nbsp;30. Father&rsquo;s Day is the heart of
+					it. Be part of bringing the Father&rsquo;s Heart Bible to the world
+					&mdash; in 2026.
+				</p>
+				<a class="closing-cta" href={communityUrl}>Join the family to begin &rarr;</a>
+			</div>
+		</Section>
+	</main>
+
+	<Footer />
+</Layout>
+
+<style>
+	.review-hero {
+		background-color: var(--color-surface);
+		padding: 120px 24px 80px;
+		text-align: center;
+	}
+	.hero-inner {
+		max-width: 760px;
+		margin: 0 auto;
+	}
+	.eyebrow {
+		display: inline-block;
+		font-family: var(--font-sans);
+		font-size: 12px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		color: var(--color-gold);
+		margin: 0 0 16px;
+	}
+	.review-hero h1 {
+		font-family: var(--font-serif);
+		font-size: clamp(32px, 5vw, 52px);
+		font-weight: 300;
+		line-height: 1.15;
+		color: var(--color-ink);
+		margin: 0 0 20px;
+	}
+	.hero-lede {
+		font-family: var(--font-sans);
+		font-size: 18px;
+		line-height: 1.55;
+		color: var(--color-on-surface, var(--color-ink));
+		margin: 0 0 14px;
+	}
+	.hero-sub {
+		font-family: var(--font-sans);
+		font-size: 15px;
+		line-height: 1.6;
+		color: var(--color-muted);
+		margin: 0 0 32px;
+	}
+	.hero-cta {
+		display: inline-block;
+		background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container));
+		color: var(--color-on-primary);
+		font-family: var(--font-sans);
+		font-size: 16px;
+		font-weight: 700;
+		padding: 16px 32px;
+		border-radius: 6px;
+		text-decoration: none;
+		transition: transform 0.15s, box-shadow 0.15s;
+	}
+	.hero-cta:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+	}
+	.hero-meta {
+		font-family: var(--font-sans);
+		font-size: 13px;
+		color: var(--color-muted);
+		margin: 16px 0 0;
+	}
+
+	.block-head {
+		text-align: center;
+		max-width: 600px;
+		margin: 0 auto 32px;
+	}
+	.block-eyebrow {
+		font-family: var(--font-sans);
+		font-size: 12px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.16em;
+		color: var(--color-gold);
+		margin: 0 0 8px;
+	}
+	.block-head h2 {
+		font-family: var(--font-serif);
+		font-size: clamp(26px, 4vw, 36px);
+		font-weight: 300;
+		line-height: 1.2;
+		color: var(--color-ink);
+		margin: 0;
+	}
+
+	.three-up {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 28px;
+		max-width: 1000px;
+		margin: 0 auto;
+	}
+	@media (min-width: 720px) {
+		.three-up { grid-template-columns: repeat(3, 1fr); gap: 32px; }
+	}
+	.block {
+		text-align: left;
+	}
+	.block-icon {
+		font-size: 32px;
+		margin: 0 0 12px;
+	}
+	.block h3 {
+		font-family: var(--font-serif);
+		font-size: 22px;
+		font-weight: 600;
+		color: var(--color-ink);
+		margin: 0 0 10px;
+	}
+	.block p {
+		font-family: var(--font-sans);
+		font-size: 15px;
+		line-height: 1.6;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.how-list {
+		list-style: none;
+		padding: 0;
+		margin: 0 auto;
+		max-width: 720px;
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+	.how-list li {
+		display: grid;
+		grid-template-columns: 56px 1fr;
+		gap: 18px;
+		align-items: start;
+	}
+	.step-num {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: var(--color-primary);
+		color: var(--color-on-primary);
+		font-family: var(--font-serif);
+		font-size: 22px;
+		font-weight: 700;
+	}
+	.how-list h3 {
+		font-family: var(--font-serif);
+		font-size: 22px;
+		font-weight: 600;
+		color: var(--color-ink);
+		margin: 0 0 6px;
+	}
+	.how-list p {
+		font-family: var(--font-sans);
+		font-size: 15px;
+		line-height: 1.6;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.closing {
+		text-align: center;
+		max-width: 720px;
+		margin: 0 auto;
+	}
+	.closing h2 {
+		font-family: var(--font-serif);
+		font-size: clamp(28px, 4.5vw, 40px);
+		font-weight: 300;
+		color: var(--color-ink);
+		margin: 0 0 16px;
+		line-height: 1.2;
+	}
+	.closing p {
+		font-family: var(--font-sans);
+		font-size: 16px;
+		line-height: 1.6;
+		color: var(--color-muted);
+		margin: 0 0 28px;
+	}
+	.closing-cta {
+		display: inline-block;
+		background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container));
+		color: var(--color-on-primary);
+		font-family: var(--font-sans);
+		font-size: 16px;
+		font-weight: 700;
+		padding: 16px 32px;
+		border-radius: 6px;
+		text-decoration: none;
+		transition: transform 0.15s;
+	}
+	.closing-cta:hover { transform: translateY(-1px); }
+</style>

@@ -35,10 +35,14 @@ const heroHeading =
 	'You were never meant to relate to God as a servant\u2026 but as a beloved child.';
 const heroSubheading =
 	'The Father\u2019s Heart Bible reveals what Scripture has always been showing: the destination was never merely forgiveness or heaven. The destination has always been the Father.';
-const heroPrimaryCtaLabel = 'Download the Free Book';
-const heroPrimaryCtaHref = '/download/';
-const heroSecondaryCtaLabel = 'Already have it? Start here';
-const heroSecondaryCtaHref = '/join/';
+// June 2026 — Public Review Month campaign. Primary CTA pushes visitors
+// into the review experience inside FH Family. Secondary keeps the free
+// book funnel alive for visitors not ready to join. After July 1 these
+// flip back via Sanity heroPrimaryCta* fields.
+const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Help Review FHB →';
+const heroPrimaryCtaHref = pageData?.heroPrimaryCtaHref || '/review/';
+const heroSecondaryCtaLabel = pageData?.heroSecondaryCtaLabel || 'Download the Free Book';
+const heroSecondaryCtaHref = pageData?.heroSecondaryCtaHref || '/download/';
 const heroVideoSrc =
 	media?.heroVideoUrl ||
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
