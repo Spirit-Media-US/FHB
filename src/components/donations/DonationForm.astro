@@ -18,27 +18,31 @@
 			Partner with the Father&rsquo;s Heart Bible
 		</h2>
 
-		<!-- One-time / Monthly toggle -->
+		<!-- Monthly / One-time toggle. Monthly is the campaign-preferred default
+		     (Father's Heart Bible First Edition launch); donors can switch to a
+		     one-time gift if they prefer. -->
 		<div class="flex gap-2 mb-5" role="tablist">
-			<button type="button" data-frequency="one_time" data-active="true"
-				class="frequency-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
-				style="font-family: var(--font-sans);">
-				One-time
-			</button>
-			<button type="button" data-frequency="recurring"
+			<button type="button" data-frequency="recurring" data-active="true"
 				class="frequency-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
 				style="font-family: var(--font-sans);">
 				Monthly
 			</button>
+			<button type="button" data-frequency="one_time"
+				class="frequency-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+				style="font-family: var(--font-sans);">
+				One-time
+			</button>
 		</div>
 
-		<!-- Suggested amounts -->
+		<!-- Suggested amounts — aligned to First Edition fundraising tiers:
+		     $5 = 1 Bible (Sponsor) · $50 = Founding Supporter · $100 = Founding
+		     Partner · $250 = Founding Patron · $1,000+ = Founder. -->
 		<div class="grid grid-cols-3 gap-2 mb-3">
-			<button type="button" data-amount="33" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$33</button>
+			<button type="button" data-amount="5" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$5</button>
+			<button type="button" data-amount="50" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$50</button>
 			<button type="button" data-amount="100" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$100</button>
-			<button type="button" data-amount="500" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$500</button>
+			<button type="button" data-amount="250" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$250</button>
 			<button type="button" data-amount="1000" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$1,000</button>
-			<button type="button" data-amount="5000" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$5,000</button>
 			<button type="button" data-amount="custom" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">Custom</button>
 		</div>
 
@@ -174,7 +178,7 @@
 	let stripePromise: Promise<any> | null = null;
 	let checkoutInstance: any = null;
 	let selectedAmountDollars = 0;
-	let frequency: 'one_time' | 'recurring' = 'one_time';
+	let frequency: 'one_time' | 'recurring' = 'recurring';
 
 	function fmt(c: number) {
 		return `$${(c / 100).toLocaleString('en-US', { minimumFractionDigits: c % 100 === 0 ? 0 : 2, maximumFractionDigits: 2 })}`;
@@ -236,7 +240,7 @@
 			btn.addEventListener('click', () => {
 				root.querySelectorAll<HTMLButtonElement>('.frequency-btn').forEach((b) => (b.dataset.active = 'false'));
 				btn.dataset.active = 'true';
-				frequency = (btn.dataset.frequency as any) || 'one_time';
+				frequency = (btn.dataset.frequency as any) || 'recurring';
 				updateImpact();
 			});
 		});
