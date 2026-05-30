@@ -14,7 +14,11 @@ export async function getStaticPaths() {
 	const paths = [];
 	for (const slug of Object.keys(manifest.books || {})) {
 		const entry = manifest.books[slug];
-		for (const ch of entry.lockedChapters) {
+		// A page exists for every readable chapter — locked AND reading-edition.
+		const available = Array.from(
+			new Set<number>([...(entry.lockedChapters || []), ...(entry.readingEditionChapters || [])]),
+		).sort((a: number, b: number) => a - b);
+		for (const ch of available) {
 			const padded = String(ch).padStart(3, '0');
 			const dataPath = path.join(BIBLE_DIR, slug, `${padded}.json`);
 			if (!fs.existsSync(dataPath)) continue;
@@ -26,7 +30,7 @@ export async function getStaticPaths() {
 					bookSlug: slug,
 					bookName: entry.book,
 					totalChapters: entry.totalChapters,
-					lockedChapters: entry.lockedChapters,
+					availableChapters: available,
 				},
 			});
 		}
@@ -34,14 +38,14 @@ export async function getStaticPaths() {
 	return paths;
 }
 
-const { data, bookSlug, bookName, totalChapters, lockedChapters } = Astro.props;
+const { data, bookSlug, bookName, totalChapters, availableChapters } = Astro.props;
 const chapter = data.chapter;
 
-// Prev/next based on the locked set so users only navigate to chapters that
-// actually exist. Wraps within the book; doesn't jump across book boundaries.
-const idx = lockedChapters.indexOf(chapter);
-const prev = idx > 0 ? lockedChapters[idx - 1] : null;
-const next = idx < lockedChapters.length - 1 ? lockedChapters[idx + 1] : null;
+// Prev/next based on the readable set (locked + reading-edition) so users only
+// navigate to chapters that actually exist. Stays within the book.
+const idx = availableChapters.indexOf(chapter);
+const prev = idx > 0 ? availableChapters[idx - 1] : null;
+const next = idx < availableChapters.length - 1 ? availableChapters[idx + 1] : null;
 
 const seoTitle = `${bookName} ${chapter} — Father's Heart Bible`;
 const seoDescription = `${bookName} ${chapter} in the Father's Heart Bible — read this chapter as the Father's voice was meant to be heard.`;
@@ -88,6 +92,7 @@ const jsonLd = {
 			book={data.book}
 			chapter={data.chapter}
 			testament={data.testament}
+			status={data.status}
 			rulesVersion={data.rulesVersion}
 			lockedAt={data.lockedAt}
 			updatedAt={data.updatedAt}

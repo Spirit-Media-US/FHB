@@ -24,21 +24,30 @@ function slugifyBook(book: string) {
 const allBooks = structure.order.map((book: string) => {
 	const slug = slugifyBook(book);
 	const entry = manifest.books?.[slug];
+	const locked = entry?.lockedChapters ?? [];
+	const readingEdition = entry?.readingEditionChapters ?? [];
+	const readableCount = locked.length + readingEdition.length;
 	return {
 		book,
 		slug,
 		testament: structure.testament.OT.includes(book) ? 'OT' : 'NT',
 		totalChapters: structure.chapters[book] || 0,
-		lockedChapters: entry?.lockedChapters ?? [],
-		available: !!(entry && entry.lockedChapters && entry.lockedChapters.length > 0),
+		lockedChapters: locked,
+		readingEditionChapters: readingEdition,
+		readableCount,
+		available: readableCount > 0,
+		// Shown as a Reading Edition while it has reader-edition chapters open.
+		isReadingEdition: readingEdition.length > 0,
 	};
 });
 
 const otBooks = allBooks.filter((b: any) => b.testament === 'OT');
 const ntBooks = allBooks.filter((b: any) => b.testament === 'NT');
 
-const totalLocked = allBooks.reduce((sum: number, b: any) => sum + b.lockedChapters.length, 0);
-const totalBooks = allBooks.filter((b: any) => b.available).length;
+const totalReadable = allBooks.reduce((sum: number, b: any) => sum + b.readableCount, 0);
+const availableBooks = allBooks.filter((b: any) => b.available);
+const anyReadingEdition = allBooks.some((b: any) => b.readingEditionChapters.length > 0);
+const leadBook = availableBooks[0]?.book ?? '';
 
 const seoTitle = "Read the Father's Heart Bible | FHB";
 const seoDescription =
@@ -56,17 +65,31 @@ const seoDescription =
 					The Father's Heart Bible
 				</h1>
 				<p class="mt-4 text-lg text-[var(--color-muted)] max-w-2xl mx-auto">
-					{totalLocked > 0
-						? `${totalLocked} chapter${totalLocked === 1 ? '' : 's'} across ${totalBooks} book${totalBooks === 1 ? '' : 's'} ready to read. More coming as each chapter is finalized.`
-						: 'The reader is open. The first locked chapters appear here as soon as they are finalized.'}
+					{totalReadable > 0
+						? `${leadBook} is open to read — its Reading Edition. This is a living text: we're sharing it as we go and listening for your reactions before we finalize it.`
+						: 'The reader is open. The first chapters appear here as soon as they are ready to read.'}
 				</p>
 			</header>
 
-			{totalLocked === 0 && (
+			{anyReadingEdition && (
+				<div class="bg-[var(--color-soft)] border border-[var(--color-hairline)] rounded-2xl p-8 text-center mb-12">
+					<p class="font-serif text-2xl text-[var(--color-ink)] mb-2">A Reading Edition — read it with us</p>
+					<p class="text-[var(--color-muted)] max-w-xl mx-auto">
+						We're opening the Father's Heart Bible to you before it's final. Read these chapters, sit with them, and tell us what you hear — what moves you, what's unclear, what reveals the Father. Your reactions shape the text before we lock it.
+					</p>
+					<p class="mt-6">
+						<a href="https://join.fathersheartbible.com/spaces/general" target="_blank" rel="noopener" class="inline-block bg-[var(--color-primary)] text-white px-6 py-3 rounded-lg font-semibold no-underline hover:bg-[var(--color-primary-dark)] transition-colors">
+							Share your reactions
+						</a>
+					</p>
+				</div>
+			)}
+
+			{totalReadable === 0 && (
 				<div class="bg-[var(--color-soft)] border border-[var(--color-hairline)] rounded-2xl p-8 text-center mb-12">
 					<p class="font-serif text-2xl text-[var(--color-ink)] mb-2">First chapters coming soon</p>
 					<p class="text-[var(--color-muted)] max-w-xl mx-auto">
-						Translation work is underway across the whole canon. Each chapter is reviewed and locked before it appears here, so what you read is the Father's Heart Bible exactly as the translator finalized it.
+						Translation work is underway across the whole canon. The first chapters open here for reading soon — and you'll be invited to read along and share what you hear.
 					</p>
 					<p class="mt-6">
 						<a href="/join/" class="inline-block bg-[var(--color-primary)] text-white px-6 py-3 rounded-lg font-semibold no-underline hover:bg-[var(--color-primary-dark)] transition-colors">
@@ -85,7 +108,7 @@ const seoDescription =
 								<li>
 									<a href={`/read/${b.slug}/`} class="flex items-center justify-between py-2 px-3 rounded hover:bg-[var(--color-soft)] no-underline">
 										<span class="text-[var(--color-ink)] font-semibold">{b.book}</span>
-										<span class="text-xs text-[var(--color-muted)]">{b.lockedChapters.length} of {b.totalChapters}</span>
+										{b.isReadingEdition ? (<span class="text-[10px] uppercase tracking-wider font-semibold text-[var(--color-primary)] border border-[var(--color-primary)] rounded-full px-2 py-0.5">Reading Edition</span>) : (<span class="text-xs text-[var(--color-muted)]">{b.lockedChapters.length} of {b.totalChapters}</span>)}
 									</a>
 								</li>
 							) : (
@@ -105,7 +128,7 @@ const seoDescription =
 								<li>
 									<a href={`/read/${b.slug}/`} class="flex items-center justify-between py-2 px-3 rounded hover:bg-[var(--color-soft)] no-underline">
 										<span class="text-[var(--color-ink)] font-semibold">{b.book}</span>
-										<span class="text-xs text-[var(--color-muted)]">{b.lockedChapters.length} of {b.totalChapters}</span>
+										{b.isReadingEdition ? (<span class="text-[10px] uppercase tracking-wider font-semibold text-[var(--color-primary)] border border-[var(--color-primary)] rounded-full px-2 py-0.5">Reading Edition</span>) : (<span class="text-xs text-[var(--color-muted)]">{b.lockedChapters.length} of {b.totalChapters}</span>)}
 									</a>
 								</li>
 							) : (
