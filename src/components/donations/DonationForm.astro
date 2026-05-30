@@ -285,6 +285,34 @@
 			document.getElementById('donation-step-form')!.style.display = '';
 		});
 
+		// On load — if a ?amount= or ?freq= param is set (e.g. from
+		// join.fathersheartbible.com/give amount buttons), pre-select the
+		// amount tier and frequency before the donor lifts a finger.
+		(() => {
+			const p = new URLSearchParams(window.location.search);
+			const amountParam = p.get('amount');
+			const freqParam = p.get('freq'); // 'one_time' | 'recurring'
+			if (freqParam === 'recurring' || freqParam === 'one_time') {
+				const btn = document.querySelector(`.frequency-btn[data-frequency="${freqParam}"]`) as HTMLElement | null;
+				btn?.click();
+			}
+			if (amountParam) {
+				const n = parseInt(amountParam, 10);
+				if (Number.isFinite(n) && n > 0) {
+					// Match a preset button if one exists; otherwise drop into Custom.
+					const preset = document.querySelector(`.amount-btn[data-amount="${n}"]`) as HTMLElement | null;
+					if (preset) {
+						preset.click();
+					} else {
+						const customBtn = document.querySelector('.amount-btn[data-amount="custom"]') as HTMLElement | null;
+						customBtn?.click();
+						const customInput = document.getElementById('custom-amount-input') as HTMLInputElement | null;
+						if (customInput) customInput.value = String(n);
+					}
+				}
+			}
+		})();
+
 		// On load — if returning from Stripe with session_id, show success state
 		const params = new URLSearchParams(window.location.search);
 		if (params.get('session_id')) {
