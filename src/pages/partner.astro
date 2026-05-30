@@ -129,9 +129,28 @@ const impactStats = partnerData?.impactStats ?? [
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 1.5 — DONATION FLOW (progress + form + feed)
+		     SECTION 1.5 — DONATION FLOW (pitch + progress + form + feed)
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="light" id="donate">
+			<!-- Pitch banner — campaign goal + math + headline. Sets the
+			     frame before the donor scans the amount tiers. -->
+			<div class="max-w-4xl mx-auto mb-10" data-reveal>
+				<div class="p-6 md:p-8 rounded-2xl text-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary);">
+					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="opacity: 0.85; font-family: var(--font-sans);">
+						First Edition Launch · Goal $100,000
+					</p>
+					<h2 class="text-2xl md:text-3xl font-light leading-tight mb-4" style="font-family: var(--font-serif);">
+						$5 places a Father&rsquo;s Heart Bible into a reader&rsquo;s hands.
+					</h2>
+					<p class="text-base md:text-lg leading-relaxed max-w-2xl mx-auto" style="font-family: var(--font-sans); opacity: 0.95;">
+						Help us launch our First Edition — 20,000 Bibles strong.
+						Give $50 or more and become a <strong>Founding Supporter</strong>,
+						receiving a numbered Founder&rsquo;s First Edition — a collector&rsquo;s copy
+						only available through this campaign.
+					</p>
+				</div>
+			</div>
+
 			<div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-start">
 				<!-- Left column: progress + donor feed -->
 				<div class="lg:col-span-2 space-y-8" data-reveal>
@@ -142,6 +161,148 @@ const impactStats = partnerData?.impactStats ?? [
 				<div class="lg:col-span-3" data-reveal>
 					<DonationForm />
 				</div>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 1.6 — DONOR TIERS + FOUNDER'S FIRST EDITION
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="max-w-4xl mx-auto">
+				<header class="text-center mb-10" data-reveal>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
+						Donor Tiers
+					</p>
+					<h2 class="text-3xl md:text-4xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
+						What every gift unlocks
+					</h2>
+				</header>
+
+				<div class="overflow-hidden rounded-2xl border" style="border-color: var(--color-outline-variant); background: var(--color-surface);" data-reveal>
+					<table class="w-full text-left" style="font-family: var(--font-sans); border-collapse: collapse;">
+						<thead>
+							<tr style="background: var(--color-surface-low); color: var(--color-ink);">
+								<th class="px-4 py-3 text-xs font-semibold tracking-widest uppercase">Gift</th>
+								<th class="px-4 py-3 text-xs font-semibold tracking-widest uppercase">Tier</th>
+								<th class="px-4 py-3 text-xs font-semibold tracking-widest uppercase">Reward</th>
+							</tr>
+						</thead>
+						<tbody style="color: var(--color-muted);">
+							<tr style="border-top: 1px solid var(--color-outline-variant);">
+								<td class="px-4 py-4 font-semibold" style="color: var(--color-ink);">$5–$49</td>
+								<td class="px-4 py-4">Sponsor</td>
+								<td class="px-4 py-4">Name on the public donor wall at fathersheartbible.com/founders</td>
+							</tr>
+							<tr style="border-top: 1px solid var(--color-outline-variant);">
+								<td class="px-4 py-4 font-semibold" style="color: var(--color-ink);">$50–$99</td>
+								<td class="px-4 py-4">Founding Supporter</td>
+								<td class="px-4 py-4">Numbered Founder&rsquo;s First Edition Bible · donor wall</td>
+							</tr>
+							<tr style="border-top: 1px solid var(--color-outline-variant);">
+								<td class="px-4 py-4 font-semibold" style="color: var(--color-ink);">$100–$249</td>
+								<td class="px-4 py-4">Founding Partner</td>
+								<td class="px-4 py-4">Founder&rsquo;s First Edition · signed thank-you letter from Kevin · donor wall</td>
+							</tr>
+							<tr style="border-top: 1px solid var(--color-outline-variant);">
+								<td class="px-4 py-4 font-semibold" style="color: var(--color-ink);">$250–$999</td>
+								<td class="px-4 py-4">Founding Patron</td>
+								<td class="px-4 py-4">Founder&rsquo;s First Edition with personalized bookplate · signed letter · donor wall</td>
+							</tr>
+							<tr style="border-top: 1px solid var(--color-outline-variant);">
+								<td class="px-4 py-4 font-semibold" style="color: var(--color-ink);">$1,000+</td>
+								<td class="px-4 py-4">Founder</td>
+								<td class="px-4 py-4">Founder&rsquo;s First Edition with bookplate · name printed in every retail edition&rsquo;s acknowledgments · invitation to launch event</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<aside class="mt-8 p-6 rounded-2xl border" style="border-color: var(--color-outline-variant); background: var(--color-surface-low);" data-reveal>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="font-family: var(--font-sans); color: var(--color-gold);">
+						The Founder&rsquo;s First Edition
+					</p>
+					<p class="leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						A numbered collector&rsquo;s edition of the First Edition Father&rsquo;s Heart Bible.
+						Same content as the retail Bible, with markers that distinguish it as the
+						founding-donor-only release. Strictly capped at 750 copies. Never reprinted in this form.
+					</p>
+				</aside>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 1.7 — HOW THE CAMPAIGN RUNS
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="max-w-4xl mx-auto">
+				<header class="mb-8" data-reveal>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
+						Campaign Mechanics
+					</p>
+					<h2 class="text-3xl md:text-4xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
+						How this campaign runs
+					</h2>
+				</header>
+				<ul class="space-y-4" style="font-family: var(--font-sans); color: var(--color-muted);" data-reveal>
+					<li class="flex gap-4">
+						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
+						<span><strong style="color: var(--color-ink);">Early-bird Founders #1–100.</strong> The first 100 Founding Supporters receive Founder&rsquo;s First Editions numbered 1 through 100 — the lowest, most collectible numbers.</span>
+					</li>
+					<li class="flex gap-4">
+						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
+						<span><strong style="color: var(--color-ink);">Public donor wall.</strong> Every donor&rsquo;s name (with permission) listed publicly at fathersheartbible.com/founders.</span>
+					</li>
+					<li class="flex gap-4">
+						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
+						<span><strong style="color: var(--color-ink);">Permanent acknowledgments.</strong> Every donor of $250+ printed in the acknowledgments of every retail edition, permanently.</span>
+					</li>
+					<li class="flex gap-4">
+						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
+						<span><strong style="color: var(--color-ink);">Numbered limited edition.</strong> Founder&rsquo;s First Editions strictly capped at 750; never reprinted in that form.</span>
+					</li>
+					<li class="flex gap-4">
+						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
+						<span><strong style="color: var(--color-ink);">Behind-the-scenes access.</strong> Founding Patrons and Founders receive weekly campaign-period updates.</span>
+					</li>
+					<li class="flex gap-4">
+						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
+						<span><strong style="color: var(--color-ink);">Bulk gifting tier.</strong> Sponsor 10 Bibles for $40 — placed in ministries, prisons, foster systems, or recipients of your choice.</span>
+					</li>
+					<li class="flex gap-4">
+						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
+						<span><strong style="color: var(--color-ink);">Launch event.</strong> Founders ($1,000+) invited to the in-person launch event when the First Edition ships.</span>
+					</li>
+				</ul>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 1.8 — STRETCH GOALS (LANGUAGE EXPANSION)
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="max-w-4xl mx-auto text-center">
+				<header class="mb-8" data-reveal>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
+						Beyond the First Edition
+					</p>
+					<h2 class="text-3xl md:text-4xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
+						Every $50,000 unlocks another language.
+					</h2>
+				</header>
+				<p class="leading-relaxed mb-6 max-w-2xl mx-auto" style="font-family: var(--font-sans); color: var(--color-muted);" data-reveal>
+					The Father&rsquo;s Heart Bible exists to make the Father-heart interpretive lens
+					available where existing translations obscure it — in the languages spoken by
+					<strong>75% of humanity</strong>.
+				</p>
+				<p class="leading-relaxed max-w-2xl mx-auto" style="font-family: var(--font-sans); color: var(--color-muted);" data-reveal>
+					Per-language all-in cost using the 2026 AI pipeline: <strong>~$50,000</strong>.
+					Covers AI drafting via the Bethel + Claude pipeline · native-language theological reviewer
+					· native-speaker editorial review · cultural adaptation · USFM formatting · POD setup
+					· AI-narrated single-voice audio version in the target language.
+				</p>
 			</div>
 		</Section>
 
