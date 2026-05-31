@@ -199,7 +199,7 @@ const currentPath = Astro.url.pathname;
 			links.forEach(el => { el.style.color = 'rgba(255,255,255,0.92)'; });
 			bars.forEach(el => { if (el) el.style.backgroundColor = 'rgba(255,255,255,0.85)'; });
 			if (logoText) logoText.style.color = 'rgba(255,255,255,0.92)';
-			if (brandLogo) brandLogo.style.filter = 'none'; // keep logo white over dark hero
+			if (brandLogo) brandLogo.style.filter = 'brightness(0) invert(1)'; // render logo white over dark hero
 		}
 	}
 
