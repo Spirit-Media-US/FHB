@@ -3,6 +3,8 @@ interface Props {
 	videoSrc?: string;
 	imageSrc?: string;
 	imagePosition?: string;
+	showLogo?: boolean;
+	headingLift?: string;
 	heading: string;
 	subheading?: string;
 	primaryCtaLabel?: string;
@@ -15,6 +17,8 @@ const {
 	videoSrc,
 	imageSrc,
 	imagePosition = 'center',
+	showLogo = true,
+	headingLift = '0',
 	heading,
 	subheading,
 	primaryCtaLabel,
@@ -51,20 +55,22 @@ const {
 		/>
 	)}
 	<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-10 md:pb-16 lg:pb-24">
-		<img
-			src="/fhb-logo-white-400.png"
-			srcset="/fhb-logo-white-240.png 240w, /fhb-logo-white-400.png 400w"
-			sizes="(max-width: 768px) 160px, (max-width: 1024px) 240px, 320px"
-			width="400"
-			height="195"
-			alt="Father's Heart Bible"
-			fetchpriority="high"
-			decoding="async"
-			class="h-14 md:h-20 lg:h-28 w-auto mx-auto mb-4 md:mb-6" data-hero-entrance
-		/>
+		{showLogo && (
+			<img
+				src="/fhb-logo-white-400.png"
+				srcset="/fhb-logo-white-240.png 240w, /fhb-logo-white-400.png 400w"
+				sizes="(max-width: 768px) 160px, (max-width: 1024px) 240px, 320px"
+				width="400"
+				height="195"
+				alt="Father's Heart Bible"
+				fetchpriority="high"
+				decoding="async"
+				class="h-14 md:h-20 lg:h-28 w-auto mx-auto mb-4 md:mb-6" data-hero-entrance
+			/>
+		)}
 		<h1
 			class="text-4xl md:text-6xl font-medium leading-snug tracking-tight"
-			style="font-family: var(--font-headline); color: #FFFFFF;" data-hero-entrance
+			style={`font-family: var(--font-headline); color: #FFFFFF; margin-bottom: ${headingLift};`} data-hero-entrance
 		>
 			{heading}
 		</h1>
