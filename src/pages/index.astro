@@ -8,7 +8,7 @@ import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
 
 // Fetch page content + media from Sanity (all values have hardcoded fallbacks)
-const [pageData, media] = await Promise.all([
+const [pageData, media, biblePageData] = await Promise.all([
 	sanityClient.fetch(`*[_type =="page" && slug =="home"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
@@ -23,7 +23,19 @@ const [pageData, media] = await Promise.all([
     communityUrl,
     logo
   }`),
+	sanityClient.fetch(`*[_type =="biblePageContent"][0] { audience }`),
 ]);
+
+// "Is This For You?" audience list — shared with /the-fathers-heart-bible,
+// same Sanity source + fallback so both pages stay in sync.
+const audience = biblePageData?.audience ?? [
+	'You have read Scripture for years and sense something is still missing.',
+	'You long for deeper intimacy with God, not just more knowledge about Him.',
+	'You are awakening to your identity as a beloved child of the Father.',
+	'You want to hear His voice — not just His instructions.',
+	'You are hungry for a Bible that feels like an encounter, not a document.',
+	"You want to give someone a Bible that reveals the Father's love clearly.",
+];
 
 const seoTitle =
 	pageData?.seoTitle ||
@@ -445,6 +457,39 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					forgiveness. Not merely heaven. Not merely religious correctness. The destination has
 					always been the Father.
 				</p>
+			</div>
+		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION — WHO THIS IS FOR / IS THIS FOR YOU?
+		     (moved from /the-fathers-heart-bible, sits under the Big Idea)
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<div class="text-center mb-12">
+				<p
+					class="text-xs font-semibold tracking-widest uppercase mb-3"
+					style="font-family: var(--font-sans); color: var(--color-gold);"
+				>
+					Is This For You?
+				</p>
+				<h2
+					class="text-3xl md:text-4xl font-light"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					This Bible was written for you — if you recognize yourself here.
+				</h2>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+				{audience.map((statement) => (
+					<div
+						class="flex gap-4 items-start p-5"
+						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
+					>
+						<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
+						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{statement}</p>
+					</div>
+				))}
 			</div>
 		</Section>
 

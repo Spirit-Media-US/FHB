@@ -124,15 +124,6 @@ const milestones = biblePageData?.milestones ?? [
 	},
 ];
 
-const audience = biblePageData?.audience ?? [
-	'You have read Scripture for years and sense something is still missing.',
-	'You long for deeper intimacy with God, not just more knowledge about Him.',
-	'You are awakening to your identity as a beloved child of the Father.',
-	'You want to hear His voice — not just His instructions.',
-	'You are hungry for a Bible that feels like an encounter, not a document.',
-	"You want to give someone a Bible that reveals the Father's love clearly.",
-];
-
 const shifts = biblePageData?.shifts ?? [
 	{ from: 'Information', to: 'Relationship' },
 	{ from: 'Distance', to: 'Intimacy' },
@@ -536,38 +527,6 @@ const formatDate = (dateString: string) => {
 						<div class="w-8 h-0.5 mx-auto mb-4" style="background-color: var(--color-gold);"></div>
 						<h3 class="text-lg font-medium mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">{milestone}</h3>
 						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{detail}</p>
-					</div>
-				))}
-			</div>
-		</Section>
-
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 8 — WHO THIS IS FOR
-		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="light">
-			<div class="text-center mb-12">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-3"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					Is This For You?
-				</p>
-				<h2
-					class="text-3xl md:text-4xl font-light"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					This Bible was written for you — if you recognize yourself here.
-				</h2>
-			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
-				{audience.map((statement) => (
-					<div
-						class="flex gap-4 items-start p-5"
-						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
-					>
-						<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
-						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{statement}</p>
 					</div>
 				))}
 			</div>
