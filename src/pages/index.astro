@@ -317,24 +317,12 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			// Hero videos from Sanity (or hardcoded fallback)
 			const R2 = 'https://assets.spiritmediapublishing.com/fathers-heart-bible';
 			const heroVideos = heroVideosFromSanity || [
-				// — Front of loop — newest clips, play first (initial video set to
-				//   the first of these via Sanity heroVideoUrl so it matches index 0).
-				//   MP4/H.264, not .mov: Chrome rejects video/quicktime in <video>.
-				{ url: `${R2}/young-man-reading-novel-bright.mp4`, theme: 'light' },
+				// Curated loop (all MP4/H.264 — Chrome rejects .mov/quicktime in <video>).
+				// Initial video set to index 0 via Sanity heroVideoUrl so the loop is seamless.
+				{ url: `${R2}/man-reading-on-couch.mp4`, theme: 'light' },
 				{ url: `${R2}/friends-reading-on-beach-sunset.mp4`, theme: 'light' },
-				// — Dark videos (light text: white) —
-				{ url: `${R2}/woman-holding-bible-sky.mp4`, theme: 'dark' },
-				{ url: `${R2}/farmer-reading-bible.mp4`, theme: 'dark' },
-				{ url: `${R2}/women-reading-bible-outdoors.mp4`, theme: 'dark' },
-				{ url: `${R2}/bible-close-up.mp4`, theme: 'dark' },
-				{ url: `${R2}/read-book.mp4`, theme: 'dark' },
-				{ url: `${R2}/bible-open-pages.mp4`, theme: 'dark' },
-				{ url: `${R2}/reading-bible-4k.mov`, theme: 'dark' },
-				// — Light videos (dark text: charcoal #1a1c1c) —
-				{ url: `${R2}/bible-lake-reading-hero.mp4`, theme: 'light' },
-				{ url: `${R2}/holy-bible.mp4`, theme: 'light' },
-				{ url: `${R2}/hands-holding-bible.mp4`, theme: 'light' },
-				{ url: `${R2}/mother-son-praying.mp4`, theme: 'light' },
+				{ url: `${R2}/reading-on-pier.mp4`, theme: 'light' },
+				{ url: `${R2}/woman-reads-under-tree.mp4`, theme: 'light' },
 			];
 
 			function applyTheme(theme) {
