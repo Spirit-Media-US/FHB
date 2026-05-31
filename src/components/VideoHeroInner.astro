@@ -2,6 +2,7 @@
 interface Props {
 	videoSrc?: string;
 	imageSrc?: string;
+	imagePosition?: string;
 	heading: string;
 	subheading?: string;
 	primaryCtaLabel?: string;
@@ -13,6 +14,7 @@ interface Props {
 const {
 	videoSrc,
 	imageSrc,
+	imagePosition = 'center',
 	heading,
 	subheading,
 	primaryCtaLabel,
@@ -34,7 +36,7 @@ const {
 			aria-hidden="true"
 			fetchpriority="high"
 			decoding="async"
-			style="opacity: 1;"
+			style={`opacity: 1; object-position: ${imagePosition};`}
 		/>
 	) : (
 		<video
