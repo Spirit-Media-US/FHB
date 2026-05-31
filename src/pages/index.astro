@@ -376,13 +376,20 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					}).catch(() => { /* autoplay blocked — poster remains */ });
 				}
 
-				const triggers = ['scroll', 'pointerdown', 'keydown', 'touchstart'];
+				const triggers = ['scroll', 'pointerdown', 'keydown', 'touchstart', 'mousemove'];
 				function kickoff() {
 					triggers.forEach(e => window.removeEventListener(e, kickoff));
 					startVideos();
 				}
 				triggers.forEach(e => window.addEventListener(e, kickoff, { once: true, passive: true }));
 				setTimeout(() => { if (!started) startVideos(); }, 10000);
+					// Returning via back/forward (bfcache restore): resume/restart the loop
+					// instead of leaving the still poster showing.
+					window.addEventListener('pageshow', (e) => {
+						if (!e.persisted) return;
+						if (!started) startVideos();
+						else if (curr && curr.paused && !fading) curr.play().catch(() => {});
+					});
 
 				function beginCrossfade() {
 					if (fading) return;
