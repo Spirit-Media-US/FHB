@@ -337,7 +337,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			if (slot && heroSection) {
 				const PLAYBACK_RATE = 0.75;
 				const FADE_DURATION = 1500;
-				const FADE_BEFORE = 1.5;
+				const CLIP_DURATION = 7000; // each clip shows 7s, then crossfade to the next; repeat
 				const VIDEO_STYLE = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 1.5s ease;opacity:0';
 
 				let heroIdx = 0;
@@ -350,6 +350,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					const v = document.createElement('video');
 					v.muted = true;
 					v.playsInline = true;
+					v.loop = true;
 					v.preload = 'none';
 					v.setAttribute('aria-hidden', 'true');
 					v.style.cssText = VIDEO_STYLE;
@@ -370,11 +371,18 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					vA.playbackRate = PLAYBACK_RATE;
 					vA.play().then(() => {
 						vA.style.opacity = '1';
-						if (poster) setTimeout(() => { poster.style.opacity = '0'; }, 300);
+						// Fully retire the poster so it can never reappear over the loop.
+						if (poster) { setTimeout(() => { poster.style.opacity = '0'; }, 300); setTimeout(() => poster.remove(), 2000); }
 						next.src = heroVideos[1].url;
 						next.load();
-						vA.addEventListener('timeupdate', onTimeUpdate);
-						vB.addEventListener('timeupdate', onTimeUpdate);
+						// Fixed 7s-per-clip rotation, then repeats through the array.
+						setInterval(beginCrossfade, CLIP_DURATION);
+						// Resilience: if the visible clip ever pauses (power-saving, tab
+						// blur, stall), resume it so the hero never freezes on a still frame.
+						setInterval(() => { if (curr && curr.paused && !fading) curr.play().catch(() => {}); }, 1000);
+						document.addEventListener('visibilitychange', () => {
+							if (!document.hidden && curr && !fading) curr.play().catch(() => {});
+						});
 					}).catch(() => { /* autoplay blocked — poster remains */ });
 				}
 
@@ -411,13 +419,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						curr.play();
 						fading = false;
 					});
-				}
-
-				function onTimeUpdate() {
-					if (this !== curr) return;
-					if (!fading && this.duration && this.currentTime >= this.duration - FADE_BEFORE) {
-						beginCrossfade();
-					}
 				}
 			}
 			} // end mobile-bail-out else
