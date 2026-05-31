@@ -132,7 +132,7 @@ const jsonLd = {
         <!-- Filter chips -->
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-xs font-semibold uppercase tracking-wider shrink-0" style="color: var(--color-muted); font-family: var(--font-sans);">Filter:</span>
-          <button data-tag="all" class="tag-chip active px-3 py-1 rounded-full text-xs font-semibold border transition-colors" style="background-color: var(--color-primary); color: var(--color-on-primary); border-color: var(--color-primary); font-family: var(--font-sans);">All</button>
+          <button data-tag="all" class="tag-chip active px-3 py-1 rounded-full text-xs font-semibold border transition-colors" style="background-color: #FFD9E0; color: #4A4A4A; border-color: #FFD9E0; font-family: var(--font-sans);">All</button>
           <button data-tag="Identity" class="tag-chip px-3 py-1 rounded-full text-xs font-semibold border transition-colors" style="border-color: var(--color-outline-variant); color: var(--color-muted); font-family: var(--font-sans);">Identity</button>
           <button data-tag="Legacy" class="tag-chip px-3 py-1 rounded-full text-xs font-semibold border transition-colors" style="border-color: var(--color-outline-variant); color: var(--color-muted); font-family: var(--font-sans);">Legacy</button>
           <button data-tag="Scripture" class="tag-chip px-3 py-1 rounded-full text-xs font-semibold border transition-colors" style="border-color: var(--color-outline-variant); color: var(--color-muted); font-family: var(--font-sans);">Scripture</button>
@@ -243,7 +243,7 @@ function renderPagination() {
   let html = '';
   html += `<button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-4 py-2 rounded-lg border text-sm font-semibold transition-colors" style="border-color: var(--color-outline-variant); color: ${currentPage === 1 ? 'var(--color-muted)' : 'var(--color-ink)'}; opacity: ${currentPage === 1 ? '0.4' : '1'}; cursor: ${currentPage === 1 ? 'not-allowed' : 'pointer'};">← Prev</button>`;
   for (let i = 1; i <= totalPages; i++) {
-    html += `<button onclick="goToPage(${i})" class="w-9 h-9 rounded-lg text-sm font-semibold transition-colors" style="${i === currentPage ? 'background-color: var(--color-primary); color: var(--color-on-primary);' : 'border: 1px solid var(--color-outline-variant); color: var(--color-ink);'} cursor: pointer;">${i}</button>`;
+    html += `<button onclick="goToPage(${i})" class="w-9 h-9 rounded-lg text-sm font-semibold transition-colors" style="${i === currentPage ? 'background-color: #FFD9E0; color: #4A4A4A;' : 'border: 1px solid var(--color-outline-variant); color: var(--color-ink);'} cursor: pointer;">${i}</button>`;
   }
   html += `<button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-4 py-2 rounded-lg border text-sm font-semibold transition-colors" style="border-color: var(--color-outline-variant); color: ${currentPage === totalPages ? 'var(--color-muted)' : 'var(--color-ink)'}; opacity: ${currentPage === totalPages ? '0.4' : '1'}; cursor: ${currentPage === totalPages ? 'not-allowed' : 'pointer'};">Next →</button>`;
 
@@ -268,9 +268,9 @@ function renderPagination() {
     (b as HTMLElement).style.borderColor = 'var(--color-outline-variant)';
   });
   const allBtn = document.querySelector('[data-tag="all"]') as HTMLElement;
-  allBtn.style.backgroundColor = 'var(--color-primary)';
-  allBtn.style.color = 'var(--color-on-primary)';
-  allBtn.style.borderColor = 'var(--color-primary)';
+  allBtn.style.backgroundColor = '#FFD9E0';
+  allBtn.style.color = '#4A4A4A';
+  allBtn.style.borderColor = '#FFD9E0';
   applyFilters();
 };
 
@@ -289,9 +289,9 @@ document.querySelectorAll('.tag-chip').forEach(btn => {
       (b as HTMLElement).style.color = 'var(--color-muted)';
       (b as HTMLElement).style.borderColor = 'var(--color-outline-variant)';
     });
-    (btn as HTMLElement).style.backgroundColor = 'var(--color-primary)';
-    (btn as HTMLElement).style.color = 'var(--color-on-primary)';
-    (btn as HTMLElement).style.borderColor = 'var(--color-primary)';
+    (btn as HTMLElement).style.backgroundColor = '#FFD9E0';
+    (btn as HTMLElement).style.color = '#4A4A4A';
+    (btn as HTMLElement).style.borderColor = '#FFD9E0';
     applyFilters();
   });
 });
