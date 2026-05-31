@@ -1,6 +1,7 @@
 ---
 interface Props {
-	videoSrc: string;
+	videoSrc?: string;
+	imageSrc?: string;
 	heading: string;
 	subheading?: string;
 	primaryCtaLabel?: string;
@@ -11,6 +12,7 @@ interface Props {
 
 const {
 	videoSrc,
+	imageSrc,
 	heading,
 	subheading,
 	primaryCtaLabel,
@@ -24,16 +26,28 @@ const {
 	class="relative flex items-end justify-center overflow-hidden min-h-[500px] md:min-h-screen"
 	style="background-color: var(--color-inverse-surface); margin-top: -1px;"
 >
-	<video
-		class="absolute inset-0 w-full h-full object-cover"
-		src={videoSrc}
-		autoplay
-		muted
-		loop
-		playsinline
-		aria-hidden="true"
-		style="opacity: 1;"
-	/>
+	{imageSrc ? (
+		<img
+			class="absolute inset-0 w-full h-full object-cover"
+			src={imageSrc}
+			alt=""
+			aria-hidden="true"
+			fetchpriority="high"
+			decoding="async"
+			style="opacity: 1;"
+		/>
+	) : (
+		<video
+			class="absolute inset-0 w-full h-full object-cover"
+			src={videoSrc}
+			autoplay
+			muted
+			loop
+			playsinline
+			aria-hidden="true"
+			style="opacity: 1;"
+		/>
+	)}
 	<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-10 md:pb-16 lg:pb-24">
 		<img
 			src="/fhb-logo-white-400.png"
