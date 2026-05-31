@@ -18,6 +18,15 @@ const siteName = siteSettings?.siteName || "Father's Heart Bible";
 const logoImage = siteSettings?.logo;
 const logoUrl = logoImage ? urlFor(logoImage).width(200).url() : null;
 
+// Visible header brand always carries the trademark. siteName itself stays
+// plain (it also feeds the og:site_name meta, which we keep ™-free).
+const brandName = `${siteName}`.replace(/™$/, '') + '™';
+// White FHB wordmark shown to the right of the brand text. The PNG is white;
+// setNavColors keeps it white over the dark hero and tints it brand-color
+// on the scrolled/light glass header.
+const brandLogoUrl =
+	'https://cdn.sanity.io/images/rusi1hyi/production/bf8e5685f1b30a651457f26abfa2ca1fa30cd784-900x450.png?w=400&auto=format';
+
 const navLinks: NavLink[] = [
 	{ label: 'Home', href: '/' },
 	{ label: 'About FHB', href: '/the-fathers-heart-bible/' },
@@ -31,19 +40,28 @@ const currentPath = Astro.url.pathname;
 <header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
 	<nav class="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
 		<!-- Logo -->
-		<a href="/" id="nav-logo" class="no-underline shrink-0 flex flex-col items-center gap-0.5">
+		<a href="/" id="nav-logo" class="no-underline shrink-0 flex flex-row items-center gap-2.5">
 			{logoUrl && (
 				<img
 					src={logoUrl}
-					alt={siteName}
-					class="h-14 md:h-20 w-auto"
+					alt=""
+					aria-hidden="true"
+					class="h-12 md:h-16 w-auto"
 					style="filter: brightness(0) saturate(100%) invert(5%) sepia(20%) saturate(500%) hue-rotate(290deg) brightness(20%) contrast(100%);"
 				/>
 			)}
 			<span
-				class="text-xs font-semibold tracking-[0.15em] uppercase text-center w-full"
+				class="text-xs font-semibold tracking-[0.15em] uppercase whitespace-nowrap"
 				style="font-family: var(--font-body); color: var(--color-primary);"
-			>{siteName}</span>
+			>{brandName}</span>
+			<img
+				id="nav-brand-logo"
+				src={brandLogoUrl}
+				alt=""
+				aria-hidden="true"
+				class="h-8 md:h-10 w-auto"
+				style="filter: brightness(0) saturate(100%) invert(5%) sepia(20%) saturate(500%) hue-rotate(290deg) brightness(20%) contrast(100%);"
+			/>
 		</a>
 
 		<!-- Desktop nav -->
@@ -162,6 +180,8 @@ const currentPath = Astro.url.pathname;
 		if (!header) return;
 		const logo = document.getElementById('nav-logo');
 		const logoText = logo?.querySelector<HTMLElement>('span');
+		const brandLogo = document.getElementById('nav-brand-logo');
+		const BRAND_FILTER = 'brightness(0) saturate(100%) invert(5%) sepia(20%) saturate(500%) hue-rotate(290deg) brightness(20%) contrast(100%)';
 		const ctaBtn = document.getElementById('nav-cta');
 		const links = Array.from(header.querySelectorAll<HTMLElement>('nav a, nav span')).filter(
 			el => el !== logo && !logo?.contains(el) && el !== ctaBtn
@@ -173,11 +193,13 @@ const currentPath = Astro.url.pathname;
 			links.forEach(el => { el.style.color = 'var(--color-on-surface-variant)'; });
 			bars.forEach(el => { if (el) el.style.backgroundColor = 'var(--color-on-surface)'; });
 			if (logoText) logoText.style.color = 'var(--color-primary)';
+			if (brandLogo) brandLogo.style.filter = BRAND_FILTER; // tint white logo to brand color
 		} else {
-			// Transparent over dark hero — white text + bars + logo text
+			// Transparent over dark hero — white text + bars + logo text + white logo
 			links.forEach(el => { el.style.color = 'rgba(255,255,255,0.92)'; });
 			bars.forEach(el => { if (el) el.style.backgroundColor = 'rgba(255,255,255,0.85)'; });
 			if (logoText) logoText.style.color = 'rgba(255,255,255,0.92)';
+			if (brandLogo) brandLogo.style.filter = 'none'; // keep logo white over dark hero
 		}
 	}
 
