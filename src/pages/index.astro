@@ -316,12 +316,12 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			if (!window.matchMedia('(min-width: 1024px)').matches) { /* mobile no-op */ } else {
 			// Hero videos from Sanity (or hardcoded fallback)
 			const R2 = 'https://assets.spiritmediapublishing.com/fathers-heart-bible';
-			const MEDIA = 'https://media.spiritmediapublishing.com';
 			const heroVideos = heroVideosFromSanity || [
 				// — Front of loop — newest clips, play first (initial video set to
-				//   the first of these via Sanity heroVideoUrl so it matches index 0)
-				{ url: `${MEDIA}/young-black-man-relaxes-reading-a-novel-in-bright-2025-12.mov`, theme: 'light' },
-				{ url: `${MEDIA}/friends-reading-book-on-beach-at-sunset-2025.mov`, theme: 'light' },
+				//   the first of these via Sanity heroVideoUrl so it matches index 0).
+				//   MP4/H.264, not .mov: Chrome rejects video/quicktime in <video>.
+				{ url: `${R2}/young-man-reading-novel-bright.mp4`, theme: 'light' },
+				{ url: `${R2}/friends-reading-on-beach-sunset.mp4`, theme: 'light' },
 				// — Dark videos (light text: white) —
 				{ url: `${R2}/woman-holding-bible-sky.mp4`, theme: 'dark' },
 				{ url: `${R2}/farmer-reading-bible.mp4`, theme: 'dark' },
