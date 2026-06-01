@@ -16,6 +16,12 @@ try {
 } catch {}
 
 const fmt = (c: number) => `$${(c / 100).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+// Privacy: show first name(s) + last initial only (e.g. "Ryan S.", "Mickey and Suzan C.").
+const displayName = (name: string) => {
+	const parts = (name || '').trim().split(/\s+/).filter(Boolean);
+	if (parts.length <= 1) return parts[0] || 'A supporter';
+	return `${parts.slice(0, -1).join(' ')} ${parts[parts.length - 1].charAt(0).toUpperCase()}.`;
+};
 const dateAgo = (iso: string) => {
 	if (!iso) return '';
 	const then = new Date(iso).getTime();
@@ -41,7 +47,7 @@ const dateAgo = (iso: string) => {
 				{initial.recent.map((d: any) => (
 					<li style="background-color: var(--color-surface); border: 1px solid var(--color-outline-variant); border-radius: 12px; padding: 16px 20px;">
 						<div class="flex items-baseline justify-between gap-3">
-							<p class="font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">{d.public_name}</p>
+							<p class="font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">{displayName(d.public_name)}</p>
 							<p class="text-sm font-semibold whitespace-nowrap" style="font-family: var(--font-sans); color: var(--color-brand);">{fmt(d.amount_cents)}</p>
 						</div>
 						{d.public_message && (
@@ -73,6 +79,11 @@ const dateAgo = (iso: string) => {
 	function escapeHtml(s: string) {
 		return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c));
 	}
+	function displayName(name: string) {
+		const parts = (name || '').trim().split(/\s+/).filter(Boolean);
+		if (parts.length <= 1) return parts[0] || 'A supporter';
+		return `${parts.slice(0, -1).join(' ')} ${parts[parts.length - 1].charAt(0).toUpperCase()}.`;
+	}
 
 	function render(recent: any[]) {
 		const root = document.querySelector('[data-donor-feed]');
@@ -87,7 +98,7 @@ const dateAgo = (iso: string) => {
 				${recent.map((d: any) => `
 					<li style="background-color: var(--color-surface); border: 1px solid var(--color-outline-variant); border-radius: 12px; padding: 16px 20px;">
 						<div class="flex items-baseline justify-between gap-3">
-							<p class="font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">${escapeHtml(d.public_name)}</p>
+							<p class="font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">${escapeHtml(displayName(d.public_name))}</p>
 							<p class="text-sm font-semibold whitespace-nowrap" style="font-family: var(--font-sans); color: var(--color-brand);">${fmtMoney(d.amount_cents)}</p>
 						</div>
 						${d.public_message ? `<p class="mt-2 leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 0.95rem;">${escapeHtml(d.public_message)}</p>` : ''}

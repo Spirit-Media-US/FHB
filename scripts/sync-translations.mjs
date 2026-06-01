@@ -46,9 +46,66 @@ function ensureDir(p) {
 	fs.mkdirSync(p, { recursive: true });
 }
 
-// Flatten a tools-api chapter JSON to the minimal public reader shape.
+// Snapshot the editorial markers already present in the output content, keyed
+// by `slug/chapter`. Used as a preserve-fallback: a chapter whose draft has NOT
+// been through the Layer-2 marking pass (no `editorial_marked` flag) keeps the
+// markers it currently shows, so a partial rollout never blanks the reader.
+function snapshotMarkers(dir) {
+	const map = {};
+	if (!fs.existsSync(dir)) return map;
+	for (const slug of fs.readdirSync(dir)) {
+		const bookDir = path.join(dir, slug);
+		if (!fs.existsSync(bookDir) || !fs.statSync(bookDir).isDirectory()) continue;
+		for (const file of fs.readdirSync(bookDir)) {
+			if (!file.endsWith('.json') || file === '_manifest.json') continue;
+			try {
+				const d = JSON.parse(fs.readFileSync(path.join(bookDir, file), 'utf8'));
+				const verses = {};
+				for (const v of d.verses || []) {
+					const m = {};
+					if (v.poetic) { m.poetic = true; m.poeticIndent = v.poeticIndent || 1; }
+					if (v.jesusWords && v.jesusWords.length) m.jesusWords = v.jesusWords;
+					if (Object.keys(m).length) verses[v.verse] = m;
+				}
+				map[`${slug}/${d.chapter}`] = {
+					headings: d.headings || [],
+					paragraphStarts: d.paragraphStarts || [],
+					divineSpeechRanges: d.divineSpeechRanges || [],
+					selahAfter: d.selahAfter || [],
+					acrostic: d.acrostic || [],
+					verses,
+				};
+			} catch { /* skip unreadable */ }
+		}
+	}
+	return map;
+}
+
+// Flatten a tools-api chapter JSON to the public reader shape. Carries the
+// Layer-2 editorial markers the reader's ChapterReader renders (headings,
+// paragraphs, poetry, divine-speech, red-letter `jesusWords`, Selah, acrostic).
+// `existing` is the preserve-fallback snapshot for this chapter (if any).
 // `status` is "locked" or "reading-edition" so the reader can label the edition.
-function flattenChapter(data, status) {
+function flattenChapter(data, status, existing) {
+	const marked = !!data.editorial_marked;
+	const ex = existing || {};
+	const verses = (data.verses || []).map(v => {
+		const out = {
+			verse: v.verse,
+			text: v.fhb_text,
+			footnote: v.footnote || null,
+			footnoteCategory: v.footnote_category || null,
+		};
+		if (marked) {
+			if (v.poetic) { out.poetic = true; out.poeticIndent = v.poeticIndent || 1; }
+			if (v.jesus_words && v.jesus_words.length) out.jesusWords = v.jesus_words;
+		} else {
+			const exV = (ex.verses && ex.verses[v.verse]) || {};
+			if (exV.poetic) { out.poetic = true; out.poeticIndent = exV.poeticIndent || 1; }
+			if (exV.jesusWords && exV.jesusWords.length) out.jesusWords = exV.jesusWords;
+		}
+		return out;
+	});
 	return {
 		book: data.book,
 		chapter: data.chapter,
@@ -59,12 +116,12 @@ function flattenChapter(data, status) {
 		lockedAt: data.locked_at || null,
 		lockedBy: data.locked_by || null,
 		updatedAt: data.updated_at,
-		verses: (data.verses || []).map(v => ({
-			verse: v.verse,
-			text: v.fhb_text,
-			footnote: v.footnote || null,
-			footnoteCategory: v.footnote_category || null,
-		})),
+		headings: marked ? (data.headings || []) : (ex.headings || []),
+		paragraphStarts: marked ? (data.paragraphStarts || []) : (ex.paragraphStarts || []),
+		divineSpeechRanges: marked ? (data.divineSpeechRanges || []) : (ex.divineSpeechRanges || []),
+		selahAfter: marked ? (data.selahAfter || []) : (ex.selahAfter || []),
+		acrostic: marked ? (data.acrostic || []) : (ex.acrostic || []),
+		verses,
 	};
 }
 
@@ -76,6 +133,10 @@ const structure = readJson(STRUCTURE_PATH);
 const bookOrder = structure.order;
 const otBooks = new Set(structure.testament.OT);
 const chapterCounts = structure.chapters;
+
+// Snapshot existing markers BEFORE clearing — preserve-fallback for chapters
+// whose drafts haven't been through the Layer-2 marking pass yet.
+const existing = snapshotMarkers(OUT_DIR);
 
 // Clear + recreate
 rmDir(OUT_DIR);
@@ -104,7 +165,7 @@ if (!fs.existsSync(LOCKED_DIR)) {
 		const files = fs.readdirSync(bookDir).filter(f => f.endsWith('.json')).sort();
 		for (const file of files) {
 			const data = readJson(path.join(bookDir, file));
-			const out = flattenChapter(data, 'locked');
+			const out = flattenChapter(data, 'locked', existing[`${slug}/${data.chapter}`]);
 			fs.writeFileSync(path.join(outBookDir, chapterFile(data.chapter)), JSON.stringify(out, null, 2));
 			chapters.push(data.chapter);
 			totalChapters++;
@@ -148,7 +209,7 @@ if (fs.existsSync(READING_EDITION_MANIFEST)) {
 			if (lockedSet.has(ch)) continue; // locked wins
 			const draftPath = path.join(DRAFTS_DIR, book, chapterFile(ch));
 			if (!fs.existsSync(draftPath)) continue;
-			const out = flattenChapter(readJson(draftPath), 'reading-edition');
+			const out = flattenChapter(readJson(draftPath), 'reading-edition', existing[`${slug}/${ch}`]);
 			out.promotedAt = info.promoted_at || null;
 			out.promotedBy = info.promoted_by || null;
 			fs.writeFileSync(path.join(outBookDir, chapterFile(ch)), JSON.stringify(out, null, 2));

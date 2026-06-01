@@ -7,6 +7,7 @@ import ImageGrid from '../components/ImageGrid.astro';
 import Navbar from '../components/Navbar.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
+import UnlockMap from '../components/UnlockMap.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
@@ -40,9 +41,6 @@ const bookCoverUrl = media?.bookCoverUrl || '';
 // the Sanity donateUrl field (it was the legacy Givebutter URL pre-migration).
 const donateUrl = '#donate';
 const communityUrl = media?.communityUrl || '/join';
-const partnerPageVideoUrl =
-	media?.partnerPageVideo ||
-	'https://assets.spiritmediapublishing.com/fathers-heart-bible/bible-lake-reading-hero.mp4';
 
 const whyMatters = partnerData?.whyMatters ?? [
 	{
@@ -55,7 +53,7 @@ const whyMatters = partnerData?.whyMatters ?? [
 	},
 	{
 		heading: 'Distribute more widely',
-		body: "Every gift helps place the Father's Heart Bible into the hands of those who are ready to receive it.",
+		body: "Every gift helps place the Father's Heart Bible™ into the hands of those who are ready to receive it.",
 	},
 	{
 		heading: 'Expand future reach',
@@ -94,7 +92,7 @@ const whyDifferent = partnerData?.whyDifferent ?? [
 ];
 
 const impactStats = partnerData?.impactStats ?? [
-	{ amount: '$33', impact: "Helps put one Father's Heart Bible into the hands of a reader." },
+	{ amount: '$33', impact: "Helps put one Father's Heart Bible™ into the hands of a reader." },
 	{ amount: '$100', impact: 'Helps place three Bibles where they are most needed.' },
 	{ amount: '$500', impact: 'Supports a meaningful portion of translation and production work.' },
 ];
@@ -122,7 +120,9 @@ const impactStats = partnerData?.impactStats ?? [
 		     SECTION 1 — HERO (no CTA — donation form is right below)
 		     ═══════════════════════════════════════════════════════════ -->
 		<VideoHeroInner
-			videoSrc={partnerPageVideoUrl}
+			imageSrc="https://cdn.sanity.io/images/rusi1hyi/production/a323755d51d350e216d2fb38cd857df127609f67-1537x1023.png?w=1920&q=80&auto=format"
+			showLogo={false}
+			headingLift="1in"
 			heading={heroHeading}
 			subheading={heroSubheading}
 		/>
@@ -135,7 +135,7 @@ const impactStats = partnerData?.impactStats ?? [
 			<!-- Pitch banner — campaign goal + math + headline. Sets the
 			     frame before the donor scans the amount tiers. -->
 			<div class="max-w-4xl mx-auto mb-10" data-reveal>
-				<div class="p-6 md:p-8 rounded-2xl text-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary);">
+				<div class="p-6 md:p-8 rounded-2xl text-center" style="background: #FFD9E0; color: #4A4A4A;">
 					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="opacity: 0.85; font-family: var(--font-sans);">
 						First Edition Launch · Goal $100,000
 					</p>
@@ -334,6 +334,30 @@ const impactStats = partnerData?.impactStats ?? [
 		</Section>
 
 
+			<!-- ═══════════════════════════════════════════════════════════
+				     SECTION 1.78 — PREMIUM (COMFORTLEATHER) EDITION
+				     ═══════════════════════════════════════════════════════════ -->
+				<Section variant="light">
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-center max-w-4xl mx-auto">
+						<div class="flex justify-center" data-reveal>
+							<img
+								src="https://cdn.sanity.io/images/rusi1hyi/production/9618d5a555e40892802d587d0faa740a513035df-1024x1024.png?w=560&fm=webp&q=80&auto=format"
+								alt="The ComfortLeather Edition of the Father's Heart Bible"
+								width="420" height="420" loading="lazy" decoding="async"
+								class="w-full max-w-sm rounded-2xl"
+							/>
+						</div>
+						<div data-reveal>
+							<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">ComfortLeather&trade; Edition · Holiday 2026</p>
+							<h2 class="text-3xl md:text-4xl font-light leading-tight mb-5" style="font-family: var(--font-serif); color: var(--color-ink);">The Founder&rsquo;s Premium Edition</h2>
+							<p class="leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The flagship Father&rsquo;s Heart Bible&trade; — bound in supple ComfortLeather&trade;, individually numbered, and crafted to be held, gifted, and treasured for a lifetime.</p>
+							<p class="leading-relaxed mb-6" style="font-family: var(--font-sans); color: var(--color-muted);">Founding Supporters ($50+) receive a numbered <strong style="color: var(--color-ink);">Founder&rsquo;s First Edition</strong> — a collector&rsquo;s copy available only through this launch campaign.</p>
+							<a href="#donate" class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border-radius: 8px;" onmouseover="this.style.opacity='0.92'" onmouseout="this.style.opacity='1'">Become a Founding Supporter →</a>
+						</div>
+					</div>
+				</Section>
+
+
 		<!-- ═══════════════════════════════════════════════════════════
 		     SECTION 1.8 — PHASE 2: GLOBAL TRANSLATION EXPANSION
 		     ═══════════════════════════════════════════════════════════ -->
@@ -370,12 +394,15 @@ const impactStats = partnerData?.impactStats ?? [
 						Nigerian Pidgin → Marathi → Telugu → Turkish → Tamil →
 						Yue Chinese → Vietnamese
 					</p>
-					<a href="/nations/" class="inline-flex items-center text-sm font-semibold no-underline" style="font-family: var(--font-sans); color: var(--color-primary);">
-						See the full unlock map · 6.43B reach →
-					</a>
 				</div>
 			</div>
 		</Section>
+
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 1.85 — THE COUNTRY / LANGUAGE UNLOCK MAP (shared w/ /nations)
+		     ═══════════════════════════════════════════════════════════ -->
+		<UnlockMap />
 
 
 		<!-- ═══════════════════════════════════════════════════════════
@@ -397,7 +424,7 @@ const impactStats = partnerData?.impactStats ?? [
 						Your support makes the publishing possible.
 					</h2>
 					<p class="leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-						The Father's Heart Bible requires real resources to complete, produce, and bring into the
+						The Father's Heart Bible™ requires real resources to complete, produce, and bring into the
 						world. Partner support is what makes it possible to take this from a vision to a Bible
 						in someone's hands.
 					</p>
@@ -547,14 +574,14 @@ const impactStats = partnerData?.impactStats ?? [
 				<ScriptureBlock
 					text="You did not choose me, but I chose you and appointed you so that you might go and bear fruit — fruit that will last."
 					reference="John 15:16"
-					translation="Father's Heart Bible"
+					translation="Father's Heart Bible™"
 				/>
 				<div class="mt-10 text-center">
 					<p
 						class="text-lg leading-relaxed"
 						style="font-family: var(--font-sans); color: var(--color-muted);"
 					>
-						Partnering with the Father's Heart Bible is a response to what the Father is already
+						Partnering with the Father's Heart Bible™ is a response to what the Father is already
 						doing — not an initiation of it. He is publishing His heart into the nations.
 						Your support helps carry that forward.
 					</p>
@@ -578,7 +605,7 @@ const impactStats = partnerData?.impactStats ?? [
 					class="text-3xl md:text-4xl font-light mb-4"
 					style="font-family: var(--font-serif); color: var(--color-ink);"
 				>
-					Partner in publishing the Father's Heart Bible.
+					Partner in publishing the Father's Heart Bible™.
 				</h2>
 				<p class="leading-relaxed mb-10" style="font-family: var(--font-sans); color: var(--color-muted);">
 					Your gift — any amount — is a meaningful act of participation in this work.
@@ -633,11 +660,11 @@ const impactStats = partnerData?.impactStats ?? [
 						before taking any other step.
 					</p>
 					<a
-						href="https://join.fathersheartbible.com/"
+						href="https://join.fathersheartbible.com/read"
 						class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline transition-all duration-200"
-						style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;"
-						onmouseover="this.style.backgroundColor='var(--color-brand-dark)'"
-						onmouseout="this.style.backgroundColor='var(--color-brand)'"
+						style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A;"
+						onmouseover="this.style.opacity='0.9'"
+						onmouseout="this.style.opacity='1'"
 					>
 						Join the FH Family
 					</a>
@@ -650,7 +677,7 @@ const impactStats = partnerData?.impactStats ?? [
 			<ImageGrid cols={3} gap="md">
 				<img src="https://cdn.sanity.io/images/rusi1hyi/production/e436847896736938d3ec72ad0b86ba36340c33da-8113x5409.jpg?w=800&auto=format" alt="Reading in a quiet place" class="w-full aspect-square object-cover" />
 				<img src="https://cdn.sanity.io/images/rusi1hyi/production/8b5d1c39f892218c978d3e3caf5720e09833bbc4-1024x1024.png?w=800&auto=format" alt="Scripture in the city" class="w-full aspect-square object-cover" />
-				<img src="https://cdn.sanity.io/images/rusi1hyi/production/1df4e3a88fa72b18ccaf7adc7d495e1c8ca2b4fb-7641x5094.jpg?w=800&auto=format" alt="Sharing the Father's heart" class="w-full aspect-square object-cover" />
+				<img src="https://cdn.sanity.io/images/rusi1hyi/production/65bfbb03bafd33cde3ec1fc7898e45bd59cdd3d5-4912x3264.jpg?w=800&auto=format" alt="Sharing the Father's heart" class="w-full aspect-square object-cover" />
 			</ImageGrid>
 		</Section>
 

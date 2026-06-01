@@ -1,6 +1,10 @@
 ---
 interface Props {
-	videoSrc: string;
+	videoSrc?: string;
+	imageSrc?: string;
+	imagePosition?: string;
+	showLogo?: boolean;
+	headingLift?: string;
 	heading: string;
 	subheading?: string;
 	primaryCtaLabel?: string;
@@ -11,6 +15,10 @@ interface Props {
 
 const {
 	videoSrc,
+	imageSrc,
+	imagePosition = 'center',
+	showLogo = true,
+	headingLift = '0',
 	heading,
 	subheading,
 	primaryCtaLabel,
@@ -21,34 +29,48 @@ const {
 ---
 
 <section
-	class="relative flex items-end justify-center overflow-hidden min-h-[500px] md:min-h-screen"
+	class="relative flex items-end justify-center overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]"
 	style="background-color: var(--color-inverse-surface); margin-top: -1px;"
 >
-	<video
-		class="absolute inset-0 w-full h-full object-cover"
-		src={videoSrc}
-		autoplay
-		muted
-		loop
-		playsinline
-		aria-hidden="true"
-		style="opacity: 1;"
-	/>
-	<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-10 md:pb-16 lg:pb-24">
+	{imageSrc ? (
 		<img
-			src="/fhb-logo-white-400.png"
-			srcset="/fhb-logo-white-240.png 240w, /fhb-logo-white-400.png 400w"
-			sizes="(max-width: 768px) 160px, (max-width: 1024px) 240px, 320px"
-			width="400"
-			height="195"
-			alt="Father's Heart Bible"
+			class="absolute inset-0 w-full h-full object-cover"
+			src={imageSrc}
+			alt=""
+			aria-hidden="true"
 			fetchpriority="high"
 			decoding="async"
-			class="h-14 md:h-20 lg:h-28 w-auto mx-auto mb-4 md:mb-6" data-hero-entrance
+			style={`opacity: 1; object-position: ${imagePosition};`}
 		/>
+	) : (
+		<video
+			class="absolute inset-0 w-full h-full object-cover"
+			src={videoSrc}
+			autoplay
+			muted
+			loop
+			playsinline
+			aria-hidden="true"
+			style="opacity: 1;"
+		/>
+	)}
+	<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-10 md:pb-16 lg:pb-24">
+		{showLogo && (
+			<img
+				src="/fhb-logo-white-400.png"
+				srcset="/fhb-logo-white-240.png 240w, /fhb-logo-white-400.png 400w"
+				sizes="(max-width: 768px) 160px, (max-width: 1024px) 240px, 320px"
+				width="400"
+				height="195"
+				alt="Father's Heart Bible"
+				fetchpriority="high"
+				decoding="async"
+				class="h-14 md:h-20 lg:h-28 w-auto mx-auto mb-4 md:mb-6" data-hero-entrance
+			/>
+		)}
 		<h1
 			class="text-4xl md:text-6xl font-medium leading-snug tracking-tight"
-			style="font-family: var(--font-headline); color: #FFFFFF;" data-hero-entrance
+			style={`font-family: var(--font-headline); color: #FFFFFF; margin-bottom: ${headingLift};`} data-hero-entrance
 		>
 			{heading}
 		</h1>
@@ -71,7 +93,7 @@ const {
 					<a
 						href={primaryCtaHref}
 						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
-						style="font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container)); color: var(--color-on-primary);"
+						style="font-family: var(--font-body); background: #FFD9E0; color: #4A4A4A;"
 						onmouseover="this.style.opacity='0.9'"
 						onmouseout="this.style.opacity='1'"
 					>
@@ -80,10 +102,10 @@ const {
 					{secondaryCtaLabel && secondaryCtaHref && (
 						<a
 							href={secondaryCtaHref}
-							class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline border transition-all duration-200"
-							style="font-family: var(--font-body); color: var(--color-primary); border-color: var(--color-primary);"
-							onmouseover="this.style.backgroundColor='var(--color-primary)'; this.style.color='var(--color-on-primary)';"
-							onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--color-primary)';"
+							class="inline-flex items-center px-8 py-3.5 text-base font-medium no-underline transition-all duration-200"
+							style="font-family: var(--font-body); background: #FFD9E0; color: #4A4A4A;"
+							onmouseover="this.style.opacity='0.9';"
+							onmouseout="this.style.opacity='1';"
 						>
 							{secondaryCtaLabel}
 						</a>
