@@ -34,16 +34,16 @@
 			</button>
 		</div>
 
-		<!-- Suggested amounts — aligned to First Edition fundraising tiers:
-		     $5 = 1 Bible (Sponsor) · $50 = Founding Supporter · $100 = Founding
-		     Partner · $250 = Founding Patron · $1,000+ = Founder. -->
+		<!-- Suggested amounts — led by # of Bibles ($5 = 1 Bible), dollar shown
+		     beneath. $25 = 5 Bibles · $50 = 10 · $100 = 20 (Founding Supporter) ·
+		     $250 = 50 (Founding Patron) · $1,000 = 200 (Founder). -->
 		<div class="grid grid-cols-3 gap-2 mb-3">
-			<button type="button" data-amount="5" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$5</button>
-			<button type="button" data-amount="50" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$50</button>
-			<button type="button" data-amount="100" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$100</button>
-			<button type="button" data-amount="250" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$250</button>
-			<button type="button" data-amount="1000" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">$1,000</button>
-			<button type="button" data-amount="custom" class="amount-btn px-4 py-3 rounded-lg text-base font-semibold transition-colors" style="font-family: var(--font-sans);">Custom</button>
+			<button type="button" data-amount="25" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">5 Bibles<span class="block text-xs font-normal opacity-70">$25</span></button>
+			<button type="button" data-amount="50" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">10 Bibles<span class="block text-xs font-normal opacity-70">$50</span></button>
+			<button type="button" data-amount="100" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">20 Bibles<span class="block text-xs font-normal opacity-70">$100</span></button>
+			<button type="button" data-amount="250" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">50 Bibles<span class="block text-xs font-normal opacity-70">$250</span></button>
+			<button type="button" data-amount="1000" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">200 Bibles<span class="block text-xs font-normal opacity-70">$1,000</span></button>
+			<button type="button" data-amount="custom" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">Custom</button>
 		</div>
 
 		<!-- Custom amount input -->
@@ -75,9 +75,12 @@
 			<summary class="cursor-pointer text-sm py-2" style="color: var(--color-muted); font-family: var(--font-sans);">
 				Add a public message (optional)
 			</summary>
-			<input type="text" id="donor-public-name" placeholder="Display name (defaults to your name)" maxlength="100"
+			<input type="text" id="donor-public-name" placeholder="Display name (optional)" maxlength="100"
 				class="w-full mt-2 px-4 py-3 rounded-lg border text-sm"
 				style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
+			<p class="mt-1 text-xs" style="color: var(--color-muted); font-family: var(--font-sans); opacity: 0.85;">
+				Publicly we show only your <strong>first name and last initial</strong> (e.g., Jane&nbsp;D.). Enter a display name above to override.
+			</p>
 			<textarea id="donor-public-message" rows="3" placeholder="Why are you giving?" maxlength="500"
 				class="w-full mt-2 px-4 py-3 rounded-lg border text-sm"
 				style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);"></textarea>
@@ -172,7 +175,10 @@
 	// Publishable key — public, safe in source. Live key for production donations.
 	const STRIPE_PK = 'pk_live_51MX6GXIZWVjKTV59eSCSw9DGhLjLGYx5B50VVmErOooiJgLKM9rGLYt5toXa6d4aize8TJe4t3QAp7NJW7GPEOTp00mAjvGWgf';
 	const TOOLS_API = 'https://tools-api.spiritmediapublishing.com';
-	const FEE_RATE = 0.029;
+	// Stripe nonprofit rate: 2.2% + $0.30 per transaction. (Amex runs higher,
+	// but the card brand isn't known until inside Stripe Checkout, so the
+	// pre-payment "cover the fee" estimate uses the standard NPO rate.)
+	const FEE_RATE = 0.022;
 	const FEE_FIXED_CENTS = 30;
 
 	let stripePromise: Promise<any> | null = null;
@@ -361,13 +367,16 @@
 			return;
 		}
 
-		const publicName = (document.getElementById('donor-public-name') as HTMLInputElement).value.trim() || `${firstName} ${lastName}`;
+		// Public display defaults to "First L." (first name + last initial) unless
+		// the donor entered a custom display name.
+		const lastInitial = lastName ? `${lastName.charAt(0).toUpperCase()}.` : '';
+		const publicName = (document.getElementById('donor-public-name') as HTMLInputElement).value.trim() || `${firstName} ${lastInitial}`.trim();
 		const publicMessage = (document.getElementById('donor-public-message') as HTMLTextAreaElement).value.trim();
 		const isPublic = (document.getElementById('donor-is-public') as HTMLInputElement).checked;
 		const coverFees = (document.getElementById('donor-cover-fees') as HTMLInputElement).checked;
 
 		// If donor opts to cover fees, gross up the amount so net = chosen amount.
-		// Stripe charges 2.9% + $0.30 (or NPO discounted rate). Use 2.9 + 0.30 as estimate.
+		// Stripe nonprofit rate: 2.2% + $0.30 (FEE_RATE / FEE_FIXED_CENTS above).
 		let amountCents = dollars * 100;
 		let feeCoveredCents = 0;
 		if (coverFees) {

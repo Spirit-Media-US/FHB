@@ -27,6 +27,8 @@ const pct = Math.min(
 	100,
 	Math.round((initial.raised_cents / Math.max(initial.goal_cents, 1)) * 100),
 );
+// Lead with Bibles funded — $5 = 1 Bible (so a $100,000 goal = 20,000 Bibles).
+const biblesNum = (c: number) => Math.floor(c / 500).toLocaleString('en-US');
 ---
 
 <div
@@ -37,17 +39,15 @@ const pct = Math.min(
 >
 	<div class="flex items-baseline justify-between mb-2">
 		<p class="text-3xl md:text-4xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
-			<span data-progress-raised>{fmt(initial.raised_cents)}</span>
+			<span data-progress-bibles>{biblesNum(initial.raised_cents)}</span><span class="text-lg md:text-xl" style="color: var(--color-muted);"> of <span data-progress-bibles-goal>{biblesNum(initial.goal_cents)}</span> Bibles</span>
 		</p>
-		<p class="text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
-			<span data-progress-pct>{pct}</span>% of <span data-progress-goal>{fmt(initial.goal_cents)}</span> goal
-		</p>
+		<p class="text-sm font-semibold whitespace-nowrap" style="color: var(--color-brand); font-family: var(--font-sans);"><span data-progress-pct>{pct}</span>%</p>
 	</div>
 	<div class="w-full rounded-full overflow-hidden" style="background-color: var(--color-outline-variant); height: 8px;">
 		<div data-progress-fill style={`width: ${pct}%; height: 100%; background-color: var(--color-brand); transition: width 600ms ease;`}></div>
 	</div>
 	<p class="mt-3 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
-		<span data-progress-supporters>{initial.supporter_count}</span> supporter<span data-progress-supporters-plural>{initial.supporter_count === 1 ? '' : 's'}</span>
+		<span data-progress-raised>{fmt(initial.raised_cents)}</span> of <span data-progress-goal>{fmt(initial.goal_cents)}</span> raised · <span data-progress-supporters>{initial.supporter_count}</span> supporter<span data-progress-supporters-plural>{initial.supporter_count === 1 ? '' : 's'}</span>
 	</p>
 </div>
 
@@ -69,6 +69,9 @@ const pct = Math.min(
 				const el = root.querySelector(`[${sel}]`) as HTMLElement | null;
 				if (el) el.textContent = val;
 			};
+			const biblesNum = (c: number) => Math.floor(c / 500).toLocaleString('en-US');
+			set('data-progress-bibles', biblesNum(d.raised_cents));
+			set('data-progress-bibles-goal', biblesNum(d.goal_cents));
 			set('data-progress-raised', fmtMoney(d.raised_cents));
 			set('data-progress-goal', fmtMoney(d.goal_cents));
 			set('data-progress-pct', String(pct));
