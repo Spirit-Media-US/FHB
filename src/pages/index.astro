@@ -47,9 +47,12 @@ const seoDescription =
 // hardcoded for the campaign window; post-July-1, restore the prior Sanity-
 // driven heroHeading ("You were never meant to relate to God as a servant\u2026
 // but as a beloved child.").
-const heroHeadingLine1 = 'Experience Father\u2019s Heart Bible\u2122 Before It\u2019s Published';
+const heroEyebrow = 'June 2026 \u00b7 The First Public Reading';
+const heroHeadingLine1 = 'Be among the first to read the Father\u2019s Heart Bible\u2122.';
 const heroSubheading =
-	'Be among the first to read Father\u2019s Heart Bible\u2122. The first intimate translation revealing our Father\u2019s voice and His heart for you.';
+	'In honor of Father\u2019s Day, throughout the month of June, Father\u2019s Heart Bible\u2122 opens for its first reading. New books added daily. Chapter by chapter, Genesis to Revelation. The translation locks July 1.';
+const heroSubheading2 =
+	'Read. Receive. Recommend. Every reaction and every thought adds your name to the Wall of Contributors \u2014 the first readers of FHB.';
 // Primary CTA points readers directly at the review experience inside FH
 // Family. The secondary "Download the Free Book" CTA is intentionally NOT
 // rendered during the June campaign so this primary CTA carries the hero
@@ -178,6 +181,12 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			<div id="mobile-hero-bg" aria-hidden="true" data-bg={heroMobile} style="position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0;transition:opacity 0.6s ease-out;"></div>
 			<div aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(36,27,23,0.55) 0%,rgba(36,27,23,0.75) 100%);pointer-events:none;"></div>
 			<div class="relative z-10 max-w-2xl mx-auto text-center">
+				<p
+					class="text-sm font-bold uppercase tracking-[0.18em]"
+					style="font-family: var(--font-body); color: #FFB1C4; margin: 0 0 1rem;"
+				>
+					{heroEyebrow}
+				</p>
 				<h1
 					class="text-[2.475rem] font-medium leading-snug tracking-tight"
 					style="font-family: var(--font-headline); color: #FFFFFF;"
@@ -189,6 +198,12 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					style="font-family: var(--font-body); color: rgba(255,255,255,0.85); margin-top: 1.5rem;"
 				>
 					{heroSubheading}
+				</p>
+				<p
+					class="text-base leading-relaxed"
+					style="font-family: var(--font-body); color: rgba(255,255,255,0.8); margin-top: 1rem;"
+				>
+					{heroSubheading2}
 				</p>
 				<div class="flex flex-col gap-3" style="margin-top: 2rem;">
 					<a
