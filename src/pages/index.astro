@@ -53,14 +53,8 @@ const heroSubheading =
 	'In honor of Father\u2019s Day, throughout the month of June, Father\u2019s Heart Bible\u2122 opens for its first reading. New books added daily. Chapter by chapter, Genesis to Revelation. Reading closes June 30.';
 const heroSubheading2 =
 	'Read. Receive. Recommend. Every reaction and every thought adds your name to the Wall of Contributors \u2014 the first readers of FHB.';
-// Primary CTA points readers directly at the review experience inside FH
-// Family. The secondary "Download the Free Book" CTA is intentionally NOT
-// rendered during the June campaign so this primary CTA carries the hero
-// alone; the Free Book CTA remains in the dedicated Free Download section
-// further down on this page.
-const heroPrimaryCtaLabel = pageData?.heroPrimaryCtaLabel || 'Read FHB →';
-const heroPrimaryCtaHref =
-	pageData?.heroPrimaryCtaHref || 'https://join.fathersheartbible.com/read';
+// The hero/section "Read FHB →" CTAs were removed (2026-06-02) — the nav now
+// carries the Read FHB entry point. The Free Book + Join/Partner CTAs remain.
 const heroVideoSrc =
 	media?.heroVideoUrl ||
 	'https://assets.spiritmediapublishing.com/fathers-heart-bible/woman-holding-bible-sky.mp4';
@@ -205,15 +199,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				>
 					{heroSubheading2}
 				</p>
-				<div class="flex flex-col gap-3" style="margin-top: 2rem;">
-					<a
-						href={heroPrimaryCtaHref}
-						class="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold no-underline"
-						style="font-family: var(--font-body); background: #FFD9E0; color: #4A4A4A;"
-					>
-						{heroPrimaryCtaLabel}
-					</a>
-				</div>
 			</div>
 		</section>
 
@@ -298,17 +283,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				>
 					{heroSubheading}
 				</p>
-				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-					<a
-						href={heroPrimaryCtaHref}
-						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
-						style="font-family: var(--font-body); background: #FFD9E0; color: #4A4A4A;"
-						onmouseover="this.style.opacity='0.9'"
-						onmouseout="this.style.opacity='1'"
-					>
-						{heroPrimaryCtaLabel}
-					</a>
-				</div>
 			</div>
 		</section>
 
@@ -464,17 +438,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					forgiveness. Not merely heaven. Not merely religious correctness. The destination has
 					always been the Father.
 				</p>
-				<div class="mt-10 flex justify-center">
-					<a
-						href={heroPrimaryCtaHref}
-						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
-						style="font-family: var(--font-body); background: #FFD9E0; color: #4A4A4A;"
-						onmouseover="this.style.opacity='0.9'"
-						onmouseout="this.style.opacity='1'"
-					>
-						{heroPrimaryCtaLabel}
-					</a>
-				</div>
 			</div>
 		</Section>
 
@@ -508,17 +471,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{statement}</p>
 					</div>
 				))}
-			</div>
-			<div class="mt-12 flex justify-center">
-				<a
-					href={heroPrimaryCtaHref}
-					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
-					style="font-family: var(--font-body); background: #FFD9E0; color: #4A4A4A;"
-					onmouseover="this.style.opacity='0.9'"
-					onmouseout="this.style.opacity='1'"
-				>
-					{heroPrimaryCtaLabel}
-				</a>
 			</div>
 		</Section>
 
