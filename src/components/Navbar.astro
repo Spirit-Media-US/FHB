@@ -27,12 +27,17 @@ const brandName = `${siteName}`.replace(/™$/, '') + '™';
 const brandLogoUrl =
 	'https://cdn.sanity.io/images/rusi1hyi/production/bf8e5685f1b30a651457f26abfa2ca1fa30cd784-900x450.png?w=400&auto=format';
 
+// Unified nav (2026-06-02) — identical labels/order on the marketing site and
+// the community app. App items use absolute join.fathersheartbible.com URLs so
+// the same list works from both domains.
 const navLinks: NavLink[] = [
 	{ label: 'Home', href: '/' },
-	{ label: 'About FHB', href: '/the-fathers-heart-bible/' },
+	{ label: 'About', href: '/the-fathers-heart-bible/' },
 	{ label: 'Read FHB', href: 'https://join.fathersheartbible.com/read' },
 	{ label: 'Partner', href: '/partner/' },
-	{ label: 'Blog', href: '/blog/' },
+	{ label: 'Groups', href: 'https://join.fathersheartbible.com/groups' },
+	{ label: 'Events', href: 'https://join.fathersheartbible.com/events' },
+	{ label: 'Resources', href: 'https://join.fathersheartbible.com/library' },
 ];
 
 const currentPath = Astro.url.pathname;
