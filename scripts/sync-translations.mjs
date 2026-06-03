@@ -65,6 +65,7 @@ function snapshotMarkers(dir) {
 					const m = {};
 					if (v.poetic) { m.poetic = true; m.poeticIndent = v.poeticIndent || 1; }
 					if (v.jesusWords && v.jesusWords.length) m.jesusWords = v.jesusWords;
+					if (v.lines && v.lines.length) m.lines = v.lines;
 					if (Object.keys(m).length) verses[v.verse] = m;
 				}
 				map[`${slug}/${d.chapter}`] = {
@@ -99,10 +100,12 @@ function flattenChapter(data, status, existing) {
 		if (marked) {
 			if (v.poetic) { out.poetic = true; out.poeticIndent = v.poeticIndent || 1; }
 			if (v.jesus_words && v.jesus_words.length) out.jesusWords = v.jesus_words;
+				if (v.lines && v.lines.length) out.lines = v.lines;
 		} else {
 			const exV = (ex.verses && ex.verses[v.verse]) || {};
 			if (exV.poetic) { out.poetic = true; out.poeticIndent = exV.poeticIndent || 1; }
 			if (exV.jesusWords && exV.jesusWords.length) out.jesusWords = exV.jesusWords;
+				if (exV.lines && exV.lines.length) out.lines = exV.lines;
 		}
 		return out;
 	});
