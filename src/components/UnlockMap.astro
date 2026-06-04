@@ -1,185 +1,102 @@
 ---
 // Shared "country map" / language-unlock section.
 // Used on /nations and /partner so the two never drift apart.
-// 20 cumulative unlocks — donor goal mapped to language + reach.
+// Each language unlocks for a flat $50,000; reach is per-language.
 interface UnlockRow {
-	dollar: string;
 	language: string;
 	flag: string; // emoji
 	parenthetical?: string;
-	reach: string;
+	reach: string; // this language's own reach
+	sponsor?: string; // pledge label override (defaults to language)
 	highlight?: boolean;
 }
 
+const COST = '$50,000';
+
 const unlocks: UnlockRow[] = [
 	{
-		dollar: '$100K',
-		language: 'Base English First Edition launch — 20,000 Bibles + audio',
+		language: 'Base Edition',
 		flag: '🇺🇸',
+		parenthetical: 'English First Edition — 20,000 Bibles + audio',
 		reach: '1.5B',
+		sponsor: 'the Base Edition',
 		highlight: true,
 	},
+	{ language: 'Spanish', flag: '🇪🇸', reach: '550M' },
+	{ language: 'Portuguese', flag: '🇧🇷', parenthetical: 'Brazil + Lusophone Africa', reach: '257M' },
+	{ language: 'French', flag: '🇫🇷', parenthetical: 'Includes Francophone Africa', reach: '280M' },
+	{ language: 'Hindi', flag: '🇮🇳', parenthetical: "India's growing church", reach: '600M' },
+	{ language: 'Arabic', flag: '🇪🇬', parenthetical: 'Middle East + N. Africa', reach: '274M' },
+	{ language: 'Mandarin', flag: '🇨🇳', parenthetical: "China's underground church", reach: '1.1B' },
 	{
-		dollar: '$150K',
-		language: 'Spanish',
-		flag: '🇪🇸',
-		parenthetical: '550M speakers',
-		reach: '2.05B',
-	},
-	{
-		dollar: '$200K',
-		language: 'Portuguese',
-		flag: '🇧🇷',
-		parenthetical: '257M — Brazil + Lusophone Africa',
-		reach: '2.31B',
-	},
-	{
-		dollar: '$250K',
-		language: 'French',
-		flag: '🇫🇷',
-		parenthetical: '280M — includes Francophone Africa',
-		reach: '2.59B',
-	},
-	{
-		dollar: '$300K',
-		language: 'Hindi',
-		flag: '🇮🇳',
-		parenthetical: "600M — India's growing church",
-		reach: '3.19B',
-	},
-	{
-		dollar: '$350K',
-		language: 'Arabic',
-		flag: '🇪🇬',
-		parenthetical: '274M — Middle East + N. Africa',
-		reach: '3.46B',
-	},
-	{
-		dollar: '$400K',
-		language: 'Mandarin',
-		flag: '🇨🇳',
-		parenthetical: '1.1B — China underground church',
-		reach: '4.56B',
-	},
-	{
-		dollar: '$450K',
 		language: 'Indonesian',
 		flag: '🇮🇩',
-		parenthetical: '199M — largest Muslim-majority nation',
-		reach: '4.76B',
+		parenthetical: 'Largest Muslim-majority nation',
+		reach: '199M',
 	},
+	{ language: 'Bengali', flag: '🇧🇩', reach: '272M' },
+	{ language: 'Urdu', flag: '🇵🇰', reach: '231M' },
+	{ language: 'Russian', flag: '🇷🇺', reach: '258M' },
+	{ language: 'German', flag: '🇩🇪', reach: '135M' },
+	{ language: 'Japanese', flag: '🇯🇵', reach: '125M' },
+	{ language: 'Nigerian Pidgin', flag: '🇳🇬', reach: '121M' },
+	{ language: 'Marathi', flag: '🇮🇳', reach: '99M' },
+	{ language: 'Telugu', flag: '🇮🇳', reach: '96M' },
+	{ language: 'Turkish', flag: '🇹🇷', reach: '88M' },
+	{ language: 'Tamil', flag: '🇮🇳', reach: '86M' },
+	{ language: 'Yue Chinese', flag: '🇭🇰', reach: '86M' },
 	{
-		dollar: '$500K',
-		language: 'Bengali',
-		flag: '🇧🇩',
-		parenthetical: '272M speakers',
-		reach: '5.03B',
-	},
-	{ dollar: '$550K', language: 'Urdu', flag: '🇵🇰', parenthetical: '231M speakers', reach: '5.26B' },
-	{
-		dollar: '$600K',
-		language: 'Russian',
-		flag: '🇷🇺',
-		parenthetical: '258M speakers',
-		reach: '5.52B',
-	},
-	{
-		dollar: '$650K',
-		language: 'German',
-		flag: '🇩🇪',
-		parenthetical: '135M speakers',
-		reach: '5.65B',
-	},
-	{
-		dollar: '$700K',
-		language: 'Japanese',
-		flag: '🇯🇵',
-		parenthetical: '125M speakers',
-		reach: '5.78B',
-	},
-	{
-		dollar: '$750K',
-		language: 'Nigerian Pidgin',
-		flag: '🇳🇬',
-		parenthetical: '121M speakers',
-		reach: '5.90B',
-	},
-	{
-		dollar: '$800K',
-		language: 'Marathi',
-		flag: '🇮🇳',
-		parenthetical: '99M speakers',
-		reach: '6.00B',
-	},
-	{
-		dollar: '$850K',
-		language: 'Telugu',
-		flag: '🇮🇳',
-		parenthetical: '96M speakers',
-		reach: '6.10B',
-	},
-	{
-		dollar: '$900K',
-		language: 'Turkish',
-		flag: '🇹🇷',
-		parenthetical: '88M speakers',
-		reach: '6.18B',
-	},
-	{ dollar: '$950K', language: 'Tamil', flag: '🇮🇳', parenthetical: '86M speakers', reach: '6.27B' },
-	{
-		dollar: '$1.0M',
-		language: 'Yue Chinese',
-		flag: '🇭🇰',
-		parenthetical: '86M speakers',
-		reach: '6.35B',
-	},
-	{
-		dollar: '$1.05M',
-		language: 'Vietnamese — all 20 languages live · 75% of humanity',
+		language: 'Vietnamese',
 		flag: '🇻🇳',
-		parenthetical: '85M speakers',
-		reach: '6.43B',
+		parenthetical: 'All 20 languages live · 75% of humanity',
+		reach: '85M',
 		highlight: true,
 	},
 ];
+
+const mailto = (row: UnlockRow) =>
+	`mailto:kevin@spiritmediapublishing.com?subject=${encodeURIComponent(
+		`Pledge to Sponsor ${row.sponsor || row.language}`,
+	)}`;
 ---
 
 <section class="py-12 md:py-16 px-4 md:px-6" style="background-color: var(--color-soft);">
-	<div class="max-w-2xl mx-auto" data-reveal>
+	<div class="max-w-3xl mx-auto" data-reveal>
 		<header class="mb-8 text-center">
 			<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
 				Unlock Map
 			</p>
 			<h2 class="text-3xl md:text-4xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
-				$100K to $1.05M — every dollar a doorway.
+				$50,000 a language — every dollar a doorway.
 			</h2>
 			<p class="mt-4 leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-				Every <strong style="color: var(--color-primary);">$50,000</strong> beyond the First Edition unlocks
-				another of the top 20 languages — together reaching about
-				<strong style="color: var(--color-primary);">6.43 billion people</strong>, 75% of humanity.
+				Each of the top 20 languages unlocks for <strong style="color: var(--color-primary);">$50,000</strong> —
+				full translation, print, digital, and audio. Together they reach about
+				<strong style="color: var(--color-primary);">75% of humanity</strong>.
 			</p>
 		</header>
 
 		<div class="overflow-hidden rounded-2xl border" style="border-color: var(--color-outline-variant); background: var(--color-surface);">
-			<div class="hidden md:grid grid-cols-[88px_64px_1fr_72px] gap-2 px-5 py-3" style="background: var(--color-surface-low); font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-ink);">
-				<span>Total Raised</span>
+			<div class="hidden md:grid grid-cols-[92px_48px_1fr_64px_180px] gap-3 px-5 py-3" style="background: var(--color-surface-low); font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-ink);">
+				<span>Cost</span>
 				<span></span>
 				<span>Unlock</span>
-				<span class="text-right">Reach</span>
+				<span>Reach</span>
+				<span></span>
 			</div>
 
 			{unlocks.map((u) => (
 				<div
-					class="grid grid-cols-[64px_1fr_auto] md:grid-cols-[88px_64px_1fr_72px] gap-3 md:gap-2 items-center px-5 py-4"
+					class="grid grid-cols-[52px_1fr] md:grid-cols-[92px_48px_1fr_64px_180px] gap-3 items-center px-5 py-4"
 					style={`border-top: 1px solid var(--color-outline-variant); ${u.highlight ? 'background: var(--color-surface-low);' : ''}`}
 				>
 					<span class="hidden md:inline" style="font-family: var(--font-sans); font-size: 14px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.02em;">
-						{u.dollar}
+						{COST}
 					</span>
-					<span style="font-size: 44px; line-height: 1; text-align: center;" aria-hidden="true">{u.flag}</span>
+					<span style="font-size: 40px; line-height: 1; text-align: center;" aria-hidden="true">{u.flag}</span>
 					<div>
 						<p class="md:hidden" style="font-family: var(--font-sans); font-size: 12px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.02em; margin: 0 0 2px;">
-							{u.dollar}
+							{COST}
 						</p>
 						<p style="font-family: var(--font-sans); font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0;">
 							{u.language}
@@ -189,17 +106,33 @@ const unlocks: UnlockRow[] = [
 								{u.parenthetical}
 							</p>
 						)}
+						<!-- Mobile: reach + pledge inline beneath the language -->
+						<div class="md:hidden flex items-center justify-between gap-3 mt-2">
+							<span style="font-family: var(--font-sans); font-size: 14px; font-weight: 700; color: var(--color-ink);">{u.reach}</span>
+							<a href={mailto(u)} style="font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--color-primary); text-decoration: none;">
+								Pledge to Sponsor {u.sponsor || u.language} →
+							</a>
+						</div>
 					</div>
-					<span class="text-right" style="font-family: var(--font-sans); font-size: 14px; font-weight: 700; color: var(--color-ink);">
+					<span class="hidden md:block text-left" style="font-family: var(--font-sans); font-size: 14px; font-weight: 700; color: var(--color-ink);">
 						{u.reach}
 					</span>
+					<a
+						href={mailto(u)}
+						class="hidden md:block text-right"
+						style="font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--color-primary); text-decoration: none;"
+						onmouseover="this.style.textDecoration='underline'"
+						onmouseout="this.style.textDecoration='none'"
+					>
+						Pledge to Sponsor {u.sponsor || u.language} →
+					</a>
 				</div>
 			))}
 		</div>
 
 		<p class="text-center mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">
-			Reach numbers are cumulative — sons and daughters who can finally read the
-			Father's heart in their own tongue.
+			Reach is the number of people who can finally read the Father&rsquo;s heart in their own tongue.
+			To pledge a language, email <a href="mailto:kevin@spiritmediapublishing.com" style="color: var(--color-brand);">kevin@spiritmediapublishing.com</a>.
 		</p>
 	</div>
 </section>
