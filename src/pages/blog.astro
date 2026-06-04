@@ -1,6 +1,4 @@
 ---
-import Footer from '../components/Footer.astro';
-import Navbar from '../components/Navbar.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
@@ -79,7 +77,6 @@ const jsonLd = {
   description="Articles on hearing the Father's voice across Scripture — orphan spirit and sonship, and what shifts when every verse is read with the Father's heart in view."
   jsonLd={jsonLd}
 >
-  <Navbar />
 
   <main id="main-content">
 
@@ -163,7 +160,6 @@ const jsonLd = {
     <script id="sanity-posts-data" type="application/json" set:html={SANITY_POSTS_JSON}></script>
   </main>
 
-  <Footer />
 </Layout>
 
 <script>

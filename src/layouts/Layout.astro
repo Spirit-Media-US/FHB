@@ -1,4 +1,7 @@
 ---
+import Footer from '../chrome/Footer.astro';
+import Header from '../chrome/Header.astro';
+import MailtoLink from '../components/MailtoLink.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
 import '../styles/global.css';
 
@@ -43,11 +46,47 @@ const {
 const siteSettings = await sanityClient.fetch(`
   *[_type == "siteSettings"][0] {
     siteName,
-    heroImage
+    heroImage,
+    logo,
+    footerQuote
   }
 `);
 
 const siteName = siteSettings?.siteName || "Father's Heart Bible";
+
+// ── Global chrome (shared Header/Footer mounted once here, per the SMP model;
+// synced from the community repo into src/chrome at build) ──
+const brandName = `${siteName}`.replace(/™$/, '') + '™';
+const headerLogoUrl = siteSettings?.logo ? urlFor(siteSettings.logo).width(200).url() : null;
+// White FHB wordmark PNG beside the brand text; Header tints it per scroll state.
+const brandWordmarkUrl =
+	'https://cdn.sanity.io/images/rusi1hyi/production/bf8e5685f1b30a651457f26abfa2ca1fa30cd784-900x450.png?w=400&auto=format';
+const footerQuote =
+	siteSettings?.footerQuote || 'I will be their Father, and they will be my sons and daughters.';
+const currentYear = new Date().getFullYear();
+
+// Unified global nav — identical labels/order to the community app's tenant nav.
+// App items use absolute join.fathersheartbible.com URLs so the same bar works
+// from both domains.
+const fhbNavLinks = [
+	{ label: 'Home', href: '/' },
+	{ label: 'About', href: '/the-fathers-heart-bible/' },
+	{ label: 'Read FHB', href: 'https://join.fathersheartbible.com/read' },
+	{ label: 'Partner', href: '/partner/' },
+	{ label: 'Groups', href: 'https://join.fathersheartbible.com/groups' },
+	{ label: 'Events', href: 'https://join.fathersheartbible.com/events' },
+	{ label: 'Resources', href: 'https://join.fathersheartbible.com/library' },
+];
+const fhbFooterNav = [
+	{ label: 'Home', href: '/' },
+	{ label: 'About FHB', href: '/the-fathers-heart-bible/' },
+	{ label: 'Partner', href: '/partner/' },
+	{ label: 'Blog', href: '/blog/' },
+];
+const fhbFooterLegal = [
+	{ label: 'Privacy', href: '/privacy/' },
+	{ label: 'Terms', href: '/terms/' },
+];
 
 // OG image — default to FHBcity mockup cover, allow per-page override
 const ogImage =
@@ -273,7 +312,29 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		</script>
 	</head>
 	<body class="min-h-screen flex flex-col" data-dark-hero={darkHero ? 'true' : 'false'}>
+		<Header
+			brandName={brandName}
+			navLinks={fhbNavLinks}
+			currentPath={Astro.url.pathname}
+			logoUrl={headerLogoUrl}
+			brandWordmarkUrl={brandWordmarkUrl}
+			ctaLabel="Read FHB →"
+			ctaHref="https://join.fathersheartbible.com/read"
+			sticky={true}
+			transparentOverHero={darkHero}
+		/>
 		<slot />
+		<Footer
+			variant="full"
+			quote={footerQuote}
+			citation="Revelation 21:7"
+			navLinks={fhbFooterNav}
+			legalLinks={fhbFooterLegal}
+			copyrightName={brandName}
+			year={currentYear}
+		>
+			<MailtoLink slot="contact" email="hello@spiritmediapublishing.com" style="text-decoration: none; color: var(--color-inverse-on-surface, #f1f1f1); opacity: 0.65; font-family: var(--font-body); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;">Contact</MailtoLink>
+		</Footer>
 		<script>
 			// Scroll reveal observer
 			const observer = new IntersectionObserver((entries) => {
