@@ -124,7 +124,7 @@ const timeline = [
 		<!-- ═══════════════════════════════════════════════════════════
 		     SECTION 2 — GIVE (pitch + the math + progress + form + feed)
 		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="light" id="donate">
+		<Section variant="light">
 			<!-- The math, as animated counters — immediately under the hero. -->
 			<div class="max-w-4xl mx-auto mb-10 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center" data-stagger>
 				<div class="p-6 rounded-2xl" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
@@ -182,7 +182,7 @@ const timeline = [
 					<DonorFeed campaign="fhb" />
 				</div>
 				<!-- Right column: donation form -->
-				<div class="lg:col-span-3" data-reveal>
+				<div id="donate" class="lg:col-span-3 scroll-mt-24" data-reveal>
 					<DonationForm />
 				</div>
 			</div>
@@ -241,10 +241,10 @@ const timeline = [
 				<!-- $50k milestone ladder -->
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12" data-stagger>
 					{milestones.map(({ amount, title, body }) => (
-						<div class="p-6 rounded-2xl" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+						<div class="p-6 rounded-2xl" style="background: #FFD9E0;">
 							<p class="text-2xl font-light mb-1" style="font-family: var(--font-serif); color: var(--color-brand);">{amount}</p>
 							<h3 class="font-semibold mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">{title}</h3>
-							<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{body}</p>
+							<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: #4A4A4A;">{body}</p>
 						</div>
 					))}
 				</div>
@@ -271,10 +271,10 @@ const timeline = [
 					</p>
 					<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 						{languageReach.map(({ language, readers, note }) => (
-							<div class="p-5 rounded-2xl text-center" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+							<div class="p-5 rounded-2xl text-center" style="background: #FFD9E0;">
 								<p class="text-lg font-semibold mb-1" style="font-family: var(--font-serif); color: var(--color-ink);">{language}</p>
-								<p class="text-sm leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{readers}</p>
-								{note && <p class="text-xs mt-2" style="font-family: var(--font-sans); color: var(--color-gold);">{note}</p>}
+								<p class="text-sm leading-snug" style="font-family: var(--font-sans); color: #4A4A4A;">{readers}</p>
+								{note && <p class="text-xs mt-2" style="font-family: var(--font-sans); color: var(--color-brand);">{note}</p>}
 							</div>
 						))}
 					</div>
@@ -310,10 +310,10 @@ const timeline = [
 				<!-- Impact in Bibles -->
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto mb-16" data-stagger>
 					{impactStats.map(({ amount, impact }) => (
-						<div class="p-8 text-center" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
+						<div class="p-8 text-center" style="background: #FFD9E0;">
 							<p class="text-3xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-brand);">{amount}</p>
 							<div class="w-8 h-0.5 mx-auto mb-4" style="background-color: var(--color-gold);"></div>
-							<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{impact}</p>
+							<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: #4A4A4A;">{impact}</p>
 						</div>
 					))}
 				</div>
