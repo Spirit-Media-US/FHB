@@ -40,7 +40,7 @@
 		<div class="grid grid-cols-3 gap-2 mb-3">
 			<button type="button" data-amount="25" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">5 Bibles<span class="block text-xs font-normal opacity-70">$25</span></button>
 			<button type="button" data-amount="50" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">10 Bibles<span class="block text-xs font-normal opacity-70">$50</span></button>
-			<button type="button" data-amount="100" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">20 Bibles<span class="block text-xs font-normal opacity-70">$100</span></button>
+			<button type="button" data-amount="100" class="amount-btn amount-btn-featured px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">20 Bibles<span class="block text-xs font-normal opacity-70">$100</span><span class="block text-[10px] font-semibold uppercase tracking-wide mt-0.5">+ Free ComfortLeather™</span></button>
 			<button type="button" data-amount="250" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">50 Bibles<span class="block text-xs font-normal opacity-70">$250</span></button>
 			<button type="button" data-amount="1000" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">200 Bibles<span class="block text-xs font-normal opacity-70">$1,000</span></button>
 			<button type="button" data-amount="custom" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">Custom</button>
@@ -163,6 +163,17 @@
 		border: 1px solid var(--color-outline-variant);
 	}
 	.amount-btn[data-active="true"] {
+		background-color: var(--color-brand);
+		color: #ffffff;
+		border-color: var(--color-brand);
+	}
+	/* Featured partner tier ($100 = 20 Bibles + free ComfortLeather) — light pink. */
+	.amount-btn-featured {
+		background-color: #FFD9E0;
+		border-color: #E89DB0;
+		color: #4A4A4A;
+	}
+	.amount-btn-featured[data-active="true"] {
 		background-color: var(--color-brand);
 		color: #ffffff;
 		border-color: var(--color-brand);
