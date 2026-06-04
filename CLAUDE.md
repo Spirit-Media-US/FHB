@@ -22,6 +22,13 @@ Running Claude from ~/ or ~/Sites/ bypasses this project's CLAUDE.md. A pre-edit
 
 Then run: `git checkout dev && git pull origin dev`
 
+### Where to launch Claude — this site shares global chrome with the app
+
+The global Header/Footer here are **shared chrome** whose canonical source lives in the community/app repo (`/srv/sites/community/chrome/`) and is synced into FHB at build via `scripts/sync-chrome.mjs`.
+
+- **FHB-only work** (pages, content, FHB styling) → `cd /srv/sites/FHB && claude` as above.
+- **Work that touches BOTH FHB and the app** (the shared chrome, or any coordinated cross-repo change) → launch Claude from **`/home/deploy`** instead, so you can edit + build + deploy both repos in one session. Lefthook pre-commit guardrails still fire on `git commit` inside each repo regardless of where Claude launched. See `reference_community_deploy` + `project_fhb_platform_unification` in memory.
+
 ## Notes
 
 - SSL must cover all four domain variants: fathersheartbible.org, www.fathersheartbible.org, fathersheartbible.com, www.fathersheartbible.com
