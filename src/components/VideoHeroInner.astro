@@ -26,6 +26,10 @@ const {
 	secondaryCtaLabel,
 	secondaryCtaHref,
 } = Astro.props;
+
+// When there's no CTA (e.g. /partner), the subheading's bottom margin + the
+// section's bottom padding would render as dead white space. Collapse them.
+const hasCta = !!(primaryCtaLabel && primaryCtaHref);
 ---
 
 <section
@@ -78,11 +82,11 @@ const {
 </section>
 
 {(subheading || primaryCtaLabel) && (
-	<section style="background-color: var(--color-canvas);" class="py-8 md:py-12 px-4 md:px-6">
+	<section style="background-color: var(--color-canvas);" class={`px-4 md:px-6 ${hasCta ? 'py-8 md:py-12' : 'pt-8 md:pt-12 pb-0'}`}>
 		<div class="max-w-2xl mx-auto text-center" data-reveal>
 			{subheading && (
 				<p
-					class="text-lg md:text-xl leading-relaxed mb-10"
+					class={`text-lg md:text-xl leading-relaxed ${hasCta ? 'mb-10' : 'mb-0'}`}
 					style="font-family: var(--font-body); color: var(--color-muted);"
 				>
 					{subheading}
