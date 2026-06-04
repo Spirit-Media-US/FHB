@@ -2,8 +2,6 @@
 import AuthorBio from '../../components/AuthorBio.astro';
 import BlogCTA from '../../components/BlogCTA.astro';
 import ChapterEmbed from '../../components/ChapterEmbed.astro';
-import Footer from '../../components/Footer.astro';
-import Navbar from '../../components/Navbar.astro';
 import PullQuote from '../../components/PullQuote.astro';
 import RelatedPosts from '../../components/RelatedPosts.astro';
 import ShareBar from '../../components/ShareBar.astro';
@@ -251,7 +249,6 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
   articleSection={tags[0]}
   articleTags={tags}
 >
-  <Navbar />
 
   <main id="main-content">
     <!-- HERO IMAGE -->
@@ -322,5 +319,4 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
     <RelatedPosts currentSlug={`/blog/${post.slug.current}`} currentTags={tags} />
   </main>
 
-  <Footer />
 </Layout>

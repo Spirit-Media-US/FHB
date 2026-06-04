@@ -13,8 +13,6 @@
 import AuthorBio from '../../../components/AuthorBio.astro';
 import BlogCTA from '../../../components/BlogCTA.astro';
 import ChapterEmbed from '../../../components/ChapterEmbed.astro';
-import Footer from '../../../components/Footer.astro';
-import Navbar from '../../../components/Navbar.astro';
 import PullQuote from '../../../components/PullQuote.astro';
 import RelatedPosts from '../../../components/RelatedPosts.astro';
 import ShareBar from '../../../components/ShareBar.astro';
@@ -251,7 +249,6 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
   articleTags={tags}
   noindex={true}
 >
-  <Navbar />
 
   <!-- Preview banner so it's unmistakable this is a draft view -->
   <div style="background-color: #fef3c7; border-bottom: 1px solid #fcd34d; padding: 12px 24px; margin-top: 80px; font-family: var(--font-sans); color: #78350f; text-align: center; font-size: 14px; font-weight: 600;">
@@ -328,5 +325,4 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
     <RelatedPosts currentSlug={`/blog/${post.slug.current}`} currentTags={tags} />
   </main>
 
-  <Footer />
 </Layout>

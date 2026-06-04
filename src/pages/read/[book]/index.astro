@@ -1,8 +1,6 @@
 ---
 import fs from 'node:fs';
 import path from 'node:path';
-import Footer from '../../../components/Footer.astro';
-import Navbar from '../../../components/Navbar.astro';
 import Layout from '../../../layouts/Layout.astro';
 
 export async function getStaticPaths() {
@@ -37,7 +35,6 @@ const seoDescription = `Read ${book} in the Father's Heart Bible — a new trans
 ---
 
 <Layout title={seoTitle} description={seoDescription}>
-	<Navbar />
 
 	<main id="main-content" class="pt-32 pb-20">
 		<section class="max-w-3xl mx-auto px-6">
@@ -81,5 +78,4 @@ const seoDescription = `Read ${book} in the Father's Heart Bible — a new trans
 		</section>
 	</main>
 
-	<Footer />
 </Layout>
