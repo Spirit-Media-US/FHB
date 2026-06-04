@@ -2,7 +2,7 @@
 import Footer from '../chrome/Footer.astro';
 import Header from '../chrome/Header.astro';
 import MailtoLink from '../components/MailtoLink.astro';
-import { sanityClient, urlFor } from '../lib/sanity';
+import { sanityClient } from '../lib/sanity';
 import '../styles/global.css';
 
 interface Props {
@@ -57,10 +57,8 @@ const siteName = siteSettings?.siteName || "Father's Heart Bible";
 // ── Global chrome (shared Header/Footer mounted once here, per the SMP model;
 // synced from the community repo into src/chrome at build) ──
 const brandName = `${siteName}`.replace(/™$/, '') + '™';
-const headerLogoUrl = siteSettings?.logo ? urlFor(siteSettings.logo).width(200).url() : null;
-// White FHB wordmark PNG beside the brand text; Header tints it per scroll state.
-const brandWordmarkUrl =
-	'https://cdn.sanity.io/images/rusi1hyi/production/bf8e5685f1b30a651457f26abfa2ca1fa30cd784-900x450.png?w=400&auto=format';
+// Same R2 logo the community app uses (fhb.json brand.logoUrl) so both navs are identical: text + logo.
+const headerLogoUrl = 'https://assets.spiritmediapublishing.com/FHB/fhb-logo.png';
 const footerQuote =
 	siteSettings?.footerQuote || 'I will be their Father, and they will be my sons and daughters.';
 const currentYear = new Date().getFullYear();
@@ -318,7 +316,6 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 			navLinks={fhbNavLinks}
 			currentPath={Astro.url.pathname}
 			logoUrl={headerLogoUrl}
-			brandWordmarkUrl={brandWordmarkUrl}
 			ctaLabel="Read FHB →"
 			ctaHref="https://join.fathersheartbible.com/read"
 			sticky={true}
