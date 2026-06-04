@@ -72,7 +72,7 @@ const milestones = [
 
 // Lead languages with reader reach (from the campaign vision).
 const languageReach = [
-	{ language: 'English', readers: '1.5 billion readers', note: 'First Edition — fall 2026' },
+	{ language: 'English', readers: '1.5 billion readers' },
 	{ language: 'Spanish', readers: '550 million readers' },
 	{ language: 'Mandarin', readers: '1.1 billion readers' },
 	{ language: 'Hindi', readers: '600 million readers' },
@@ -125,25 +125,8 @@ const timeline = [
 		     SECTION 2 — GIVE (pitch + the math + progress + form + feed)
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="light" id="donate">
-			<!-- Pitch banner — the monthly-partner call. -->
-			<div class="max-w-4xl mx-auto mb-10" data-reveal>
-				<div class="p-6 md:p-8 rounded-2xl text-center" style="background: #FFD9E0; color: #4A4A4A;">
-					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="opacity: 0.85; font-family: var(--font-sans);">
-						Monthly Partnership · First Milestone $50,000/month
-					</p>
-					<h2 class="text-2xl md:text-3xl font-light leading-tight mb-4" style="font-family: var(--font-serif);">
-						500 partners at $100/month takes the Father&rsquo;s Heart Bible to the nations.
-					</h2>
-					<p class="text-base md:text-lg leading-relaxed max-w-2xl mx-auto" style="font-family: var(--font-sans); opacity: 0.95;">
-						At $5 a Bible, <strong>$100/month sponsors 20 Bibles every month</strong>.
-						Partners who give <strong>$100 or more a month receive a free ComfortLeather&trade; edition</strong>.
-						Give more if you can; if you need to give less, every gift matters.
-					</p>
-				</div>
-			</div>
-
-			<!-- The math, as animated counters. -->
-			<div class="max-w-4xl mx-auto mb-12 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center" data-stagger>
+			<!-- The math, as animated counters — immediately under the hero. -->
+			<div class="max-w-4xl mx-auto mb-10 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center" data-stagger>
 				<div class="p-6 rounded-2xl" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
 					<p class="text-4xl font-light mb-2" style="font-family: var(--font-serif); color: var(--color-brand);">
 						<span data-counter="500">0</span>
@@ -161,6 +144,34 @@ const timeline = [
 						<span data-counter="50000" data-prefix="$">$0</span><span class="text-xl" style="color: var(--color-muted);">/mo</span>
 					</p>
 					<p class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">first milestone, together</p>
+				</div>
+			</div>
+
+			<!-- Pitch — text left, video placeholder right. -->
+			<div class="max-w-5xl mx-auto mb-12" data-reveal>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+					<div class="p-6 md:p-8 rounded-2xl flex flex-col justify-center" style="background: #FFD9E0; color: #4A4A4A;">
+						<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="opacity: 0.85; font-family: var(--font-sans);">
+							Monthly Partnership · First Milestone $50,000/month
+						</p>
+						<h2 class="text-2xl md:text-3xl font-light leading-tight mb-3" style="font-family: var(--font-serif);">
+							500 partners at $100/month takes the Father&rsquo;s Heart Bible to the nations.
+						</h2>
+						<p class="text-base leading-relaxed" style="font-family: var(--font-sans); opacity: 0.95;">
+							At $5 a Bible, <strong>$100/month sponsors 20 Bibles every month</strong>.
+							Partners who give <strong>$100 or more a month receive a free ComfortLeather&trade; edition</strong>.
+							Give more if you can; if you need to give less, every gift matters.
+						</p>
+					</div>
+					<!-- Video placeholder — drop the partner/hero video in here when ready. -->
+					<div class="rounded-2xl overflow-hidden flex items-center justify-center min-h-[240px]" style="background: var(--color-surface-low); border: 1px solid var(--color-outline-variant);">
+						<div class="text-center px-6">
+							<div class="mx-auto mb-3 flex items-center justify-center rounded-full" style="width: 56px; height: 56px; background: var(--color-surface); border: 1px solid var(--color-outline-variant);">
+								<svg width="22" height="22" viewBox="0 0 24 24" fill="var(--color-primary)" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+							</div>
+							<p class="text-sm font-semibold" style="font-family: var(--font-sans); color: var(--color-muted);">Partner video coming soon</p>
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -238,8 +249,23 @@ const timeline = [
 					))}
 				</div>
 
-				<!-- Per-language reach -->
+				<!-- Production timeline -->
 				<div class="mb-12" data-reveal>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-4 text-center" style="font-family: var(--font-sans); color: var(--color-primary);">
+						Production Timeline
+					</p>
+					<ol class="rounded-2xl overflow-hidden border" style="list-style: none; padding: 0; margin: 0; border-color: var(--color-outline-variant); background: var(--color-surface);">
+						{timeline.map(({ when, what, emphasis }) => (
+							<li class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-2 md:gap-6 px-5 py-4" style={`border-bottom: 1px solid var(--color-outline-variant); ${emphasis ? 'background: var(--color-surface-low);' : ''}`}>
+								<span style="font-family: var(--font-sans); font-size: 13px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.04em;">{when}</span>
+								<span style={`font-family: var(--font-sans); line-height: 1.55; ${emphasis ? 'color: var(--color-ink); font-weight: 600;' : 'color: var(--color-muted);'}`}>{what}</span>
+							</li>
+						))}
+					</ol>
+				</div>
+
+				<!-- Per-language reach -->
+				<div data-reveal>
 					<p class="text-xs font-semibold tracking-widest uppercase mb-4 text-center" style="font-family: var(--font-sans); color: var(--color-primary);">
 						Each language, $50,000 — the reach it opens
 					</p>
@@ -256,21 +282,6 @@ const timeline = [
 						Families, businesses, and foundations are invited to <strong style="color: var(--color-ink);">sponsor a whole language for $50,000</strong> —
 						underwriting its full translation, release, and audio narration.
 					</p>
-				</div>
-
-				<!-- Production timeline -->
-				<div data-reveal>
-					<p class="text-xs font-semibold tracking-widest uppercase mb-4 text-center" style="font-family: var(--font-sans); color: var(--color-primary);">
-						Production Timeline
-					</p>
-					<ol class="rounded-2xl overflow-hidden border" style="list-style: none; padding: 0; margin: 0; border-color: var(--color-outline-variant); background: var(--color-surface);">
-						{timeline.map(({ when, what, emphasis }) => (
-							<li class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-2 md:gap-6 px-5 py-4" style={`border-bottom: 1px solid var(--color-outline-variant); ${emphasis ? 'background: var(--color-surface-low);' : ''}`}>
-								<span style="font-family: var(--font-sans); font-size: 13px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.04em;">{when}</span>
-								<span style={`font-family: var(--font-sans); line-height: 1.55; ${emphasis ? 'color: var(--color-ink); font-weight: 600;' : 'color: var(--color-muted);'}`}>{what}</span>
-							</li>
-						))}
-					</ol>
 				</div>
 			</div>
 		</Section>
