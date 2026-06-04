@@ -3,19 +3,15 @@ import DonationForm from '../components/donations/DonationForm.astro';
 import DonorFeed from '../components/donations/DonorFeed.astro';
 import ProgressBar from '../components/donations/ProgressBar.astro';
 import ImageGrid from '../components/ImageGrid.astro';
-import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
 import UnlockMap from '../components/UnlockMap.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
-const [pageData, media] = await Promise.all([
-	sanityClient.fetch(`*[_type =="page" && slug =="partner"][0] {
+const pageData = await sanityClient.fetch(`*[_type =="page" && slug =="partner"][0] {
     seoTitle, seoDescription
-  }`),
-	sanityClient.fetch(`*[_type =="siteSettings"][0] { partnerPageVideo, communityUrl }`),
-]);
+  }`);
 
 const seoTitle = pageData?.seoTitle || "Partner With Us | Father's Heart Bible";
 const seoDescription =
@@ -94,8 +90,6 @@ const timeline = [
 	{ when: '2027', what: 'Study Bibles · international language translations begin' },
 	{ when: '2028', what: "Men's, Women's, Student & Children's Bibles · more languages" },
 ];
-
-const communityUrl = media?.communityUrl || '/join';
 ---
 
 <Layout
@@ -350,29 +344,7 @@ const communityUrl = media?.communityUrl || '/join';
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 6 — SCRIPTURE CAPSTONE (movement-first giving)
-		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="scripture">
-			<div class="max-w-2xl mx-auto">
-				<div class="w-10 h-0.5 mb-10" style="background-color: var(--color-gold);"></div>
-				<ScriptureBlock
-					text="You did not choose me, but I chose you and appointed you so that you might go and bear fruit — fruit that will last."
-					reference="John 15:16"
-					translation="Father's Heart Bible™"
-				/>
-				<div class="mt-10 text-center">
-					<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-						Partnering with the Father&rsquo;s Heart Bible&trade; is a response to what the Father is already
-						doing — not an initiation of it. He is publishing His heart into the nations.
-						Your support helps carry that forward.
-					</p>
-				</div>
-			</div>
-		</Section>
-
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 7 — FINAL CTA (scrolls to the form)
+		     SECTION 6 — FINAL CTA (scrolls to the form)
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="light">
 			<div class="max-w-xl mx-auto text-center">
@@ -395,36 +367,9 @@ const communityUrl = media?.communityUrl || '/join';
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 8 — JOIN THE FH FAMILY + images
+		     SECTION 7 — CLOSING IMAGES
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="soft">
-			<div class="max-w-xl mx-auto">
-				<div class="p-8 text-center" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
-					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
-						Community
-					</p>
-					<h3 class="text-2xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">
-						Join the FH Family
-					</h3>
-					<p class="text-sm leading-relaxed mb-6" style="font-family: var(--font-sans); color: var(--color-muted);">
-						Belonging comes before giving. Join the Father&rsquo;s Heart community and grow in identity
-						before taking any other step.
-					</p>
-					<a
-						href="https://join.fathersheartbible.com/read"
-						class="inline-flex items-center px-6 py-3 text-sm font-semibold no-underline transition-all duration-200"
-						style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A;"
-						onmouseover="this.style.opacity='0.9'"
-						onmouseout="this.style.opacity='1'"
-					>
-						Join the FH Family
-					</a>
-				</div>
-			</div>
-		</Section>
-
-
-		<Section variant="light">
 			<ImageGrid cols={3} gap="md">
 				<img src="https://cdn.sanity.io/images/rusi1hyi/production/e436847896736938d3ec72ad0b86ba36340c33da-8113x5409.jpg?w=800&auto=format" alt="Reading in a quiet place" class="w-full aspect-square object-cover" />
 				<img src="https://cdn.sanity.io/images/rusi1hyi/production/8b5d1c39f892218c978d3e3caf5720e09833bbc4-1024x1024.png?w=800&auto=format" alt="Scripture in the city" class="w-full aspect-square object-cover" />
