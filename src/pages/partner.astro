@@ -10,90 +10,92 @@ import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
-const [pageData, media, partnerData] = await Promise.all([
+const [pageData, media] = await Promise.all([
 	sanityClient.fetch(`*[_type =="page" && slug =="partner"][0] {
-    seoTitle, seoDescription,
-    heroHeading, heroSubheading,
-    heroPrimaryCtaLabel, heroPrimaryCtaHref
+    seoTitle, seoDescription
   }`),
-	sanityClient.fetch(
-		`*[_type =="siteSettings"][0] { partnerPageVideo, bookCoverUrl, donateUrl, communityUrl }`,
-	),
-	sanityClient.fetch(
-		`*[_type =="partnerContent"][0] { whyMatters, scope, whyDifferent, impactStats }`,
-	),
+	sanityClient.fetch(`*[_type =="siteSettings"][0] { partnerPageVideo, communityUrl }`),
 ]);
 
 const seoTitle = pageData?.seoTitle || "Partner With Us | Father's Heart Bible";
 const seoDescription =
 	pageData?.seoDescription ||
-	"Partner with the Father's Heart Bible project and help bring this transformational translation to the world. Your support makes a difference.";
+	"Become a monthly partner — $100/month sponsors 20 Bibles every month and helps take the Father's Heart Bible to the nations. 500 partners reach $50,000/month.";
 const heroHeading = 'Partner With Us';
-const heroSubheading = 'Be part of what the Father is doing.';
-// Donate Now button removed from hero — donation form is in the next section,
-// no need to send the donor scrolling past it to a CTA that's already visible.
-const heroPrimaryCtaLabel = '';
-const heroPrimaryCtaHref = '';
-const bookCoverUrl = media?.bookCoverUrl || '';
-// Always scroll to the embedded Stripe form in Section 1.5 — never depend on
-// the Sanity donateUrl field (it was the legacy Givebutter URL pre-migration).
-const donateUrl = '#donate';
-const communityUrl = media?.communityUrl || '/join';
+const heroSubheading = "Partner with us to take the Father's Heart Bible to the nations.";
 
-const whyMatters = partnerData?.whyMatters ?? [
+// Why your partnership matters — woven into the consolidated "Why this matters" section.
+const whyMatters = [
 	{
-		heading: 'Complete the translation',
-		body: 'The full canon — Genesis to Revelation — requires sustained support to complete and bring to publication.',
+		heading: 'Complete & publish the canon',
+		body: 'The full canon — Genesis to Revelation — published digitally (YouVersion, Bible Gateway, and more) and in paperback, hardback, eBook, and audiobook.',
 	},
 	{
-		heading: 'Produce physical editions',
-		body: 'Premium print Bibles that can be held, given, and treasured require real production investment.',
+		heading: 'Produce the ComfortLeather™ edition',
+		body: 'A premium print Bible that can be held, given, and treasured — crafted to last a lifetime.',
 	},
 	{
-		heading: 'Distribute more widely',
-		body: "Every gift helps place the Father's Heart Bible™ into the hands of those who are ready to receive it.",
-	},
-	{
-		heading: 'Expand future reach',
-		body: 'Audio, study editions, and language translations — future expressions of this work require a foundation to stand on.',
+		heading: 'Reach the nations',
+		body: "Translate the Father's Heart Bible™ into the top 20 languages — reaching about 75% of humanity within 24 months.",
 	},
 ];
 
-const scope = partnerData?.scope ?? [
-	{
-		title: 'Translation',
-		body: "The ongoing interpretive work of rendering the full Biblical canon with the Father's heart in view.",
-	},
-	{
-		title: 'Publishing',
-		body: 'Editorial, design, and production preparation for the flagship premium print edition.',
-	},
-	{
-		title: 'Production',
-		body: 'Physical Bible printing, binding, and manufacturing to bring this translation into tangible form.',
-	},
-	{
-		title: 'Distribution',
-		body: 'Getting Bibles into the hands of readers — including those who could not otherwise access them.',
-	},
-	{
-		title: 'Future Reach',
-		body: "Study editions, audio, and translations that extend the Father's voice into more languages and formats.",
-	},
-];
-
-const whyDifferent = partnerData?.whyDifferent ?? [
+// What makes this Bible different — short trust signals.
+const whyDifferent = [
 	'Reveals the Father where Scripture reveals Him — from Genesis to Revelation.',
 	'Speaks directly to identity, intimacy, and belonging — the deep hunger of this generation.',
 	'Written not to inform but to create encounter — a Bible that changes how readers know God.',
 	'Rooted in the historic Christian and Trinitarian faith — trustworthy and spiritually serious.',
 ];
 
-const impactStats = partnerData?.impactStats ?? [
-	{ amount: '$33', impact: "Helps put one Father's Heart Bible™ into the hands of a reader." },
-	{ amount: '$100', impact: 'Helps place three Bibles where they are most needed.' },
-	{ amount: '$500', impact: 'Supports a meaningful portion of translation and production work.' },
+// Impact, measured in Bibles throughout. $5 = 1 Bible.
+const impactStats = [
+	{ amount: '$5', impact: "Places one Father's Heart Bible™ into a reader's hands." },
+	{ amount: '$100/mo', impact: 'Sponsors 20 Bibles every month as a monthly partner.' },
+	{ amount: '$50,000', impact: 'Translates and releases the Bible into an entire language.' },
 ];
+
+// $50,000 milestone ladder — the memorable unit of this campaign.
+const milestones = [
+	{
+		amount: '$50,000',
+		title: 'English — digital & print',
+		body: 'Publishes the digital editions (YouVersion, Bible Gateway, and more) and releases paperback, hardback, eBook, and audiobook worldwide.',
+	},
+	{
+		amount: '$50,000',
+		title: 'The ComfortLeather™ edition',
+		body: 'Prints and distributes the premium ComfortLeather™ Bible — the flagship edition built to be treasured.',
+	},
+	{
+		amount: '$50,000 each',
+		title: 'Every language after that',
+		body: 'Each new language — full translation, print and digital release, and audio narration — is unlocked for $50,000.',
+	},
+];
+
+// Lead languages with reader reach (from the campaign vision).
+const languageReach = [
+	{ language: 'English', readers: '1.5 billion readers', note: 'First Edition — fall 2026' },
+	{ language: 'Spanish', readers: '550 million readers' },
+	{ language: 'Mandarin', readers: '1.1 billion readers' },
+	{ language: 'Hindi', readers: '600 million readers' },
+];
+
+// Production timeline.
+const timeline = [
+	{ when: 'June 2026', what: "Public Review · Founder's Clubs open" },
+	{ when: 'July 2026', what: 'Canon locked · formatting and design' },
+	{ when: 'August 2026', what: 'Digital Bibles published' },
+	{ when: 'September 2026', what: 'Paperback & Hardback published' },
+	{ when: 'October 2026', what: 'eBook and audiobook published' },
+	{ when: 'November 2026', what: 'ComfortLeather™ Edition published', emphasis: true },
+	{ when: 'December 31, 2026', what: '20,000 copies distributed across all formats' },
+	{ when: '2027', what: 'Study Bibles · international language translations begin' },
+	{ when: '2028', what: "Men's, Women's, Student & Children's Bibles · more languages" },
+];
+
+const communityUrl = media?.communityUrl || '/join';
 ---
 
 <Layout
@@ -114,7 +116,7 @@ const impactStats = partnerData?.impactStats ?? [
 	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 1 — HERO (no CTA — donation form is right below)
+		     SECTION 1 — HERO (video placeholder until hero video ships)
 		     ═══════════════════════════════════════════════════════════ -->
 		<VideoHeroInner
 			imageSrc="https://cdn.sanity.io/images/rusi1hyi/production/a323755d51d350e216d2fb38cd857df127609f67-1537x1023.png?w=1920&q=80&auto=format"
@@ -126,25 +128,45 @@ const impactStats = partnerData?.impactStats ?? [
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 1.5 — DONATION FLOW (pitch + progress + form + feed)
+		     SECTION 2 — GIVE (pitch + the math + progress + form + feed)
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="light" id="donate">
-			<!-- Pitch banner — campaign goal + math + headline. Sets the
-			     frame before the donor scans the amount tiers. -->
+			<!-- Pitch banner — the monthly-partner call. -->
 			<div class="max-w-4xl mx-auto mb-10" data-reveal>
 				<div class="p-6 md:p-8 rounded-2xl text-center" style="background: #FFD9E0; color: #4A4A4A;">
 					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="opacity: 0.85; font-family: var(--font-sans);">
-						First Edition Launch · Goal $100,000
+						Monthly Partnership · First Milestone $50,000/month
 					</p>
 					<h2 class="text-2xl md:text-3xl font-light leading-tight mb-4" style="font-family: var(--font-serif);">
-						$5 places a Father&rsquo;s Heart Bible into a reader&rsquo;s hands.
+						500 partners at $100/month takes the Father&rsquo;s Heart Bible to the nations.
 					</h2>
 					<p class="text-base md:text-lg leading-relaxed max-w-2xl mx-auto" style="font-family: var(--font-sans); opacity: 0.95;">
-						Help us launch our First Edition — 20,000 Bibles strong.
-						Give $50 or more and become a <strong>Founding Supporter</strong>,
-						receiving a numbered Founder&rsquo;s First Edition — a collector&rsquo;s copy
-						only available through this campaign.
+						At $5 a Bible, <strong>$100/month sponsors 20 Bibles every month</strong>.
+						Partners who give <strong>$100 or more a month receive a free ComfortLeather&trade; edition</strong>.
+						Give more if you can; if you need to give less, every gift matters.
 					</p>
+				</div>
+			</div>
+
+			<!-- The math, as animated counters. -->
+			<div class="max-w-4xl mx-auto mb-12 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center" data-stagger>
+				<div class="p-6 rounded-2xl" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+					<p class="text-4xl font-light mb-2" style="font-family: var(--font-serif); color: var(--color-brand);">
+						<span data-counter="500">0</span>
+					</p>
+					<p class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">monthly partners</p>
+				</div>
+				<div class="p-6 rounded-2xl" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+					<p class="text-4xl font-light mb-2" style="font-family: var(--font-serif); color: var(--color-brand);">
+						<span data-counter="100" data-prefix="$">$0</span><span class="text-xl" style="color: var(--color-muted);">/mo</span>
+					</p>
+					<p class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">each — sponsors 20 Bibles/month</p>
+				</div>
+				<div class="p-6 rounded-2xl" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+					<p class="text-4xl font-light mb-2" style="font-family: var(--font-serif); color: var(--color-brand);">
+						<span data-counter="50000" data-prefix="$">$0</span><span class="text-xl" style="color: var(--color-muted);">/mo</span>
+					</p>
+					<p class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">first milestone, together</p>
 				</div>
 			</div>
 
@@ -163,409 +185,174 @@ const impactStats = partnerData?.impactStats ?? [
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 1.6 — DONOR TIERS + FOUNDER'S FIRST EDITION
+		     SECTION 3 — WHAT YOUR PARTNERSHIP UNLOCKS (ComfortLeather reward)
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="soft">
-			<div class="max-w-4xl mx-auto">
-				<header class="text-center mb-10" data-reveal>
-					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
-						Donor Tiers
-					</p>
-					<h2 class="text-3xl md:text-4xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
-						What every gift unlocks
-					</h2>
-				</header>
-
-				<div class="overflow-hidden rounded-2xl border" style="border-color: var(--color-outline-variant); background: var(--color-surface);" data-reveal>
-					<table class="w-full text-left" style="font-family: var(--font-sans); border-collapse: collapse;">
-						<thead>
-							<tr style="background: var(--color-surface-low); color: var(--color-ink);">
-								<th class="px-4 py-3 text-xs font-semibold tracking-widest uppercase">Gift</th>
-								<th class="px-4 py-3 text-xs font-semibold tracking-widest uppercase">Tier</th>
-								<th class="px-4 py-3 text-xs font-semibold tracking-widest uppercase">Reward</th>
-							</tr>
-						</thead>
-						<tbody style="color: var(--color-muted);">
-							<tr style="border-top: 1px solid var(--color-outline-variant);">
-								<td class="px-4 py-4 font-semibold" style="color: var(--color-ink);">$5–$49</td>
-								<td class="px-4 py-4">Sponsor</td>
-								<td class="px-4 py-4">Name on the public donor wall at fathersheartbible.com/founders</td>
-							</tr>
-							<tr style="border-top: 1px solid var(--color-outline-variant);">
-								<td class="px-4 py-4 font-semibold" style="color: var(--color-ink);">$50–$99</td>
-								<td class="px-4 py-4">Founding Supporter</td>
-								<td class="px-4 py-4">Numbered Founder&rsquo;s First Edition Bible · donor wall</td>
-							</tr>
-							<tr style="border-top: 1px solid var(--color-outline-variant);">
-								<td class="px-4 py-4 font-semibold" style="color: var(--color-ink);">$100–$249</td>
-								<td class="px-4 py-4">Founding Partner</td>
-								<td class="px-4 py-4">Founder&rsquo;s First Edition · signed thank-you letter from Kevin · donor wall</td>
-							</tr>
-							<tr style="border-top: 1px solid var(--color-outline-variant);">
-								<td class="px-4 py-4 font-semibold" style="color: var(--color-ink);">$250–$999</td>
-								<td class="px-4 py-4">Founding Patron</td>
-								<td class="px-4 py-4">Founder&rsquo;s First Edition with personalized bookplate · signed letter · donor wall</td>
-							</tr>
-							<tr style="border-top: 1px solid var(--color-outline-variant);">
-								<td class="px-4 py-4 font-semibold" style="color: var(--color-ink);">$1,000+</td>
-								<td class="px-4 py-4">Founder</td>
-								<td class="px-4 py-4">Founder&rsquo;s First Edition with bookplate · name printed in every retail edition&rsquo;s acknowledgments · invitation to launch event</td>
-							</tr>
-						</tbody>
-					</table>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-center max-w-4xl mx-auto">
+				<div class="flex justify-center" data-reveal>
+					<img
+						src="https://cdn.sanity.io/images/rusi1hyi/production/9618d5a555e40892802d587d0faa740a513035df-1024x1024.png?w=560&fm=webp&q=80&auto=format"
+						alt="The ComfortLeather Edition of the Father's Heart Bible"
+						width="420" height="420" loading="lazy" decoding="async"
+						class="w-full max-w-sm rounded-2xl"
+					/>
 				</div>
-
-				<aside class="mt-8 p-6 rounded-2xl border" style="border-color: var(--color-outline-variant); background: var(--color-surface-low);" data-reveal>
-					<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="font-family: var(--font-sans); color: var(--color-gold);">
-						The Founder&rsquo;s First Edition
+				<div data-reveal>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">What your partnership unlocks</p>
+					<h2 class="text-3xl md:text-4xl font-light leading-tight mb-5" style="font-family: var(--font-serif); color: var(--color-ink);">A free ComfortLeather&trade; edition</h2>
+					<p class="leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Every partner who gives <strong style="color: var(--color-ink);">$100 or more a month</strong> receives a
+						free ComfortLeather&trade; Father&rsquo;s Heart Bible&trade; — the flagship edition,
+						bound in supple leather and crafted to be held, gifted, and treasured for a lifetime.
 					</p>
-					<p class="leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-						A numbered collector&rsquo;s edition of the First Edition Father&rsquo;s Heart Bible.
-						Same content as the retail Bible, with markers that distinguish it as the
-						founding-donor-only release. Strictly capped at 750 copies. Never reprinted in this form.
+					<p class="leading-relaxed mb-6" style="font-family: var(--font-sans); color: var(--color-muted);">
+						It&rsquo;s our way of placing the very Bible you&rsquo;re helping send to the nations into your own hands.
 					</p>
-				</aside>
+					<a href="#donate" class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border-radius: 8px;" onmouseover="this.style.opacity='0.92'" onmouseout="this.style.opacity='1'">Become a Monthly Partner →</a>
+				</div>
 			</div>
 		</Section>
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 1.7 — HOW THE CAMPAIGN RUNS
+		     SECTION 4 — THE 24-MONTH VISION ($50k ladder + timeline + langs + map)
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="light">
 			<div class="max-w-4xl mx-auto">
-				<header class="mb-8" data-reveal>
+				<header class="text-center mb-10" data-reveal>
 					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
-						Campaign Mechanics
+						The 24-Month Vision
 					</p>
 					<h2 class="text-3xl md:text-4xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
-						How this campaign runs
+						Every $50,000 takes the Bible further.
 					</h2>
+					<p class="mt-4 leading-relaxed max-w-2xl mx-auto" style="font-family: var(--font-sans); color: var(--color-muted);">
+						$50,000 is the unit that moves this mission forward — English first, then the
+						ComfortLeather&trade; edition, then a new language at a time, on toward the top 20
+						languages and about <strong>75% of humanity within 24 months</strong>.
+					</p>
 				</header>
-				<ul class="space-y-4" style="font-family: var(--font-sans); color: var(--color-muted);" data-reveal>
-					<li class="flex gap-4">
-						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
-						<span><strong style="color: var(--color-ink);">Early-bird Founders #1–100.</strong> The first 100 Founding Supporters receive Founder&rsquo;s First Editions numbered 1 through 100 — the lowest, most collectible numbers.</span>
-					</li>
-					<li class="flex gap-4">
-						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
-						<span><strong style="color: var(--color-ink);">Public donor wall.</strong> Every donor&rsquo;s name (with permission) listed publicly at fathersheartbible.com/founders.</span>
-					</li>
-					<li class="flex gap-4">
-						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
-						<span><strong style="color: var(--color-ink);">Permanent acknowledgments.</strong> Every donor of $250+ printed in the acknowledgments of every retail edition, permanently.</span>
-					</li>
-					<li class="flex gap-4">
-						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
-						<span><strong style="color: var(--color-ink);">Numbered limited edition.</strong> Founder&rsquo;s First Editions strictly capped at 750; never reprinted in that form.</span>
-					</li>
-					<li class="flex gap-4">
-						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
-						<span><strong style="color: var(--color-ink);">Behind-the-scenes access.</strong> Founding Patrons and Founders receive weekly campaign-period updates.</span>
-					</li>
-					<li class="flex gap-4">
-						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
-						<span><strong style="color: var(--color-ink);">Bulk gifting tier.</strong> Sponsor 10 Bibles for $40 — placed in ministries, prisons, foster systems, or recipients of your choice.</span>
-					</li>
-					<li class="flex gap-4">
-						<span aria-hidden="true" style="color: var(--color-primary); font-weight: 700; flex-shrink: 0;">·</span>
-						<span><strong style="color: var(--color-ink);">Launch event.</strong> Founders ($1,000+) invited to the in-person launch event when the First Edition ships.</span>
-					</li>
-				</ul>
-			</div>
-		</Section>
 
+				<!-- $50k milestone ladder -->
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12" data-stagger>
+					{milestones.map(({ amount, title, body }) => (
+						<div class="p-6 rounded-2xl" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+							<p class="text-2xl font-light mb-1" style="font-family: var(--font-serif); color: var(--color-brand);">{amount}</p>
+							<h3 class="font-semibold mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">{title}</h3>
+							<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{body}</p>
+						</div>
+					))}
+				</div>
 
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 1.75 — PRODUCTION TIMELINE
-		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="soft">
-			<div class="max-w-3xl mx-auto">
-				<header class="mb-8" data-reveal>
-					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
+				<!-- Per-language reach -->
+				<div class="mb-12" data-reveal>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-4 text-center" style="font-family: var(--font-sans); color: var(--color-primary);">
+						Each language, $50,000 — the reach it opens
+					</p>
+					<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+						{languageReach.map(({ language, readers, note }) => (
+							<div class="p-5 rounded-2xl text-center" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+								<p class="text-lg font-semibold mb-1" style="font-family: var(--font-serif); color: var(--color-ink);">{language}</p>
+								<p class="text-sm leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{readers}</p>
+								{note && <p class="text-xs mt-2" style="font-family: var(--font-sans); color: var(--color-gold);">{note}</p>}
+							</div>
+						))}
+					</div>
+					<p class="text-sm text-center mt-5 leading-relaxed max-w-2xl mx-auto" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Families, businesses, and foundations are invited to <strong style="color: var(--color-ink);">sponsor a whole language for $50,000</strong> —
+						underwriting its full translation, release, and audio narration.
+					</p>
+				</div>
+
+				<!-- Production timeline -->
+				<div data-reveal>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-4 text-center" style="font-family: var(--font-sans); color: var(--color-primary);">
 						Production Timeline
 					</p>
-					<h2 class="text-3xl md:text-4xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
-						What ships when
-					</h2>
-				</header>
-				<ol class="rounded-2xl overflow-hidden border" style="list-style: none; padding: 0; margin: 0; border-color: var(--color-outline-variant); background: var(--color-surface);" data-reveal>
-					<li class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-2 md:gap-6 px-5 py-4" style="border-bottom: 1px solid var(--color-outline-variant);">
-						<span style="font-family: var(--font-sans); font-size: 13px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.04em;">June 2026</span>
-						<span style="font-family: var(--font-sans); color: var(--color-muted); line-height: 1.55;">Public Review · Founder&rsquo;s Clubs open</span>
-					</li>
-					<li class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-2 md:gap-6 px-5 py-4" style="border-bottom: 1px solid var(--color-outline-variant);">
-						<span style="font-family: var(--font-sans); font-size: 13px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.04em;">July 2026</span>
-						<span style="font-family: var(--font-sans); color: var(--color-muted); line-height: 1.55;">Canon locked · formatting and design</span>
-					</li>
-					<li class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-2 md:gap-6 px-5 py-4" style="border-bottom: 1px solid var(--color-outline-variant);">
-						<span style="font-family: var(--font-sans); font-size: 13px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.04em;">August 2026</span>
-						<span style="font-family: var(--font-sans); color: var(--color-muted); line-height: 1.55;">Digital Bibles published</span>
-					</li>
-					<li class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-2 md:gap-6 px-5 py-4" style="border-bottom: 1px solid var(--color-outline-variant);">
-						<span style="font-family: var(--font-sans); font-size: 13px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.04em;">September 2026</span>
-						<span style="font-family: var(--font-sans); color: var(--color-muted); line-height: 1.55;">Paperback &amp; Hardback published</span>
-					</li>
-					<li class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-2 md:gap-6 px-5 py-4" style="border-bottom: 1px solid var(--color-outline-variant);">
-						<span style="font-family: var(--font-sans); font-size: 13px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.04em;">October 2026</span>
-						<span style="font-family: var(--font-sans); color: var(--color-muted); line-height: 1.55;">eBook and audiobook published</span>
-					</li>
-					<li class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-2 md:gap-6 px-5 py-4" style="border-bottom: 1px solid var(--color-outline-variant); background: var(--color-surface-low);">
-						<span style="font-family: var(--font-sans); font-size: 13px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.04em;">November 2026</span>
-						<span style="font-family: var(--font-sans); color: var(--color-ink); font-weight: 600; line-height: 1.55;">ComfortLeather&trade; Edition published</span>
-					</li>
-					<li class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-2 md:gap-6 px-5 py-4" style="border-bottom: 1px solid var(--color-outline-variant);">
-						<span style="font-family: var(--font-sans); font-size: 13px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.04em;">December 31, 2026</span>
-						<span style="font-family: var(--font-sans); color: var(--color-muted); line-height: 1.55;">20,000 copies distributed across all formats</span>
-					</li>
-					<li class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-2 md:gap-6 px-5 py-4" style="border-bottom: 1px solid var(--color-outline-variant);">
-						<span style="font-family: var(--font-sans); font-size: 13px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.04em;">2027</span>
-						<span style="font-family: var(--font-sans); color: var(--color-muted); line-height: 1.55;">Study Bibles published · international language translations</span>
-					</li>
-					<li class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-2 md:gap-6 px-5 py-4">
-						<span style="font-family: var(--font-sans); font-size: 13px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.04em;">2028</span>
-						<span style="font-family: var(--font-sans); color: var(--color-muted); line-height: 1.55;">Men&rsquo;s, Women&rsquo;s, Student, and Children&rsquo;s Bibles published · more international language translations</span>
-					</li>
-				</ol>
-			</div>
-		</Section>
-
-
-			<!-- ═══════════════════════════════════════════════════════════
-				     SECTION 1.78 — PREMIUM (COMFORTLEATHER) EDITION
-				     ═══════════════════════════════════════════════════════════ -->
-				<Section variant="light">
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-center max-w-4xl mx-auto">
-						<div class="flex justify-center" data-reveal>
-							<img
-								src="https://cdn.sanity.io/images/rusi1hyi/production/9618d5a555e40892802d587d0faa740a513035df-1024x1024.png?w=560&fm=webp&q=80&auto=format"
-								alt="The ComfortLeather Edition of the Father's Heart Bible"
-								width="420" height="420" loading="lazy" decoding="async"
-								class="w-full max-w-sm rounded-2xl"
-							/>
-						</div>
-						<div data-reveal>
-							<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">ComfortLeather&trade; Edition · Holiday 2026</p>
-							<h2 class="text-3xl md:text-4xl font-light leading-tight mb-5" style="font-family: var(--font-serif); color: var(--color-ink);">The Founder&rsquo;s Premium Edition</h2>
-							<p class="leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The flagship Father&rsquo;s Heart Bible&trade; — bound in supple ComfortLeather&trade;, individually numbered, and crafted to be held, gifted, and treasured for a lifetime.</p>
-							<p class="leading-relaxed mb-6" style="font-family: var(--font-sans); color: var(--color-muted);">Founding Supporters ($50+) receive a numbered <strong style="color: var(--color-ink);">Founder&rsquo;s First Edition</strong> — a collector&rsquo;s copy available only through this launch campaign.</p>
-							<a href="#donate" class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border-radius: 8px;" onmouseover="this.style.opacity='0.92'" onmouseout="this.style.opacity='1'">Become a Founding Supporter →</a>
-						</div>
-					</div>
-				</Section>
-
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 1.8 — PHASE 2: GLOBAL TRANSLATION EXPANSION
-		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="soft">
-			<div class="max-w-4xl mx-auto">
-				<header class="mb-8 text-center" data-reveal>
-					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
-						Beyond the First Edition
-					</p>
-					<h2 class="text-3xl md:text-4xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
-						Phase 2 — Global Translation Expansion
-					</h2>
-				</header>
-				<p class="leading-relaxed mb-5 max-w-3xl mx-auto" style="font-family: var(--font-sans); color: var(--color-muted);" data-reveal>
-					Phase 2 begins after the English First Edition launches in fall 2026.
-					Every <strong>$50,000</strong> unlocks one of the top 20 languages —
-					full translation, print and digital release, and audio narration in the
-					target language.
-				</p>
-				<p class="leading-relaxed mb-8 max-w-3xl mx-auto" style="font-family: var(--font-sans); color: var(--color-muted);" data-reveal>
-					Together, the top 20 languages reach about <strong>5.6 billion people</strong>
-					— roughly <strong>75% of humanity</strong>.
-				</p>
-				<div class="max-w-3xl mx-auto p-6 rounded-2xl border" style="border-color: var(--color-outline-variant); background: var(--color-surface);" data-reveal>
-					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-primary);">
-						Priority Order
-					</p>
-					<p class="text-sm mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
-						Set by speaker count, size of the Christian church in each region, spiritual openness, and distribution feasibility.
-					</p>
-					<p class="leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-ink); font-weight: 500;">
-						Spanish → Portuguese → French → Hindi → Arabic → Mandarin →
-						Indonesian → Bengali → Urdu → Russian → German → Japanese →
-						Nigerian Pidgin → Marathi → Telugu → Turkish → Tamil →
-						Yue Chinese → Vietnamese
-					</p>
+					<ol class="rounded-2xl overflow-hidden border" style="list-style: none; padding: 0; margin: 0; border-color: var(--color-outline-variant); background: var(--color-surface);">
+						{timeline.map(({ when, what, emphasis }) => (
+							<li class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-2 md:gap-6 px-5 py-4" style={`border-bottom: 1px solid var(--color-outline-variant); ${emphasis ? 'background: var(--color-surface-low);' : ''}`}>
+								<span style="font-family: var(--font-sans); font-size: 13px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.04em;">{when}</span>
+								<span style={`font-family: var(--font-sans); line-height: 1.55; ${emphasis ? 'color: var(--color-ink); font-weight: 600;' : 'color: var(--color-muted);'}`}>{what}</span>
+							</li>
+						))}
+					</ol>
 				</div>
 			</div>
 		</Section>
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 1.85 — THE COUNTRY / LANGUAGE UNLOCK MAP (shared w/ /nations)
+		     SECTION 4.5 — THE COUNTRY / LANGUAGE UNLOCK MAP (shared w/ /nations)
 		     ═══════════════════════════════════════════════════════════ -->
 		<UnlockMap />
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 2 — WHY YOUR SUPPORT MATTERS
+		     SECTION 5 — WHY THIS MATTERS (impact + what makes it different)
 		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="light">
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-start">
-				<div>
-					<p
-						class="text-xs font-semibold tracking-widest uppercase mb-4"
-						style="font-family: var(--font-sans); color: var(--color-gold);"
-					>
+		<Section variant="soft">
+			<div class="max-w-5xl mx-auto">
+				<div class="text-center mb-12" data-reveal>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
 						Why It Matters
 					</p>
-					<h2
-						class="text-3xl md:text-4xl font-light leading-tight mb-6"
-						style="font-family: var(--font-serif); color: var(--color-ink);"
-					>
-						Your support makes the publishing possible.
+					<h2 class="text-3xl md:text-4xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
+						Every gift places the Father&rsquo;s Word in someone&rsquo;s hands.
 					</h2>
-					<p class="leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-						The Father's Heart Bible™ requires real resources to complete, produce, and bring into the
-						world. Partner support is what makes it possible to take this from a vision to a Bible
-						in someone's hands.
-					</p>
 				</div>
-				<div class="space-y-6">
-					{whyMatters.map(({ heading, body }) => (
-						<div class="flex gap-4 items-start">
-							<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
-							<div>
-								<p class="font-semibold mb-1" style="font-family: var(--font-sans); color: var(--color-ink);">{heading}</p>
-								<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{body}</p>
-							</div>
+
+				<!-- Impact in Bibles -->
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto mb-16" data-stagger>
+					{impactStats.map(({ amount, impact }) => (
+						<div class="p-8 text-center" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
+							<p class="text-3xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-brand);">{amount}</p>
+							<div class="w-8 h-0.5 mx-auto mb-4" style="background-color: var(--color-gold);"></div>
+							<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{impact}</p>
 						</div>
 					))}
 				</div>
-			</div>
-		</Section>
 
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 3 — TANGIBLE IMPACT
-		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="soft">
-			<div class="text-center mb-12">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-3"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					Tangible Impact
-				</p>
-				<h2
-					class="text-3xl md:text-4xl font-light"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					Every gift places the Father's Word in someone's hands.
-				</h2>
-			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto" data-stagger>
-				{impactStats.map(({ amount, impact }) => {
-					const num = parseInt(amount.replace('$', ''), 10);
-					return (
-					<div
-						class="p-8 text-center"
-						style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
-					>
-						<p
-							class="text-4xl font-light mb-4"
-							style="font-family: var(--font-serif); color: var(--color-brand);"
-						>
-							<span data-counter={num} data-prefix="$">$0</span>
-						</p>
-						<div class="w-8 h-0.5 mx-auto mb-4" style="background-color: var(--color-gold);"></div>
-						<p
-							class="text-sm leading-relaxed"
-							style="font-family: var(--font-sans); color: var(--color-muted);"
-						>
-							{impact}
-						</p>
-					</div>
-				)})}
-
-			</div>
-		</Section>
-
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 4 — WHAT YOU ARE SUPPORTING
-		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="light">
-			<div class="text-center mb-12">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-3"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					Scope of the Work
-				</p>
-				<h2
-					class="text-3xl md:text-4xl font-light"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					What your partnership supports.
-				</h2>
-			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
-				{scope.map(({ title, body }) => (
-					<div
-						class="p-6"
-						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
-					>
-						<div class="w-6 h-0.5 mb-4" style="background-color: var(--color-gold);"></div>
-						<h3
-							class="font-semibold mb-2"
-							style="font-family: var(--font-sans); color: var(--color-ink);"
-						>
-							{title}
+				<!-- What partnership funds + what makes it different -->
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-start">
+					<div data-reveal>
+						<h3 class="text-2xl font-light leading-tight mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">
+							What your partnership funds
 						</h3>
-						<p
-							class="text-sm leading-relaxed"
-							style="font-family: var(--font-sans); color: var(--color-muted);"
-						>
-							{body}
-						</p>
+						<div class="space-y-6">
+							{whyMatters.map(({ heading, body }) => (
+								<div class="flex gap-4 items-start">
+									<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
+									<div>
+										<p class="font-semibold mb-1" style="font-family: var(--font-sans); color: var(--color-ink);">{heading}</p>
+										<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{body}</p>
+									</div>
+								</div>
+							))}
+						</div>
 					</div>
-				))}
+					<div data-reveal>
+						<h3 class="text-2xl font-light leading-tight mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">
+							This is not one more Bible project
+						</h3>
+						<div class="space-y-4">
+							{whyDifferent.map((statement) => (
+								<div class="flex gap-4 items-start p-5" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
+									<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
+									<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{statement}</p>
+								</div>
+							))}
+						</div>
+					</div>
+				</div>
 			</div>
 		</Section>
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 5 — WHY THIS PROJECT IS DIFFERENT
+		     SECTION 6 — SCRIPTURE CAPSTONE (movement-first giving)
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="scripture">
-			<div class="text-center mb-12">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-3"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					Why This Matters
-				</p>
-				<h2
-					class="text-3xl md:text-4xl font-light"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					This is not one more Bible project.
-				</h2>
-			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
-				{whyDifferent.map((statement) => (
-					<div
-						class="flex gap-4 items-start p-5"
-						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
-					>
-						<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
-						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{statement}</p>
-					</div>
-				))}
-			</div>
-		</Section>
-
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 6 — MOVEMENT-FIRST GIVING
-		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="soft">
 			<div class="max-w-2xl mx-auto">
 				<div class="w-10 h-0.5 mb-10" style="background-color: var(--color-gold);"></div>
 				<ScriptureBlock
@@ -574,11 +361,8 @@ const impactStats = partnerData?.impactStats ?? [
 					translation="Father's Heart Bible™"
 				/>
 				<div class="mt-10 text-center">
-					<p
-						class="text-lg leading-relaxed"
-						style="font-family: var(--font-sans); color: var(--color-muted);"
-					>
-						Partnering with the Father's Heart Bible™ is a response to what the Father is already
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Partnering with the Father&rsquo;s Heart Bible&trade; is a response to what the Father is already
 						doing — not an initiation of it. He is publishing His heart into the nations.
 						Your support helps carry that forward.
 					</p>
@@ -588,72 +372,42 @@ const impactStats = partnerData?.impactStats ?? [
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 7 — DONATE NOW
+		     SECTION 7 — FINAL CTA (scrolls to the form)
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="light">
 			<div class="max-w-xl mx-auto text-center">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-4"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					Give Now
+				<p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">
+					Partner Today
 				</p>
-				<h2
-					class="text-3xl md:text-4xl font-light mb-4"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					Partner in publishing the Father's Heart Bible™.
+				<h2 class="text-3xl md:text-4xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Take the Father&rsquo;s Heart Bible to the nations.
 				</h2>
-				<p class="leading-relaxed mb-10" style="font-family: var(--font-sans); color: var(--color-muted);">
-					Your gift — any amount — is a meaningful act of participation in this work.
-					Every dollar helps translate, produce, and place the Father's Word in someone's hands.
+				<p class="leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Become one of 500 monthly partners. $100 a month sponsors 20 Bibles and earns a free
+					ComfortLeather&trade; edition — and every gift, of any size, matters.
 				</p>
-				<div
-					class="p-8 md:p-12 mb-8"
-					style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
-				>
-					<!-- Donation integration area — Kevin connects payment provider here -->
-					<p
-						class="text-sm mb-6"
-						style="font-family: var(--font-sans); color: var(--color-muted);"
-					>
-						Secure giving — all contributions go directly toward translation, production, and distribution.
-					</p>
-					<p
-						class="text-xs mt-5"
-						style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;"
-					>
-						Questions? Email us at <a href="#" data-e="hello" data-d="fathersheartbible.com" style="color: var(--color-brand);" onclick="event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d">hello@fathersheartbible.com</a>.
-					</p>
-				</div>
+				<a href="#donate" class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border-radius: 8px;" onmouseover="this.style.opacity='0.92'" onmouseout="this.style.opacity='1'">Become a Monthly Partner →</a>
+				<p class="text-xs mt-6" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.7;">
+					Questions? Email us at <a href="#" data-e="hello" data-d="fathersheartbible.com" style="color: var(--color-brand);" onclick="event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d">hello@fathersheartbible.com</a>.
+				</p>
 			</div>
 		</Section>
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 8 — SECONDARY PATHS
+		     SECTION 8 — JOIN THE FH FAMILY + images
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="soft">
 			<div class="max-w-xl mx-auto">
-				<!-- Join -->
-				<div
-					class="p-8 text-center"
-					style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);"
-				>
-					<p
-						class="text-xs font-semibold tracking-widest uppercase mb-3"
-						style="font-family: var(--font-sans); color: var(--color-gold);"
-					>
+				<div class="p-8 text-center" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
+					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
 						Community
 					</p>
-					<h3
-						class="text-2xl font-light mb-4"
-						style="font-family: var(--font-serif); color: var(--color-ink);"
-					>
+					<h3 class="text-2xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">
 						Join the FH Family
 					</h3>
 					<p class="text-sm leading-relaxed mb-6" style="font-family: var(--font-sans); color: var(--color-muted);">
-						Belonging comes before giving. Join the Father's Heart community and grow in identity
+						Belonging comes before giving. Join the Father&rsquo;s Heart community and grow in identity
 						before taking any other step.
 					</p>
 					<a
