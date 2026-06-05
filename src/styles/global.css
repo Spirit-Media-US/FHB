@@ -181,6 +181,10 @@ body {
 	color: var(--color-ink);
 	background-color: var(--color-canvas);
 	line-height: 1.75;
+	/* Kill any minor horizontal overflow (a few content sections sit a few px
+	   off-axis on mobile) — `clip` prevents a phantom sideways scroll without
+	   creating a scroll container (so position:sticky chrome still works). */
+	overflow-x: clip;
 }
 
 @media (min-width: 768px) {
