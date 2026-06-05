@@ -1,7 +1,7 @@
 # Option A SEO/AEO/GEO Migration — Phase 0 Plan & Sign-off
 
-**Status:** PLAN COMPLETE — all resolvable open questions closed with safe, reversible defaults. **ZERO production changes made.** Stops at the production gate.
-**Author:** Jona (Claude Code session) · **Updated:** 2026-06-05 · **Branch:** `dev` (FHB repo)
+**Status:** PLAN COMPLETE + **CODE PRE-STAGED ON `dev`** — the §2.7 community changes and the `fhb-apex-router` Worker are committed to `dev` (community repo + `/home/deploy/bin/workers/fhb-apex-router/`). The go-live window is now **merge + route-bind + config push only — no coding.** **ZERO production changes made.** Stops at the production gate.
+**Author:** Jona (Claude Code session) · **Updated:** 2026-06-05 · **Branch:** `dev` (both repos)
 
 **Goal of Option A:** unify the FHB *marketing* site (apex `fathersheartbible.com`) and the FHB *community* app (`join.fathersheartbible.com`) so Google sees **one site** — community content served under apex subfolders (`fathersheartbible.com/feed`, `/map`, `/listen`, …) via a Cloudflare Worker in front of the apex. `join.` is kept: it becomes a 301 redirector for browsers **and** the technical origin the apex Worker proxies to. Routing + config, not a rewrite.
 
@@ -13,6 +13,10 @@ Everything below this box is resolved with safe, reversible defaults. The only t
 
 1. **Approve the single go-live window** and the `dev → main` merges it requires (his merge authority). Within the window, in order (§6): (a) merge + deploy the community redeploy; (b) `supabase config push` adding the apex redirect URL; (c) deploy + **bind the apex Worker route** `fathersheartbible.com/*` → `fhb-apex-router` (the go-live flip, replacing the citation-logger route); (d) register the apex Stripe webhook URL. **Recommended default: proceed as sequenced.**
 2. **(Non-blocking) Q1 override option:** v1 ships with marketing keeping `/read` and the community audio reader at **`/listen`**. If you'd rather the community reader *take over* `/read` later (one richer reader), that's a content/SEO call — say the word and we run the parity audit. **Default: ship `/listen` now; revisit later.** *(Also covers a one-word rename if you dislike `/listen`.)*
+
+### STAGED — NEEDS KEVIN (surfaced during staging, one-word answers)
+
+- **S1 — Community nav "Read FHB" destination.** `communities/fhb.json:88` has nav link `{ "label": "Read FHB", "href": "/read" }`. Post-unification both targets are valid: **`/read`** = marketing's text Bible (SEO-canonical, 823 indexed pages) or **`/listen`** = the community audio reader (the member lure). This is a product/nav call, not mechanical, so I **left it at `/read`** (did not guess). **Recommended default: point "Read FHB" → `/read`** (the indexable text Bible is the natural "Read" destination; the audio reader is reached from inside the app + its own CTAs, which already point to `/listen`). One word: `/read` or `/listen`.
 
 That's it. No other open question needs you.
 
@@ -268,7 +272,7 @@ Per Kevin's "routing + config, not a rewrite" framing (Q4), these are all config
 
 1. **Reader prefix move** — `git mv src/pages/read → src/pages/listen` (3 files: `index.astro`, `[book]/index.astro`, `[book]/[chapter].astro`) and find-replace `/read`→`/listen` across the ~20 references found in the audit: `middleware.ts` allowlist, `api/auth/callback.ts` default landing, `login.astro`, `shareables.astro`, `contributors.astro`, `spaces/[slug].astro` (×2), `components/ChapterAudioPlayer.astro` (`loginNext`), `index.astro` redirect target, and the self-links inside the moved files. (Leave `bible`/`sync-bible`/`unread`/`read-only` strings alone.)
 2. **Asset namespace** — `astro.config.mjs`: `build.assets:'_community'` (§2.4).
-3. **Canonical flip** — build with `PUBLIC_SITE_URL=https://fathersheartbible.com`.
+3. **Canonical flip** — `PUBLIC_SITE_URL=https://fathersheartbible.com`. **This is a DEPLOY-TIME env var, deliberately NOT committed** (hardcoding it would flip the dev-preview canonical to apex). Set it at the go-live build only, via the `community` CF Pages project → Settings → Environment variables (Production) **or** export it in the go-live build command. Until then `Astro.site` stays `join.` (committed default), so the dev preview is unaffected.
 4. **Cookie domain** — `src/lib/supabase-server.ts` `setAll()`: add `domain: '.fathersheartbible.com'` (PROD only) so sessions are shared apex↔join↔www (Q8).
 5. **`join.` 301 + reader special-case** — top of `src/middleware.ts onRequest`, before static bail + tenant resolution:
 ```ts
@@ -283,7 +287,7 @@ if (host === 'join.fathersheartbible.com' && !fromApexProxy && reqUrl.pathname !
   return Response.redirect(`https://fathersheartbible.com${path}${reqUrl.search}`, 301);
 }
 ```
-> These ship together in one community redeploy → `dev → main` merge = Kevin (gate). Validate the unverifiable bits in Phase-1 preview (§3, §Appendix).
+> **Pre-staged on `dev` (2026-06-05):** changes 1, 2, 4, and 5 are committed to the community `dev` branch (reader moved to `src/pages/listen/`, `build.assets:'_community'`, host-gated cookie domain in `supabase-server.ts`, middleware 301 block; plus `APEX_PROXY_SECRET` added to `runtime-env.ts` and the sitemap pruned to public-only). Change 3 (`PUBLIC_SITE_URL`) is intentionally deploy-time-only. Local `npm run build` passes; `dist/_community/` assets confirmed; sitemap is public-only with `/listen`. The middleware 301 + cookie domain are **host-gated → inert on localhost/preview**, so the dev preview behaves exactly as before. The go-live window is now **merge + route-bind + config push, no coding.** Validate the unverifiable bits in Phase-1 preview (§3, §Appendix).
 
 ---
 
@@ -375,9 +379,9 @@ Community Pages project + `join.` DNS are never deleted → pre-migration world 
 | # | Step | Who | Verify |
 |---|---|---|---|
 | 0 | Confirm preview sign-off; freeze other deploys to both repos | Jona | §3 all green |
-| a | Community redeploy: the 5 changes in §2.7 (reader→`/listen`, `_community` assets, `PUBLIC_SITE_URL`, cookie domain, middleware 301). **`dev→main` = Kevin.** | Dev→**Kevin** | `join./feed`→301 apex; `join./read/x`→301 `apex/listen/x`; `/api/auth/send-email` not redirected; apex-proxy (secret) serves |
+| a | Community redeploy — **already pre-staged on `dev`** (§2.7 changes 1,2,4,5 committed; verify the diff). Set `PUBLIC_SITE_URL=https://fathersheartbible.com` (change 3, deploy-time) on the `community` CF Pages prod env. Answer **S1** (nav "Read FHB" → `/read` or `/listen`) and apply if `/listen`. **`dev→main` = Kevin.** | Dev→**Kevin** | `join./feed`→301 apex; `join./read/x`→301 `apex/listen/x`; `/api/auth/send-email` not redirected; apex-proxy (secret) serves |
 | b | Supabase `config push` +apex redirect URL (full toml preserved) | Dev (admin creds) | diff = +1 URL; magic-link still sends |
-| c | Deploy `fhb-apex-router` (secret on Worker **and** community env; KV bound) **without** binding the route | Dev | preview alias serves; `wrangler tail` clean |
+| c | Deploy `fhb-apex-router` — **source pre-staged** at `/home/deploy/bin/workers/fhb-apex-router/` (route block commented out in `wrangler.toml`). `wrangler secret put APEX_PROXY_SECRET` on the Worker **and** set the same value on the community CF Pages env; KV already bound. `wrangler deploy` **without** binding the route. | Dev | preview alias serves; `wrangler tail` clean |
 | d | **Bind route `fathersheartbible.com/*` → `fhb-apex-router`** (replaces citation-logger on this zone; keep its `spiritmediapublishing.com/*`). **= Kevin (go-live flip).** | **Kevin** | `apex/`→200 marketing; `apex/feed`→303; `apex/map`,`apex/listen/john/3`→200; `/_astro`+`/_community` 200 |
 | e | Prod authed smoke: magic-link + cookie-on-apex + reader audio + one POST (CSRF) + signout | Dev | login persists on reload; POST not 403'd |
 | f | Stripe: register `apex/api/giving/webhook`; send test event | Dev | 200 + HMAC ok |
