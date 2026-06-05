@@ -293,25 +293,28 @@ if (host === 'join.fathersheartbible.com' && !fromApexProxy && reqUrl.pathname !
 
 ### 2.8 Canonical dedup safeguard — `/listen` → `/read` (CONFIRMED, committed on `dev`)
 
-`/listen` serves the **same scripture text** as the 823 indexed `/read` pages, so it must never be indexed as duplicate content. **Done (community `dev`, commit `7fd32a8`):**
+`/listen` serves the **same scripture text** as the 823 indexed `/read` pages, so it must never be indexed as duplicate content. **Done (community `dev`, commits `7fd32a8` + `7bc803d`):**
 - `src/layouts/Layout.astro` rewrites `canonical` **and** `og:url` for any `/listen` or `/listen/*` path to the `/read` equivalent, built from `Astro.site` (so it follows `PUBLIC_SITE_URL` — `join./read/*` on preview, `apex/read/*` at go-live). **Canonical only — no `noindex`** (the two directives conflict).
+- **Trailing slash (commit `7bc803d`):** preview validation found the marketing site serves + self-canonicalizes `/read/*` **with a trailing slash** (`/read/john/3/`) and 308-redirects the non-slash form; the sitemap lists the trailing-slash form. The canonical now emits the trailing-slash `/read` URL so it points at the **exact indexed 200 page, not a 308 redirect.**
 - `/listen` dropped from the community sitemap (added to the `astro.config.mjs` filter exclusions) so the non-canonical URLs aren't listed.
 
 **Verified on the dev preview (`dev.community-cm1.pages.dev`):**
 
-| URL | HTTP | rendered `<link rel="canonical">` (= `og:url`) |
-|---|---|---|
-| `/listen` | 200 | `https://join.fathersheartbible.com/read` |
-| `/listen/john` | 302 → `/listen/john/1`; resolved page canonical | `https://join.fathersheartbible.com/read/john/1` |
-| `/listen/john/3` | 200 | `https://join.fathersheartbible.com/read/john/3` |
+| URL | HTTP | rendered `<link rel="canonical">` (= `og:url`) | marketing target |
+|---|---|---|---|
+| `/listen` | 200 | `https://join.fathersheartbible.com/read/` | `/read/` → 200 |
+| `/listen/john` | 302 → `/listen/john/1`; resolved page | `https://join.fathersheartbible.com/read/john/1/` | `/read/john/1/` → 200 |
+| `/listen/john/3` | 200 | `https://join.fathersheartbible.com/read/john/3/` | `/read/john/3/` → 200 |
 
-Sitemap confirmed `/listen`-free. At go-live (`PUBLIC_SITE_URL=https://fathersheartbible.com`) these resolve to `https://fathersheartbible.com/read/...`. **The §6 "confirm canonical in place" gate is satisfied** — re-verify once more on the apex after the route bind.
+Marketing targets confirmed real 200s (trailing slash). Sitemap confirmed `/listen`-free. At go-live (`PUBLIC_SITE_URL=https://fathersheartbible.com`) these resolve to `https://fathersheartbible.com/read/...`. **The §6 "confirm canonical in place" gate is satisfied** — re-verify once more on the apex after the route bind.
 
 ---
 
 ## 3. Preview / Staging Validation Plan (Phase 1 — first step of the sign-off window)
 
 Validate on a **non-production** surface before binding the apex route. Surface (Q7 default): a preview Worker whose `MARKETING_ORIGIN`/`COMMUNITY_ORIGIN` point at the two projects' preview deployments, exercised via `wrangler dev --remote` and/or a temporary `stage.` preview route created *inside* the window (the only DNS touch, gated).
+
+> **SAFE SUBSET RUN 2026-06-05** (local `wrangler dev` → community origin = `dev.community-cm1.pages.dev`, marketing = `fathersheartbible.pages.dev`; nothing deployed/bound). **PASS:** A marketing passthrough (`/`,`/blog/`,`/read/john/3/`→200); B community passthrough (`/map`,`/listen`,`/listen/john/3`→200; gated `/profile`,`/settings`→303 `/login`; `/feed`→200 = correct guest-teaser); C asset namespace (community `/_community/*` 200, marketing `/_astro/*` 200, **Playwright: 0 failed requests, 0 console errors**); D Origin-rewrite (worker log: `/api/comments` POST `origin-out= https://join.fathersheartbible.com`); E citation logger (`PerplexityBot` → `citation-bot {…}` logged). **PARTIAL (proxy path proven; full assertion prod-coupled):** F Stripe — `/api/giving/intent`→303 gated (client_secret needs a session); `/api/giving/webhook` reachable + handler runs (returns its own `501 secret-not-set` — the **dev preview env has no `STRIPE_FHB_WEBHOOK_SECRET`**, so HMAC-verify can't be tested off-prod). Tenant resolved to `fhb` on every proxied hit. **DEFERRED to runbook a/e (host-gated to prod):** the magic-link auth round trip, cookie-on-apex, and the `join.`→apex 301. Also a fix landed from this run: canonical now uses marketing's **trailing-slash** form (`/read/john/3/`) — see §2.8.
 
 **All must pass:**
 1. **Marketing passthrough:** `/`, `/blog/`, `/download/`, `/read/john/3/` → 200 + `/_astro/*` 200.
