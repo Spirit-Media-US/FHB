@@ -14,11 +14,13 @@ Everything below this box is resolved with safe, reversible defaults. The only t
 1. **Approve the single go-live window** and the `dev → main` merges it requires (his merge authority). Within the window, in order (§6): (a) merge + deploy the community redeploy; (b) `supabase config push` adding the apex redirect URL; (c) deploy + **bind the apex Worker route** `fathersheartbible.com/*` → `fhb-apex-router` (the go-live flip, replacing the citation-logger route); (d) register the apex Stripe webhook URL. **Recommended default: proceed as sequenced.**
 2. **(Non-blocking) Q1 override option:** v1 ships with marketing keeping `/read` and the community audio reader at **`/listen`**. If you'd rather the community reader *take over* `/read` later (one richer reader), that's a content/SEO call — say the word and we run the parity audit. **Default: ship `/listen` now; revisit later.** *(Also covers a one-word rename if you dislike `/listen`.)*
 
-### STAGED — NEEDS KEVIN (surfaced during staging, one-word answers)
+### RESOLVED (Kevin, 2026-06-05)
 
-- **S1 — Community nav "Read FHB" destination.** `communities/fhb.json:88` has nav link `{ "label": "Read FHB", "href": "/read" }`. Post-unification both targets are valid: **`/read`** = marketing's text Bible (SEO-canonical, 823 indexed pages) or **`/listen`** = the community audio reader (the member lure). This is a product/nav call, not mechanical, so I **left it at `/read`** (did not guess). **Recommended default: point "Read FHB" → `/read`** (the indexable text Bible is the natural "Read" destination; the audio reader is reached from inside the app + its own CTAs, which already point to `/listen`). One word: `/read` or `/listen`.
+- **S1 — Community nav "Read FHB" → `/read`.** ✅ Kevin chose `/read` (the indexable text Bible). Confirmed `communities/fhb.json:88` already reads `"href": "/read"` — no change needed.
+- **Window approved — proceed as sequenced (§6).**
+- **Canonical safeguard added (Kevin's pre-go-live condition).** ✅ See "CONFIRMED" below.
 
-That's it. No other open question needs you.
+That's it. No open question remains — go-live is merge + route-bind + `PUBLIC_SITE_URL` + Phase-1 preview (§3).
 
 ---
 
@@ -289,6 +291,22 @@ if (host === 'join.fathersheartbible.com' && !fromApexProxy && reqUrl.pathname !
 ```
 > **Pre-staged on `dev` (2026-06-05):** changes 1, 2, 4, and 5 are committed to the community `dev` branch (reader moved to `src/pages/listen/`, `build.assets:'_community'`, host-gated cookie domain in `supabase-server.ts`, middleware 301 block; plus `APEX_PROXY_SECRET` added to `runtime-env.ts` and the sitemap pruned to public-only). Change 3 (`PUBLIC_SITE_URL`) is intentionally deploy-time-only. Local `npm run build` passes; `dist/_community/` assets confirmed; sitemap is public-only with `/listen`. The middleware 301 + cookie domain are **host-gated → inert on localhost/preview**, so the dev preview behaves exactly as before. The go-live window is now **merge + route-bind + config push, no coding.** Validate the unverifiable bits in Phase-1 preview (§3, §Appendix).
 
+### 2.8 Canonical dedup safeguard — `/listen` → `/read` (CONFIRMED, committed on `dev`)
+
+`/listen` serves the **same scripture text** as the 823 indexed `/read` pages, so it must never be indexed as duplicate content. **Done (community `dev`, commit `7fd32a8`):**
+- `src/layouts/Layout.astro` rewrites `canonical` **and** `og:url` for any `/listen` or `/listen/*` path to the `/read` equivalent, built from `Astro.site` (so it follows `PUBLIC_SITE_URL` — `join./read/*` on preview, `apex/read/*` at go-live). **Canonical only — no `noindex`** (the two directives conflict).
+- `/listen` dropped from the community sitemap (added to the `astro.config.mjs` filter exclusions) so the non-canonical URLs aren't listed.
+
+**Verified on the dev preview (`dev.community-cm1.pages.dev`):**
+
+| URL | HTTP | rendered `<link rel="canonical">` (= `og:url`) |
+|---|---|---|
+| `/listen` | 200 | `https://join.fathersheartbible.com/read` |
+| `/listen/john` | 302 → `/listen/john/1`; resolved page canonical | `https://join.fathersheartbible.com/read/john/1` |
+| `/listen/john/3` | 200 | `https://join.fathersheartbible.com/read/john/3` |
+
+Sitemap confirmed `/listen`-free. At go-live (`PUBLIC_SITE_URL=https://fathersheartbible.com`) these resolve to `https://fathersheartbible.com/read/...`. **The §6 "confirm canonical in place" gate is satisfied** — re-verify once more on the apex after the route bind.
+
 ---
 
 ## 3. Preview / Staging Validation Plan (Phase 1 — first step of the sign-off window)
@@ -383,7 +401,7 @@ Community Pages project + `join.` DNS are never deleted → pre-migration world 
 | b | Supabase `config push` +apex redirect URL (full toml preserved) | Dev (admin creds) | diff = +1 URL; magic-link still sends |
 | c | Deploy `fhb-apex-router` — **source pre-staged** at `/home/deploy/bin/workers/fhb-apex-router/` (route block commented out in `wrangler.toml`). `wrangler secret put APEX_PROXY_SECRET` on the Worker **and** set the same value on the community CF Pages env; KV already bound. `wrangler deploy` **without** binding the route. | Dev | preview alias serves; `wrangler tail` clean |
 | d | **Bind route `fathersheartbible.com/*` → `fhb-apex-router`** (replaces citation-logger on this zone; keep its `spiritmediapublishing.com/*`). **= Kevin (go-live flip).** | **Kevin** | `apex/`→200 marketing; `apex/feed`→303; `apex/map`,`apex/listen/john/3`→200; `/_astro`+`/_community` 200 |
-| e | Prod authed smoke: magic-link + cookie-on-apex + reader audio + one POST (CSRF) + signout | Dev | login persists on reload; POST not 403'd |
+| e | Prod authed smoke: magic-link + cookie-on-apex + reader audio + one POST (CSRF) + signout; **re-confirm `/listen` canonical = `https://fathersheartbible.com/read/...`** (§2.8, now on apex base) | Dev | login persists on reload; POST not 403'd; canonical/og:url on `/listen*` point to apex `/read*` |
 | f | Stripe: register `apex/api/giving/webhook`; send test event | Dev | 200 + HMAC ok |
 | g | SEO: unify robots/sitemap (`/listen`, prune gated); resubmit GSC+Bing; IndexNow ping | Dev | sitemap 200; GSC accepts |
 | h | Marketing internal links `join.…`→apex-relative (grep count before/after) | Dev | expected residual only |
