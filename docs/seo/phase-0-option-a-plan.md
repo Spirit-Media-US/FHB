@@ -1,6 +1,6 @@
 # Option A SEO/AEO/GEO Migration — Phase 0 Plan & Sign-off
 
-**Status:** PLAN COMPLETE + **CODE PRE-STAGED ON `dev`** — the §2.7 community changes and the `fhb-apex-router` Worker are committed to `dev` (community repo + `/home/deploy/bin/workers/fhb-apex-router/`). The go-live window is now **merge + route-bind + config push only — no coding.** **ZERO production changes made.** Stops at the production gate.
+**Status:** 🟢 **CUTOVER LIVE (2026-06-05) — step-e auth smoke PASSED.** Apex Worker bound; community content serving under apex; auth/cookie verified on apex. **One URGENT follow-up:** the Stripe webhook must be repointed to apex (step f) — it 301s on `join.` and is silently failing there. Full Cutover Log below. (Pre-cutover plan retained beneath.)
 **Author:** Jona (Claude Code session) · **Updated:** 2026-06-05 · **Branch:** `dev` (both repos)
 
 **Goal of Option A:** unify the FHB *marketing* site (apex `fathersheartbible.com`) and the FHB *community* app (`join.fathersheartbible.com`) so Google sees **one site** — community content served under apex subfolders (`fathersheartbible.com/feed`, `/map`, `/listen`, …) via a Cloudflare Worker in front of the apex. `join.` is kept: it becomes a 301 redirector for browsers **and** the technical origin the apex Worker proxies to. Routing + config, not a rewrite.
@@ -13,6 +13,38 @@ Everything below this box is resolved with safe, reversible defaults. The only t
 
 1. **Approve the single go-live window** and the `dev → main` merges it requires (his merge authority). Within the window, in order (§6): (a) merge + deploy the community redeploy; (b) `supabase config push` adding the apex redirect URL; (c) deploy + **bind the apex Worker route** `fathersheartbible.com/*` → `fhb-apex-router` (the go-live flip, replacing the citation-logger route); (d) register the apex Stripe webhook URL. **Recommended default: proceed as sequenced.**
 2. **(Non-blocking) Q1 override option:** v1 ships with marketing keeping `/read` and the community audio reader at **`/listen`**. If you'd rather the community reader *take over* `/read` later (one richer reader), that's a content/SEO call — say the word and we run the parity audit. **Default: ship `/listen` now; revisit later.** *(Also covers a one-word rename if you dislike `/listen`.)*
+
+---
+
+## 🟢 CUTOVER LOG — 2026-06-05
+
+**Cutover sequence executed (window):**
+- **a — community `dev→main` merge + prod deploy** (Kevin): `origin/main` = `6ec7d2b`; reader at `/listen`, `join.`→apex 301s live. First prod build rendered `join.` canonical (local Bethel build via `deploy-live.sh` doesn't read CF Pages env); fixed by patching `deploy-live.sh` Step 3 to `export PUBLIC_SITE_URL=https://fathersheartbible.com` (community-scoped) + redeploy.
+- **b — Supabase config push** (us): `+https://fathersheartbible.com` to `additional_redirect_urls` (also restored a remote-only `dev.community-cm1.pages.dev/**` the first push clobbered; corrected `config.toml` committed `ae6b2d6`). `site_url`/`send_email.uri` stay `join.`
+- **c — Worker deploy** (us): `fhb-apex-router` deployed; `APEX_PROXY_SECRET` set identically on the Worker and the community prod env. **Key finding:** CF Pages env-var changes need a **redeploy** to reach the live app — the community redeploy in (a)'s fix is what surfaced the secret to the running Functions; without it the bind would have redirect-looped.
+- **d — route bind mechanics** (Kevin): `fathersheartbible.com/*` → **`fhb-apex-router`** bound, **replacing** the `smp-citation-bot-logger` route on this zone; `smp-citation-bot-logger`'s `spiritmediapublishing.com/*` route **kept** (verified both). Citation logging is folded into `fhb-apex-router`.
+
+**Step-e production smoke (2026-06-05 ~22:35 UTC) — PASS except the flagged Stripe item:**
+
+| # | Check | Result |
+|---|---|---|
+| 1 | Canonical (A.3) | ✅ `apex/listen/john/3` → `https://fathersheartbible.com/read/john/3/`; `apex/listen` → `/read/` (apex + trailing slash, = og:url) |
+| 2 | Magic-link round trip + **cookie-on-apex** | ✅ send → `303 /feed?sent=1`; callback → `303 /feed`; `sb-…-auth-token` set on **`.fathersheartbible.com`, HttpOnly, Secure**; authed reload `/profile`→200 & `/feed`→member-redirect `/spaces/readers`; no-cookie `/profile`→`303 /login` |
+| 3 | CSRF / Origin-rewrite | ✅ legit apex-Origin POST passes `checkOrigin`+auth (handler runs, e.g. RSVP→`303 /events?error=missing-fields`). **⚠ Security note:** the Worker blanket-rewrites *every* `Origin`→join., so `checkOrigin` is bypassed for foreign origins too (an `evil.example.com` POST also passed). Mitigated by the auth cookie's `SameSite=Lax` (cross-site POSTs don't carry it) → no active CSRF, but defense-in-depth weakened. **Follow-up:** tighten the Worker to rewrite only `https://fathersheartbible.com`→join., pass others through. |
+| 4 | Signout | ✅ `/api/auth/signout`→`303 /login?signed-out=1`; cookie cleared; post-signout `/profile`→`303 /login` |
+| 5 | **Stripe webhook** | 🚨 **BROKEN on `join.` — URGENT (step f).** `join./api/giving/webhook` **301s** to apex (GET + JSON POST); Stripe doesn't follow webhook 301s → if Stripe is still pointed at `join.`, **donation webhooks are silently failing now.** `apex/api/giving/webhook` **works** (reaches handler: `401 signature verification failed`). The middleware exempts only `/api/auth/send-email`, not the giving webhook. **Fix: repoint the Stripe Dashboard webhook endpoint to `https://fathersheartbible.com/api/giving/webhook`.** User-facing: gift records/receipts not processed until repointed. |
+| 6 | Citation logger on apex | ✅ `PerplexityBot` → 200 (folded-in logger fires) |
+| 7 | Playwright (apex `/listen/john/3` + `/feed`) | ✅ **0 failed requests, 0 console errors**; `/_community/*` assets 200; fonts/beacon 200 |
+
+**`/og/default.png`** — accepted as-is for cutover (no change required).
+
+**What remains:**
+- **f (URGENT):** repoint Stripe webhook → `https://fathersheartbible.com/api/giving/webhook` (and re-verify a real test event HMAC-passes once the prod secret matches).
+- **g:** unify robots/sitemap at apex (fold community public URLs in, drop `/listen` per §2.8 + gated pages); resubmit GSC + Bing; IndexNow ping; monitor GSC Coverage/Performance ×2–3 weeks for the `join.`→apex migration.
+- **h:** marketing internal links `join.…` → apex-relative (grep `/srv/sites/FHB/src`).
+- **Security follow-up:** tighten the Worker `Origin`-rewrite (item 3 note) to only rewrite the apex origin.
+- **Secret rotation:** `APEX_PROXY_SECRET` value was echoed into a session log (internal, low-value) — rotate at convenience: `wrangler secret put` on the Worker + update the community prod env to the same new value, then redeploy community so it's surfaced.
+- **`deploy-live.sh`:** the community `PUBLIC_SITE_URL` export edit is local on Bethel — ensure it's committed/persisted in the `bin` repo.
 
 ### RESOLVED (Kevin, 2026-06-05)
 
