@@ -7,7 +7,7 @@
 // Mechanism B (shared source + sync), decided 2026-06-04. Runs first in the
 // build chain, exactly like sync-translations.mjs. Both repo paths exist on
 // Bethel where builds run.
-import { existsSync, mkdirSync, copyFileSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, mkdirSync, copyFileSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 const CANONICAL =
@@ -69,3 +69,25 @@ if (drift.length) {
 	);
 }
 console.log(`[sync-chrome] token drift-guard OK (${checked} shared color tokens match the canonical brand).`);
+
+// 3) Emit the canonical global nav (fhb.json brand.navLinks) for the FHB site.
+//    The app renders these links relative (it lives on join.fathersheartbible.com);
+//    on the marketing domain those app paths don't exist, so resolve any relative
+//    (app) href to absolute join.fathersheartbible.com. Marketing links are already
+//    absolute. Result: ONE canonical nav (fhb.json) → identical global menu on both
+//    site and app, no drift. Recurses into dropdown children (e.g. "Family").
+const APP_ORIGIN = "https://join.fathersheartbible.com";
+const resolveHref = (href) =>
+	typeof href === "string" && href.startsWith("/") ? APP_ORIGIN + href : href;
+const resolveNav = (items) =>
+	(items ?? []).map((it) => ({
+		...it,
+		href: resolveHref(it.href),
+		...(it.children ? { children: resolveNav(it.children) } : {}),
+	}));
+const navResolved = resolveNav(brand?.brand?.navLinks ?? []);
+writeFileSync(
+	path.join(DEST, "nav.generated.json"),
+	`${JSON.stringify(navResolved, null, 2)}\n`,
+);
+console.log(`[sync-chrome] wrote ${navResolved.length} canonical global-nav item(s) → src/chrome/nav.generated.json`);
