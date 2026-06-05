@@ -1,6 +1,10 @@
 ---
 import Footer from '../chrome/Footer.astro';
 import Header from '../chrome/Header.astro';
+// Canonical global nav — generated from communities/fhb.json by sync-chrome.mjs
+// (app-relative hrefs resolved to absolute join.fathersheartbible.com). Single
+// source of truth shared with the app so the global menu never drifts.
+import globalNav from '../chrome/nav.generated.json';
 import MailtoLink from '../components/MailtoLink.astro';
 import { sanityClient } from '../lib/sanity';
 import '../styles/global.css';
@@ -63,18 +67,9 @@ const footerQuote =
 	siteSettings?.footerQuote || 'I will be their Father, and they will be my sons and daughters.';
 const currentYear = new Date().getFullYear();
 
-// Unified global nav — identical labels/order to the community app's tenant nav.
-// App items use absolute join.fathersheartbible.com URLs so the same bar works
-// from both domains.
-const fhbNavLinks = [
-	{ label: 'Home', href: '/' },
-	{ label: 'About', href: '/the-fathers-heart-bible/' },
-	{ label: 'Read FHB', href: 'https://join.fathersheartbible.com/read' },
-	{ label: 'Partner', href: '/partner/' },
-	{ label: 'Groups', href: 'https://join.fathersheartbible.com/groups' },
-	{ label: 'Events', href: 'https://join.fathersheartbible.com/events' },
-	{ label: 'Resources', href: 'https://join.fathersheartbible.com/library' },
-];
+// Global nav now comes from the canonical `globalNav` (generated from fhb.json) —
+// see the import above. The previously-hardcoded list drifted from the app's
+// fuller menu (missing the Family dropdown, Intercessors, Founders).
 const fhbFooterNav = [
 	{ label: 'Home', href: '/' },
 	{ label: 'About FHB', href: '/the-fathers-heart-bible/' },
@@ -313,7 +308,7 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 	<body class="min-h-screen flex flex-col" data-dark-hero={darkHero ? 'true' : 'false'}>
 		<Header
 			brandName={brandName}
-			navLinks={fhbNavLinks}
+			navLinks={globalNav}
 			currentPath={Astro.url.pathname}
 			logoUrl={headerLogoUrl}
 			ctaLabel="Read FHB →"
