@@ -71,12 +71,12 @@ if (drift.length) {
 console.log(`[sync-chrome] token drift-guard OK (${checked} shared color tokens match the canonical brand).`);
 
 // 3) Emit the canonical global nav (fhb.json brand.navLinks) for the FHB site.
-//    The app renders these links relative (it lives on join.fathersheartbible.com);
-//    on the marketing domain those app paths don't exist, so resolve any relative
-//    (app) href to absolute join.fathersheartbible.com. Marketing links are already
-//    absolute. Result: ONE canonical nav (fhb.json) → identical global menu on both
-//    site and app, no drift. Recurses into dropdown children (e.g. "Family").
-const APP_ORIGIN = "https://join.fathersheartbible.com";
+//    Option A: the community app's paths are now served UNDER the apex (via the
+//    fhb-apex-router Worker), so resolve app-relative hrefs to the apex origin —
+//    no more cross-domain jump to join. (which 301s back to apex anyway).
+//    Marketing links are already absolute. Result: ONE canonical nav (fhb.json) →
+//    identical global menu on both surfaces, no drift. Recurses into children.
+const APP_ORIGIN = "https://fathersheartbible.com";
 const resolveHref = (href) =>
 	typeof href === "string" && href.startsWith("/") ? APP_ORIGIN + href : href;
 const resolveNav = (items) =>

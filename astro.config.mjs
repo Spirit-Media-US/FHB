@@ -9,6 +9,21 @@ export default defineConfig({
 	build: { inlineStylesheets: 'auto' },
 	integrations: [
 		sitemap({
+			// Option A: fold the community app's PUBLIC pages (served under the apex
+			// via the fhb-apex-router Worker) into the unified apex sitemap. These
+			// aren't built by this repo, so they're added as customPages. EXCLUDED:
+			// /listen (canonicalizes to /read — §2.8) and all gated/teaser routes
+			// (/feed, /directory, /dms, /profile, /settings, /moderation, /spaces/*).
+			customPages: [
+				'https://fathersheartbible.com/about/',
+				'https://fathersheartbible.com/contributors/',
+				'https://fathersheartbible.com/events/',
+				'https://fathersheartbible.com/groups/',
+				'https://fathersheartbible.com/library/',
+				'https://fathersheartbible.com/map/',
+				'https://fathersheartbible.com/shareables/',
+				'https://fathersheartbible.com/login/',
+			],
 			filter: (page) => !page.includes('/privacy') && !page.includes('/terms'),
 			serialize(item) {
 				const now = new Date().toISOString();
