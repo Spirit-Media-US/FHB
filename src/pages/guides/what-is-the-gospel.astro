@@ -1,0 +1,235 @@
+---
+// Phase-5 Gold-Level guide — /guides/what-is-the-gospel
+// Target: "what is the gospel" (KD 21, ~11k) + "what is the gospel of Jesus
+// Christ", "gospel meaning". Locked FHB conventions (memory
+// feedback-fhb-content-seo-conventions). This page is the natural home of the
+// Father's-Heart one-story arc. Featured: John 3 (3:16), verseLimit 21.
+import AuthorBio from '../../components/AuthorBio.astro';
+import FeatureChapter from '../../components/FeatureChapter.astro';
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/guides/what-is-the-gospel';
+const TITLE = "What Is the Gospel? — A Clear, Simple Answer | Father's Heart Bible";
+const DESCRIPTION =
+	'What is the gospel? The good news that God is a Father who, through His Son Jesus, brings His lost children home. A clear, Scripture-based answer for beginners.';
+const PUBLISHED = '2026-06-06';
+const MODIFIED = '2026-06-06';
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/e1bf90d1eaeab499989a239a2f5bfd98494e3f78-5867x3911.jpg';
+const HERO_ALT = 'A multi-generation family together at home';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: "Lead Translator, Father's Heart Bible | CEO, Spirit Media Publishing",
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+const FAQS = [
+	{
+		question: 'What is the gospel in simple terms?',
+		answer:
+			'The gospel is the good news that God is a loving Father who made you, came after you when you were lost, and through His Son Jesus’ death and resurrection brings you home as His own child. The word "gospel" literally means good news. In short: you were created by a Father, you wandered, and He has done everything needed to welcome you back.',
+	},
+	{
+		question: 'What is the gospel of Jesus Christ?',
+		answer:
+			"It is the announcement that Jesus — God's Son — lived, died on the cross for our sins, and rose from the dead, opening the way back to the Father for everyone who trusts Him. Paul sums it up: Christ died for our sins, was buried, and was raised on the third day. Jesus called it the way to the Father, not merely the way to heaven.",
+	},
+	{
+		question: 'Is the gospel just about going to heaven?',
+		answer:
+			'No. Heaven is part of it, but the heart of the gospel is relationship, not just destination. Jesus said He is the way to the Father — the goal was always being restored to God Himself as His beloved children, not only escaping punishment. Many people believe the gospel for forgiveness yet never come home to the Father it was meant to reunite them with.',
+	},
+	{
+		question: 'How do I respond to the gospel?',
+		answer:
+			'You respond by trusting Jesus and turning to receive the Father’s welcome. There is no ritual to perform or qualification to earn — Scripture says if you believe in your heart and confess Jesus as Lord, you are saved. You can simply pray, in your own words, that you receive His forgiveness and come home as His child. Then begin reading, praying, and living as a beloved son or daughter.',
+	},
+];
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: 'What Is the Gospel? A Clear, Simple Answer',
+	description: DESCRIPTION,
+	image: OG_IMG,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: PUBLISHED,
+	dateModified: MODIFIED,
+	inLanguage: 'en-US',
+	articleSection: 'Bible Reading Guides',
+	keywords:
+		'what is the gospel, what is the gospel of Jesus Christ, gospel meaning, good news, John 3:16',
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'Guides',
+			item: 'https://fathersheartbible.com/guides/',
+		},
+		{ '@type': 'ListItem', position: 3, name: 'What Is the Gospel?', item: PAGE_URL },
+	],
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [articleSchema, breadcrumbSchema, faqSchema];
+
+const TOC = [
+	{ id: 'meaning', label: 'What "gospel" means' },
+	{ id: 'one-story', label: 'The gospel in one story' },
+	{ id: 'cross', label: 'Why the cross is good news' },
+	{ id: 'about-the-father', label: 'It’s about the Father' },
+	{ id: 'john316', label: 'John 3:16' },
+	{ id: 'respond', label: 'How to respond' },
+	{ id: 'faq', label: 'FAQ' },
+];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={PUBLISHED}
+	articleSection="Bible Reading Guides"
+	articleTags={["what is the gospel", "the good news", "John 3:16"]}
+	preloadImageMobile={HERO_IMG}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
+			<img src={HERO_IMG} alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-x-0 top-0 z-10" style="height: 160px; background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0));"></div>
+		</section>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/guides/" class="hover:underline">Guides</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">What Is the Gospel?</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Reading Guide</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">What Is the Gospel?</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/lead-translator/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; Lead Translator, Father&rsquo;s Heart Bible</span>
+					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<strong style="color: var(--color-ink);">The gospel is the good news that God is a loving Father who made you, came after you when you were lost, and through His Son Jesus&rsquo; death and resurrection brings you home as His own beloved child.</strong> The word itself simply means <em>good news</em> &mdash; an announcement of something that has already happened, not advice about something you must achieve. And the news is better than most people have been told. It is not mainly that you can avoid hell or earn a place in heaven; it is that the God who seemed distant is a Father, and He has done everything required to welcome His children back to Himself. Jesus called Himself &ldquo;the way&rdquo; &mdash; and the destination He named was not a place but a Person: the Father. Understand that, and the whole Bible reads as one long rescue story with your name in it.
+				</p>
+
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">The gospel is good news, not good advice: God is a Father who, through His Son&rsquo;s death and resurrection, brings His lost children home. The destination was always the Father Himself.</p>
+				</aside>
+
+				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>
+					<ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
+						{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}
+					</ul>
+				</nav>
+
+				<h2 id="meaning" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">What does &ldquo;gospel&rdquo; actually mean?</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">&ldquo;Gospel&rdquo; is an old English word for <em>good news</em>, translating a Greek term that announced a royal victory or the birth of a king. That is the first thing to get right: the gospel is news, not advice. Advice tells you what to do; news tells you what has been done. Most religion runs on advice &mdash; try harder, be better, climb higher. The gospel runs the other direction: it reports that God has already acted, in history, to rescue people who could never climb high enough on their own. So the right response to news is not first effort but trust &mdash; the way you receive any announcement that something wonderful is already true. Hearing the gospel as good news, rather than one more demand, is where everything begins.</p>
+
+				<FeatureChapter book="John" slug="john" chapter={3} verseLimit={21} />
+
+				<h2 id="one-story" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The gospel in one story</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The good news only lands when you hear the story it completes. It runs in four movements. <strong style="color: var(--color-ink);">Creation:</strong> a Father makes the world and forms people as His own children, made to be loved. <strong style="color: var(--color-ink);">The break:</strong> humanity turns away, and the whole race inherits a quiet ache of separation from Him. <strong style="color: var(--color-ink);">The rescue:</strong> instead of writing us off, the Father sends His Son to take on our death and defeat it, opening the way back. <strong style="color: var(--color-ink);">The homecoming:</strong> everyone who trusts Him is welcomed back, not as a hired servant but as a beloved son or daughter. Creation, break, rescue, homecoming &mdash; that is the arc the whole Bible traces, and the gospel is the moment the rescue arrives. It is, quite literally, your family&rsquo;s story.</p>
+
+				<h2 id="cross" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Why the cross and resurrection are good news</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">At the center of the gospel stand two historical events: Jesus&rsquo; death and His resurrection. On the cross, the Son willingly took the weight of human sin and the separation it causes &mdash; He was forsaken so that we never have to be. Three days later He rose, proving the rescue worked and that death itself had been beaten. The apostle Paul gives the gospel in one breath: Christ died for our sins, was buried, and was raised on the third day. This is why it is good news and not merely good teaching: the problem of sin and death has been dealt with from God&rsquo;s side, by God Himself. You are not asked to fix what is broken between you and the Father &mdash; you are invited to receive a reconciliation already accomplished.</p>
+
+				<h2 id="about-the-father" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The gospel is about the Father, not just heaven</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">For generations the gospel has often been preached as a way to get <em>to heaven</em> or to get <em>out of hell</em>. Both are real, but neither is the heart of it. Jesus said, &ldquo;I am the way, the truth, and the life; no one comes to the <em>Father</em> except through me&rdquo; &mdash; the destination He kept naming was a Person, not a place. The gospel reunites children with their Father. Miss that, and you can spend a lifetime relieved of guilt yet still feeling like an orphan, serving a Master you never learned to call Dad. Hear it rightly, and forgiveness becomes the door into a relationship &mdash; you are not just pardoned, you are welcomed home and seated at the table. That Father-centered reading is the very thing the <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible</a> exists to surface.</p>
+
+				<h2 id="john316" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">John 3:16 &mdash; the gospel in one verse</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The best-known summary of the gospel is in the featured chapter above. In the Father&rsquo;s Heart Bible, John 3:16 reads: <em>&ldquo;For our Father so loved the world that he gave his one and only Son, so that everyone who trusts in him would not be lost, but would live in the life of the age to come.&rdquo;</em> Hear it in the Father&rsquo;s voice and every phrase opens: the One who loves is the Father; what He gives is His own Son; and the aim of His giving is that His children &ldquo;would not be lost&rdquo; &mdash; that the wandering family would come home. It is not a transaction grudgingly arranged but a Father&rsquo;s heart poured out. The whole gospel is compressed into that one sentence, and it has been spoken over the world ever since.</p>
+
+				<h2 id="respond" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">How to respond to the gospel</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Because the gospel is news of something already done, you respond not by performing but by trusting and receiving. Scripture is strikingly simple here: if you believe in your heart that God raised Jesus from the dead and confess Him as Lord, you are saved. There is no qualification to earn and no ritual to master. You can respond right now, in your own words &mdash; something as plain as: <em>&ldquo;Father, thank You for sending Your Son for me. I trust Jesus, I receive Your forgiveness, and I come home to You as Your child.&rdquo;</em> Then begin living in it: read the Bible, talk to your Father in prayer, and find others walking the same road. The gospel is not the finish line but the doorway &mdash; and on the other side of it, you are family.</p>
+
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Read the story for yourself</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Start in the Gospel of John and read the good news in the Father&rsquo;s own voice &mdash; free online, with audio, in the Father&rsquo;s Heart Bible.</p>
+					<a href="https://fathersheartbible.com/read/john/3" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a>
+				</aside>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="space-y-6">
+					{FAQS.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Keep going: read <a href="/guides/how-to-read-the-bible/" style="color: var(--color-brand);" class="hover:underline">How to Read the Bible</a> and <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">Where to Start</a>, read <a href="https://fathersheartbible.com/read/john/3" style="color: var(--color-brand);" class="hover:underline">John 3 with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why the Father&rsquo;s Heart Bible exists</a>, or get the free book in the <a href="https://fathersheartbible.com/library" style="color: var(--color-brand);" class="hover:underline">resource library</a>. Browse <a href="/blog/" style="color: var(--color-brand);" class="hover:underline">the blog</a> for more.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">See the good news for yourself, from Genesis to John &mdash; the whole Bible free online with audio, in a fresh translation that reveals God as a loving Father.</p>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>

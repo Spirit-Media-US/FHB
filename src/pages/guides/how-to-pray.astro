@@ -1,0 +1,242 @@
+---
+// Phase-5 Gold-Level guide — /guides/how-to-pray
+// Target: "how to pray" (KD 24, ~18k) + "how to pray to God", "how to pray as a
+// beginner". Locked FHB conventions (memory feedback-fhb-content-seo-conventions).
+// Featured: Matthew 6 (the Lord's Prayer), verseLimit 15.
+import AuthorBio from '../../components/AuthorBio.astro';
+import FeatureChapter from '../../components/FeatureChapter.astro';
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/guides/how-to-pray';
+const TITLE = "How to Pray — A Simple Guide for Beginners | Father's Heart Bible";
+const DESCRIPTION =
+	"How to pray: a simple guide for beginners. Prayer is talking with God as your Father — honestly, in your own words. Learn the Lord's Prayer as a model.";
+const PUBLISHED = '2026-06-06';
+const MODIFIED = '2026-06-06';
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/a06de2cfda461dee4850c71666ad2502a503c166-6720x4480.jpg';
+const HERO_ALT = 'A person praying with an open Bible';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: "Lead Translator, Father's Heart Bible | CEO, Spirit Media Publishing",
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+const FAQS = [
+	{
+		question: 'How do I start praying as a beginner?',
+		answer:
+			"Begin by simply talking to God as your Father in your own words — out loud or silently. Thank Him for something, tell Him what's on your mind, and ask for what you need. You do not need special language or a particular posture. If you want a model, pray slowly through the Lord's Prayer. Start with a few minutes a day; honesty matters far more than length or eloquence.",
+	},
+	{
+		question: 'Is there a right way to pray?',
+		answer:
+			'There is no magic formula. Jesus actually warned against showy, repetitive prayer and pointed instead to simple, honest words to the Father. The Lord\'s Prayer gives a helpful pattern — praise, surrender, asking for daily needs, forgiveness, and protection — but it is a model to learn from, not a script you must recite. The "right" way to pray is sincerely, as a child speaks to a loving parent.',
+	},
+	{
+		question: "What do I say when I don't know what to say?",
+		answer:
+			'Tell God exactly that — "Father, I don\'t know what to say" is already a prayer. You can also pray Scripture: read a Psalm slowly and make its words your own. Or sit quietly and simply be with Him. The Bible says God\'s Spirit helps us pray when we are at a loss, so you are never truly stuck. Honesty about having no words is more welcome than impressive words.',
+	},
+	{
+		question: 'How long should I pray?',
+		answer:
+			'There is no required length. A sincere minute is worth more than an hour of going through the motions. Many people start with five minutes a day, attached to a regular moment — morning coffee, a commute, bedtime — and find it naturally grows over time. Consistency matters more than duration; a short daily conversation builds a relationship better than occasional marathons.',
+	},
+];
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: 'How to Pray: A Simple Guide for Beginners',
+	description: DESCRIPTION,
+	image: OG_IMG,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: PUBLISHED,
+	dateModified: MODIFIED,
+	inLanguage: 'en-US',
+	articleSection: 'Bible Reading Guides',
+	keywords:
+		"how to pray, how to pray to God, how to pray as a beginner, the Lord's Prayer, prayer for beginners",
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'Guides',
+			item: 'https://fathersheartbible.com/guides/',
+		},
+		{ '@type': 'ListItem', position: 3, name: 'How to Pray', item: PAGE_URL },
+	],
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [articleSchema, breadcrumbSchema, faqSchema];
+
+const TOC = [
+	{ id: 'what-is-prayer', label: 'What prayer is' },
+	{ id: 'five-steps', label: '5 simple steps' },
+	{ id: 'lords-prayer', label: 'The Lord’s Prayer' },
+	{ id: 'no-words', label: 'When you’re stuck' },
+	{ id: 'pray-scripture', label: 'Praying Scripture' },
+	{ id: 'fathers-heart', label: 'Praying to a Father' },
+	{ id: 'faq', label: 'FAQ' },
+];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={PUBLISHED}
+	articleSection="Bible Reading Guides"
+	articleTags={["how to pray", "the Lord's Prayer", "prayer for beginners"]}
+	preloadImageMobile={HERO_IMG}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
+			<img src={HERO_IMG} alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-x-0 top-0 z-10" style="height: 160px; background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0));"></div>
+		</section>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/guides/" class="hover:underline">Guides</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">How to Pray</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Reading Guide</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">How to Pray: A Simple Guide for Beginners</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/lead-translator/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; Lead Translator, Father&rsquo;s Heart Bible</span>
+					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<strong style="color: var(--color-ink);">To pray, simply talk to God as your Father &mdash; honestly, in your own words. Thank Him, tell Him what is on your heart, and ask for what you need.</strong> Prayer is not a performance or a magic formula; Jesus said plainly that you do not need fine phrases or many words, because your Father already knows what you need before you ask. He gave one short model &mdash; the Lord&rsquo;s Prayer &mdash; that you can lean on whenever your own words run out. Start small: a few honest minutes a day, attached to a moment you already keep. Speak out loud or silently, eyes open or closed; none of that is the point. The point is that the God of the universe is a Father who is glad to hear from you, and prayer is simply a child learning to talk with Him.
+				</p>
+
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">Prayer is talking with God as your Father &mdash; honestly and simply. Use the Lord&rsquo;s Prayer as a model, start with a few minutes a day, and speak as a child to a Father who is glad to listen.</p>
+				</aside>
+
+				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>
+					<ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
+						{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}
+					</ul>
+				</nav>
+
+				<h2 id="what-is-prayer" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">What is prayer, really?</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Prayer is conversation with God &mdash; nothing more complicated than that. We often picture it as a religious ritual reserved for the holy or the eloquent, but Jesus described it as a child speaking to a loving Father. That single image changes everything. You do not approach a Father with a script and a nervous voice; you come as you are and say what is true. Prayer includes thanking Him, telling Him your fears and hopes, asking for help, confessing what you got wrong, and then listening. It can happen anywhere, in any words, at any moment of the day. If you have ever spoken honestly to someone who loves you, you already know how to pray &mdash; you are simply turning that same honesty toward the One who loves you most.</p>
+
+				<FeatureChapter book="Matthew" slug="matthew" chapter={6} verseLimit={15} />
+
+				<h2 id="five-steps" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">How to pray in 5 simple steps</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">If you like a little structure to begin, this simple pattern covers the essentials:</p>
+				<ol class="space-y-3 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: decimal;">
+					<li><strong style="color: var(--color-ink);">Address your Father.</strong> Begin simply: &ldquo;Father&hellip;&rdquo; You are talking to someone who loves you.</li>
+					<li><strong style="color: var(--color-ink);">Thank Him.</strong> Name one thing you are grateful for.</li>
+					<li><strong style="color: var(--color-ink);">Be honest.</strong> Tell Him what is really going on &mdash; the worry, the sin, the hope.</li>
+					<li><strong style="color: var(--color-ink);">Ask.</strong> Bring your needs and the people on your heart.</li>
+					<li><strong style="color: var(--color-ink);">Listen.</strong> Sit quietly for a moment and let Him have the last word.</li>
+				</ol>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">It is a guide, not a law. Some days you will pour out paragraphs; some days you will manage one sentence. Both are real prayer, and both are heard.</p>
+
+				<h2 id="lords-prayer" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The Lord&rsquo;s Prayer as a model</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">When the disciples asked Jesus how to pray, He gave them the prayer in the featured chapter above &mdash; and notice how it opens: not &ldquo;Almighty God&rdquo; but <em>&ldquo;Our Father.&rdquo;</em> That first word sets the tone for everything after it. The prayer then moves through a handful of simple movements you can make your own: honoring the Father&rsquo;s name, welcoming His kingdom and will, asking for today&rsquo;s bread, seeking and extending forgiveness, and asking to be kept from evil. Pray it slowly, pausing to fill each line with your own life &mdash; your actual needs, your actual people, your actual struggles. Used this way, the Lord&rsquo;s Prayer is not a memorized recital but a trellis your own prayers can grow on, and it keeps you anchored in the Father&rsquo;s heart.</p>
+
+				<h2 id="no-words" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">What to do when you don&rsquo;t know what to say</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Every honest person prays this prayer eventually: <em>&ldquo;I don&rsquo;t know what to say.&rdquo;</em> That sentence is itself a prayer, and a good one. When words fail, you have options. You can borrow the Bible&rsquo;s words &mdash; pray a Psalm line by line and let it speak for you. You can simply sit in silence and be with the Father, the way you can sit with someone you love without talking. You can name the numbness or the grief directly. Scripture promises that when we are too weak or confused to pray, God&rsquo;s own Spirit prays within us, carrying what we cannot put into words. So you are never truly stuck. On the days you arrive empty, emptiness offered honestly is exactly the prayer your Father is waiting to receive.</p>
+
+				<h2 id="pray-scripture" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Praying the Bible &mdash; and listening</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">One of the oldest and richest ways to pray is to pray Scripture back to God. Read a passage slowly &mdash; a Psalm, the Lord&rsquo;s Prayer, a line from the Gospels &mdash; and turn each phrase into your own words to the Father. It steadies a wandering mind and fills your prayers with His own promises. Prayer is also a two-way conversation, so leave room to listen: many people read a chapter, then sit quietly and ask the Father what He wants them to hear. In the <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible you can read and listen to any chapter free</a>, which makes praying through a passage simple &mdash; hear it spoken, then answer Him in your own voice.</p>
+
+				<h2 id="fathers-heart" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">You&rsquo;re praying to a Father, not performing for a judge</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The biggest shift in anyone&rsquo;s prayer life is realizing <em>who</em> they are talking to. Many people pray as if to a distant official they must impress or appease &mdash; so prayer feels like a chore and silence feels like rejection. But Jesus revealed God as a Father who runs to meet returning children, and that changes the whole tone. You do not have to earn an audience; you already have one. You do not have to perform; you get to be honest. Prayer, at its heart, is less about getting things from God and more about being with your Father &mdash; the same Father the <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible</a> reveals on every page. Come as a beloved child, and prayer stops being a duty and becomes the most natural thing in the world.</p>
+
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Pray the Bible with us</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Read and listen to the Psalms, the Gospels, and the Lord&rsquo;s Prayer in the Father&rsquo;s Heart Bible &mdash; free online &mdash; and let Scripture shape how you talk with your Father.</p>
+					<a href="https://fathersheartbible.com/read/matthew/6" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a>
+				</aside>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="space-y-6">
+					{FAQS.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Keep going: read <a href="/guides/how-to-read-the-bible/" style="color: var(--color-brand);" class="hover:underline">How to Read the Bible</a>, pray through the <a href="https://fathersheartbible.com/read/matthew/6" style="color: var(--color-brand);" class="hover:underline">Lord&rsquo;s Prayer in Matthew 6</a>, or open the <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">whole Bible free with audio</a>. Browse <a href="/blog/" style="color: var(--color-brand);" class="hover:underline">the blog</a> for more on the Father&rsquo;s heart, or get the free book in the <a href="https://fathersheartbible.com/library" style="color: var(--color-brand);" class="hover:underline">resource library</a>.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Meet the Father prayer is addressed to. Read the Father&rsquo;s Heart Bible free online with audio &mdash; a fresh translation that reveals God as a loving Father on every page.</p>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>
