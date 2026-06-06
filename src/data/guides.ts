@@ -31,4 +31,25 @@ export const GUIDES: GuideEntry[] = [
 			'A simple observe–interpret–apply method for beginners — read in context and study for the Father’s heart.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c42c2fd1d784331411250317010d54a0cfac62cc-5959x3724.jpg',
 	},
+	{
+		slug: 'how-to-understand-the-bible',
+		title: 'How to Understand the Bible',
+		blurb:
+			'Why it feels hard, and how to fix it — read in context, know the genre, and read it as the Father revealing Himself.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
+	},
+	{
+		slug: 'how-to-pray',
+		title: 'How to Pray',
+		blurb:
+			'A simple guide for beginners — prayer is talking with God as your Father, with the Lord’s Prayer as a model.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/a06de2cfda461dee4850c71666ad2502a503c166-6720x4480.jpg',
+	},
+	{
+		slug: 'what-is-the-gospel',
+		title: 'What Is the Gospel?',
+		blurb:
+			'The good news in plain terms — God is a Father who, through His Son, brings His lost children home.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/e1bf90d1eaeab499989a239a2f5bfd98494e3f78-5867x3911.jpg',
+	},
 ];
