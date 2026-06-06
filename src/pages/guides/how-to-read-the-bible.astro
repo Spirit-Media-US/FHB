@@ -1,0 +1,316 @@
+---
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase-5 Gold-Level guide page — /guides/how-to-read-the-bible
+// Target query: "how to read the Bible" (KD 2, ~11k vol) + "where to start
+// reading the bible" (KD 0), "how to understand the bible" (KD 3), "how to read
+// the bible for beginners" (KD 5). Generic-first per fhb-seo-strategy.md Part 3.
+//
+// Pattern (replicable for every /guides/<slug> page):
+//   generic phrase in title + H1 + first 150 words → direct-answer + key-takeaway
+//   → mini-TOC → 6 self-contained 134-167-word H2s (listicle where possible)
+//   → read+listen CTA → visible FAQ (mirrors FAQPage JSON-LD) → join CTA
+//   → author bio. JSON-LD: Article + BreadcrumbList + FAQPage (Organization is
+//   appended sitewide by Layout). See docs/seo/fhb-aeo-geo-guide.md.
+// ─────────────────────────────────────────────────────────────────────────────
+import AuthorBio from '../../components/AuthorBio.astro';
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/guides/how-to-read-the-bible';
+const TITLE = 'How to Read the Bible — A Simple Guide for Beginners';
+const DESCRIPTION =
+	"A simple, step-by-step guide to reading the Bible — where to start, how to understand it, and how to make it a daily habit, with the Father's Heart Bible.";
+const PUBLISHED = '2026-06-06';
+const MODIFIED = '2026-06-06';
+
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+// Kevin White's author entity — same Person schema used across FHB blog posts so
+// AI engines resolve a single authoritative author across the site (E-E-A-T).
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: "Lead Translator, Father's Heart Bible | CEO, Spirit Media Publishing",
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+// Visible FAQ pairs — rendered as H2/p below AND emitted as FAQPage JSON-LD so
+// the same Q&As AI Overviews / Perplexity extract are also on the page.
+const FAQS = [
+	{
+		question: 'What is the best book of the Bible to read first?',
+		answer:
+			"For most beginners the Gospel of John is the best place to start. It tells the story of Jesus plainly and centers everything on God's love as a Father, so you meet the heart of the whole Bible right away. From there, read the other Gospels — Matthew, Mark, and Luke — then the book of Genesis to see where the story begins.",
+	},
+	{
+		question: 'How much of the Bible should I read each day?',
+		answer:
+			'Start with one chapter a day. A single chapter takes about five minutes to read and is short enough to think about and remember. Consistency matters far more than volume — five focused minutes every day will take you further than an hour once a month, and one chapter a day carries you through an entire Gospel in under a month.',
+	},
+	{
+		question: 'Do I need to read the Bible in order?',
+		answer:
+			'No. The Bible is a library of 66 books, not a single front-to-back novel, so you do not have to read it in order. Begin with the Gospel of John to meet Jesus, then move through the New Testament before going back to read the Old Testament story from Genesis. Reading by theme — love, strength, faith — is another good way in.',
+	},
+	{
+		question: 'Does listening to the Bible count as reading it?',
+		answer:
+			"Yes. Hearing Scripture read aloud is how the Bible was experienced for most of history, and listening helps you absorb the meaning and rhythm of a passage. In the Father's Heart Bible every chapter is free to read online and to hear with verse-by-verse audio, so you can read, listen, or do both at once.",
+	},
+];
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: 'How to Read the Bible: A Simple Guide for Beginners',
+	description: DESCRIPTION,
+	image:
+		'https://cdn.sanity.io/images/rusi1hyi/production/8b5d1c39f892218c978d3e3caf5720e09833bbc4-1024x1024.png?w=1200&h=630&fit=crop',
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: PUBLISHED,
+	dateModified: MODIFIED,
+	inLanguage: 'en-US',
+	articleSection: 'Bible Reading Guides',
+	keywords:
+		'how to read the bible, how to read the bible for beginners, where to start reading the bible, how to understand the bible, daily bible reading',
+};
+
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'Guides',
+			item: 'https://fathersheartbible.com/guides/',
+		},
+		{ '@type': 'ListItem', position: 3, name: 'How to Read the Bible', item: PAGE_URL },
+	],
+};
+
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+
+const jsonLd = [articleSchema, breadcrumbSchema, faqSchema];
+
+// Jump-link mini-TOC sections (page exceeds ~800 words → TOC per AEO guide §B10).
+const TOC = [
+	{ id: 'where-to-start', label: 'Where to start' },
+	{ id: 'five-steps', label: '5 simple steps' },
+	{ id: 'understand', label: 'How to understand it' },
+	{ id: 'daily-habit', label: 'Building a daily habit' },
+	{ id: 'listen', label: 'Reading vs. listening' },
+	{ id: 'fathers-heart', label: "Read for the Father's heart" },
+	{ id: 'faq', label: 'FAQ' },
+];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={PUBLISHED}
+	articleSection="Bible Reading Guides"
+	articleTags={["how to read the Bible", "Bible for beginners", "daily Bible reading"]}
+>
+	<main id="main-content">
+		<!-- ── HEADER ─────────────────────────────────────────────── -->
+		<section class="px-6 pt-28 md:pt-32 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a>
+					<span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/guides/" class="hover:underline">Guides</a>
+					<span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">How to Read the Bible</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">
+					Bible Reading Guide
+				</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+					How to Read the Bible: A Simple Guide for Beginners
+				</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/lead-translator/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> — Lead Translator</span>
+					<span aria-hidden="true">&middot;</span>
+					<span>{formatDate(PUBLISHED)}</span>
+				</div>
+			</div>
+		</section>
+
+		<!-- ── CONTENT ────────────────────────────────────────────── -->
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+
+				<!-- Direct-answer paragraph (first ~180 words; contains the query) -->
+				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<strong style="color: var(--color-ink);">To read the Bible, start with the Gospel of John, read one chapter a day, and read for the Father&rsquo;s heart rather than for information.</strong> The Bible is not one book but a library of 66 books, so you do not have to read it cover to cover or in order. Begin with the story of Jesus in the Gospel of John, where God&rsquo;s love is shown most plainly. Read a single chapter each day &mdash; about five minutes &mdash; and pause to ask one question: <em>what does this show me about God as my Father?</em> Read in a clear modern translation, listen to the audio when you can, and let understanding grow over weeks, not in one sitting. That simple rhythm &mdash; short, daily, and centered on the Father&rsquo;s heart &mdash; is how reading the Bible becomes a habit that lasts, and it is exactly how the Father&rsquo;s Heart Bible is designed to be read.
+				</p>
+
+				<!-- Key takeaway callout (the citation snippet) -->
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">
+						Begin in the Gospel of John, read one chapter a day, and ask what each passage reveals about God as Father. Small and consistent beats long and rare.
+					</p>
+				</aside>
+
+				<!-- Mini-TOC -->
+				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>
+					<ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
+						{TOC.map((t) => (
+							<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>
+						))}
+					</ul>
+				</nav>
+
+				<!-- H2 1 — Where to start -->
+				<h2 id="where-to-start" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Where should a beginner start reading the Bible?
+				</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Start with the Gospel of John. Pastors and Bible scholars consistently point new readers to John first because it tells the story of Jesus simply and says outright why it was written: &ldquo;so that you may believe.&rdquo; You meet the love of God as a Father on the very first page, which is the lens the whole Bible is read through. After John, read the other three Gospels &mdash; Matthew, Mark, and Luke &mdash; to see the life of Jesus from every angle. Then turn back to Genesis, the Bible&rsquo;s opening book, to see where the story of God and his family begins. Avoid the common mistake of starting at page one and grinding through Leviticus until you quit. In the <a href="/read" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible you can open the Gospel of John free online</a> and begin reading in under a minute.
+				</p>
+
+				<!-- H2 2 — 5 simple steps (listicle / Top-N) -->
+				<h2 id="five-steps" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					How to read the Bible in 5 simple steps
+				</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					These five steps turn &ldquo;I should read the Bible&rdquo; into something you actually do:
+				</p>
+				<ol class="space-y-3 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: decimal;">
+					<li><strong style="color: var(--color-ink);">Pick a starting point.</strong> Open the Gospel of John rather than page one.</li>
+					<li><strong style="color: var(--color-ink);">Read one chapter a day.</strong> Short and daily beats long and rare.</li>
+					<li><strong style="color: var(--color-ink);">Read in plain modern English.</strong> A clear translation removes the barrier of old language.</li>
+					<li><strong style="color: var(--color-ink);">Ask one question.</strong> &ldquo;What does this show me about God as my Father?&rdquo;</li>
+					<li><strong style="color: var(--color-ink);">Listen as you read.</strong> Hearing a chapter aloud helps the meaning land.</li>
+				</ol>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Keep it light. The goal is not to finish fast but to keep showing up &mdash; a chapter a day will carry you through an entire Gospel in under a month and through the whole New Testament within a year.
+				</p>
+
+				<!-- H2 3 — Understand -->
+				<h2 id="understand" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					How to understand what you read
+				</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Understanding the Bible grows from three simple habits. First, read in context: notice who is speaking, who they are speaking to, and what comes just before and after the verse. A single line means what it means inside its own story. Second, use a clear translation &mdash; old-fashioned wording is the biggest reason beginners feel lost, and a fresh, plain-English rendering removes it. Third, let Scripture explain Scripture; when a passage is hard, a clearer one usually sheds light on it. When you want to dig deeper, free study tools such as <a href="https://www.blueletterbible.org/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Blue Letter Bible</a> and <a href="https://biblehub.com/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Bible Hub</a> show the original Hebrew and Greek behind a word. But you do not need them to begin &mdash; read for the heart of the passage first, and the details fill in over time.
+				</p>
+
+				<!-- H2 4 — Daily habit -->
+				<h2 id="daily-habit" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					How to build a daily Bible-reading habit
+				</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					A habit forms when reading is small, fixed, and easy to start. Attach it to something you already do every day &mdash; your morning coffee, your commute, the few minutes before sleep &mdash; so the time chooses itself. Keep the bar low: one chapter, five minutes. According to the American Bible Society&rsquo;s annual <em>State of the Bible</em> research, the people who report the most peace and hope are the ones who engage Scripture consistently, not occasionally &mdash; rhythm is what changes a reader. Use a simple plan so you never wonder what comes next; reading straight through a Gospel is plan enough to start. And let listening carry you on the busy days: in the <a href="/read" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible every chapter has free audio</a>, so &ldquo;I&rsquo;m too tired to read&rdquo; never has to mean skipping a day.
+				</p>
+
+				<!-- H2 5 — Listen -->
+				<h2 id="listen" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Does listening to the Bible count as reading it?
+				</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Yes &mdash; and for most of history, hearing was how people received Scripture at all. The books of the Bible were written to be read aloud to gathered communities; only a small fraction of people could read for themselves. Listening engages you differently than reading with your eyes: you catch the rhythm, the tone, and the emotion of a passage, and you can take it in while you walk, drive, or rest. The strongest approach is to do both at once &mdash; follow the words on the page while you hear them spoken. That is exactly how the <a href="/read" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible is built</a>: every chapter is free to read online with verse-by-verse audio, so you can read, listen, or read and listen together. However you take it in, the Word is doing its work.
+				</p>
+
+				<!-- H2 6 — Father's heart (FHB pillar) -->
+				<h2 id="fathers-heart" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Read for the Father&rsquo;s heart, not just information
+				</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					The most important shift a new reader can make is <em>why</em> they read. Many people read the Bible to gather facts &mdash; names, dates, rules &mdash; and finish informed but untouched. Scripture was given for something deeper: to reveal God as a loving Father and to show you who you are as his beloved child. Read each passage asking, &ldquo;What does this tell me about my Father, and about how he sees me?&rdquo; That question turns reading into relationship. It is the very reason the <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible</a> exists &mdash; a fresh translation that brings the Father&rsquo;s love forward in every passage, so the heart behind the words is impossible to miss. You can <a href="/samples/" style="color: var(--color-brand);" class="hover:underline">compare a few sample passages</a> to see how that reads. Start there, and the Bible stops being a book you study and becomes a Father you know.
+				</p>
+
+				<!-- READ + LISTEN CTA -->
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">
+						Start in the Gospel of John today
+					</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Read the Father&rsquo;s Heart Bible free online &mdash; a fresh translation revealing God as a loving Father, with verse-by-verse audio so you can read and listen together.
+					</p>
+					<a href="/read" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">
+						Read &amp; Listen Free
+						<span aria-hidden="true">&rarr;</span>
+					</a>
+				</aside>
+
+				<!-- FAQ (visible — mirrors FAQPage JSON-LD) -->
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Frequently asked questions
+				</h2>
+				<div class="space-y-6">
+					{FAQS.map((f) => (
+						<div>
+							<h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3>
+							<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p>
+						</div>
+					))}
+				</div>
+
+				<!-- Related authority + internal links -->
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						More on reading well: compare translations side by side at <a href="https://www.biblegateway.com/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">BibleGateway</a> or follow a guided plan in the <a href="https://www.bible.com/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">YouVersion Bible App</a>. On this site, <a href="/read" style="color: var(--color-brand);" class="hover:underline">read the Bible free with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why the Father&rsquo;s Heart Bible exists</a>, and <a href="/samples/" style="color: var(--color-brand);" class="hover:underline">see sample passages</a>.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- JOIN CTA -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Read together with a global family
+				</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Join free to unlock the audio Bible, react to passages, and help shape the Father&rsquo;s Heart Bible as it goes out for the first time.
+				</p>
+				<a href="/join/" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">
+					Join Free
+					<span aria-hidden="true">&rarr;</span>
+				</a>
+			</div>
+		</section>
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>
