@@ -256,6 +256,7 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
   description={post.seoDescription || post.excerpt || "Read this article on the Father's Heart Bible blog."}
   image={heroImage}
   jsonLd={jsonLd}
+  darkHero={true}
   pageType="article"
   articleAuthor={author}
   articlePublishedTime={post.publishDate}
@@ -264,9 +265,10 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
 >
 
   <main id="main-content">
-    <!-- HERO IMAGE -->
-    <div class="w-full" style="margin-top: 80px;">
-      <img src={heroImage} alt={post.heroImage?.alt || post.title} class="w-full h-72 lg:h-[600px] object-cover" style="object-position: center center;" />
+    <!-- HERO IMAGE — full-bleed, starts at top behind the transparent nav (matches homepage/guides) -->
+    <div class="relative w-full overflow-hidden h-72 lg:h-[600px]">
+      <img src={heroImage} alt={post.heroImage?.alt || post.title} class="absolute inset-0 w-full h-full object-cover" style="object-position: center center;" fetchpriority="high" decoding="async" />
+      <div class="absolute inset-x-0 top-0 z-10" style="height: 160px; background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0));"></div>
     </div>
 
     <!-- POST HEADER -->
