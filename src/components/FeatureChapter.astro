@@ -15,9 +15,10 @@ interface Props {
 	slug: string; // url slug, e.g. "genesis"
 	chapter: number;
 	verseLimit?: number; // optionally show only the first N verses (with a "read on" link)
+	playable?: boolean; // true = ungated inline audio (blogs); false = join-gated link (guides/Bible reader). Kevin 2026-06-06.
 }
 
-const { book, slug, chapter, verseLimit } = Astro.props;
+const { book, slug, chapter, verseLimit, playable = false } = Astro.props;
 
 let data: any = null;
 try {
@@ -49,6 +50,7 @@ const sup = (n: number) => SUPERSCRIPTS[n] ?? `^${n}`;
 // community app via the apex Worker, which only runs on fathersheartbible.com —
 // a relative /read link 404s on the dev .pages.dev preview. Always point to prod.
 const readerHref = `https://fathersheartbible.com/read/${slug}/${chapter}`;
+const audioSrc = `https://media.spiritmediapublishing.com/audio/en/${slug}/${chapter}.mp3`;
 const ref = `${book} ${chapter}`;
 ---
 
@@ -63,12 +65,26 @@ const ref = `${book} ${chapter}`;
 			</h2>
 		</header>
 
-		<!-- Audio is JOIN-GATED in the reader (Kevin 2026-06-06): no inline player here.
-		     Link into /read/<book>/<chapter>, where joining free unlocks the narration. -->
-		<a href={readerHref} class="flex items-center justify-between gap-3 mb-6 px-5 py-4 rounded-xl no-underline transition-opacity hover:opacity-90" style="background-color: #ffffff; border: 1px solid #f4c0d0;">
-			<span class="text-sm font-semibold" style="color: #a04060; font-family: var(--font-sans);">🎧 Listen to {ref} &mdash; join free to play the audio in the reader</span>
-			<span aria-hidden="true" style="color: #a04060;">&rarr;</span>
-		</a>
+		{playable ? (
+			<!-- Ungated inline narration (blogs, Kevin 2026-06-06): plays for everyone,
+			     no join required. The Bible reader (/read) audio stays join-gated separately. -->
+			<div class="mb-6 px-4 py-4 rounded-xl" style="background-color: #ffffff; border: 1px solid #f4c0d0;">
+				<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: #a04060; font-family: var(--font-sans);">
+					🎧 Listen to {ref}
+				</p>
+				<audio controls preload="none" class="w-full" style="width: 100%;">
+					<source src={audioSrc} type="audio/mpeg" />
+					Your browser does not support the audio element.
+				</audio>
+			</div>
+		) : (
+			<!-- Audio is JOIN-GATED in the reader (Kevin 2026-06-06): no inline player here.
+			     Link into /read/<book>/<chapter>, where joining free unlocks the narration. -->
+			<a href={readerHref} class="flex items-center justify-between gap-3 mb-6 px-5 py-4 rounded-xl no-underline transition-opacity hover:opacity-90" style="background-color: #ffffff; border: 1px solid #f4c0d0;">
+				<span class="text-sm font-semibold" style="color: #a04060; font-family: var(--font-sans);">🎧 Listen to {ref} &mdash; join free to play the audio in the reader</span>
+				<span aria-hidden="true" style="color: #a04060;">&rarr;</span>
+			</a>
+		)}
 
 		<!-- Reading text — headings + numbered verses, as in the reader -->
 		<div class="space-y-3">
