@@ -78,14 +78,16 @@ const jsonLd = [collectionSchema, breadcrumbSchema];
 	title={TITLE}
 	description={DESCRIPTION}
 	image={OG_IMG}
+	darkHero={true}
 	jsonLd={jsonLd}
 	preloadImageMobile={HERO_IMG}
 	preloadImageDesktop={HERO_IMG}
 >
 	<main id="main-content">
-		<div class="w-full" style="margin-top: 80px;">
-			<img src={HERO_IMG} alt={HERO_ALT} width="1400" height="560" class="w-full h-52 md:h-72 lg:h-[400px] object-cover" style="object-position: center center;" fetchpriority="high" decoding="async" />
-		</div>
+		<section class="relative w-full overflow-hidden min-h-[420px] md:min-h-[60vh]">
+			<img src={HERO_IMG} alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center center;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-x-0 top-0 z-10" style="height: 160px; background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0));"></div>
+		</section>
 
 		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">
