@@ -1,0 +1,133 @@
+---
+// ─────────────────────────────────────────────────────────────────────────────
+// FeatureChapter — anchors a guide/blog with a real Father's Heart Bible chapter:
+// the actual reading-edition text (section headings, verse numbers, footnotes)
+// PLUS a working audio player, mirroring the /read/<book>/<chapter> experience.
+//
+// Reads the synced reading data at src/content/bible/<slug>/<NNN>.json (the same
+// source the community reader uses) and the per-chapter narration MP3 at
+// media.spiritmediapublishing.com/audio/en/<slug>/<chapter>.mp3 (verified live).
+//
+// Usage: <FeatureChapter book="Genesis" slug="genesis" chapter={1} />
+// ─────────────────────────────────────────────────────────────────────────────
+interface Props {
+	book: string; // display name, e.g. "Genesis"
+	slug: string; // url slug, e.g. "genesis"
+	chapter: number;
+	verseLimit?: number; // optionally show only the first N verses (with a "read on" link)
+}
+
+const { book, slug, chapter, verseLimit } = Astro.props;
+
+let data: any = null;
+try {
+	const padded = String(chapter).padStart(3, '0');
+	const mod = await import(`../content/bible/${slug}/${padded}.json`);
+	data = mod.default || mod;
+} catch {
+	data = null;
+}
+
+const allVerses: any[] = data?.verses ?? [];
+const verses = verseLimit ? allVerses.slice(0, verseLimit) : allVerses;
+const truncated = verseLimit ? allVerses.length > verseLimit : false;
+const headings: { beforeVerse: number; text: string }[] = data?.headings ?? [];
+const headingBefore = (n: number) => headings.find((h) => h.beforeVerse === n)?.text || null;
+
+// Footnotes, numbered in verse order (only for the verses we render).
+const footnoteOrder: number[] = [];
+for (const v of verses) if (v.footnote) footnoteOrder.push(v.verse);
+const footnoteNumberFor = (verseNum: number) => {
+	const i = footnoteOrder.indexOf(verseNum);
+	return i === -1 ? null : i + 1;
+};
+const versesWithFootnotes = verses.filter((v) => v.footnote);
+const SUPERSCRIPTS = ['', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹', '¹⁰', '¹¹', '¹²'];
+const sup = (n: number) => SUPERSCRIPTS[n] ?? `^${n}`;
+
+const readerHref = `/read/${slug}/${chapter}`;
+const audioSrc = `https://media.spiritmediapublishing.com/audio/en/${slug}/${chapter}.mp3`;
+const ref = `${book} ${chapter}`;
+---
+
+{data ? (
+	<aside class="my-12 px-6 py-8 lg:px-10 lg:py-10 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;" aria-label={`${ref} in the Father's Heart Bible`}>
+		<header class="mb-5">
+			<p class="text-xs font-semibold uppercase tracking-widest" style="color: #a04060; font-family: var(--font-sans);">
+				Father&rsquo;s Heart Bible&trade; &middot; Featured Chapter
+			</p>
+			<h2 class="mt-1 text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+				{ref}
+			</h2>
+		</header>
+
+		<!-- Audio player — verse-by-verse narration, same MP3 the reader streams -->
+		<div class="mb-6 px-4 py-4 rounded-xl" style="background-color: #ffffff; border: 1px solid #f4c0d0;">
+			<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: #a04060; font-family: var(--font-sans);">
+				🎧 Listen to {ref}
+			</p>
+			<audio controls preload="none" class="w-full" style="width: 100%;">
+				<source src={audioSrc} type="audio/mpeg" />
+				Your browser does not support the audio element.
+			</audio>
+		</div>
+
+		<!-- Reading text — headings + numbered verses, as in the reader -->
+		<div class="space-y-3">
+			{verses.map((v: any) => {
+				const heading = headingBefore(v.verse);
+				const fn = footnoteNumberFor(v.verse);
+				return (
+					<>
+						{heading && (
+							<h3 class="pt-4 text-sm font-semibold uppercase tracking-widest" style="color: #a04060; font-family: var(--font-sans);">
+								{heading}
+							</h3>
+						)}
+						<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">
+							<span class="inline-block mr-2 align-baseline text-sm font-semibold" style="color: #a04060;">{v.verse}</span>
+							{v.text}
+							{fn !== null && (
+								<sup class="ml-0.5" style="color: #a04060; font-weight: 600;"><a href={`#feat-fn-${slug}-${chapter}-${fn}`} style="color: inherit; text-decoration: none;">{sup(fn)}</a></sup>
+							)}
+						</p>
+					</>
+				);
+			})}
+		</div>
+
+		{versesWithFootnotes.length > 0 && (
+			<footer class="mt-7 pt-6 border-t" style="border-color: #f4c0d0;">
+				<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: #a04060; font-family: var(--font-sans);">Footnotes</p>
+				<ol class="space-y-2" style="list-style: none; padding-left: 0;">
+					{versesWithFootnotes.map((v: any) => {
+						const fn = footnoteNumberFor(v.verse);
+						return (
+							<li id={`feat-fn-${slug}-${chapter}-${fn}`} class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+								<span class="font-semibold mr-2" style="color: #a04060;">{sup(fn ?? 0)}</span>
+								<span class="font-semibold" style="color: var(--color-ink);">{`${ref}:${v.verse}`}</span>
+								<span> &mdash; {v.footnote}</span>
+							</li>
+						);
+					})}
+				</ol>
+			</footer>
+		)}
+
+		<div class="mt-7 pt-5 flex flex-wrap items-center gap-4 border-t" style="border-color: #f4c0d0;">
+			<a href={readerHref} class="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">
+				{truncated ? `Continue reading & listening to ${ref}` : `Open ${ref} in the reader`}
+				<span aria-hidden="true">&rarr;</span>
+			</a>
+			<span class="text-xs" style="color: #a04060; font-family: var(--font-sans);">Free &middot; read &amp; listen</span>
+		</div>
+
+		<p class="mt-5 pt-4 text-xs leading-relaxed border-t" style="border-color: #f4c0d0; color: #a04060; font-family: var(--font-sans);">
+			Scripture from the Father&rsquo;s Heart Bible. &copy; 2026 Spirit Media Publishing. All rights reserved.
+		</p>
+	</aside>
+) : (
+	<aside class="my-8 p-4 rounded-xl text-sm" style="background-color: #fef3c7; border: 1px solid #f59e0b; color: #92400e; font-family: var(--font-sans);">
+		Featured chapter data missing for {book} {chapter} (looked for src/content/bible/{slug}/{String(chapter).padStart(3,'0')}.json).
+	</aside>
+)}
