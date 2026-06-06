@@ -35,12 +35,15 @@ const audience = biblePageData?.audience ?? [
 	"You want to give someone a Bible that reveals the Father's love clearly.",
 ];
 
+// Generic-first per the SEO strategy (Part 3): lead with the high-volume
+// "Read the Bible Free Online with Audio" phrase so the home surfaces for
+// everyday Bible searches, brand second. NOTE: the LIVE value comes from
+// Sanity (pageData.seoTitle) when set — update it there to match.
 const seoTitle =
-	pageData?.seoTitle ||
-	"Father's Heart Bible | A New Bible Translation Revealing the Father's Heart";
+	pageData?.seoTitle || "Read the Bible Free Online with Audio — Father's Heart Bible";
 const seoDescription =
 	pageData?.seoDescription ||
-	"Discover the Father's Heart Bible, a new Bible translation revealing God as Father where Scripture reveals Him. Download the free book, explore sample passages, join the movement, and be part of what the Father is doing.";
+	"Read the Bible free online with verse-by-verse audio. The Father's Heart Bible is a fresh translation revealing God as a loving Father — Old & New Testament, book by book.";
 // June 2026 \u2014 Public Reading Month launch. Two-line announcement headline
 // hardcoded for the campaign window; post-July-1, restore the prior Sanity-
 // driven heroHeading ("You were never meant to relate to God as a servant\u2026
