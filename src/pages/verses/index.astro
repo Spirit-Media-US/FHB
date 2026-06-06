@@ -1,0 +1,106 @@
+---
+// /verses — "Bible Verses by Topic" hub. Targets the head term "bible verses"
+// (~323k/mo). Lists every live topical collection as a card (from verseTopics).
+// Add a row to src/data/verseTopics.ts when a new /verses/<topic> page ships.
+import { VERSE_TOPICS } from '../../data/verseTopics';
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/verses/';
+const TITLE = "Bible Verses by Topic — Read & Listen Free | Father's Heart Bible";
+const DESCRIPTION =
+	"Find Bible verses by topic — love, strength, faith, anxiety, and healing — read and heard in the Father's Heart Bible, free online with audio.";
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/82a0a4ceff7d68b1489b2085f692af2ed4f0e58c-6016x4016.jpg';
+const HERO_ALT = 'Friends reading Scripture together outdoors';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=560&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const collectionSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'CollectionPage',
+	name: 'Bible Verses by Topic',
+	description: DESCRIPTION,
+	url: PAGE_URL,
+	inLanguage: 'en-US',
+	isPartOf: {
+		'@type': 'WebSite',
+		name: "Father's Heart Bible",
+		url: 'https://fathersheartbible.com/',
+	},
+	mainEntity: {
+		'@type': 'ItemList',
+		itemListElement: VERSE_TOPICS.map((t, i) => ({
+			'@type': 'ListItem',
+			position: i + 1,
+			name: t.title,
+			url: `https://fathersheartbible.com/verses/${t.slug}`,
+		})),
+	},
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{ '@type': 'ListItem', position: 2, name: 'Bible Verses by Topic', item: PAGE_URL },
+	],
+};
+const jsonLd = [collectionSchema, breadcrumbSchema];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	preloadImageMobile={HERO_IMG}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
+			<img src={HERO_IMG} alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-x-0 top-0 z-10" style="height: 160px; background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0));"></div>
+		</section>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Bible Verses by Topic</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Verses by Topic</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Bible Verses by Topic</h1>
+				<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Looking for what the Bible says about a specific theme? These collections gather Scripture&rsquo;s best-loved verses on love, strength, faith, anxiety, and healing &mdash; each shown in the <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible</a>, a fresh translation in the Father&rsquo;s own voice, and linked into the chapter so you can read and listen free.
+				</p>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-4xl">
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+					{VERSE_TOPICS.map((t) => (
+						<a href={`/verses/${t.slug}/`} class="block rounded-2xl overflow-hidden no-underline transition-all hover:opacity-95" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+							<img src={`${t.img}?w=800&h=460&fit=crop&crop=entropy&fm=webp&q=70`} alt={t.title} width="800" height="460" class="w-full h-44 object-cover" loading="lazy" decoding="async" />
+							<div class="p-5">
+								<h2 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{t.title}</h2>
+								<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{t.blurb}</p>
+								<span class="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">See the verses <span aria-hidden="true">&rarr;</span></span>
+							</div>
+						</a>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Don&rsquo;t stop at a single verse &mdash; read the whole story, free online with audio, in a fresh translation that reveals God as a loving Father.</p>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+	</main>
+</Layout>

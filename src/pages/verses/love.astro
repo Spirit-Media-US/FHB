@@ -1,45 +1,14 @@
 ---
-// Phase-5 topical verse collection — /verses/love  (SAMPLE for approval)
-// Target: "bible verses about love" (KD 11, ~52k). The VERSES are the content:
-// real FHB renderings (pulled verbatim from src/content/bible — never fabricated)
-// grouped by sub-theme, each linking into /read for the full chapter + audio.
-// Anchor = the famous Love Chapter (1 Corinthians 13) via <FeatureChapter>.
-// Locked FHB conventions (memory feedback-fhb-content-seo-conventions): generic+
-// brand title, full-bleed homepage-height hero, direct-answer + key-takeaway,
-// FHB framing, FAQPage, Read-FHB CTA, reader links absolute to prod.
-import AuthorBio from '../../components/AuthorBio.astro';
-import FeatureChapter from '../../components/FeatureChapter.astro';
-import Layout from '../../layouts/Layout.astro';
+// /verses/love — "bible verses about love" (KD 11, ~52k). Data only; rendered by
+// VerseCollection. All verse text is verbatim FHB (src/content/bible).
+import VerseCollection from '../../components/VerseCollection.astro';
 
-const PAGE_URL = 'https://fathersheartbible.com/verses/love';
-const TITLE = "Bible Verses About Love (with Audio) — Father's Heart Bible";
-const DESCRIPTION =
-	"Bible verses about love, read and heard in the Father's Heart Bible — what Scripture says about God's love, loving Him, and loving others. Free to read online with audio.";
-const PUBLISHED = '2026-06-06';
-const MODIFIED = '2026-06-06';
-
-const HERO_BASE =
-	'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg';
-const HERO_ALT = 'People gathered together around a table';
-const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
-const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
-
-const formatDate = (iso: string) =>
-	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-	});
-
-const reader = (slug: string, ch: number) => `https://fathersheartbible.com/read/${slug}/${ch}`;
-
-// Curated, REAL FHB renderings (verbatim from src/content/bible). Grouped by theme.
-const THEMES = [
+const themes = [
 	{
 		id: 'gods-love',
 		heading: "God's love for you",
 		intro:
-			"Before love is anything you do, it is something done to you. These verses show the Father's love reaching toward His children first.",
+			'Before love is anything you do, it is something done to you. These verses show the Father reaching toward His children first.',
 		verses: [
 			{
 				ref: '1 John 3:1',
@@ -128,7 +97,7 @@ const THEMES = [
 	},
 ];
 
-const FAQS = [
+const faqs = [
 	{
 		question: 'What does the Bible say about love?',
 		answer:
@@ -150,192 +119,24 @@ const FAQS = [
 			'Jesus said the greatest commandment is to love God with all your heart, soul, and mind (Matthew 22:37–38), and the second is to love your neighbor as yourself. Together they sum up the whole law. In the Father\'s Heart Bible the first command reads "love your Father," underscoring that we are loving a Father, not merely obeying a rule.',
 	},
 ];
-
-const articleSchema = {
-	'@context': 'https://schema.org',
-	'@type': 'Article',
-	headline: 'Bible Verses About Love',
-	description: DESCRIPTION,
-	image: OG_IMG,
-	author: {
-		'@type': 'Person',
-		'@id': 'https://kevinwhite.us/#person',
-		name: 'Kevin White',
-		url: 'https://kevinwhite.us',
-		jobTitle: "Lead Translator, Father's Heart Bible | CEO, Spirit Media Publishing",
-		affiliation: {
-			'@type': 'Organization',
-			'@id': 'https://spiritmediapublishing.com/#organization',
-			name: 'Spirit Media Publishing',
-		},
-		sameAs: [
-			'https://kevinwhite.us',
-			'https://kevinwhite.us/about/',
-			'https://www.linkedin.com/in/kevinwhiteus/',
-			'https://www.youtube.com/@KevinWhiteus',
-			'https://spiritmediapublishing.com',
-		],
-	},
-	publisher: {
-		'@type': 'Organization',
-		'@id': 'https://spiritmediapublishing.com/#organization',
-		name: 'Spirit Media Publishing',
-		url: 'https://spiritmediapublishing.com',
-	},
-	url: PAGE_URL,
-	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
-	datePublished: PUBLISHED,
-	dateModified: MODIFIED,
-	inLanguage: 'en-US',
-	articleSection: 'Bible Verses by Topic',
-	keywords:
-		'bible verses about love, what the bible says about love, love bible verses, 1 corinthians 13, john 3:16',
-};
-const itemListSchema = {
-	'@context': 'https://schema.org',
-	'@type': 'ItemList',
-	name: 'Bible Verses About Love',
-	itemListElement: THEMES.flatMap((t) => t.verses).map((v, i) => ({
-		'@type': 'ListItem',
-		position: i + 1,
-		name: v.ref,
-		url: reader(v.slug, v.ch),
-	})),
-};
-const breadcrumbSchema = {
-	'@context': 'https://schema.org',
-	'@type': 'BreadcrumbList',
-	itemListElement: [
-		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
-		{
-			'@type': 'ListItem',
-			position: 2,
-			name: 'Verses',
-			item: 'https://fathersheartbible.com/verses/',
-		},
-		{ '@type': 'ListItem', position: 3, name: 'Bible Verses About Love', item: PAGE_URL },
-	],
-};
-const faqSchema = {
-	'@context': 'https://schema.org',
-	'@type': 'FAQPage',
-	mainEntity: FAQS.map((f) => ({
-		'@type': 'Question',
-		name: f.question,
-		acceptedAnswer: { '@type': 'Answer', text: f.answer },
-	})),
-};
-const jsonLd = [articleSchema, itemListSchema, breadcrumbSchema, faqSchema];
-
-const TOC = [
-	...THEMES.map((t) => ({ id: t.id, label: t.heading })),
-	{ id: 'love-chapter', label: 'The Love Chapter' },
-	{ id: 'faq', label: 'FAQ' },
-];
 ---
 
-<Layout
-	title={TITLE}
-	description={DESCRIPTION}
-	image={OG_IMG}
-	darkHero={true}
-	jsonLd={jsonLd}
-	pageType="article"
-	articleAuthor="Kevin White"
-	articlePublishedTime={PUBLISHED}
-	articleSection="Bible Verses by Topic"
-	articleTags={["bible verses about love", "love", "1 Corinthians 13"]}
-	preloadImageMobile={HERO_IMG}
-	preloadImageDesktop={HERO_IMG}
->
-	<main id="main-content">
-		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
-			<img src={HERO_IMG} alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
-			<div class="absolute inset-x-0 top-0 z-10" style="height: 160px; background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0));"></div>
-		</section>
-
-		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
-			<div class="mx-auto max-w-3xl">
-				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
-					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
-					<a href="/verses/" class="hover:underline">Verses</a><span class="px-1.5" aria-hidden="true">/</span>
-					<span style="color: var(--color-ink);">Bible Verses About Love</span>
-				</nav>
-				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Verses by Topic</p>
-				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Bible Verses About Love</h1>
-				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
-					<span>Curated by <a href="/the-fathers-heart-bible/lead-translator/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; Lead Translator, Father&rsquo;s Heart Bible</span>
-					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
-				</div>
-			</div>
-		</section>
-
-		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
-			<div class="mx-auto max-w-3xl">
-				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">
-					<strong style="color: var(--color-ink);">The Bible&rsquo;s clearest word about love is that God Himself <em>is</em> love &mdash; He loved us first, and every love we offer is a response to His.</strong> Below are some of Scripture&rsquo;s best-loved verses on the subject, gathered in three movements: the Father&rsquo;s love for us, our love returned to Him, and the love we then carry to one another. Each one is shown in the Father&rsquo;s Heart Bible &mdash; a fresh translation that renders these passages in the Father&rsquo;s own voice &mdash; and links straight into the chapter so you can <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">read and listen to it free</a>. Read slowly; these are not facts to file away but a Father speaking love over His children.
-				</p>
-
-				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
-					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
-					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">God is love; He loved us first; we love in return and toward others. The Bible&rsquo;s love verses are, at heart, the voice of a Father over His children.</p>
-				</aside>
-
-				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
-					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>
-					<ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
-						{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}
-					</ul>
-				</nav>
-
-				{THEMES.map((theme) => (
-					<>
-						<h2 id={theme.id} class="text-2xl md:text-3xl font-light mt-12 mb-3 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">{theme.heading}</h2>
-						<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">{theme.intro}</p>
-						<div class="space-y-4">
-							{theme.verses.map((v) => (
-								<div class="px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
-									<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: #a04060; font-family: var(--font-sans);">{v.ref}</p>
-									<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">{v.text}</p>
-									<a href={reader(v.slug, v.ch)} class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold hover:underline" style="color: #a04060; font-family: var(--font-sans);">Read &amp; listen to {v.ref.split('–')[0].split(':')[0]} <span aria-hidden="true">&rarr;</span></a>
-								</div>
-							))}
-						</div>
-					</>
-				))}
-
-				<h2 id="love-chapter" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The Love Chapter: 1 Corinthians 13</h2>
-				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">If one passage defines love, it is this one &mdash; read at weddings the world over, yet written to an ordinary, struggling church about how to treat each other. Read it (or listen) slowly, and notice that every line describes the way the Father has already loved you.</p>
-
-				<FeatureChapter book="1 Corinthians" slug="1-corinthians" chapter={13} />
-
-				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
-					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Hear the Father&rsquo;s love for yourself</p>
-					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Read and listen to these passages in full &mdash; free online in the Father&rsquo;s Heart Bible, a fresh translation that lets you hear love in the Father&rsquo;s own voice.</p>
-					<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a>
-				</aside>
-
-				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
-				<div class="space-y-6">
-					{FAQS.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
-				</div>
-
-				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
-					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-						Keep going: read the <a href="https://fathersheartbible.com/read/1-corinthians/13" style="color: var(--color-brand);" class="hover:underline">Love Chapter</a> or the <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">whole Bible free with audio</a>, see our <a href="/guides/how-to-read-the-bible/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why the Father&rsquo;s Heart Bible exists</a>, or get the free book in the <a href="https://fathersheartbible.com/library" style="color: var(--color-brand);" class="hover:underline">resource library</a>. For cross-references, see <a href="https://www.blueletterbible.org/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Blue Letter Bible</a>.
-					</p>
-				</div>
-			</div>
-		</section>
-
-		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
-			<div class="mx-auto max-w-2xl text-center">
-				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible free</h2>
-				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Every verse above is a doorway. Step through and read the whole story &mdash; free online with audio, in a fresh translation that reveals God as a loving Father.</p>
-				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
-			</div>
-		</section>
-
-		<AuthorBio author="Kevin White" />
-	</main>
-</Layout>
+<VerseCollection
+	slug="love"
+	topic="Love"
+	title="Bible Verses About Love (with Audio) — Father's Heart Bible"
+	description="Bible verses about love, read and heard in the Father's Heart Bible — what Scripture says about God's love, loving Him, and loving others. Free to read online with audio."
+	h1="Bible Verses About Love"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg"
+	heroAlt="People gathered together around a table"
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">The Bible&rsquo;s clearest word about love is that God Himself <em>is</em> love &mdash; He loved us first, and every love we offer is a response to His.</strong> Below are some of Scripture&rsquo;s best-loved verses on the subject, gathered in three movements: the Father&rsquo;s love for us, our love returned to Him, and the love we then carry to one another. Each one is shown in the Father&rsquo;s Heart Bible &mdash; a fresh translation that renders these passages in the Father&rsquo;s own voice &mdash; and links straight into the chapter so you can <a href=\"https://fathersheartbible.com/read\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read and listen to it free</a>. Read slowly; these are not facts to file away but a Father speaking love over His children.`}
+	keyTakeaway="God is love; He loved us first; we love in return and toward others. The Bible’s love verses are, at heart, the voice of a Father over His children."
+	themes={themes}
+	featured={{ book: '1 Corinthians', slug: '1-corinthians', chapter: 13, heading: 'The Love Chapter: 1 Corinthians 13', intro: 'If one passage defines love, it is this one — read at weddings the world over, yet written to an ordinary, struggling church about how to treat each other. Read it (or listen) slowly, and notice that every line describes the way the Father has already loved you.' }}
+	faqs={faqs}
+	relatedHtml={`Keep going: read the <a href=\"https://fathersheartbible.com/read/1-corinthians/13\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Love Chapter</a> or the <a href=\"https://fathersheartbible.com/read\" style=\"color: var(--color-brand);\" class=\"hover:underline\">whole Bible free with audio</a>, see our <a href=\"/guides/how-to-read-the-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Bible reading guides</a>, learn <a href=\"/the-fathers-heart-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">why the Father&rsquo;s Heart Bible exists</a>, or get the free book in the <a href=\"https://fathersheartbible.com/library\" style=\"color: var(--color-brand);\" class=\"hover:underline\">resource library</a>. For cross-references, see <a href=\"https://www.blueletterbible.org/\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Blue Letter Bible</a>.`}
+	ctaMidHeading="Hear the Father’s love for yourself"
+	ctaMidBodyHtml="Read and listen to these passages in full &mdash; free online in the Father&rsquo;s Heart Bible, a fresh translation that lets you hear love in the Father&rsquo;s own voice."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole story &mdash; free online with audio, in a fresh translation that reveals God as a loving Father."
+	tags={["bible verses about love", "love", "1 Corinthians 13"]}
+/>
