@@ -2,6 +2,7 @@
 import AuthorBio from '../../components/AuthorBio.astro';
 import BlogCTA from '../../components/BlogCTA.astro';
 import ChapterEmbed from '../../components/ChapterEmbed.astro';
+import FeatureChapter from '../../components/FeatureChapter.astro';
 import HowToHubCards from '../../components/HowToHubCards.astro';
 import PullQuote from '../../components/PullQuote.astro';
 import RelatedPosts from '../../components/RelatedPosts.astro';
@@ -114,9 +115,14 @@ const tags = post.tags || [];
 // (currently `fhbChapter` → <ChapterEmbed>). Runs of regular `block` items
 // are batched into single HTML fragments to preserve normal portable-text
 // behavior; `fhbChapter` items break the run and render the component.
+// A `fhbChapter` block renders the older text-only <ChapterEmbed> by default.
+// When the block carries an optional `slug` (the reader url slug, e.g. "john"),
+// it upgrades to <FeatureChapter> — real reader text + working audio + an
+// "Open <ref> in the reader" link, matching the guide pages. Old posts have no
+// slug, so they keep their current ChapterEmbed rendering untouched.
 type BodySegment =
 	| { kind: 'html'; html: string }
-	| { kind: 'chapter'; book: string; chapter: number }
+	| { kind: 'chapter'; book: string; chapter: number; slug?: string; verseLimit?: number }
 	| { kind: 'image'; src: string; alt: string; caption?: string }
 	| { kind: 'pullquote'; quote: string; attribution?: string };
 
@@ -132,7 +138,13 @@ function segmentBody(blocks: any[]): BodySegment[] {
 	for (const b of blocks || []) {
 		if (b?._type === 'fhbChapter') {
 			flush();
-			segments.push({ kind: 'chapter', book: b.book, chapter: b.chapter });
+			segments.push({
+				kind: 'chapter',
+				book: b.book,
+				chapter: b.chapter,
+				slug: b.slug,
+				verseLimit: b.verseLimit,
+			});
 		} else if (b?._type === 'image' && b?.asset) {
 			flush();
 			const src = urlFor(b).width(1000).format('webp').url();
@@ -297,7 +309,9 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
       <div class="mx-auto max-w-3xl space-y-4">
         {bodySegments.map((seg) =>
           seg.kind === 'chapter'
-            ? <ChapterEmbed book={seg.book} chapter={seg.chapter} />
+            ? (seg.slug
+                ? <FeatureChapter book={seg.book} slug={seg.slug} chapter={seg.chapter} verseLimit={seg.verseLimit} />
+                : <ChapterEmbed book={seg.book} chapter={seg.chapter} />)
             : seg.kind === 'image'
               ? <figure class="my-8">
                   <img src={seg.src} alt={seg.alt} class="w-full max-w-md mx-auto rounded-lg shadow-sm" loading="lazy" decoding="async" />
