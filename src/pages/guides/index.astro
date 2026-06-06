@@ -3,6 +3,8 @@
 // Lists every live guide as a card. NOTE: only real, published guides are listed
 // — never link a guide that doesn't exist yet (no broken links). Add a row to
 // GUIDES when a new /guides/<slug> page ships. Targets "bible reading guide".
+import HowToHubCards from '../../components/HowToHubCards.astro';
+import { GUIDES } from '../../data/guides';
 import Layout from '../../layouts/Layout.astro';
 
 const PAGE_URL = 'https://fathersheartbible.com/guides/';
@@ -15,31 +17,6 @@ const HERO_BASE =
 const HERO_ALT = 'Friends reading books together indoors';
 const HERO_IMG = `${HERO_BASE}?w=1400&h=560&fit=crop&crop=entropy&fm=webp&q=72`;
 const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
-
-// Live guides only. card image = each guide's hero, cropped small.
-const GUIDES = [
-	{
-		slug: 'how-to-read-the-bible',
-		title: 'How to Read the Bible',
-		blurb:
-			'A simple beginner’s guide — where to start, how to understand it, and how to make it a daily habit.',
-		img: 'https://cdn.sanity.io/images/rusi1hyi/production/13334b01b91963fa9581ecebb66c4cf6064938d2-6016x4016.jpg',
-	},
-	{
-		slug: 'where-to-start-reading-the-bible',
-		title: 'Where to Start Reading the Bible',
-		blurb:
-			'A simple reading plan: begin in Genesis 1–3, then the Gospel of John, then the rest of the Bible.',
-		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
-	},
-	{
-		slug: 'how-to-study-the-bible',
-		title: 'How to Study the Bible',
-		blurb:
-			'A simple observe–interpret–apply method for beginners — read in context and study for the Father’s heart.',
-		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c42c2fd1d784331411250317010d54a0cfac62cc-5959x3724.jpg',
-	},
-];
 
 const collectionSchema = {
 	'@context': 'https://schema.org',
@@ -103,22 +80,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema];
 			</div>
 		</section>
 
-		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
-			<div class="mx-auto max-w-4xl">
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{GUIDES.map((g) => (
-						<a href={`/guides/${g.slug}/`} class="block rounded-2xl overflow-hidden no-underline transition-all hover:opacity-95" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
-							<img src={`${g.img}?w=800&h=460&fit=crop&crop=entropy&fm=webp&q=70`} alt={g.title} width="800" height="460" class="w-full h-44 object-cover" loading="lazy" decoding="async" />
-							<div class="p-5">
-								<h2 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{g.title}</h2>
-								<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{g.blurb}</p>
-								<span class="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">Read the guide <span aria-hidden="true">&rarr;</span></span>
-							</div>
-						</a>
-					))}
-				</div>
-			</div>
-		</section>
+		<HowToHubCards bg="var(--color-surface)" />
 
 		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-2xl text-center">
