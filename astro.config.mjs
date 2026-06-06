@@ -65,7 +65,7 @@ export default defineConfig({
 					return { ...item, changefreq: 'weekly', priority: 1.0, lastmod: now };
 				}
 				// Key landing pages
-				if (url.includes('/download') || url.includes('/samples') || url.includes('/guides')) {
+				if (url.includes('/samples') || url.includes('/guides')) {
 					return { ...item, changefreq: 'monthly', priority: 0.9, lastmod: now };
 				}
 				// Blog index
