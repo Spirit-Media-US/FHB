@@ -1,0 +1,241 @@
+---
+// Phase-5 Gold-Level guide — /guides/how-to-study-the-bible
+// Target: "how to study the bible" (KD 4, ~6.1k) + "bible study for beginners",
+// "how to study the bible effectively". Locked FHB conventions (see memory
+// feedback-fhb-content-seo-conventions). Featured chapter: Psalm 1 ("on his law
+// he meditates day and night") — the Bible's own picture of studying the Word.
+import AuthorBio from '../../components/AuthorBio.astro';
+import FeatureChapter from '../../components/FeatureChapter.astro';
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/guides/how-to-study-the-bible';
+const TITLE = "How to Study the Bible — A Simple Method for Beginners | Father's Heart Bible";
+const DESCRIPTION =
+	"How to study the Bible: a simple observe-interpret-apply method for beginners — read in context, use cross-references, and study for the Father's heart.";
+const PUBLISHED = '2026-06-06';
+const MODIFIED = '2026-06-06';
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/c42c2fd1d784331411250317010d54a0cfac62cc-5959x3724.jpg';
+const HERO_ALT = 'Focused young adults studying and reading books together indoors';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: "Lead Translator, Father's Heart Bible | CEO, Spirit Media Publishing",
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+const FAQS = [
+	{
+		question: 'How do I study the Bible as a beginner?',
+		answer:
+			'Use three simple steps on one passage at a time: observe (what does it say?), interpret (what did it mean to the first readers?), and apply (what does it mean for me?). Read in context, ask what each passage reveals about God as Father, and write down one thing to carry into your day. Start in Genesis 1-3, then the Gospel of John, a chapter at a time.',
+	},
+	{
+		question: 'What is the difference between reading and studying the Bible?',
+		answer:
+			'Reading moves through the text to take in the story; studying slows down on a passage to understand it deeply. Both matter. A healthy rhythm is to read widely and steadily — a chapter a day — while studying one shorter passage more closely each week, observing, interpreting, and applying it. In the Father’s Heart Bible you can read and listen to a chapter, then return to study the verses that stood out.',
+	},
+	{
+		question: 'Do I need study tools or commentaries to study the Bible?',
+		answer:
+			'No tools are required to begin — context and prayerful attention take you a long way. But free resources help when a passage is hard: Blue Letter Bible and Bible Hub show the original Hebrew and Greek and offer trusted commentary. Use them to check your interpretation, not to replace your own reading. Read for the heart of the passage first; let the tools fill in the details.',
+	},
+	{
+		question: 'How often should I study the Bible?',
+		answer:
+			'Aim for a little every day rather than a lot once in a while. Psalm 1 pictures the blessed person meditating on God’s word “day and night” — a steady, unhurried rhythm. A practical pattern: read a chapter daily, and set aside one longer slot each week to study a passage more closely. Consistency, not intensity, is what forms a reader over time.',
+	},
+];
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: 'How to Study the Bible: A Simple Method for Beginners',
+	description: DESCRIPTION,
+	image: OG_IMG,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: PUBLISHED,
+	dateModified: MODIFIED,
+	inLanguage: 'en-US',
+	articleSection: 'Bible Reading Guides',
+	keywords:
+		'how to study the bible, bible study for beginners, how to study the bible effectively, bible study method, observe interpret apply',
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'Guides',
+			item: 'https://fathersheartbible.com/guides/',
+		},
+		{ '@type': 'ListItem', position: 3, name: 'How to Study the Bible', item: PAGE_URL },
+	],
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [articleSchema, breadcrumbSchema, faqSchema];
+
+const TOC = [
+	{ id: 'method', label: 'A simple 3-step method' },
+	{ id: 'context', label: 'Read in context' },
+	{ id: 'tools', label: 'Cross-references & tools' },
+	{ id: 'journal', label: 'Keep a journal' },
+	{ id: 'together', label: 'Study with others' },
+	{ id: 'fathers-heart', label: "Study for the Father's heart" },
+	{ id: 'faq', label: 'FAQ' },
+];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={PUBLISHED}
+	articleSection="Bible Reading Guides"
+	articleTags={["how to study the Bible", "Bible study", "Bible for beginners"]}
+	preloadImageMobile={HERO_IMG}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
+			<img src={HERO_IMG} alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-x-0 top-0 z-10" style="height: 160px; background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0));"></div>
+		</section>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/guides/" class="hover:underline">Guides</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">How to Study the Bible</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Reading Guide</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">How to Study the Bible: A Simple Method</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/lead-translator/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; Lead Translator, Father&rsquo;s Heart Bible</span>
+					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<strong style="color: var(--color-ink);">To study the Bible, take one passage at a time and move through three questions &mdash; observe (what does it say?), interpret (what did it mean to the first readers?), and apply (what does it mean for me?) &mdash; reading in context and asking what the passage reveals about God as Father.</strong> Studying is simply reading slowed down. Where reading carries you through the story, studying stops on a passage long enough to understand it. You do not need seminary training or a shelf of commentaries to start &mdash; you need a clear translation, a little time, and a few good habits. Begin where the story begins, Genesis 1&ndash;3, then the Gospel of John, and study a shorter passage closely each week while you read a chapter a day. Above all, study for relationship, not just information: the Bible was given to reveal a Father, and that is what careful study uncovers.
+				</p>
+
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">Observe, interpret, apply &mdash; one passage at a time, read in context, asking what it shows you about your Father. Study is reading slowed down.</p>
+				</aside>
+
+				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>
+					<ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
+						{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}
+					</ul>
+				</nav>
+
+				<h2 id="method" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">A simple 3-step Bible study method</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The most reliable beginner&rsquo;s method has three steps you run on a single passage:</p>
+				<ol class="space-y-3 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: decimal;">
+					<li><strong style="color: var(--color-ink);">Observe</strong> &mdash; What does it actually say? Note who is speaking, what happens, repeated words.</li>
+					<li><strong style="color: var(--color-ink);">Interpret</strong> &mdash; What did it mean to the people who first heard it? Read the surrounding verses.</li>
+					<li><strong style="color: var(--color-ink);">Apply</strong> &mdash; What does it mean for me today, and what does it show me about my Father?</li>
+				</ol>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Run those three questions on one short passage and you have studied the Bible &mdash; no special training required. The featured Psalm below is a perfect first passage to practice on.</p>
+
+				<FeatureChapter book="Psalm" slug="psalms" chapter={1} />
+
+				<h2 id="context" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Always read in context</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The single biggest study skill is reading in context. A verse means what it means inside its own paragraph, chapter, and book &mdash; lift it out and you can make it say almost anything. Before you settle on what a verse means, read the verses just before and after it, ask who is speaking and to whom, and notice where it sits in the larger story. This is exactly why we study with the whole arc in view: from Genesis to Revelation the Bible is following a single thread &mdash; a Father, the children He made, their long wandering, and His patient work through the Son to gather them back. A passage read against that backdrop almost always opens up. Context turns a confusing verse into a clear one, and it guards you from building an idea the text never intended.</p>
+
+				<h2 id="tools" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Use cross-references and free study tools</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">When a passage is hard, let Scripture explain Scripture &mdash; a clearer verse often unlocks a harder one, and most Bibles list cross-references in the margin for exactly this. When you want to dig into a specific word, free tools such as <a href="https://www.blueletterbible.org/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Blue Letter Bible</a> and <a href="https://biblehub.com/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Bible Hub</a> show the original Hebrew and Greek behind it, along with trusted commentary. Use these to <em>check</em> your interpretation, not to replace your own reading &mdash; tools serve the text, they do not stand over it. Reading in a fresh, plain-English translation like the Father&rsquo;s Heart Bible removes much of the difficulty before you ever reach for a tool, because the meaning is already clear on the page.</p>
+
+				<h2 id="journal" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Keep a simple journal</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Writing turns reading into study. After your three questions, jot down a sentence or two: what you noticed, what it shows you about the Father, and one thing to carry into your day. You do not need anything elaborate &mdash; a cheap notebook or a notes app is plenty. Over weeks, a journal does two things: it slows you down enough to actually absorb a passage, and it leaves a record you can look back on to see how the Father has been speaking. Many readers also write a short prayer in response, turning the passage straight back to Him. The act of writing it down is what moves a verse from your eyes to your heart, and from a single morning into something you remember.</p>
+
+				<h2 id="together" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Study with others</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">You were never meant to study the Bible entirely alone. Reading the same passage alongside others &mdash; a friend, a small group, a church class &mdash; surfaces observations you would have missed and gently corrects interpretations that drift. The Father&rsquo;s Heart Bible is being read by a global family for this very reason: Scripture comes alive in community. You can listen to a chapter, bring what you noticed, and let others add what they saw. If you do not have a group yet, start small &mdash; one other person reading the same chapter each week is enough. Studying together keeps you honest, keeps you encouraged, and reflects the truth that the Father is forming a family, not just individual readers.</p>
+
+				<h2 id="fathers-heart" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Study for the Father&rsquo;s heart, not just facts</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">It is possible to master Bible facts and miss the point entirely. Jesus said it to the most diligent students of his day: you study the Scriptures thinking they give you life, yet you miss the One they point to. The aim of study is not information but relationship &mdash; to know the Father the whole Bible reveals. So as you observe, interpret, and apply, let one question govern the rest: <em>what is this teaching me about my Father, and about who He says I am?</em> Studied that way, Scripture stops being an ancient record to analyze and starts reading like a letter addressed to you &mdash; the Father naming you His own. That is the very reason the <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible</a> exists, and the thread traced in the free book <a href="/download/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart &rarr; Beloved Identity</a>.</p>
+
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Study it with audio, free</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Read and listen to any passage in the Father&rsquo;s Heart Bible &mdash; a fresh translation in plain English, free online, that brings the Father&rsquo;s heart to the surface.</p>
+					<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a>
+				</aside>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="space-y-6">
+					{FAQS.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Keep going: read <a href="/guides/how-to-read-the-bible/" style="color: var(--color-brand);" class="hover:underline">How to Read the Bible</a> and <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">Where to Start Reading the Bible</a>, study a passage in the <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">Bible free with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why the Father&rsquo;s Heart Bible exists</a>, or get the free book in the <a href="https://fathersheartbible.com/library" style="color: var(--color-brand);" class="hover:underline">resource library</a>. Browse <a href="/blog/" style="color: var(--color-brand);" class="hover:underline">the blog</a> for more on the Father&rsquo;s heart in Scripture. For original-language study, see <a href="https://www.blueletterbible.org/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Blue Letter Bible</a> or <a href="https://biblehub.com/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Bible Hub</a>.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Open any passage and study it with the words and the audio together &mdash; the whole Bible, free online, in a fresh translation that brings the Father&rsquo;s heart to the surface.</p>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>

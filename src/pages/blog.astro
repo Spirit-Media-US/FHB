@@ -1,4 +1,5 @@
 ---
+import HowToHubCards from '../components/HowToHubCards.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
@@ -158,6 +159,9 @@ const jsonLd = {
     </section>
 
     <script id="sanity-posts-data" type="application/json" set:html={SANITY_POSTS_JSON}></script>
+
+    <!-- HOW-TO HUB — feature the guide cluster at the bottom of the blog -->
+    <HowToHubCards heading="Bible Reading Guides" />
   </main>
 
 </Layout>

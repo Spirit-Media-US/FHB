@@ -1,0 +1,93 @@
+---
+// Phase-5 section hub — /guides/  (fixes the breadcrumb that every guide links to)
+// Lists every live guide as a card. NOTE: only real, published guides are listed
+// — never link a guide that doesn't exist yet (no broken links). Add a row to
+// GUIDES when a new /guides/<slug> page ships. Targets "bible reading guide".
+import HowToHubCards from '../../components/HowToHubCards.astro';
+import { GUIDES } from '../../data/guides';
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/guides/';
+const TITLE = "Bible Reading Guides — How to Read, Study & Begin | Father's Heart Bible";
+const DESCRIPTION =
+	"Free Bible reading guides for beginners — how to read the Bible, where to start, and how to study it, with the Father's Heart Bible. Read free online with audio.";
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/5c79ea5c7847e8a64dea32438633334fa53becd4-6000x4000.jpg';
+const HERO_ALT = 'Friends reading books together indoors';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=560&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const collectionSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'CollectionPage',
+	name: 'Bible Reading Guides',
+	description: DESCRIPTION,
+	url: PAGE_URL,
+	inLanguage: 'en-US',
+	isPartOf: {
+		'@type': 'WebSite',
+		name: "Father's Heart Bible",
+		url: 'https://fathersheartbible.com/',
+	},
+	mainEntity: {
+		'@type': 'ItemList',
+		itemListElement: GUIDES.map((g, i) => ({
+			'@type': 'ListItem',
+			position: i + 1,
+			name: g.title,
+			url: `https://fathersheartbible.com/guides/${g.slug}`,
+		})),
+	},
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{ '@type': 'ListItem', position: 2, name: 'Guides', item: PAGE_URL },
+	],
+};
+const jsonLd = [collectionSchema, breadcrumbSchema];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	preloadImageMobile={HERO_IMG}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
+			<img src={HERO_IMG} alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-x-0 top-0 z-10" style="height: 160px; background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0));"></div>
+		</section>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Guides</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Reading Guides</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Bible Reading Guides</h1>
+				<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Simple, free guides to help you read the Bible &mdash; where to begin, how to understand it, and how to study it for yourself. Each one starts where the story starts, in Genesis, and reads toward the Father&rsquo;s heart revealed in Jesus. Every guide links you straight into the <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible</a>, free to read online with audio.
+				</p>
+			</div>
+		</section>
+
+		<HowToHubCards bg="var(--color-surface)" />
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Begin in Genesis, read on through John, and listen as you go &mdash; the whole Bible, free online with audio, in a fresh translation revealing God as a loving Father.</p>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+	</main>
+</Layout>

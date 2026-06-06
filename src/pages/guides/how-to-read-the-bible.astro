@@ -1,0 +1,350 @@
+---
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase-5 Gold-Level guide page — /guides/how-to-read-the-bible
+// Target query: "how to read the Bible" (KD 2, ~11k vol) + "where to start
+// reading the bible" (KD 0), "how to understand the bible" (KD 3), "how to read
+// the bible for beginners" (KD 5). Generic phrase + brand per Kevin (2026-06-06):
+// fold "Father's Heart Bible" into every guide purposefully, not just generic.
+//
+// FHB conviction folded into the reading order (Kevin, 2026-06-06): start in
+// Genesis 1-3, THEN the Gospel of John. If we start wrong at Genesis 1:1 we stay
+// wrong through the whole Bible; readers must see the Father already restoring
+// His sons and daughters in creation before John, or they won't grasp why Jesus
+// came, died, and rose. The blog is ANCHORED with a real featured chapter
+// (Genesis 1) showing the reader text + working audio (<FeatureChapter>).
+//
+// Pattern (replicable for every /guides/<slug> page): generic+brand title/H1/
+// first 150 words → direct-answer + key-takeaway → mini-TOC → featured chapter
+// anchor → 6 self-contained H2s (listicle where possible) → visible FAQ (mirrors
+// FAQPage JSON-LD) → read+listen + join CTAs → author bio. JSON-LD: Article +
+// BreadcrumbList + FAQPage (Organization appended sitewide by Layout).
+// All internal links verified live on fathersheartbible.com (2026-06-06).
+// ─────────────────────────────────────────────────────────────────────────────
+import AuthorBio from '../../components/AuthorBio.astro';
+import FeatureChapter from '../../components/FeatureChapter.astro';
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/guides/how-to-read-the-bible';
+const TITLE = "How to Read the Bible — A Beginner's Guide | Father's Heart Bible";
+const DESCRIPTION =
+	"A simple, step-by-step guide to reading the Bible — where to start, how to understand it, and how to make it a daily habit, with the Father's Heart Bible.";
+const PUBLISHED = '2026-06-06';
+const MODIFIED = '2026-06-06';
+
+// Feature image — Sanity "Blog Images" tag, unused asset (verified 2026-06-06).
+// "couple-studying-bible-together-at-wooden-table". Sanity CDN handles sizing.
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/13334b01b91963fa9581ecebb66c4cf6064938d2-6016x4016.jpg';
+const HERO_ALT = 'A couple reading and studying the Bible together at a wooden table';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+// Kevin White's author entity — same Person schema used across FHB blog posts so
+// AI engines resolve a single authoritative author across the site (E-E-A-T).
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: "Lead Translator, Father's Heart Bible | CEO, Spirit Media Publishing",
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+// Visible FAQ pairs — rendered as H2/H3 below AND emitted as FAQPage JSON-LD so
+// the same Q&As AI Overviews / Perplexity extract are also on the page.
+const FAQS = [
+	{
+		question: 'What book of the Bible should I read first?',
+		answer:
+			'Read Genesis 1-3 first, then the Gospel of John. Genesis shows our Heavenly Father creating the world and His sons and daughters, and the early chapters reveal why we needed rescue. With that foundation, the Gospel of John — where Jesus comes to restore the Father\'s family — makes sense. In the Father\'s Heart Bible, Genesis 1:1 reads, "In the beginning, our Heavenly Father created the heavens and the earth."',
+	},
+	{
+		question: 'Why start with Genesis instead of the Gospels?',
+		answer:
+			"Because if you start wrong at Genesis 1:1, you stay wrong through the whole Bible. Genesis 1-3 establishes who God is — a Father, not a distant force — and shows Him already at work restoring His beloved sons and daughters. Without that, the Gospel of John can feel like it begins mid-story: you won't fully understand why Jesus came, died, and rose. Genesis builds the faith that reading John then rewards.",
+	},
+	{
+		question: 'How much of the Bible should I read each day?',
+		answer:
+			'Start with one chapter a day. A single chapter takes about five minutes and is short enough to think about and remember. Consistency matters far more than volume — five focused minutes daily takes you further than an hour once a month, and one chapter a day carries you through an entire book in a few weeks.',
+	},
+	{
+		question: 'Do I need to read the Bible in order?',
+		answer:
+			'No. The Bible is a library of 66 books, not a single front-to-back novel. The most fruitful path for a beginner is Genesis 1-3, then the Gospel of John, then the rest of the New Testament, and from there back through the Old Testament story. Reading by theme — love, strength, faith — is another good way in once you have the foundation.',
+	},
+	{
+		question: 'Does listening to the Bible count as reading it?',
+		answer:
+			"Yes. Hearing Scripture read aloud is how the Bible was experienced for most of history, and listening helps you absorb the meaning and rhythm of a passage. In the Father's Heart Bible every chapter is free to read online and to hear with audio narration, so you can read, listen, or do both at once.",
+	},
+];
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: 'How to Read the Bible: A Beginner’s Guide',
+	description: DESCRIPTION,
+	image: OG_IMG,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: PUBLISHED,
+	dateModified: MODIFIED,
+	inLanguage: 'en-US',
+	articleSection: 'Bible Reading Guides',
+	keywords:
+		'how to read the bible, how to read the bible for beginners, where to start reading the bible, how to understand the bible, daily bible reading',
+};
+
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'Guides',
+			item: 'https://fathersheartbible.com/guides/',
+		},
+		{ '@type': 'ListItem', position: 3, name: 'How to Read the Bible', item: PAGE_URL },
+	],
+};
+
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+
+const jsonLd = [articleSchema, breadcrumbSchema, faqSchema];
+
+// Jump-link mini-TOC sections (page exceeds ~800 words → TOC per AEO guide §B10).
+const TOC = [
+	{ id: 'where-to-start', label: 'Where to start' },
+	{ id: 'five-steps', label: '5 simple steps' },
+	{ id: 'understand', label: 'How to understand it' },
+	{ id: 'daily-habit', label: 'Building a daily habit' },
+	{ id: 'listen', label: 'Reading vs. listening' },
+	{ id: 'fathers-heart', label: "Read for the Father's heart" },
+	{ id: 'faq', label: 'FAQ' },
+];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={PUBLISHED}
+	articleSection="Bible Reading Guides"
+	articleTags={["how to read the Bible", "Bible for beginners", "daily Bible reading"]}
+	preloadImageMobile={HERO_IMG}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<!-- FEATURE IMAGE — full-bleed hero, starts at top behind the transparent nav -->
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
+			<img src={HERO_IMG} alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-x-0 top-0 z-10" style="height: 160px; background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0));"></div>
+		</section>
+
+		<!-- ── HEADER ─────────────────────────────────────────────── -->
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a>
+					<span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/guides/" class="hover:underline">Guides</a>
+					<span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">How to Read the Bible</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">
+					Bible Reading Guide
+				</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+					How to Read the Bible: A Beginner&rsquo;s Guide
+				</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/lead-translator/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; Lead Translator, Father&rsquo;s Heart Bible</span>
+					<span aria-hidden="true">&middot;</span>
+					<span>{formatDate(PUBLISHED)}</span>
+				</div>
+			</div>
+		</section>
+
+		<!-- ── CONTENT ────────────────────────────────────────────── -->
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+
+				<!-- Direct-answer paragraph (first ~190 words; contains the query) -->
+				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<strong style="color: var(--color-ink);">To read the Bible, begin in Genesis 1&ndash;3, then move to the Gospel of John, read one chapter a day, and read for the Father&rsquo;s heart rather than for information.</strong> The Bible is not one book but a library of 66 books, so you do not have to read it cover to cover. But where you begin matters: in the Father&rsquo;s Heart Bible we hold that if you start wrong at Genesis 1:1, you stay wrong through the whole Bible. So start at the foundation. Genesis 1&ndash;3 shows our Heavenly Father creating the world and His sons and daughters, and already moving to restore them when everything breaks. With that in place, the Gospel of John &mdash; where Jesus comes to bring the family home &mdash; finally makes sense. Read a single chapter each day (about five minutes), pause to ask <em>what does this show me about God as my Father?</em>, and listen to the audio when you can. That simple rhythm &mdash; start at creation, read short and daily, centered on the Father&rsquo;s heart &mdash; is exactly how the Father&rsquo;s Heart Bible is made to be read.
+				</p>
+
+				<!-- Key takeaway callout (the citation snippet) -->
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">
+						Start in Genesis 1&ndash;3, then the Gospel of John. Read one chapter a day and ask what each passage reveals about God as Father. Begin right at creation, and the rest of the Bible reads right.
+					</p>
+				</aside>
+
+				<!-- Mini-TOC -->
+				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>
+					<ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
+						{TOC.map((t) => (
+							<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>
+						))}
+					</ul>
+				</nav>
+
+				<!-- H2 1 — Where to start -->
+				<h2 id="where-to-start" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Where should a beginner start reading the Bible?
+				</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Start in Genesis 1&ndash;3, then go to the Gospel of John. Many guides send beginners straight to John, but that can drop you into the middle of the story. Genesis is the foundation: in just three chapters you meet our Heavenly Father creating the world, forming His sons and daughters in His own image, and &mdash; the moment they fall &mdash; already moving to restore them. That is the whole Bible in miniature &mdash; the one story it tells from first page to last: the Father made His children in His image, they wandered from Him, and He has been bringing them home ever since through His Son. It is the faith you need before John. So when you later read that Jesus came, died, and rose, you understand <em>why</em>: He is the way home to the Father &mdash; not merely the way to heaven &mdash; the rescue for the family begun in Genesis. In the <a href="https://fathersheartbible.com/read/genesis/1" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible, Genesis 1:1 reads</a>, &ldquo;In the beginning, our Heavenly Father created the heavens and the earth&rdquo; &mdash; the Father&rsquo;s heart, right from the first line. Read it and listen below, then continue into Genesis 2&ndash;3 and on to John.
+				</p>
+
+				<!-- FEATURED CHAPTER ANCHOR — real reader text + audio -->
+				<FeatureChapter book="Genesis" slug="genesis" chapter={1} />
+
+				<!-- H2 2 — 5 simple steps (listicle / Top-N) -->
+				<h2 id="five-steps" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					How to read the Bible in 5 simple steps
+				</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					These five steps turn &ldquo;I should read the Bible&rdquo; into something you actually do:
+				</p>
+				<ol class="space-y-3 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: decimal;">
+					<li><strong style="color: var(--color-ink);">Start at the foundation.</strong> Read Genesis 1&ndash;3, then the Gospel of John.</li>
+					<li><strong style="color: var(--color-ink);">Read one chapter a day.</strong> Short and daily beats long and rare.</li>
+					<li><strong style="color: var(--color-ink);">Read in plain modern English.</strong> A clear translation removes the barrier of old language.</li>
+					<li><strong style="color: var(--color-ink);">Ask one question.</strong> &ldquo;What does this show me about God as my Father?&rdquo;</li>
+					<li><strong style="color: var(--color-ink);">Listen as you read.</strong> Hearing a chapter aloud helps the meaning land.</li>
+				</ol>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Keep it light. The goal is not to finish fast but to keep showing up &mdash; a chapter a day carries you from Genesis through John in about a month, and through the whole New Testament within a year.
+				</p>
+
+				<!-- H2 3 — Understand -->
+				<h2 id="understand" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					How to understand what you read
+				</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Understanding the Bible grows from three simple habits. First, read in context: notice who is speaking, who they are speaking to, and what comes just before and after &mdash; a single verse means what it means inside its own story, which is exactly why beginning at Genesis matters. Second, use a clear translation; old-fashioned wording is the biggest reason beginners feel lost, and a fresh, plain-English rendering like the Father&rsquo;s Heart Bible removes it. Third, let Scripture explain Scripture &mdash; when a passage is hard, a clearer one usually sheds light on it. When you want to go deeper, free study tools such as <a href="https://www.blueletterbible.org/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Blue Letter Bible</a> and <a href="https://biblehub.com/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Bible Hub</a> show the original Hebrew and Greek behind a word. You do not need them to begin &mdash; read for the heart of the passage first, and the details fill in over time.
+				</p>
+
+				<!-- H2 4 — Daily habit -->
+				<h2 id="daily-habit" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					How to build a daily Bible-reading habit
+				</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					A habit forms when reading is small, fixed, and easy to start. Attach it to something you already do every day &mdash; your morning coffee, your commute, the few minutes before sleep &mdash; so the time chooses itself. Keep the bar low: one chapter, five minutes. According to the American Bible Society&rsquo;s annual <em>State of the Bible</em> research, the people who report the most peace and hope are those who engage Scripture consistently, not occasionally &mdash; rhythm is what changes a reader. Use a simple plan so you never wonder what comes next; reading Genesis, then John, then the rest of the New Testament is plan enough to start. And let listening carry the busy days: in the <a href="https://fathersheartbible.com/read/genesis/1" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible every chapter has free audio</a>, so &ldquo;I&rsquo;m too tired to read&rdquo; never has to mean skipping a day.
+				</p>
+
+				<!-- H2 5 — Listen -->
+				<h2 id="listen" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Does listening to the Bible count as reading it?
+				</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Yes &mdash; and for most of history, hearing was how people received Scripture at all. The books of the Bible were written to be read aloud to gathered communities; only a small fraction of people could read for themselves. Listening engages you differently than reading with your eyes: you catch the rhythm, the tone, and the emotion of a passage, and you can take it in while you walk, drive, or rest. The strongest approach is to do both at once &mdash; follow the words on the page while you hear them spoken, just as you can with the audio player on Genesis 1 above. That is how the <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible is built</a>: every chapter is free to read online with audio narration, so you can read, listen, or read and listen together. However you take it in, the Word is doing its work.
+				</p>
+
+				<!-- H2 6 — Father's heart (FHB pillar) -->
+				<h2 id="fathers-heart" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Read for the Father&rsquo;s heart, not just information
+				</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					The most important shift a new reader can make is <em>why</em> they read. Many people read the Bible to gather facts &mdash; names, dates, rules &mdash; and finish informed but untouched. Scripture was given for something deeper: to reveal God as a loving Father and to show you who you are as His beloved child. This is why we start at Genesis &mdash; you watch the Father create His children in His own image and pursue them the moment they fall, so by the time you reach John you read the cross as a Father bringing His family home. Read this way and Scripture stops being someone else&rsquo;s history and becomes your own story: the Father restoring the beloved identity He gave you at the beginning. Read each passage asking, &ldquo;What does this tell me about my Father, and how He sees me?&rdquo; That question turns reading into relationship. It is the very reason the <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible</a> exists &mdash; a fresh translation that brings the Father&rsquo;s love forward in every passage, the same thread traced in the free book <a href="/download/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart &rarr; Beloved Identity</a>. You can <a href="/samples/" style="color: var(--color-brand);" class="hover:underline">compare sample passages</a> to see how that reads.
+				</p>
+
+				<!-- READ + LISTEN CTA -->
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">
+						Start in Genesis today
+					</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Read the Father&rsquo;s Heart Bible free online &mdash; a fresh translation revealing God as a loving Father, with audio narration so you can read and listen together, from Genesis to John and beyond.
+					</p>
+					<a href="https://fathersheartbible.com/read/genesis/1" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">
+						Read &amp; Listen Free
+						<span aria-hidden="true">&rarr;</span>
+					</a>
+				</aside>
+
+				<!-- FAQ (visible — mirrors FAQPage JSON-LD) -->
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Frequently asked questions
+				</h2>
+				<div class="space-y-6">
+					{FAQS.map((f) => (
+						<div>
+							<h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3>
+							<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p>
+						</div>
+					))}
+				</div>
+
+				<!-- Related authority + internal links -->
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Keep going: <a href="https://fathersheartbible.com/read/genesis/1" style="color: var(--color-brand);" class="hover:underline">read &amp; listen to Genesis 1</a>, then <a href="https://fathersheartbible.com/read/genesis/3" style="color: var(--color-brand);" class="hover:underline">Genesis 3</a> and the <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">whole Bible free with audio</a>. Learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why the Father&rsquo;s Heart Bible exists</a>, <a href="/samples/" style="color: var(--color-brand);" class="hover:underline">see sample passages</a>, or get the free book and other downloads in the <a href="https://fathersheartbible.com/library" style="color: var(--color-brand);" class="hover:underline">resource library</a>. Browse <a href="/blog/" style="color: var(--color-brand);" class="hover:underline">the blog</a> for more on the Father&rsquo;s heart in Scripture. For original-language study, see <a href="https://www.blueletterbible.org/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Blue Letter Bible</a>.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- PRIMARY CTA — READ FHB (the site's primary call to action) -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Read the Father&rsquo;s Heart Bible free
+				</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Begin in Genesis, read on through John, and listen as you go &mdash; the whole Bible, free online with audio narration, in a fresh translation revealing God as a loving Father.
+				</p>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">
+					Read FHB
+					<span aria-hidden="true">&rarr;</span>
+				</a>
+			</div>
+		</section>
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>

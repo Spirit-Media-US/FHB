@@ -2,6 +2,7 @@
 import AuthorBio from '../../components/AuthorBio.astro';
 import BlogCTA from '../../components/BlogCTA.astro';
 import ChapterEmbed from '../../components/ChapterEmbed.astro';
+import HowToHubCards from '../../components/HowToHubCards.astro';
 import PullQuote from '../../components/PullQuote.astro';
 import RelatedPosts from '../../components/RelatedPosts.astro';
 import ShareBar from '../../components/ShareBar.astro';
@@ -317,6 +318,9 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
 
     <!-- RELATED POSTS -->
     <RelatedPosts currentSlug={`/blog/${post.slug.current}`} currentTags={tags} />
+
+    <!-- HOW-TO HUB — cross-link the guide cluster from every blog post -->
+    <HowToHubCards heading="Bible Reading Guides" />
   </main>
 
 </Layout>
