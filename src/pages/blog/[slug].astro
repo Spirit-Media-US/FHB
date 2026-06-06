@@ -312,7 +312,7 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
         {bodySegments.map((seg) =>
           seg.kind === 'chapter'
             ? (seg.slug
-                ? <FeatureChapter book={seg.book} slug={seg.slug} chapter={seg.chapter} verseLimit={seg.verseLimit} />
+                ? <FeatureChapter book={seg.book} slug={seg.slug} chapter={seg.chapter} verseLimit={seg.verseLimit} playable={true} />
                 : <ChapterEmbed book={seg.book} chapter={seg.chapter} />)
             : seg.kind === 'image'
               ? <figure class="my-8">
