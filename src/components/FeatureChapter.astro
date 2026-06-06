@@ -45,7 +45,10 @@ const versesWithFootnotes = verses.filter((v) => v.footnote);
 const SUPERSCRIPTS = ['', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹', '¹⁰', '¹¹', '¹²'];
 const sup = (n: number) => SUPERSCRIPTS[n] ?? `^${n}`;
 
-const readerHref = `/read/${slug}/${chapter}`;
+// Absolute to the production apex: the reader (/read/*) is served by the
+// community app via the apex Worker, which only runs on fathersheartbible.com —
+// a relative /read link 404s on the dev .pages.dev preview. Always point to prod.
+const readerHref = `https://fathersheartbible.com/read/${slug}/${chapter}`;
 const audioSrc = `https://media.spiritmediapublishing.com/audio/en/${slug}/${chapter}.mp3`;
 const ref = `${book} ${chapter}`;
 ---
