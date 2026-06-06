@@ -1,0 +1,275 @@
+---
+import Layout from '../layouts/Layout.astro';
+// Reusable topical verse-collection page (/verses/<topic>). Each /verses page is
+// a thin data file that passes props here; this renders the full Gold-Level page
+// so the pattern never drifts. Verses must be REAL FHB renderings (verbatim from
+// src/content/bible). Locked conventions: generic+brand title, full-bleed hero,
+// direct-answer + key-takeaway, FHB framing, FeatureChapter anchor + audio,
+// Article+ItemList+BreadcrumbList+FAQPage JSON-LD, Read-FHB CTA, absolute reader links.
+import AuthorBio from './AuthorBio.astro';
+import FeatureChapter from './FeatureChapter.astro';
+
+interface Verse {
+	ref: string;
+	slug: string;
+	ch: number;
+	text: string;
+}
+interface Theme {
+	id: string;
+	heading: string;
+	intro: string;
+	verses: Verse[];
+}
+interface Faq {
+	question: string;
+	answer: string;
+}
+interface Props {
+	slug: string; // 'love'
+	topic: string; // 'Love' (breadcrumb/H1 build), title is passed separately
+	title: string;
+	description: string;
+	h1: string;
+	heroBase: string;
+	heroAlt: string;
+	heroPosition?: string;
+	published?: string;
+	modified?: string;
+	directAnswerHtml: string;
+	keyTakeaway: string;
+	themes: Theme[];
+	featured: {
+		book: string;
+		slug: string;
+		chapter: number;
+		verseLimit?: number;
+		heading: string;
+		intro: string;
+	};
+	faqs: Faq[];
+	relatedHtml: string;
+	ctaMidHeading: string;
+	ctaMidBodyHtml: string;
+	ctaBottomBodyHtml: string;
+	tags?: string[];
+}
+const {
+	slug,
+	topic,
+	title,
+	description,
+	h1,
+	heroBase,
+	heroAlt,
+	heroPosition = 'center top',
+	published = '2026-06-06',
+	modified = '2026-06-06',
+	directAnswerHtml,
+	keyTakeaway,
+	themes,
+	featured,
+	faqs,
+	relatedHtml,
+	ctaMidHeading,
+	ctaMidBodyHtml,
+	ctaBottomBodyHtml,
+	tags = [],
+} = Astro.props as Props;
+
+const PAGE_URL = `https://fathersheartbible.com/verses/${slug}`;
+const HERO_IMG = `${heroBase}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${heroBase}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+const reader = (s: string, ch: number) => `https://fathersheartbible.com/read/${s}/${ch}`;
+const refLabel = (ref: string) => ref.split('–')[0].split(':')[0]; // "Romans 8:38–39" → "Romans 8"
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: "Lead Translator, Father's Heart Bible | CEO, Spirit Media Publishing",
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: h1,
+	description,
+	image: OG_IMG,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: published,
+	dateModified: modified,
+	inLanguage: 'en-US',
+	articleSection: 'Bible Verses by Topic',
+};
+const itemListSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'ItemList',
+	name: h1,
+	itemListElement: themes
+		.flatMap((t) => t.verses)
+		.map((v, i) => ({
+			'@type': 'ListItem',
+			position: i + 1,
+			name: v.ref,
+			url: reader(v.slug, v.ch),
+		})),
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'Bible Verses by Topic',
+			item: 'https://fathersheartbible.com/verses/',
+		},
+		{ '@type': 'ListItem', position: 3, name: h1, item: PAGE_URL },
+	],
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: faqs.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [articleSchema, itemListSchema, breadcrumbSchema, faqSchema];
+
+const TOC = [
+	...themes.map((t) => ({ id: t.id, label: t.heading })),
+	{ id: 'featured', label: featured.heading },
+	{ id: 'faq', label: 'FAQ' },
+];
+---
+
+<Layout
+	title={title}
+	description={description}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={published}
+	articleSection="Bible Verses by Topic"
+	articleTags={tags}
+	preloadImageMobile={HERO_IMG}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
+			<img src={HERO_IMG} alt={heroAlt} class="absolute inset-0 w-full h-full object-cover" style={`object-position: ${heroPosition};`} fetchpriority="high" decoding="async" />
+			<div class="absolute inset-x-0 top-0 z-10" style="height: 160px; background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0));"></div>
+		</section>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/verses/" class="hover:underline">Verses</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">{h1}</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Verses by Topic</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{h1}</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>Curated by <a href="/the-fathers-heart-bible/lead-translator/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; Lead Translator, Father&rsquo;s Heart Bible</span>
+					<span aria-hidden="true">&middot;</span><span>{formatDate(published)}</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={directAnswerHtml} />
+
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">{keyTakeaway}</p>
+				</aside>
+
+				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>
+					<ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
+						{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}
+					</ul>
+				</nav>
+
+				{themes.map((theme) => (
+					<>
+						<h2 id={theme.id} class="text-2xl md:text-3xl font-light mt-12 mb-3 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">{theme.heading}</h2>
+						<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">{theme.intro}</p>
+						<div class="space-y-4">
+							{theme.verses.map((v) => (
+								<div class="px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+									<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: #a04060; font-family: var(--font-sans);">{v.ref}</p>
+									<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">{v.text}</p>
+									<a href={reader(v.slug, v.ch)} class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold hover:underline" style="color: #a04060; font-family: var(--font-sans);">Read &amp; listen to {refLabel(v.ref)} <span aria-hidden="true">&rarr;</span></a>
+								</div>
+							))}
+						</div>
+					</>
+				))}
+
+				<h2 id="featured" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">{featured.heading}</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">{featured.intro}</p>
+				<FeatureChapter book={featured.book} slug={featured.slug} chapter={featured.chapter} verseLimit={featured.verseLimit} />
+
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">{ctaMidHeading}</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaMidBodyHtml} />
+					<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a>
+				</aside>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="space-y-6">
+					{faqs.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={relatedHtml} />
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaBottomBodyHtml} />
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>

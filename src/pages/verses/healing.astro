@@ -1,0 +1,102 @@
+---
+// /verses/healing — "bible verses about healing". Verbatim FHB text.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+	{
+		id: 'god-who-heals',
+		heading: 'The God who heals',
+		intro:
+			'Throughout Scripture, healing is part of who God is — not a reluctant favor but an expression of a Father’s care for body and heart.',
+		verses: [
+			{
+				ref: 'Psalm 147:3',
+				slug: 'psalms',
+				ch: 147,
+				text: 'He heals the brokenhearted and binds up their wounds.',
+			},
+			{
+				ref: 'Jeremiah 30:17',
+				slug: 'jeremiah',
+				ch: 30,
+				text: '“For I will restore your health and heal your wounds, declares our Father.”',
+			},
+			{
+				ref: 'Psalm 30:2',
+				slug: 'psalms',
+				ch: 30,
+				text: 'My Father, I cried to you for help, and you healed me.',
+			},
+		],
+	},
+	{
+		id: 'healing-through-christ',
+		heading: 'Healing through Christ',
+		intro:
+			'The deepest healing the Bible promises runs through the cross — where Jesus carried not only our sins but the brokenness that came with them.',
+		verses: [
+			{
+				ref: 'Isaiah 53:5',
+				slug: 'isaiah',
+				ch: 53,
+				text: 'But he was pierced for our transgressions; he was crushed for our iniquities; the punishment that brought us peace was upon him, and by his wounds we are healed.',
+			},
+			{
+				ref: '1 Peter 2:24',
+				slug: '1-peter',
+				ch: 2,
+				text: 'He himself bore our sins in his body on the tree, so that we might die to sin and live for righteousness; by his wounds you have been healed.',
+			},
+			{
+				ref: 'James 5:14–15',
+				slug: 'james',
+				ch: 5,
+				text: 'Is anyone among you sick? Let them call for the elders of the church… And the prayer offered in faith will save the one who is sick, and the Lord will raise them up.',
+			},
+		],
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does the Bible say about healing?',
+		answer:
+			'The Bible presents God as a healer of bodies, hearts, and our broken relationship with Him. He “heals the brokenhearted and binds up their wounds” (Psalm 147:3) and promises, “I will restore your health and heal your wounds” (Jeremiah 30:17). The deepest healing comes through Christ, “by whose wounds you have been healed” (1 Peter 2:24).',
+	},
+	{
+		question: 'What is a good Bible verse for healing the sick?',
+		answer:
+			'James 5:14–15 directly addresses sickness: “Is anyone among you sick? Let them call for the elders… and the prayer offered in faith will save the one who is sick.” Psalm 103 (featured below) adds that God “heals all your diseases.”',
+	},
+	{
+		question: 'Does the Bible say God heals broken hearts?',
+		answer:
+			'Yes. Psalm 147:3 says plainly, “He heals the brokenhearted and binds up their wounds.” Scripture treats emotional and inner wounds as real and as something the Father tends — He is close to the brokenhearted, not distant from them.',
+	},
+	{
+		question: 'What does “by his wounds we are healed” mean?',
+		answer:
+			'It comes from Isaiah 53:5 and 1 Peter 2:24, pointing to Jesus’ death on the cross. He took on Himself the consequences of our sin and brokenness, so that through His suffering we could be made whole — the ultimate healing being our reconciliation to the Father.',
+	},
+];
+---
+
+<VerseCollection
+	slug="healing"
+	topic="Healing"
+	title="Bible Verses About Healing (with Audio) — Father's Heart Bible"
+	description="Bible verses about healing, read and heard in the Father's Heart Bible — the God who heals body and heart, and the healing that comes through Christ. Free online with audio."
+	h1="Bible Verses About Healing"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg"
+	heroAlt="A woman in a quiet, peaceful church"
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">The Bible presents God as a healer &mdash; of bodies, of broken hearts, and ultimately of our separation from Him.</strong> Healing in Scripture is not a reluctant favor but an expression of the Father&rsquo;s care; He binds up the brokenhearted, restores health, and through the wounds of His Son makes us whole. Below are the most comforting verses on healing, each in the Father&rsquo;s Heart Bible and linked into the chapter so you can <a href=\"https://fathersheartbible.com/read\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read and listen free</a>. Read them as the words of a Father who draws near to the hurting.`}
+	keyTakeaway="God heals body, heart, and our separation from Him. Healing is an expression of the Father’s care — and the deepest healing comes through Christ, by whose wounds we are healed."
+	themes={themes}
+	featured={{ book: 'Psalm', slug: 'psalms', chapter: 103, verseLimit: 5, heading: 'Bless the One who heals: Psalm 103', intro: 'Psalm 103 calls the soul to remember every kindness of God — including the One “who heals all your diseases.” Read or listen to its opening below, then continue into the whole psalm.' }}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href=\"https://fathersheartbible.com/read/psalms/103\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Psalm 103</a> or the <a href=\"https://fathersheartbible.com/read\" style=\"color: var(--color-brand);\" class=\"hover:underline\">whole Bible free with audio</a>, browse more <a href=\"/verses/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Bible verses by topic</a>, see our <a href=\"/guides/how-to-pray/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">guide to prayer</a>, or get the free book in the <a href=\"https://fathersheartbible.com/library\" style=\"color: var(--color-brand);\" class=\"hover:underline\">resource library</a>. For cross-references, see <a href=\"https://www.blueletterbible.org/\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Blue Letter Bible</a>.`}
+	ctaMidHeading="Hear the Healer’s heart"
+	ctaMidBodyHtml="Read and listen to these passages in full &mdash; free online in the Father&rsquo;s Heart Bible, a fresh translation that lets you hear a Father who draws near to the hurting."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole story &mdash; free online with audio, in a fresh translation that reveals God as a loving Father."
+	tags={["bible verses about healing", "healing", "Psalm 103"]}
+/>
