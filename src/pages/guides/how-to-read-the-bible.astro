@@ -31,6 +31,14 @@ const DESCRIPTION =
 const PUBLISHED = '2026-06-06';
 const MODIFIED = '2026-06-06';
 
+// Feature image — Sanity "Blog Images" tag, unused asset (verified 2026-06-06).
+// "couple-studying-bible-together-at-wooden-table". Sanity CDN handles sizing.
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/13334b01b91963fa9581ecebb66c4cf6064938d2-6016x4016.jpg';
+const HERO_ALT = 'A couple reading and studying the Bible together at a wooden table';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
 const formatDate = (iso: string) =>
 	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
 		year: 'numeric',
@@ -95,8 +103,7 @@ const articleSchema = {
 	'@type': 'Article',
 	headline: 'How to Read the Bible: A Beginner’s Guide',
 	description: DESCRIPTION,
-	image:
-		'https://cdn.sanity.io/images/rusi1hyi/production/8b5d1c39f892218c978d3e3caf5720e09833bbc4-1024x1024.png?w=1200&h=630&fit=crop',
+	image: OG_IMG,
 	author: KEVIN_WHITE_AUTHOR,
 	publisher: {
 		'@type': 'Organization',
@@ -156,16 +163,33 @@ const TOC = [
 <Layout
 	title={TITLE}
 	description={DESCRIPTION}
+	image={OG_IMG}
 	jsonLd={jsonLd}
 	pageType="article"
 	articleAuthor="Kevin White"
 	articlePublishedTime={PUBLISHED}
 	articleSection="Bible Reading Guides"
 	articleTags={["how to read the Bible", "Bible for beginners", "daily Bible reading"]}
+	preloadImageMobile={HERO_IMG}
+	preloadImageDesktop={HERO_IMG}
 >
 	<main id="main-content">
+		<!-- ── FEATURE IMAGE (LCP) ────────────────────────────────── -->
+		<div class="w-full" style="margin-top: 80px;">
+			<img
+				src={HERO_IMG}
+				alt={HERO_ALT}
+				width="1400"
+				height="620"
+				class="w-full h-60 md:h-80 lg:h-[460px] object-cover"
+				style="object-position: center center;"
+				fetchpriority="high"
+				decoding="async"
+			/>
+		</div>
+
 		<!-- ── HEADER ─────────────────────────────────────────────── -->
-		<section class="px-6 pt-28 md:pt-32 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">
 				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
 					<a href="/" class="hover:underline">Home</a>
