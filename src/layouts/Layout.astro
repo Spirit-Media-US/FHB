@@ -67,16 +67,12 @@ const footerQuote =
 	siteSettings?.footerQuote || 'I will be their Father, and they will be my sons and daughters.';
 const currentYear = new Date().getFullYear();
 
-// Global nav now comes from the canonical `globalNav` (generated from fhb.json) —
-// see the import above. The previously-hardcoded list drifted from the app's
-// fuller menu (missing the Family dropdown, Intercessors, Founders).
-const fhbFooterNav = [
-	{ label: 'Home', href: '/' },
-	{ label: 'About FHB', href: '/the-fathers-heart-bible/' },
-	{ label: 'Samples', href: '/samples/' },
-	{ label: 'Partner', href: '/partner/' },
-	{ label: 'Blog', href: '/blog/' },
-];
+// Footer nav mirrors the header global nav (same `globalNav` source) so the two
+// never drift. The "Family" item is a header-only dropdown whose top-level href
+// is /login (which we don't advertise), so it's dropped from the flat footer.
+const fhbFooterNav = globalNav
+	.filter((item: { label: string }) => item.label !== 'Family')
+	.map((item: { label: string; href: string }) => ({ label: item.label, href: item.href }));
 const fhbFooterLegal = [
 	{ label: 'Privacy', href: '/privacy/' },
 	{ label: 'Terms', href: '/terms/' },

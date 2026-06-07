@@ -37,12 +37,13 @@ const seoDescription =
 const heroHeading = 'What is the Father\u2019s Heart Bible\u2122?';
 const heroSubheading =
 	'The Father\u2019s Heart Bible\u2122 is a new interpretive English Bible translation that reveals God as Father where Scripture reveals Him\u2014and helps readers encounter not only His name, but His heart.';
-// June 2026 — Public Reading Month: secondary CTA repurposed to point to
-// the community. Post-July-1 this can flip back to the free-book funnel.
-const heroPrimaryCtaLabel = 'Read Sample Passages';
-const heroPrimaryCtaHref = '/samples/';
-const heroSecondaryCtaLabel = 'Read FHB →';
-const heroSecondaryCtaHref = '/read';
+// Hero CTA: single "Read FHB" (the site's primary CTA). The old "Read Sample
+// Passages" button was removed (2026-06-06, Kevin) since Read FHB sat right
+// beside it — redundant.
+const heroPrimaryCtaLabel = 'Read FHB →';
+const heroPrimaryCtaHref = '/read';
+const heroSecondaryCtaLabel = '';
+const heroSecondaryCtaHref = '';
 const bookCoverUrl = media?.bookCoverUrl || '';
 
 // FHB → Beloved Identity cover — prefer Sanity image, fall back to hardcoded
@@ -147,15 +148,11 @@ const faqs = [
 	},
 	{
 		q: 'Which books of the Bible are included?',
-		a: 'The full canon — Genesis to Revelation. Translation work proceeds book by book. Genesis, Joel, and John are currently in active draft; sample chapters are available on the Samples page.',
+		a: 'The full canon — Genesis to Revelation, available to read or listen to free online.',
 	},
 	{
 		q: 'Why does FHB render “God” as “our Father” in some places?',
 		a: 'The Hebrew uses two distinct divine names — YHWH (personal covenant name) and Elohim (generic word for deity) — and they fall on different lips and in different contexts. The apostles already read these differences and applied them to specific Persons of the Trinity (e.g. Joel 2:32 → Romans 10:13 applies the verse to Jesus). FHB does this work on the page rather than leaving it for the reader to assemble.',
-	},
-	{
-		q: 'How can I read or sample the Father’s Heart Bible™?',
-		a: "Visit the Samples page for translated chapter excerpts, or download the free book Father's Heart → Beloved Identity — a short companion volume that opens the door into the heart behind the translation.",
 	},
 ];
 
@@ -449,13 +446,13 @@ const formatDate = (dateString: string) => {
 
 			<div class="text-center mt-14">
 				<a
-					href="/samples/"
+					href="https://fathersheartbible.com/read/"
 					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 					style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A;"
 					onmouseover="this.style.opacity='0.9'"
 					onmouseout="this.style.opacity='1'"
 				>
-					Read All Sample Passages
+					Read FHB →
 				</a>
 			</div>
 		</Section>
@@ -696,7 +693,7 @@ const formatDate = (dateString: string) => {
 						Start with the free book.
 					</h2>
 					<p class="leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
-						<em>Father's Heart → Beloved Identity</em> is a free PDF that opens the door into
+						<a href="https://fathersheartbible.com/library" style="color: var(--color-brand);" class="hover:underline"><em>Father's Heart → Beloved Identity</em></a> is a free PDF that opens the door into
 						the heart behind this translation. Concise, accessible, and designed to shift how
 						you read every page of Scripture.
 					</p>
