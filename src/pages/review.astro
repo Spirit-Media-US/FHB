@@ -12,28 +12,81 @@
 export const prerender = true;
 
 import Section from '../components/Section.astro';
+import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
+import { sanityClient, urlFor } from '../lib/sanity';
 
-// Reviews data flows through the same-origin /api/reviews Pages Function, so no
+// Reviews data flows through the same-origin /review-api Pages Function, so no
 // Supabase URL or key is shipped to the browser and there is no build-time env
 // dependency. The Turnstile sitekey is public by design (domain-locked, meant
 // to live in the page HTML) — safe to inline.
 const TURNSTILE_SITEKEY = '0x4AAAAAADg_aq06TImxh0zh';
 
-const title = "Reader Reviews | Father's Heart Bible";
+// Hero content + image come from the Sanity `page` doc (slug "review") so the
+// team can edit copy and swap the hero image in Studio without a code change.
+const page = await sanityClient.fetch(`*[_type == "page" && slug == "review"][0] {
+	seoTitle, seoDescription, heroEyebrow, heroHeading, heroSubheading,
+	heroPrimaryCtaLabel, heroPrimaryCtaHref, heroImage
+}`);
+
+const title = page?.seoTitle || "Reader Reviews | Father's Heart Bible";
 const description =
+	page?.seoDescription ||
 	"Read what The Father's Heart Bible means to readers around the world — and share your own experience.";
+const heroHeading = page?.heroHeading || 'Read and loved around the world.';
+const heroSubheading =
+	page?.heroSubheading ||
+	"Readers everywhere are sharing what The Father's Heart Bible means to them. Add your voice.";
+const heroCtaLabel = page?.heroPrimaryCtaLabel || 'Share your experience';
+const heroCtaHref = page?.heroPrimaryCtaHref || '#share';
+
+// Sanity-driven hero image (client-editable). Fall back to the chosen unused
+// asset if the field is ever cleared. Sized WebP for LCP + preload below.
+const FALLBACK_HERO =
+	'https://cdn.sanity.io/images/rusi1hyi/production/12f9a2993c7824800cff7337b979c2330cfb2773-3690x2232.jpg';
+const heroImageDesktop = page?.heroImage
+	? urlFor(page.heroImage)
+			.width(1920)
+			.height(900)
+			.fit('crop')
+			.format('webp')
+			.quality(80)
+			.auto('format')
+			.url()
+	: `${FALLBACK_HERO}?w=1920&h=900&fit=crop&auto=format`;
+const heroImageMobile = page?.heroImage
+	? urlFor(page.heroImage)
+			.width(900)
+			.height(700)
+			.fit('crop')
+			.format('webp')
+			.quality(78)
+			.auto('format')
+			.url()
+	: `${FALLBACK_HERO}?w=900&h=700&fit=crop&auto=format`;
 ---
 
-<Layout title={title} description={description}>
-	<!-- Header: global reach (no rating). -->
-	<Section variant="scripture" class="text-center">
-		<p class="text-sm uppercase tracking-widest text-brand font-semibold mb-3">Reader Reviews</p>
-		<h1 class="font-bold text-3xl md:text-5xl text-ink mb-4">Read and loved around the world.</h1>
-		<p class="text-muted text-lg max-w-2xl mx-auto mb-8">
-			Readers everywhere are sharing what The Father's Heart Bible means to them. Add your voice.
-		</p>
-		<div class="flex items-center justify-center gap-10 md:gap-16 mb-8">
+<Layout
+	title={title}
+	description={description}
+	darkHero={true}
+	preloadImageMobile={heroImageMobile}
+	preloadImageDesktop={heroImageDesktop}
+>
+	<!-- Hero — image + headline, matching the site's interior-page design. -->
+	<VideoHeroInner
+		imageSrc={heroImageDesktop}
+		imagePosition="center"
+		showLogo={false}
+		heading={heroHeading}
+		subheading={heroSubheading}
+		primaryCtaLabel={heroCtaLabel}
+		primaryCtaHref={heroCtaHref}
+	/>
+
+	<!-- Global-reach stats strip (no public rating). -->
+	<Section variant="light" class="text-center">
+		<div class="flex items-center justify-center gap-12 md:gap-20">
 			<div>
 				<div id="stat-readers" class="text-4xl md:text-5xl font-extrabold text-brand leading-none">—</div>
 				<div class="text-xs uppercase tracking-wide text-muted mt-1">Readers</div>
@@ -43,9 +96,6 @@ const description =
 				<div class="text-xs uppercase tracking-wide text-muted mt-1">Countries</div>
 			</div>
 		</div>
-		<a href="#share" class="inline-block bg-brand text-on-primary font-bold px-7 py-3 rounded-lg hover:bg-brand-dark transition-colors">
-			✍️ Share your experience
-		</a>
 	</Section>
 
 	<!-- Featured (pinned) testimonies — hidden until populated. -->

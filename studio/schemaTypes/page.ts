@@ -25,6 +25,7 @@ export default {
 					{ title: 'Download (/download)', value: 'download' },
 					{ title: 'Join the Movement (/join)', value: 'join' },
 					{ title: 'Partner With Us (/partner)', value: 'partner' },
+					{ title: 'Reader Reviews (/review)', value: 'review' },
 					{ title: 'About (/about)', value: 'about' },
 					{ title: 'Contact (/contact)', value: 'contact' },
 					{ title: 'Privacy Policy (/privacy)', value: 'privacy' },
