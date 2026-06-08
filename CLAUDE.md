@@ -43,17 +43,30 @@ The global Header/Footer here are **shared chrome** whose canonical source lives
 
 ## Routes & Nav (FHB-specific)
 
-| Route | File |
-|-------|------|
-| `/` | index.astro |
-| `/the-fathers-heart-bible` | the-fathers-heart-bible.astro |
-| `/samples` | samples.astro |
-| `/download` | download.astro |
-| `/join` | join.astro |
-| `/partner` | partner.astro |
-| `/about` | about.astro |
+> **`fathersheartbible.com` is served by TWO repos** stitched on the apex by the
+> apex-router Worker: **this repo (marketing, static)** + the **community app**
+> (`Spirit-Media-US/community`, SSR, multi-tenant — `/read`, `/feed`, `/groups`,
+> `/library`, `/login`, etc.). There is **no `/download`, `/join`, or `/about`
+> marketing page** — "join" = community `/login`, "About" (nav) = `/the-fathers-heart-bible`.
 
-Nav order: Home, The Father's Heart Bible, Samples, Download, Join the Movement, Partner With Us, About.
+**FHB marketing pages (this repo, `src/pages`):**
+
+| Route | Notes |
+|-------|-------|
+| `/` | home |
+| `/the-fathers-heart-bible` (+ `/lead-translator`) | product page (nav label "About") |
+| `/partner` | partner/give |
+| `/nations` | global-access page (not in main nav) |
+| `/blog` (+ `/blog/[slug]`) | 14 Gold-standard posts |
+| `/guides/` (index + 6 guides) | SEO hub |
+| `/verses/` (index + 5 topics) | SEO hub |
+| `/review` | 301 → `/read` (a testimonial-wall feature is WIP here) |
+| `/samples` | retired 2026-06-08 → 301 to `/read` |
+| `/privacy`, `/terms` | footer |
+
+**Nav** (7 top-level, generated from `communities/fhb.json` → `src/chrome/nav.generated.json`, do not hand-edit): Home · About(→/the-fathers-heart-bible) · Read FHB(→/read) · Family(→/login) · Partner · Events · Resources(→/library).
+
+Full authoritative inventory (incl. every community page) lives in auto-memory: `reference-fhb-site-pages.md`.
 
 ## Theme System (LOCKED)
 
