@@ -193,10 +193,13 @@ const heroImageMobile = page?.heroImage
 	</Section>
 </Layout>
 
-<style>
+<!-- is:global is REQUIRED: the review cards are injected via JS (innerHTML), so
+     Astro's scoped-style hash never lands on them — scoped rules would silently
+     not apply, leaving the cards unframed. These names are review-specific. -->
+<style is:global>
 	#star-input .star { transition: color 0.12s; cursor: pointer; }
 	#star-input .star.on { color: #f5a623; }
-	.rv-card { background: var(--color-surface-lowest); border: 1px solid var(--color-hairline); border-radius: 12px; padding: 18px 20px; }
+	.rv-card { background: var(--color-surface-lowest); border: 1px solid var(--color-hairline); border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
 	.rv-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--color-brand); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex: 0 0 auto; }
 	.rv-stars { color: #f5a623; letter-spacing: 1px; }
 </style>
