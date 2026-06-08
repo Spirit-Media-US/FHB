@@ -1,8 +1,319 @@
 ---
-// /review — legacy interstitial collapsed into join.fathersheartbible.com.
-// The Public Review Month purpose page now lives at the community landing
-// directly, so this URL is preserved as a 301-style redirect for any
-// cached links or social shares.
+// /review — public testimonial wall. Visitors share what The Father's Heart
+// Bible means to them. Separate from the /read verse comments.
+//
+// Static shell + client island: published reviews + stats are fetched from
+// Supabase (anon key, RLS-filtered email-free view) after paint, so the page
+// stays static and fast. Submissions POST to /api/review (Pages Function),
+// which Turnstile-verifies and queues them; a Bethel cron moderates + publishes.
 export const prerender = true;
-return Astro.redirect('/read', 301);
+
+import Section from '../components/Section.astro';
+import Layout from '../layouts/Layout.astro';
+
+// Public config, embedded at build time. The anon key + Turnstile sitekey are
+// designed to be public (protected by RLS / domain allowlist respectively).
+const SUPABASE_URL = process.env.SUPABASE_FHB_URL || '';
+const SUPABASE_ANON = process.env.SUPABASE_FHB_ANON_KEY || '';
+const TURNSTILE_SITEKEY = process.env.TURNSTILE_SITEKEY_FHB || '';
+
+const title = "Reader Reviews | Father's Heart Bible";
+const description =
+	"Read what The Father's Heart Bible means to readers around the world — and share your own experience.";
 ---
+
+<Layout title={title} description={description}>
+	<!-- Header: global reach (no rating). -->
+	<Section variant="scripture" class="text-center">
+		<p class="text-sm uppercase tracking-widest text-brand font-semibold mb-3">Reader Reviews</p>
+		<h1 class="font-bold text-3xl md:text-5xl text-ink mb-4">Read and loved around the world.</h1>
+		<p class="text-muted text-lg max-w-2xl mx-auto mb-8">
+			Readers everywhere are sharing what The Father's Heart Bible means to them. Add your voice.
+		</p>
+		<div class="flex items-center justify-center gap-10 md:gap-16 mb-8">
+			<div>
+				<div id="stat-readers" class="text-4xl md:text-5xl font-extrabold text-brand leading-none">—</div>
+				<div class="text-xs uppercase tracking-wide text-muted mt-1">Readers</div>
+			</div>
+			<div>
+				<div id="stat-countries" class="text-4xl md:text-5xl font-extrabold text-brand leading-none">—</div>
+				<div class="text-xs uppercase tracking-wide text-muted mt-1">Countries</div>
+			</div>
+		</div>
+		<a href="#share" class="inline-block bg-brand text-on-primary font-bold px-7 py-3 rounded-lg hover:bg-brand-dark transition-colors">
+			✍️ Share your experience
+		</a>
+	</Section>
+
+	<!-- Featured (pinned) testimonies — hidden until populated. -->
+	<Section id="featured" variant="soft" class="hidden">
+		<h2 class="font-bold text-2xl text-ink mb-6 text-center">Featured</h2>
+		<div id="featured-list" class="grid gap-4 md:grid-cols-2 max-w-4xl mx-auto"></div>
+	</Section>
+
+	<!-- The feed. -->
+	<Section variant="light">
+		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 max-w-3xl mx-auto">
+			<h2 class="font-bold text-2xl text-ink">What readers are saying</h2>
+			<label class="text-sm text-muted flex items-center gap-2">
+				Country
+				<select id="country-filter" class="border border-hairline rounded-md px-3 py-1.5 bg-surface-lowest text-ink text-sm">
+					<option value="">All countries</option>
+				</select>
+			</label>
+		</div>
+		<div id="reviews-list" class="grid gap-4 max-w-3xl mx-auto"></div>
+		<p id="reviews-empty" class="text-center text-muted py-10 hidden">
+			Be the first to share what this Bible means to you.
+		</p>
+		<div class="text-center mt-8">
+			<button id="load-more" class="hidden border border-brand text-brand font-semibold px-6 py-2.5 rounded-lg hover:bg-brand hover:text-on-primary transition-colors">
+				Load more
+			</button>
+		</div>
+	</Section>
+
+	<!-- Submit form. -->
+	<Section id="share" variant="soft">
+		<div class="max-w-xl mx-auto">
+			<h2 class="font-bold text-2xl md:text-3xl text-ink mb-2 text-center">Share your experience</h2>
+			<p class="text-muted text-center mb-8">Tell us what The Father's Heart Bible has meant to you.</p>
+
+			<form id="review-form" class="grid gap-5 bg-surface-lowest border border-hairline rounded-2xl p-6 md:p-8">
+				<div class="grid sm:grid-cols-2 gap-5">
+					<label class="grid gap-1.5">
+						<span class="text-sm font-semibold text-ink">First name</span>
+						<input name="first_name" type="text" required maxlength="50"
+							class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink" />
+					</label>
+					<label class="grid gap-1.5">
+						<span class="text-sm font-semibold text-ink">Location <span class="font-normal text-muted">(e.g. Lagos, Nigeria)</span></span>
+						<input name="location" type="text" required maxlength="80"
+							class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink" />
+					</label>
+				</div>
+
+				<div class="grid gap-1.5">
+					<span class="text-sm font-semibold text-ink">Your rating</span>
+					<div id="star-input" class="flex gap-1 text-3xl" role="radiogroup" aria-label="Star rating">
+						<button type="button" data-v="1" aria-label="1 star" class="star text-surface-dim leading-none">★</button>
+						<button type="button" data-v="2" aria-label="2 stars" class="star text-surface-dim leading-none">★</button>
+						<button type="button" data-v="3" aria-label="3 stars" class="star text-surface-dim leading-none">★</button>
+						<button type="button" data-v="4" aria-label="4 stars" class="star text-surface-dim leading-none">★</button>
+						<button type="button" data-v="5" aria-label="5 stars" class="star text-surface-dim leading-none">★</button>
+					</div>
+					<input type="hidden" name="stars" id="stars-value" />
+				</div>
+
+				<label class="grid gap-1.5">
+					<span class="text-sm font-semibold text-ink">Title</span>
+					<input name="title" type="text" required maxlength="100"
+						class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink" />
+				</label>
+
+				<label class="grid gap-1.5">
+					<span class="text-sm font-semibold text-ink">Your review</span>
+					<textarea name="body" required maxlength="2000" rows="5"
+						class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink resize-y"></textarea>
+				</label>
+
+				<label class="grid gap-1.5">
+					<span class="text-sm font-semibold text-ink">Email <span class="font-normal text-muted">(optional — want to hear about the Father's Heart family?)</span></span>
+					<input name="email" type="email" maxlength="120"
+						class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink" />
+				</label>
+
+				<!-- Honeypot — visually hidden, ignored by humans. -->
+				<input name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true"
+					class="absolute opacity-0 pointer-events-none h-0 w-0" />
+
+				<!-- Turnstile mounts here (script lazy-loaded on first interaction). -->
+				<div id="turnstile-slot"></div>
+
+				<button type="submit" id="review-submit"
+					class="bg-brand text-on-primary font-bold px-7 py-3 rounded-lg hover:bg-brand-dark transition-colors disabled:opacity-50">
+					Post my review
+				</button>
+				<p id="form-msg" class="text-sm text-center hidden"></p>
+			</form>
+		</div>
+	</Section>
+</Layout>
+
+<style>
+	#star-input .star { transition: color 0.12s; cursor: pointer; }
+	#star-input .star.on { color: #f5a623; }
+	.rv-card { background: var(--color-surface-lowest); border: 1px solid var(--color-hairline); border-radius: 12px; padding: 18px 20px; }
+	.rv-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--color-brand); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex: 0 0 auto; }
+	.rv-stars { color: #f5a623; letter-spacing: 1px; }
+</style>
+
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON, TURNSTILE_SITEKEY }}>
+	const PAGE_SIZE = 20;
+	let offset = 0;
+	let country = '';
+
+	const rest = (path) => `${SUPABASE_URL}/rest/v1/${path}`;
+	const headers = { apikey: SUPABASE_ANON, authorization: `Bearer ${SUPABASE_ANON}` };
+
+	const flag = (cc) =>
+		cc && cc.length === 2
+			? cc.toUpperCase().replace(/./g, (c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
+			: '';
+
+	const stars = (n) => '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n);
+
+	const ago = (iso) => {
+		const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+		const map = [[31536000, 'year'], [2592000, 'month'], [604800, 'week'], [86400, 'day'], [3600, 'hour'], [60, 'minute']];
+		for (const [secs, label] of map) {
+			const v = Math.floor(s / secs);
+			if (v >= 1) return `${v} ${label}${v > 1 ? 's' : ''} ago`;
+		}
+		return 'just now';
+	};
+
+	const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+	const cardHTML = (r) => `
+		<article class="rv-card">
+			<div class="flex items-center gap-3 mb-1.5">
+				<div class="rv-avatar">${esc((r.first_name || '?').charAt(0).toUpperCase())}</div>
+				<div>
+					<div class="font-semibold text-ink">${esc(r.first_name)} ${flag(r.country_code)}</div>
+					<div class="text-xs text-muted">${esc(r.location || '')}</div>
+				</div>
+			</div>
+			<div class="rv-stars text-sm mb-1" aria-label="${r.stars} out of 5 stars">${stars(r.stars)}</div>
+			<p class="font-bold text-ink mb-1">${esc(r.title)}</p>
+			<p class="text-sm text-on-surface-variant leading-relaxed whitespace-pre-line">${esc(r.body)}</p>
+			<div class="text-xs text-muted mt-2">${ago(r.created_at)}</div>
+		</article>`;
+
+	async function loadStats() {
+		try {
+			const res = await fetch(rest('rpc/fhb_review_stats'), {
+				method: 'POST', headers: { ...headers, 'content-type': 'application/json' }, body: '{}',
+			});
+			const s = await res.json();
+			document.getElementById('stat-readers').textContent = (s.readers ?? 0).toLocaleString();
+			document.getElementById('stat-countries').textContent = (s.countries ?? 0).toLocaleString();
+		} catch { /* leave the em-dashes */ }
+	}
+
+	async function loadFeatured() {
+		try {
+			const res = await fetch(rest('fhb_reviews_public?featured=eq.true&order=created_at.desc&limit=4'), { headers });
+			const rows = await res.json();
+			if (Array.isArray(rows) && rows.length) {
+				document.getElementById('featured-list').innerHTML = rows.map(cardHTML).join('');
+				document.getElementById('featured').classList.remove('hidden');
+			}
+		} catch { /* no featured section */ }
+	}
+
+	async function loadCountries() {
+		try {
+			const res = await fetch(rest('fhb_reviews_public?select=country_code'), { headers });
+			const rows = await res.json();
+			const codes = [...new Set(rows.map((r) => r.country_code).filter(Boolean))].sort();
+			const sel = document.getElementById('country-filter');
+			for (const c of codes) {
+				const o = document.createElement('option');
+				o.value = c; o.textContent = `${flag(c)} ${c}`;
+				sel.appendChild(o);
+			}
+		} catch { /* filter stays "All" */ }
+	}
+
+	async function loadReviews(reset = false) {
+		if (reset) { offset = 0; document.getElementById('reviews-list').innerHTML = ''; }
+		let q = `fhb_reviews_public?order=created_at.desc&limit=${PAGE_SIZE}&offset=${offset}`;
+		if (country) q += `&country_code=eq.${country}`;
+		const res = await fetch(rest(q), { headers });
+		const rows = await res.json().catch(() => []);
+		const list = document.getElementById('reviews-list');
+		if (Array.isArray(rows)) list.insertAdjacentHTML('beforeend', rows.map(cardHTML).join(''));
+		offset += (rows.length || 0);
+		document.getElementById('reviews-empty').classList.toggle('hidden', list.children.length > 0);
+		document.getElementById('load-more').classList.toggle('hidden', !Array.isArray(rows) || rows.length < PAGE_SIZE);
+	}
+
+	document.getElementById('country-filter').addEventListener('change', (e) => {
+		country = e.target.value; loadReviews(true);
+	});
+	document.getElementById('load-more').addEventListener('click', () => loadReviews(false));
+
+	// Star picker.
+	let starVal = 0;
+	const starBtns = [...document.querySelectorAll('#star-input .star')];
+	const paint = (n) => starBtns.forEach((b, i) => b.classList.toggle('on', i < n));
+	starBtns.forEach((b) => {
+		b.addEventListener('mouseenter', () => paint(Number(b.dataset.v)));
+		b.addEventListener('mouseleave', () => paint(starVal));
+		b.addEventListener('click', () => { starVal = Number(b.dataset.v); document.getElementById('stars-value').value = starVal; paint(starVal); });
+	});
+
+	// Lazy-load Turnstile when the form nears the viewport (keeps it off initial load).
+	let turnstileLoaded = false;
+	const loadTurnstile = () => {
+		if (turnstileLoaded) return;
+		turnstileLoaded = true;
+		const s = document.createElement('script');
+		s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+		s.async = true; s.defer = true;
+		s.onload = () => window.turnstile?.render('#turnstile-slot', { sitekey: TURNSTILE_SITEKEY });
+		document.head.appendChild(s);
+	};
+	const formEl = document.getElementById('share');
+	if ('IntersectionObserver' in window) {
+		const io = new IntersectionObserver((entries) => {
+			if (entries.some((e) => e.isIntersecting)) { loadTurnstile(); io.disconnect(); }
+		}, { rootMargin: '300px' });
+		io.observe(formEl);
+	} else { loadTurnstile(); }
+
+	// Submit.
+	const form = document.getElementById('review-form');
+	const msg = document.getElementById('form-msg');
+	const setMsg = (text, ok) => {
+		msg.textContent = text;
+		msg.className = `text-sm text-center ${ok ? 'text-brand' : 'text-red-600'}`;
+	};
+	form.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		const btn = document.getElementById('review-submit');
+		if (!starVal) { setMsg('Please choose a star rating.', false); return; }
+		const token = window.turnstile?.getResponse?.();
+		if (!token) { setMsg('Please complete the verification.', false); loadTurnstile(); return; }
+		const fd = new FormData(form);
+		btn.disabled = true; setMsg('Posting…', true);
+		try {
+			const res = await fetch('/api/review', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({
+					first_name: fd.get('first_name'), location: fd.get('location'),
+					stars: starVal, title: fd.get('title'), body: fd.get('body'),
+					email: fd.get('email'), website: fd.get('website'), turnstileToken: token,
+				}),
+			});
+			const data = await res.json().catch(() => ({}));
+			if (res.ok && data.ok) {
+				form.reset(); starVal = 0; paint(0);
+				setMsg('Thank you! Your review will appear shortly, once reviewed.', true);
+				window.turnstile?.reset?.();
+			} else {
+				setMsg(data.error === 'rate_limited' ? 'You’ve posted a few times recently — please try again later.' : 'Something went wrong. Please try again.', false);
+				window.turnstile?.reset?.();
+			}
+		} catch {
+			setMsg('Network error. Please try again.', false);
+		} finally {
+			btn.disabled = false;
+		}
+	});
+
+	// Initial loads (after paint).
+	loadStats(); loadFeatured(); loadCountries(); loadReviews(true);
+</script>
