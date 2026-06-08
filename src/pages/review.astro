@@ -11,11 +11,11 @@ export const prerender = true;
 import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Public config, embedded at build time. The anon key + Turnstile sitekey are
-// designed to be public (protected by RLS / domain allowlist respectively).
-const SUPABASE_URL = process.env.SUPABASE_FHB_URL || '';
-const SUPABASE_ANON = process.env.SUPABASE_FHB_ANON_KEY || '';
-const TURNSTILE_SITEKEY = process.env.TURNSTILE_SITEKEY_FHB || '';
+// Reviews data flows through the same-origin /api/reviews Pages Function, so no
+// Supabase URL or key is shipped to the browser and there is no build-time env
+// dependency. The Turnstile sitekey is public by design (domain-locked, meant
+// to live in the page HTML) — safe to inline.
+const TURNSTILE_SITEKEY = '0x4AAAAAADg_aq06TImxh0zh';
 
 const title = "Reader Reviews | Father's Heart Bible";
 const description =
@@ -148,13 +148,12 @@ const description =
 	.rv-stars { color: #f5a623; letter-spacing: 1px; }
 </style>
 
-<script define:vars={{ SUPABASE_URL, SUPABASE_ANON, TURNSTILE_SITEKEY }}>
+<script define:vars={{ TURNSTILE_SITEKEY }}>
 	const PAGE_SIZE = 20;
 	let offset = 0;
 	let country = '';
 
-	const rest = (path) => `${SUPABASE_URL}/rest/v1/${path}`;
-	const headers = { apikey: SUPABASE_ANON, authorization: `Bearer ${SUPABASE_ANON}` };
+	const api = (qs) => `/api/reviews${qs ? `?${qs}` : ''}`;
 
 	const flag = (cc) =>
 		cc && cc.length === 2
@@ -192,19 +191,21 @@ const description =
 
 	async function loadStats() {
 		try {
-			const res = await fetch(rest('rpc/fhb_review_stats'), {
-				method: 'POST', headers: { ...headers, 'content-type': 'application/json' }, body: '{}',
-			});
-			const s = await res.json();
+			const s = await fetch(api('stats=1')).then((r) => r.json());
 			document.getElementById('stat-readers').textContent = (s.readers ?? 0).toLocaleString();
 			document.getElementById('stat-countries').textContent = (s.countries ?? 0).toLocaleString();
+			const sel = document.getElementById('country-filter');
+			for (const c of s.countryList || []) {
+				const o = document.createElement('option');
+				o.value = c; o.textContent = `${flag(c)} ${c}`;
+				sel.appendChild(o);
+			}
 		} catch { /* leave the em-dashes */ }
 	}
 
 	async function loadFeatured() {
 		try {
-			const res = await fetch(rest('fhb_reviews_public?featured=eq.true&order=created_at.desc&limit=4'), { headers });
-			const rows = await res.json();
+			const rows = await fetch(api('featured=1')).then((r) => r.json());
 			if (Array.isArray(rows) && rows.length) {
 				document.getElementById('featured-list').innerHTML = rows.map(cardHTML).join('');
 				document.getElementById('featured').classList.remove('hidden');
@@ -212,26 +213,10 @@ const description =
 		} catch { /* no featured section */ }
 	}
 
-	async function loadCountries() {
-		try {
-			const res = await fetch(rest('fhb_reviews_public?select=country_code'), { headers });
-			const rows = await res.json();
-			const codes = [...new Set(rows.map((r) => r.country_code).filter(Boolean))].sort();
-			const sel = document.getElementById('country-filter');
-			for (const c of codes) {
-				const o = document.createElement('option');
-				o.value = c; o.textContent = `${flag(c)} ${c}`;
-				sel.appendChild(o);
-			}
-		} catch { /* filter stays "All" */ }
-	}
-
 	async function loadReviews(reset = false) {
 		if (reset) { offset = 0; document.getElementById('reviews-list').innerHTML = ''; }
-		let q = `fhb_reviews_public?order=created_at.desc&limit=${PAGE_SIZE}&offset=${offset}`;
-		if (country) q += `&country_code=eq.${country}`;
-		const res = await fetch(rest(q), { headers });
-		const rows = await res.json().catch(() => []);
+		const qs = `offset=${offset}${country ? `&country=${country}` : ''}`;
+		const rows = await fetch(api(qs)).then((r) => r.json()).catch(() => []);
 		const list = document.getElementById('reviews-list');
 		if (Array.isArray(rows)) list.insertAdjacentHTML('beforeend', rows.map(cardHTML).join(''));
 		offset += (rows.length || 0);
@@ -289,7 +274,7 @@ const description =
 		const fd = new FormData(form);
 		btn.disabled = true; setMsg('Posting…', true);
 		try {
-			const res = await fetch('/api/review', {
+			const res = await fetch('/api/reviews', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({
@@ -315,5 +300,5 @@ const description =
 	});
 
 	// Initial loads (after paint).
-	loadStats(); loadFeatured(); loadCountries(); loadReviews(true);
+	loadStats(); loadFeatured(); loadReviews(true);
 </script>
