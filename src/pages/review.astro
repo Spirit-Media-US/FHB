@@ -2,10 +2,13 @@
 // /review — public testimonial wall. Visitors share what The Father's Heart
 // Bible means to them. Separate from the /read verse comments.
 //
-// Static shell + client island: published reviews + stats are fetched from
-// Supabase (anon key, RLS-filtered email-free view) after paint, so the page
-// stays static and fast. Submissions POST to /api/review (Pages Function),
-// which Turnstile-verifies and queues them; a Bethel cron moderates + publishes.
+// Static shell + client island. All data flows through the same-origin
+// /review-api Pages Function (Supabase access is server-side; no key reaches
+// the browser). GET returns the email-free published feed/stats/featured;
+// POST submits a Turnstile-verified review queued as pending. A Bethel cron
+// (fhb-review-moderate.mjs) moderates pending rows → published within ~1 min.
+// NB: path is /review-api, not /api/* — the apex router proxies /api/* to the
+// community app, so the marketing function must live off that prefix.
 export const prerender = true;
 
 import Section from '../components/Section.astro';
@@ -153,7 +156,7 @@ const description =
 	let offset = 0;
 	let country = '';
 
-	const api = (qs) => `/api/reviews${qs ? `?${qs}` : ''}`;
+	const api = (qs) => `/review-api${qs ? `?${qs}` : ''}`;
 
 	const flag = (cc) =>
 		cc && cc.length === 2
@@ -274,7 +277,7 @@ const description =
 		const fd = new FormData(form);
 		btn.disabled = true; setMsg('Posting…', true);
 		try {
-			const res = await fetch('/api/reviews', {
+			const res = await fetch('/review-api', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({

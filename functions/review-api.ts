@@ -1,9 +1,9 @@
-// /api/reviews — public review wall API (Cloudflare Pages Function).
+// /review-api — public review wall API (Cloudflare Pages Function).
 //
-//   GET  /api/reviews?stats=1        → { readers, countries, countryList }
-//   GET  /api/reviews?featured=1     → [ featured reviews ]
-//   GET  /api/reviews?offset=&country=  → [ published reviews, newest first ]
-//   POST /api/reviews                → submit a review (Turnstile-gated)
+//   GET  /review-api?stats=1        → { readers, countries, countryList }
+//   GET  /review-api?featured=1     → [ featured reviews ]
+//   GET  /review-api?offset=&country=  → [ published reviews, newest first ]
+//   POST /review-api                → submit a review (Turnstile-gated)
 //
 // All Supabase access happens server-side with the service-role key (never
 // shipped to the browser); reads use the email-free `fhb_reviews_public` view.
