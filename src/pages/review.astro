@@ -81,22 +81,20 @@ const heroImageMobile = page?.heroImage
 	<!-- Two columns: submission form (left, sticky) + reviews (right). On mobile
 	     they stack with the form first, so submitting is always quick to reach. -->
 	<Section variant="light">
-		<!-- Global reach — above both columns (above "Share your experience"). -->
-		<div class="flex items-center justify-center gap-12 md:gap-16 mb-8 pb-6 border-b border-hairline">
-			<div class="text-center">
-				<span id="stat-readers" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
-				<span class="block text-xs uppercase tracking-wide text-muted mt-1">Readers</span>
-			</div>
-			<div class="text-center">
-				<span id="stat-countries" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
-				<span class="block text-xs uppercase tracking-wide text-muted mt-1">Countries</span>
-			</div>
-		</div>
-
 		<div class="grid lg:grid-cols-[minmax(320px,380px)_1fr] gap-8 lg:gap-12 items-start">
 
-			<!-- LEFT — submission form -->
+			<!-- LEFT — global-reach stats + submission form -->
 			<div id="share" class="lg:sticky lg:top-24">
+				<div class="flex items-center gap-10 mb-6 pb-5 border-b border-hairline">
+					<div>
+						<span id="stat-readers" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
+						<span class="block text-xs uppercase tracking-wide text-muted mt-1">Readers</span>
+					</div>
+					<div>
+						<span id="stat-countries" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
+						<span class="block text-xs uppercase tracking-wide text-muted mt-1">Countries</span>
+					</div>
+				</div>
 				<h2 class="font-bold text-2xl text-ink mb-1">Share your experience</h2>
 				<p class="text-muted text-sm mb-5">{heroSubheading}</p>
 
