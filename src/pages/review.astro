@@ -471,6 +471,7 @@ const heroImageMobile = page?.heroImage
 			const data = await res.json().catch(() => ({}));
 			if (res.ok && data.ok) {
 				form.reset(); starVal = 0; paint(0);
+				try { localStorage.setItem('fhb_reviewed', '1'); } catch { /* ignore */ }
 				setMsg('Thank you! Your review will appear shortly, once reviewed.', true);
 			} else if (res.status === 401 || data.error === 'signin-required') {
 				localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
