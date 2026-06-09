@@ -91,12 +91,18 @@ const heroImageMobile = page?.heroImage
 				<h2 class="font-bold text-2xl text-ink mb-1">Share your experience</h2>
 				<p class="text-muted text-sm mb-5">{heroSubheading}</p>
 
-				<form id="review-form" class="grid gap-4 border border-hairline rounded-2xl p-5 md:p-6" style="background-color: #fdeaf1;">
-					<!-- Auth status (filled by JS). Guests post via a one-time FH Family
-					     sign-in link — verified identity keeps reviews accountable. -->
-					<div id="auth-status" class="flex items-center gap-3 text-sm text-muted bg-surface-lowest border border-hairline rounded-lg px-3 py-2.5">
-						<span>You'll confirm with a quick FH Family sign-in link when you post — this keeps reviews honest.</span>
-					</div>
+				<!-- Guests sign in FIRST (so nobody fills out the form only to hit a
+				     sign-in wall). Swapped for the form once signed in. -->
+				<div id="review-guest" class="border border-hairline rounded-2xl p-6 text-center" style="background-color: #fdeaf1;">
+					<p class="text-2xl mb-1">❤️</p>
+					<p class="font-semibold text-ink mb-1">Sign in to write your review</p>
+					<p class="text-muted text-sm mb-5">Reviews come from members of the Father's Heart family. We'll email you a secure one-tap link — no password.</p>
+					<a href="/login?next=/review" id="review-signin" class="inline-block bg-brand text-on-primary font-bold px-6 py-3 rounded-lg hover:bg-brand-dark transition-colors">Sign in to write a review</a>
+				</div>
+
+				<form id="review-form" hidden class="grid gap-4 border border-hairline rounded-2xl p-5 md:p-6" style="background-color: #fdeaf1;">
+					<!-- "Posting as <member>" — filled by JS once signed in. -->
+					<div id="auth-status" class="flex items-center gap-3 text-sm text-muted bg-surface-lowest border border-hairline rounded-lg px-3 py-2.5"></div>
 
 					<label class="grid gap-1.5">
 						<span class="text-sm font-semibold text-ink">Location <span class="font-normal text-muted">(e.g. Lagos, Nigeria)</span></span>
@@ -454,8 +460,16 @@ const heroImageMobile = page?.heroImage
 			const r = await fetch(SUBMIT_API, { headers: { accept: 'application/json' } });
 			if (r.ok) session = await r.json();
 		} catch { /* guest */ }
-		renderAuthStatus();
-		if (session.signedIn && session.location && !field('location').value) field('location').value = session.location;
+		const guestEl = document.getElementById('review-guest');
+		if (session.signedIn) {
+			if (guestEl) guestEl.hidden = true;
+			form.hidden = false;
+			renderAuthStatus();
+			if (session.location && !field('location').value) field('location').value = session.location;
+		} else {
+			if (guestEl) guestEl.hidden = false;
+			form.hidden = true;
+		}
 	}
 
 	const collectDraft = () => ({ location: field('location').value, stars: starVal, title: field('title').value, body: field('body').value });
