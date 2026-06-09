@@ -4,8 +4,9 @@
 //
 // Static shell + client island. All data flows through the same-origin
 // /review-api Pages Function (Supabase access is server-side; no key reaches
-// the browser). GET returns the email-free published feed/stats/featured;
-// POST submits a Turnstile-verified review queued as pending. A Bethel cron
+// the browser). GET returns the email-free published feed/stats/featured +
+// reaction counts; POST submits a Turnstile-verified review (queued as pending)
+// or records a love/like/dislike reaction. A Bethel cron
 // (fhb-review-moderate.mjs) moderates pending rows → published within ~1 min.
 // NB: path is /review-api, not /api/* — the apex router proxies /api/* to the
 // community app, so the marketing function must live off that prefix.
@@ -16,17 +17,14 @@ import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
 
-// Reviews data flows through the same-origin /review-api Pages Function, so no
-// Supabase URL or key is shipped to the browser and there is no build-time env
-// dependency. The Turnstile sitekey is public by design (domain-locked, meant
-// to live in the page HTML) — safe to inline.
+// The Turnstile sitekey is public by design (domain-locked, meant to live in
+// the page HTML) — safe to inline. No Supabase key reaches the browser.
 const TURNSTILE_SITEKEY = '0x4AAAAAADg_aq06TImxh0zh';
 
 // Hero content + image come from the Sanity `page` doc (slug "review") so the
 // team can edit copy and swap the hero image in Studio without a code change.
 const page = await sanityClient.fetch(`*[_type == "page" && slug == "review"][0] {
-	seoTitle, seoDescription, heroEyebrow, heroHeading, heroSubheading,
-	heroPrimaryCtaLabel, heroPrimaryCtaHref, heroImage
+	seoTitle, seoDescription, heroEyebrow, heroHeading, heroSubheading, heroImage
 }`);
 
 const title = page?.seoTitle || "Reader Reviews | Father's Heart Bible";
@@ -37,33 +35,31 @@ const heroHeading = page?.heroHeading || 'Read and loved around the world.';
 const heroSubheading =
 	page?.heroSubheading ||
 	"Readers everywhere are sharing what The Father's Heart Bible means to them. Add your voice.";
-const heroCtaLabel = page?.heroPrimaryCtaLabel || 'Share your experience';
-const heroCtaHref = page?.heroPrimaryCtaHref || '#share';
 
-// Sanity-driven hero image (client-editable). Fall back to the chosen unused
-// asset if the field is ever cleared. Sized WebP for LCP + preload below.
+// Sanity-driven hero image (client-editable). Fall back to the chosen asset if
+// the field is ever cleared. Sized WebP for LCP + preload below.
 const FALLBACK_HERO =
 	'https://cdn.sanity.io/images/rusi1hyi/production/362afc437aae7cd4de58a226072819333667c3e0-5760x3840.jpg';
 const heroImageDesktop = page?.heroImage
 	? urlFor(page.heroImage)
 			.width(1920)
-			.height(900)
+			.height(760)
 			.fit('crop')
 			.format('webp')
 			.quality(80)
 			.auto('format')
 			.url()
-	: `${FALLBACK_HERO}?w=1920&h=900&fit=crop&auto=format`;
+	: `${FALLBACK_HERO}?w=1920&h=760&fit=crop&auto=format`;
 const heroImageMobile = page?.heroImage
 	? urlFor(page.heroImage)
 			.width(900)
-			.height(700)
+			.height(620)
 			.fit('crop')
 			.format('webp')
 			.quality(78)
 			.auto('format')
 			.url()
-	: `${FALLBACK_HERO}?w=900&h=700&fit=crop&auto=format`;
+	: `${FALLBACK_HERO}?w=900&h=620&fit=crop&auto=format`;
 ---
 
 <Layout
@@ -73,67 +69,26 @@ const heroImageMobile = page?.heroImage
 	preloadImageMobile={heroImageMobile}
 	preloadImageDesktop={heroImageDesktop}
 >
-	<!-- Hero — image + headline, matching the site's interior-page design. -->
+	<!-- Hero — image + headline ONLY (no subheading/CTA section), so there is no
+	     dead gap beneath it; the two-column content starts immediately below. -->
 	<VideoHeroInner
 		imageSrc={heroImageDesktop}
 		imagePosition="center"
 		showLogo={false}
 		heading={heroHeading}
-		subheading={heroSubheading}
-		primaryCtaLabel={heroCtaLabel}
-		primaryCtaHref={heroCtaHref}
 	/>
 
-	<!-- Global-reach stats strip (no public rating). -->
-	<Section variant="light" class="text-center">
-		<div class="flex items-center justify-center gap-12 md:gap-20">
-			<div>
-				<div id="stat-readers" class="text-4xl md:text-5xl font-extrabold text-brand leading-none">—</div>
-				<div class="text-xs uppercase tracking-wide text-muted mt-1">Readers</div>
-			</div>
-			<div>
-				<div id="stat-countries" class="text-4xl md:text-5xl font-extrabold text-brand leading-none">—</div>
-				<div class="text-xs uppercase tracking-wide text-muted mt-1">Countries</div>
-			</div>
-		</div>
-	</Section>
-
-	<!-- Featured (pinned) testimonies — hidden until populated. -->
-	<Section id="featured" variant="soft" class="hidden">
-		<h2 class="font-bold text-2xl text-ink mb-6 text-center">Featured</h2>
-		<div id="featured-list" class="grid gap-4 md:grid-cols-2 max-w-4xl mx-auto"></div>
-	</Section>
-
-	<!-- The feed. -->
+	<!-- Two columns: submission form (left, sticky) + reviews (right). On mobile
+	     they stack with the form first, so submitting is always quick to reach. -->
 	<Section variant="light">
-		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 max-w-3xl mx-auto">
-			<h2 class="font-bold text-2xl text-ink">What readers are saying</h2>
-			<label class="text-sm text-muted flex items-center gap-2">
-				Country
-				<select id="country-filter" class="border border-hairline rounded-md px-3 py-1.5 bg-surface-lowest text-ink text-sm">
-					<option value="">All countries</option>
-				</select>
-			</label>
-		</div>
-		<div id="reviews-list" class="grid gap-4 max-w-3xl mx-auto"></div>
-		<p id="reviews-empty" class="text-center text-muted py-10 hidden">
-			Be the first to share what this Bible means to you.
-		</p>
-		<div class="text-center mt-8">
-			<button id="load-more" class="hidden border border-brand text-brand font-semibold px-6 py-2.5 rounded-lg hover:bg-brand hover:text-on-primary transition-colors">
-				Load more
-			</button>
-		</div>
-	</Section>
+		<div class="grid lg:grid-cols-[minmax(320px,380px)_1fr] gap-8 lg:gap-12 items-start">
 
-	<!-- Submit form. -->
-	<Section id="share" variant="soft">
-		<div class="max-w-xl mx-auto">
-			<h2 class="font-bold text-2xl md:text-3xl text-ink mb-2 text-center">Share your experience</h2>
-			<p class="text-muted text-center mb-8">Tell us what The Father's Heart Bible has meant to you.</p>
+			<!-- LEFT — submission form -->
+			<div id="share" class="lg:sticky lg:top-24">
+				<h2 class="font-bold text-2xl text-ink mb-1">Share your experience</h2>
+				<p class="text-muted text-sm mb-5">{heroSubheading}</p>
 
-			<form id="review-form" class="grid gap-5 bg-surface-lowest border border-hairline rounded-2xl p-6 md:p-8">
-				<div class="grid sm:grid-cols-2 gap-5">
+				<form id="review-form" class="grid gap-4 bg-surface-lowest border border-hairline rounded-2xl p-5 md:p-6">
 					<label class="grid gap-1.5">
 						<span class="text-sm font-semibold text-ink">First name</span>
 						<input name="first_name" type="text" required maxlength="50"
@@ -144,70 +99,115 @@ const heroImageMobile = page?.heroImage
 						<input name="location" type="text" required maxlength="80"
 							class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink" />
 					</label>
-				</div>
 
-				<div class="grid gap-1.5">
-					<span class="text-sm font-semibold text-ink">Your rating</span>
-					<div id="star-input" class="flex gap-1 text-3xl" role="radiogroup" aria-label="Star rating">
-						<button type="button" data-v="1" aria-label="1 star" class="star text-surface-dim leading-none">★</button>
-						<button type="button" data-v="2" aria-label="2 stars" class="star text-surface-dim leading-none">★</button>
-						<button type="button" data-v="3" aria-label="3 stars" class="star text-surface-dim leading-none">★</button>
-						<button type="button" data-v="4" aria-label="4 stars" class="star text-surface-dim leading-none">★</button>
-						<button type="button" data-v="5" aria-label="5 stars" class="star text-surface-dim leading-none">★</button>
+					<div class="grid gap-1.5">
+						<span class="text-sm font-semibold text-ink">Your rating</span>
+						<div id="star-input" class="flex gap-1 text-3xl" role="radiogroup" aria-label="Star rating">
+							<button type="button" data-v="1" aria-label="1 star" class="star text-surface-dim leading-none">★</button>
+							<button type="button" data-v="2" aria-label="2 stars" class="star text-surface-dim leading-none">★</button>
+							<button type="button" data-v="3" aria-label="3 stars" class="star text-surface-dim leading-none">★</button>
+							<button type="button" data-v="4" aria-label="4 stars" class="star text-surface-dim leading-none">★</button>
+							<button type="button" data-v="5" aria-label="5 stars" class="star text-surface-dim leading-none">★</button>
+						</div>
+						<input type="hidden" name="stars" id="stars-value" />
 					</div>
-					<input type="hidden" name="stars" id="stars-value" />
+
+					<label class="grid gap-1.5">
+						<span class="text-sm font-semibold text-ink">Title</span>
+						<input name="title" type="text" required maxlength="100"
+							class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink" />
+					</label>
+
+					<label class="grid gap-1.5">
+						<span class="text-sm font-semibold text-ink">Your review</span>
+						<textarea name="body" required maxlength="2000" rows="4"
+							class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink resize-y"></textarea>
+					</label>
+
+					<label class="grid gap-1.5">
+						<span class="text-sm font-semibold text-ink">Email <span class="font-normal text-muted">(optional — hear about the Father's Heart family?)</span></span>
+						<input name="email" type="email" maxlength="120"
+							class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink" />
+					</label>
+
+					<!-- Honeypot — visually hidden, ignored by humans. -->
+					<input name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true"
+						class="absolute opacity-0 pointer-events-none h-0 w-0" />
+
+					<div id="turnstile-slot"></div>
+
+					<button type="submit" id="review-submit"
+						class="bg-brand text-on-primary font-bold px-7 py-3 rounded-lg hover:bg-brand-dark transition-colors disabled:opacity-50">
+						Post my review
+					</button>
+					<p id="form-msg" class="text-sm text-center hidden"></p>
+				</form>
+			</div>
+
+			<!-- RIGHT — stats (top of the reviews) + featured + feed -->
+			<div>
+				<div class="flex items-center gap-10 mb-6 pb-5 border-b border-hairline">
+					<div>
+						<span id="stat-readers" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
+						<span class="text-xs uppercase tracking-wide text-muted ml-2">Readers</span>
+					</div>
+					<div>
+						<span id="stat-countries" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
+						<span class="text-xs uppercase tracking-wide text-muted ml-2">Countries</span>
+					</div>
 				</div>
 
-				<label class="grid gap-1.5">
-					<span class="text-sm font-semibold text-ink">Title</span>
-					<input name="title" type="text" required maxlength="100"
-						class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink" />
-				</label>
+				<div id="featured" class="hidden mb-8">
+					<h2 class="font-bold text-lg text-ink mb-3">Featured</h2>
+					<div id="featured-list" class="grid gap-4"></div>
+				</div>
 
-				<label class="grid gap-1.5">
-					<span class="text-sm font-semibold text-ink">Your review</span>
-					<textarea name="body" required maxlength="2000" rows="5"
-						class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink resize-y"></textarea>
-				</label>
-
-				<label class="grid gap-1.5">
-					<span class="text-sm font-semibold text-ink">Email <span class="font-normal text-muted">(optional — want to hear about the Father's Heart family?)</span></span>
-					<input name="email" type="email" maxlength="120"
-						class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink" />
-				</label>
-
-				<!-- Honeypot — visually hidden, ignored by humans. -->
-				<input name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true"
-					class="absolute opacity-0 pointer-events-none h-0 w-0" />
-
-				<!-- Turnstile mounts here (script lazy-loaded on first interaction). -->
-				<div id="turnstile-slot"></div>
-
-				<button type="submit" id="review-submit"
-					class="bg-brand text-on-primary font-bold px-7 py-3 rounded-lg hover:bg-brand-dark transition-colors disabled:opacity-50">
-					Post my review
-				</button>
-				<p id="form-msg" class="text-sm text-center hidden"></p>
-			</form>
+				<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+					<h2 class="font-bold text-2xl text-ink">What readers are saying</h2>
+					<label class="text-sm text-muted flex items-center gap-2">
+						Country
+						<select id="country-filter" class="border border-hairline rounded-md px-3 py-1.5 bg-surface-lowest text-ink text-sm">
+							<option value="">All countries</option>
+						</select>
+					</label>
+				</div>
+				<div id="reviews-list" class="grid gap-4"></div>
+				<p id="reviews-empty" class="text-muted py-10 hidden">Be the first to share what this Bible means to you.</p>
+				<div class="mt-6">
+					<button id="load-more" class="hidden border border-brand text-brand font-semibold px-6 py-2.5 rounded-lg hover:bg-brand hover:text-on-primary transition-colors">
+						Load more
+					</button>
+				</div>
+			</div>
 		</div>
 	</Section>
 </Layout>
 
-<!-- is:global is REQUIRED: the review cards are injected via JS (innerHTML), so
+<!-- is:global is REQUIRED: review cards are injected via JS (innerHTML), so
      Astro's scoped-style hash never lands on them — scoped rules would silently
-     not apply, leaving the cards unframed. These names are review-specific. -->
+     not apply. These names are review-specific. -->
 <style is:global>
 	#star-input .star { transition: color 0.12s; cursor: pointer; }
 	#star-input .star.on { color: #f5a623; }
 	.rv-card { background: var(--color-surface-lowest); border: 1px solid var(--color-hairline); border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
 	.rv-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--color-brand); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex: 0 0 auto; }
 	.rv-stars { color: #f5a623; letter-spacing: 1px; }
+	.rv-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--color-hairline); }
+	.rv-actions { display: flex; gap: 6px; }
+	.rv-react, .rv-share { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; padding: 4px 9px; border: 1px solid var(--color-hairline); border-radius: 999px; background: #fff; color: var(--color-muted); cursor: pointer; transition: all .12s; }
+	.rv-react:hover, .rv-share:hover { border-color: var(--color-brand); color: var(--color-brand); }
+	.rv-react.on { background: var(--color-primary-fixed, #ffd9e0); border-color: var(--color-brand); color: var(--color-brand-dark, #8f0043); font-weight: 700; }
+	.rv-n { font-variant-numeric: tabular-nums; }
+	.rv-share-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.14); display: flex; flex-direction: column; min-width: 150px; overflow: hidden; }
+	.rv-share-menu a, .rv-share-menu button { text-align: left; padding: 9px 14px; font-size: 13px; color: var(--color-ink); background: #fff; border: 0; cursor: pointer; text-decoration: none; }
+	.rv-share-menu a:hover, .rv-share-menu button:hover { background: var(--color-surface-low); }
 </style>
 
 <script define:vars={{ TURNSTILE_SITEKEY }}>
-	const PAGE_SIZE = 20;
 	let offset = 0;
+	const PAGE_SIZE = 20;
 	let country = '';
+	const SHARE_URL = 'https://fathersheartbible.com/review';
 
 	const api = (qs) => `/review-api${qs ? `?${qs}` : ''}`;
 
@@ -215,23 +215,28 @@ const heroImageMobile = page?.heroImage
 		cc && cc.length === 2
 			? cc.toUpperCase().replace(/./g, (c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
 			: '';
-
 	const stars = (n) => '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n);
-
 	const ago = (iso) => {
 		const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
 		const map = [[31536000, 'year'], [2592000, 'month'], [604800, 'week'], [86400, 'day'], [3600, 'hour'], [60, 'minute']];
-		for (const [secs, label] of map) {
-			const v = Math.floor(s / secs);
-			if (v >= 1) return `${v} ${label}${v > 1 ? 's' : ''} ago`;
-		}
+		for (const [secs, label] of map) { const v = Math.floor(s / secs); if (v >= 1) return `${v} ${label}${v > 1 ? 's' : ''} ago`; }
 		return 'just now';
 	};
-
 	const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-	const cardHTML = (r) => `
-		<article class="rv-card">
+	// Local voter identity + remembered reactions (light, per-browser).
+	const getVoter = () => {
+		let v = localStorage.getItem('fhb_voter');
+		if (!v) { v = (crypto.randomUUID && crypto.randomUUID()) || `${Date.now()}-${Math.round(Math.random() * 1e9)}`; localStorage.setItem('fhb_voter', v); }
+		return v;
+	};
+	const getMine = () => { try { return JSON.parse(localStorage.getItem('fhb_my_reactions') || '{}'); } catch { return {}; } };
+	const setMine = (m) => localStorage.setItem('fhb_my_reactions', JSON.stringify(m));
+
+	const cardHTML = (r) => {
+		const rx = r.reactions || { love: 0, like: 0, dislike: 0 };
+		return `
+		<article class="rv-card" data-id="${r.id}">
 			<div class="flex items-center gap-3 mb-1.5">
 				<div class="rv-avatar">${esc((r.first_name || '?').charAt(0).toUpperCase())}</div>
 				<div>
@@ -242,8 +247,25 @@ const heroImageMobile = page?.heroImage
 			<div class="rv-stars text-sm mb-1" aria-label="${r.stars} out of 5 stars">${stars(r.stars)}</div>
 			<p class="font-bold text-ink mb-1">${esc(r.title)}</p>
 			<p class="text-sm text-on-surface-variant leading-relaxed whitespace-pre-line">${esc(r.body)}</p>
+			<div class="rv-foot">
+				<div class="rv-actions">
+					<button class="rv-react" type="button" data-kind="love" aria-label="Love this review">❤️ <span class="rv-n" data-kind="love">${rx.love}</span></button>
+					<button class="rv-react" type="button" data-kind="like" aria-label="Like this review">👍 <span class="rv-n" data-kind="like">${rx.like}</span></button>
+					<button class="rv-react" type="button" data-kind="dislike" aria-label="Dislike this review">👎 <span class="rv-n" data-kind="dislike">${rx.dislike}</span></button>
+				</div>
+				<button class="rv-share" type="button" data-title="${esc(r.title)}" data-name="${esc(r.first_name)}" aria-label="Share this review">↗ Share</button>
+			</div>
 			<div class="text-xs text-muted mt-2">${ago(r.created_at)}</div>
 		</article>`;
+	};
+
+	const applyMine = (root) => {
+		const mine = getMine();
+		root.querySelectorAll('.rv-card').forEach((card) => {
+			const k = mine[card.dataset.id];
+			card.querySelectorAll('.rv-react').forEach((b) => b.classList.toggle('on', !!k && b.dataset.kind === k));
+		});
+	};
 
 	async function loadStats() {
 		try {
@@ -265,6 +287,7 @@ const heroImageMobile = page?.heroImage
 			if (Array.isArray(rows) && rows.length) {
 				document.getElementById('featured-list').innerHTML = rows.map(cardHTML).join('');
 				document.getElementById('featured').classList.remove('hidden');
+				applyMine(document.getElementById('featured'));
 			}
 		} catch { /* no featured section */ }
 	}
@@ -278,12 +301,73 @@ const heroImageMobile = page?.heroImage
 		offset += (rows.length || 0);
 		document.getElementById('reviews-empty').classList.toggle('hidden', list.children.length > 0);
 		document.getElementById('load-more').classList.toggle('hidden', !Array.isArray(rows) || rows.length < PAGE_SIZE);
+		applyMine(list);
 	}
 
-	document.getElementById('country-filter').addEventListener('change', (e) => {
-		country = e.target.value; loadReviews(true);
-	});
+	document.getElementById('country-filter').addEventListener('change', (e) => { country = e.target.value; loadReviews(true); });
 	document.getElementById('load-more').addEventListener('click', () => loadReviews(false));
+
+	// Reactions + share — delegated (cards are injected dynamically).
+	function openShareMenu(btn, text, url) {
+		document.querySelector('.rv-share-menu')?.remove();
+		const e = encodeURIComponent;
+		const menu = document.createElement('div');
+		menu.className = 'rv-share-menu';
+		menu.innerHTML =
+			`<a href="https://twitter.com/intent/tweet?text=${e(text)}&url=${e(url)}" target="_blank" rel="noopener">Share on X</a>` +
+			`<a href="https://www.facebook.com/sharer/sharer.php?u=${e(url)}" target="_blank" rel="noopener">Share on Facebook</a>` +
+			`<a href="https://wa.me/?text=${e(`${text} ${url}`)}" target="_blank" rel="noopener">Share on WhatsApp</a>` +
+			`<button type="button" class="rv-copy">Copy link</button>`;
+		btn.parentElement.style.position = 'relative';
+		btn.parentElement.appendChild(menu);
+		menu.querySelector('.rv-copy').addEventListener('click', () => {
+			navigator.clipboard?.writeText(url);
+			menu.querySelector('.rv-copy').textContent = 'Copied!';
+			setTimeout(() => menu.remove(), 900);
+		});
+	}
+
+	document.addEventListener('click', async (ev) => {
+		const react = ev.target.closest('.rv-react');
+		if (react) {
+			const card = react.closest('.rv-card');
+			const id = card?.dataset.id;
+			const kind = react.dataset.kind;
+			if (!id) return;
+			const acts = react.closest('.rv-actions');
+			acts.querySelectorAll('.rv-react').forEach((b) => (b.disabled = true));
+			try {
+				const data = await fetch('/review-api', {
+					method: 'POST', headers: { 'content-type': 'application/json' },
+					body: JSON.stringify({ action: 'react', review_id: id, voter: getVoter(), kind }),
+				}).then((r) => r.json());
+				if (data.ok) {
+					for (const k of ['love', 'like', 'dislike']) {
+						const n = acts.querySelector(`.rv-n[data-kind="${k}"]`);
+						if (n) n.textContent = data.reactions[k] ?? 0;
+					}
+					const mine = getMine();
+					if (data.mine) mine[id] = data.mine; else delete mine[id];
+					setMine(mine);
+					acts.querySelectorAll('.rv-react').forEach((b) => b.classList.toggle('on', b.dataset.kind === data.mine));
+				}
+			} catch { /* ignore */ } finally {
+				acts.querySelectorAll('.rv-react').forEach((b) => (b.disabled = false));
+			}
+			return;
+		}
+
+		const share = ev.target.closest('.rv-share');
+		if (share) {
+			const text = `"${share.dataset.title}" — ${share.dataset.name || 'a reader'}'s review of The Father's Heart Bible`;
+			if (navigator.share) { try { await navigator.share({ title: "Father's Heart Bible", text, url: SHARE_URL }); } catch { /* cancelled */ } }
+			else openShareMenu(share, text, SHARE_URL);
+			return;
+		}
+
+		const menu = document.querySelector('.rv-share-menu');
+		if (menu && !ev.target.closest('.rv-share-menu')) menu.remove();
+	});
 
 	// Star picker.
 	let starVal = 0;
@@ -295,7 +379,7 @@ const heroImageMobile = page?.heroImage
 		b.addEventListener('click', () => { starVal = Number(b.dataset.v); document.getElementById('stars-value').value = starVal; paint(starVal); });
 	});
 
-	// Lazy-load Turnstile when the form nears the viewport (keeps it off initial load).
+	// Lazy-load Turnstile when the form nears the viewport.
 	let turnstileLoaded = false;
 	const loadTurnstile = () => {
 		if (turnstileLoaded) return;
@@ -308,19 +392,14 @@ const heroImageMobile = page?.heroImage
 	};
 	const formEl = document.getElementById('share');
 	if ('IntersectionObserver' in window) {
-		const io = new IntersectionObserver((entries) => {
-			if (entries.some((e) => e.isIntersecting)) { loadTurnstile(); io.disconnect(); }
-		}, { rootMargin: '300px' });
+		const io = new IntersectionObserver((entries) => { if (entries.some((e) => e.isIntersecting)) { loadTurnstile(); io.disconnect(); } }, { rootMargin: '300px' });
 		io.observe(formEl);
 	} else { loadTurnstile(); }
 
 	// Submit.
 	const form = document.getElementById('review-form');
 	const msg = document.getElementById('form-msg');
-	const setMsg = (text, ok) => {
-		msg.textContent = text;
-		msg.className = `text-sm text-center ${ok ? 'text-brand' : 'text-red-600'}`;
-	};
+	const setMsg = (text, ok) => { msg.textContent = text; msg.className = `text-sm text-center ${ok ? 'text-brand' : 'text-red-600'}`; };
 	form.addEventListener('submit', async (e) => {
 		e.preventDefault();
 		const btn = document.getElementById('review-submit');
@@ -331,8 +410,7 @@ const heroImageMobile = page?.heroImage
 		btn.disabled = true; setMsg('Posting…', true);
 		try {
 			const res = await fetch('/review-api', {
-				method: 'POST',
-				headers: { 'content-type': 'application/json' },
+				method: 'POST', headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({
 					first_name: fd.get('first_name'), location: fd.get('location'),
 					stars: starVal, title: fd.get('title'), body: fd.get('body'),
@@ -348,11 +426,7 @@ const heroImageMobile = page?.heroImage
 				setMsg(data.error === 'rate_limited' ? 'You’ve posted a few times recently — please try again later.' : 'Something went wrong. Please try again.', false);
 				window.turnstile?.reset?.();
 			}
-		} catch {
-			setMsg('Network error. Please try again.', false);
-		} finally {
-			btn.disabled = false;
-		}
+		} catch { setMsg('Network error. Please try again.', false); } finally { btn.disabled = false; }
 	});
 
 	// Initial loads (after paint).
