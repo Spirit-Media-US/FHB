@@ -38,61 +38,71 @@ function slugifyHeading(s: string): string {
 
 function renderPortableText(blocks: any[]): string {
 	if (!Array.isArray(blocks)) return '';
-
-	return blocks
-		.map((block: any) => {
-			if (!block || block._type !== 'block') return '';
-
-			const children = Array.isArray(block.children) ? block.children : [];
-			const rawText = children.map((c: any) => c?.text || '').join('');
-			if (/^\{[\w]+\}\s*[—–-]\s*\{[\w]+\}$/.test(rawText.trim())) return '';
-
-			// Build a lookup of link markDefs by _key so we can resolve string marks
-			// like "ld9595c9aee7" back to their href. Sanity portable text stores
-			// annotations as keyed entries in the block's markDefs; the child span's
-			// `marks` array contains the _key as a string, not the object itself.
-			const markDefs = Array.isArray(block.markDefs) ? block.markDefs : [];
-			const linkByKey: Record<string, string> = {};
-			for (const md of markDefs) {
-				if (md && md._type === 'link' && md._key && md.href) {
-					linkByKey[md._key] = md.href;
-				}
-			}
-
-			const textContent = children
-				.map((child: any) => {
-					if (!child) return '';
-					let text = child.text || '';
-					const marks = Array.isArray(child.marks) ? child.marks : [];
-					if (marks.length > 0) {
-						if (marks.includes('strong')) text = `<strong>${text}</strong>`;
-						if (marks.includes('em')) text = `<em>${text}</em>`;
-						const linkKey = marks.find((m: any) => typeof m === 'string' && linkByKey[m]);
-						if (linkKey) {
-							const href = linkByKey[linkKey];
-							const isExternal = /^https?:\/\//i.test(href);
-							const targetAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
-							text = `<a href="${href}" style="color: var(--color-brand);" class="hover:underline"${targetAttrs}>${text}</a>`;
-						}
+	let html = '';
+	let listType: string | null = null;
+	const closeList = () => {
+		if (listType) {
+			html += listType === 'number' ? '</ol>' : '</ul>';
+			listType = null;
+		}
+	};
+	for (const block of blocks) {
+		if (!block || block._type !== 'block') continue;
+		const children = Array.isArray(block.children) ? block.children : [];
+		const rawText = children.map((c: any) => c?.text || '').join('');
+		if (/^\{[\w]+\}\s*[—–-]\s*\{[\w]+\}$/.test(rawText.trim())) continue;
+		const markDefs = Array.isArray(block.markDefs) ? block.markDefs : [];
+		const linkByKey: Record<string, string> = {};
+		for (const md of markDefs) {
+			if (md && md._type === 'link' && md._key && md.href) linkByKey[md._key] = md.href;
+		}
+		const textContent = children
+			.map((child: any) => {
+				if (!child) return '';
+				let text = child.text || '';
+				const marks = Array.isArray(child.marks) ? child.marks : [];
+				if (marks.length > 0) {
+					if (marks.includes('strong')) text = `<strong>${text}</strong>`;
+					if (marks.includes('em')) text = `<em>${text}</em>`;
+					const linkKey = marks.find((m: any) => typeof m === 'string' && linkByKey[m]);
+					if (linkKey) {
+						const href = linkByKey[linkKey];
+						const isExternal = /^https?:\/\//i.test(href);
+						const targetAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+						text = `<a href="${href}" style="color: var(--color-brand);" class="hover:underline"${targetAttrs}>${text}</a>`;
 					}
-					return text;
-				})
-				.join('');
-
-			const style = block.style || 'normal';
-			if (style === 'h2') {
-				const id = slugifyHeading(rawText);
-				return `<h2 id="${id}" class="text-2xl font-bold mt-12 mb-4 scroll-mt-24" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h2>`;
+				}
+				return text;
+			})
+			.join('');
+		const listItem = block.listItem;
+		if (listItem === 'bullet' || listItem === 'number') {
+			if (listType && listType !== listItem) closeList();
+			if (!listType) {
+				listType = listItem;
+				html +=
+					listItem === 'number'
+						? '<ol class="list-decimal pl-7 my-6 space-y-2 text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">'
+						: '<ul class="list-disc pl-7 my-6 space-y-2 text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">';
 			}
-			if (style === 'h3')
-				return `<h3 class="text-xl font-bold mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h3>`;
-			// Blockquote = inline FHB verse quote. Pink card matching the
-			// chapter-embed palette so FHB renderings always read FHB-pink.
-			if (style === 'blockquote')
-				return `<blockquote class="my-6 px-6 py-5 lg:px-8 rounded-2xl text-lg leading-relaxed" style="background-color: #fdf2f5; border: 1px solid #f9d6e0; font-family: var(--font-serif); color: var(--color-ink);">${textContent}</blockquote>`;
-			return `<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">${textContent}</p>`;
-		})
-		.join('');
+			html += `<li>${textContent}</li>`;
+			continue;
+		}
+		closeList();
+		const style = block.style || 'normal';
+		if (style === 'h2') {
+			const id = slugifyHeading(rawText);
+			html += `<h2 id="${id}" class="text-2xl font-bold mt-12 mb-4 scroll-mt-24" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h2>`;
+		} else if (style === 'h3') {
+			html += `<h3 class="text-xl font-bold mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h3>`;
+		} else if (style === 'blockquote') {
+			html += `<blockquote class="my-6 px-6 py-5 lg:px-8 rounded-2xl text-lg leading-relaxed" style="background-color: #fdf2f5; border: 1px solid #f9d6e0; font-family: var(--font-serif); color: var(--color-ink);">${textContent}</blockquote>`;
+		} else {
+			html += `<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">${textContent}</p>`;
+		}
+	}
+	closeList();
+	return html;
 }
 
 const formatDate = (dateString: string) => {
