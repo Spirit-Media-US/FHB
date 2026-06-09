@@ -81,6 +81,18 @@ const heroImageMobile = page?.heroImage
 	<!-- Two columns: submission form (left, sticky) + reviews (right). On mobile
 	     they stack with the form first, so submitting is always quick to reach. -->
 	<Section variant="light">
+		<!-- Global reach — above both columns (above "Share your experience"). -->
+		<div class="flex items-center justify-center gap-12 md:gap-16 mb-8 pb-6 border-b border-hairline">
+			<div class="text-center">
+				<span id="stat-readers" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
+				<span class="block text-xs uppercase tracking-wide text-muted mt-1">Readers</span>
+			</div>
+			<div class="text-center">
+				<span id="stat-countries" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
+				<span class="block text-xs uppercase tracking-wide text-muted mt-1">Countries</span>
+			</div>
+		</div>
+
 		<div class="grid lg:grid-cols-[minmax(320px,380px)_1fr] gap-8 lg:gap-12 items-start">
 
 			<!-- LEFT — submission form -->
@@ -88,7 +100,7 @@ const heroImageMobile = page?.heroImage
 				<h2 class="font-bold text-2xl text-ink mb-1">Share your experience</h2>
 				<p class="text-muted text-sm mb-5">{heroSubheading}</p>
 
-				<form id="review-form" class="grid gap-4 bg-surface-lowest border border-hairline rounded-2xl p-5 md:p-6">
+				<form id="review-form" class="grid gap-4 border border-hairline rounded-2xl p-5 md:p-6" style="background-color: #fdeaf1;">
 					<label class="grid gap-1.5">
 						<span class="text-sm font-semibold text-ink">First name</span>
 						<input name="first_name" type="text" required maxlength="50"
@@ -144,24 +156,8 @@ const heroImageMobile = page?.heroImage
 				</form>
 			</div>
 
-			<!-- RIGHT — stats (top of the reviews) + featured + feed -->
+			<!-- RIGHT — reviews ("What readers are saying" is the top of this column) -->
 			<div>
-				<div class="flex items-center gap-10 mb-6 pb-5 border-b border-hairline">
-					<div>
-						<span id="stat-readers" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
-						<span class="text-xs uppercase tracking-wide text-muted ml-2">Readers</span>
-					</div>
-					<div>
-						<span id="stat-countries" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
-						<span class="text-xs uppercase tracking-wide text-muted ml-2">Countries</span>
-					</div>
-				</div>
-
-				<div id="featured" class="hidden mb-8">
-					<h2 class="font-bold text-lg text-ink mb-3">Featured</h2>
-					<div id="featured-list" class="grid gap-4"></div>
-				</div>
-
 				<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
 					<h2 class="font-bold text-2xl text-ink">What readers are saying</h2>
 					<label class="text-sm text-muted flex items-center gap-2">
@@ -170,6 +166,11 @@ const heroImageMobile = page?.heroImage
 							<option value="">All countries</option>
 						</select>
 					</label>
+				</div>
+
+				<div id="featured" class="hidden mb-8">
+					<h2 class="font-bold text-lg text-ink mb-3">Featured</h2>
+					<div id="featured-list" class="grid gap-4"></div>
 				</div>
 				<div id="reviews-list" class="grid gap-4"></div>
 				<p id="reviews-empty" class="text-muted py-10 hidden">Be the first to share what this Bible means to you.</p>
