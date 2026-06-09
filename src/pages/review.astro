@@ -183,6 +183,12 @@ const heroImageMobile = page?.heroImage
 	.rv-share-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.14); display: flex; flex-direction: column; min-width: 150px; overflow: hidden; }
 	.rv-share-menu a, .rv-share-menu button { text-align: left; padding: 9px 14px; font-size: 13px; color: var(--color-ink); background: #fff; border: 0; cursor: pointer; text-decoration: none; }
 	.rv-share-menu a:hover, .rv-share-menu button:hover { background: var(--color-surface-low); }
+	/* This page's below-hero content is interactive (form + live feed). Show it
+	   immediately instead of hiding it behind the site's scroll-reveal entrance
+	   (which left everything below the hero blank until the user scrolled). The
+	   stat counters do their own scroll-triggered animation separately. Scoped to
+	   /review — this <style is:global> only ships on this page. */
+	[data-reveal] { opacity: 1 !important; transform: none !important; }
 </style>
 
 <script>
@@ -222,21 +228,36 @@ const heroImageMobile = page?.heroImage
 		requestAnimationFrame(tick);
 	};
 
-	// Run once, only when both the values are loaded AND the strip is on screen.
+	// Count up only when the strip is genuinely scrolled INTO the reading area.
+	// rootMargin '-35%' on the bottom means it won't fire while it's only peeking
+	// in at the very bottom on load — it must rise into the top ~65% of the
+	// viewport. Reset to 0 whenever it leaves, so it always replays from 0.
 	let statsTarget = null;
 	let statsInView = false;
 	let statsAnimated = false;
+	const rdEl = () => document.getElementById('stat-readers');
+	const ctEl = () => document.getElementById('stat-countries');
 	const tryAnimateStats = () => {
 		if (statsAnimated || !statsInView || !statsTarget) return;
 		statsAnimated = true;
-		animateCount(document.getElementById('stat-readers'), statsTarget.readers);
-		animateCount(document.getElementById('stat-countries'), statsTarget.countries);
+		animateCount(rdEl(), statsTarget.readers);
+		animateCount(ctEl(), statsTarget.countries);
 	};
 	const stripEl = document.getElementById('stats-strip');
 	if (stripEl && 'IntersectionObserver' in window) {
 		new IntersectionObserver((entries) => {
-			if (entries.some((e) => e.isIntersecting)) { statsInView = true; tryAnimateStats(); }
-		}, { threshold: 0.6 }).observe(stripEl);
+			for (const e of entries) {
+				statsInView = e.isIntersecting;
+				if (e.isIntersecting) {
+					tryAnimateStats();
+				} else {
+					// Out of view → re-arm and reset so the next scroll-in replays 0→N.
+					statsAnimated = false;
+					if (rdEl()) rdEl().textContent = '0';
+					if (ctEl()) ctEl().textContent = '0';
+				}
+			}
+		}, { threshold: 0, rootMargin: '0px 0px -35% 0px' }).observe(stripEl);
 	} else {
 		statsInView = true; // no observer support — show on load
 	}
