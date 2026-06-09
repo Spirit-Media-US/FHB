@@ -84,7 +84,7 @@ const heroImageMobile = page?.heroImage
 
 			<!-- LEFT — global-reach stats + submission form -->
 			<div id="share" class="lg:sticky lg:top-24">
-				<div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 mb-6 pb-5 border-b border-hairline">
+				<div id="stats-strip" class="flex flex-wrap items-baseline gap-x-6 gap-y-1 mb-6 pb-5 border-b border-hairline">
 					<span class="whitespace-nowrap"><span id="stat-readers" class="text-2xl md:text-3xl font-extrabold text-brand">0</span> <span class="text-muted">Readers</span></span>
 					<span class="whitespace-nowrap"><span id="stat-countries" class="text-2xl md:text-3xl font-extrabold text-brand">0</span> <span class="text-muted">Countries</span></span>
 				</div>
@@ -206,17 +206,40 @@ const heroImageMobile = page?.heroImage
 	};
 	const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-	// Animated count-up for the stat numbers (0 → target, ease-out).
-	const countUp = (el, target, ms = 900) => {
+	// Count-up that fires when the stats scroll into view (not on load) and ticks
+	// LINEARLY at ~300ms per number so small totals (0,1,2,3…) are clearly visible;
+	// total time is capped so large totals still finish quickly.
+	const animateCount = (el, target) => {
 		if (!el) return;
+		const dur = Math.min(1500, Math.max(700, target * 300));
 		const start = performance.now();
 		const tick = (now) => {
-			const p = Math.min(1, (now - start) / ms);
-			el.textContent = Math.round((1 - (1 - p) ** 3) * target).toLocaleString();
+			const p = Math.min(1, (now - start) / dur);
+			el.textContent = Math.round(p * target).toLocaleString();
 			if (p < 1) requestAnimationFrame(tick);
+			else el.textContent = target.toLocaleString();
 		};
 		requestAnimationFrame(tick);
 	};
+
+	// Run once, only when both the values are loaded AND the strip is on screen.
+	let statsTarget = null;
+	let statsInView = false;
+	let statsAnimated = false;
+	const tryAnimateStats = () => {
+		if (statsAnimated || !statsInView || !statsTarget) return;
+		statsAnimated = true;
+		animateCount(document.getElementById('stat-readers'), statsTarget.readers);
+		animateCount(document.getElementById('stat-countries'), statsTarget.countries);
+	};
+	const stripEl = document.getElementById('stats-strip');
+	if (stripEl && 'IntersectionObserver' in window) {
+		new IntersectionObserver((entries) => {
+			if (entries.some((e) => e.isIntersecting)) { statsInView = true; tryAnimateStats(); }
+		}, { threshold: 0.6 }).observe(stripEl);
+	} else {
+		statsInView = true; // no observer support — show on load
+	}
 
 	// Local voter identity + remembered reactions (light, per-browser).
 	const getVoter = () => {
@@ -266,8 +289,8 @@ const heroImageMobile = page?.heroImage
 	async function loadStats() {
 		try {
 			const s = await fetch(api('stats=1')).then((r) => r.json());
-			countUp(document.getElementById('stat-readers'), s.readers ?? 0);
-			countUp(document.getElementById('stat-countries'), s.countries ?? 0);
+			statsTarget = { readers: s.readers ?? 0, countries: s.countries ?? 0 };
+			tryAnimateStats();
 			const sel = document.getElementById('country-filter');
 			for (const c of s.countryList || []) {
 				const o = document.createElement('option');
