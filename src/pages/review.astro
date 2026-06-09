@@ -233,13 +233,18 @@ const heroImageMobile = page?.heroImage
 	// in at the very bottom on load — it must rise into the top ~65% of the
 	// viewport. Reset to 0 whenever it leaves, so it always replays from 0.
 	let statsTarget = null;
-	let statsInView = false;
-	let statsAnimated = false;
+	let statsArmed = false; // baseline established (first observer callback)
+	let statsCounted = false; // already counted during the current in-view session
 	const rdEl = () => document.getElementById('stat-readers');
 	const ctEl = () => document.getElementById('stat-countries');
-	const tryAnimateStats = () => {
-		if (statsAnimated || !statsInView || !statsTarget) return;
-		statsAnimated = true;
+	// Resting state = the REAL number (never a lonely "0" that looks broken).
+	const showFinal = () => {
+		if (!statsTarget) return;
+		if (rdEl()) rdEl().textContent = statsTarget.readers.toLocaleString();
+		if (ctEl()) ctEl().textContent = statsTarget.countries.toLocaleString();
+	};
+	const runCount = () => {
+		if (!statsTarget) return;
 		animateCount(rdEl(), statsTarget.readers);
 		animateCount(ctEl(), statsTarget.countries);
 	};
@@ -247,19 +252,22 @@ const heroImageMobile = page?.heroImage
 	if (stripEl && 'IntersectionObserver' in window) {
 		new IntersectionObserver((entries) => {
 			for (const e of entries) {
-				statsInView = e.isIntersecting;
+				if (!statsArmed) {
+					// First callback = initial state. Show the real number; only
+					// ANIMATE later, when the strip is actively scrolled into view.
+					statsArmed = true;
+					statsCounted = e.isIntersecting;
+					showFinal();
+					continue;
+				}
 				if (e.isIntersecting) {
-					tryAnimateStats();
+					if (!statsCounted) { statsCounted = true; runCount(); }
 				} else {
-					// Out of view → re-arm and reset so the next scroll-in replays 0→N.
-					statsAnimated = false;
-					if (rdEl()) rdEl().textContent = '0';
-					if (ctEl()) ctEl().textContent = '0';
+					statsCounted = false; // re-arm; rest showing the real number
+					showFinal();
 				}
 			}
-		}, { threshold: 0, rootMargin: '0px 0px -35% 0px' }).observe(stripEl);
-	} else {
-		statsInView = true; // no observer support — show on load
+		}, { threshold: 0.25 }).observe(stripEl);
 	}
 
 	// Local voter identity + remembered reactions (light, per-browser).
@@ -311,7 +319,7 @@ const heroImageMobile = page?.heroImage
 		try {
 			const s = await fetch(api('stats=1')).then((r) => r.json());
 			statsTarget = { readers: s.readers ?? 0, countries: s.countries ?? 0 };
-			tryAnimateStats();
+			showFinal();
 			const sel = document.getElementById('country-filter');
 			for (const c of s.countryList || []) {
 				const o = document.createElement('option');
