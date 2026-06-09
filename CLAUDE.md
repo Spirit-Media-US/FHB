@@ -4,6 +4,13 @@
 
 This site: Father's Heart Bible | Repo: github.com/Spirit-Media-US/FHB | Domain: fathersheartbible.com / fathersheartbible.org | Sanity ID: rusi1hyi | R2 bucket: n/a
 
+> ⚠️ **THE BIBLE READER IS NOT SERVED BY THIS SITE.** `fathersheartbible.com/read` is served
+> by the **community** project (`/srv/sites/community`), NOT FHB — this site builds **zero**
+> `/read` pages, so deploying FHB does **nothing** for the reader. To publish or fix
+> translation text on `/read`, follow the publish path in
+> `tools-api/pipelines/translation/CLAUDE.md` (promote → community sync → deploy **community**).
+> (Deploying FHB by mistake here cost a painful session 2026-06-09.)
+
 **Migration protocol:** /home/deploy/bin/tools-api/pipelines/migration/CLAUDE.md
 **Sanity Studio:** Embedded at fathersheartbible.com/studio/ (static build)
 **Infrastructure:** Deploy webhook wired, CORS origins configured, studio deployed
