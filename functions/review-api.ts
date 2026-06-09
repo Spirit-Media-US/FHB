@@ -189,65 +189,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
 	if (payload.action === 'react') return handleReact(payload, env);
 
-	// Honeypot — silently accept (so bots think they succeeded) but drop.
-	if (clean(payload.website)) return json({ ok: true });
-
-	const first_name = clean(payload.first_name).slice(0, 50);
-	const location = clean(payload.location).slice(0, 80);
-	const title = clean(payload.title).slice(0, 100);
-	const body = clean(payload.body).slice(0, 2000);
-	const email = clean(payload.email).slice(0, 120);
-	const stars = Number(payload.stars);
-
-	if (!first_name || !location || !title || !body)
-		return json({ ok: false, error: 'missing_fields' }, 400);
-	if (!Number.isInteger(stars) || stars < 1 || stars > 5)
-		return json({ ok: false, error: 'bad_stars' }, 400);
-	if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
-		return json({ ok: false, error: 'bad_email' }, 400);
-
-	const token = clean(payload.turnstileToken);
-	if (!token) return json({ ok: false, error: 'turnstile_missing' }, 400);
-	const ip = request.headers.get('CF-Connecting-IP') || '';
-	const verify = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-		method: 'POST',
-		headers: { 'content-type': 'application/json' },
-		body: JSON.stringify({ secret: env.TURNSTILE_SECRET_FHB, response: token, remoteip: ip }),
-	})
-		.then((r) => r.json() as Promise<{ success: boolean }>)
-		.catch(() => ({ success: false }));
-	if (!verify.success) return json({ ok: false, error: 'turnstile_failed' }, 403);
-
-	const country_code = request.headers.get('CF-IPCountry') || null;
-	const ip_hash = ip ? await sha256(`${env.REVIEW_IP_SALT || 'fhb'}:${ip}`) : null;
-	const { base, headers } = sb(env);
-
-	// Soft rate-limit: max 5 submissions per IP per 10 minutes.
-	if (ip_hash) {
-		const since = new Date(Date.now() - 10 * 60 * 1000).toISOString();
-		const countRes = await fetch(
-			`${base}/rest/v1/fhb_reviews?select=id&ip_hash=eq.${ip_hash}&created_at=gte.${since}`,
-			{ headers: { ...headers, prefer: 'count=exact' } },
-		);
-		const total = Number((countRes.headers.get('content-range') || '').split('/')[1] || '0');
-		if (total >= 5) return json({ ok: false, error: 'rate_limited' }, 429);
-	}
-
-	const insert = await fetch(`${base}/rest/v1/fhb_reviews`, {
-		method: 'POST',
-		headers: { ...headers, prefer: 'return=minimal' },
-		body: JSON.stringify({
-			first_name,
-			location,
-			country_code,
-			stars,
-			title,
-			body,
-			email: email || null,
-			ip_hash,
-			status: 'pending',
-		}),
-	});
-	if (!insert.ok) return json({ ok: false, error: 'insert_failed' }, 502);
-	return json({ ok: true });
+	// Review submission moved to the authenticated /api/review-submit endpoint
+	// (FH Family magic-link sign-in). This endpoint no longer accepts ungated
+	// submissions — that would bypass the accountability gate.
+	return json({ ok: false, error: 'use_review_submit' }, 410);
 };

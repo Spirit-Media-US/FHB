@@ -17,9 +17,8 @@ import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
 
-// The Turnstile sitekey is public by design (domain-locked, meant to live in
-// the page HTML) — safe to inline. No Supabase key reaches the browser.
-const TURNSTILE_SITEKEY = '0x4AAAAAADg_aq06TImxh0zh';
+// Posting requires a verified FH Family member (magic-link sign-in) via the
+// /api/review-submit endpoint; no Supabase key reaches the browser.
 
 // Hero content + image come from the Sanity `page` doc (slug "review") so the
 // team can edit copy and swap the hero image in Studio without a code change.
@@ -81,31 +80,30 @@ const heroImageMobile = page?.heroImage
 	<!-- Two columns: submission form (left, sticky) + reviews (right). On mobile
 	     they stack with the form first, so submitting is always quick to reach. -->
 	<Section variant="light">
-		<!-- Global reach — above both columns (above "Share your experience"). -->
-		<div class="flex items-center justify-center gap-12 md:gap-16 mb-8 pb-6 border-b border-hairline">
-			<div class="text-center">
-				<span id="stat-readers" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
-				<span class="block text-xs uppercase tracking-wide text-muted mt-1">Readers</span>
-			</div>
-			<div class="text-center">
-				<span id="stat-countries" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
-				<span class="block text-xs uppercase tracking-wide text-muted mt-1">Countries</span>
-			</div>
-		</div>
-
 		<div class="grid lg:grid-cols-[minmax(320px,380px)_1fr] gap-8 lg:gap-12 items-start">
 
-			<!-- LEFT — submission form -->
+			<!-- LEFT — global-reach stats + submission form -->
 			<div id="share" class="lg:sticky lg:top-24">
+				<div id="stats-strip" class="flex flex-wrap items-baseline gap-x-6 gap-y-1 mb-6 pb-5 border-b border-hairline">
+					<span class="whitespace-nowrap"><span id="stat-readers" class="text-2xl md:text-3xl font-extrabold text-brand">0</span> <span class="text-muted">Readers</span></span>
+					<span class="whitespace-nowrap"><span id="stat-countries" class="text-2xl md:text-3xl font-extrabold text-brand">0</span> <span class="text-muted">Countries</span></span>
+				</div>
 				<h2 class="font-bold text-2xl text-ink mb-1">Share your experience</h2>
 				<p class="text-muted text-sm mb-5">{heroSubheading}</p>
 
-				<form id="review-form" class="grid gap-4 border border-hairline rounded-2xl p-5 md:p-6" style="background-color: #fdeaf1;">
-					<label class="grid gap-1.5">
-						<span class="text-sm font-semibold text-ink">First name</span>
-						<input name="first_name" type="text" required maxlength="50"
-							class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink" />
-					</label>
+				<!-- Guests sign in FIRST (so nobody fills out the form only to hit a
+				     sign-in wall). Swapped for the form once signed in. -->
+				<div id="review-guest" class="border border-hairline rounded-2xl p-6 text-center" style="background-color: #fdeaf1;">
+					<p class="text-2xl mb-1">❤️</p>
+					<p class="font-semibold text-ink mb-1">Sign in to write your review</p>
+					<p class="text-muted text-sm mb-5">Reviews come from members of the Father's Heart family. We'll email you a secure one-tap link — no password.</p>
+					<a href="/login?next=/review" id="review-signin" class="inline-block bg-brand text-on-primary font-bold px-6 py-3 rounded-lg hover:bg-brand-dark transition-colors">Sign in to write a review</a>
+				</div>
+
+				<form id="review-form" hidden class="grid gap-4 border border-hairline rounded-2xl p-5 md:p-6" style="background-color: #fdeaf1;">
+					<!-- "Posting as <member>" — filled by JS once signed in. -->
+					<div id="auth-status" class="flex items-center gap-3 text-sm text-muted bg-surface-lowest border border-hairline rounded-lg px-3 py-2.5"></div>
+
 					<label class="grid gap-1.5">
 						<span class="text-sm font-semibold text-ink">Location <span class="font-normal text-muted">(e.g. Lagos, Nigeria)</span></span>
 						<input name="location" type="text" required maxlength="80"
@@ -135,18 +133,6 @@ const heroImageMobile = page?.heroImage
 						<textarea name="body" required maxlength="2000" rows="4"
 							class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink resize-y"></textarea>
 					</label>
-
-					<label class="grid gap-1.5">
-						<span class="text-sm font-semibold text-ink">Email <span class="font-normal text-muted">(optional — hear about the Father's Heart family?)</span></span>
-						<input name="email" type="email" maxlength="120"
-							class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink" />
-					</label>
-
-					<!-- Honeypot — visually hidden, ignored by humans. -->
-					<input name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true"
-						class="absolute opacity-0 pointer-events-none h-0 w-0" />
-
-					<div id="turnstile-slot"></div>
 
 					<button type="submit" id="review-submit"
 						class="bg-brand text-on-primary font-bold px-7 py-3 rounded-lg hover:bg-brand-dark transition-colors disabled:opacity-50">
@@ -192,6 +178,7 @@ const heroImageMobile = page?.heroImage
 	#star-input .star.on { color: #f5a623; }
 	.rv-card { background: var(--color-surface-lowest); border: 1px solid var(--color-hairline); border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
 	.rv-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--color-brand); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex: 0 0 auto; }
+	.rv-avatar-img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; }
 	.rv-stars { color: #f5a623; letter-spacing: 1px; }
 	.rv-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--color-hairline); }
 	.rv-actions { display: flex; gap: 6px; }
@@ -202,9 +189,15 @@ const heroImageMobile = page?.heroImage
 	.rv-share-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.14); display: flex; flex-direction: column; min-width: 150px; overflow: hidden; }
 	.rv-share-menu a, .rv-share-menu button { text-align: left; padding: 9px 14px; font-size: 13px; color: var(--color-ink); background: #fff; border: 0; cursor: pointer; text-decoration: none; }
 	.rv-share-menu a:hover, .rv-share-menu button:hover { background: var(--color-surface-low); }
+	/* This page's below-hero content is interactive (form + live feed). Show it
+	   immediately instead of hiding it behind the site's scroll-reveal entrance
+	   (which left everything below the hero blank until the user scrolled). The
+	   stat counters do their own scroll-triggered animation separately. Scoped to
+	   /review — this <style is:global> only ships on this page. */
+	[data-reveal] { opacity: 1 !important; transform: none !important; }
 </style>
 
-<script define:vars={{ TURNSTILE_SITEKEY }}>
+<script>
 	let offset = 0;
 	const PAGE_SIZE = 20;
 	let country = '';
@@ -225,6 +218,64 @@ const heroImageMobile = page?.heroImage
 	};
 	const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+	// Count-up that fires when the stats scroll into view (not on load) and ticks
+	// LINEARLY at ~300ms per number so small totals (0,1,2,3…) are clearly visible;
+	// total time is capped so large totals still finish quickly.
+	const animateCount = (el, target) => {
+		if (!el) return;
+		const dur = Math.min(1500, Math.max(700, target * 300));
+		const start = performance.now();
+		const tick = (now) => {
+			const p = Math.min(1, (now - start) / dur);
+			el.textContent = Math.round(p * target).toLocaleString();
+			if (p < 1) requestAnimationFrame(tick);
+			else el.textContent = target.toLocaleString();
+		};
+		requestAnimationFrame(tick);
+	};
+
+	// Count up only when the strip is genuinely scrolled INTO the reading area.
+	// rootMargin '-35%' on the bottom means it won't fire while it's only peeking
+	// in at the very bottom on load — it must rise into the top ~65% of the
+	// viewport. Reset to 0 whenever it leaves, so it always replays from 0.
+	let statsTarget = null;
+	let statsArmed = false; // baseline established (first observer callback)
+	let statsCounted = false; // already counted during the current in-view session
+	const rdEl = () => document.getElementById('stat-readers');
+	const ctEl = () => document.getElementById('stat-countries');
+	// Resting state = the REAL number (never a lonely "0" that looks broken).
+	const showFinal = () => {
+		if (!statsTarget) return;
+		if (rdEl()) rdEl().textContent = statsTarget.readers.toLocaleString();
+		if (ctEl()) ctEl().textContent = statsTarget.countries.toLocaleString();
+	};
+	const runCount = () => {
+		if (!statsTarget) return;
+		animateCount(rdEl(), statsTarget.readers);
+		animateCount(ctEl(), statsTarget.countries);
+	};
+	const stripEl = document.getElementById('stats-strip');
+	if (stripEl && 'IntersectionObserver' in window) {
+		new IntersectionObserver((entries) => {
+			for (const e of entries) {
+				if (!statsArmed) {
+					// First callback = initial state. Show the real number; only
+					// ANIMATE later, when the strip is actively scrolled into view.
+					statsArmed = true;
+					statsCounted = e.isIntersecting;
+					showFinal();
+					continue;
+				}
+				if (e.isIntersecting) {
+					if (!statsCounted) { statsCounted = true; runCount(); }
+				} else {
+					statsCounted = false; // re-arm; rest showing the real number
+					showFinal();
+				}
+			}
+		}, { threshold: 0.25 }).observe(stripEl);
+	}
+
 	// Local voter identity + remembered reactions (light, per-browser).
 	const getVoter = () => {
 		let v = localStorage.getItem('fhb_voter');
@@ -239,7 +290,9 @@ const heroImageMobile = page?.heroImage
 		return `
 		<article class="rv-card" data-id="${r.id}">
 			<div class="flex items-center gap-3 mb-1.5">
-				<div class="rv-avatar">${esc((r.first_name || '?').charAt(0).toUpperCase())}</div>
+				${r.avatar_url
+					? `<img class="rv-avatar-img" src="${esc(r.avatar_url)}" alt="" loading="lazy" decoding="async" />`
+					: `<div class="rv-avatar">${esc((r.first_name || '?').charAt(0).toUpperCase())}</div>`}
 				<div>
 					<div class="font-semibold text-ink">${esc(r.first_name)} ${flag(r.country_code)}</div>
 					<div class="text-xs text-muted">${esc(r.location || '')}</div>
@@ -271,8 +324,8 @@ const heroImageMobile = page?.heroImage
 	async function loadStats() {
 		try {
 			const s = await fetch(api('stats=1')).then((r) => r.json());
-			document.getElementById('stat-readers').textContent = (s.readers ?? 0).toLocaleString();
-			document.getElementById('stat-countries').textContent = (s.countries ?? 0).toLocaleString();
+			statsTarget = { readers: s.readers ?? 0, countries: s.countries ?? 0 };
+			showFinal();
 			const sel = document.getElementById('country-filter');
 			for (const c of s.countryList || []) {
 				const o = document.createElement('option');
@@ -380,56 +433,96 @@ const heroImageMobile = page?.heroImage
 		b.addEventListener('click', () => { starVal = Number(b.dataset.v); document.getElementById('stars-value').value = starVal; paint(starVal); });
 	});
 
-	// Lazy-load Turnstile when the form nears the viewport.
-	let turnstileLoaded = false;
-	const loadTurnstile = () => {
-		if (turnstileLoaded) return;
-		turnstileLoaded = true;
-		const s = document.createElement('script');
-		s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-		s.async = true; s.defer = true;
-		s.onload = () => window.turnstile?.render('#turnstile-slot', { sitekey: TURNSTILE_SITEKEY });
-		document.head.appendChild(s);
-	};
-	const formEl = document.getElementById('share');
-	if ('IntersectionObserver' in window) {
-		const io = new IntersectionObserver((entries) => { if (entries.some((e) => e.isIntersecting)) { loadTurnstile(); io.disconnect(); } }, { rootMargin: '300px' });
-		io.observe(formEl);
-	} else { loadTurnstile(); }
+	// ── FH Family sign-in gating ───────────────────────────────────────────
+	// Posting requires a verified FH Family member. Session + insert live behind
+	// /api/review-submit (community app), reached via the apex proxy on the real
+	// domain. On the dev preview there's no proxy, so this resolves to "guest".
+	const SUBMIT_API = '/api/review-submit';
+	const DRAFT_KEY = 'fhb_review_draft';
+	let session = { signedIn: false };
 
-	// Submit.
 	const form = document.getElementById('review-form');
 	const msg = document.getElementById('form-msg');
+	const authStatus = document.getElementById('auth-status');
+	const field = (n) => form.querySelector(`[name="${n}"]`);
 	const setMsg = (text, ok) => { msg.textContent = text; msg.className = `text-sm text-center ${ok ? 'text-brand' : 'text-red-600'}`; };
-	form.addEventListener('submit', async (e) => {
-		e.preventDefault();
+
+	function renderAuthStatus() {
+		if (!authStatus || !session.signedIn) return;
+		const av = session.avatarUrl
+			? `<img class="rv-avatar-img" src="${esc(session.avatarUrl)}" alt="" />`
+			: `<div class="rv-avatar" style="width:28px;height:28px;font-size:13px;">${esc((session.firstName || '?').charAt(0).toUpperCase())}</div>`;
+		authStatus.innerHTML = `${av}<span>Posting as <strong class="text-ink">${esc(session.firstName || session.name || 'you')}</strong> — verified FH Family member.</span>`;
+	}
+
+	async function loadSession() {
+		try {
+			const r = await fetch(SUBMIT_API, { headers: { accept: 'application/json' } });
+			if (r.ok) session = await r.json();
+		} catch { /* guest */ }
+		const guestEl = document.getElementById('review-guest');
+		if (session.signedIn) {
+			if (guestEl) guestEl.hidden = true;
+			form.hidden = false;
+			renderAuthStatus();
+			if (session.location && !field('location').value) field('location').value = session.location;
+		} else {
+			if (guestEl) guestEl.hidden = false;
+			form.hidden = true;
+		}
+	}
+
+	const collectDraft = () => ({ location: field('location').value, stars: starVal, title: field('title').value, body: field('body').value });
+
+	async function submitReview(draft) {
 		const btn = document.getElementById('review-submit');
-		if (!starVal) { setMsg('Please choose a star rating.', false); return; }
-		const token = window.turnstile?.getResponse?.();
-		if (!token) { setMsg('Please complete the verification.', false); loadTurnstile(); return; }
-		const fd = new FormData(form);
 		btn.disabled = true; setMsg('Posting…', true);
 		try {
-			const res = await fetch('/review-api', {
+			const res = await fetch(SUBMIT_API, {
 				method: 'POST', headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({
-					first_name: fd.get('first_name'), location: fd.get('location'),
-					stars: starVal, title: fd.get('title'), body: fd.get('body'),
-					email: fd.get('email'), website: fd.get('website'), turnstileToken: token,
-				}),
+				body: JSON.stringify(draft),
 			});
 			const data = await res.json().catch(() => ({}));
 			if (res.ok && data.ok) {
 				form.reset(); starVal = 0; paint(0);
+				try { localStorage.setItem('fhb_reviewed', '1'); } catch { /* ignore */ }
 				setMsg('Thank you! Your review will appear shortly, once reviewed.', true);
-				window.turnstile?.reset?.();
+			} else if (res.status === 401 || data.error === 'signin-required') {
+				localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+				window.location.href = '/login?next=/review';
 			} else {
-				setMsg(data.error === 'rate_limited' ? 'You’ve posted a few times recently — please try again later.' : 'Something went wrong. Please try again.', false);
-				window.turnstile?.reset?.();
+				setMsg('Something went wrong. Please try again.', false);
 			}
 		} catch { setMsg('Network error. Please try again.', false); } finally { btn.disabled = false; }
+	}
+
+	form.addEventListener('submit', (e) => {
+		e.preventDefault();
+		if (!field('location').value.trim() || !field('title').value.trim() || !field('body').value.trim()) { setMsg('Please add your location, a title, and your review.', false); return; }
+		if (!starVal) { setMsg('Please choose a star rating.', false); return; }
+		const draft = collectDraft();
+		if (session.signedIn) { submitReview(draft); return; }
+		// Guest → save the draft, then send them through the FH Family sign-in link.
+		localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+		setMsg('Sending you a sign-in link to confirm your review…', true);
+		window.location.href = '/login?next=/review';
 	});
+
+	// On return from sign-in: restore the saved draft and post it automatically.
+	async function resumeDraftIfSignedIn() {
+		if (!session.signedIn) return;
+		let draft = null;
+		try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch { /* none */ }
+		if (!draft) return;
+		localStorage.removeItem(DRAFT_KEY);
+		field('location').value = draft.location || '';
+		field('title').value = draft.title || '';
+		field('body').value = draft.body || '';
+		starVal = Number(draft.stars) || 0; paint(starVal);
+		if (draft.title && draft.body && starVal) await submitReview(draft);
+	}
 
 	// Initial loads (after paint).
 	loadStats(); loadFeatured(); loadReviews(true);
+	loadSession().then(resumeDraftIfSignedIn);
 </script>
