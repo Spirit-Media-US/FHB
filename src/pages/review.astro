@@ -5,9 +5,9 @@
 // Static shell + client island. All data flows through the same-origin
 // /review-api Pages Function (Supabase access is server-side; no key reaches
 // the browser). GET returns the email-free published feed/stats/featured +
-// reaction counts; POST submits a Turnstile-verified review (queued as pending)
-// or records a love/like/dislike reaction. A Bethel cron
-// (fhb-review-moderate.mjs) moderates pending rows → published within ~1 min.
+// reaction counts; POST records a love/like/dislike reaction. Review submission
+// is the sign-in-gated /api/review-submit (community), queued pending; a Bethel
+// cron (fhb-review-moderate.mjs) moderates pending rows → published within ~1 min.
 // NB: path is /review-api, not /api/* — the apex router proxies /api/* to the
 // community app, so the marketing function must live off that prefix.
 export const prerender = true;

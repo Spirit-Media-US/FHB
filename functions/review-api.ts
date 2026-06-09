@@ -3,8 +3,8 @@
 //   GET  /review-api?stats=1        → { readers, countries, countryList }
 //   GET  /review-api?featured=1     → [ featured reviews + reaction counts ]
 //   GET  /review-api?offset=&country=  → [ published reviews + reaction counts ]
-//   POST /review-api                → submit a review (Turnstile-gated)
 //   POST /review-api {action:"react"} → love/like/dislike a review (toggle)
+//   (review submission is the authenticated /api/review-submit, not here)
 //
 // All Supabase access happens server-side with the service-role key (never
 // shipped to the browser); reads use the email-free `fhb_reviews_public` view.
@@ -17,7 +17,6 @@
 interface Env {
 	SUPABASE_FHB_URL: string;
 	SUPABASE_FHB_SERVICE_ROLE_KEY: string;
-	TURNSTILE_SECRET_FHB: string;
 	REVIEW_IP_SALT?: string;
 }
 
@@ -30,7 +29,6 @@ interface Payload {
 	body?: string;
 	email?: string;
 	website?: string; // honeypot
-	turnstileToken?: string;
 	// react action
 	review_id?: string;
 	voter?: string;
