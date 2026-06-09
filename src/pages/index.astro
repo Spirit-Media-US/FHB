@@ -483,7 +483,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		<Section variant="soft">
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
 				<!-- Book image -->
-				<div class="flex justify-center" data-reveal="slide-left">
+				<div class="order-1 md:order-2 flex justify-center" data-reveal="slide-right">
 					{bookCoverUrl ? (
 						<img
 							src={bookCoverUrl}
@@ -513,7 +513,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				</div>
 
 				<!-- Content -->
-				<div data-reveal="slide-right">
+				<div class="order-2 md:order-1" data-reveal="slide-left">
 					<p
 						class="text-xs font-semibold tracking-widest uppercase mb-4"
 						style="font-family: var(--font-sans); color: var(--color-gold);"
@@ -680,7 +680,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		<Section variant="soft">
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
 				<!-- Content -->
-				<div class="order-2 md:order-1" data-reveal="slide-left">
+				<div class="order-2 md:order-2" data-reveal="slide-right">
 					<p
 						class="text-xs font-semibold tracking-widest uppercase mb-4"
 						style="font-family: var(--font-sans); color: var(--color-gold);"
@@ -724,7 +724,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				</div>
 
 				<!-- Book image -->
-				<div class="order-1 md:order-2 flex justify-center" data-reveal="slide-right">
+				<div class="order-1 md:order-1 flex justify-center" data-reveal="slide-left">
 					{fhbiCoverUrl ? (
 						<img
 							src={fhbiCoverUrl}
