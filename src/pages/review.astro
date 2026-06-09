@@ -17,9 +17,8 @@ import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
 
-// The Turnstile sitekey is public by design (domain-locked, meant to live in
-// the page HTML) — safe to inline. No Supabase key reaches the browser.
-const TURNSTILE_SITEKEY = '0x4AAAAAADg_aq06TImxh0zh';
+// Posting requires a verified FH Family member (magic-link sign-in) via the
+// /api/review-submit endpoint; no Supabase key reaches the browser.
 
 // Hero content + image come from the Sanity `page` doc (slug "review") so the
 // team can edit copy and swap the hero image in Studio without a code change.
@@ -85,25 +84,20 @@ const heroImageMobile = page?.heroImage
 
 			<!-- LEFT — global-reach stats + submission form -->
 			<div id="share" class="lg:sticky lg:top-24">
-				<div class="flex items-center gap-10 mb-6 pb-5 border-b border-hairline">
-					<div>
-						<span id="stat-readers" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
-						<span class="block text-xs uppercase tracking-wide text-muted mt-1">Readers</span>
-					</div>
-					<div>
-						<span id="stat-countries" class="text-3xl md:text-4xl font-extrabold text-brand leading-none">—</span>
-						<span class="block text-xs uppercase tracking-wide text-muted mt-1">Countries</span>
-					</div>
+				<div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 mb-6 pb-5 border-b border-hairline">
+					<span class="whitespace-nowrap"><span id="stat-readers" class="text-2xl md:text-3xl font-extrabold text-brand">0</span> <span class="text-muted">Readers</span></span>
+					<span class="whitespace-nowrap"><span id="stat-countries" class="text-2xl md:text-3xl font-extrabold text-brand">0</span> <span class="text-muted">Countries</span></span>
 				</div>
 				<h2 class="font-bold text-2xl text-ink mb-1">Share your experience</h2>
 				<p class="text-muted text-sm mb-5">{heroSubheading}</p>
 
 				<form id="review-form" class="grid gap-4 border border-hairline rounded-2xl p-5 md:p-6" style="background-color: #fdeaf1;">
-					<label class="grid gap-1.5">
-						<span class="text-sm font-semibold text-ink">First name</span>
-						<input name="first_name" type="text" required maxlength="50"
-							class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink" />
-					</label>
+					<!-- Auth status (filled by JS). Guests post via a one-time FH Family
+					     sign-in link — verified identity keeps reviews accountable. -->
+					<div id="auth-status" class="flex items-center gap-3 text-sm text-muted bg-surface-lowest border border-hairline rounded-lg px-3 py-2.5">
+						<span>You'll confirm with a quick FH Family sign-in link when you post — this keeps reviews honest.</span>
+					</div>
+
 					<label class="grid gap-1.5">
 						<span class="text-sm font-semibold text-ink">Location <span class="font-normal text-muted">(e.g. Lagos, Nigeria)</span></span>
 						<input name="location" type="text" required maxlength="80"
@@ -133,18 +127,6 @@ const heroImageMobile = page?.heroImage
 						<textarea name="body" required maxlength="2000" rows="4"
 							class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink resize-y"></textarea>
 					</label>
-
-					<label class="grid gap-1.5">
-						<span class="text-sm font-semibold text-ink">Email <span class="font-normal text-muted">(optional — hear about the Father's Heart family?)</span></span>
-						<input name="email" type="email" maxlength="120"
-							class="border border-hairline rounded-lg px-3 py-2.5 bg-surface text-ink" />
-					</label>
-
-					<!-- Honeypot — visually hidden, ignored by humans. -->
-					<input name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true"
-						class="absolute opacity-0 pointer-events-none h-0 w-0" />
-
-					<div id="turnstile-slot"></div>
 
 					<button type="submit" id="review-submit"
 						class="bg-brand text-on-primary font-bold px-7 py-3 rounded-lg hover:bg-brand-dark transition-colors disabled:opacity-50">
@@ -190,6 +172,7 @@ const heroImageMobile = page?.heroImage
 	#star-input .star.on { color: #f5a623; }
 	.rv-card { background: var(--color-surface-lowest); border: 1px solid var(--color-hairline); border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
 	.rv-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--color-brand); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex: 0 0 auto; }
+	.rv-avatar-img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; }
 	.rv-stars { color: #f5a623; letter-spacing: 1px; }
 	.rv-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--color-hairline); }
 	.rv-actions { display: flex; gap: 6px; }
@@ -202,7 +185,7 @@ const heroImageMobile = page?.heroImage
 	.rv-share-menu a:hover, .rv-share-menu button:hover { background: var(--color-surface-low); }
 </style>
 
-<script define:vars={{ TURNSTILE_SITEKEY }}>
+<script>
 	let offset = 0;
 	const PAGE_SIZE = 20;
 	let country = '';
@@ -223,6 +206,18 @@ const heroImageMobile = page?.heroImage
 	};
 	const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+	// Animated count-up for the stat numbers (0 → target, ease-out).
+	const countUp = (el, target, ms = 900) => {
+		if (!el) return;
+		const start = performance.now();
+		const tick = (now) => {
+			const p = Math.min(1, (now - start) / ms);
+			el.textContent = Math.round((1 - (1 - p) ** 3) * target).toLocaleString();
+			if (p < 1) requestAnimationFrame(tick);
+		};
+		requestAnimationFrame(tick);
+	};
+
 	// Local voter identity + remembered reactions (light, per-browser).
 	const getVoter = () => {
 		let v = localStorage.getItem('fhb_voter');
@@ -237,7 +232,9 @@ const heroImageMobile = page?.heroImage
 		return `
 		<article class="rv-card" data-id="${r.id}">
 			<div class="flex items-center gap-3 mb-1.5">
-				<div class="rv-avatar">${esc((r.first_name || '?').charAt(0).toUpperCase())}</div>
+				${r.avatar_url
+					? `<img class="rv-avatar-img" src="${esc(r.avatar_url)}" alt="" loading="lazy" decoding="async" />`
+					: `<div class="rv-avatar">${esc((r.first_name || '?').charAt(0).toUpperCase())}</div>`}
 				<div>
 					<div class="font-semibold text-ink">${esc(r.first_name)} ${flag(r.country_code)}</div>
 					<div class="text-xs text-muted">${esc(r.location || '')}</div>
@@ -269,8 +266,8 @@ const heroImageMobile = page?.heroImage
 	async function loadStats() {
 		try {
 			const s = await fetch(api('stats=1')).then((r) => r.json());
-			document.getElementById('stat-readers').textContent = (s.readers ?? 0).toLocaleString();
-			document.getElementById('stat-countries').textContent = (s.countries ?? 0).toLocaleString();
+			countUp(document.getElementById('stat-readers'), s.readers ?? 0);
+			countUp(document.getElementById('stat-countries'), s.countries ?? 0);
 			const sel = document.getElementById('country-filter');
 			for (const c of s.countryList || []) {
 				const o = document.createElement('option');
@@ -378,56 +375,87 @@ const heroImageMobile = page?.heroImage
 		b.addEventListener('click', () => { starVal = Number(b.dataset.v); document.getElementById('stars-value').value = starVal; paint(starVal); });
 	});
 
-	// Lazy-load Turnstile when the form nears the viewport.
-	let turnstileLoaded = false;
-	const loadTurnstile = () => {
-		if (turnstileLoaded) return;
-		turnstileLoaded = true;
-		const s = document.createElement('script');
-		s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-		s.async = true; s.defer = true;
-		s.onload = () => window.turnstile?.render('#turnstile-slot', { sitekey: TURNSTILE_SITEKEY });
-		document.head.appendChild(s);
-	};
-	const formEl = document.getElementById('share');
-	if ('IntersectionObserver' in window) {
-		const io = new IntersectionObserver((entries) => { if (entries.some((e) => e.isIntersecting)) { loadTurnstile(); io.disconnect(); } }, { rootMargin: '300px' });
-		io.observe(formEl);
-	} else { loadTurnstile(); }
+	// ── FH Family sign-in gating ───────────────────────────────────────────
+	// Posting requires a verified FH Family member. Session + insert live behind
+	// /api/review-submit (community app), reached via the apex proxy on the real
+	// domain. On the dev preview there's no proxy, so this resolves to "guest".
+	const SUBMIT_API = '/api/review-submit';
+	const DRAFT_KEY = 'fhb_review_draft';
+	let session = { signedIn: false };
 
-	// Submit.
 	const form = document.getElementById('review-form');
 	const msg = document.getElementById('form-msg');
+	const authStatus = document.getElementById('auth-status');
+	const field = (n) => form.querySelector(`[name="${n}"]`);
 	const setMsg = (text, ok) => { msg.textContent = text; msg.className = `text-sm text-center ${ok ? 'text-brand' : 'text-red-600'}`; };
-	form.addEventListener('submit', async (e) => {
-		e.preventDefault();
+
+	function renderAuthStatus() {
+		if (!authStatus || !session.signedIn) return;
+		const av = session.avatarUrl
+			? `<img class="rv-avatar-img" src="${esc(session.avatarUrl)}" alt="" />`
+			: `<div class="rv-avatar" style="width:28px;height:28px;font-size:13px;">${esc((session.firstName || '?').charAt(0).toUpperCase())}</div>`;
+		authStatus.innerHTML = `${av}<span>Posting as <strong class="text-ink">${esc(session.firstName || session.name || 'you')}</strong> — verified FH Family member.</span>`;
+	}
+
+	async function loadSession() {
+		try {
+			const r = await fetch(SUBMIT_API, { headers: { accept: 'application/json' } });
+			if (r.ok) session = await r.json();
+		} catch { /* guest */ }
+		renderAuthStatus();
+		if (session.signedIn && session.location && !field('location').value) field('location').value = session.location;
+	}
+
+	const collectDraft = () => ({ location: field('location').value, stars: starVal, title: field('title').value, body: field('body').value });
+
+	async function submitReview(draft) {
 		const btn = document.getElementById('review-submit');
-		if (!starVal) { setMsg('Please choose a star rating.', false); return; }
-		const token = window.turnstile?.getResponse?.();
-		if (!token) { setMsg('Please complete the verification.', false); loadTurnstile(); return; }
-		const fd = new FormData(form);
 		btn.disabled = true; setMsg('Posting…', true);
 		try {
-			const res = await fetch('/review-api', {
+			const res = await fetch(SUBMIT_API, {
 				method: 'POST', headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({
-					first_name: fd.get('first_name'), location: fd.get('location'),
-					stars: starVal, title: fd.get('title'), body: fd.get('body'),
-					email: fd.get('email'), website: fd.get('website'), turnstileToken: token,
-				}),
+				body: JSON.stringify(draft),
 			});
 			const data = await res.json().catch(() => ({}));
 			if (res.ok && data.ok) {
 				form.reset(); starVal = 0; paint(0);
 				setMsg('Thank you! Your review will appear shortly, once reviewed.', true);
-				window.turnstile?.reset?.();
+			} else if (res.status === 401 || data.error === 'signin-required') {
+				localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+				window.location.href = '/login?next=/review';
 			} else {
-				setMsg(data.error === 'rate_limited' ? 'You’ve posted a few times recently — please try again later.' : 'Something went wrong. Please try again.', false);
-				window.turnstile?.reset?.();
+				setMsg('Something went wrong. Please try again.', false);
 			}
 		} catch { setMsg('Network error. Please try again.', false); } finally { btn.disabled = false; }
+	}
+
+	form.addEventListener('submit', (e) => {
+		e.preventDefault();
+		if (!field('location').value.trim() || !field('title').value.trim() || !field('body').value.trim()) { setMsg('Please add your location, a title, and your review.', false); return; }
+		if (!starVal) { setMsg('Please choose a star rating.', false); return; }
+		const draft = collectDraft();
+		if (session.signedIn) { submitReview(draft); return; }
+		// Guest → save the draft, then send them through the FH Family sign-in link.
+		localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+		setMsg('Sending you a sign-in link to confirm your review…', true);
+		window.location.href = '/login?next=/review';
 	});
+
+	// On return from sign-in: restore the saved draft and post it automatically.
+	async function resumeDraftIfSignedIn() {
+		if (!session.signedIn) return;
+		let draft = null;
+		try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch { /* none */ }
+		if (!draft) return;
+		localStorage.removeItem(DRAFT_KEY);
+		field('location').value = draft.location || '';
+		field('title').value = draft.title || '';
+		field('body').value = draft.body || '';
+		starVal = Number(draft.stars) || 0; paint(starVal);
+		if (draft.title && draft.body && starVal) await submitReview(draft);
+	}
 
 	// Initial loads (after paint).
 	loadStats(); loadFeatured(); loadReviews(true);
+	loadSession().then(resumeDraftIfSignedIn);
 </script>
