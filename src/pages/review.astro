@@ -97,7 +97,7 @@ const heroImageMobile = page?.heroImage
 					<p class="text-2xl mb-1">❤️</p>
 					<p class="font-semibold text-ink mb-1">Verify your email to post your review</p>
 					<p class="text-muted text-sm mb-5">So reviews stay genuine, we'll email you a secure one-tap link to confirm it's really you — no password, takes seconds.</p>
-					<a href="/login?next=/review" id="review-signin" class="inline-block bg-brand text-on-primary font-bold px-6 py-3 rounded-lg hover:bg-brand-dark transition-colors">Email me a link to post</a>
+					<a href="/login?next=/review&error=join-to-interact" id="review-signin" class="inline-block bg-brand text-on-primary font-bold px-6 py-3 rounded-lg hover:bg-brand-dark transition-colors">Email me a link to post</a>
 				</div>
 
 				<form id="review-form" hidden class="grid gap-4 border border-hairline rounded-2xl p-5 md:p-6" style="background-color: #fdeaf1;">
@@ -489,7 +489,7 @@ const heroImageMobile = page?.heroImage
 				setMsg('Thank you! Your review will appear shortly, once reviewed.', true);
 			} else if (res.status === 401 || data.error === 'signin-required') {
 				localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-				window.location.href = '/login?next=/review';
+				window.location.href = '/login?next=/review&error=join-to-interact';
 			} else {
 				setMsg('Something went wrong. Please try again.', false);
 			}
@@ -505,7 +505,7 @@ const heroImageMobile = page?.heroImage
 		// Guest → save the draft, then send them through the FH Family sign-in link.
 		localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
 		setMsg('Sending you a sign-in link to confirm your review…', true);
-		window.location.href = '/login?next=/review';
+		window.location.href = '/login?next=/review&error=join-to-interact';
 	});
 
 	// On return from sign-in: restore the saved draft and post it automatically.
