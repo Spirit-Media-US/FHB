@@ -128,6 +128,9 @@ const timeline = [
 ];
 
 // Partnership FAQ — common giving questions, rendered as a compact no-JS accordion.
+// SM Gives Stripe Customer Portal (org-wide, not FHB-specific) — donors enter
+// their email and get a secure link to manage their giving.
+const STRIPE_PORTAL_URL = 'https://billing.stripe.com/p/login/bJefZi1aL4yf4Y50gj2Ry00';
 const partnershipFaq = [
 	{
 		q: 'Are donations tax-deductible?',
@@ -147,7 +150,8 @@ const partnershipFaq = [
 	},
 	{
 		q: 'How do I update my payment method?',
-		a: 'Monthly partners can update a card or bank account at any time — just email us and we’ll send a secure link to manage your payment details.',
+		a: 'Monthly partners can update a card or bank account, view past receipts, and change or cancel a recurring gift at any time through our secure SM Gives giving portal. Just enter your email and you’ll receive a one-time secure login link.',
+		link: { href: STRIPE_PORTAL_URL, label: 'Manage your giving →' },
 	},
 	{
 		q: 'Can I designate my gift — for example, pledging to sponsor a specific language?',
@@ -485,13 +489,18 @@ const partnershipFaq = [
 						</h3>
 					</div>
 					<div class="space-y-3">
-						{partnershipFaq.map(({ q, a }) => (
+						{partnershipFaq.map(({ q, a, link }) => (
 							<details class="faq-item rounded-2xl" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
 								<summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">
 									<span>{q}</span>
 									<svg class="faq-chev shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
 								</summary>
-								<p class="px-5 pb-5 -mt-1 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{a}</p>
+								<div class="px-5 pb-5 -mt-1">
+									<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{a}</p>
+									{link && (
+										<a href={link.href} target="_blank" rel="noopener noreferrer" class="inline-flex items-center mt-3 text-sm font-semibold no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand);">{link.label}</a>
+									)}
+								</div>
 							</details>
 						))}
 					</div>
