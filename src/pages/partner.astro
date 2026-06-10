@@ -20,6 +20,39 @@ const seoDescription =
 const heroHeading = 'Partner With Us';
 const heroSubheading = "Partner with us to take the Father's Heart Bible to the nations.";
 
+// Featured blog card shown in place of the (coming-soon) partner video.
+// Same card style as the /blog index — fetched from Sanity so title/excerpt/cover stay live.
+const visionPost =
+	await sanityClient.fetch(`*[_type == "blogPost" && slug.current == "the-fathers-vision"][0] {
+    "slug": "/blog/" + slug.current,
+    title,
+    excerpt,
+    "image": coalesce(heroImage.asset->url + "?w=800&auto=format", "/fhb-logo.png"),
+    "author": coalesce(author, "Kevin White"),
+    "date": publishDate,
+    tags
+  }`);
+const MONTHS = [
+	'January',
+	'February',
+	'March',
+	'April',
+	'May',
+	'June',
+	'July',
+	'August',
+	'September',
+	'October',
+	'November',
+	'December',
+];
+const visionDate = visionPost?.date
+	? (() => {
+			const d = new Date(visionPost.date);
+			return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+		})()
+	: '';
+
 // Why your partnership matters — woven into the consolidated "Why this matters" section.
 const whyMatters = [
 	{
@@ -93,6 +126,38 @@ const timeline = [
 		what: "Study Bibles editions published for men, women, and students. Children's Bible + more languages",
 	},
 ];
+
+// Partnership FAQ — common giving questions, rendered as a compact no-JS accordion.
+// SM Gives Stripe Customer Portal (org-wide, not FHB-specific) — donors enter
+// their email and get a secure link to manage their giving.
+const STRIPE_PORTAL_URL = 'https://billing.stripe.com/p/login/bJefZi1aL4yf4Y50gj2Ry00';
+const partnershipFaq = [
+	{
+		q: 'Are donations tax-deductible?',
+		a: 'Yes. Spirit Media Charities is a registered 501(c)(3) nonprofit organization, so your gift is tax-deductible to the fullest extent allowed by law.',
+	},
+	{
+		q: 'Can I give by check?',
+		a: 'Yes. Make your check payable to Spirit Media Charities and mail it to 205 S Academy St #3251, Cary, NC 27519. Please write “FHB” in the memo line so your gift supports the Father’s Heart Bible™.',
+	},
+	{
+		q: 'Will I get a receipt?',
+		a: 'Yes. A receipt is emailed to you automatically as soon as your gift is processed — keep it for your records.',
+	},
+	{
+		q: 'Will I receive an annual giving statement?',
+		a: 'Yes. At the start of each year, Spirit Media Charities sends an annual giving statement summarizing your tax-deductible contributions from the prior year.',
+	},
+	{
+		q: 'How do I update my payment method?',
+		a: 'Monthly partners can update a card or bank account, view past receipts, and change or cancel a recurring gift at any time through our secure SM Gives giving portal. Just enter your email and you’ll receive a one-time secure login link.',
+		link: { href: STRIPE_PORTAL_URL, label: 'Manage your giving →' },
+	},
+	{
+		q: 'Can I designate my gift — for example, pledging to sponsor a specific language?',
+		a: 'While donations to charity are ultimately unrestricted in order to remain tax-deductible, Spirit Media Charities is committed to partnering with each donor to honor the intent of their gift. To discuss sponsoring a language or another designated gift, reach out and we’ll work with you directly.',
+	},
+];
 ---
 
 <Layout
@@ -108,7 +173,12 @@ const timeline = [
 			{ "@type": "BreadcrumbList", "itemListElement": [
 				{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
 				{ "@type": "ListItem", "position": 2, "name": "Partner With Us", "item": "https://fathersheartbible.com/partner" }
-			]}
+			]},
+			{ "@type": "FAQPage", "mainEntity": partnershipFaq.map((f) => ({
+				"@type": "Question",
+				"name": f.q,
+				"acceptedAnswer": { "@type": "Answer", "text": f.a }
+			})) }
 		]
 	}}
 >
@@ -168,15 +238,36 @@ const timeline = [
 							Give more if you can; if you need to give less, every gift matters.
 						</p>
 					</div>
-					<!-- Video placeholder — drop the partner/hero video in here when ready. -->
-					<div class="rounded-2xl overflow-hidden flex items-center justify-center min-h-[260px]" style="background: var(--color-surface-low); border: 1px solid var(--color-outline-variant);">
-						<div class="text-center px-6">
-							<div class="mx-auto mb-3 flex items-center justify-center rounded-full" style="width: 56px; height: 56px; background: var(--color-surface); border: 1px solid var(--color-outline-variant);">
-								<svg width="22" height="22" viewBox="0 0 24 24" fill="var(--color-primary)" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+					<!-- Featured blog card (stands in for the partner video until it ships). -->
+					{visionPost ? (
+						<a href={visionPost.slug} class="group rounded-2xl border overflow-hidden transition-shadow hover:shadow-md flex flex-col" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
+							<div class="overflow-hidden h-40 shrink-0">
+								<img src={visionPost.image} alt={visionPost.title} width="800" height="320" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style="object-position: center top;" />
 							</div>
-							<p class="text-sm font-semibold" style="font-family: var(--font-sans); color: var(--color-muted);">Partner video coming soon</p>
+							<div class="p-6 flex flex-col flex-1">
+								<div class="flex flex-wrap gap-1.5 mb-3">
+									{(visionPost.tags || []).slice(0, 2).map((t: string) => (
+										<span class="text-xs font-semibold rounded-full px-2.5 py-0.5" style="color: var(--color-muted); background-color: var(--color-surface-low);">{t}</span>
+									))}
+								</div>
+								<h3 class="text-xl font-bold mb-2 leading-snug" style="font-family: var(--font-serif); color: var(--color-brand);">{visionPost.title}</h3>
+								<p class="text-sm mb-4 leading-relaxed line-clamp-3" style="font-family: var(--font-sans); color: var(--color-muted);">{visionPost.excerpt || ''}</p>
+								<div class="mt-auto flex items-center justify-between text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+									<span>{visionPost.author} · {visionDate}</span>
+									<span class="font-semibold group-hover:underline" style="color: var(--color-brand);">Read →</span>
+								</div>
+							</div>
+						</a>
+					) : (
+						<div class="rounded-2xl overflow-hidden flex items-center justify-center min-h-[260px]" style="background: var(--color-surface-low); border: 1px solid var(--color-outline-variant);">
+							<div class="text-center px-6">
+								<div class="mx-auto mb-3 flex items-center justify-center rounded-full" style="width: 56px; height: 56px; background: var(--color-surface); border: 1px solid var(--color-outline-variant);">
+									<svg width="22" height="22" viewBox="0 0 24 24" fill="var(--color-primary)" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+								</div>
+								<p class="text-sm font-semibold" style="font-family: var(--font-sans); color: var(--color-muted);">Partner video coming soon</p>
+							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</div>
 
@@ -189,6 +280,22 @@ const timeline = [
 				<!-- Right column: donation form -->
 				<div id="donate" class="lg:col-span-3 scroll-mt-24" data-reveal>
 					<DonationForm />
+
+					<!-- Prefer to give by check? — compact mail option right under the form. -->
+					<div class="mt-5 rounded-2xl p-5" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+						<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">
+							Prefer to give by check?
+						</p>
+						<p class="text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">
+							Make your check payable to <strong style="color: var(--color-ink);">Spirit Media Charities</strong> and mail to:
+						</p>
+						<address class="not-italic text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">
+							Spirit Media Charities · 205 S Academy St #3251 · Cary, NC 27519
+						</address>
+						<p class="text-xs leading-snug" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.8;">
+							Write <strong style="color: var(--color-ink);">&ldquo;FHB&rdquo;</strong> in the memo so your gift supports the Father&rsquo;s Heart Bible&trade;. All gifts are tax-deductible as allowed by the IRS.
+						</p>
+					</div>
 				</div>
 			</div>
 		</Section>
@@ -370,6 +477,54 @@ const timeline = [
 						</div>
 					</div>
 				</div>
+
+				<!-- Partnership FAQ — compact no-JS accordion -->
+				<div class="max-w-3xl mx-auto mt-20" data-reveal>
+					<div class="text-center mb-8">
+						<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
+							Partnership FAQ
+						</p>
+						<h3 class="text-2xl md:text-3xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
+							Common questions about giving
+						</h3>
+					</div>
+					<div class="space-y-3">
+						{partnershipFaq.map(({ q, a, link }) => (
+							<details class="faq-item rounded-2xl" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
+								<summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">
+									<span>{q}</span>
+									<svg class="faq-chev shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+								</summary>
+								<div class="px-5 pb-5 -mt-1">
+									<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{a}</p>
+									{link && (
+										<a href={link.href} target="_blank" rel="noopener noreferrer" class="inline-flex items-center mt-3 text-sm font-semibold no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand);">{link.label}</a>
+									)}
+								</div>
+							</details>
+						))}
+					</div>
+
+					<!-- Who do I contact? -->
+					<div class="text-center mt-8">
+						<p class="text-sm mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+							Still have a question? We’re glad to help.
+						</p>
+						<a
+							href="#"
+							data-e="kevin"
+							data-d="spiritmediapublishing.com"
+							class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
+							style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border-radius: 8px;"
+							aria-label="Email us a question about partnering"
+							onclick="event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent('Partnership Question — Father’s Heart Bible')"
+							onmouseover="this.style.opacity='0.92'"
+							onmouseout="this.style.opacity='1'"
+						>
+							Email Us a Question
+						</a>
+					</div>
+				</div>
 			</div>
 		</Section>
 
@@ -410,3 +565,20 @@ const timeline = [
 
 	</main>
 </Layout>
+
+<style>
+	/* Partnership FAQ accordion — native <details>, no JS. */
+	.faq-item > summary {
+		cursor: pointer;
+		list-style: none;
+	}
+	.faq-item > summary::-webkit-details-marker {
+		display: none;
+	}
+	.faq-chev {
+		transition: transform 0.2s ease;
+	}
+	.faq-item[open] > summary .faq-chev {
+		transform: rotate(180deg);
+	}
+</style>

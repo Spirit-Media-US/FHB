@@ -291,30 +291,11 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 			<script type="application/ld+json" set:html={JSON.stringify(schema)} />
 		))}
 
-		<!-- GA4 (Property 537965791 under Spirit Media account 238664774).
-		     Deferred to first user interaction with 8s fallback per performance-gate.md
-		     so it doesn't compete with LCP. Channel group "AI Engines" lives on the
-		     property — sessions from chatgpt.com / perplexity.ai / claude.ai etc. flow
-		     into their own GA4 channel. -->
-		<script is:inline>
-			window.dataLayer = window.dataLayer || [];
-			function gtag(){dataLayer.push(arguments);}
-			gtag('js', new Date());
-			gtag('config', 'G-RLT17QRJLQ', { send_page_view: false });
-			const loadGA = () => {
-				if (window._gaLoaded) return;
-				window._gaLoaded = true;
-				const s = document.createElement('script');
-				s.src = 'https://www.googletagmanager.com/gtag/js?id=G-RLT17QRJLQ';
-				s.async = true;
-				document.head.appendChild(s);
-				gtag('event', 'page_view');
-			};
-			['scroll','click','touchstart','keydown','mousemove'].forEach(e =>
-				window.addEventListener(e, loadGA, { once: true, passive: true })
-			);
-			setTimeout(loadGA, 8000);
-		</script>
+		<!-- Analytics: Cloudflare Web Analytics only (cookieless, zone-injected).
+		     GA4 was removed 2026-06-10 — it set non-essential _ga cookies that
+		     would have required a consent banner for EU/UK visitors. Cookieless
+		     CF analytics needs no consent, so the site sets zero non-essential
+		     cookies and needs no cookie banner. (Kevin, load-scaling review.) -->
 	</head>
 	<body class="min-h-screen flex flex-col" data-dark-hero={darkHero ? 'true' : 'false'}>
 		<Header
