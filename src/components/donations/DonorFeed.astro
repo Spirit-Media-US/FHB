@@ -1,11 +1,16 @@
 ---
-// Donor feed — most recent public donations with name, amount, message.
-// Re-renders whenever ProgressBar fires the donations:updated event.
+// Donor feed — recent public donations with name, amount, message.
+// Shows the first 8; a "Load more supporters" button reveals 8 more per click
+// (the established donor-wall pattern — GiveWP/GoFundMe). Re-renders whenever
+// ProgressBar fires the donations:updated event.
 
 interface Props {
 	campaign?: string;
 }
 const { campaign = 'fhb' } = Astro.props;
+
+const INITIAL = 8;
+const STEP = 8;
 
 let initial: any = { recent: [] };
 try {
@@ -14,6 +19,10 @@ try {
 	);
 	if (res.ok) initial = await res.json();
 } catch {}
+
+const full: any[] = initial.recent || [];
+const firstBatch = full.slice(0, INITIAL);
+const remaining = Math.max(0, full.length - INITIAL);
 
 const fmt = (c: number) => `$${(c / 100).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
 // Privacy: show first name(s) + last initial only (e.g. "Ryan S.", "Mickey and Suzan C.").
@@ -35,8 +44,9 @@ const dateAgo = (iso: string) => {
 };
 ---
 
-<div data-donor-feed class="space-y-4">
-	{initial.recent.length === 0 ? (
+<div data-donor-feed data-initial={INITIAL} data-step={STEP} class="space-y-4">
+	<script type="application/json" data-donor-data set:html={JSON.stringify(full)}></script>
+	{full.length === 0 ? (
 		<p style="color: var(--color-muted); font-family: var(--font-sans);">Be the first to partner with us.</p>
 	) : (
 		<>
@@ -44,7 +54,7 @@ const dateAgo = (iso: string) => {
 				Recent Supporters
 			</p>
 			<ul class="space-y-3" data-donor-list style="list-style: none; padding: 0; margin: 0;">
-				{initial.recent.map((d: any) => (
+				{firstBatch.map((d: any) => (
 					<li style="background-color: var(--color-surface); border: 1px solid var(--color-outline-variant); border-radius: 12px; padding: 16px 20px;">
 						<div class="flex items-baseline justify-between gap-3">
 							<p class="font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">{displayName(d.public_name)}</p>
@@ -59,11 +69,21 @@ const dateAgo = (iso: string) => {
 					</li>
 				))}
 			</ul>
+			{remaining > 0 && (
+				<button data-load-more type="button" class="w-full" style="margin-top: 4px; padding: 12px 16px; background-color: transparent; border: 1px solid var(--color-outline-variant); border-radius: 12px; color: var(--color-brand); font-family: var(--font-sans); font-weight: 600; font-size: 0.9rem; cursor: pointer;">
+					Load more supporters
+				</button>
+			)}
 		</>
 	)}
 </div>
 
 <script>
+	const INITIAL = 8;
+	const STEP = 8;
+	let current: any[] = [];
+	let visible = INITIAL;
+
 	function fmtMoney(cents: number) {
 		return `$${(cents / 100).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
 	}
@@ -85,17 +105,19 @@ const dateAgo = (iso: string) => {
 		return `${parts.slice(0, -1).join(' ')} ${parts[parts.length - 1].charAt(0).toUpperCase()}.`;
 	}
 
-	function render(recent: any[]) {
+	function render() {
 		const root = document.querySelector('[data-donor-feed]');
 		if (!root) return;
-		if (!recent || recent.length === 0) {
+		if (!current || current.length === 0) {
 			root.innerHTML = `<p style="color: var(--color-muted); font-family: var(--font-sans);">Be the first to partner with us.</p>`;
 			return;
 		}
+		const shown = current.slice(0, visible);
+		const remaining = Math.max(0, current.length - visible);
 		root.innerHTML = `
 			<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="color: var(--color-brand); font-family: var(--font-sans);">Recent Supporters</p>
-			<ul class="space-y-3" style="list-style: none; padding: 0; margin: 0;">
-				${recent.map((d: any) => `
+			<ul class="space-y-3" data-donor-list style="list-style: none; padding: 0; margin: 0;">
+				${shown.map((d: any) => `
 					<li style="background-color: var(--color-surface); border: 1px solid var(--color-outline-variant); border-radius: 12px; padding: 16px 20px;">
 						<div class="flex items-baseline justify-between gap-3">
 							<p class="font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">${escapeHtml(displayName(d.public_name))}</p>
@@ -106,10 +128,35 @@ const dateAgo = (iso: string) => {
 					</li>
 				`).join('')}
 			</ul>
+			${remaining > 0 ? `<button data-load-more type="button" class="w-full" style="margin-top: 4px; padding: 12px 16px; background-color: transparent; border: 1px solid var(--color-outline-variant); border-radius: 12px; color: var(--color-brand); font-family: var(--font-sans); font-weight: 600; font-size: 0.9rem; cursor: pointer;">Load more supporters</button>` : ''}
 		`;
 	}
 
-	window.addEventListener('donations:updated', (e: any) => {
-		render(e.detail?.recent || []);
+	function init() {
+		const root = document.querySelector('[data-donor-feed]');
+		if (!root) return;
+		const json = root.querySelector('[data-donor-data]')?.textContent;
+		if (json) {
+			try { current = JSON.parse(json) || []; } catch { current = []; }
+			render();
+		}
+	}
+
+	// Load more (delegated — survives re-render)
+	document.addEventListener('click', (e) => {
+		const btn = (e.target as HTMLElement)?.closest('[data-load-more]');
+		if (!btn) return;
+		visible += STEP;
+		render();
 	});
+
+	// Live refresh from ProgressBar's poll — keep however many the visitor expanded.
+	window.addEventListener('donations:updated', (e: any) => {
+		current = e.detail?.recent || [];
+		render();
+	});
+
+	document.addEventListener('astro:page-load', init);
+	if (document.readyState !== 'loading') init();
+	else document.addEventListener('DOMContentLoaded', init);
 </script>
