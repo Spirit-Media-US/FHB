@@ -20,6 +20,39 @@ const seoDescription =
 const heroHeading = 'Partner With Us';
 const heroSubheading = "Partner with us to take the Father's Heart Bible to the nations.";
 
+// Featured blog card shown in place of the (coming-soon) partner video.
+// Same card style as the /blog index — fetched from Sanity so title/excerpt/cover stay live.
+const visionPost =
+	await sanityClient.fetch(`*[_type == "blogPost" && slug.current == "the-fathers-vision"][0] {
+    "slug": "/blog/" + slug.current,
+    title,
+    excerpt,
+    "image": coalesce(heroImage.asset->url + "?w=800&auto=format", "/fhb-logo.png"),
+    "author": coalesce(author, "Kevin White"),
+    "date": publishDate,
+    tags
+  }`);
+const MONTHS = [
+	'January',
+	'February',
+	'March',
+	'April',
+	'May',
+	'June',
+	'July',
+	'August',
+	'September',
+	'October',
+	'November',
+	'December',
+];
+const visionDate = visionPost?.date
+	? (() => {
+			const d = new Date(visionPost.date);
+			return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+		})()
+	: '';
+
 // Why your partnership matters — woven into the consolidated "Why this matters" section.
 const whyMatters = [
 	{
@@ -168,15 +201,36 @@ const timeline = [
 							Give more if you can; if you need to give less, every gift matters.
 						</p>
 					</div>
-					<!-- Video placeholder — drop the partner/hero video in here when ready. -->
-					<div class="rounded-2xl overflow-hidden flex items-center justify-center min-h-[260px]" style="background: var(--color-surface-low); border: 1px solid var(--color-outline-variant);">
-						<div class="text-center px-6">
-							<div class="mx-auto mb-3 flex items-center justify-center rounded-full" style="width: 56px; height: 56px; background: var(--color-surface); border: 1px solid var(--color-outline-variant);">
-								<svg width="22" height="22" viewBox="0 0 24 24" fill="var(--color-primary)" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+					<!-- Featured blog card (stands in for the partner video until it ships). -->
+					{visionPost ? (
+						<a href={visionPost.slug} class="group rounded-2xl border overflow-hidden transition-shadow hover:shadow-md flex flex-col" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
+							<div class="overflow-hidden" style="aspect-ratio: 16/9;">
+								<img src={visionPost.image} alt={visionPost.title} width="800" height="450" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style="object-position: center top;" />
 							</div>
-							<p class="text-sm font-semibold" style="font-family: var(--font-sans); color: var(--color-muted);">Partner video coming soon</p>
+							<div class="p-6 flex flex-col flex-1">
+								<div class="flex flex-wrap gap-1.5 mb-3">
+									{(visionPost.tags || []).slice(0, 2).map((t: string) => (
+										<span class="text-xs font-semibold rounded-full px-2.5 py-0.5" style="color: var(--color-muted); background-color: var(--color-surface-low);">{t}</span>
+									))}
+								</div>
+								<h3 class="text-xl font-bold mb-2 leading-snug" style="font-family: var(--font-serif); color: var(--color-brand);">{visionPost.title}</h3>
+								<p class="text-sm mb-4 leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{visionPost.excerpt || ''}</p>
+								<div class="mt-auto flex items-center justify-between text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+									<span>{visionPost.author} · {visionDate}</span>
+									<span class="font-semibold group-hover:underline" style="color: var(--color-brand);">Read →</span>
+								</div>
+							</div>
+						</a>
+					) : (
+						<div class="rounded-2xl overflow-hidden flex items-center justify-center min-h-[260px]" style="background: var(--color-surface-low); border: 1px solid var(--color-outline-variant);">
+							<div class="text-center px-6">
+								<div class="mx-auto mb-3 flex items-center justify-center rounded-full" style="width: 56px; height: 56px; background: var(--color-surface); border: 1px solid var(--color-outline-variant);">
+									<svg width="22" height="22" viewBox="0 0 24 24" fill="var(--color-primary)" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+								</div>
+								<p class="text-sm font-semibold" style="font-family: var(--font-sans); color: var(--color-muted);">Partner video coming soon</p>
+							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</div>
 
@@ -189,6 +243,27 @@ const timeline = [
 				<!-- Right column: donation form -->
 				<div id="donate" class="lg:col-span-3 scroll-mt-24" data-reveal>
 					<DonationForm />
+
+					<!-- Prefer to give by check? — mail option right under the form. -->
+					<div class="mt-6 rounded-2xl p-6" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+						<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">
+							Prefer to give by check?
+						</p>
+						<p class="text-sm leading-relaxed mb-3" style="font-family: var(--font-sans); color: var(--color-muted);">
+							Make your check payable to <strong style="color: var(--color-ink);">Spirit Media Charities</strong> and mail it to:
+						</p>
+						<address class="not-italic text-sm leading-relaxed mb-3" style="font-family: var(--font-sans); color: var(--color-ink);">
+							Spirit Media Charities<br />
+							205 S Academy St #3251<br />
+							Cary, NC 27519
+						</address>
+						<p class="text-xs leading-relaxed mb-3" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.85;">
+							Please write <strong style="color: var(--color-ink);">&ldquo;FHB&rdquo;</strong> in the memo line so your gift supports the Father&rsquo;s Heart Bible&trade;.
+						</p>
+						<p class="text-xs leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.7;">
+							All gifts are tax-deductible as allowed by the IRS.
+						</p>
+					</div>
 				</div>
 			</div>
 		</Section>
