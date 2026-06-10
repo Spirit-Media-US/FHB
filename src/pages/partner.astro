@@ -237,8 +237,8 @@ const partnershipFaq = [
 					<!-- Featured blog card (stands in for the partner video until it ships). -->
 					{visionPost ? (
 						<a href={visionPost.slug} class="group rounded-2xl border overflow-hidden transition-shadow hover:shadow-md flex flex-col" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
-							<div class="overflow-hidden" style="aspect-ratio: 16/9;">
-								<img src={visionPost.image} alt={visionPost.title} width="800" height="450" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style="object-position: center top;" />
+							<div class="overflow-hidden h-40 shrink-0">
+								<img src={visionPost.image} alt={visionPost.title} width="800" height="320" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style="object-position: center top;" />
 							</div>
 							<div class="p-6 flex flex-col flex-1">
 								<div class="flex flex-wrap gap-1.5 mb-3">
@@ -247,7 +247,7 @@ const partnershipFaq = [
 									))}
 								</div>
 								<h3 class="text-xl font-bold mb-2 leading-snug" style="font-family: var(--font-serif); color: var(--color-brand);">{visionPost.title}</h3>
-								<p class="text-sm mb-4 leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{visionPost.excerpt || ''}</p>
+								<p class="text-sm mb-4 leading-relaxed line-clamp-3" style="font-family: var(--font-sans); color: var(--color-muted);">{visionPost.excerpt || ''}</p>
 								<div class="mt-auto flex items-center justify-between text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
 									<span>{visionPost.author} · {visionDate}</span>
 									<span class="font-semibold group-hover:underline" style="color: var(--color-brand);">Read →</span>
@@ -277,24 +277,19 @@ const partnershipFaq = [
 				<div id="donate" class="lg:col-span-3 scroll-mt-24" data-reveal>
 					<DonationForm />
 
-					<!-- Prefer to give by check? — mail option right under the form. -->
-					<div class="mt-6 rounded-2xl p-6" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
+					<!-- Prefer to give by check? — compact mail option right under the form. -->
+					<div class="mt-5 rounded-2xl p-5" style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);">
 						<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">
 							Prefer to give by check?
 						</p>
-						<p class="text-sm leading-relaxed mb-3" style="font-family: var(--font-sans); color: var(--color-muted);">
-							Make your check payable to <strong style="color: var(--color-ink);">Spirit Media Charities</strong> and mail it to:
+						<p class="text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">
+							Make your check payable to <strong style="color: var(--color-ink);">Spirit Media Charities</strong> and mail to:
 						</p>
-						<address class="not-italic text-sm leading-relaxed mb-3" style="font-family: var(--font-sans); color: var(--color-ink);">
-							Spirit Media Charities<br />
-							205 S Academy St #3251<br />
-							Cary, NC 27519
+						<address class="not-italic text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">
+							Spirit Media Charities · 205 S Academy St #3251 · Cary, NC 27519
 						</address>
-						<p class="text-xs leading-relaxed mb-3" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.85;">
-							Please write <strong style="color: var(--color-ink);">&ldquo;FHB&rdquo;</strong> in the memo line so your gift supports the Father&rsquo;s Heart Bible&trade;.
-						</p>
-						<p class="text-xs leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.7;">
-							All gifts are tax-deductible as allowed by the IRS.
+						<p class="text-xs leading-snug" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.8;">
+							Write <strong style="color: var(--color-ink);">&ldquo;FHB&rdquo;</strong> in the memo so your gift supports the Father&rsquo;s Heart Bible&trade;. All gifts are tax-deductible as allowed by the IRS.
 						</p>
 					</div>
 				</div>
