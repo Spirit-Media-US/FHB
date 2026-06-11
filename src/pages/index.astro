@@ -311,10 +311,24 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				<!-- Video (right on desktop). Lazy YouTube facade — the iframe
 				     only loads on click, so no third-party JS hits initial load. -->
 				<div>
+					<!-- Mobile: YouTube's native player embedded directly so a single
+					     tap lands on YouTube's play button and starts the video.
+					     (A facade would force a second tap — mobile blocks autoplay.)
+					     loading="lazy" keeps it off the initial load for perf. -->
+					<iframe
+						class="lg:hidden block w-full overflow-hidden rounded-xl shadow-lg"
+						style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);"
+						src="https://www.youtube-nocookie.com/embed/Ld4_H5XxrLk?rel=0&playsinline=1"
+						title="Father's Heart Bible invitation"
+						loading="lazy"
+						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+						allowfullscreen
+					></iframe>
+					<!-- Desktop: lazy facade — single click autoplays (desktop allows it). -->
 					<button
 						type="button"
 						id="fhb-video-facade"
-						class="group relative block w-full overflow-hidden rounded-xl shadow-lg"
+						class="group relative hidden lg:block w-full overflow-hidden rounded-xl shadow-lg"
 						style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);"
 						aria-label="Play the Father's Heart Bible invitation video"
 						data-video-id="Ld4_H5XxrLk"
