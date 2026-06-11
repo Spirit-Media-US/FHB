@@ -71,14 +71,54 @@ if (drift.length) {
 console.log(`[sync-chrome] token drift-guard OK (${checked} shared color tokens match the canonical brand).`);
 
 // 3) Emit the canonical global nav (fhb.json brand.navLinks) for the FHB site.
-//    Option A: the community app's paths are now served UNDER the apex (via the
-//    fhb-apex-router Worker), so resolve app-relative hrefs to the apex origin —
-//    no more cross-domain jump to join. (which 301s back to apex anyway).
-//    Marketing links are already absolute. Result: ONE canonical nav (fhb.json) →
-//    identical global menu on both surfaces, no drift. Recurses into children.
+//    Two classes of app-relative href need DIFFERENT origins:
+//
+//    a) MARKETING routes that THIS repo builds (/, /partner, /blog, …) exist on
+//       every FHB deploy — including the dev.pages.dev preview. Keep them
+//       RELATIVE so they resolve to the current origin: on dev they stay on dev
+//       (so content/pages are reviewable before merge), on the apex they stay on
+//       the apex. This is the env-correct behavior Kevin/Jay expect from dev.
+//    b) COMMUNITY APP routes (/read, /login, /feed, /library, /events, …) do NOT
+//       exist on the FHB preview — they're served only UNDER the production apex
+//       by the fhb-apex-router Worker. Pin those to the apex ORIGIN so they work
+//       from any surface (a relative /read on dev would 404).
+//
+//    The marketing set is derived from src/pages (no hardcoded list to drift).
+//    Recurses into children.
 const APP_ORIGIN = "https://fathersheartbible.com";
-const resolveHref = (href) =>
-	typeof href === "string" && href.startsWith("/") ? APP_ORIGIN + href : href;
+const PAGES_DIR = path.resolve(process.cwd(), "src/pages");
+const marketingSegments = () => {
+	const set = new Set();
+	for (const entry of readdirSync(PAGES_DIR)) {
+		const seg = entry.replace(/\.(astro|md|mdx|html)$/i, "").toLowerCase();
+		if (seg === "index" || seg === "404") continue; // root + error page aren't nav targets
+		set.add(seg);
+	}
+	return set;
+};
+const MARKETING = marketingSegments();
+const isMarketingPath = (href) => {
+	if (href === "/") return true; // home — built here
+	const seg = href.split(/[/?#]/)[1]?.toLowerCase() ?? "";
+	return MARKETING.has(seg);
+};
+// Normalize every href to a path first (marketing links are stored absolute to
+// the apex in fhb.json; app links are stored relative), then re-emit:
+//   marketing → RELATIVE (current-origin: dev on dev, apex on apex)
+//   app       → ABSOLUTE to the production apex (only surface it exists on)
+// Hrefs on a different origin (not the apex) pass through untouched.
+const resolveHref = (href) => {
+	if (typeof href !== "string") return href;
+	let p;
+	if (href.startsWith(`${APP_ORIGIN}/`) || href === APP_ORIGIN) {
+		p = href.slice(APP_ORIGIN.length) || "/";
+	} else if (href.startsWith("/")) {
+		p = href;
+	} else {
+		return href; // external origin — leave as-is
+	}
+	return isMarketingPath(p) ? p : APP_ORIGIN + p;
+};
 const resolveNav = (items) =>
 	(items ?? []).map((it) => ({
 		...it,
