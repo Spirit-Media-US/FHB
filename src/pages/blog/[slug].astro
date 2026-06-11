@@ -279,7 +279,9 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
     <!-- HERO IMAGE — full-bleed, starts at top behind the transparent nav (matches homepage/guides) -->
     <div class="relative w-full overflow-hidden h-72 lg:h-[600px]">
       <img src={heroImage} alt={post.heroImage?.alt || post.title} class="absolute inset-0 w-full h-full object-cover" style="object-position: center center;" fetchpriority="high" decoding="async" />
-      <div class="absolute inset-x-0 top-0 z-10" style="height: 160px; background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0));"></div>
+      <!-- Top scrim: keeps the transparent header's white logo/nav/CTA legible even
+           over bright hero imagery (e.g. a sunlit sky). Taller + darker than before. -->
+      <div class="absolute inset-x-0 top-0 z-10" style="height: 220px; background: linear-gradient(to bottom, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.32) 45%, rgba(0,0,0,0));"></div>
     </div>
 
     <!-- POST HEADER -->

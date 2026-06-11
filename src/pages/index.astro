@@ -262,6 +262,10 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				/>
 			</picture>
 			<div id="hero-video-slot" data-hero-src={heroVideoSrc || ''} aria-hidden="true"></div>
+			<!-- Dark overlay: keeps the transparent header's white logo/nav/CTA legible
+			     at the top and the white heading legible at the bottom, while the
+			     poster/video still reads through the lighter middle. -->
+			<div aria-hidden="true" class="absolute inset-0 z-[1]" style="background: linear-gradient(to bottom, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.18) 32%, rgba(0,0,0,0.30) 65%, rgba(0,0,0,0.62) 100%); pointer-events:none;"></div>
 			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto lg:pb-24" style="transition: color 1.2s ease;">
 				<h1
 					id="hero-heading"
