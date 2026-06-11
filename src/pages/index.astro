@@ -283,8 +283,8 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		     ═══════════════════════════════════════════════════════════ -->
 		<section style="background-color: var(--color-canvas);" class="py-10 md:py-14 px-6">
 			<div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-				<!-- Copy (left on desktop, stacked above the video on mobile). -->
-				<div>
+				<!-- Copy (left on desktop; on mobile it sits BELOW the video via order). -->
+				<div class="order-2 lg:order-1">
 					<h2
 						class="text-3xl font-medium leading-snug tracking-tight mb-4"
 						style="font-family: var(--font-headline); color: var(--color-ink);"
@@ -307,9 +307,8 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						Read FHB &rarr;
 					</a>
 				</div>
-				<!-- Video (right on desktop). Lazy YouTube facade — the iframe
-				     only loads on click, so no third-party JS hits initial load. -->
-				<div>
+				<!-- Video (right on desktop; on mobile it sits ABOVE the copy via order). -->
+				<div class="order-1 lg:order-2">
 					<!-- Mobile: YouTube's native player embedded directly so a single
 					     tap lands on YouTube's play button and starts the video.
 					     (A facade would force a second tap — mobile blocks autoplay.)
