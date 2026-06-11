@@ -56,7 +56,14 @@ export default defineConfig({
 				`${SITE}/events/`,
 				...readPages,
 			],
-			filter: (page) => !page.includes('/privacy') && !page.includes('/terms'),
+			// Exclude /privacy + /terms (low-value), and /blog/preview/* — the latter
+			// are noindex draft-preview duplicates of the real posts; advertising them
+			// in the sitemap makes GSC report "Submitted URL marked noindex" and inflates
+			// the not-indexed count. They still exist (noindex), just not advertised.
+			filter: (page) =>
+				!page.includes('/privacy') &&
+				!page.includes('/terms') &&
+				!page.includes('/blog/preview'),
 			serialize(item) {
 				const now = new Date().toISOString();
 				const url = item.url;

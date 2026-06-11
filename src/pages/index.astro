@@ -281,16 +281,86 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		     DESKTOP HERO SUBTEXT — appears below the desktop hero only
 		     (mobile subtitle + CTAs already rendered in the mobile hero above)
 		     ═══════════════════════════════════════════════════════════ -->
-		<section style="background-color: var(--color-canvas);" class="hidden lg:block md:py-6 md:px-6">
-			<div class="max-w-2xl mx-auto text-center" data-reveal>
-				<p
-					class="md:text-xl leading-relaxed mb-5"
-					style="font-family: var(--font-body); color: var(--color-muted);"
-				>
-					{heroSubheading}
-				</p>
+		<section style="background-color: var(--color-canvas);" class="py-10 md:py-14 px-6">
+			<div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center" data-reveal>
+				<!-- Copy (left on desktop). Hidden on mobile — the mobile hero
+				     already carries this Father's Day announcement. -->
+				<div class="hidden lg:block">
+					<h2
+						class="text-3xl font-medium leading-snug tracking-tight mb-4"
+						style="font-family: var(--font-headline); color: var(--color-ink);"
+					>
+						It&rsquo;s here &mdash; the Father&rsquo;s Heart Bible&trade; is live
+					</h2>
+					<p
+						class="text-xl leading-relaxed"
+						style="font-family: var(--font-body); color: var(--color-muted);"
+					>
+						{heroSubheading}
+					</p>
+					<a
+						href="/read"
+						class="inline-flex items-center mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
+						style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A;"
+						onmouseover="this.style.opacity='0.9'"
+						onmouseout="this.style.opacity='1'"
+					>
+						Read FHB &rarr;
+					</a>
+				</div>
+				<!-- Video (right on desktop). Lazy YouTube facade — the iframe
+				     only loads on click, so no third-party JS hits initial load. -->
+				<div>
+					<button
+						type="button"
+						id="fhb-video-facade"
+						class="group relative block w-full overflow-hidden rounded-xl shadow-lg"
+						style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);"
+						aria-label="Play the Father's Heart Bible invitation video"
+						data-video-id="Ld4_H5XxrLk"
+					>
+						<img
+							src="https://i.ytimg.com/vi/Ld4_H5XxrLk/hqdefault.jpg"
+							alt="An invitation to read the Father's Heart Bible"
+							width="480"
+							height="360"
+							loading="lazy"
+							class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+						/>
+						<span aria-hidden="true" class="absolute inset-0" style="background: rgba(36,27,23,0.12);"></span>
+						<span
+							aria-hidden="true"
+							class="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110"
+							style="width: 4.5rem; height: 4.5rem; transform: translate(-50%,-50%); background: rgba(255,255,255,0.92); border: 2px solid #FFFFFF; box-shadow: 0 4px 18px rgba(0,0,0,0.4);"
+						>
+							<svg width="26" height="26" viewBox="0 0 24 24" fill="var(--color-brand)" style="margin-left: 3px;"><path d="M8 5v14l11-7z"/></svg>
+						</span>
+					</button>
+				</div>
 			</div>
 		</section>
+
+		<script is:inline>
+			// Lazy YouTube facade — swap the poster button for an autoplaying
+			// iframe only when the user clicks. Keeps third-party JS off the
+			// initial load so the homepage perf score is untouched.
+			(() => {
+				const btn = document.getElementById('fhb-video-facade');
+				if (!btn) return;
+				btn.addEventListener('click', () => {
+					const id = btn.dataset.videoId;
+					const iframe = document.createElement('iframe');
+					iframe.width = '100%';
+					iframe.height = '100%';
+					iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;';
+					iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+					iframe.allowFullscreen = true;
+					iframe.title = "Father's Heart Bible invitation";
+					iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+					btn.replaceWith(iframe);
+				}, { once: true });
+			})();
+		</script>
 
 		<script define:vars={{ heroVideosFromSanity }} is:inline>
 			// Mobile bail-out — desktop-only video carousel. On mobile, the

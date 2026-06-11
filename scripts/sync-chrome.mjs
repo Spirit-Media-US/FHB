@@ -7,7 +7,7 @@
 // Mechanism B (shared source + sync), decided 2026-06-04. Runs first in the
 // build chain, exactly like sync-translations.mjs. Both repo paths exist on
 // Bethel where builds run.
-import { existsSync, mkdirSync, copyFileSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, copyFileSync, readFileSync, readdirSync, writeFileSync, rmSync } from "node:fs";
 import path from "node:path";
 
 const CANONICAL =
@@ -33,7 +33,13 @@ mkdirSync(DEST, { recursive: true });
 const files = readdirSync(CANONICAL).filter((f) => f.endsWith(".astro"));
 if (!files.length) fail(`no .astro components found in ${CANONICAL}`);
 for (const f of files) {
-	copyFileSync(path.join(CANONICAL, f), path.join(DEST, f));
+	const dest = path.join(DEST, f);
+	// Remove any prior copy first: copyFileSync chmods the dest to match the
+	// source after copying, which throws EPERM when the existing dest is owned
+	// by a different dev (these are gitignored, mixed-ownership build artifacts).
+	// Unlinking guarantees a fresh file owned by whoever runs this build.
+	rmSync(dest, { force: true });
+	copyFileSync(path.join(CANONICAL, f), dest);
 }
 console.log(`[sync-chrome] copied ${files.length} chrome component(s) → src/chrome/: ${files.join(", ")}`);
 
