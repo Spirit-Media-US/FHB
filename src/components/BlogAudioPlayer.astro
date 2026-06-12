@@ -27,6 +27,15 @@ const RING_C = 2 * Math.PI * 34; // r=34 in a 76-box — matches the chapter pla
 	<audio id="blog-audio-el" preload="none"></audio>
 </div>
 
+<!-- One-time coachmark inviting the reader to listen. Shown once per browser,
+     non-blocking (no backdrop), auto-dismisses on tap / scroll / play / Esc. -->
+<div id="blog-audio-hint" class="ba-hint" role="dialog" aria-label="Listen to this blog" hidden>
+	<button type="button" class="ba-hint-x" aria-label="Dismiss">&times;</button>
+	<p class="ba-hint-title">Prefer to listen?</p>
+	<p class="ba-hint-text">Tap the circle to hear this blog read aloud.</p>
+	<span class="ba-hint-arrow" aria-hidden="true"></span>
+</div>
+
 <style>
 	/* Floating control — always reachable while reading/scrolling (matches /read). */
 	.audio-fab {
@@ -60,6 +69,42 @@ const RING_C = 2 * Math.PI * 34; // r=34 in a 76-box — matches the chapter pla
 		color: #2f3131; border-radius: 9999px;
 		font-size: 12px; font-weight: 700; padding: 3px 9px; cursor: pointer;
 		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	}
+
+	/* "Prefer to listen?" coachmark — a small card above the floating ring. */
+	.ba-hint {
+		position: fixed;
+		right: 18px;
+		bottom: 116px;
+		z-index: 61;
+		width: 230px;
+		background: #2f3131;
+		color: #fff;
+		border-radius: 14px;
+		padding: 14px 16px 13px;
+		box-shadow: 0 14px 36px rgba(0, 0, 0, 0.32);
+		font-family: var(--font-sans, system-ui, sans-serif);
+		opacity: 0;
+		transform: translateY(6px);
+		transition: opacity .25s ease, transform .25s ease;
+		cursor: pointer;
+	}
+	.ba-hint.show { opacity: 1; transform: translateY(0); }
+	.ba-hint-x {
+		position: absolute; top: 6px; right: 9px;
+		background: none; border: 0; color: #cdbfc2; font-size: 19px; line-height: 1;
+		cursor: pointer; padding: 2px;
+	}
+	.ba-hint-title { margin: 0 0 3px; font-weight: 800; font-size: 15px; color: #ffd9e0; }
+	.ba-hint-text { margin: 0; font-size: 13px; line-height: 1.45; color: #f3eef0; }
+	/* Arrow pointing down toward the ring (which sits at right:20px). */
+	.ba-hint-arrow {
+		position: absolute; bottom: -8px; right: 34px;
+		width: 16px; height: 16px; background: #2f3131; transform: rotate(45deg);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.ba-hint { transition: opacity .25s ease; transform: none; }
+		.ba-hint.show { transform: none; }
 	}
 </style>
 
@@ -118,6 +163,36 @@ function initBlogAudio() {
 			timeEl.textContent = `${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;
 		}
 	});
+
+	// One-time "Prefer to listen?" coachmark, pointing at the ring.
+	const HINT_KEY = 'fhb_blog_listen_hint_seen';
+	const hint = document.getElementById('blog-audio-hint');
+	let seen = false;
+	try { seen = localStorage.getItem(HINT_KEY) === '1'; } catch { seen = true; }
+	if (hint && !seen) {
+		const dismiss = () => {
+			if (hint.hidden) return;
+			hint.classList.remove('show');
+			window.setTimeout(() => { hint.hidden = true; }, 260);
+			try { localStorage.setItem(HINT_KEY, '1'); } catch { /* ignore */ }
+			window.removeEventListener('scroll', onScroll);
+			document.removeEventListener('keydown', onKey);
+		};
+		const onScroll = () => dismiss();
+		const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') dismiss(); };
+		// Show shortly after load, but only if the player is actually visible.
+		window.setTimeout(() => {
+			if (el.hidden) return;
+			hint.hidden = false;
+			requestAnimationFrame(() => hint.classList.add('show'));
+			window.addEventListener('scroll', onScroll, { passive: true });
+			document.addEventListener('keydown', onKey);
+			window.setTimeout(dismiss, 12000); // auto-fade
+		}, 1400);
+		hint.querySelector('.ba-hint-x')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(); });
+		hint.addEventListener('click', () => { audio.play().catch(() => {}); dismiss(); });
+		audio.addEventListener('play', dismiss, { once: true });
+	}
 }
 document.addEventListener('astro:page-load', initBlogAudio);
 if (document.readyState !== 'loading') initBlogAudio();
