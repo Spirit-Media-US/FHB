@@ -188,8 +188,15 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.32) 45%, rgba(0,0,0,0.4) 100%);" aria-hidden="true"></div>
 			<div class="absolute inset-x-0 bottom-0 z-20 px-6 pb-10 lg:px-8 lg:pb-14">
 				<div class="mx-auto max-w-4xl">
-					<p class="text-sm font-semibold uppercase tracking-widest mb-3 flex items-center gap-2.5" style="color: #fff; font-family: var(--font-sans);">{flagImg ? (<img src={flagImg} alt={`Flag of ${country}`} width="30" height="20" class="rounded-sm shadow" style="width: 30px; height: auto;" loading="eager" decoding="async" />) : (<span class="text-2xl leading-none" aria-hidden="true">{flag}</span>)} The Bible Around the World</p>
-					<h1 class="text-4xl md:text-5xl lg:text-6xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{h1}</h1>
+					<div class="flex items-end gap-4 md:gap-5">
+						{flagImg && (
+							<img src={flagImg} alt={`Flag of ${country}`} width="84" height="56" class="shrink-0 rounded-md" style="width: 72px; height: auto; border: 3px solid rgba(255,255,255,0.92); box-shadow: 0 4px 18px rgba(0,0,0,0.45);" loading="eager" decoding="async" />
+						)}
+						<div>
+							<p class="text-sm font-semibold uppercase tracking-widest mb-2" style="color: #fff; font-family: var(--font-sans);">The Bible Around the World</p>
+							<h1 class="text-4xl md:text-5xl lg:text-6xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{h1}</h1>
+						</div>
+					</div>
 					<p class="mt-4 max-w-2xl text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.92);">{heroSubhead}</p>
 				</div>
 			</div>
@@ -202,7 +209,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				<nav aria-label="Breadcrumb" class="mb-6 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
 					<a href="/bible-in/" class="hover:underline">The Bible Around the World</a><span class="px-1.5" aria-hidden="true">/</span>
-					<span style="color: var(--color-ink);">{country}</span>
+					<span class="inline-flex items-center gap-1.5" style="color: var(--color-ink);">{flagImg && <img src={flagImg} alt="" width="18" height="12" class="rounded-[2px]" style="width: 18px; height: auto; border: 1px solid var(--color-hairline);" loading="lazy" decoding="async" aria-hidden="true" />}{country}</span>
 				</nav>
 				<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={directAnswerHtml}></p>
 				<div class="mt-6 rounded-xl px-5 py-4" style={`background-color: var(--color-surface-lowest); border-left: 4px solid ${colorPrimary};`}>
@@ -373,12 +380,14 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 			</div>
 		</section>
 
-		<!-- Mid CTA (read-first) -->
-		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-brand);">
+		<!-- Mid CTA (read-first) — country accent band. Dark text assumes a
+		     light/mid primary (e.g. saffron); a very dark primary should pass a
+		     lighter variant later. -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${colorPrimary};`}>
 			<div class="mx-auto max-w-2xl text-center">
-				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-on-primary);">{ctaMidHeading}</h2>
-				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-on-primary); opacity: 0.92;" set:html={ctaMidBodyHtml}></p>
-				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline" style="background-color: var(--color-on-primary); color: var(--color-brand); font-family: var(--font-sans);">Read FHB free<span aria-hidden="true">&rarr;</span></a>
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-deep);">{ctaMidHeading}</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-deep); opacity: 0.9;" set:html={ctaMidBodyHtml}></p>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline" style="background-color: var(--color-deep); color: #fff; font-family: var(--font-sans);">Read FHB free<span aria-hidden="true">&rarr;</span></a>
 			</div>
 		</section>
 
