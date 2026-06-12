@@ -8,10 +8,14 @@
 // Hides itself if the MP3 is missing so audio-less posts render cleanly.
 interface Props {
 	src: string; // absolute mp3 URL
+	timings?: { id: string; t: number }[]; // sentence start times for synced highlight
 }
-const { src } = Astro.props;
+const { src, timings = [] } = Astro.props;
 const RING_C = 2 * Math.PI * 34; // r=34 in a 76-box — matches the chapter player
 ---
+{timings.length > 0 && (
+	<script type="application/json" id="blog-audio-timings" set:html={JSON.stringify(timings)}></script>
+)}
 <div id="blog-audio" class="audio-fab" data-mp3={src} data-ring-c={RING_C} hidden>
 	<div class="audio-ring-wrap">
 		<svg id="blog-audio-ring" class="audio-ring" viewBox="0 0 76 76" aria-hidden="true">
@@ -108,6 +112,17 @@ const RING_C = 2 * Math.PI * 34; // r=34 in a 76-box — matches the chapter pla
 	}
 </style>
 
+<!-- Highlight lives on .ba-seg spans inside the article (outside this component's
+     scope), so these rules must be global. Subtle warm wash on the active line. -->
+<style is:global>
+	.ba-seg { transition: background-color 0.25s ease, box-shadow 0.25s ease; border-radius: 3px; }
+	.ba-seg-active {
+		background-color: #fbe6ee;
+		box-shadow: 0 0 0 3px #fbe6ee;
+	}
+	@media (prefers-reduced-motion: reduce) { .ba-seg { transition: none; } }
+</style>
+
 <script>
 function initBlogAudio() {
 	const root = document.getElementById('blog-audio');
@@ -157,12 +172,59 @@ function initBlogAudio() {
 		const frac = (((Math.atan2(dy, dx) + Math.PI / 2) / (2 * Math.PI)) % 1 + 1) % 1;
 		audio.currentTime = frac * audio.duration;
 	});
+	// ── Synced sentence highlight ───────────────────────────────────────────
+	// Timings (sentence start times) are inlined at build time; each maps to a
+	// <span data-seg="sN"> in the article. On every timeupdate we light up the
+	// sentence currently being read and gently keep it in view — like /read.
+	let segs: { id: string; t: number }[] = [];
+	try {
+		const tnode = document.getElementById('blog-audio-timings');
+		if (tnode && tnode.textContent) segs = JSON.parse(tnode.textContent);
+	} catch { segs = []; }
+	// Keep only sentences that actually have a span on this page (graceful if the
+	// sidecar and the rendered text ever drift).
+	segs = segs.filter((s) => document.querySelector(`[data-seg="${s.id}"]`)).sort((a, b) => a.t - b.t);
+	let activeId: string | null = null;
+	const segAtTime = (t: number): string | null => {
+		let lo = 0, hi = segs.length - 1, ans: string | null = null;
+		while (lo <= hi) {
+			const mid = (lo + hi) >> 1;
+			if (segs[mid].t <= t) { ans = segs[mid].id; lo = mid + 1; } else hi = mid - 1;
+		}
+		return ans;
+	};
+	function clearHighlight() {
+		if (!activeId) return;
+		document.querySelector(`[data-seg="${activeId}"]`)?.classList.remove('ba-seg-active');
+		activeId = null;
+	}
+	function highlightAt(t: number) {
+		if (!segs.length) return;
+		const id = segAtTime(t);
+		if (id === activeId) return;
+		if (activeId) document.querySelector(`[data-seg="${activeId}"]`)?.classList.remove('ba-seg-active');
+		activeId = id;
+		if (!id) return;
+		const span = document.querySelector(`[data-seg="${id}"]`) as HTMLElement | null;
+		if (!span) return;
+		span.classList.add('ba-seg-active');
+		// Keep the read sentence in view, but never fight the reader: only scroll
+		// when it has drifted out of the comfortable middle band of the viewport.
+		const r = span.getBoundingClientRect();
+		if (r.top < 90 || r.bottom > window.innerHeight - 120) {
+			span.scrollIntoView({ block: 'center', behavior: 'smooth' });
+		}
+	}
+
 	audio.addEventListener('timeupdate', () => {
 		if (audio.duration && isFinite(audio.duration)) {
 			ringProgress.style.strokeDashoffset = String(RING_C * (1 - audio.currentTime / audio.duration));
 			timeEl.textContent = `${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;
 		}
+		highlightAt(audio.currentTime);
 	});
+	audio.addEventListener('ended', clearHighlight);
+	audio.addEventListener('seeking', () => highlightAt(audio.currentTime));
 
 	// One-time "Prefer to listen?" coachmark, pointing at the ring.
 	const HINT_KEY = 'fhb_blog_listen_hint_seen';

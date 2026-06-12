@@ -38,6 +38,82 @@ function slugifyHeading(s: string): string {
 		.replace(/\s+/g, '-');
 }
 
+// ── Sentence-highlight alignment ────────────────────────────────────────────
+// These two pure functions MUST stay byte-identical to the copy in
+// community/scripts/generate-blog-audio.mjs — they decide which blocks get a
+// highlight span and where sentences split, so the on-page <span data-seg="sN">
+// line up 1:1 with the audio marks (sN) the generator wrote to the sidecar.
+// `segState` is the running sentence counter, shared across every block in body
+// order (it must advance only on highlightable prose — exactly like the audio).
+const segState = { id: 0 };
+function sentenceRanges(text: string): [number, number][] {
+	if (!text) return [];
+	const ranges: [number, number][] = [];
+	let last = 0;
+	const re = /[.!?]+["'”’)\]]*\s+/g;
+	let m: RegExpExecArray | null = re.exec(text);
+	while (m) {
+		const end = m.index + m[0].length;
+		ranges.push([last, end]);
+		last = end;
+		m = re.exec(text);
+	}
+	if (last < text.length) ranges.push([last, text.length]);
+	return ranges.filter(([a, b]) => text.slice(a, b).trim());
+}
+function isHighlightBlock(b: any): boolean {
+	if (!b || b._type !== 'block') return false;
+	const text = (b.children || [])
+		.map((c: any) => c?.text || '')
+		.join('')
+		.trim();
+	if (!text) return false;
+	if (/^\{[\w]+\}\s*[—–-]\s*\{[\w]+\}$/.test(text)) return false; // chapter marker
+	if (/^By\s.+/.test(text) && /Updated/i.test(text)) return false; // byline
+	if (/^Jump to:/i.test(text)) return false; // mini-TOC
+	if (b.style === 'blockquote' && !/^Key takeaway/i.test(text)) return false; // CTA callouts
+	return true;
+}
+
+// Build a block's inner HTML as one <span data-seg> per sentence, preserving
+// inline marks (bold/italic/links) by slicing the formatting runs to each
+// sentence range. Advances segState.id so the spans match the audio's sN marks.
+function sentenceSpans(children: any[], linkByKey: Record<string, string>): string {
+	let full = '';
+	const runs: { start: number; end: number; marks: any[] }[] = [];
+	for (const c of children) {
+		const text = c?.text || '';
+		const start = full.length;
+		full += text;
+		runs.push({ start, end: full.length, marks: Array.isArray(c?.marks) ? c.marks : [] });
+	}
+	const wrap = (sub: string, marks: any[]): string => {
+		let t = sub;
+		if (marks.includes('strong')) t = `<strong>${t}</strong>`;
+		if (marks.includes('em')) t = `<em>${t}</em>`;
+		const linkKey = marks.find((m: any) => typeof m === 'string' && linkByKey[m]);
+		if (linkKey) {
+			const href = linkByKey[linkKey];
+			const isExternal = /^https?:\/\//i.test(href);
+			const targetAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+			t = `<a href="${href}" style="color: var(--color-brand);" class="hover:underline"${targetAttrs}>${t}</a>`;
+		}
+		return t;
+	};
+	let out = '';
+	for (const [a, b] of sentenceRanges(full)) {
+		const id = `s${segState.id++}`;
+		let inner = '';
+		for (const r of runs) {
+			const s = Math.max(a, r.start);
+			const e = Math.min(b, r.end);
+			if (s < e) inner += wrap(full.slice(s, e), r.marks);
+		}
+		out += `<span class="ba-seg" data-seg="${id}">${inner}</span>`;
+	}
+	return out;
+}
+
 function renderPortableText(blocks: any[]): string {
 	if (!Array.isArray(blocks)) return '';
 	let html = '';
@@ -77,6 +153,9 @@ function renderPortableText(blocks: any[]): string {
 				return text;
 			})
 			.join('');
+		// Highlightable prose gets per-sentence spans (with sN ids) so the audio
+		// player can light up the sentence being read; everything else renders flat.
+		const inner = isHighlightBlock(block) ? sentenceSpans(children, linkByKey) : textContent;
 		const listItem = block.listItem;
 		if (listItem === 'bullet' || listItem === 'number') {
 			if (listType && listType !== listItem) closeList();
@@ -87,20 +166,20 @@ function renderPortableText(blocks: any[]): string {
 						? '<ol class="list-decimal pl-7 my-6 space-y-2 text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">'
 						: '<ul class="list-disc pl-7 my-6 space-y-2 text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">';
 			}
-			html += `<li>${textContent}</li>`;
+			html += `<li>${inner}</li>`;
 			continue;
 		}
 		closeList();
 		const style = block.style || 'normal';
 		if (style === 'h2') {
 			const id = slugifyHeading(rawText);
-			html += `<h2 id="${id}" class="text-2xl font-bold mt-12 mb-4 scroll-mt-24" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h2>`;
+			html += `<h2 id="${id}" class="text-2xl font-bold mt-12 mb-4 scroll-mt-24" style="font-family: var(--font-serif); color: var(--color-ink);">${inner}</h2>`;
 		} else if (style === 'h3') {
-			html += `<h3 class="text-xl font-bold mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h3>`;
+			html += `<h3 class="text-xl font-bold mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">${inner}</h3>`;
 		} else if (style === 'blockquote') {
-			html += `<blockquote class="my-6 px-6 py-5 lg:px-8 rounded-2xl text-lg leading-relaxed" style="background-color: #fdf2f5; border: 1px solid #f9d6e0; font-family: var(--font-serif); color: var(--color-ink);">${textContent}</blockquote>`;
+			html += `<blockquote class="my-6 px-6 py-5 lg:px-8 rounded-2xl text-lg leading-relaxed" style="background-color: #fdf2f5; border: 1px solid #f9d6e0; font-family: var(--font-serif); color: var(--color-ink);">${inner}</blockquote>`;
 		} else {
-			html += `<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">${textContent}</p>`;
+			html += `<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">${inner}</p>`;
 		}
 	}
 	closeList();
@@ -173,6 +252,18 @@ function segmentBody(blocks: any[]): BodySegment[] {
 }
 
 const bodySegments = segmentBody(post.body || []);
+
+// Sentence timings for the audio player's synced highlight. Fetched at BUILD
+// time (server-side — the page's CSP connect-src can't reach the media host from
+// the browser) and inlined. Absent/old sidecar → no highlight, audio still works.
+const audioBase = `https://media.spiritmediapublishing.com/audio/blog/en/${post.slug.current}`;
+let audioTimings: { id: string; t: number }[] = [];
+try {
+	const meta = await fetch(`${audioBase}.json`).then((r) => (r.ok ? r.json() : null));
+	if (meta && Array.isArray(meta.segments)) audioTimings = meta.segments;
+} catch {
+	/* no narration yet → highlight disabled */
+}
 
 // Kevin White's author entity, with sameAs links to his real-world properties.
 // Inlined as a Person schema on every blog post so AI engines / search crawlers
@@ -356,7 +447,7 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
     <!-- POST CONTENT -->
     <section class="px-6 py-10 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
       <div class="mx-auto max-w-3xl space-y-4">
-        <BlogAudioPlayer src={`https://media.spiritmediapublishing.com/audio/blog/en/${post.slug.current}.mp3`} />
+        <BlogAudioPlayer src={`${audioBase}.mp3`} timings={audioTimings} />
         {bodySegments.map((seg) =>
           seg.kind === 'chapter'
             ? (seg.slug
