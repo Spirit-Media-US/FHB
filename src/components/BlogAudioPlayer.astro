@@ -85,10 +85,18 @@ function initBlogAudio() {
 			return `${m}:${String(sec).padStart(2, '0')}`;
 		};
 
-		// Reveal only if the MP3 actually exists; otherwise leave the control hidden.
-		fetch(src, { method: 'HEAD' })
-			.then((r) => { if (r.ok) { audio.src = src; el.hidden = false; } })
-			.catch(() => {});
+		// Reveal optimistically and let the <audio> element load its metadata
+		// (media-src CSP allows the media domain; a fetch() would hit connect-src
+		// and be blocked). If the MP3 is genuinely missing, the audio 'error'
+		// event hides the control so audio-less posts render cleanly.
+		audio.preload = 'metadata';
+		audio.src = src;
+		el.hidden = false;
+		audio.addEventListener('error', () => { el.hidden = true; });
+		audio.addEventListener('loadedmetadata', () => {
+			timeEl.hidden = false;
+			timeEl.textContent = `0:00 / ${fmt(audio.duration)}`;
+		});
 
 		el.dataset.bound = '1';
 		btn.addEventListener('click', () => { audio.paused ? audio.play() : audio.pause(); });
