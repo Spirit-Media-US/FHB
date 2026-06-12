@@ -175,19 +175,19 @@ function initBlogAudio() {
 			hint.classList.remove('show');
 			window.setTimeout(() => { hint.hidden = true; }, 260);
 			try { localStorage.setItem(HINT_KEY, '1'); } catch { /* ignore */ }
-			window.removeEventListener('scroll', onScroll);
 			document.removeEventListener('keydown', onKey);
 		};
-		const onScroll = () => dismiss();
+		// Don't dismiss on scroll — readers scroll immediately, and the player is
+		// fixed (always visible), so the invite can linger a few seconds while they
+		// begin reading. It clears on tap/play/Esc or the auto-fade.
 		const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') dismiss(); };
 		// Show shortly after load, but only if the player is actually visible.
 		window.setTimeout(() => {
 			if (el.hidden) return;
 			hint.hidden = false;
 			requestAnimationFrame(() => hint.classList.add('show'));
-			window.addEventListener('scroll', onScroll, { passive: true });
 			document.addEventListener('keydown', onKey);
-			window.setTimeout(dismiss, 12000); // auto-fade
+			window.setTimeout(dismiss, 9000); // auto-fade
 		}, 1400);
 		hint.querySelector('.ba-hint-x')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(); });
 		hint.addEventListener('click', () => { audio.play().catch(() => {}); dismiss(); });
