@@ -1,4 +1,5 @@
 ---
+import ReviewLink from '../../components/ReviewLink.astro';
 // /verses — "Bible Verses by Topic" hub. Targets the head term "bible verses"
 // (~323k/mo). Lists every live topical collection as a card (from verseTopics).
 // Add a row to src/data/verseTopics.ts when a new /verses/<topic> page ships.
@@ -102,5 +103,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema];
 				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
 			</div>
 		</section>
+
+		<ReviewLink class="mb-12" />
 	</main>
 </Layout>

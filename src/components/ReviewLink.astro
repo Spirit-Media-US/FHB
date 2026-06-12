@@ -1,0 +1,21 @@
+---
+// Discreet, on-brand inline link inviting readers to the testimonial wall.
+// Used across guides, blog posts, and resource/verses pages. Intentionally
+// subtle (small sans text, muted rule) so it never competes with the page's
+// primary CTA. Absolute URL because some host pages are served on the apex by
+// the community app via the router.
+const { class: className = '' } = Astro.props;
+---
+
+<p
+	class={`text-sm leading-relaxed text-center ${className}`}
+	style="font-family: var(--font-sans); color: var(--color-muted);"
+>
+	<a
+		href="https://fathersheartbible.com/review/"
+		class="hover:underline"
+		style="color: var(--color-brand); font-weight: 600;"
+	>
+		&hearts; See what readers are saying &rarr;
+	</a>
+</p>
