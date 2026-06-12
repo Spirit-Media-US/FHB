@@ -6,6 +6,7 @@ import Header from '../chrome/Header.astro';
 // source of truth shared with the app so the global menu never drifts.
 import globalNav from '../chrome/nav.generated.json';
 import MailtoLink from '../components/MailtoLink.astro';
+import WelcomeTour from '../components/WelcomeTour.astro';
 import { sanityClient } from '../lib/sanity';
 import '../styles/global.css';
 
@@ -321,6 +322,7 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		>
 			<MailtoLink slot="contact" email="hello@spiritmediapublishing.com" style="text-decoration: none; color: var(--color-inverse-on-surface, #f1f1f1); opacity: 0.65; font-family: var(--font-body); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;">Contact</MailtoLink>
 		</Footer>
+		<WelcomeTour />
 		<script>
 			// Scroll reveal observer
 			const observer = new IntersectionObserver((entries) => {
