@@ -1,0 +1,232 @@
+---
+// WelcomeTour — first-visit guided coachmark tour for FHB marketing pages.
+// Offered after the visitor's 3rd interaction (click or scroll), shown once per
+// browser. Spotlights the three things we want new readers to do: Read/listen,
+// Free Resources, Share. Easy to decline (No thanks / Skip / × / Esc). Every
+// outcome is posted to /tour-api (Supabase) so we can see if the tour is wanted.
+//
+// Targets live in the shared chrome (Read FHB, Resources, the Share button). On
+// mobile those nav links sit behind the hamburger, so the tour opens the menu to
+// reveal them, then closes it for the final Share step.
+---
+
+<div id="fhb-tour" hidden>
+	<div id="tour-ring" hidden aria-hidden="true"></div>
+
+	<!-- The offer -->
+	<div id="tour-welcome" class="tour-card" role="dialog" aria-modal="false" aria-label="Welcome tour" hidden>
+		<button type="button" class="tour-x" data-tour-decline aria-label="Dismiss">&times;</button>
+		<p class="tour-emoji" aria-hidden="true">👋</p>
+		<p class="tour-title">Welcome! Want a 15-second tour?</p>
+		<p class="tour-sub">Three quick things you can do here.</p>
+		<div class="tour-actions">
+			<button type="button" class="tour-ghost" data-tour-decline>No thanks</button>
+			<button type="button" class="tour-go" data-tour-accept>Yes&nbsp;→</button>
+		</div>
+	</div>
+
+	<!-- A single coachmark, re-pointed for each step -->
+	<div id="tour-step" class="tour-card tour-coach" role="dialog" aria-label="Tour step" hidden>
+		<button type="button" class="tour-x" data-tour-skip aria-label="Close tour">&times;</button>
+		<p class="tour-n" data-tour-n></p>
+		<p class="tour-step-title" data-tour-title></p>
+		<p class="tour-step-body" data-tour-body></p>
+		<div class="tour-actions">
+			<button type="button" class="tour-ghost" data-tour-skip>Skip</button>
+			<button type="button" class="tour-go" data-tour-next>Next</button>
+		</div>
+	</div>
+</div>
+
+<style is:global>
+	#fhb-tour[hidden] { display: none; }
+	#tour-ring {
+		position: fixed; z-index: 9998; pointer-events: none;
+		border: 2px solid var(--color-gold, #C9A15D); border-radius: 12px;
+		box-shadow: 0 0 0 4px rgba(201,161,93,0.25), 0 0 0 9999px rgba(28,26,23,0.45);
+		transition: top .25s ease, left .25s ease, width .25s ease, height .25s ease;
+	}
+	.tour-card {
+		position: fixed; z-index: 9999; width: min(300px, calc(100vw - 24px));
+		background: var(--color-soft, #FCFBF8); color: var(--color-ink, #1C1A17);
+		border: 1px solid var(--color-hairline, #E7DED2); border-radius: 16px;
+		box-shadow: 0 12px 40px rgba(28,26,23,0.22); padding: 18px 18px 16px;
+		font-family: var(--font-sans);
+	}
+	/* The offer rests bottom-center until accepted. */
+	#tour-welcome { left: 50%; bottom: 24px; transform: translateX(-50%); text-align: center; }
+	.tour-emoji { font-size: 26px; margin: 0 0 4px; }
+	.tour-title { font-weight: 700; font-size: 16px; margin: 0 0 4px; color: var(--color-ink); }
+	.tour-sub { font-size: 13px; color: var(--color-muted, #5F5A54); margin: 0 0 14px; }
+	.tour-n { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-brand, #8A5A34); margin: 0 0 6px; }
+	.tour-step-title { font-weight: 700; font-size: 15px; margin: 0 0 4px; }
+	.tour-step-body { font-size: 13px; color: var(--color-muted, #5F5A54); margin: 0 0 14px; line-height: 1.5; }
+	.tour-actions { display: flex; justify-content: flex-end; gap: 10px; }
+	#tour-welcome .tour-actions { justify-content: center; }
+	.tour-go {
+		background: var(--color-brand, #8A5A34); color: #fff; border: 0; cursor: pointer;
+		font-weight: 700; font-size: 13px; font-family: inherit; padding: 9px 16px; border-radius: 9px;
+	}
+	.tour-go:hover { background: var(--color-brand-dark, #6F4528); }
+	.tour-ghost {
+		background: transparent; color: var(--color-muted, #5F5A54); border: 0; cursor: pointer;
+		font-weight: 600; font-size: 13px; font-family: inherit; padding: 9px 10px; border-radius: 9px;
+	}
+	.tour-ghost:hover { color: var(--color-ink, #1C1A17); }
+	.tour-x {
+		position: absolute; top: 8px; right: 10px; background: transparent; border: 0; cursor: pointer;
+		font-size: 20px; line-height: 1; color: var(--color-muted, #5F5A54); padding: 4px;
+	}
+	.tour-x:hover { color: var(--color-ink, #1C1A17); }
+	@media (prefers-reduced-motion: reduce) { #tour-ring { transition: none; } }
+</style>
+
+<script>
+	(function () {
+		const SEEN = 'fhb_tour_seen';
+		try { if (localStorage.getItem(SEEN)) return; } catch { /* storage off → just run once in-session */ }
+
+		const root = document.getElementById('fhb-tour');
+		const ring = document.getElementById('tour-ring');
+		const welcome = document.getElementById('tour-welcome');
+		const coach = document.getElementById('tour-step');
+		if (!root || !ring || !welcome || !coach) return;
+
+		// The three stops. selector resolves the live chrome element; needsNav means
+		// the target lives in the (mobile-collapsed) nav and the menu must be opened.
+		const STEPS = [
+			{ needsNav: true,  sel: '#chrome-nav-list a[href*="/read"]:not([href*="login"])', alt: '#chrome-cta',
+			  title: 'Read & listen to FHB', body: 'Open the whole Bible free online — every chapter with audio.' },
+			{ needsNav: true,  sel: '#chrome-nav-list a[href*="/library"]', alt: '#chrome-nav-list a[href*="/resource"]',
+			  title: 'Free Resources', body: 'Downloads, teaching, and graphics — free to read and share.' },
+			{ needsNav: false, sel: '#chrome-share', alt: null,
+			  title: 'Share FHB', body: 'Tap the heart at the top to send it to someone you love.' },
+		];
+
+		function post(response, step) {
+			const payload = JSON.stringify({ response, step: step ?? null, path: location.pathname });
+			try {
+				if (navigator.sendBeacon) {
+					navigator.sendBeacon('/tour-api', new Blob([payload], { type: 'application/json' }));
+					return;
+				}
+			} catch { /* fall through */ }
+			fetch('/tour-api', { method: 'POST', headers: { 'content-type': 'application/json' }, body: payload, keepalive: true }).catch(() => {});
+		}
+
+		const isMobile = () => {
+			const t = document.getElementById('chrome-nav-toggle');
+			return !!t && getComputedStyle(t).display !== 'none';
+		};
+		function setMenu(open) {
+			const toggle = document.getElementById('chrome-nav-toggle');
+			const list = document.getElementById('chrome-nav-list');
+			if (!toggle || !list || !isMobile()) return;
+			const isOpen = list.classList.contains('open');
+			if (open !== isOpen) toggle.click();
+		}
+
+		let idx = 0;
+		function finish() {
+			try { localStorage.setItem(SEEN, '1'); } catch { /* ignore */ }
+			ring.hidden = true; welcome.hidden = true; coach.hidden = true; root.hidden = true;
+			setMenu(false);
+			window.removeEventListener('resize', reposition);
+			window.removeEventListener('scroll', reposition, true);
+			document.removeEventListener('keydown', onKey);
+		}
+
+		function placeCoach(el) {
+			const r = el.getBoundingClientRect();
+			ring.hidden = false;
+			ring.style.top = (r.top - 6) + 'px';
+			ring.style.left = (r.left - 6) + 'px';
+			ring.style.width = (r.width + 12) + 'px';
+			ring.style.height = (r.height + 12) + 'px';
+			const cw = Math.min(300, window.innerWidth - 24);
+			coach.style.width = cw + 'px';
+			coach.hidden = false;
+			const ch = coach.offsetHeight || 150;
+			let left = Math.min(Math.max(12, r.left), window.innerWidth - cw - 12);
+			let top = r.bottom + 12;
+			if (top + ch > window.innerHeight - 8) top = Math.max(12, r.top - 12 - ch);
+			coach.style.left = left + 'px';
+			coach.style.top = top + 'px';
+		}
+
+		function currentTarget() {
+			const s = STEPS[idx];
+			return document.querySelector(s.sel) || (s.alt && document.querySelector(s.alt)) || null;
+		}
+		function reposition() {
+			const el = currentTarget();
+			if (el && el.getBoundingClientRect().width > 0) placeCoach(el);
+		}
+
+		function showStep() {
+			if (idx >= STEPS.length) { post('completed', STEPS.length); finish(); return; }
+			const s = STEPS[idx];
+			setMenu(s.needsNav);
+			// Let the menu open/close transition settle before measuring.
+			setTimeout(() => {
+				const el = currentTarget();
+				if (!el || el.getBoundingClientRect().width === 0) {
+					// Target not reachable on this layout — skip ahead rather than stall.
+					idx++; showStep(); return;
+				}
+				coach.querySelector('[data-tour-n]').textContent = `Step ${idx + 1} of ${STEPS.length}`;
+				coach.querySelector('[data-tour-title]').textContent = s.title;
+				coach.querySelector('[data-tour-body]').textContent = s.body;
+				coach.querySelector('[data-tour-next]').textContent = idx === STEPS.length - 1 ? 'Done' : 'Next';
+				welcome.hidden = true;
+				placeCoach(el);
+			}, isMobile() ? 240 : 0);
+		}
+
+		function onKey(e) { if (e.key === 'Escape') { post(coach.hidden ? 'declined' : 'skipped', coach.hidden ? 0 : idx); finish(); } }
+
+		function startTour() {
+			post('accepted', 0);
+			idx = 0;
+			window.addEventListener('resize', reposition);
+			window.addEventListener('scroll', reposition, true);
+			showStep();
+		}
+
+		function offer() {
+			root.hidden = false;
+			welcome.hidden = false;
+			post('offered', 0);
+			document.addEventListener('keydown', onKey);
+		}
+
+		// Wire buttons (delegated within the tour root).
+		root.addEventListener('click', (e) => {
+			const t = e.target.closest('[data-tour-accept],[data-tour-decline],[data-tour-skip],[data-tour-next]');
+			if (!t) return;
+			if (t.hasAttribute('data-tour-accept')) { startTour(); }
+			else if (t.hasAttribute('data-tour-decline')) { post('declined', 0); finish(); }
+			else if (t.hasAttribute('data-tour-skip')) { post('skipped', idx); finish(); }
+			else if (t.hasAttribute('data-tour-next')) { idx++; showStep(); }
+		});
+
+		// Trigger: offer after the 3rd interaction (click or scroll), once.
+		let interactions = 0, offered = false, lastScroll = 0;
+		function bump() {
+			if (offered) return;
+			if (++interactions >= 3) { offered = true; teardownTriggers(); offer(); }
+		}
+		function onScroll() {
+			const now = Date.now ? Date.now() : +new Date();
+			if (now - lastScroll < 400) return; // count discrete scroll gestures
+			lastScroll = now; bump();
+		}
+		function onClick(e) { if (root.contains(e.target)) return; bump(); }
+		function teardownTriggers() {
+			document.removeEventListener('click', onClick, true);
+			window.removeEventListener('scroll', onScroll, { passive: true });
+		}
+		document.addEventListener('click', onClick, true);
+		window.addEventListener('scroll', onScroll, { passive: true });
+	})();
+</script>
