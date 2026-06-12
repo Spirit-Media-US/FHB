@@ -195,6 +195,98 @@ const partnershipFaq = [
 			subheading={heroSubheading}
 		/>
 
+		<!-- ═══════════════════════════════════════════════════════════
+		     SECTION 1.5 — INVITATION VIDEO (directly under the hero)
+		     Copy left / video right on desktop; video-on-top on mobile.
+		     Mirrors the homepage invitation-video pattern:
+		       • mobile = native YouTube iframe (single tap plays)
+		       • desktop = lazy facade (click-to-load, keeps JS off initial load)
+		       • aspect-ratio sizing (never height:100% → no fullscreen blowup)
+		       • NO data-reveal gate (that left the section opacity:0/invisible)
+		     ═══════════════════════════════════════════════════════════ -->
+		<section style="background-color: var(--color-canvas);" class="py-10 md:py-14 px-6">
+			<div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+				<!-- Copy (left on desktop; on mobile it sits BELOW the video via order). -->
+				<div class="order-2 lg:order-1">
+					<h2
+						class="text-3xl md:text-4xl font-light leading-tight tracking-tight mb-4"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						Partner with us to take the Father&rsquo;s Heart Bible&trade; to the nations.
+					</h2>
+					<p
+						class="text-lg leading-relaxed"
+						style="font-family: var(--font-sans); color: var(--color-muted);"
+					>
+						Envision a world filled with beloved sons and daughters all under the daily pour of our
+						Heavenly Father&rsquo;s heart of perfect and holy love. There is no greater purpose,
+						destiny, or legacy.
+					</p>
+				</div>
+				<!-- Video (right on desktop; on mobile it sits ABOVE the copy via order). -->
+				<div class="order-1 lg:order-2">
+					<!-- Mobile: YouTube's native player embedded directly so a single
+					     tap lands on YouTube's play button and starts the video.
+					     (A facade would force a second tap — mobile blocks autoplay.)
+					     loading="lazy" keeps it off the initial load for perf. -->
+					<iframe
+						class="lg:hidden block w-full overflow-hidden rounded-xl shadow-lg"
+						style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);"
+						src="https://www.youtube-nocookie.com/embed/eD06eSXd2uU?rel=0&playsinline=1"
+						title="Partner with the Father's Heart Bible"
+						loading="lazy"
+						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+						allowfullscreen
+					></iframe>
+					<!-- Desktop: lazy facade — single click autoplays (desktop allows it). -->
+					<button
+						type="button"
+						id="partner-video-facade"
+						class="group relative hidden lg:block w-full overflow-hidden rounded-xl shadow-lg"
+						style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);"
+						aria-label="Play the Father's Heart Bible partner video"
+						data-video-id="eD06eSXd2uU"
+					>
+						<img
+							src="https://i.ytimg.com/vi/eD06eSXd2uU/hqdefault.jpg"
+							alt="Partner with us to take the Father's Heart Bible to the nations"
+							width="480"
+							height="360"
+							loading="lazy"
+							class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+						/>
+						<span aria-hidden="true" class="absolute inset-0" style="background: rgba(36,27,23,0.12);"></span>
+						<span
+							aria-hidden="true"
+							class="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110"
+							style="width: 4.5rem; height: 4.5rem; transform: translate(-50%,-50%); background: rgba(255,255,255,0.92); border: 2px solid #FFFFFF; box-shadow: 0 4px 18px rgba(0,0,0,0.4);"
+						>
+							<svg width="26" height="26" viewBox="0 0 24 24" fill="var(--color-brand)" style="margin-left: 3px;"><path d="M8 5v14l11-7z"/></svg>
+						</span>
+					</button>
+				</div>
+			</div>
+		</section>
+
+		<script is:inline>
+			// Lazy YouTube facade — swap the poster button for an autoplaying
+			// iframe only when the user clicks. Keeps third-party JS off the
+			// initial load so the partner page perf score is untouched.
+			(() => {
+				const btn = document.getElementById('partner-video-facade');
+				if (!btn) return;
+				btn.addEventListener('click', () => {
+					const id = btn.dataset.videoId;
+					const iframe = document.createElement('iframe');
+					iframe.style.cssText = 'display:block;width:100%;aspect-ratio:16/9;height:auto;border:0;border-radius:0.75rem;';
+					iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+					iframe.allowFullscreen = true;
+					iframe.title = "Partner with the Father's Heart Bible";
+					iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+					btn.replaceWith(iframe);
+				}, { once: true });
+			})();
+		</script>
 
 		<!-- ═══════════════════════════════════════════════════════════
 		     SECTION 2 — GIVE (pitch + the math + progress + form + feed)
