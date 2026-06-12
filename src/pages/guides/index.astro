@@ -4,6 +4,7 @@
 // — never link a guide that doesn't exist yet (no broken links). Add a row to
 // GUIDES when a new /guides/<slug> page ships. Targets "bible reading guide".
 import HowToHubCards from '../../components/HowToHubCards.astro';
+import ReviewLink from '../../components/ReviewLink.astro';
 import { GUIDES } from '../../data/guides';
 import Layout from '../../layouts/Layout.astro';
 
@@ -89,5 +90,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema];
 				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
 			</div>
 		</section>
+
+		<ReviewLink class="mb-12" />
 	</main>
 </Layout>
