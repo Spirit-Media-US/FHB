@@ -1,5 +1,6 @@
 ---
 import AuthorBio from '../../components/AuthorBio.astro';
+import BlogAudioPlayer from '../../components/BlogAudioPlayer.astro';
 import BlogCTA from '../../components/BlogCTA.astro';
 import ChapterEmbed from '../../components/ChapterEmbed.astro';
 import FeatureChapter from '../../components/FeatureChapter.astro';
@@ -322,6 +323,7 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
     <!-- POST CONTENT -->
     <section class="px-6 py-10 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
       <div class="mx-auto max-w-3xl space-y-4">
+        <BlogAudioPlayer src={`https://media.spiritmediapublishing.com/audio/blog/en/${post.slug.current}.mp3`} />
         {bodySegments.map((seg) =>
           seg.kind === 'chapter'
             ? (seg.slug

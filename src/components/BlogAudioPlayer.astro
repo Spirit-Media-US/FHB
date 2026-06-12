@@ -1,0 +1,201 @@
+---
+// BlogAudioPlayer — the SAME floating ring player as the /read chapter reader
+// (community ChapterAudioPlayer.astro), for the whole-post "Listen to this blog"
+// narration. Identical look + behavior (ring progress, tap-to-seek, play/pause,
+// time, speed) — minus the reader-only bits (member gate, verse highlighting,
+// next-chapter advance). Audio: media.spiritmediapublishing.com/audio/blog/en/<slug>.mp3
+// (Google TTS, same voice as chapters — community scripts/generate-blog-audio.mjs).
+// Hides itself if the MP3 is missing so audio-less posts render cleanly.
+interface Props {
+	src: string; // absolute mp3 URL
+}
+const { src } = Astro.props;
+const RING_C = 2 * Math.PI * 34; // r=34 in a 76-box — matches the chapter player
+---
+<div id="blog-audio" class="audio-fab" data-mp3={src} data-ring-c={RING_C} hidden>
+	<div class="audio-ring-wrap">
+		<svg id="blog-audio-ring" class="audio-ring" viewBox="0 0 76 76" aria-hidden="true">
+			<circle class="ring-track" cx="38" cy="38" r="34" fill="none" stroke-width="5" />
+			<circle id="blog-ring-progress" class="ring-progress" cx="38" cy="38" r="34" fill="none"
+				stroke-width="5" stroke-linecap="round" transform="rotate(-90 38 38)"
+				stroke-dasharray={RING_C} stroke-dashoffset={RING_C} />
+		</svg>
+		<button id="blog-audio-toggle" type="button" class="audio-fab-btn" aria-label="Listen to this blog">▶</button>
+	</div>
+	<span id="blog-audio-time" class="audio-time" hidden>0:00 / 0:00</span>
+	<button id="blog-audio-speed" type="button" class="audio-fab-speed" aria-label="Playback speed" hidden>1×</button>
+	<audio id="blog-audio-el" preload="none"></audio>
+</div>
+
+<!-- One-time coachmark inviting the reader to listen. Shown once per browser,
+     non-blocking (no backdrop), auto-dismisses on tap / scroll / play / Esc. -->
+<div id="blog-audio-hint" class="ba-hint" role="dialog" aria-label="Listen to this blog" hidden>
+	<button type="button" class="ba-hint-x" aria-label="Dismiss">&times;</button>
+	<p class="ba-hint-title">Prefer to listen?</p>
+	<p class="ba-hint-text">Tap the circle to hear this blog read aloud.</p>
+	<span class="ba-hint-arrow" aria-hidden="true"></span>
+</div>
+
+<style>
+	/* Floating control — always reachable while reading/scrolling (matches /read). */
+	.audio-fab {
+		position: fixed;
+		right: 20px;
+		bottom: 24px;
+		z-index: 60;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+	}
+	.audio-ring-wrap { position: relative; width: 76px; height: 76px; display: grid; place-items: center; }
+	.audio-ring { position: absolute; inset: 0; width: 76px; height: 76px; cursor: pointer; }
+	.ring-track { stroke: rgba(0, 0, 0, 0.12); }
+	.ring-progress { stroke: #ffb1c4; transition: stroke-dashoffset .2s linear; }
+	.audio-fab-btn {
+		position: relative; z-index: 2;
+		width: 52px; height: 52px; border-radius: 9999px; border: none;
+		background: #2f3131; color: #ffd9e0; font-size: 19px;
+		cursor: pointer; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+		display: flex; align-items: center; justify-content: center;
+	}
+	.audio-time {
+		font-size: 11px; font-weight: 600; color: var(--color-ink, #1a1c1c);
+		background: #fff; border-radius: 9999px; padding: 2px 8px;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); font-variant-numeric: tabular-nums;
+	}
+	.audio-fab-speed {
+		border: 1px solid #2f3131; background: #fff;
+		color: #2f3131; border-radius: 9999px;
+		font-size: 12px; font-weight: 700; padding: 3px 9px; cursor: pointer;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	}
+
+	/* "Prefer to listen?" coachmark — a small card above the floating ring. */
+	.ba-hint {
+		position: fixed;
+		right: 18px;
+		bottom: 116px;
+		z-index: 61;
+		width: 230px;
+		background: #2f3131;
+		color: #fff;
+		border-radius: 14px;
+		padding: 14px 16px 13px;
+		box-shadow: 0 14px 36px rgba(0, 0, 0, 0.32);
+		font-family: var(--font-sans, system-ui, sans-serif);
+		opacity: 0;
+		transform: translateY(6px);
+		transition: opacity .25s ease, transform .25s ease;
+		cursor: pointer;
+	}
+	.ba-hint.show { opacity: 1; transform: translateY(0); }
+	.ba-hint-x {
+		position: absolute; top: 6px; right: 9px;
+		background: none; border: 0; color: #cdbfc2; font-size: 19px; line-height: 1;
+		cursor: pointer; padding: 2px;
+	}
+	.ba-hint-title { margin: 0 0 3px; font-weight: 800; font-size: 15px; color: #ffd9e0; }
+	.ba-hint-text { margin: 0; font-size: 13px; line-height: 1.45; color: #f3eef0; }
+	/* Arrow pointing down toward the ring (which sits at right:20px). */
+	.ba-hint-arrow {
+		position: absolute; bottom: -8px; right: 34px;
+		width: 16px; height: 16px; background: #2f3131; transform: rotate(45deg);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.ba-hint { transition: opacity .25s ease; transform: none; }
+		.ba-hint.show { transform: none; }
+	}
+</style>
+
+<script>
+function initBlogAudio() {
+	const root = document.getElementById('blog-audio');
+	if (!root || (root as HTMLElement).dataset.bound === '1') return;
+	const el = root as HTMLElement;
+	const src = el.dataset.mp3 || '';
+	if (!src) return;
+	const audio = document.getElementById('blog-audio-el') as HTMLAudioElement;
+	const btn = document.getElementById('blog-audio-toggle') as HTMLButtonElement;
+	const speedBtn = document.getElementById('blog-audio-speed') as HTMLButtonElement;
+	const timeEl = document.getElementById('blog-audio-time') as HTMLElement;
+	const ring = document.getElementById('blog-audio-ring') as unknown as SVGSVGElement;
+	const ringProgress = document.getElementById('blog-ring-progress') as unknown as SVGCircleElement;
+	const RING_C = Number(el.dataset.ringC);
+	const SPEEDS = [1, 1.25, 1.5, 0.75];
+	let speedIdx = 0;
+	const fmt = (s: number) => {
+		if (!isFinite(s)) return '0:00';
+		const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+		return `${m}:${String(sec).padStart(2, '0')}`;
+	};
+
+	// Reveal optimistically; <audio> playback uses media-src (allowed). A fetch()
+	// would hit connect-src and be blocked, so rely on the audio 'error' event to
+	// hide the control when a post has no generated narration.
+	audio.preload = 'metadata';
+	audio.src = src;
+	el.hidden = false;
+	audio.addEventListener('error', () => { el.hidden = true; });
+
+	el.dataset.bound = '1';
+	btn.addEventListener('click', () => { audio.paused ? audio.play() : audio.pause(); });
+	audio.addEventListener('play', () => { btn.textContent = '❚❚'; speedBtn.hidden = false; timeEl.hidden = false; });
+	audio.addEventListener('pause', () => { btn.textContent = '▶'; });
+	audio.addEventListener('ended', () => { btn.textContent = '▶'; });
+	speedBtn.addEventListener('click', () => {
+		speedIdx = (speedIdx + 1) % SPEEDS.length;
+		audio.playbackRate = SPEEDS[speedIdx];
+		speedBtn.textContent = `${SPEEDS[speedIdx]}×`;
+	});
+	// Tap anywhere on the ring → seek to that clock position (same as /read).
+	ring.addEventListener('click', (e) => {
+		if (!audio.duration || !isFinite(audio.duration)) return;
+		const box = ring.getBoundingClientRect();
+		const dx = (e as MouseEvent).clientX - (box.left + box.width / 2);
+		const dy = (e as MouseEvent).clientY - (box.top + box.height / 2);
+		const frac = (((Math.atan2(dy, dx) + Math.PI / 2) / (2 * Math.PI)) % 1 + 1) % 1;
+		audio.currentTime = frac * audio.duration;
+	});
+	audio.addEventListener('timeupdate', () => {
+		if (audio.duration && isFinite(audio.duration)) {
+			ringProgress.style.strokeDashoffset = String(RING_C * (1 - audio.currentTime / audio.duration));
+			timeEl.textContent = `${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;
+		}
+	});
+
+	// One-time "Prefer to listen?" coachmark, pointing at the ring.
+	const HINT_KEY = 'fhb_blog_listen_hint_seen';
+	const hint = document.getElementById('blog-audio-hint');
+	let seen = false;
+	try { seen = localStorage.getItem(HINT_KEY) === '1'; } catch { seen = true; }
+	if (hint && !seen) {
+		const dismiss = () => {
+			if (hint.hidden) return;
+			hint.classList.remove('show');
+			window.setTimeout(() => { hint.hidden = true; }, 260);
+			try { localStorage.setItem(HINT_KEY, '1'); } catch { /* ignore */ }
+			document.removeEventListener('keydown', onKey);
+		};
+		// The invite STICKS until the reader acts — it does not auto-vanish while
+		// they read (the player is fixed/always visible, so no scroll-dismiss). It
+		// clears only on tap / × / play / Esc. A long safety timeout removes it if
+		// the reader never interacts, so it never lingers forever.
+		const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') dismiss(); };
+		// Show shortly after load, but only if the player is actually visible.
+		window.setTimeout(() => {
+			if (el.hidden) return;
+			hint.hidden = false;
+			requestAnimationFrame(() => hint.classList.add('show'));
+			document.addEventListener('keydown', onKey);
+			window.setTimeout(dismiss, 30000); // safety auto-fade (only if never tapped)
+		}, 900);
+		hint.querySelector('.ba-hint-x')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(); });
+		hint.addEventListener('click', () => { audio.play().catch(() => {}); dismiss(); });
+		audio.addEventListener('play', dismiss, { once: true });
+	}
+}
+document.addEventListener('astro:page-load', initBlogAudio);
+if (document.readyState !== 'loading') initBlogAudio();
+else document.addEventListener('DOMContentLoaded', initBlogAudio);
+</script>

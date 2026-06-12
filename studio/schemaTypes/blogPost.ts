@@ -145,6 +145,13 @@ export default {
 							type: 'number',
 							validation: (Rule: any) => Rule.required().integer().min(1),
 						},
+						{
+							name: 'slug',
+							title: 'Reader slug',
+							type: 'string',
+							description:
+								'Lowercase reader url slug (e.g. "job", "1-john"). When set, the embed upgrades from the text-only card to <FeatureChapter> — real reader text + working audio player. Auto-filled by the blog pipeline.',
+						},
 					],
 					preview: {
 						select: { book: 'book', chapter: 'chapter' },
