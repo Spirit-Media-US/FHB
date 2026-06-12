@@ -35,11 +35,16 @@ export interface CountryLanguage {
 	speakers: string; // e.g. "97 million"
 	status: 'Available' | 'On the roadmap' | 'Translation needed';
 }
+export interface CountryKnownFor {
+	label: string;
+	text: string;
+}
 
 export interface Props {
 	slug: string;
 	country: string;
 	flag: string; // emoji flag, e.g. "🇮🇳"
+	flagImg?: string; // flag image URL (e.g. flagcdn) for national-pride display
 	colorPrimary: string; // hex, e.g. "#FF9933"
 	colorSecondary: string; // hex
 	title: string; // <title>
@@ -52,9 +57,20 @@ export interface Props {
 	keyTakeaway: string;
 	glanceIntroHtml: string;
 	stats: CountryStat[];
+	knownForHeading?: string;
+	knownForIntroHtml?: string;
+	knownFor?: CountryKnownFor[];
 	faithHeading: string;
 	faithBodyHtml: string; // multi-paragraph allowed
 	sources: CountrySource[];
+	faithsHeading?: string;
+	faithsIntroHtml?: string;
+	faithsBlocks?: CountryWhyBlock[];
+	painsHeading?: string;
+	painsIntroHtml?: string;
+	painStats?: CountryStat[];
+	painsBodyHtml?: string;
+	painsSources?: CountrySource[];
 	whyHeading: string;
 	whyBlocks: CountryWhyBlock[];
 	opportunityHeading?: string;
@@ -72,6 +88,7 @@ const {
 	slug,
 	country,
 	flag,
+	flagImg,
 	colorPrimary,
 	colorSecondary,
 	title,
@@ -84,9 +101,20 @@ const {
 	keyTakeaway,
 	glanceIntroHtml,
 	stats,
+	knownForHeading,
+	knownForIntroHtml,
+	knownFor = [],
 	faithHeading,
 	faithBodyHtml,
 	sources,
+	faithsHeading,
+	faithsIntroHtml,
+	faithsBlocks = [],
+	painsHeading,
+	painsIntroHtml,
+	painStats = [],
+	painsBodyHtml,
+	painsSources = [],
 	whyHeading,
 	whyBlocks,
 	opportunityHeading,
@@ -160,7 +188,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.32) 45%, rgba(0,0,0,0.4) 100%);" aria-hidden="true"></div>
 			<div class="absolute inset-x-0 bottom-0 z-20 px-6 pb-10 lg:px-8 lg:pb-14">
 				<div class="mx-auto max-w-4xl">
-					<p class="text-sm font-semibold uppercase tracking-widest mb-3 flex items-center gap-2" style="color: #fff; font-family: var(--font-sans);"><span class="text-2xl leading-none" aria-hidden="true">{flag}</span> The Bible Around the World</p>
+					<p class="text-sm font-semibold uppercase tracking-widest mb-3 flex items-center gap-2.5" style="color: #fff; font-family: var(--font-sans);">{flagImg ? (<img src={flagImg} alt={`Flag of ${country}`} width="30" height="20" class="rounded-sm shadow" style="width: 30px; height: auto;" loading="eager" decoding="async" />) : (<span class="text-2xl leading-none" aria-hidden="true">{flag}</span>)} The Bible Around the World</p>
 					<h1 class="text-4xl md:text-5xl lg:text-6xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{h1}</h1>
 					<p class="mt-4 max-w-2xl text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.92);">{heroSubhead}</p>
 				</div>
@@ -199,6 +227,26 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 			</div>
 		</section>
 
+		<!-- What the country is known for (national pride) -->
+		{knownFor.length > 0 && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-4xl">
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{knownForHeading || `What ${country} is known for`}</h2>
+					{knownForIntroHtml && (
+						<p class="mt-4 max-w-3xl text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={knownForIntroHtml}></p>
+					)}
+					<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+						{knownFor.map((k) => (
+							<div class="rounded-2xl p-5" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+								<h3 class="text-lg font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{k.label}</h3>
+								<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{k.text}</p>
+							</div>
+						))}
+					</div>
+				</div>
+			</section>
+		)}
+
 		<!-- Faith & the Bible -->
 		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">
@@ -211,6 +259,56 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				)}
 			</div>
 		</section>
+
+		<!-- What pains the country (the ache) -->
+		{(painsBodyHtml || painStats.length > 0) && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-3xl">
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{painsHeading || `What pains ${country}`}</h2>
+					{painsIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={painsIntroHtml}></p>
+					)}
+					{painStats.length > 0 && (
+						<dl class="mt-7 grid grid-cols-2 md:grid-cols-3 gap-5">
+							{painStats.map((s) => (
+								<div class="rounded-2xl p-5" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+									<dt class="text-2xl font-medium leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{s.value}</dt>
+									<dd class="mt-2 text-sm leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{s.label}</dd>
+								</div>
+							))}
+						</dl>
+					)}
+					{painsBodyHtml && (
+						<div class="mt-6 space-y-5 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={painsBodyHtml}></div>
+					)}
+					{painsSources.length > 0 && (
+						<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">
+							Sources: {painsSources.map((s, i) => (<>{i > 0 && <span aria-hidden="true"> · </span>}<a href={s.url} target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">{s.label}</a></>))}
+						</p>
+					)}
+				</div>
+			</section>
+		)}
+
+		<!-- How "our Father" meets the country (world religions + hope) -->
+		{faithsBlocks.length > 0 && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-deep);">
+				<div class="mx-auto max-w-3xl">
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{faithsHeading || `What "our Father" offers ${country}`}</h2>
+					{faithsIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.82);" set:html={faithsIntroHtml}></p>
+					)}
+					<div class="mt-8 space-y-7">
+						{faithsBlocks.map((b) => (
+							<div class="border-l-2 pl-5" style="border-color: var(--color-gold);">
+								<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-gold);">{b.heading}</h3>
+								<p class="mt-2 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.85);" set:html={b.bodyHtml}></p>
+							</div>
+						))}
+					</div>
+				</div>
+			</section>
+		)}
 
 		<!-- Why FHB -->
 		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
