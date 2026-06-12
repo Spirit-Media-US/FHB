@@ -177,9 +177,10 @@ function initBlogAudio() {
 			try { localStorage.setItem(HINT_KEY, '1'); } catch { /* ignore */ }
 			document.removeEventListener('keydown', onKey);
 		};
-		// Don't dismiss on scroll — readers scroll immediately, and the player is
-		// fixed (always visible), so the invite can linger a few seconds while they
-		// begin reading. It clears on tap/play/Esc or the auto-fade.
+		// The invite STICKS until the reader acts — it does not auto-vanish while
+		// they read (the player is fixed/always visible, so no scroll-dismiss). It
+		// clears only on tap / × / play / Esc. A long safety timeout removes it if
+		// the reader never interacts, so it never lingers forever.
 		const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') dismiss(); };
 		// Show shortly after load, but only if the player is actually visible.
 		window.setTimeout(() => {
@@ -187,8 +188,8 @@ function initBlogAudio() {
 			hint.hidden = false;
 			requestAnimationFrame(() => hint.classList.add('show'));
 			document.addEventListener('keydown', onKey);
-			window.setTimeout(dismiss, 9000); // auto-fade
-		}, 1400);
+			window.setTimeout(dismiss, 30000); // safety auto-fade (only if never tapped)
+		}, 900);
 		hint.querySelector('.ba-hint-x')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(); });
 		hint.addEventListener('click', () => { audio.play().catch(() => {}); dismiss(); });
 		audio.addEventListener('play', dismiss, { once: true });
