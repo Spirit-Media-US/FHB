@@ -1,0 +1,320 @@
+---
+// CountryBible — reusable template for the /bible-in/<country> hub.
+// Each country page (src/pages/bible-in/<slug>.astro) supplies a data object;
+// this component renders the full SEO/AEO layout: hero (flag + country colors),
+// direct-answer paragraph, key takeaway, "at a glance" facts, faith/Bible state,
+// "why FHB" blocks, scripture sampler, keep-reading links, FAQ, and read-first
+// CTAs. Architecture rules (read-first CTA, English-first) live in
+// memory/project_fhb_country_pages.md. Mirror the /verses + /guides patterns.
+import Layout from '../layouts/Layout.astro';
+
+export interface CountryStat {
+	label: string;
+	value: string;
+}
+export interface CountrySource {
+	label: string;
+	url: string;
+}
+export interface CountryVerse {
+	ref: string;
+	slug: string; // /read book slug
+	ch: number;
+	text: string;
+}
+export interface CountryFaq {
+	question: string;
+	answer: string;
+}
+export interface CountryWhyBlock {
+	heading: string;
+	bodyHtml: string;
+}
+export interface CountryLanguage {
+	language: string;
+	speakers: string; // e.g. "97 million"
+	status: 'Available' | 'On the roadmap' | 'Translation needed';
+}
+
+export interface Props {
+	slug: string;
+	country: string;
+	flag: string; // emoji flag, e.g. "🇮🇳"
+	colorPrimary: string; // hex, e.g. "#FF9933"
+	colorSecondary: string; // hex
+	title: string; // <title>
+	description: string; // meta description
+	h1: string;
+	heroSubhead: string;
+	heroBase: string; // Sanity CDN base
+	heroAlt: string;
+	directAnswerHtml: string;
+	keyTakeaway: string;
+	glanceIntroHtml: string;
+	stats: CountryStat[];
+	faithHeading: string;
+	faithBodyHtml: string; // multi-paragraph allowed
+	sources: CountrySource[];
+	whyHeading: string;
+	whyBlocks: CountryWhyBlock[];
+	opportunityHeading?: string;
+	opportunityIntroHtml?: string;
+	languages?: CountryLanguage[];
+	verses: CountryVerse[];
+	keepReadingHtml: string;
+	faqs: CountryFaq[];
+	ctaMidHeading: string;
+	ctaMidBodyHtml: string;
+	ctaBottomBodyHtml: string;
+}
+
+const {
+	slug,
+	country,
+	flag,
+	colorPrimary,
+	colorSecondary,
+	title,
+	description,
+	h1,
+	heroSubhead,
+	heroBase,
+	heroAlt,
+	directAnswerHtml,
+	keyTakeaway,
+	glanceIntroHtml,
+	stats,
+	faithHeading,
+	faithBodyHtml,
+	sources,
+	whyHeading,
+	whyBlocks,
+	opportunityHeading,
+	opportunityIntroHtml,
+	languages = [],
+	verses,
+	keepReadingHtml,
+	faqs,
+	ctaMidHeading,
+	ctaMidBodyHtml,
+	ctaBottomBodyHtml,
+} = Astro.props;
+
+const PAGE_URL = `https://fathersheartbible.com/bible-in/${slug}/`;
+const HERO_IMG = `${heroBase}?w=1400&h=560&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${heroBase}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'The Bible Around the World',
+			item: 'https://fathersheartbible.com/bible-in/',
+		},
+		{ '@type': 'ListItem', position: 3, name: country, item: PAGE_URL },
+	],
+};
+const collectionSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'CollectionPage',
+	name: h1,
+	description,
+	url: PAGE_URL,
+	inLanguage: 'en',
+	isPartOf: {
+		'@type': 'WebSite',
+		name: "Father's Heart Bible",
+		url: 'https://fathersheartbible.com/',
+	},
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: faqs.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
+---
+
+<Layout
+	title={title}
+	description={description}
+	image={OG_IMG}
+	imageAlt={heroAlt}
+	darkHero={true}
+	jsonLd={jsonLd}
+	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<!-- Hero -->
+		<section class="relative w-full overflow-hidden min-h-[560px] lg:min-h-[calc(46vh_+_2in)]">
+			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={heroAlt} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.32) 45%, rgba(0,0,0,0.4) 100%);" aria-hidden="true"></div>
+			<div class="absolute inset-x-0 bottom-0 z-20 px-6 pb-10 lg:px-8 lg:pb-14">
+				<div class="mx-auto max-w-4xl">
+					<p class="text-sm font-semibold uppercase tracking-widest mb-3 flex items-center gap-2" style="color: #fff; font-family: var(--font-sans);"><span class="text-2xl leading-none" aria-hidden="true">{flag}</span> The Bible Around the World</p>
+					<h1 class="text-4xl md:text-5xl lg:text-6xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{h1}</h1>
+					<p class="mt-4 max-w-2xl text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.92);">{heroSubhead}</p>
+				</div>
+			</div>
+			<div class="absolute inset-x-0 bottom-0 z-30 h-1.5" style={`background: linear-gradient(to right, ${colorPrimary} 0%, ${colorPrimary} 50%, ${colorSecondary} 50%, ${colorSecondary} 100%);`} aria-hidden="true"></div>
+		</section>
+
+		<!-- Breadcrumb + direct answer -->
+		<section class="px-6 pt-9 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-6 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/bible-in/" class="hover:underline">The Bible Around the World</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">{country}</span>
+				</nav>
+				<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={directAnswerHtml}></p>
+				<div class="mt-6 rounded-xl px-5 py-4" style={`background-color: var(--color-surface-lowest); border-left: 4px solid ${colorPrimary};`}>
+					<p class="text-base font-medium leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);"><span class="font-semibold uppercase text-xs tracking-widest mr-2" style={`color: ${colorPrimary};`}>Key takeaway</span>{keyTakeaway}</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- At a glance -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-4xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{country} at a glance</h2>
+				<p class="mt-4 max-w-3xl text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={glanceIntroHtml}></p>
+				<dl class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-5">
+					{stats.map((s) => (
+						<div class="rounded-2xl p-5" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+							<dt class="text-xs font-semibold uppercase tracking-widest" style="color: var(--color-muted); font-family: var(--font-sans);">{s.label}</dt>
+							<dd class="mt-2 text-2xl font-medium leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{s.value}</dd>
+						</div>
+					))}
+				</dl>
+			</div>
+		</section>
+
+		<!-- Faith & the Bible -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{faithHeading}</h2>
+				<div class="mt-5 space-y-5 text-base lg:text-lg leading-relaxed prose-fhb" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={faithBodyHtml}></div>
+				{sources.length > 0 && (
+					<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Sources: {sources.map((s, i) => (<>{i > 0 && <span aria-hidden="true"> · </span>}<a href={s.url} target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">{s.label}</a></>))}
+					</p>
+				)}
+			</div>
+		</section>
+
+		<!-- Why FHB -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{whyHeading}</h2>
+				<div class="mt-8 space-y-8">
+					{whyBlocks.map((b) => (
+						<div>
+							<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{b.heading}</h3>
+							<p class="mt-3 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.bodyHtml}></p>
+						</div>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<!-- Translation opportunity (languages + populations) -->
+		{languages.length > 0 && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-3xl">
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{opportunityHeading || `The opportunity in ${country}`}</h2>
+					{opportunityIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={opportunityIntroHtml}></p>
+					)}
+					<ul class="mt-7 divide-y" style="border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline);">
+						{languages.map((l) => {
+							const tone =
+								l.status === 'Available'
+									? '#138808'
+									: l.status === 'On the roadmap'
+										? 'var(--color-brand)'
+										: 'var(--color-muted)';
+							return (
+								<li class="flex items-center justify-between gap-4 py-3.5" style="border-color: var(--color-hairline);">
+									<div>
+										<span class="text-lg font-medium" style="font-family: var(--font-serif); color: var(--color-ink);">{l.language}</span>
+										<span class="ml-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">{l.speakers} speakers</span>
+									</div>
+									<span class="shrink-0 text-xs font-semibold uppercase tracking-wide rounded-full px-3 py-1" style={`color: ${tone}; border: 1px solid ${tone};`}>{l.status}</span>
+								</li>
+							);
+						})}
+					</ul>
+					<p class="mt-6 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Every language is a door. If you feel called to help open one, you can <a href="/partner" style="color: var(--color-brand);" class="hover:underline">sponsor a translation</a> &mdash; or simply <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">start reading the editions available today</a>.</p>
+				</div>
+			</section>
+		)}
+
+		<!-- Scripture sampler -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Hear the Father&rsquo;s voice</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">A few of the most-read passages in the world, in the Father&rsquo;s Heart Bible &mdash; tap any reference to read and listen free.</p>
+				<div class="mt-7 space-y-5">
+					{verses.map((v) => (
+						<a href={`https://fathersheartbible.com/read/${v.slug}/${v.ch}`} class="block rounded-2xl p-5 no-underline transition-opacity hover:opacity-90" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+							<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.text}&rdquo;</p>
+							<span class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">{v.ref}<span aria-hidden="true">&rarr;</span></span>
+						</a>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<!-- Mid CTA (read-first) -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-brand);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-on-primary);">{ctaMidHeading}</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-on-primary); opacity: 0.92;" set:html={ctaMidBodyHtml}></p>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline" style="background-color: var(--color-on-primary); color: var(--color-brand); font-family: var(--font-sans);">Read FHB free<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<!-- Keep reading -->
+		<section class="px-6 py-12 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-xl md:text-2xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Keep reading</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={keepReadingHtml}></p>
+			</div>
+		</section>
+
+		<!-- FAQ -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="mt-7 space-y-4">
+					{faqs.map((f) => (
+						<details class="rounded-2xl px-5 py-4" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+							<summary class="cursor-pointer text-lg font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</summary>
+							<p class="mt-3 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p>
+						</details>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<!-- Bottom CTA (read-first) -->
+		<section class="px-6 py-14 lg:px-8 lg:py-20" style="background-color: var(--color-deep);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">Read the Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.85);" set:html={ctaBottomBodyHtml}></p>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline" style="background-color: var(--color-gold); color: var(--color-deep); font-family: var(--font-sans);">Start reading<span aria-hidden="true">&rarr;</span></a>
+				<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: rgba(255,255,255,0.6);">Believe in the mission? <a href="/partner" style="color: var(--color-gold);" class="hover:underline">Help take it to the nations &rarr;</a></p>
+			</div>
+		</section>
+	</main>
+</Layout>
