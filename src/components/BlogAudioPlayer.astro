@@ -1,0 +1,122 @@
+---
+// BlogAudioPlayer — "Listen to this blog" control. Same playback behavior as the
+// /read chapter ring player (play/pause, progress ring, tap-to-seek, time,
+// speed), minus the verse highlighting (a blog has no verses). Audio is the
+// whole-post narration at media.spiritmediapublishing.com/audio/blog/en/<slug>.mp3
+// (Google TTS, same voice as the chapter reader — see community
+// scripts/generate-blog-audio.mjs). If the MP3 is missing, the control hides
+// itself, so posts without generated audio render cleanly.
+interface Props {
+	src: string; // absolute mp3 URL
+}
+const { src } = Astro.props;
+const RING_C = 2 * Math.PI * 22; // r=22 in a 52-box
+---
+<div
+	class="blog-audio"
+	data-src={src}
+	data-ring-c={RING_C}
+	hidden
+>
+	<div class="ba-ring-wrap">
+		<svg class="ba-ring" viewBox="0 0 52 52" aria-hidden="true">
+			<circle class="ba-ring-track" cx="26" cy="26" r="22" fill="none" stroke-width="4" />
+			<circle class="ba-ring-progress" cx="26" cy="26" r="22" fill="none"
+				stroke-width="4" stroke-linecap="round" transform="rotate(-90 26 26)"
+				stroke-dasharray={RING_C} stroke-dashoffset={RING_C} />
+		</svg>
+		<button type="button" class="ba-btn" aria-label="Listen to this blog">▶</button>
+	</div>
+	<div class="ba-meta">
+		<span class="ba-label">Listen to this blog</span>
+		<span class="ba-time" hidden>0:00 / 0:00</span>
+	</div>
+	<button type="button" class="ba-speed" aria-label="Playback speed" hidden>1×</button>
+	<audio class="ba-el" preload="none"></audio>
+</div>
+
+<style>
+	.blog-audio {
+		display: flex; align-items: center; gap: 14px;
+		margin: 0 0 28px; padding: 12px 16px;
+		background: var(--color-soft, #FCFBF8);
+		border: 1px solid var(--color-hairline, #E7DED2);
+		border-radius: 9999px;
+	}
+	.ba-ring-wrap { position: relative; width: 52px; height: 52px; display: grid; place-items: center; flex: none; }
+	.ba-ring { position: absolute; inset: 0; width: 52px; height: 52px; cursor: pointer; }
+	.ba-ring-track { stroke: var(--color-hairline, #E7DED2); }
+	.ba-ring-progress { stroke: var(--color-gold, #C9A15D); transition: stroke-dashoffset .2s linear; }
+	.ba-btn {
+		position: relative; z-index: 2;
+		width: 38px; height: 38px; border-radius: 9999px; border: none;
+		background: var(--color-brand, #8A5A34); color: #fff; font-size: 14px;
+		cursor: pointer; display: flex; align-items: center; justify-content: center;
+	}
+	.ba-meta { display: flex; flex-direction: column; line-height: 1.25; }
+	.ba-label { font-family: var(--font-sans); font-weight: 600; font-size: 14px; color: var(--color-ink, #1C1A17); }
+	.ba-time { font-size: 12px; color: var(--color-muted, #5F5A54); font-variant-numeric: tabular-nums; }
+	.ba-speed {
+		margin-left: auto; border: 1px solid var(--color-brand, #8A5A34); background: transparent;
+		color: var(--color-brand, #8A5A34); border-radius: 9999px;
+		font-size: 12px; font-weight: 700; padding: 3px 10px; cursor: pointer; font-family: var(--font-sans);
+	}
+</style>
+
+<script>
+function initBlogAudio() {
+	document.querySelectorAll('.blog-audio').forEach((root) => {
+		if ((root as HTMLElement).dataset.bound === '1') return;
+		const el = root as HTMLElement;
+		const src = el.dataset.src || '';
+		if (!src) return;
+		const audio = el.querySelector('.ba-el') as HTMLAudioElement;
+		const btn = el.querySelector('.ba-btn') as HTMLButtonElement;
+		const speedBtn = el.querySelector('.ba-speed') as HTMLButtonElement;
+		const timeEl = el.querySelector('.ba-time') as HTMLElement;
+		const ring = el.querySelector('.ba-ring') as unknown as SVGSVGElement;
+		const ringProgress = el.querySelector('.ba-ring-progress') as unknown as SVGCircleElement;
+		const RING_C = Number(el.dataset.ringC);
+		const SPEEDS = [1, 1.25, 1.5, 0.75];
+		let speedIdx = 0;
+		const fmt = (s: number) => {
+			if (!isFinite(s)) return '0:00';
+			const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+			return `${m}:${String(sec).padStart(2, '0')}`;
+		};
+
+		// Reveal only if the MP3 actually exists; otherwise leave the control hidden.
+		fetch(src, { method: 'HEAD' })
+			.then((r) => { if (r.ok) { audio.src = src; el.hidden = false; } })
+			.catch(() => {});
+
+		el.dataset.bound = '1';
+		btn.addEventListener('click', () => { audio.paused ? audio.play() : audio.pause(); });
+		audio.addEventListener('play', () => { btn.textContent = '❚❚'; speedBtn.hidden = false; timeEl.hidden = false; });
+		audio.addEventListener('pause', () => { btn.textContent = '▶'; });
+		audio.addEventListener('ended', () => { btn.textContent = '▶'; });
+		speedBtn.addEventListener('click', () => {
+			speedIdx = (speedIdx + 1) % SPEEDS.length;
+			audio.playbackRate = SPEEDS[speedIdx];
+			speedBtn.textContent = `${SPEEDS[speedIdx]}×`;
+		});
+		ring.addEventListener('click', (e) => {
+			if (!audio.duration || !isFinite(audio.duration)) return;
+			const box = ring.getBoundingClientRect();
+			const dx = (e as MouseEvent).clientX - (box.left + box.width / 2);
+			const dy = (e as MouseEvent).clientY - (box.top + box.height / 2);
+			const frac = (((Math.atan2(dy, dx) + Math.PI / 2) / (2 * Math.PI)) % 1 + 1) % 1;
+			audio.currentTime = frac * audio.duration;
+		});
+		audio.addEventListener('timeupdate', () => {
+			if (audio.duration && isFinite(audio.duration)) {
+				ringProgress.style.strokeDashoffset = String(RING_C * (1 - audio.currentTime / audio.duration));
+				timeEl.textContent = `${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;
+			}
+		});
+	});
+}
+document.addEventListener('astro:page-load', initBlogAudio);
+if (document.readyState !== 'loading') initBlogAudio();
+else document.addEventListener('DOMContentLoaded', initBlogAudio);
+</script>
