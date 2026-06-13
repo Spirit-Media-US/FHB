@@ -89,6 +89,10 @@ export interface Props {
 	painsSources?: CountrySource[];
 	whyHeading: string;
 	whyBlocks: CountryWhyBlock[];
+	globalHeading?: string;
+	globalIntroHtml?: string;
+	globalStats?: CountryStat[];
+	globalBlocks?: CountryWhyBlock[];
 	resourcesHeading?: string;
 	resourcesIntroHtml?: string;
 	resources?: CountrySource[];
@@ -147,6 +151,10 @@ const {
 	painsSources = [],
 	whyHeading,
 	whyBlocks,
+	globalHeading,
+	globalIntroHtml,
+	globalStats = [],
+	globalBlocks = [],
 	resourcesHeading,
 	resourcesIntroHtml,
 	resources = [],
@@ -419,6 +427,39 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 						})}
 					</ul>
 					<p class="mt-6 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Every language is a door. If you feel called to help open one, you can <a href="/partner" style="color: var(--color-brand);" class="hover:underline">sponsor a translation</a> &mdash; or simply <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">start reading the editions available today</a>.</p>
+				</div>
+			</section>
+		)}
+
+		<!-- Country and the world (diaspora + language spread + strategic role +
+		     how this nation carries FHB out). Shows global/strategic significance. -->
+		{(globalBlocks.length > 0 || globalStats.length > 0) && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-4xl">
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{globalHeading || `${country} and the world`}</h2>
+					{globalIntroHtml && (
+						<p class="mt-4 max-w-3xl text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={globalIntroHtml}></p>
+					)}
+					{globalStats.length > 0 && (
+						<dl class="mt-7 grid grid-cols-2 md:grid-cols-3 gap-5">
+							{globalStats.map((s) => (
+								<div class="rounded-2xl p-5" style={`background-color: ${tintWarm}; border: 1px solid rgba(0,0,0,0.06);`}>
+									<dt class="text-2xl font-medium leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{s.value}</dt>
+									<dd class="mt-2 text-sm leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{s.label}</dd>
+								</div>
+							))}
+						</dl>
+					)}
+					{globalBlocks.length > 0 && (
+						<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+							{globalBlocks.map((b) => (
+								<div class="rounded-2xl p-5" style={`background-color: ${tintBlue}; border: 1px solid rgba(0,0,0,0.06); border-left: 4px solid ${colorSecondary};`}>
+									<h3 class="text-lg font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{b.heading}</h3>
+									<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.bodyHtml}></p>
+								</div>
+							))}
+						</div>
+					)}
 				</div>
 			</section>
 		)}
