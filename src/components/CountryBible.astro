@@ -49,6 +49,9 @@ export interface Props {
 	country: string;
 	flag: string; // emoji flag, e.g. "🇮🇳"
 	flagImg?: string; // flag image URL (e.g. flagcdn) for national-pride display
+	countryWikipedia?: string; // Wikipedia URL → schema sameAs for the Country node (AEO entity binding)
+	lastUpdated?: string; // human display, e.g. "June 2026" (freshness signal)
+	lastUpdatedIso?: string; // ISO date, e.g. "2026-06-13" → schema dateModified
 	colorPrimary: string; // hex, e.g. "#FF9933" (saffron)
 	colorSecondary: string; // hex, e.g. "#138808" (green)
 	colorAccent?: string; // third flag color for dramatic section + bottom CTA (e.g. navy). Default FHB deep.
@@ -104,6 +107,9 @@ const {
 	country,
 	flag,
 	flagImg,
+	countryWikipedia,
+	lastUpdated,
+	lastUpdatedIso,
 	colorPrimary,
 	colorSecondary,
 	colorAccent = 'var(--color-deep)',
@@ -172,6 +178,11 @@ const breadcrumbSchema = {
 		{ '@type': 'ListItem', position: 3, name: country, item: PAGE_URL },
 	],
 };
+const countryNode = {
+	'@type': 'Country',
+	name: country,
+	...(countryWikipedia ? { sameAs: countryWikipedia } : {}),
+};
 const collectionSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'CollectionPage',
@@ -179,6 +190,9 @@ const collectionSchema = {
 	description,
 	url: PAGE_URL,
 	inLanguage: 'en',
+	...(lastUpdatedIso ? { dateModified: lastUpdatedIso } : {}),
+	about: countryNode,
+	spatialCoverage: countryNode,
 	isPartOf: {
 		'@type': 'WebSite',
 		name: "Father's Heart Bible™",
@@ -231,6 +245,9 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 					<span class="inline-flex items-center gap-1.5" style="color: var(--color-ink);">{flagImg && <img src={flagImg} alt="" width="18" height="12" class="rounded-[2px]" style="width: 18px; height: auto; border: 1px solid var(--color-hairline);" loading="lazy" decoding="async" aria-hidden="true" />}{country}</span>
 				</nav>
 				<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={directAnswerHtml}></p>
+				{lastUpdated && (
+					<p class="mt-3 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);">Last updated {lastUpdated}</p>
+				)}
 				<div class="mt-6 rounded-xl px-5 py-4" style={`background-color: ${tintWarm}; border-left: 4px solid ${colorPrimary};`}>
 					<p class="text-base font-semibold leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);"><span class="font-bold uppercase text-sm tracking-widest mr-2" style="color: var(--color-brand);">Key takeaway</span>{keyTakeaway}</p>
 				</div>
@@ -332,7 +349,12 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 			</section>
 		)}
 
-		<!-- How "our Father" meets the country (world religions + hope) -->
+		<!-- How "our Father" meets the country (world religions + hope).
+		     AUTHORING RULE: each faithsBlock must answer a specific ache from the
+		     "What pains <country>" section above (debt→home-with-no-ledger,
+		     despair→hope, isolation→belonging) AND the country's dominant
+		     faith/worldview. Pick the framing variant per country (other-faith /
+		     nominal-Christian / secular); never reuse India's Hindu-contrast verbatim. -->
 		{faithsBlocks.length > 0 && (
 			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
 				<div class="mx-auto max-w-3xl">
