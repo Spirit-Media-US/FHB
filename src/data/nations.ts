@@ -20,4 +20,12 @@ export const NATIONS: Nation[] = [
 			'One of the world’s largest English-reading populations can read the Father’s Heart Bible free today — with Hindi among the first translations on our roadmap.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6251d0054881b302d10b339359d39b107db86cc5-6669x4451.jpg',
 	},
+	{
+		slug: 'brazil',
+		country: 'Brazil',
+		title: 'The Bible in Brazil',
+		blurb:
+			'The largest Bible nation on earth — where the Father’s Heart Bible™ invites 217 million people to meet the Father in the book they already love.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/5f3eac722a31c44eaa305a80dbf004c27a222df7-4680x3744.jpg',
+	},
 ];
