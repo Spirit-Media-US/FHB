@@ -1,0 +1,183 @@
+---
+// /bible-in/uganda — ~85% Christian (Catholic + Anglican + Pentecostal). Deep
+// Christian heritage (the Uganda Martyrs, 1885–87). Standard Christian-majority
+// "our Father" framing. Signature pains: AIDS orphans + the legacy of the LRA
+// war in the north (abducted children / child soldiers) + hosting Africa's
+// largest refugee population. Luganda featured (~10M+). "Pearl of Africa,"
+// source of the Nile. Photos: Pexels.
+import CountryBible from '../../components/CountryBible.astro';
+
+const verses = [
+	{
+		ref: 'John 14:18',
+		slug: 'john',
+		ch: 14,
+		text: 'I will not leave you as orphans; I will come to you.',
+	},
+	{
+		ref: 'Psalm 68:5',
+		slug: 'psalms',
+		ch: 68,
+		text: 'A father to the fatherless, a defender of widows, is God in his holy dwelling.',
+	},
+	{
+		ref: 'John 3:16',
+		slug: 'john',
+		ch: 3,
+		text: 'For our Father so loved the world, that he gave his one and only Son, that whoever believes in him should not perish but have eternal life.',
+	},
+];
+
+const stats = [
+	{ label: 'People', value: '48 million' },
+	{ label: 'Christian', value: '~85% of Uganda' },
+	{ label: 'Christians', value: '~41 million' },
+	{ label: 'Refugees hosted', value: '~1.5 million' },
+];
+
+const faqs = [
+	{
+		question: 'Can I read the Bible online free in Uganda?',
+		answer:
+			"Yes. The Father's Heart Bible™ is free to read online with audio — no account, no purchase, no app. It is in English, an official language of Uganda widely used in schools and churches, so it is available today. A Luganda edition is among our highest priorities.",
+	},
+	{
+		question: 'Is there an audio Bible I can listen to in Uganda?',
+		answer:
+			"Yes. Every chapter of the Father's Heart Bible™ comes with free audio, so you can listen on any phone — a natural fit for Uganda's rich oral and church-singing tradition.",
+	},
+	{
+		question: 'What is the most popular Bible translation in Uganda?',
+		answer:
+			'Most Ugandan Christians read the Luganda Bible (Baibuli Entukuvu) or English versions like the NIV and KJV, alongside Scripture in heart languages such as Runyankole, Acholi, and Lango. Much Bible reading in Uganda is in Luganda or English.',
+	},
+	{
+		question: "Is the Father's Heart Bible available in Luganda?",
+		answer:
+			'Not yet — it is currently in English. Luganda, the most widely spoken language of Uganda with over 10 million speakers, is on our roadmap, alongside Runyankole, Acholi, and other Ugandan languages.',
+	},
+];
+---
+
+<CountryBible
+	slug="uganda"
+	country="Uganda"
+	flag="🇺🇬"
+	flagImg="/flags/ug.svg"
+	countryWikipedia="https://en.wikipedia.org/wiki/Uganda"
+	lastUpdated="June 2026"
+	lastUpdatedIso="2026-06-13"
+	colorPrimary="#D90000"
+	colorSecondary="#1A1A1A"
+	colorAccent="#FCDC04"
+	tintWarm="#FBE9E9"
+	tintCool="#FCF6DA"
+	tintBlue="#F1F0EE"
+	title="The Bible in Uganda — Read Free Online with Audio | Father's Heart Bible™"
+	description="Read the Bible free online in Uganda, with audio. The Father's Heart Bible™ reveals God as Father in the Pearl of Africa — free on any phone, in English now, with Luganda on the way."
+	h1="The Bible in Uganda"
+	heroSubhead="In the Pearl of Africa, at the source of the Nile — a fresh translation that reveals God as a Father near to the orphan and the weary. Free online, with audio."
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/4cf1cc4bf2602e3412c91fb7c9b5f27285504329-1880x1253.jpg"
+	heroAlt="The rapids at the source of the Nile in Jinja, Uganda"
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in Uganda right now.</strong> The <a href=\"https://fathersheartbible.com/read\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. English is an official language of Uganda, so it&rsquo;s available today &mdash; and the Father&rsquo;s Heart Bible&trade; reveals what this fervently Christian nation longs for: God known as a near and loving <em>Father</em>. Luganda and more heart languages are on our roadmap.`}
+	keyTakeaway="Uganda is one of the most Christian nations on earth — and the Father's Heart Bible™ reveals a Father near to the orphan, the displaced, and every searching heart."
+	glanceIntroHtml={`Uganda is the &ldquo;Pearl of Africa&rdquo; &mdash; the green land at the source of the Nile, ringed by Lake Victoria, the Rwenzori mountains, and the misty forests of the mountain gorilla. It is one of the most fervently Christian nations on earth, with a faith forged by the courage of the Uganda Martyrs.`}
+	stats={stats}
+	knownForHeading="What Uganda is known for"
+	knownForIntroHtml={`Few lands hold more beauty or warmer welcome than Uganda &mdash; the Pearl of Africa.`}
+	knownFor={[
+		{ label: 'The source of the Nile', text: 'At Jinja, the world’s longest river begins its journey from Lake Victoria toward the sea.' },
+		{ label: 'The Pearl of Africa', text: 'Churchill’s name for Uganda — for its green hills, lakes, and astonishing variety of life.' },
+		{ label: 'Mountain gorillas', text: 'Bwindi’s forests shelter nearly half the world’s remaining mountain gorillas.' },
+		{ label: 'The Uganda Martyrs', text: 'The young believers martyred in 1885–87 are honored worldwide — a cornerstone of African Christianity.' },
+		{ label: 'A young, faithful nation', text: 'Uganda has one of the youngest populations on earth — and one of the most devoted to the church.' },
+		{ label: 'Refuge for the displaced', text: 'Uganda hosts more refugees than any nation in Africa, with one of the world’s most welcoming policies.' },
+	]}
+	gallery={[
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/37555cd790158c06c273c554ddc88c454bc3d1b5-1880x1253.jpg', alt: 'A smiling Ugandan woman in a village' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/b901980f18c71659c394f12c727f1931ff76604a-1880x1253.jpg', alt: 'A joyful Ugandan woman with a green headscarf' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/f2f3ed6717bd4568ab217db8e52fd40b5750af4f-1880x1253.jpg', alt: 'Smiling Ugandan students walking to school' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/c5e5be6f9fcdb72e8ccc12ff70f82a79f0e7e9a7-1880x1253.jpg', alt: 'Four cheerful Ugandan children' },
+	]}
+	galleryCreditHtml={`Photos via <a href="https://www.pexels.com/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Pexels</a> &amp; <a href="https://commons.wikimedia.org/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Wikimedia Commons</a>.`}
+	galleryBottom={[
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/64d69eac5a31e2cdd21a997d8375bacc48fbd519-1880x1253.jpg', alt: 'A mountain gorilla in Bwindi forest, Uganda' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/6dbf77228afc503b064b44c472cff22ada31ebec-1733x1300.jpg', alt: 'A boat on Lake Victoria, Uganda' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/a5a008695ba0a4902ba357edacb34d7e48ebde64-1880x1253.jpg', alt: 'The Kampala skyline, Uganda' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/4cf1cc4bf2602e3412c91fb7c9b5f27285504329-1880x1253.jpg', alt: 'The source of the Nile at Jinja, Uganda' },
+	]}
+	galleryBottomCreditHtml={`Photos via <a href="https://www.pexels.com/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Pexels</a> &amp; <a href="https://commons.wikimedia.org/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Wikimedia Commons</a>.`}
+	faithHeading="Faith and the Bible in Uganda"
+	faithBodyHtml={`<p>Uganda is one of the most Christian nations on earth. About <strong>85% of Ugandans are Christian</strong> &mdash; roughly 41 million believers, Catholic, Anglican, and Pentecostal &mdash; with churches that overflow and a faith woven into daily life. The courage of the <strong>Uganda Martyrs</strong> in the 1880s still anchors the nation&rsquo;s devotion.</p><p>The Bible is treasured here. Most Ugandans read the Luganda Bible or English versions, alongside Scripture in Runyankole, Acholi, and other heart languages.</p><p>And yet, amid the scars of war in the north, the AIDS generation&rsquo;s orphans, and deep poverty, many know God more as a distant power than as a near Father. The need is not a first faith. It is to know, in the Bible Uganda already treasures, the Father who draws near to the suffering.</p>`}
+	sources={[
+		{ label: 'Religion in Uganda (Wikipedia)', url: 'https://en.wikipedia.org/wiki/Religion_in_Uganda' },
+		{ label: 'Uganda — Encyclopaedia Britannica', url: 'https://www.britannica.com/place/Uganda' },
+	]}
+	painsHeading="What pains Uganda"
+	painsIntroHtml={`Behind Uganda&rsquo;s beauty and fervent faith, families carry heavy burdens &mdash; and it is into these exact wounds that the Father&rsquo;s heart speaks.`}
+	painStats={[
+		{ value: '~2.5 million', label: 'orphaned and vulnerable children, many from the AIDS years' },
+		{ value: '~30,000+', label: 'children abducted by the LRA during decades of war in the north' },
+		{ value: '~1.5 million', label: 'refugees Uganda shelters — the most of any nation in Africa' },
+		{ value: 'one in five', label: 'Ugandans live below the national poverty line' },
+		{ value: 'the youngest', label: 'population on earth — a generation longing for a future' },
+		{ value: 'deep trauma', label: 'the legacy of war in the north still grieves families' },
+	]}
+	painsBodyHtml={`<p>A generation of children was orphaned by AIDS; tens of thousands more were abducted and torn from home by the LRA&rsquo;s long war in the north; and Uganda now shelters more refugees than any other African nation. Across the land, the wound of the orphan and the fatherless runs deep.</p><p>These are not statistics to a Father. They are children He longs to gather. Uganda does not need more distance &mdash; it needs to know it is held by a Father to the fatherless.</p>`}
+	painsSources={[
+		{ label: 'Orphans and vulnerable children — UNICEF Uganda', url: 'https://www.unicef.org/uganda/' },
+		{ label: 'LRA war & abducted children (HRW)', url: 'https://www.hrw.org/africa/uganda' },
+	]}
+	faithsHeading="What “our Father” offers Uganda"
+	faithsIntroHtml={`Uganda already believes. The Father&rsquo;s Heart Bible&trade; does not bring a new religion &mdash; it answers the deepest cry of a nation that knows loss: to be held by a Father who never abandons His children. For the first time in a fresh translation, Scripture reveals God not as a distant power, but as a <em>Father</em> near to the suffering.`}
+	faithsBlocks={[
+		{ heading: 'For the orphan', bodyHtml: `To a generation orphaned by AIDS and war, Scripture promises <a href="https://fathersheartbible.com/read/psalms/68" style="color: var(--color-gold);" class="hover:underline">&ldquo;a father to the fatherless&rdquo;</a> &mdash; and Jesus&rsquo; own words: <a href="https://fathersheartbible.com/read/john/14" style="color: var(--color-gold);" class="hover:underline">&ldquo;I will not leave you as orphans.&rdquo;</a>` },
+		{ heading: 'For the war-wounded north', bodyHtml: `To families torn by decades of conflict, the Father offers healing and homecoming &mdash; <a href="https://fathersheartbible.com/read/luke/15" style="color: var(--color-gold);" class="hover:underline">the Father who runs to meet His returning child</a>.` },
+		{ heading: 'For the displaced and the refugee', bodyHtml: `In a land that shelters more refugees than any in Africa, the Father&rsquo;s Heart Bible&trade; reveals a God who makes a home for the homeless and a family for the alone.` },
+		{ heading: 'For the one longing to belong', bodyHtml: `Across every tribe and tongue, the Father calls every Ugandan His beloved son or daughter &mdash; a belonging deeper than any line that divides.` },
+	]}
+	whyHeading="Why the Father's Heart Bible™ for Uganda"
+	whyBlocks={[
+		{ heading: 'God revealed as Father, near to the suffering', bodyHtml: `In one of Africa&rsquo;s most faithful nations, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
+		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; built for the basic smartphones most Ugandans use.` },
+		{ heading: 'Luganda leads the way', bodyHtml: `English is available today, and Luganda &mdash; Uganda&rsquo;s most widely spoken tongue, over 10 million speakers &mdash; leads a roadmap that includes Runyankole and Acholi. See the <a href="/bible-in/uganda/#translation-opportunity" style="color: var(--color-brand);" class="hover:underline">translation opportunity</a>.` },
+	]}
+	globalHeading="Uganda and the world"
+	globalIntroHtml={`Uganda is a young, fervent, sending church at the heart of Africa &mdash; and a refuge for the displaced of a whole region. To give Uganda the Father&rsquo;s heart is to strengthen a nation already pouring itself out for others.`}
+	globalStats={[
+		{ value: '~10 million', label: 'Luganda speakers a Luganda edition would reach' },
+		{ value: '#1 in Africa', label: 'Uganda hosts more refugees than any other African nation' },
+		{ value: 'a sending church', label: 'Ugandan missionaries serve across Africa and the world' },
+	]}
+	globalBlocks={[
+		{ heading: 'A refuge for the region', bodyHtml: `Uganda shelters some 1.5 million refugees from South Sudan, DR Congo, and beyond. As it receives the Father&rsquo;s Heart Bible&trade;, it can place it into the hands of the displaced of a whole region.` },
+		{ heading: 'A young, sending church', bodyHtml: `With one of the youngest, most fervent Christian populations on earth, Uganda already sends missionaries across Africa &mdash; ready to carry the Father&rsquo;s heart outward.` },
+		{ heading: 'A crossroads of tongues', bodyHtml: `From Uganda, the Father&rsquo;s heart can reach Luganda, Runyankole, Acholi, Swahili, and the many peoples who meet in this central African land.` },
+		{ heading: 'The Ugandan diaspora', bodyHtml: `Ugandans abroad &mdash; in the UK, US, and across the Gulf and Africa &mdash; carry their faith and their language into the world.` },
+	]}
+	wordHeading="His Word will not return void"
+	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do. From the source of the Nile to every home touched by war and loss, His Word will not return empty &mdash; it will find the orphan and the weary, and it will not fail.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;My word&hellip; will not return to me empty, but will accomplish that which I purpose.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
+	resourcesHeading="Learn more about Uganda"
+	resourcesIntroHtml={`Trusted sources for the facts on this page &mdash; and for going deeper into Uganda&rsquo;s people, faith, and story.`}
+	resources={[
+		{ label: 'Uganda — Wikipedia', url: 'https://en.wikipedia.org/wiki/Uganda' },
+		{ label: 'Religion in Uganda — Wikipedia', url: 'https://en.wikipedia.org/wiki/Religion_in_Uganda' },
+		{ label: 'Uganda — Encyclopaedia Britannica', url: 'https://www.britannica.com/place/Uganda' },
+		{ label: 'Uganda — UNICEF', url: 'https://www.unicef.org/uganda/' },
+		{ label: 'Uganda — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/UG' },
+	]}
+	opportunityHeading="The translation opportunity in Uganda"
+	opportunityIntroHtml={`English reaches many Ugandans, but the nation&rsquo;s heart beats in Luganda &mdash; with Runyankole, Acholi, and dozens more still waiting for a Bible in the Father&rsquo;s voice.`}
+	languages={[
+		{ language: 'English', speakers: 'available now', status: 'Available' },
+		{ language: 'Luganda', speakers: '10 million', status: 'On the roadmap' },
+		{ language: 'Runyankole', speakers: '4 million', status: 'Translation needed' },
+		{ language: 'Acholi', speakers: '1.5 million', status: 'Translation needed' },
+	]}
+	verses={verses}
+	keepReadingHtml={`Begin with the <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why the Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> &mdash; including <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start</a> and <a href="/guides/what-is-the-gospel/" style="color: var(--color-brand);" class="hover:underline">what the gospel is</a>. Browse Scripture by theme on our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> pages.`}
+	faqs={faqs}
+	ctaMidHeading="Know God as a Father near to you"
+	ctaMidBodyHtml={`Uganda knows God. Now read Him in His own voice as Father &mdash; free, with audio, on any phone.`}
+	ctaBottomBodyHtml={`From Genesis to Revelation, free online with audio &mdash; a fresh translation that reveals God as a loving Father to every beloved son and daughter, in Uganda and across the heart of Africa.`}
+/>

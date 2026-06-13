@@ -76,4 +76,20 @@ export const NATIONS: Nation[] = [
 			'One of the oldest Christian nations on earth — where the Father’s Heart Bible™ reveals, beneath an ancient faith, a God who is Abba, Father. Amharic leads the roadmap.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/cddb1c0e73aa24a9a515ac8ca0b9c86c3604b12a-1880x1253.jpg',
 	},
+	{
+		slug: 'tanzania',
+		country: 'Tanzania',
+		title: 'The Bible in Tanzania',
+		blurb:
+			'The birthplace of Swahili — where the Father’s Heart Bible™ reveals a Father near to the orphan and the weary, in the tongue that unites East Africa. Swahili leads the roadmap.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/a2b368da9ba333ba6711cd3cbb148f6542c00bf6-1880x1246.jpg',
+	},
+	{
+		slug: 'uganda',
+		country: 'Uganda',
+		title: 'The Bible in Uganda',
+		blurb:
+			'The Pearl of Africa, at the source of the Nile — where the Father’s Heart Bible™ reveals a Father near to the orphan and the displaced, in one of earth’s most Christian nations. Luganda leads the roadmap.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/4cf1cc4bf2602e3412c91fb7c9b5f27285504329-1880x1253.jpg',
+	},
 ];
