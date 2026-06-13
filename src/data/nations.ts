@@ -28,4 +28,12 @@ export const NATIONS: Nation[] = [
 			'The largest Bible nation on earth — where the Father’s Heart Bible™ invites 217 million people to meet the Father in the book they already love.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/d5bf406c5039b3d5ff0262302cdb49a56257060c-2497x3744.jpg',
 	},
+	{
+		slug: 'mexico',
+		country: 'Mexico',
+		title: 'The Bible in Mexico',
+		blurb:
+			'The largest Spanish-speaking nation on earth — where the Father’s Heart Bible™ invites a deeply faithful people to meet the Father personally. Spanish is our #1 priority.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/b50f17816ea816a8f110c2ffddb17fc0a6544fc0-3264x2176.jpg',
+	},
 ];
