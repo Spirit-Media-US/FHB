@@ -30,6 +30,15 @@ const {
 // When there's no CTA (e.g. /partner), the subheading's bottom margin + the
 // section's bottom padding would render as dead white space. Collapse them.
 const hasCta = !!(primaryCtaLabel && primaryCtaHref);
+
+// Responsive hero: derive mobile/desktop widths from the Sanity URL's w= param
+// so phones don't download the full-width hero (e.g. /partner shipped a 1920w
+// image to 390px screens → ~10s mobile LCP). 720w mobile, 1280w desktop.
+const hasW = imageSrc && /[?&]w=\d+/.test(imageSrc);
+const heroSrcset = hasW
+	? `${imageSrc.replace(/([?&])w=\d+/, '$1w=720')} 720w, ${imageSrc.replace(/([?&])w=\d+/, '$1w=1280')} 1280w`
+	: undefined;
+const heroSrcMain = hasW ? imageSrc.replace(/([?&])w=\d+/, '$1w=1280') : imageSrc;
 ---
 
 <section
@@ -39,7 +48,9 @@ const hasCta = !!(primaryCtaLabel && primaryCtaHref);
 	{imageSrc ? (
 		<img
 			class="absolute inset-0 w-full h-full object-cover"
-			src={imageSrc}
+			src={heroSrcMain}
+			srcset={heroSrcset}
+			sizes="100vw"
 			alt=""
 			aria-hidden="true"
 			fetchpriority="high"
