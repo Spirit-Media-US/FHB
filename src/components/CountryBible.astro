@@ -268,7 +268,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				<div class="mt-5 space-y-5 text-base lg:text-lg leading-relaxed prose-fhb" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={faithBodyHtml}></div>
 				{sources.length > 0 && (
 					<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">
-						Sources: {sources.map((s, i) => (<>{i > 0 && <span aria-hidden="true"> · </span>}<a href={s.url} target="_blank" rel="noopener noreferrer" style={`color: ${colorSecondary};`} class="hover:underline">{s.label}</a></>))}
+						Sources: {sources.map((s, i) => (<>{i > 0 && <span aria-hidden="true"> · </span>}<a href={s.url} target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">{s.label}</a></>))}
 					</p>
 				)}
 			</div>
@@ -297,7 +297,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 					)}
 					{painsSources.length > 0 && (
 						<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">
-							Sources: {painsSources.map((s, i) => (<>{i > 0 && <span aria-hidden="true"> · </span>}<a href={s.url} target="_blank" rel="noopener noreferrer" style={`color: ${colorSecondary};`} class="hover:underline">{s.label}</a></>))}
+							Sources: {painsSources.map((s, i) => (<>{i > 0 && <span aria-hidden="true"> · </span>}<a href={s.url} target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">{s.label}</a></>))}
 						</p>
 					)}
 				</div>
@@ -315,7 +315,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 					<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
 						{faithsBlocks.map((b) => (
 							<div class="rounded-2xl p-5" style={`background-color: ${tintCool}; border: 1px solid rgba(0,0,0,0.06); border-left: 4px solid ${colorSecondary};`}>
-								<h3 class="text-xl font-medium leading-snug" style={`font-family: var(--font-serif); color: ${colorSecondary};`}>{b.heading}</h3>
+								<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{b.heading}</h3>
 								<p class="mt-2 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.bodyHtml}></p>
 							</div>
 						))}
@@ -366,7 +366,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 							);
 						})}
 					</ul>
-					<p class="mt-6 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Every language is a door. If you feel called to help open one, you can <a href="/partner" style={`color: ${colorSecondary};`} class="hover:underline">sponsor a translation</a> &mdash; or simply <a href="https://fathersheartbible.com/read" style={`color: ${colorSecondary};`} class="hover:underline">start reading the editions available today</a>.</p>
+					<p class="mt-6 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Every language is a door. If you feel called to help open one, you can <a href="/partner" style="color: var(--color-brand);" class="hover:underline">sponsor a translation</a> &mdash; or simply <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">start reading the editions available today</a>.</p>
 				</div>
 			</section>
 		)}
@@ -380,7 +380,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 					{verses.map((v) => (
 						<a href={`https://fathersheartbible.com/read/${v.slug}/${v.ch}`} class="block rounded-2xl p-5 no-underline transition-opacity hover:opacity-90" style={`background-color: ${tintWarm}; border: 1px solid rgba(0,0,0,0.06);`}>
 							<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.text}&rdquo;</p>
-							<span class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold" style={`color: ${colorSecondary}; font-family: var(--font-sans);`}>{v.ref}<span aria-hidden="true">&rarr;</span></span>
+							<span class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">{v.ref}<span aria-hidden="true">&rarr;</span></span>
 						</a>
 					))}
 				</div>
@@ -392,7 +392,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 			<div class="mx-auto max-w-2xl text-center">
 				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{ctaMidHeading}</h2>
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaMidBodyHtml}></p>
-				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline" style={`background-color: ${colorPrimary}; color: var(--color-ink); font-family: var(--font-sans);`}>Read FHB free<span aria-hidden="true">&rarr;</span></a>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read FHB free<span aria-hidden="true">&rarr;</span></a>
 			</div>
 		</section>
 
@@ -417,7 +417,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 							<li>
 								<a href={r.url} target="_blank" rel="noopener noreferrer" class="flex items-center justify-between gap-3 rounded-xl px-5 py-4 no-underline transition-opacity hover:opacity-90" style={`background-color: ${tintCool}; border: 1px solid rgba(0,0,0,0.06);`}>
 									<span class="text-base font-medium leading-snug" style="font-family: var(--font-sans); color: var(--color-ink);">{r.label}</span>
-									<span class="shrink-0 text-sm font-semibold" style={`color: ${colorSecondary};`} aria-hidden="true">&nearr;</span>
+									<span class="shrink-0 text-sm font-semibold" style="color: var(--color-brand);" aria-hidden="true">&nearr;</span>
 								</a>
 							</li>
 						))}
@@ -446,8 +446,8 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 			<div class="mx-auto max-w-2xl text-center">
 				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible free</h2>
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaBottomBodyHtml}></p>
-				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline" style={`background-color: ${colorPrimary}; color: var(--color-ink); font-family: var(--font-sans);`}>Start reading<span aria-hidden="true">&rarr;</span></a>
-				<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">Believe in the mission? <a href="/partner" style={`color: ${colorSecondary};`} class="hover:underline">Help take it to the nations &rarr;</a></p>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Start reading<span aria-hidden="true">&rarr;</span></a>
+				<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">Believe in the mission? <a href="/partner" style="color: var(--color-brand);" class="hover:underline">Help take it to the nations &rarr;</a></p>
 			</div>
 		</section>
 	</main>
