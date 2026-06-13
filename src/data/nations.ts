@@ -77,6 +77,14 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3f849b700a3a0a02c6094ea83abac9de097c5161-1880x993.jpg',
 	},
 	{
+		slug: 'hong-kong',
+		country: 'Hong Kong',
+		title: 'The Bible in Hong Kong',
+		blurb:
+			'A gateway between China and the world, with a deep Christian heritage — where the Father’s Heart Bible™ longs to reveal, in Cantonese, a Father near to a weary, fast-moving people. Cantonese among our priorities.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/66cd8a0b2f94502af5a326582836a7fc0a1edd55-1880x1253.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
