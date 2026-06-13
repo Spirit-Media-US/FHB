@@ -70,6 +70,8 @@ export interface Props {
 	knownFor?: CountryKnownFor[];
 	gallery?: CountryPhoto[];
 	galleryCreditHtml?: string;
+	galleryBottom?: CountryPhoto[];
+	galleryBottomCreditHtml?: string;
 	faithHeading: string;
 	faithBodyHtml: string; // multi-paragraph allowed
 	sources: CountrySource[];
@@ -123,6 +125,8 @@ const {
 	knownFor = [],
 	gallery = [],
 	galleryCreditHtml,
+	galleryBottom = [],
+	galleryBottomCreditHtml,
 	faithHeading,
 	faithBodyHtml,
 	sources,
@@ -464,6 +468,22 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				</div>
 			</div>
 		</section>
+
+		<!-- Photo gallery row (before bottom CTA) -->
+		{galleryBottom.length > 0 && (
+			<section class="px-6 pt-10 pb-4 lg:px-8 lg:pt-14" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-5xl">
+					<div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+						{galleryBottom.map((p) => (
+							<img src={`${p.src}?w=600&h=420&fit=crop&crop=entropy&fm=webp&q=70`} srcset={`${p.src}?w=400&h=280&fit=crop&crop=entropy&fm=webp&q=68 400w, ${p.src}?w=600&h=420&fit=crop&crop=entropy&fm=webp&q=70 600w`} sizes="(max-width: 767px) 45vw, 23vw" alt={p.alt} width="600" height="420" class="w-full h-36 md:h-48 object-cover rounded-xl" style="border: 1px solid rgba(0,0,0,0.06);" loading="lazy" decoding="async" />
+						))}
+					</div>
+					{galleryBottomCreditHtml && (
+						<p class="mt-3 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={galleryBottomCreditHtml}></p>
+					)}
+				</div>
+			</section>
+		)}
 
 		<!-- Bottom CTA (read-first) -->
 		<section class="px-6 py-14 lg:px-8 lg:py-20" style="background-color: var(--color-surface-low);">
