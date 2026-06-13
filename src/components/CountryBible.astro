@@ -6,6 +6,7 @@
 // "why FHB" blocks, scripture sampler, keep-reading links, FAQ, and read-first
 // CTAs. Architecture rules (read-first CTA, English-first) live in
 // memory/project_fhb_country_pages.md. Mirror the /verses + /guides patterns.
+import { NATIONS } from '../data/nations';
 import Layout from '../layouts/Layout.astro';
 
 export interface CountryStat {
@@ -161,6 +162,7 @@ const {
 } = Astro.props;
 
 const PAGE_URL = `https://fathersheartbible.com/bible-in/${slug}/`;
+const otherNations = NATIONS.filter((n) => n.slug !== slug);
 const HERO_IMG = `${heroBase}?w=1400&h=560&fit=crop&crop=entropy&fm=webp&q=72`;
 const OG_IMG = `${heroBase}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
 
@@ -514,6 +516,19 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaBottomBodyHtml}></p>
 				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Start reading<span aria-hidden="true">&rarr;</span></a>
 				<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">Believe in the mission? <a href="/partner" style="color: var(--color-brand);" class="hover:underline">Help take it to the nations &rarr;</a></p>
+			</div>
+		</section>
+
+		<!-- Footnote (above the shared global footer): country-hub discoverability + cross-links -->
+		<section class="px-6 py-6 lg:px-8" style="background-color: var(--color-surface); border-top: 1px solid var(--color-hairline);">
+			<div class="mx-auto max-w-4xl text-center">
+				<p class="text-xs leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<span class="font-semibold" style="color: var(--color-ink);">The Father&rsquo;s Heart Bible&trade; around the world</span> &mdash; read free online, country by country.
+					{otherNations.length > 0 && (
+						<span>{' '}Also explore: {otherNations.map((n, i) => (<>{i > 0 && <span aria-hidden="true"> &middot; </span>}<a href={`/bible-in/${n.slug}/`} style="color: var(--color-brand);" class="hover:underline">{n.country}</a></>))}.</span>
+					)}
+					{' '}<a href="/bible-in/" style="color: var(--color-brand);" class="hover:underline font-semibold">Browse all nations &rarr;</a>
+				</p>
 			</div>
 		</section>
 	</main>
