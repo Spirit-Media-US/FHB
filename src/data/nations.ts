@@ -93,6 +93,14 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/ddae14bf38118338b36097d6a8399d2d0b5c9b9d-1880x1264.jpg',
 	},
 	{
+		slug: 'south-korea',
+		country: 'South Korea',
+		title: 'The Bible in South Korea',
+		blurb:
+			'One of Asia’s great sending churches, yet a people weary beneath their success — where the Father’s Heart Bible™ longs to reveal afresh, in Korean, the Father who gives rest. Korean among our priorities.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/2fc21064a603d292015c6e62cec99f19f2e014c9-1880x1253.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
