@@ -175,6 +175,30 @@ const {
 
 const PAGE_URL = `https://fathersheartbible.com/bible-in/${slug}/`;
 const otherNations = NATIONS.filter((n) => n.slug !== slug);
+
+// --- Sponsor-a-translation maths (bottom section) ---
+// Each language unlocks for a one-time $50,000 (translation + print + digital +
+// audio). Cost-per-reader = $50,000 / speakers, parsed from each language's
+// `speakers` string ("550 million", "1.7 million"). Available editions skipped.
+const TRANSLATION_COST = 50000;
+function parseReaders(s: string): number | null {
+	const m = (s || '').match(/([\d.]+)\s*(billion|million)/i);
+	if (!m) return null;
+	return parseFloat(m[1]) * (m[2].toLowerCase() === 'billion' ? 1e9 : 1e6);
+}
+function perReaderLabel(readers: number): string {
+	const cents = (TRANSLATION_COST / readers) * 100;
+	if (cents < 0.01) return 'less than 0.01¢ per reader';
+	if (cents < 1) return `${cents.toFixed(2)}¢ per reader`;
+	if (cents < 10) return `${cents.toFixed(1)}¢ per reader`;
+	return `${Math.round(cents)}¢ per reader`;
+}
+const sponsorLangs = languages
+	.filter((l) => l.status !== 'Available')
+	.map((l) => ({ ...l, readers: parseReaders(l.speakers) }))
+	.filter((l): l is typeof l & { readers: number } => l.readers != null);
+const primaryRoadmapLang =
+	languages.find((l) => l.status === 'On the roadmap')?.language || country;
 const HERO_IMG = `${heroBase}?w=1400&h=560&fit=crop&crop=entropy&fm=webp&q=72`;
 const OG_IMG = `${heroBase}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
 
@@ -574,6 +598,33 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">Believe in the mission? <a href="/partner" style="color: var(--color-brand);" class="hover:underline">Help take it to the nations &rarr;</a></p>
 			</div>
 		</section>
+
+		<!-- Sponsor a translation (bottom invitation, under the read-free CTA) -->
+		{sponsorLangs.length > 0 && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${tintWarm};`}>
+				<div class="mx-auto max-w-4xl">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style={`color: ${colorPrimary}; font-family: var(--font-sans);`}>Sponsor a translation</p>
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Put the Father&rsquo;s Heart Bible&trade; in {country}&rsquo;s languages</h2>
+					<p class="mt-4 max-w-3xl text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Each language unlocks for a one-time <strong style="color: var(--color-ink);">$50,000</strong> &mdash; full translation, print, digital, and audio. English shows the model: $50,000 to translate plus $50,000 for the ComfortLeather&trade; edition &mdash; <strong style="color: var(--color-ink);">$100,000 to reach 1.5 billion readers, less than one hundredth of a cent each.</strong></p>
+					<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+						{sponsorLangs.map((l) => (
+							<div class="rounded-2xl p-5" style="background-color: var(--color-surface-lowest); border: 1px solid rgba(0,0,0,0.06);">
+								<div class="flex items-baseline justify-between gap-3">
+									<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{l.language}</h3>
+									<span class="shrink-0 text-sm font-semibold" style={`color: ${colorPrimary}; font-family: var(--font-sans);`}>{l.speakers}</span>
+								</div>
+								<p class="mt-3 flex items-baseline gap-2">
+									<span class="text-2xl font-medium" style="font-family: var(--font-serif); color: var(--color-ink);">$50,000</span>
+									<span class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">one-time &middot; {perReaderLabel(l.readers)}</span>
+								</p>
+							</div>
+						))}
+					</div>
+					<p class="mt-7 max-w-3xl text-base lg:text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">There is no greater purpose, destiny, or legacy than to reveal the Father&rsquo;s heart to the {primaryRoadmapLang}-speaking peoples of the world.</p>
+					<a href="/partner" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Sponsor a language<span aria-hidden="true">&rarr;</span></a>
+				</div>
+			</section>
+		)}
 
 		<!-- Footnote (above the shared global footer): country-hub discoverability + cross-links -->
 		<section class="px-6 py-6 lg:px-8" style="background-color: var(--color-surface); border-top: 1px solid var(--color-hairline);">
