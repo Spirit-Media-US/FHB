@@ -18,6 +18,6 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in India',
 		blurb:
 			'One of the world’s largest English-reading populations can read the Father’s Heart Bible free today — with Hindi among the first translations on our roadmap.',
-		img: 'https://cdn.sanity.io/images/rusi1hyi/production/82a0a4ceff7d68b1489b2085f692af2ed4f0e58c-6016x4016.jpg',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6251d0054881b302d10b339359d39b107db86cc5-6669x4451.jpg',
 	},
 ];
