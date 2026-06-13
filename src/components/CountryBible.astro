@@ -108,7 +108,9 @@ export interface Props {
 	// (e.g. English print + ComfortLeather™ on the USA page, where the language
 	// is already free to READ online but PUBLISHING it still needs sponsorship).
 	// When set, all roadmap/needed languages drop to "Also available" below.
-	sponsorFeatured?: { label: string; speakers: string; note?: string }[];
+	// `reach` (optional) drives the cost-per-reader math when `speakers` isn't a
+	// number (e.g. ComfortLeather™ "premium keepsake" still reaches 1.5B readers).
+	sponsorFeatured?: { label: string; speakers: string; note?: string; reach?: string }[];
 	sponsorIntroHtml?: string;
 	sponsorVisionHtml?: string;
 	verses: CountryVerse[];
@@ -228,7 +230,7 @@ const featuredCards = hasCustomFeatured
 			language: s.label,
 			speakers: s.speakers,
 			note: s.note,
-			readers: parseReaders(s.speakers),
+			readers: parseReaders(s.reach || s.speakers),
 		}))
 	: featured.map((l) => ({
 			language: l.language,
@@ -665,7 +667,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 										</div>
 										<p class="mt-3 flex items-baseline gap-2">
 											<span class="text-2xl font-medium" style="font-family: var(--font-serif); color: var(--color-ink);">$50,000</span>
-											<span class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">one-time &middot; {l.note || (l.readers ? perReaderLabel(l.readers) : 'full publication')}</span>
+											<span class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">one-time &middot; {l.readers ? perReaderLabel(l.readers) : (l.note || 'full publication')}</span>
 										</p>
 									</div>
 								))}
