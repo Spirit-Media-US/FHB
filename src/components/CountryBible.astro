@@ -206,6 +206,10 @@ const phase2 = featuredSponsor.length
 	? sponsorLangs.filter((l) => l.status === 'Translation needed')
 	: [];
 const SPONSOR_VIDEO_ID = 'eD06eSXd2uU';
+// Spam-safe mailto (matches /partner UnlockMap): address assembled on click so
+// kevin@… never appears in the served HTML.
+const pledgeOnclick =
+	"event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent(this.dataset.subj)";
 const HERO_IMG = `${heroBase}?w=1400&h=560&fit=crop&crop=entropy&fm=webp&q=72`;
 const OG_IMG = `${heroBase}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
 
@@ -630,7 +634,18 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 							))}
 						</div>
 						{phase2.length > 0 && (
-							<p class="mt-4 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">We can also open the door for {phase2.map((l) => l.language).join(', ')} &mdash; these and more languages in Phase 2.</p>
+							<div class="mt-5">
+								<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">Also available for sponsorship</p>
+								<ul class="divide-y" style="border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline);">
+									{phase2.map((l) => (
+										<li class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 py-2.5 text-sm" style="font-family: var(--font-sans);">
+											<span class="font-semibold" style="color: var(--color-ink);">{l.language}</span>
+											<span style="color: var(--color-muted);">$50,000 &middot; {l.speakers} &middot; {perReaderLabel(l.readers)}</span>
+											<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" data-subj={`Sponsor ${l.language} — Father's Heart Bible`} onclick={pledgeOnclick} class="font-semibold hover:underline" style="color: var(--color-brand);">Sponsor {l.language} &rarr;</a>
+										</li>
+									))}
+								</ul>
+							</div>
 						)}
 						<p class="mt-6 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">There is no greater purpose, destiny, or legacy than to reveal the Father&rsquo;s heart to the {primaryRoadmapLang}-speaking peoples of the world.</p>
 						<a href="/partner" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Sponsor a language<span aria-hidden="true">&rarr;</span></a>
