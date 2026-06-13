@@ -183,15 +183,17 @@ const otherNations = NATIONS.filter((n) => n.slug !== slug);
 const TRANSLATION_COST = 50000;
 function parseReaders(s: string): number | null {
 	const m = (s || '').match(/([\d.]+)\s*(billion|million)/i);
-	if (!m) return null;
-	return parseFloat(m[1]) * (m[2].toLowerCase() === 'billion' ? 1e9 : 1e6);
+	if (m) return parseFloat(m[1]) * (m[2].toLowerCase() === 'billion' ? 1e9 : 1e6);
+	const digits = (s || '').replace(/[^\d]/g, '');
+	return digits ? parseInt(digits, 10) : null;
 }
 function perReaderLabel(readers: number): string {
 	const cents = (TRANSLATION_COST / readers) * 100;
 	if (cents < 0.01) return 'less than 0.01¢ per reader';
 	if (cents < 1) return `${cents.toFixed(2)}¢ per reader`;
 	if (cents < 10) return `${cents.toFixed(1)}¢ per reader`;
-	return `${Math.round(cents)}¢ per reader`;
+	if (cents < 100) return `${Math.round(cents)}¢ per reader`;
+	return `$${(cents / 100).toFixed(2)} per reader`;
 }
 const sponsorLangs = languages
 	.filter((l) => l.status !== 'Available')
