@@ -313,3 +313,15 @@ h6 {
 [data-counter] {
 	display: inline-block;
 }
+
+/* ── A11y: link-in-text-block (WCAG 1.4.1) ──────────────────────────────────
+   Inline body links use `hover:underline` (brand color + underline only on
+   hover), so they're distinguished from surrounding text by color alone — a
+   WCAG fail. Make the underline persistent. Scoped to .hover:underline links,
+   so nav (.chrome-nav-link, text-decoration:none) and CTAs (.no-underline) are
+   untouched. */
+a.hover\:underline {
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+	text-decoration-thickness: from-font;
+}
