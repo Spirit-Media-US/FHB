@@ -60,4 +60,12 @@ export const NATIONS: Nation[] = [
 			'The heart of East Africa — where the Father’s Heart Bible™ reveals a Father near to the orphan and the weary, in a fervently Christian land. Swahili leads the roadmap.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/275b03def9aacaee75f4e796b910385dc632eacd-1880x1253.jpg',
 	},
+	{
+		slug: 'dr-congo',
+		country: 'DR Congo',
+		title: 'The Bible in DR Congo',
+		blurb:
+			'The heart of Africa and the largest French-speaking nation on earth — where the Father’s Heart Bible™ reveals a Father near to the displaced and the orphan. French leads the roadmap.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/59c51a44a4c06371f743249efc2ce4026e25c81a-1880x1253.jpg',
+	},
 ];
