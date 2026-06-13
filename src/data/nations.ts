@@ -85,6 +85,14 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/66cd8a0b2f94502af5a326582836a7fc0a1edd55-1880x1253.jpg',
 	},
 	{
+		slug: 'vietnam',
+		country: 'Vietnam',
+		title: 'The Bible in Vietnam',
+		blurb:
+			'A resilient land with one of Asia’s fastest-growing churches — where the Father’s Heart Bible™ longs to reveal, in Vietnamese, a Father near to the orphan and the searching. Vietnamese among our priorities.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/ddae14bf38118338b36097d6a8399d2d0b5c9b9d-1880x1264.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
