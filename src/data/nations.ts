@@ -21,6 +21,22 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/2658a7764aeef2dbe21f813fa7027e46dd261083-1880x1253.jpg',
 	},
 	{
+		slug: 'china',
+		country: 'China',
+		title: 'The Bible in China',
+		blurb:
+			'The world’s largest people, home to one of the fastest-growing churches in history — where the Father’s Heart Bible™ longs to reveal, in Mandarin, a Father near to the weary. Mandarin among our highest priorities.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/8929e8beea5b7ea98aafaa68ae190802d03117aa-1733x1300.jpg',
+	},
+	{
+		slug: 'egypt',
+		country: 'Egypt',
+		title: 'The Bible in Egypt',
+		blurb:
+			'A land woven through Scripture itself, home to one of the oldest churches on earth — where the Father’s Heart Bible™ longs to reveal, in Arabic, the Father who called His son out of Egypt. Arabic among our highest priorities.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/5288503725b20a8271e8783cb406e7cf4c0e7640-1880x1253.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
