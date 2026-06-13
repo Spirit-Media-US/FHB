@@ -181,7 +181,10 @@
 </style>
 
 <script>
-	import { loadStripe } from '@stripe/stripe-js';
+	// `/pure` so merely importing this does NOT auto-load js.stripe.com on page
+	// load (the default entry warms Stripe.js eagerly → ~800ms TBT on /partner).
+	// Stripe.js now loads only when loadStripe() is called on the donate click.
+	import { loadStripe } from '@stripe/stripe-js/pure';
 
 	// Publishable key — public, safe in source. Live key for production donations.
 	const STRIPE_PK = 'pk_live_51MX6GXIZWVjKTV59eSCSw9DGhLjLGYx5B50VVmErOooiJgLKM9rGLYt5toXa6d4aize8TJe4t3QAp7NJW7GPEOTp00mAjvGWgf';
