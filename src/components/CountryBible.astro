@@ -615,56 +615,56 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 		<!-- Sponsor a translation (bottom invitation, under the read-free CTA) -->
 		{sponsorLangs.length > 0 && (
 			<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${tintWarm};`}>
-				<div class="mx-auto max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
-					<!-- Left: sponsor copy + featured language(s) -->
-					<div class="order-2 lg:order-1">
-						<p class="text-xs font-semibold uppercase tracking-widest mb-3" style={`color: ${colorPrimary}; font-family: var(--font-sans);`}>Sponsor a translation</p>
-						<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Open the door for {country}&rsquo;s languages</h2>
-						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">A one-time <strong style="color: var(--color-ink);">$50,000</strong> opens the door for an entire language &mdash; full translation, print, digital, and audio.</p>
-						<div class="mt-6 space-y-4">
-							{featured.map((l) => (
-								<div class="rounded-2xl p-5" style="background-color: var(--color-surface-lowest); border: 1px solid rgba(0,0,0,0.06);">
-									<div class="flex items-baseline justify-between gap-3">
-										<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{l.language}</h3>
-										<span class="shrink-0 text-sm font-semibold" style={`color: ${colorPrimary}; font-family: var(--font-sans);`}>{l.speakers}</span>
+				<div class="mx-auto max-w-5xl">
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+						<div class="order-2 lg:order-1">
+							<p class="text-xs font-semibold uppercase tracking-widest mb-3" style={`color: ${colorPrimary}; font-family: var(--font-sans);`}>Sponsor a translation</p>
+							<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Open the door for {country}&rsquo;s languages</h2>
+							<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">A one-time <strong style="color: var(--color-ink);">$50,000</strong> opens the door for an entire language &mdash; full translation, print, digital, and audio.</p>
+							<div class="mt-6 space-y-4">
+								{featured.map((l) => (
+									<div class="rounded-2xl p-5" style="background-color: var(--color-surface-lowest); border: 1px solid rgba(0,0,0,0.06);">
+										<div class="flex items-baseline justify-between gap-3">
+											<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{l.language}</h3>
+											<span class="shrink-0 text-sm font-semibold" style={`color: ${colorPrimary}; font-family: var(--font-sans);`}>{l.speakers}</span>
+										</div>
+										<p class="mt-3 flex items-baseline gap-2">
+											<span class="text-2xl font-medium" style="font-family: var(--font-serif); color: var(--color-ink);">$50,000</span>
+											<span class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">one-time &middot; {perReaderLabel(l.readers)}</span>
+										</p>
 									</div>
-									<p class="mt-3 flex items-baseline gap-2">
-										<span class="text-2xl font-medium" style="font-family: var(--font-serif); color: var(--color-ink);">$50,000</span>
-										<span class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">one-time &middot; {perReaderLabel(l.readers)}</span>
-									</p>
-								</div>
-							))}
-						</div>
-						{phase2.length > 0 && (
-							<div class="mt-5">
-								<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">Also available for sponsorship</p>
-								<ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
-									{phase2.map((l) => (
-										<li class="text-sm leading-snug" style="font-family: var(--font-sans);">
-											<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" data-subj={`Sponsor ${l.language} — Father's Heart Bible`} onclick={pledgeOnclick} class="font-semibold hover:underline" style="color: var(--color-brand);">{l.language} &rarr;</a>
-											<span class="block" style="color: var(--color-muted);">$50,000 &middot; {l.speakers} &middot; {perReaderLabel(l.readers)}</span>
-										</li>
-									))}
-								</ul>
+								))}
 							</div>
-						)}
-						<p class="mt-6 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">There is no greater purpose, destiny, or legacy than to reveal the Father&rsquo;s heart to the {primaryRoadmapLang}-speaking peoples of the world.</p>
-						<a href="/partner" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Sponsor a language<span aria-hidden="true">&rarr;</span></a>
+						</div>
+						<div class="order-1 lg:order-2">
+							<iframe class="lg:hidden block w-full overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);" src={`https://www.youtube-nocookie.com/embed/${SPONSOR_VIDEO_ID}?rel=0&playsinline=1`} title="Partner with the Father's Heart Bible" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+							<button type="button" id="sponsor-video-facade" class="group relative hidden lg:block w-full overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);" aria-label="Play the Father's Heart Bible partner video" data-video-id={SPONSOR_VIDEO_ID}>
+								<img src={`https://i.ytimg.com/vi/${SPONSOR_VIDEO_ID}/hqdefault.jpg`} alt="Partner with us to take the Father's Heart Bible to the nations" width="480" height="360" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+								<span aria-hidden="true" class="absolute inset-0" style="background: rgba(36,27,23,0.12);"></span>
+								<span aria-hidden="true" class="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110" style="width: 4.5rem; height: 4.5rem; transform: translate(-50%,-50%); background: rgba(255,255,255,0.92); border: 2px solid #FFFFFF; box-shadow: 0 4px 18px rgba(0,0,0,0.4);">
+									<svg width="26" height="26" viewBox="0 0 24 24" fill="var(--color-brand)" style="margin-left: 3px;"><path d="M8 5v14l11-7z"></path></svg>
+								</span>
+							</button>
+							<p class="mt-4 text-center text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/partner" style="color: var(--color-brand);" class="hover:underline font-semibold">Partner with us &rarr;</a></p>
+						</div>
 					</div>
-					<!-- Right: video (mobile iframe / desktop facade) + partner link -->
-					<div class="order-1 lg:order-2">
-						<iframe class="lg:hidden block w-full overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);" src={`https://www.youtube-nocookie.com/embed/${SPONSOR_VIDEO_ID}?rel=0&playsinline=1`} title="Partner with the Father's Heart Bible" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-						<button type="button" id="sponsor-video-facade" class="group relative hidden lg:block w-full overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);" aria-label="Play the Father's Heart Bible partner video" data-video-id={SPONSOR_VIDEO_ID}>
-							<img src={`https://i.ytimg.com/vi/${SPONSOR_VIDEO_ID}/hqdefault.jpg`} alt="Partner with us to take the Father's Heart Bible to the nations" width="480" height="360" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
-							<span aria-hidden="true" class="absolute inset-0" style="background: rgba(36,27,23,0.12);"></span>
-							<span aria-hidden="true" class="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110" style="width: 4.5rem; height: 4.5rem; transform: translate(-50%,-50%); background: rgba(255,255,255,0.92); border: 2px solid #FFFFFF; box-shadow: 0 4px 18px rgba(0,0,0,0.4);">
-								<svg width="26" height="26" viewBox="0 0 24 24" fill="var(--color-brand)" style="margin-left: 3px;"><path d="M8 5v14l11-7z"></path></svg>
-							</span>
-						</button>
-						<p class="mt-4 text-center text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/partner" style="color: var(--color-brand);" class="hover:underline font-semibold">Partner with us &rarr;</a></p>
-					</div>
+					{phase2.length > 0 && (
+						<div class="mt-8">
+							<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">Also available for sponsorship</p>
+							<ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2.5">
+								{phase2.map((l) => (
+									<li class="text-sm leading-snug" style="font-family: var(--font-sans);">
+										<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" data-subj={`Sponsor ${l.language} — Father's Heart Bible`} onclick={pledgeOnclick} class="font-semibold hover:underline" style="color: var(--color-brand);">{l.language} &rarr;</a>
+										<span class="block" style="color: var(--color-muted);">$50,000 &middot; {l.speakers} &middot; {perReaderLabel(l.readers)}</span>
+									</li>
+								))}
+							</ul>
+						</div>
+					)}
+					<p class="mt-7 max-w-3xl text-base lg:text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">There is no greater purpose, destiny, or legacy than to reveal the Father&rsquo;s heart to the {primaryRoadmapLang}-speaking peoples of the world.</p>
+					<a href="/partner" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Sponsor a language<span aria-hidden="true">&rarr;</span></a>
 				</div>
-			</section>
+						</section>
 		)}
 		<script is:inline>
 			(() => {
