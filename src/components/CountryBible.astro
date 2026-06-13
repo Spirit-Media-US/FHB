@@ -45,8 +45,12 @@ export interface Props {
 	country: string;
 	flag: string; // emoji flag, e.g. "🇮🇳"
 	flagImg?: string; // flag image URL (e.g. flagcdn) for national-pride display
-	colorPrimary: string; // hex, e.g. "#FF9933"
-	colorSecondary: string; // hex
+	colorPrimary: string; // hex, e.g. "#FF9933" (saffron)
+	colorSecondary: string; // hex, e.g. "#138808" (green)
+	colorAccent?: string; // third flag color for dramatic section + bottom CTA (e.g. navy). Default FHB deep.
+	tintWarm?: string; // light shade of primary (e.g. light saffron) for section/card fills
+	tintCool?: string; // light shade of secondary (e.g. light green)
+	tintBlue?: string; // light shade of accent (e.g. light blue)
 	title: string; // <title>
 	description: string; // meta description
 	h1: string;
@@ -73,6 +77,9 @@ export interface Props {
 	painsSources?: CountrySource[];
 	whyHeading: string;
 	whyBlocks: CountryWhyBlock[];
+	resourcesHeading?: string;
+	resourcesIntroHtml?: string;
+	resources?: CountrySource[];
 	opportunityHeading?: string;
 	opportunityIntroHtml?: string;
 	languages?: CountryLanguage[];
@@ -91,6 +98,10 @@ const {
 	flagImg,
 	colorPrimary,
 	colorSecondary,
+	colorAccent = 'var(--color-deep)',
+	tintWarm = 'var(--color-surface-low)',
+	tintCool = 'var(--color-surface)',
+	tintBlue = 'var(--color-surface-low)',
 	title,
 	description,
 	h1,
@@ -117,6 +128,9 @@ const {
 	painsSources = [],
 	whyHeading,
 	whyBlocks,
+	resourcesHeading,
+	resourcesIntroHtml,
+	resources = [],
 	opportunityHeading,
 	opportunityIntroHtml,
 	languages = [],
@@ -188,14 +202,14 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.32) 45%, rgba(0,0,0,0.4) 100%);" aria-hidden="true"></div>
 			<div class="absolute inset-x-0 bottom-0 z-20 px-6 pb-10 lg:px-8 lg:pb-14">
 				<div class="mx-auto max-w-4xl">
-					<div class="flex items-end gap-4 md:gap-5">
-						{flagImg && (
-							<img src={flagImg} alt={`Flag of ${country}`} width="84" height="56" class="shrink-0 rounded-md" style="width: 72px; height: auto; border: 3px solid rgba(255,255,255,0.92); box-shadow: 0 4px 18px rgba(0,0,0,0.45);" loading="eager" decoding="async" />
-						)}
+					<div class="flex items-end justify-between gap-4 md:gap-6">
 						<div>
 							<p class="text-sm font-semibold uppercase tracking-widest mb-2" style="color: #fff; font-family: var(--font-sans);">The Bible Around the World</p>
 							<h1 class="text-4xl md:text-5xl lg:text-6xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{h1}</h1>
 						</div>
+						{flagImg && (
+							<img src={flagImg} alt={`Flag of ${country}`} width="84" height="56" class="shrink-0 rounded-md" style="width: 72px; height: auto; border: 3px solid rgba(255,255,255,0.92); box-shadow: 0 4px 18px rgba(0,0,0,0.45);" loading="eager" decoding="async" />
+						)}
 					</div>
 					<p class="mt-4 max-w-2xl text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.92);">{heroSubhead}</p>
 				</div>
@@ -219,7 +233,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 		</section>
 
 		<!-- At a glance -->
-		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${tintWarm};`}>
 			<div class="mx-auto max-w-4xl">
 				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{country} at a glance</h2>
 				<p class="mt-4 max-w-3xl text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={glanceIntroHtml}></p>
@@ -236,7 +250,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 
 		<!-- What the country is known for (national pride) -->
 		{knownFor.length > 0 && (
-			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${tintCool};`}>
 				<div class="mx-auto max-w-4xl">
 					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{knownForHeading || `What ${country} is known for`}</h2>
 					{knownForIntroHtml && (
@@ -255,7 +269,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 		)}
 
 		<!-- Faith & the Bible -->
-		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${tintBlue};`}>
 			<div class="mx-auto max-w-3xl">
 				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{faithHeading}</h2>
 				<div class="mt-5 space-y-5 text-base lg:text-lg leading-relaxed prose-fhb" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={faithBodyHtml}></div>
@@ -299,7 +313,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 
 		<!-- How "our Father" meets the country (world religions + hope) -->
 		{faithsBlocks.length > 0 && (
-			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-deep);">
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${colorAccent};`}>
 				<div class="mx-auto max-w-3xl">
 					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{faithsHeading || `What "our Father" offers ${country}`}</h2>
 					{faithsIntroHtml && (
@@ -318,7 +332,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 		)}
 
 		<!-- Why FHB -->
-		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${tintWarm};`}>
 			<div class="mx-auto max-w-3xl">
 				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{whyHeading}</h2>
 				<div class="mt-8 space-y-8">
@@ -334,7 +348,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 
 		<!-- Translation opportunity (languages + populations) -->
 		{languages.length > 0 && (
-			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${tintCool};`}>
 				<div class="mx-auto max-w-3xl">
 					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{opportunityHeading || `The opportunity in ${country}`}</h2>
 					{opportunityIntroHtml && (
@@ -365,7 +379,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 		)}
 
 		<!-- Scripture sampler -->
-		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${tintBlue};`}>
 			<div class="mx-auto max-w-3xl">
 				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Hear the Father&rsquo;s voice</h2>
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">A few of the most-read passages in the world, in the Father&rsquo;s Heart Bible &mdash; tap any reference to read and listen free.</p>
@@ -387,7 +401,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 			<div class="mx-auto max-w-2xl text-center">
 				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-deep);">{ctaMidHeading}</h2>
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-deep); opacity: 0.9;" set:html={ctaMidBodyHtml}></p>
-				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline" style="background-color: var(--color-deep); color: #fff; font-family: var(--font-sans);">Read FHB free<span aria-hidden="true">&rarr;</span></a>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline" style={`background-color: ${colorAccent}; color: #fff; font-family: var(--font-sans);`}>Read FHB free<span aria-hidden="true">&rarr;</span></a>
 			</div>
 		</section>
 
@@ -398,6 +412,28 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={keepReadingHtml}></p>
 			</div>
 		</section>
+
+		<!-- Resources (authority links) -->
+		{resources.length > 0 && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${tintWarm};`}>
+				<div class="mx-auto max-w-3xl">
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{resourcesHeading || `Learn more about ${country}`}</h2>
+					{resourcesIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={resourcesIntroHtml}></p>
+					)}
+					<ul class="mt-7 grid grid-cols-1 md:grid-cols-2 gap-3">
+						{resources.map((r) => (
+							<li>
+								<a href={r.url} target="_blank" rel="noopener noreferrer" class="flex items-center justify-between gap-3 rounded-xl px-5 py-4 no-underline transition-opacity hover:opacity-90" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+									<span class="text-base font-medium leading-snug" style="font-family: var(--font-sans); color: var(--color-ink);">{r.label}</span>
+									<span class="shrink-0 text-sm font-semibold" style="color: var(--color-brand);" aria-hidden="true">&nearr;</span>
+								</a>
+							</li>
+						))}
+					</ul>
+				</div>
+			</section>
+		)}
 
 		<!-- FAQ -->
 		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
@@ -415,7 +451,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 		</section>
 
 		<!-- Bottom CTA (read-first) -->
-		<section class="px-6 py-14 lg:px-8 lg:py-20" style="background-color: var(--color-deep);">
+		<section class="px-6 py-14 lg:px-8 lg:py-20" style={`background-color: ${colorAccent};`}>
 			<div class="mx-auto max-w-2xl text-center">
 				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">Read the Father&rsquo;s Heart Bible free</h2>
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.85);" set:html={ctaBottomBodyHtml}></p>
