@@ -30,11 +30,13 @@ const DIST = path.resolve('dist');
 const SYNC_CSS_PAGES = new Set([
 	'blog/index.html',
 	'read/index.html',
+	'nations.html', // minor CLS + the country grid reflows from deferred CSS
 ]);
 
 // Render-blocking page prefixes (dir + everything under it).
 const SYNC_CSS_PREFIXES = [
 	'read/', // all Bible chapter pages — text-heavy
+	'bible-in/', // country pages: deferred CSS reflowed the whole hero (CLS ~0.75-0.98 measured 2026-06-13)
 ];
 
 function isSyncPage(relPath) {
