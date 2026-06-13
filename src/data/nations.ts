@@ -26,6 +26,6 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Brazil',
 		blurb:
 			'The largest Bible nation on earth — where the Father’s Heart Bible™ invites 217 million people to meet the Father in the book they already love.',
-		img: 'https://cdn.sanity.io/images/rusi1hyi/production/5f3eac722a31c44eaa305a80dbf004c27a222df7-4680x3744.jpg',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/d5bf406c5039b3d5ff0262302cdb49a56257060c-2497x3744.jpg',
 	},
 ];
