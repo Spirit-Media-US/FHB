@@ -93,6 +93,8 @@ export interface Props {
 	globalIntroHtml?: string;
 	globalStats?: CountryStat[];
 	globalBlocks?: CountryWhyBlock[];
+	wordHeading?: string; // "His Word will not return void" promise section
+	wordBodyHtml?: string;
 	resourcesHeading?: string;
 	resourcesIntroHtml?: string;
 	resources?: CountrySource[];
@@ -155,6 +157,8 @@ const {
 	globalIntroHtml,
 	globalStats = [],
 	globalBlocks = [],
+	wordHeading,
+	wordBodyHtml,
 	resourcesHeading,
 	resourcesIntroHtml,
 	resources = [],
@@ -460,6 +464,17 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 							))}
 						</div>
 					)}
+				</div>
+			</section>
+		)}
+
+		<!-- His Word will not return void (promise/hope band) -->
+		{wordBodyHtml && (
+			<section class="px-6 py-14 lg:px-8 lg:py-20" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-3xl text-center">
+					<div class="mx-auto mb-6 h-1 w-16 rounded-full" style={`background-color: ${colorSecondary};`} aria-hidden="true"></div>
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{wordHeading || 'His Word will not return void'}</h2>
+					<div class="mt-5 text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted);" set:html={wordBodyHtml}></div>
 				</div>
 			</section>
 		)}
