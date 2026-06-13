@@ -61,6 +61,14 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/e687a7e35fc45726c6ed0695f68102f9c519bd0d-1733x1300.jpg',
 	},
 	{
+		slug: 'japan',
+		country: 'Japan',
+		title: 'The Bible in Japan',
+		blurb:
+			'One of the least-reached nations on earth, gentle and searching — where the Father’s Heart Bible™ longs to reveal, in Japanese, a Father near to the weary and the lonely. Japanese among our priorities.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/dcf30948a3b86f3a9738df4e9d973137bdcfc167-1733x1300.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
