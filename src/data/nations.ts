@@ -53,6 +53,14 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/539e529a17ab4dd958a23acc0ea98b958d9e42ba-1880x1058.jpg',
 	},
 	{
+		slug: 'germany',
+		country: 'Germany',
+		title: 'The Bible in Germany',
+		blurb:
+			'The land of Gutenberg and Luther that gave the world the printed Bible — where the Father’s Heart Bible™ longs to help a drifting nation meet, afresh, the Father in its pages. German among our priorities.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/e687a7e35fc45726c6ed0695f68102f9c519bd0d-1733x1300.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
