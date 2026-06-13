@@ -52,4 +52,12 @@ export const NATIONS: Nation[] = [
 			'The largest Christian nation in Asia — where the Father’s Heart Bible™ reveals a Father who is always near, even when earthly fathers must work far away.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/b97662a208363f9d75672796365b1511748fd2b1-1880x1253.jpg',
 	},
+	{
+		slug: 'kenya',
+		country: 'Kenya',
+		title: 'The Bible in Kenya',
+		blurb:
+			'The heart of East Africa — where the Father’s Heart Bible™ reveals a Father near to the orphan and the weary, in a fervently Christian land. Swahili leads the roadmap.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/275b03def9aacaee75f4e796b910385dc632eacd-1880x1253.jpg',
+	},
 ];
