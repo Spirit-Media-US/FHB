@@ -135,3 +135,4 @@ Full authoritative inventory (incl. every community page) lives in auto-memory: 
 - All work goes to the **dev** branch — never push directly to main
 - Only merge dev to main when Kevin says "push to main"
 - Never push without local preview first
+- **Trademark: the brand name is always "Father's Heart Bible™" — the ™ is required on every visible mention, everywhere on the site.** Use `™` in JS strings/attributes and `&trade;` in HTML/`.astro` markup (right after "Bible"). Never write "Father's Heart Bible" without the ™.

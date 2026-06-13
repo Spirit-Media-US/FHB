@@ -1,4 +1,4 @@
-// Single source of truth for the "Father's Heart Bible Around the World" hub
+// Single source of truth for the "Father's Heart Bible™ Around the World" hub
 // (/bible-in). Each entry is a live per-country landing page that targets
 // "Bible in <country>" search/AEO intent and funnels to /read + /partner.
 // Add a row here ONLY when the matching /bible-in/<slug>.astro page ships —
