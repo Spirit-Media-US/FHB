@@ -281,10 +281,32 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		     DESKTOP HERO SUBTEXT — appears below the desktop hero only
 		     (mobile subtitle + CTAs already rendered in the mobile hero above)
 		     ═══════════════════════════════════════════════════════════ -->
-		<section style="background-color: var(--color-canvas);" class="py-10 md:py-14 px-6">
-			<div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+		{/* Critical above-fold layout for the intro section. These dimensions
+		    otherwise come from the DEFERRED Tailwind stylesheet (we can't use a
+		    critical-CSS extractor — Beasties is incompatible with Tailwind v4),
+		    so without this the section paints as a full-width stack then snaps to
+		    the 2-col grid (+ facade resize) when the deferred CSS lands (~165ms) =
+		    ~0.15 CLS. Values mirror the Tailwind classes exactly, so applying the
+		    deferred copy is a no-op (no shift). */}
+		<style is:inline>
+			#home-intro { padding: 2.5rem 1.5rem; }
+			#home-intro-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; align-items: center; max-width: 64rem; margin-left: auto; margin-right: auto; }
+			#home-intro-copy { order: 2; }
+			#home-intro-video { order: 1; }
+			#home-intro-cta { display: flex; }
+			#fhb-video-facade { display: block; width: 100%; }
+			@media (min-width: 768px) { #home-intro { padding: 3.5rem 1.5rem; } }
+			@media (min-width: 1024px) {
+				#home-intro-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; }
+				#home-intro-copy { order: 1; }
+				#home-intro-video { order: 2; }
+				#home-intro-cta { display: inline-flex; }
+			}
+		</style>
+		<section id="home-intro" style="background-color: var(--color-canvas);" class="py-10 md:py-14 px-6">
+			<div id="home-intro-grid" class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
 				<!-- Copy (left on desktop; on mobile it sits BELOW the video via order). -->
-				<div class="order-2 lg:order-1">
+				<div id="home-intro-copy" class="order-2 lg:order-1">
 					<h2
 						class="text-3xl font-medium leading-snug tracking-tight mb-4"
 						style="font-family: var(--font-headline); color: var(--color-ink);"
@@ -299,6 +321,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					</p>
 					<a
 						href="/read"
+						id="home-intro-cta"
 						class="flex lg:inline-flex w-fit mx-auto lg:mx-0 items-center justify-center mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
 						style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A;"
 						onmouseover="this.style.opacity='0.9'"
@@ -307,26 +330,16 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						Read FHB &rarr;
 					</a>
 				</div>
-				<!-- Video (right on desktop; on mobile it sits ABOVE the copy via order). -->
-				<div class="order-1 lg:order-2">
-					<!-- Mobile: YouTube's native player embedded directly so a single
-					     tap lands on YouTube's play button and starts the video.
-					     (A facade would force a second tap — mobile blocks autoplay.)
-					     loading="lazy" keeps it off the initial load for perf. -->
-					<iframe
-						class="lg:hidden block w-full overflow-hidden rounded-xl shadow-lg"
-						style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);"
-						src="https://www.youtube-nocookie.com/embed/Ld4_H5XxrLk?rel=0&playsinline=1"
-						title="Father's Heart Bible invitation"
-						loading="lazy"
-						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-						allowfullscreen
-					></iframe>
-					<!-- Desktop: lazy facade — single click autoplays (desktop allows it). -->
+				<!-- Video (right on desktop; on mobile it sits ABOVE the copy via order).
+				     One click-to-load facade for ALL viewports (unified 2026-06-13 to
+				     keep YouTube's JS off the initial load everywhere — it was the
+				     intermittent mobile TBT/LCP spike). Desktop: one click autoplays.
+				     Mobile: tap loads the player, then YouTube's own play button. -->
+				<div id="home-intro-video" class="order-1 lg:order-2">
 					<button
 						type="button"
 						id="fhb-video-facade"
-						class="group relative hidden lg:block w-full overflow-hidden rounded-xl shadow-lg"
+						class="group relative block w-full overflow-hidden rounded-xl shadow-lg"
 						style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);"
 						aria-label="Play the Father's Heart Bible invitation video"
 						data-video-id="Ld4_H5XxrLk"
