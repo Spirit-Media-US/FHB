@@ -36,4 +36,20 @@ export const NATIONS: Nation[] = [
 			'The largest Spanish-speaking nation on earth — where the Father’s Heart Bible™ invites a deeply faithful people to meet the Father personally. Spanish is our #1 priority.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/b50f17816ea816a8f110c2ffddb17fc0a6544fc0-3264x2176.jpg',
 	},
+	{
+		slug: 'nigeria',
+		country: 'Nigeria',
+		title: 'The Bible in Nigeria',
+		blurb:
+			'Africa’s most populous nation — where the Father’s Heart Bible™ invites every tribe and tongue to know God as a near and loving Father. English now, Pidgin on the way.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/aa8821b46e994ecfec690257b4f8287eb810dbf4-1825x1300.jpg',
+	},
+	{
+		slug: 'philippines',
+		country: 'the Philippines',
+		title: 'The Bible in the Philippines',
+		blurb:
+			'The largest Christian nation in Asia — where the Father’s Heart Bible™ reveals a Father who is always near, even when earthly fathers must work far away.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/b97662a208363f9d75672796365b1511748fd2b1-1880x1253.jpg',
+	},
 ];
