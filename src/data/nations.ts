@@ -37,6 +37,14 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/5288503725b20a8271e8783cb406e7cf4c0e7640-1880x1253.jpg',
 	},
 	{
+		slug: 'russia',
+		country: 'Russia',
+		title: 'The Bible in Russia',
+		blurb:
+			'A land of deep Orthodox faith that survived a century of atheism and is reviving — where the Father’s Heart Bible™ longs to reveal, in Russian, the Father who runs to meet His returning child. Russian among our priorities.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/8459e8235bba613ec62bbe31d8da4a81a4d49742-1880x1253.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
