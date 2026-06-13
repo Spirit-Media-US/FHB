@@ -615,7 +615,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 		<!-- Sponsor a translation (bottom invitation, under the read-free CTA) -->
 		{sponsorLangs.length > 0 && (
 			<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${tintWarm};`}>
-				<div class="mx-auto max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+				<div class="mx-auto max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
 					<!-- Left: sponsor copy + featured language(s) -->
 					<div class="order-2 lg:order-1">
 						<p class="text-xs font-semibold uppercase tracking-widest mb-3" style={`color: ${colorPrimary}; font-family: var(--font-sans);`}>Sponsor a translation</p>
@@ -638,12 +638,11 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 						{phase2.length > 0 && (
 							<div class="mt-5">
 								<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">Also available for sponsorship</p>
-								<ul class="divide-y" style="border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline);">
+								<ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
 									{phase2.map((l) => (
-										<li class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 py-2.5 text-sm" style="font-family: var(--font-sans);">
-											<span class="font-semibold" style="color: var(--color-ink);">{l.language}</span>
-											<span style="color: var(--color-muted);">$50,000 &middot; {l.speakers} &middot; {perReaderLabel(l.readers)}</span>
-											<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" data-subj={`Sponsor ${l.language} — Father's Heart Bible`} onclick={pledgeOnclick} class="font-semibold hover:underline" style="color: var(--color-brand);">Sponsor {l.language} &rarr;</a>
+										<li class="text-sm leading-snug" style="font-family: var(--font-sans);">
+											<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" data-subj={`Sponsor ${l.language} — Father's Heart Bible`} onclick={pledgeOnclick} class="font-semibold hover:underline" style="color: var(--color-brand);">{l.language} &rarr;</a>
+											<span class="block" style="color: var(--color-muted);">$50,000 &middot; {l.speakers} &middot; {perReaderLabel(l.readers)}</span>
 										</li>
 									))}
 								</ul>
