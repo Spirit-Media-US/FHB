@@ -45,6 +45,14 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/8459e8235bba613ec62bbe31d8da4a81a4d49742-1880x1253.jpg',
 	},
 	{
+		slug: 'indonesia',
+		country: 'Indonesia',
+		title: 'The Bible in Indonesia',
+		blurb:
+			'The world’s largest archipelago and largest Muslim-majority nation, with a vibrant church across its islands — where the Father’s Heart Bible™ longs to reveal, in Bahasa Indonesia, a Father near to every island and heart.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/539e529a17ab4dd958a23acc0ea98b958d9e42ba-1880x1058.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
