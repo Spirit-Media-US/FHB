@@ -13,6 +13,14 @@ export interface Nation {
 
 export const NATIONS: Nation[] = [
 	{
+		slug: 'usa',
+		country: 'the USA',
+		title: 'The Bible in the USA',
+		blurb:
+			'A nation of more Bibles than any on earth — where the Father’s Heart Bible™ invites a people who own the book to finally meet the Father in it. English is live now and reaches ~1.5 billion worldwide.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/2658a7764aeef2dbe21f813fa7027e46dd261083-1880x1253.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
