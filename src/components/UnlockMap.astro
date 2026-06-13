@@ -53,8 +53,8 @@ const unlocks: UnlockRow[] = [
 		parenthetical: 'Largest Muslim-majority nation',
 		reach: '199M',
 	},
-	{ language: 'Bengali', flag: '🇧🇩', reach: '272M' },
-	{ language: 'Urdu', flag: '🇵🇰', reach: '231M' },
+	{ language: 'Bengali', flag: '🇧🇩', reach: '272M', country: { slug: 'india', label: 'India' } },
+	{ language: 'Urdu', flag: '🇵🇰', reach: '231M', country: { slug: 'india', label: 'India' } },
 	{ language: 'Russian', flag: '🇷🇺', reach: '258M' },
 	{ language: 'German', flag: '🇩🇪', reach: '135M' },
 	{ language: 'Japanese', flag: '🇯🇵', reach: '125M' },
@@ -66,15 +66,28 @@ const unlocks: UnlockRow[] = [
 	},
 	{ language: 'Marathi', flag: '🇮🇳', reach: '99M', country: { slug: 'india', label: 'India' } },
 	{ language: 'Telugu', flag: '🇮🇳', reach: '96M', country: { slug: 'india', label: 'India' } },
+	{
+		language: 'Filipino (Tagalog)',
+		flag: '🇵🇭',
+		reach: '90M',
+		country: { slug: 'philippines', label: 'Philippines' },
+	},
 	{ language: 'Turkish', flag: '🇹🇷', reach: '88M' },
 	{ language: 'Tamil', flag: '🇮🇳', reach: '86M', country: { slug: 'india', label: 'India' } },
 	{ language: 'Yue Chinese', flag: '🇭🇰', reach: '86M' },
 	{
 		language: 'Vietnamese',
 		flag: '🇻🇳',
-		parenthetical: 'All 20 languages live · within reach of ~75% of humanity',
+		parenthetical: 'Among the world\u2019s major tongues \u00b7 within reach of most of humanity',
 		reach: '85M',
 		highlight: true,
+	},
+	{
+		language: 'Swahili',
+		flag: '🇰🇪',
+		parenthetical: 'East Africa\u2019s lingua franca',
+		reach: '80M',
+		country: { slug: 'kenya', label: 'Kenya' },
 	},
 ];
 
@@ -95,9 +108,9 @@ const pledgeSubject = (row: UnlockRow) => `Pledge to Sponsor ${row.sponsor || ro
 				$50,000 a language — every dollar a doorway.
 			</h2>
 			<p class="mt-4 leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-				Each of the top 20 languages unlocks for <strong style="color: var(--color-primary);">$50,000</strong> —
-				full translation, print, digital, and audio. Together they put the Bible within reach of about
-				<strong style="color: var(--color-primary);">75% of humanity</strong>.
+				Each language opens for a one-time <strong style="color: var(--color-primary);">$50,000</strong> —
+				full translation, print, digital, and audio. Ranked by reach, these tongues already put the Bible
+				within reach of <strong style="color: var(--color-primary);">most of humanity</strong> &mdash; and the list keeps growing.
 			</p>
 		</header>
 
