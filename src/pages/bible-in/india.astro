@@ -1,0 +1,178 @@
+---
+// /bible-in/india — first country page in the "Bible Around the World" hub.
+// Data only; rendered by <CountryBible>. English-first, read-first per the
+// architecture rules in memory/project_fhb_country_pages.md. All stats are
+// cited in the `sources` array. To add a country: copy this file, swap the
+// data, and add a row to src/data/nations.ts.
+import CountryBible from '../../components/CountryBible.astro';
+
+const verses = [
+	{
+		ref: 'Isaiah 41:10',
+		slug: 'isaiah',
+		ch: 41,
+		text: 'Fear not, for I am with you; be not dismayed, for I am your Father. I will strengthen you, I will help you, I will uphold you with my righteous right hand.',
+	},
+	{
+		ref: 'Jeremiah 29:11',
+		slug: 'jeremiah',
+		ch: 29,
+		text: 'For I know the plans I have for you, declares your Father — plans for peace and not for harm, to give you a future and a hope.',
+	},
+	{
+		ref: 'John 3:16',
+		slug: 'john',
+		ch: 3,
+		text: 'For our Father so loved the world, that he gave his one and only Son, that whoever believes in him should not perish but have eternal life.',
+	},
+];
+
+const stats = [
+	{ label: 'People', value: '1.4 billion' },
+	{ label: 'Official languages', value: '22 + English' },
+	{ label: 'English users', value: '2nd most on earth' },
+	{ label: 'Christians', value: '~28 million' },
+];
+
+const faqs = [
+	{
+		question: 'Can I read the Bible online free in India?',
+		answer:
+			"Yes. The Father's Heart Bible™ is free to read online in India — no account, no purchase, no app required. Open fathersheartbible.com/read on any phone, tablet, or computer and start in Genesis, John, or any book you like, with audio you can listen to as you read.",
+	},
+	{
+		question: 'Is there an audio Bible I can listen to in India?',
+		answer:
+			"Yes. Every chapter of the Father's Heart Bible™ comes with free audio, so you can listen to Scripture on your phone — useful on the go or in any setting where reading aloud is easier than reading from a screen. Audio Bible demand is rising fast worldwide, with more than 1.3 billion audio-Bible listens recorded in 2024.",
+	},
+	{
+		question: "Is the Father's Heart Bible™ available in Hindi?",
+		answer:
+			"Not yet — the Father's Heart Bible™ is currently available in English, which India's very large English-reading population can use today. Hindi, spoken by roughly 600 million people, is among the first translations on our roadmap, alongside other major world languages.",
+	},
+	{
+		question: 'What is the most-read Bible verse in the world?',
+		answer:
+			'Isaiah 41:10 — "Fear not, for I am with you" — was the most-engaged-with verse worldwide in 2025 on the YouVersion Bible App, followed by Jeremiah 29:11 and Romans 12:2. You can read and hear all of them free in the Father\'s Heart Bible.',
+	},
+	{
+		question: "What makes the Father's Heart Bible™ different from other Bibles?",
+		answer:
+			"It is the first English translation to reveal God as Father wherever Scripture reveals Him as Father — from Genesis 1:1 to John 3:16 — instead of a distant, generic 'God.' For many readers in India and around the world, that single change turns the Bible from a book about a deity into a letter from a loving Father.",
+	},
+];
+---
+
+<CountryBible
+	slug="india"
+	country="India"
+	flag="🇮🇳"
+	flagImg="/flags/in.svg"
+	countryWikipedia="https://en.wikipedia.org/wiki/India"
+	lastUpdated="June 2026"
+	lastUpdatedIso="2026-06-13"
+	colorPrimary="#FF9933"
+	colorSecondary="#138808"
+	colorAccent="#000080"
+	tintWarm="#FFF3E6"
+	tintCool="#EBF6EA"
+	tintBlue="#EAF0FA"
+	title="The Bible in India — Read Free Online with Audio | Father's Heart Bible™"
+	description="Read the Bible free online in India, with audio. The Father's Heart Bible™ reveals God as Father — free on any phone, no app needed. English now, Hindi on the way."
+	h1="The Bible in India"
+	heroSubhead="A free online Bible with audio for one of the world's largest English-reading nations — revealing God as a loving Father, on any phone."
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/6251d0054881b302d10b339359d39b107db86cc5-6669x4451.jpg"
+	heroAlt="An open Bible held against the colors of India"
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in India right now.</strong> The <a href=\"https://fathersheartbible.com/read\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is a fresh English translation you can read and <em>listen to</em> free on any phone, with no app to install and no account to create. India is home to the world&rsquo;s second-largest English-using population, so for hundreds of millions of readers it is available today &mdash; and Hindi is among the first new translations on our roadmap. Whether you&rsquo;re searching for &ldquo;read the Bible online,&rdquo; a &ldquo;free Bible with audio,&rdquo; or simply where to begin, you can start in the next breath.`}
+	keyTakeaway="The Bible is free to read and hear online in India today in English — and the Father's Heart Bible™ reads it in the Father's own voice, not as a distant God."
+	glanceIntroHtml={`India is a nation of staggering scale and variety &mdash; the most populous country on earth and one of the most linguistically rich places in human history. It&rsquo;s a land where faith is woven into daily life, and where the Bible already travels in dozens of tongues.`}
+	stats={stats}
+	knownForHeading="What India is known for"
+	knownForIntroHtml={`India is one of civilization&rsquo;s great originators &mdash; a land that gave the world enduring ideas, flavors, and beauty long before it gave the world its software engineers.`}
+	knownFor={[
+		{ label: 'The cradle of zero and chess', text: 'India gave mathematics the concept of zero and the decimal system, and gave the world chess, now played in nearly every country on earth.' },
+		{ label: 'A civilization of festivals', text: 'From the lights of Diwali to the colors of Holi, India celebrates more public festivals than almost any nation — joy is a way of life.' },
+		{ label: 'The Taj Mahal & ancient wonders', text: 'A monument to love that draws millions of pilgrims and travelers each year, beside thousands of temples, forts, and sacred rivers.' },
+		{ label: 'The world’s largest democracy', text: 'Nearly a billion eligible voters make India the largest democratic exercise humanity has ever undertaken.' },
+		{ label: 'Cuisine that conquered the globe', text: 'India’s spices and dishes are loved on every continent — a generosity of flavor that mirrors its hospitality.' },
+		{ label: 'Bollywood & a culture of story', text: 'India produces more films than any other country, telling stories of love, family, and longing to billions of viewers.' },
+	]}
+	gallery={[
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/cdab8e222229a20360ac942d20cf6e0f4e5a332b-3366x2244.jpg', alt: 'The Taj Mahal in Agra, India' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/50d898efc3124d337746de63a811f6c25b9ab4b5-3264x2448.jpg', alt: 'Houseboat on the palm-lined backwaters of Kerala, India' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/5d0f1ee95e5529c4f02e25adbc6be6eb9c8e120b-3072x2048.jpg', alt: 'The Kullu Valley in the Indian Himalayas, Himachal Pradesh' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/7e959f9c1598aeea59f02300cc9c836ffc0ebf01-4032x2688.jpg', alt: 'An Indian family on the coast at sunset' },
+	]}
+	galleryCreditHtml={`Photos via <a href="https://commons.wikimedia.org/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Wikimedia Commons</a>.`}
+	galleryBottom={[
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/ad212c41e72f3755baec915d1c72b25547a4bce1-4608x2592.jpg', alt: 'Green tea plantation hills in Munnar, Kerala, India' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/5ce89d5801deae1f8720afa2d1a3382b844b70c4-6000x4000.jpg', alt: 'A farmer harvesting rice in Karnataka, India' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/8a053c937d1e9299381a7d2710156e4a3a3871c1-4164x2956.jpg', alt: 'The Hawa Mahal palace in Jaipur, India' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/37645700082fbdae6ff2af761466488a0243da97-5594x3872.jpg', alt: 'Children celebrating Holi with colors in India' },
+	]}
+	galleryBottomCreditHtml={`Photos via <a href="https://commons.wikimedia.org/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Wikimedia Commons</a>.`}
+	faithHeading="Faith and the Bible in India"
+	faithBodyHtml={`<p>India is one of the most religious societies on earth. Hindus make up about 79.8% of the population, Muslims 14.2%, and Christians roughly 2.3% &mdash; but in a nation of 1.4 billion, that small percentage is still around <strong>28 million Christians</strong>, more than the entire population of many countries.</p><p>The appetite for Scripture is enormous and growing. In 2024 India received about <strong>1.8 million printed Bibles</strong> &mdash; second in the world only to Brazil &mdash; and the Bible Society of India now produces audio Scripture in <strong>69 languages</strong>, from Hindi and Bengali to Punjabi, Marathi and beyond. Globally, digital Bible distribution has now overtaken print for the first time, and audio is surging: more than 1.3 billion audio-Bible listens were recorded in a single year.</p><p>India&rsquo;s linguistic reality shapes everything. The Constitution recognizes 22 official languages plus English, the census counts over 1,600 mother tongues, and Hindi alone has more than 500 million speakers. English is the bridge language of education and the internet here &mdash; which is exactly why a clear, free English Bible meets a real and present need, while translations like Hindi open the door to hundreds of millions more.</p>`}
+	sources={[
+		{ label: 'Pew Research — religion in India', url: 'https://www.pewresearch.org/short-reads/2021/09/21/key-findings-about-the-religious-composition-of-india/' },
+		{ label: 'Bible Society of India', url: 'https://www.bsind.org/' },
+		{ label: 'Bible distribution 2024 (Christian Today)', url: 'https://www.christiantoday.com/news/digital-bible-distribution-outstrips-print-worldwide-for-the-first-time' },
+	]}
+	painsHeading="What pains India"
+	painsIntroHtml={`Behind the festivals and the fast-growing economy, ordinary families carry heavy burdens. The data tells a sobering story &mdash; and it is into exactly these aches that the Father&rsquo;s heart speaks.`}
+	painStats={[
+		{ value: '~203 million', label: 'people still live in multidimensional poverty (health, schooling, basic necessities)' },
+		{ value: '170,746', label: 'lives lost to suicide in 2024 — about one every three minutes' },
+		{ value: '33.5%', label: 'of those suicides were driven by family problems — the leading cause' },
+		{ value: '34.7%', label: 'of households still lack clean cooking fuel; 1 in 4 lack proper sanitation' },
+		{ value: '7.6%', label: 'of suicides were linked to drug or alcohol addiction' },
+		{ value: '10,546', label: 'farmers and farm laborers died by suicide — debt a major driver' },
+	]}
+	painsBodyHtml={`<p>Daily-wage earners make up the largest share of those lost to suicide &mdash; the people working hardest simply to survive. Debt drives farmers to despair; addiction fractures homes; and family breakdown, now the number-one cause of suicide, reaches into marriages and across generations. Divorce, long among the world&rsquo;s lowest, is climbing sharply in India&rsquo;s cities.</p><p>These are not abstract numbers. They are fathers without work, mothers without rest, sons and daughters without hope. India does not need another distant authority to obey &mdash; it needs a Father who draws near.</p>`}
+	painsSources={[
+		{ label: 'UNDP/NITI Aayog MPI 2024', url: 'https://hdr.undp.org/sites/default/files/Country-Profiles/MPI2024/IND.pdf' },
+		{ label: 'NCRB 2024 (suicide data)', url: 'https://theprint.in/india/family-problems-leading-cause-of-suicide-in-india-highest-in-18-30-age-bracket-ncrb/2925220/' },
+	]}
+	faithsHeading="What “our Father” offers India"
+	faithsIntroHtml={`India is home to Hindus, Muslims, Buddhists, Sikhs, Jains, and millions seeking. The Father&rsquo;s Heart Bible&trade; does not erase that search &mdash; it answers the longing underneath it. For the first time in English, Scripture reveals God not as a remote deity to appease, but as a <em>Father</em> who runs to meet His children.`}
+	faithsBlocks={[
+		{ heading: 'For the one seeking intimacy', bodyHtml: `Many faiths reach toward the divine through ritual and distance. The Father&rsquo;s Heart Bible&trade; reveals a God who reaches first &mdash; <a href="https://fathersheartbible.com/read/john/3" style="color: var(--color-brand);" class="hover:underline">&ldquo;our Father so loved the world&rdquo;</a> &mdash; offering not a transaction but a relationship, closeness instead of fear.` },
+		{ heading: 'For the one longing to belong', bodyHtml: `In a land of caste, class, and a billion striving souls, the Father calls every person &mdash; rich or poor, high or low &mdash; His beloved son or daughter. Belonging is no longer earned; it is given.` },
+		{ heading: 'For the one carrying shame or debt', bodyHtml: `To the farmer crushed by debt and the family broken by addiction, the Father offers a home with no ledger of wrongs &mdash; the relief of being received, not judged.` },
+		{ heading: 'For the one without hope', bodyHtml: `Where despair drives so many to the edge, the Father speaks <a href="https://fathersheartbible.com/read/jeremiah/29" style="color: var(--color-brand);" class="hover:underline">a future and a hope</a> &mdash; identity, intimacy, and inheritance that no circumstance can take away.` },
+	]}
+	whyHeading="Why the Father's Heart Bible™ for India"
+	whyBlocks={[
+		{ heading: 'God revealed as Father, not a distant deity', bodyHtml: `In a culture rich with names and images for the divine, the Father&rsquo;s Heart Bible&trade; offers something no English Bible has before: it reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href=\"https://fathersheartbible.com/read/genesis/1\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Genesis 1:1</a> onward. Not a remote power to appease, but a Father who loves His sons and daughters.` },
+		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href=\"https://fathersheartbible.com/read\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read online</a> with audio on every chapter &mdash; built to work on a basic smartphone, which is how most of India reads the internet.` },
+		{ heading: 'A starting point for every reader', bodyHtml: `New to the Bible? Our <a href=\"/guides/where-to-start-reading-the-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">where-to-start guide</a> and <a href=\"/guides/how-to-read-the-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">how-to-read-the-Bible guide</a> walk you through the first steps, so you&rsquo;re never lost on page one.` },
+	]}
+	resourcesHeading="Learn more about India"
+	resourcesIntroHtml={`Trusted sources for the facts and figures on this page &mdash; and for going deeper into India&rsquo;s people, faith, and story.`}
+	resources={[
+		{ label: 'India — Wikipedia', url: 'https://en.wikipedia.org/wiki/India' },
+		{ label: 'Christianity in India — Wikipedia', url: 'https://en.wikipedia.org/wiki/Christianity_in_India' },
+		{ label: 'The Bible Society of India', url: 'https://www.bsind.org/' },
+		{ label: 'Religion in India — Pew Research Center', url: 'https://www.pewresearch.org/religion/2021/09/21/religion-in-india-tolerance-and-segregation/' },
+		{ label: 'India — Encyclopaedia Britannica', url: 'https://www.britannica.com/place/India' },
+		{ label: 'India — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/IN' },
+	]}
+	opportunityHeading="The translation opportunity in India"
+	opportunityIntroHtml={`English reaches a remarkable share of India, but it is a second language for most. India&rsquo;s heart languages are spoken by hundreds of millions who have never had a Bible that calls God <em>Father</em> in their own tongue. Here is the scale of what&rsquo;s still ahead &mdash; and where a sponsored translation reaches the most people.`}
+	languages={[
+		{ language: 'English', speakers: '125 million+', status: 'Available' },
+		{ language: 'Hindi', speakers: '600 million', status: 'On the roadmap' },
+		{ language: 'Bengali', speakers: '97 million', status: 'Translation needed' },
+		{ language: 'Marathi', speakers: '83 million', status: 'Translation needed' },
+		{ language: 'Telugu', speakers: '81 million', status: 'Translation needed' },
+		{ language: 'Tamil', speakers: '69 million', status: 'Translation needed' },
+		{ language: 'Gujarati', speakers: '55 million', status: 'Translation needed' },
+		{ language: 'Urdu', speakers: '50 million', status: 'Translation needed' },
+	]}
+	verses={verses}
+	keepReadingHtml={`Begin with the <a href=\"https://fathersheartbible.com/read\" style=\"color: var(--color-brand);\" class=\"hover:underline\">whole Bible free online with audio</a>, learn <a href=\"/the-fathers-heart-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">why the Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href=\"/guides/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Bible reading guides</a> &mdash; including <a href=\"/guides/where-to-start-reading-the-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">where to start</a>, <a href=\"/guides/how-to-pray/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">how to pray</a>, and <a href=\"/guides/what-is-the-gospel/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">what the gospel is</a>. Browse Scripture by theme on our <a href=\"/verses/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Bible verses by topic</a> pages.`}
+	faqs={faqs}
+	ctaMidHeading="Start reading in your own language today"
+	ctaMidBodyHtml={`India&rsquo;s English readers can open the Father&rsquo;s Heart Bible&trade; this minute &mdash; free, with audio, on any phone. Hear Scripture in the Father&rsquo;s own voice.`}
+	ctaBottomBodyHtml={`From Genesis to Revelation, free online with audio &mdash; a fresh translation that reveals God as a loving Father to every beloved son and daughter, in India and around the world.`}
+/>

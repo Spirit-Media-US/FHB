@@ -76,6 +76,9 @@ const currentYear = new Date().getFullYear();
 const fhbFooterNav = globalNav
 	.filter((item: { label: string }) => item.label !== 'Family')
 	.map((item: { label: string; href: string }) => ({ label: item.label, href: item.href }));
+// Surface the country hub in the footer (it's a Resources dropdown child in the
+// header, but the footer is flat top-level, so add it explicitly here).
+fhbFooterNav.push({ label: 'Nations', href: '/bible-in/' });
 const fhbFooterLegal = [
 	{ label: 'Privacy', href: '/privacy/' },
 	{ label: 'Terms', href: '/terms/' },
