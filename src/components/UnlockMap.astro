@@ -85,7 +85,7 @@ const pledgeSubject = (row: UnlockRow) => `Pledge to Sponsor ${row.sponsor || ro
 		</header>
 
 		<div class="overflow-hidden rounded-2xl border" style="border-color: var(--color-outline-variant); background: var(--color-surface);">
-			<div class="hidden md:grid grid-cols-[88px_48px_200px_104px_1fr] gap-3 px-5 py-3" style="background: var(--color-surface-low); font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-ink);">
+			<div class="hidden md:grid grid-cols-[88px_48px_180px_150px_1fr] gap-3 px-5 py-3" style="background: var(--color-surface-low); font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-ink);">
 				<span>Cost</span>
 				<span></span>
 				<span>Unlock</span>
@@ -95,7 +95,7 @@ const pledgeSubject = (row: UnlockRow) => `Pledge to Sponsor ${row.sponsor || ro
 
 			{unlocks.map((u) => (
 				<div
-					class="grid grid-cols-[52px_1fr] md:grid-cols-[88px_48px_200px_104px_1fr] gap-3 items-center px-5 py-4"
+					class="grid grid-cols-[52px_1fr] md:grid-cols-[88px_48px_180px_150px_1fr] gap-3 items-center px-5 py-4"
 					style={`border-top: 1px solid var(--color-outline-variant); ${u.highlight ? 'background: var(--color-surface-low);' : ''}`}
 				>
 					<span class="hidden md:inline" style="font-family: var(--font-sans); font-size: 14px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.02em;">
@@ -125,10 +125,10 @@ const pledgeSubject = (row: UnlockRow) => `Pledge to Sponsor ${row.sponsor || ro
 							</a>
 						</div>
 					</div>
-					<span class="hidden md:block text-left" style="font-family: var(--font-sans); font-size: 14px; font-weight: 700; color: var(--color-ink);">
+					<span class="hidden md:block text-left whitespace-nowrap" style="font-family: var(--font-sans); font-size: 14px; font-weight: 700; color: var(--color-ink);">
 						{u.reach}
 						{u.country && (
-							<a href={`/bible-in/${u.country.slug}/#translation-opportunity`} class="block" style="font-size: 12px; font-weight: 600; color: var(--color-primary); text-decoration: none; margin-top: 3px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+							<a href={`/bible-in/${u.country.slug}/#translation-opportunity`} style="font-size: 12px; font-weight: 600; color: var(--color-primary); text-decoration: none; margin-left: 8px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
 								{u.country.label} &rarr;
 							</a>
 						)}
