@@ -104,9 +104,12 @@ export interface Props {
 	opportunityHeading?: string;
 	opportunityIntroHtml?: string;
 	languages?: CountryLanguage[];
-	// Optional: feature an already-LIVE base edition (e.g. English on the USA
-	// page) at the top of the sponsor section, instead of only roadmap languages.
-	baseEdition?: { language: string; speakers: string; note?: string };
+	// Optional: override the featured $50,000 sponsor cards with explicit items
+	// (e.g. English print + ComfortLeather™ on the USA page, where the language
+	// is already free to READ online but PUBLISHING it still needs sponsorship).
+	// When set, all roadmap/needed languages drop to "Also available" below.
+	sponsorFeatured?: { label: string; speakers: string; note?: string }[];
+	sponsorIntroHtml?: string;
 	sponsorVisionHtml?: string;
 	verses: CountryVerse[];
 	keepReadingHtml: string;
@@ -173,7 +176,8 @@ const {
 	opportunityHeading,
 	opportunityIntroHtml,
 	languages = [],
-	baseEdition,
+	sponsorFeatured,
+	sponsorIntroHtml,
 	sponsorVisionHtml,
 	verses,
 	keepReadingHtml,
@@ -217,6 +221,23 @@ const featured = featuredSponsor.length ? featuredSponsor : sponsorLangs;
 const phase2 = featuredSponsor.length
 	? sponsorLangs.filter((l) => l.status === 'Translation needed')
 	: [];
+// Explicit featured cards override (USA: English print + ComfortLeather™).
+const hasCustomFeatured = !!(sponsorFeatured && sponsorFeatured.length);
+const featuredCards = hasCustomFeatured
+	? sponsorFeatured.map((s) => ({
+			language: s.label,
+			speakers: s.speakers,
+			note: s.note,
+			readers: parseReaders(s.speakers),
+		}))
+	: featured.map((l) => ({
+			language: l.language,
+			speakers: l.speakers,
+			note: undefined,
+			readers: l.readers,
+		}));
+// When featured cards are custom, every actual language drops to "Also available".
+const alsoAvailable = hasCustomFeatured ? sponsorLangs : phase2;
 const SPONSOR_VIDEO_ID = 'eD06eSXd2uU';
 // Spam-safe mailto (matches /partner UnlockMap): address assembled on click so
 // kevin@… never appears in the served HTML.
@@ -623,28 +644,20 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 		</section>
 
 		<!-- Sponsor a translation (bottom invitation, under the read-free CTA) -->
-		{(sponsorLangs.length > 0 || baseEdition) && (
+		{(sponsorLangs.length > 0 || hasCustomFeatured) && (
 			<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${tintWarm};`}>
 				<div class="mx-auto max-w-5xl">
 					<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
 						<div class="order-2 lg:order-1">
 							<p class="text-xs font-semibold uppercase tracking-widest mb-3" style={`color: ${colorPrimary}; font-family: var(--font-sans);`}>Sponsor a translation</p>
 							<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Open the door for {country}&rsquo;s languages</h2>
-							<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">A one-time <strong style="color: var(--color-ink);">$50,000</strong> opens the door for an entire language &mdash; full translation, print, digital, and audio.</p>
+							{sponsorIntroHtml ? (
+								<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={sponsorIntroHtml}></p>
+							) : (
+								<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">A one-time <strong style="color: var(--color-ink);">$50,000</strong> opens the door for an entire language &mdash; full translation, print, digital, and audio.</p>
+							)}
 							<div class="mt-6 space-y-4">
-								{baseEdition && (
-									<div class="rounded-2xl p-5" style={`background-color: var(--color-surface-lowest); border: 1px solid ${colorPrimary}33;`}>
-										<div class="flex items-baseline justify-between gap-3">
-											<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{baseEdition.language}</h3>
-											<span class="shrink-0 text-sm font-semibold" style={`color: ${colorPrimary}; font-family: var(--font-sans);`}>{baseEdition.speakers}</span>
-										</div>
-										<p class="mt-3 flex items-baseline gap-2">
-											<span class="text-2xl font-medium" style="font-family: var(--font-serif); color: var(--color-ink);">Available now</span>
-											<span class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">free &middot; {baseEdition.note || 'the base edition, already live'}</span>
-										</p>
-									</div>
-								)}
-								{featured.map((l) => (
+								{featuredCards.map((l) => (
 									<div class="rounded-2xl p-5" style="background-color: var(--color-surface-lowest); border: 1px solid rgba(0,0,0,0.06);">
 										<div class="flex items-baseline justify-between gap-3">
 											<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{l.language}</h3>
@@ -652,7 +665,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 										</div>
 										<p class="mt-3 flex items-baseline gap-2">
 											<span class="text-2xl font-medium" style="font-family: var(--font-serif); color: var(--color-ink);">$50,000</span>
-											<span class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">one-time &middot; {perReaderLabel(l.readers)}</span>
+											<span class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">one-time &middot; {l.note || (l.readers ? perReaderLabel(l.readers) : 'full publication')}</span>
 										</p>
 									</div>
 								))}
@@ -670,11 +683,11 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 							<p class="mt-4 text-center text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/partner" style="color: var(--color-brand);" class="hover:underline font-semibold">Partner with us &rarr;</a></p>
 						</div>
 					</div>
-					{phase2.length > 0 && (
+					{alsoAvailable.length > 0 && (
 						<div class="mt-8">
 							<p class="text-xs font-semibold uppercase tracking-widest mb-2" style={`font-family: var(--font-sans); color: ${colorPrimary};`}>Also available for sponsorship</p>
 							<ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2.5">
-								{phase2.map((l) => (
+								{alsoAvailable.map((l) => (
 									<li class="text-sm leading-snug" style="font-family: var(--font-sans);">
 										<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" data-subj={`Sponsor ${l.language} — Father's Heart Bible`} onclick={pledgeOnclick} class="font-semibold hover:underline" style="color: var(--color-brand);">{l.language} &rarr;</a>
 										<span class="block" style="color: var(--color-muted);">$50,000 &middot; {l.speakers} &middot; {perReaderLabel(l.readers)}</span>
