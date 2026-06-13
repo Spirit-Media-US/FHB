@@ -69,6 +69,14 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/dcf30948a3b86f3a9738df4e9d973137bdcfc167-1733x1300.jpg',
 	},
 	{
+		slug: 'turkey',
+		country: 'Turkey',
+		title: 'The Bible in Turkey',
+		blurb:
+			'The cradle of the early church — Antioch, Ephesus, the Seven Churches — now ~99% Muslim. The Father’s Heart Bible™ longs to reveal again, in Turkish, the Father whose story began in this very land.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3f849b700a3a0a02c6094ea83abac9de097c5161-1880x993.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
