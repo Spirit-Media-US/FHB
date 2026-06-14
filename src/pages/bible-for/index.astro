@@ -1,0 +1,128 @@
+---
+// /bible-for — the "A Father For" hub. Sibling to /bible-in. Lists every live
+// group page as a card (from GROUPS) and the rest of the roadmap as an
+// "on the way" list (from UPCOMING_GROUPS). The URL is "bible-for" for SEO/AEO,
+// but the heart is "A Father FOR every calling and season." Add a group by
+// shipping /bible-for/<slug>.astro and moving its name into GROUPS in
+// src/data/groups.ts. FHB color scheme. Read-first per the architecture rules
+// in memory/reference_group_page_builder.md.
+import { GROUPS, UPCOMING_GROUPS } from '../../data/groups';
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/bible-for/';
+const TITLE = "A Father For You — Bible Verses & Hope for Every Calling | Father's Heart Bible™";
+const DESCRIPTION =
+	"Whoever you are and whatever you carry, the Father's Heart Bible™ has a word for you. Read free with audio — the Father's own voice for worship leaders, pastors, parents, and more.";
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/e50078ea47f2ce7aadd278f2f5bec9e5c07f3304-1200x800.jpg';
+const HERO_ALT = 'People worshipping together with hands raised';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=560&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const collectionSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'CollectionPage',
+	name: 'A Father For',
+	description: DESCRIPTION,
+	url: PAGE_URL,
+	inLanguage: 'en',
+	isPartOf: {
+		'@type': 'WebSite',
+		name: "Father's Heart Bible™",
+		url: 'https://fathersheartbible.com/',
+	},
+	mainEntity: {
+		'@type': 'ItemList',
+		itemListElement: GROUPS.map((g, i) => ({
+			'@type': 'ListItem',
+			position: i + 1,
+			name: g.title,
+			url: `https://fathersheartbible.com/bible-for/${g.slug}/`,
+		})),
+	},
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{ '@type': 'ListItem', position: 2, name: 'A Father For', item: PAGE_URL },
+	],
+};
+const jsonLd = [collectionSchema, breadcrumbSchema];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[560px] lg:min-h-[calc(46vh_+_2in)]">
+			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.4) 100%);" aria-hidden="true"></div>
+			<div class="absolute inset-x-0 bottom-0 z-20 px-6 pb-10 lg:px-8 lg:pb-14">
+				<div class="mx-auto max-w-4xl">
+					<p class="text-sm font-semibold uppercase tracking-widest mb-2" style="color: var(--color-gold); font-family: var(--font-sans);">A Father For</p>
+					<h1 class="text-4xl md:text-5xl lg:text-6xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">A Father for you</h1>
+					<p class="mt-4 max-w-2xl text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.92);">Whoever you are and whatever you carry, there is a word from the Father for you.</p>
+				</div>
+			</div>
+			<div class="absolute inset-x-0 bottom-0 z-30 h-1.5" style="background: linear-gradient(to right, var(--color-gold) 0%, var(--color-brand) 100%);" aria-hidden="true"></div>
+		</section>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">A Father For</span>
+				</nav>
+				<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					The answer to what you carry is not another duty, and not a distant God &mdash; it is a holy <strong style="color: var(--color-ink);">Father</strong> for a beloved son or daughter. The <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and hear online, and it speaks His own voice over every calling and season. Find yours below.
+				</p>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-4xl">
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+					{GROUPS.map((g) => (
+						<a href={`/bible-for/${g.slug}/`} class="block rounded-2xl overflow-hidden no-underline transition-all hover:opacity-95" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+							<img src={`${g.img}?w=800&h=460&fit=crop&crop=entropy&fm=webp&q=70`} alt={g.title} width="800" height="460" class="w-full h-44 object-cover" loading="lazy" decoding="async" />
+							<div class="p-5">
+								<h2 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{g.title}</h2>
+								<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{g.blurb}</p>
+								<span class="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">Read more <span aria-hidden="true">&rarr;</span></span>
+							</div>
+						</a>
+					))}
+				</div>
+
+				{UPCOMING_GROUPS.length > 0 && (
+					<div class="mt-12">
+						<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-gold); font-family: var(--font-sans);">More on the way</p>
+						<ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2.5">
+							{UPCOMING_GROUPS.map((name) => (
+								<li class="text-base leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{name}</li>
+							))}
+						</ul>
+						<p class="mt-6 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">A Father for every calling and season &mdash; new pages are being added. <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">Start reading free</a> while you wait.</p>
+					</div>
+				)}
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible&trade; free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Wherever you are and whatever you carry, start now &mdash; the whole Bible, free online with audio, in a fresh translation that reveals God as a loving Father.</p>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+	</main>
+</Layout>
