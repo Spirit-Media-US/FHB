@@ -101,6 +101,14 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/2fc21064a603d292015c6e62cec99f19f2e014c9-1880x1253.jpg',
 	},
 	{
+		slug: 'iran',
+		country: 'Iran',
+		title: 'The Bible in Iran',
+		blurb:
+			'Ancient Persia — woven into the Bible through Cyrus, Esther, and the Magi — today a searching nation with one of the fastest-growing movements to Christ on earth. The Father’s Heart Bible™ longs to reveal, in Persian, the Father found by all who seek Him.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/42f1fa91a001338ac6641bd0ec7505b6f28b5e20-1880x1253.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
