@@ -28,11 +28,18 @@ export const GROUPS: Group[] = [
 			'For the ones who carry the room every week — a Father who sings over you, so you can be loved before you ever lead. You are a beloved son or daughter, not a performer.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/e50078ea47f2ce7aadd278f2f5bec9e5c07f3304-1200x800.jpg',
 	},
+	{
+		slug: 'pastors',
+		group: 'Pastors',
+		title: 'For Pastors',
+		blurb:
+			'For the ones who carry everyone else’s weight — a Bible that lets you be fathered before you shepherd, because even the shepherd needs a Shepherd. Before you’re a pastor, you’re a son.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/141479390101f73507ff3662dec8e5c8e1427284-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
 export const UPCOMING_GROUPS: string[] = [
-	'Pastors',
 	'Student Ministry',
 	"Children's Ministry",
 	'Church Staff',
