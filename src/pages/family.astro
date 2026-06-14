@@ -13,6 +13,17 @@
 import Layout from '../layouts/Layout.astro';
 
 const JOIN_URL = 'https://fathersheartbible.com/login?error=join-to-interact';
+
+// Why Join — condensed from the canonical perks list on the login page (Kevin
+// owns that copy). The strongest free value-adds, short and scannable.
+const whyJoin = [
+	'Read the whole Bible free — with verse-by-verse audio',
+	'Highlight, save &amp; share any verse',
+	'Turn verses into beautiful shareable image cards',
+	'Compare translations side by side',
+	'Join the Readers &amp; Intercessors groups and feeds',
+	'Add your pin to the Readers World Map',
+];
 const IMG = 'https://cdn.sanity.io/images/rusi1hyi/production/';
 // Group cards reuse each community resource's own Sanity image (passed as an
 // asset id). The Connection Points whose pages have no single fixed image
@@ -107,6 +118,17 @@ const jsonLd = {
 				<a href={JOIN_URL} class="fam-join">Join the Family</a>
 				<p class="fam-free">Free to join — one tap, no password.</p>
 			</header>
+
+			<section class="fam-why" aria-labelledby="fam-why-title">
+				<h2 id="fam-why-title">Why join?</h2>
+				<p class="fam-why-lede">Reading is free for everyone. Joining — also free — unlocks all of this:</p>
+				<ul class="fam-why-list">
+					{whyJoin.map((item) => (
+						<li><span class="fam-why-check" aria-hidden="true">✓</span><span set:html={item} /></li>
+					))}
+				</ul>
+				<p class="fam-why-more">…plus free resource downloads, live events, member messages, and a hand in shaping the translation itself.</p>
+			</section>
 
 			<section class="fam-section">
 				<div class="fam-section-head">
@@ -213,6 +235,71 @@ const jsonLd = {
 	@media (min-width: 768px) {
 		.fam-hero h1 {
 			font-size: 3rem;
+		}
+	}
+	/* WHY JOIN — condensed checklist, no images (keeps the page fast + CLS-free) */
+	.fam-why {
+		max-width: 760px;
+		margin: 0 auto 48px;
+		padding: 28px 28px 24px;
+		border: 1px solid var(--color-outline-variant);
+		border-radius: 16px;
+		background: linear-gradient(120deg, #fff4f7 0%, #ffe9ee 100%);
+		text-align: center;
+	}
+	.fam-why h2 {
+		font-family: var(--font-headline);
+		font-size: 22px;
+		font-weight: 700;
+		color: var(--color-ink);
+		letter-spacing: -0.02em;
+		margin: 0 0 6px;
+	}
+	.fam-why-lede {
+		color: var(--color-muted, #5b3f46);
+		font-size: 15px;
+		margin: 0 auto 18px;
+		max-width: 36rem;
+	}
+	.fam-why-list {
+		list-style: none;
+		margin: 0 0 14px;
+		padding: 0;
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 10px 24px;
+		text-align: left;
+	}
+	.fam-why-list li {
+		display: flex;
+		align-items: flex-start;
+		gap: 10px;
+		font-size: 15px;
+		line-height: 1.4;
+		color: var(--color-ink);
+	}
+	.fam-why-check {
+		flex-shrink: 0;
+		width: 20px;
+		height: 20px;
+		border-radius: 9999px;
+		background: var(--color-primary, #b60057);
+		color: #fff;
+		font-size: 12px;
+		font-weight: 700;
+		line-height: 20px;
+		text-align: center;
+	}
+	.fam-why-more {
+		color: var(--color-muted, #5b3f46);
+		font-size: 13.5px;
+		line-height: 1.5;
+		margin: 0 auto;
+		max-width: 36rem;
+	}
+	@media (min-width: 640px) {
+		.fam-why-list {
+			grid-template-columns: 1fr 1fr;
 		}
 	}
 	/* SECTIONS — mirror /library .lib-* */
