@@ -427,7 +427,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 		)}
 
 		<!-- Why the Father's Heart Bible™ for <group> -->
-		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${TINT_PINK};`}>
 			<div class="mx-auto max-w-3xl">
 				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{whyHeading || `Why the Father's Heart Bible™ for ${groupLower}`}</h2>
 				<div class="mt-8 space-y-8">
@@ -452,18 +452,23 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 			</section>
 		)}
 
-		<!-- Mid-page read CTA (Gold standard: mid + bottom). Dark band, matching the declaration. -->
+		<!-- Mid-page read CTA (Gold standard: mid + bottom). Dark band w/ FHB cover. -->
 		<section class="px-6 py-14 lg:px-8 lg:py-16" style="background-color: var(--color-deep);">
-			<div class="mx-auto max-w-2xl text-center">
-				<div class="mx-auto mb-6 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
-				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{ctaMidHeading}</h2>
-				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.85);" set:html={ctaMidBodyHtml}></p>
-				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read FHB free<span aria-hidden="true">&rarr;</span></a>
+			<div class="mx-auto max-w-4xl">
+				<div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+					<img src="https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png?w=360&fm=webp&q=72&auto=format" alt="The Father's Heart Bible™ cover" width="180" height="252" class="w-36 md:w-44 shrink-0" style="filter: drop-shadow(0 10px 24px rgba(0,0,0,0.5));" loading="lazy" decoding="async" />
+					<div class="text-center md:text-left">
+						<div class="mx-auto md:mx-0 mb-5 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
+						<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{ctaMidHeading}</h2>
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.85);" set:html={ctaMidBodyHtml}></p>
+						<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read FHB free<span aria-hidden="true">&rarr;</span></a>
+					</div>
+				</div>
 			</div>
 		</section>
 
 		<!-- What our Father says to <group> — first person, from the Father -->
-		<section id="father-says" class="px-6 py-14 lg:px-8 lg:py-20 scroll-mt-24" style={`background-color: ${TINT_PINK};`}>
+		<section id="father-says" class="px-6 py-14 lg:px-8 lg:py-20 scroll-mt-24" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">
 				<h2 class="text-2xl md:text-3xl font-light leading-tight text-center" style="font-family: var(--font-serif); color: var(--color-ink);">{fatherSaysHeading || `What our Father says to ${groupLower}`}</h2>
 				<div class="mt-7 space-y-5 text-base lg:text-lg leading-relaxed italic" style="font-family: var(--font-serif); color: var(--color-ink);" set:html={fatherSaysHtml}></div>
