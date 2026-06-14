@@ -97,7 +97,8 @@ export interface Props {
 	// External voices (E-E-A-T) — short attributed statements from notable figures
 	voicesHeading?: string;
 	voicesIntroHtml?: string;
-	voices?: { quote: string; name: string; role: string }[];
+	voices?: { quote: string; name: string; role: string; photo?: string }[];
+	voicesCreditHtml?: string; // photo attribution (CC requires author + license)
 	// Free PDF gift card (rendered library-style)
 	pdf?: {
 		title: string;
@@ -172,6 +173,7 @@ const {
 	voicesHeading,
 	voicesIntroHtml,
 	voices = [],
+	voicesCreditHtml,
 	pdf,
 	wordHeading,
 	wordBodyHtml,
@@ -504,10 +506,16 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 						{voices.map((v) => (
 							<figure class="rounded-2xl p-6" style="background-color: var(--color-surface-low); border: 1px solid rgba(0,0,0,0.06); border-left: 4px solid var(--color-gold);">
 								<blockquote class="text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.quote}&rdquo;</blockquote>
-								<figcaption class="mt-3 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><span class="font-semibold" style="color: var(--color-ink);">{v.name}</span> &mdash; {v.role}</figcaption>
+								<figcaption class="mt-4 flex items-center gap-3 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">
+									{v.photo && (<img src={`${v.photo}?w=120&h=120&fit=crop&crop=top&fm=webp&q=75`} alt={v.name} width="48" height="48" class="rounded-full object-cover shrink-0" style="width: 48px; height: 48px; border: 1px solid var(--color-hairline);" loading="lazy" decoding="async" />)}
+									<span><span class="font-semibold" style="color: var(--color-ink);">{v.name}</span> &mdash; {v.role}</span>
+								</figcaption>
 							</figure>
 						))}
 					</div>
+					{voicesCreditHtml && (
+						<p class="mt-5 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={voicesCreditHtml}></p>
+					)}
 				</div>
 			</section>
 		)}
