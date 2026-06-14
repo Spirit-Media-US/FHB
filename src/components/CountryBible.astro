@@ -67,6 +67,9 @@ export interface Props {
 	// Sanity crop mode for the hero (default 'entropy'). Use a focal point when
 	// entropy picks the wrong region, e.g. 'focalpoint&fp-x=0.49&fp-y=0.3'.
 	heroCrop?: string;
+	// Optional Sanity brightness adjustment for the hero (-100..100). Positive
+	// lightens a too-dark hero image, e.g. heroBrightness={18}.
+	heroBrightness?: number;
 	directAnswerHtml: string;
 	keyTakeaway: string;
 	glanceIntroHtml: string;
@@ -141,6 +144,7 @@ const {
 	heroBase,
 	heroAlt,
 	heroCrop = 'entropy',
+	heroBrightness,
 	directAnswerHtml,
 	keyTakeaway,
 	glanceIntroHtml,
@@ -243,7 +247,8 @@ const SPONSOR_VIDEO_ID = 'eD06eSXd2uU';
 // kevin@… never appears in the served HTML.
 const pledgeOnclick =
 	"event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent(this.dataset.subj)";
-const HERO_IMG = `${heroBase}?w=1400&h=560&fit=crop&crop=${heroCrop}&fm=webp&q=72`;
+const HERO_BRI = heroBrightness != null ? `&bri=${heroBrightness}` : '';
+const HERO_IMG = `${heroBase}?w=1400&h=560&fit=crop&crop=${heroCrop}${HERO_BRI}&fm=webp&q=72`;
 const OG_IMG = `${heroBase}?w=1200&h=630&fit=crop&crop=${heroCrop}&fm=jpg&q=80`;
 
 const breadcrumbSchema = {
