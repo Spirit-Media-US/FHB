@@ -117,6 +117,14 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/04152bca121aec87b9a859e38f29cce4f4794b31-1880x1177.jpg',
 	},
 	{
+		slug: 'thailand',
+		country: 'Thailand',
+		title: 'The Bible in Thailand',
+		blurb:
+			'The gentle “Land of Smiles,” one of the largest unreached Buddhist nations on earth — where the Father’s Heart Bible™ longs to reveal, in Thai, a Father who frees the bound and gathers the weary. Thai among our priorities.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/803235d0ba419715e9951124102b1577d840e5fb-1880x1253.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
