@@ -6,7 +6,6 @@
 // "why FHB" blocks, scripture sampler, keep-reading links, FAQ, and read-first
 // CTAs. Architecture rules (read-first CTA, English-first) live in
 // memory/project_fhb_country_pages.md. Mirror the /verses + /guides patterns.
-import { NATIONS } from '../data/nations';
 import Layout from '../layouts/Layout.astro';
 
 export interface CountryStat {
@@ -190,7 +189,6 @@ const {
 } = Astro.props;
 
 const PAGE_URL = `https://fathersheartbible.com/bible-in/${slug}/`;
-const otherNations = NATIONS.filter((n) => n.slug !== slug);
 
 // --- Sponsor-a-translation maths (bottom section) ---
 // Each language unlocks for a one-time $50,000 (translation + print + digital +
@@ -729,9 +727,6 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 			<div class="mx-auto max-w-4xl text-center">
 				<p class="text-xs leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
 					<span class="font-semibold" style="color: var(--color-ink);">The Father&rsquo;s Heart Bible&trade; around the world</span> &mdash; read free online, country by country.
-					{otherNations.length > 0 && (
-						<span>{' '}Also explore: {otherNations.map((n, i) => (<>{i > 0 && <span aria-hidden="true"> &middot; </span>}<a href={`/bible-in/${n.slug}/`} style="color: var(--color-brand);" class="hover:underline">{n.country}</a></>))}.</span>
-					)}
 					{' '}<a href="/bible-in/" style="color: var(--color-brand);" class="hover:underline font-semibold">Browse all nations &rarr;</a>
 				</p>
 			</div>
