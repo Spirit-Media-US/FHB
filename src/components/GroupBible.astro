@@ -89,9 +89,23 @@ export interface Props {
 	offersHeading?: string;
 	offersIntroHtml?: string;
 	offersBlocks?: GroupBlock[];
+	// Standalone pull-quote (AEO: a clean, self-contained, citable sentence)
+	pullQuote?: string;
 	// "Why the Father's Heart Bible™ for <group>"
 	whyHeading?: string;
 	whyBlocks: GroupBlock[];
+	// External voices (E-E-A-T) — short attributed statements from notable figures
+	voicesHeading?: string;
+	voicesIntroHtml?: string;
+	voices?: { quote: string; name: string; role: string }[];
+	// Free PDF gift card (rendered library-style)
+	pdf?: {
+		title: string;
+		description: string;
+		coverUrl: string;
+		fileUrl: string;
+		buttonText?: string;
+	};
 	// "His Word will not return void"
 	wordHeading?: string;
 	wordBodyHtml?: string;
@@ -152,8 +166,13 @@ const {
 	offersHeading,
 	offersIntroHtml,
 	offersBlocks = [],
+	pullQuote,
 	whyHeading,
 	whyBlocks,
+	voicesHeading,
+	voicesIntroHtml,
+	voices = [],
+	pdf,
 	wordHeading,
 	wordBodyHtml,
 	ctaMidHeading = 'Be loved before you lead',
@@ -254,7 +273,12 @@ const collectionSchema = {
 	description,
 	url: PAGE_URL,
 	inLanguage: 'en',
+	isAccessibleForFree: true,
 	author: KEVIN_WHITE_AUTHOR,
+	speakable: {
+		'@type': 'SpeakableSpecification',
+		cssSelector: ['#direct-answer', '#key-takeaway'],
+	},
 	...(lastUpdatedIso ? { dateModified: lastUpdatedIso } : {}),
 	isPartOf: {
 		'@type': 'WebSite',
@@ -307,10 +331,10 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 					<a href="/bible-for/" class="hover:underline">A Father For</a><span class="px-1.5" aria-hidden="true">/</span>
 					<span style="color: var(--color-ink);">{group}</span>
 				</nav>
-				<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={directAnswerHtml}></p>
+				<p id="direct-answer" class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={directAnswerHtml}></p>
 				<p class="mt-3 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">By <a href="/the-fathers-heart-bible/lead-translator/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; Lead Translator, Father&rsquo;s Heart Bible&trade;{lastUpdated && <span> &middot; Last updated {lastUpdated}</span>}</p>
 				<div class="mt-6 rounded-xl px-5 py-4" style={`background-color: ${TINT_PINK}; border-left: 4px solid var(--color-gold);`}>
-					<p class="text-base font-semibold leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);"><span class="font-bold uppercase text-sm tracking-widest mr-2" style="color: var(--color-brand);">Key takeaway</span>{keyTakeaway}</p>
+					<p id="key-takeaway" class="text-base font-semibold leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);"><span class="font-bold uppercase text-sm tracking-widest mr-2" style="color: var(--color-brand);">Key takeaway</span>{keyTakeaway}</p>
 				</div>
 				<nav aria-label="On this page" class="mt-6">
 					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>
@@ -370,6 +394,15 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 				<div class="mt-5 space-y-5 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={aFatherBodyHtml}></div>
 			</div>
 		</section>
+
+		<!-- Standalone pull-quote (clean, citable) -->
+		{pullQuote && (
+			<section class="px-6 py-10 lg:px-8 lg:py-12" style="background-color: var(--color-surface-low);">
+				<figure class="mx-auto max-w-3xl text-center">
+					<blockquote class="text-2xl md:text-3xl font-light leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{pullQuote}&rdquo;</blockquote>
+				</figure>
+			</section>
+		)}
 
 		<!-- Top photo gallery -->
 		{gallery.length > 0 && (
@@ -441,6 +474,26 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 			</div>
 		</section>
 
+		<!-- External voices (E-E-A-T): short attributed statements -->
+		{voices.length > 0 && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-3xl">
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{voicesHeading || 'What the great worshipers found'}</h2>
+					{voicesIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={voicesIntroHtml}></p>
+					)}
+					<div class="mt-8 space-y-5">
+						{voices.map((v) => (
+							<figure class="rounded-2xl p-6" style="background-color: var(--color-surface-low); border: 1px solid rgba(0,0,0,0.06); border-left: 4px solid var(--color-gold);">
+								<blockquote class="text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.quote}&rdquo;</blockquote>
+								<figcaption class="mt-3 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><span class="font-semibold" style="color: var(--color-ink);">{v.name}</span> &mdash; {v.role}</figcaption>
+							</figure>
+						))}
+					</div>
+				</div>
+			</section>
+		)}
+
 		<!-- His Word will not return void -->
 		{wordBodyHtml && (
 			<section class="px-6 py-14 lg:px-8 lg:py-20" style="background-color: var(--color-surface-low);">
@@ -490,6 +543,23 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 				<div class="mx-auto max-w-3xl">
 					<h2 class="text-xl md:text-2xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Keep reading</h2>
 					<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={keepReadingHtml}></p>
+				</div>
+			</section>
+		)}
+
+		<!-- Free PDF gift card (library-style) -->
+		{pdf && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-md">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-4 text-center" style="color: var(--color-gold); font-family: var(--font-sans);">A free gift for you</p>
+					<article class="overflow-hidden rounded-2xl" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+						<img src={pdf.coverUrl} alt={pdf.title} class="w-full h-52 object-cover" loading="lazy" decoding="async" />
+						<div class="p-6 text-center">
+							<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{pdf.title}</h3>
+							<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{pdf.description}</p>
+							<a href={pdf.fileUrl} target="_blank" rel="noopener" class="inline-flex items-center gap-2 mt-5 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">{pdf.buttonText || 'Download the PDF'}<span aria-hidden="true">&rarr;</span></a>
+						</div>
+					</article>
 				</div>
 			</section>
 		)}
