@@ -14,15 +14,22 @@ import Layout from '../layouts/Layout.astro';
 
 const JOIN_URL = 'https://fathersheartbible.com/login?error=join-to-interact';
 
-// Why Join — condensed from the canonical perks list on the login page (Kevin
-// owns that copy). The strongest free value-adds, short and scannable.
+// Why Join — the canonical free perks list (titles), verbatim from the login
+// page (Kevin owns that copy). Titles only, multi-column, for a scannable pitch.
 const whyJoin = [
-	'Read the whole Bible free — with verse-by-verse audio',
-	'Highlight, save &amp; share any verse',
-	'Turn verses into beautiful shareable image cards',
-	'Compare translations side by side',
-	'Join the Readers &amp; Intercessors groups and feeds',
+	'Hear every chapter read aloud',
+	'Compare translations',
+	'Highlight, copy &amp; share verses',
+	'Make &amp; share verse image cards',
+	'Recommend wording on any verse',
+	'React &amp; comment on any chapter',
+	'Your name on the Wall of Contributors',
+	'See the Groups — and their feeds',
+	'DM members you know',
+	'Update your profile',
 	'Add your pin to the Readers World Map',
+	'RSVP to Events',
+	'Download FREE resources',
 ];
 const IMG = 'https://cdn.sanity.io/images/rusi1hyi/production/';
 // Group cards reuse each community resource's own Sanity image (passed as an
@@ -120,14 +127,13 @@ const jsonLd = {
 			</header>
 
 			<section class="fam-why" aria-labelledby="fam-why-title">
-				<h2 id="fam-why-title">Why join?</h2>
-				<p class="fam-why-lede">Reading is free for everyone. Joining — also free — unlocks all of this:</p>
+				<h2 id="fam-why-title">Why join? It's all free.</h2>
+				<p class="fam-why-lede">Reading is open to everyone. Joining the Family — free — unlocks everything you can do:</p>
 				<ul class="fam-why-list">
 					{whyJoin.map((item) => (
 						<li><span class="fam-why-check" aria-hidden="true">✓</span><span set:html={item} /></li>
 					))}
 				</ul>
-				<p class="fam-why-more">…plus free resource downloads, live events, member messages, and a hand in shaping the translation itself.</p>
 			</section>
 
 			<section class="fam-section">
@@ -263,10 +269,10 @@ const jsonLd = {
 	}
 	.fam-why-list {
 		list-style: none;
-		margin: 0 0 14px;
+		margin: 0;
 		padding: 0;
 		display: grid;
-		grid-template-columns: 1fr;
+		grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
 		gap: 10px 24px;
 		text-align: left;
 	}
@@ -289,18 +295,6 @@ const jsonLd = {
 		font-weight: 700;
 		line-height: 20px;
 		text-align: center;
-	}
-	.fam-why-more {
-		color: var(--color-muted, #5b3f46);
-		font-size: 13.5px;
-		line-height: 1.5;
-		margin: 0 auto;
-		max-width: 36rem;
-	}
-	@media (min-width: 640px) {
-		.fam-why-list {
-			grid-template-columns: 1fr 1fr;
-		}
 	}
 	/* SECTIONS — mirror /library .lib-* */
 	.fam-section {
