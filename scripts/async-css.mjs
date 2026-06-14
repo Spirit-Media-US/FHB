@@ -30,7 +30,8 @@ const DIST = path.resolve('dist');
 const SYNC_CSS_PAGES = new Set([
 	'blog/index.html',
 	'read/index.html',
-	'nations.html', // minor CLS + the country grid reflows from deferred CSS
+	'nations/index.html', // minor CLS + the country grid reflows from deferred CSS
+	'family/index.html', // text-LCP hero + card grid; deferred CSS would reflow the hero
 ]);
 
 // Render-blocking page prefixes (dir + everything under it).

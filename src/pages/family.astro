@@ -1,0 +1,331 @@
+---
+// /family — the public hub for the Father's Heart Family community.
+//
+// Replaces the long "Family" dropdown in the global nav (which made the mobile
+// menu scroll endlessly and buried Resources). The nav's "Family" item now links
+// here. This is a STATIC marketing page on purpose: its job is to convert
+// non-members (Join the Family is the prioritized hero CTA), so it must be public,
+// fast, and SEO-indexable. The destinations it links to stay as community SSR
+// routes (served on the apex domain); a logged-out tap into any of them lands on
+// the join flow, which reinforces signup.
+//
+// Styled to match /library's card-grid look (the .fam-* classes mirror .lib-*).
+import Layout from '../layouts/Layout.astro';
+
+const JOIN_URL = 'https://fathersheartbible.com/login?error=join-to-interact';
+const IMG = 'https://cdn.sanity.io/images/rusi1hyi/production/';
+// Group cards reuse each community resource's own Sanity image (passed as an
+// asset id). The Connection Points whose pages have no single fixed image
+// (Map, Events, Directory) use live screenshots of the actual page, captured
+// and hosted in R2 — passed as full https URLs, returned as-is.
+const FAM = 'https://assets.spiritmediapublishing.com/FHB/family/';
+const cover = (v: string) =>
+	v.startsWith('http') ? v : `${IMG}${v}?w=640&h=400&fit=crop&crop=entropy&fm=webp&q=72`;
+
+// Available Groups — the community "spaces" (groups) members can join.
+const groups = [
+	{
+		title: 'Readers',
+		href: 'https://fathersheartbible.com/spaces/readers',
+		desc: 'The heart of the family — share what you’re reading and encourage one another.',
+		cta: 'Join the conversation →',
+		img: '158c3459d549d4902a4f85209dadc8a9e48dc0d6-7934x5292.jpg',
+	},
+	{
+		title: 'Intercessors',
+		href: 'https://fathersheartbible.com/spaces/intercessors',
+		desc: 'Stand together in prayer for readers and for the Bible reaching every nation.',
+		cta: 'Pray with us →',
+		img: '30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
+	},
+	{
+		title: 'Founders',
+		href: 'https://fathersheartbible.com/spaces/founders',
+		desc: 'Our partners who help carry the Father’s Heart Bible to the world.',
+		cta: 'Meet the Founders →',
+		img: 'e1bf90d1eaeab499989a239a2f5bfd98494e3f78-5867x3911.jpg',
+	},
+];
+
+// Connection Points — ways to belong and connect across the whole family.
+const connections = [
+	{
+		title: 'Events',
+		href: 'https://fathersheartbible.com/events',
+		desc: 'Gather with the family for live readings, prayer, and fellowship.',
+		cta: 'See what’s on →',
+		img: `${FAM}family-events.webp`,
+	},
+	{
+		title: 'Readers World Map',
+		href: 'https://fathersheartbible.com/map',
+		desc: 'See where the family is reading the Father’s heart around the globe.',
+		cta: 'Open the map →',
+		img: `${FAM}family-map.webp`,
+	},
+	{
+		title: 'Wall of Contributors',
+		href: 'https://fathersheartbible.com/contributors',
+		desc: 'Meet the readers and partners building this movement together.',
+		cta: 'See the wall →',
+		img: '1bd508c989202adb0ebaee1b078e44e487690149-7226x3095.jpg',
+	},
+	{
+		title: 'Member Directory',
+		href: 'https://fathersheartbible.com/directory',
+		desc: 'Find and connect with brothers and sisters across the family.',
+		cta: 'Find members →',
+		img: `${FAM}family-directory.webp`,
+	},
+];
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'CollectionPage',
+	name: 'Join the Father’s Heart Family',
+	description:
+		'Connect with beloved sons and daughters around the world — groups, prayer, events, and the global family of Father’s Heart Bible readers.',
+	url: 'https://fathersheartbible.com/family/',
+	hasPart: [...groups, ...connections].map((c) => ({
+		'@type': 'WebPage',
+		name: c.title,
+		url: c.href,
+	})),
+};
+---
+
+<Layout
+	title="Join the Father's Heart Family"
+	description="Connect with beloved sons and daughters around the world. Join the free Father's Heart Family — reader groups, intercessors, events, the world map, and more."
+	jsonLd={jsonLd}
+>
+	<main class="fam-shell">
+		<div class="container">
+			<header class="fam-hero">
+				<h1>Join the Father's Heart Family</h1>
+				<p class="fam-lede">Connect with beloved sons and daughters around the world.</p>
+				<a href={JOIN_URL} class="fam-join">Join the Family</a>
+				<p class="fam-free">Free to join — one tap, no password.</p>
+			</header>
+
+			<section class="fam-section">
+				<div class="fam-section-head">
+					<h2 class="fam-section-title">Available Groups</h2>
+					<a class="fam-section-link" href="https://fathersheartbible.com/groups">All Groups →</a>
+				</div>
+				<div class="fam-grid">
+					{groups.map((c) => (
+						<a class="fam-card" href={c.href}>
+							<div class="fam-cover">
+								<img src={cover(c.img)} alt={c.title} width="640" height="400" loading="lazy" decoding="async" />
+							</div>
+							<div class="fam-card-body">
+								<h3 class="fam-card-title">{c.title}</h3>
+								<p class="fam-card-desc">{c.desc}</p>
+								<span class="fam-cta">{c.cta}</span>
+							</div>
+						</a>
+					))}
+				</div>
+			</section>
+
+			<section class="fam-section">
+				<h2 class="fam-section-title">Connection Points</h2>
+				<div class="fam-grid">
+					{connections.map((c) => (
+						<a class="fam-card" href={c.href}>
+							<div class="fam-cover">
+								<img src={cover(c.img)} alt={c.title} width="640" height="400" loading="lazy" decoding="async" />
+							</div>
+							<div class="fam-card-body">
+								<h3 class="fam-card-title">{c.title}</h3>
+								<p class="fam-card-desc">{c.desc}</p>
+								<span class="fam-cta">{c.cta}</span>
+							</div>
+						</a>
+					))}
+				</div>
+			</section>
+
+			<section class="fam-closer">
+				<h2>Come and belong</h2>
+				<p>The family is free, and there’s a place for you in it.</p>
+				<a href={JOIN_URL} class="fam-join">Join the Family</a>
+			</section>
+		</div>
+	</main>
+</Layout>
+
+<style>
+	.fam-shell {
+		padding: 48px 24px 64px;
+		min-height: calc(100dvh - 64px);
+		background: var(--color-canvas);
+	}
+	.container {
+		max-width: 1100px;
+		margin: 0 auto;
+	}
+	/* HERO — text-LCP, no image. Sized generously so the deferred (sync, for this
+	   page) CSS never reflows it. */
+	.fam-hero {
+		text-align: center;
+		padding: 32px 0 48px;
+	}
+	.fam-hero h1 {
+		font-family: var(--font-headline);
+		font-size: 2.25rem;
+		line-height: 1.15;
+		font-weight: 700;
+		color: var(--color-ink);
+		letter-spacing: -0.02em;
+		margin: 0 0 12px;
+	}
+	.fam-lede {
+		color: var(--color-on-surface-variant);
+		font-size: 1.125rem;
+		line-height: 1.5;
+		max-width: 36rem;
+		margin: 0 auto 24px;
+	}
+	.fam-join {
+		display: inline-block;
+		padding: 14px 32px;
+		background: var(--color-primary-fixed, #ffd9e0);
+		color: #4a4a4a;
+		text-decoration: none;
+		font-family: var(--font-body);
+		font-size: 0.95rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		border-radius: 8px;
+		transition: opacity 0.12s;
+	}
+	.fam-join:hover {
+		opacity: 0.88;
+	}
+	.fam-free {
+		color: var(--color-on-surface-variant);
+		font-size: 0.85rem;
+		margin: 14px 0 0;
+	}
+	@media (min-width: 768px) {
+		.fam-hero h1 {
+			font-size: 3rem;
+		}
+	}
+	/* SECTIONS — mirror /library .lib-* */
+	.fam-section {
+		margin-bottom: 44px;
+	}
+	.fam-section-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 16px;
+		margin: 0 0 16px;
+	}
+	.fam-section-head .fam-section-title {
+		margin: 0;
+	}
+	.fam-section-link {
+		font-family: var(--font-body);
+		font-size: 14px;
+		font-weight: 700;
+		color: var(--color-primary, #b60057);
+		text-decoration: none;
+		white-space: nowrap;
+	}
+	.fam-section-link:hover {
+		text-decoration: underline;
+	}
+	.fam-section-title {
+		font-family: var(--font-headline);
+		font-size: 22px;
+		font-weight: 700;
+		color: var(--color-ink);
+		letter-spacing: -0.02em;
+		margin: 0 0 16px;
+	}
+	.fam-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+		gap: 18px;
+	}
+	.fam-card {
+		background: var(--color-surface-lowest);
+		border: 1px solid var(--color-outline-variant);
+		border-radius: 12px;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		text-decoration: none;
+		transition: box-shadow 0.14s, transform 0.14s;
+	}
+	.fam-card:hover {
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+		transform: translateY(-2px);
+	}
+	.fam-cover {
+		aspect-ratio: 16 / 10;
+		overflow: hidden;
+		background: var(--color-surface-container);
+	}
+	.fam-cover img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+	.fam-card-body {
+		padding: 16px 18px 18px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		flex: 1;
+	}
+	.fam-card-title {
+		font-family: var(--font-headline);
+		font-size: 17px;
+		font-weight: 700;
+		color: var(--color-ink);
+		letter-spacing: -0.01em;
+		margin: 0;
+	}
+	.fam-card-desc {
+		color: var(--color-on-surface-variant);
+		font-size: 14px;
+		line-height: 1.5;
+		margin: 0;
+		flex: 1;
+	}
+	.fam-cta {
+		display: inline-block;
+		margin-top: 4px;
+		color: var(--color-primary, #b60057);
+		font-family: var(--font-body);
+		font-size: 14px;
+		font-weight: 700;
+	}
+	/* CLOSER */
+	.fam-closer {
+		text-align: center;
+		padding: 40px 24px 8px;
+		border-top: 1px solid var(--color-outline-variant);
+		margin-top: 8px;
+	}
+	.fam-closer h2 {
+		font-family: var(--font-headline);
+		font-size: 24px;
+		font-weight: 700;
+		color: var(--color-ink);
+		letter-spacing: -0.02em;
+		margin: 0 0 8px;
+	}
+	.fam-closer p {
+		color: var(--color-on-surface-variant);
+		font-size: 16px;
+		margin: 0 0 20px;
+	}
+</style>
