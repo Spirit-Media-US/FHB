@@ -216,6 +216,6 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Uganda',
 		blurb:
 			'The Pearl of Africa, at the source of the Nile — where the Father’s Heart Bible™ reveals a Father near to the orphan and the displaced, in one of earth’s most Christian nations. Luganda leads the roadmap.',
-		img: 'https://cdn.sanity.io/images/rusi1hyi/production/4cf1cc4bf2602e3412c91fb7c9b5f27285504329-1880x1253.jpg',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c5e5be6f9fcdb72e8ccc12ff70f82a79f0e7e9a7-1880x1253.jpg',
 	},
 ];
