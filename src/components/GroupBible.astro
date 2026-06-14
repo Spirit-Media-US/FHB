@@ -1,0 +1,503 @@
+---
+// GroupBible — reusable template for the /bible-for/<group> series.
+// Sibling to CountryBible (the /bible-in country pages), but group-based and
+// pastoral rather than nation-based. The URL is "bible-for" (true, for SEO/AEO),
+// but the heart of every page is "A Father FOR <group>": the answer to each
+// group's pain is not religion or another duty, but a holy Father for His
+// beloved sons and daughters.
+//
+// Section order (Kevin's spec, 2026-06-14):
+//   hero → direct answer + key takeaway → the pressures (pain stats) →
+//   DECLARATION callout (you are a beloved son/daughter — not a slave, servant,
+//   tool, or performer) → "A Father for <group>" → "The Father's voice for
+//   <group>" (FHB verses, deep-linked /read) → "What our Father offers <group>"
+//   → "Why the Father's Heart Bible™ for <group>" → "His Word will not return
+//   void" → "What our Father says to <group>" (first-person, from the Father) →
+//   "A prayer for <group>" (pastoral, no name, to Our Father, ends in Jesus'
+//   name) → keep reading → FAQ → resources → read-FHB CTA with the video.
+//
+// FHB COLOR SCHEME ONLY — no per-group colors. Links/accents = --color-brand
+// (magenta), dividers = --color-gold, buttons = the homepage #FFD9E0/#4A4A4A.
+import Layout from '../layouts/Layout.astro';
+
+export interface GroupStat {
+	value: string;
+	label: string;
+}
+export interface GroupSource {
+	label: string;
+	url: string;
+}
+export interface GroupVerse {
+	ref: string;
+	slug: string; // /read book slug, e.g. "zephaniah"
+	ch: number;
+	text: string;
+}
+export interface GroupBlock {
+	heading: string;
+	bodyHtml: string;
+}
+export interface GroupFaq {
+	question: string;
+	answer: string;
+}
+export interface GroupPhoto {
+	src: string; // Sanity CDN base URL
+	alt: string;
+}
+
+export interface Props {
+	slug: string;
+	group: string; // Title case, e.g. "Worship Leaders"
+	groupLower?: string; // lowercase for mid-sentence, e.g. "worship leaders"
+	lastUpdated?: string; // "June 2026"
+	lastUpdatedIso?: string; // "2026-06-14"
+	title: string;
+	description: string;
+	h1: string;
+	heroEyebrow?: string; // default "A Father For"
+	heroSubhead: string;
+	heroBase: string; // Sanity CDN base
+	heroAlt: string;
+	heroCrop?: string;
+	heroBrightness?: number;
+	directAnswerHtml: string;
+	keyTakeaway: string;
+	// The pressures (pain stats)
+	painsHeading?: string;
+	painsIntroHtml?: string;
+	painStats?: GroupStat[];
+	painsBodyHtml?: string;
+	painsSources?: GroupSource[];
+	// Declaration callout (groups 1-5 church professionals; optional elsewhere)
+	declarationHtml?: string;
+	// "A Father for <group>" — the heart turn
+	aFatherHeading?: string;
+	aFatherBodyHtml: string;
+	// Top gallery (renders after "A Father for")
+	gallery?: GroupPhoto[];
+	galleryCreditHtml?: string;
+	// "The Father's voice for <group>" — FHB verses
+	voiceHeading?: string;
+	voiceIntroHtml?: string;
+	verses: GroupVerse[];
+	// "What our Father offers <group>"
+	offersHeading?: string;
+	offersIntroHtml?: string;
+	offersBlocks?: GroupBlock[];
+	// "Why the Father's Heart Bible™ for <group>"
+	whyHeading?: string;
+	whyBlocks: GroupBlock[];
+	// "His Word will not return void"
+	wordHeading?: string;
+	wordBodyHtml?: string;
+	// "What our Father says to <group>" — first person, from the Father
+	fatherSaysHeading?: string;
+	fatherSaysHtml: string;
+	// "A prayer for <group>"
+	prayerHeading?: string;
+	prayerHtml: string;
+	// Bottom gallery (renders before bottom CTA)
+	galleryBottom?: GroupPhoto[];
+	galleryBottomCreditHtml?: string;
+	keepReadingHtml?: string;
+	faqs: GroupFaq[];
+	resourcesHeading?: string;
+	resourcesIntroHtml?: string;
+	resources?: GroupSource[];
+	// Closing read-FHB CTA (always ends every page; embeds the FHB film)
+	ctaVideoId?: string; // default Ld4_H5XxrLk (https://youtu.be/Ld4_H5XxrLk)
+	ctaBottomHeading?: string;
+	ctaBottomBodyHtml: string;
+}
+
+const {
+	slug,
+	group,
+	groupLower = group.toLowerCase(),
+	lastUpdated,
+	lastUpdatedIso,
+	title,
+	description,
+	h1,
+	heroEyebrow = 'A Father For',
+	heroSubhead,
+	heroBase,
+	heroAlt,
+	heroCrop = 'entropy',
+	heroBrightness,
+	directAnswerHtml,
+	keyTakeaway,
+	painsHeading,
+	painsIntroHtml,
+	painStats = [],
+	painsBodyHtml,
+	painsSources = [],
+	declarationHtml,
+	aFatherHeading,
+	aFatherBodyHtml,
+	gallery = [],
+	galleryCreditHtml,
+	voiceHeading,
+	voiceIntroHtml,
+	verses,
+	offersHeading,
+	offersIntroHtml,
+	offersBlocks = [],
+	whyHeading,
+	whyBlocks,
+	wordHeading,
+	wordBodyHtml,
+	fatherSaysHeading,
+	fatherSaysHtml,
+	prayerHeading,
+	prayerHtml,
+	galleryBottom = [],
+	galleryBottomCreditHtml,
+	keepReadingHtml,
+	faqs,
+	resourcesHeading,
+	resourcesIntroHtml,
+	resources = [],
+	ctaVideoId = 'Ld4_H5XxrLk',
+	ctaBottomHeading,
+	ctaBottomBodyHtml,
+} = Astro.props;
+
+const PAGE_URL = `https://fathersheartbible.com/bible-for/${slug}/`;
+
+// FHB palette — soft brand-pink wash for emphasis cards; cool gray for alternates.
+const TINT_PINK = '#FBEDF2';
+
+const HERO_BRI = heroBrightness != null ? `&bri=${heroBrightness}` : '';
+const HERO_IMG = `${heroBase}?w=1400&h=560&fit=crop&crop=${heroCrop}${HERO_BRI}&fm=webp&q=72`;
+const OG_IMG = `${heroBase}?w=1200&h=630&fit=crop&crop=${heroCrop}&fm=jpg&q=80`;
+
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'A Father For',
+			item: 'https://fathersheartbible.com/bible-for/',
+		},
+		{ '@type': 'ListItem', position: 3, name: group, item: PAGE_URL },
+	],
+};
+const collectionSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'CollectionPage',
+	name: h1,
+	description,
+	url: PAGE_URL,
+	inLanguage: 'en',
+	...(lastUpdatedIso ? { dateModified: lastUpdatedIso } : {}),
+	isPartOf: {
+		'@type': 'WebSite',
+		name: "Father's Heart Bible™",
+		url: 'https://fathersheartbible.com/',
+	},
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: faqs.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
+---
+
+<Layout
+	title={title}
+	description={description}
+	image={OG_IMG}
+	imageAlt={heroAlt}
+	darkHero={true}
+	jsonLd={jsonLd}
+	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<!-- Hero -->
+		<section class="relative w-full overflow-hidden min-h-[560px] lg:min-h-[calc(46vh_+_2in)]">
+			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={heroAlt} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.34) 45%, rgba(0,0,0,0.42) 100%);" aria-hidden="true"></div>
+			<div class="absolute inset-x-0 bottom-0 z-20 px-6 pb-10 lg:px-8 lg:pb-14">
+				<div class="mx-auto max-w-4xl">
+					<p class="text-sm font-semibold uppercase tracking-widest mb-2" style="color: var(--color-gold); font-family: var(--font-sans);">{heroEyebrow}</p>
+					<h1 class="text-4xl md:text-5xl lg:text-6xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{h1}</h1>
+					<p class="mt-4 max-w-2xl text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.92);">{heroSubhead}</p>
+				</div>
+			</div>
+			<div class="absolute inset-x-0 bottom-0 z-30 h-1.5" style="background: linear-gradient(to right, var(--color-gold) 0%, var(--color-brand) 100%);" aria-hidden="true"></div>
+		</section>
+
+		<!-- Breadcrumb + direct answer -->
+		<section class="px-6 pt-9 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-6 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/bible-for/" class="hover:underline">A Father For</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">{group}</span>
+				</nav>
+				<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={directAnswerHtml}></p>
+				{lastUpdated && (
+					<p class="mt-3 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);">Last updated {lastUpdated}</p>
+				)}
+				<div class="mt-6 rounded-xl px-5 py-4" style={`background-color: ${TINT_PINK}; border-left: 4px solid var(--color-gold);`}>
+					<p class="text-base font-semibold leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);"><span class="font-bold uppercase text-sm tracking-widest mr-2" style="color: var(--color-brand);">Key takeaway</span>{keyTakeaway}</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- The pressures (pain stats) -->
+		{(painsBodyHtml || painStats.length > 0) && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-3xl">
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{painsHeading || `The weight ${groupLower} carry`}</h2>
+					{painsIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={painsIntroHtml}></p>
+					)}
+					{painStats.length > 0 && (
+						<dl class="mt-7 grid grid-cols-2 md:grid-cols-3 gap-5">
+							{painStats.map((s) => (
+								<div class="rounded-2xl p-5" style="background-color: var(--color-surface-low); border: 1px solid rgba(0,0,0,0.06);">
+									<dt class="text-2xl font-medium leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{s.value}</dt>
+									<dd class="mt-2 text-sm leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{s.label}</dd>
+								</div>
+							))}
+						</dl>
+					)}
+					{painsBodyHtml && (
+						<div class="mt-6 space-y-5 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={painsBodyHtml}></div>
+					)}
+					{painsSources.length > 0 && (
+						<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">
+							Sources: {painsSources.map((s, i) => (<>{i > 0 && <span aria-hidden="true"> · </span>}<a href={s.url} target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">{s.label}</a></>))}
+						</p>
+					)}
+				</div>
+			</section>
+		)}
+
+		<!-- Declaration callout (deep band, gold accent) -->
+		{declarationHtml && (
+			<section class="px-6 py-14 lg:px-8 lg:py-16" style="background-color: var(--color-deep);">
+				<div class="mx-auto max-w-3xl text-center">
+					<div class="mx-auto mb-6 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
+					<div class="text-2xl md:text-3xl font-light leading-snug" style="font-family: var(--font-serif); color: #fff;" set:html={declarationHtml}></div>
+				</div>
+			</section>
+		)}
+
+		<!-- A Father for <group> — the heart turn -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{aFatherHeading || `A Father for ${groupLower}`}</h2>
+				<div class="mt-5 space-y-5 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={aFatherBodyHtml}></div>
+			</div>
+		</section>
+
+		<!-- Top photo gallery -->
+		{gallery.length > 0 && (
+			<section class="px-6 pt-2 pb-10 lg:px-8 lg:pb-14" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-5xl">
+					<div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+						{gallery.map((p) => (
+							<img src={`${p.src}?w=600&h=420&fit=crop&crop=entropy&fm=webp&q=70`} srcset={`${p.src}?w=400&h=280&fit=crop&crop=entropy&fm=webp&q=68 400w, ${p.src}?w=600&h=420&fit=crop&crop=entropy&fm=webp&q=70 600w`} sizes="(max-width: 767px) 45vw, 23vw" alt={p.alt} width="600" height="420" class="w-full h-36 md:h-48 object-cover rounded-xl" style="border: 1px solid rgba(0,0,0,0.06);" loading="lazy" decoding="async" />
+						))}
+					</div>
+					{galleryCreditHtml && (
+						<p class="mt-3 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={galleryCreditHtml}></p>
+					)}
+				</div>
+			</section>
+		)}
+
+		<!-- The Father's voice for <group> — FHB verses, deep-linked /read -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{voiceHeading || `The Father's voice for ${groupLower}`}</h2>
+				{voiceIntroHtml && (
+					<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={voiceIntroHtml}></p>
+				)}
+				<div class="mt-7 space-y-5">
+					{verses.map((v) => (
+						<a href={`https://fathersheartbible.com/read/${v.slug}/${v.ch}`} class="block rounded-2xl p-5 no-underline transition-opacity hover:opacity-90" style={`background-color: ${TINT_PINK}; border: 1px solid rgba(0,0,0,0.06);`}>
+							<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.text}&rdquo;</p>
+							<span class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">{v.ref}<span aria-hidden="true">&rarr;</span></span>
+						</a>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<!-- What our Father offers <group> -->
+		{offersBlocks.length > 0 && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-3xl">
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{offersHeading || `What “our Father” offers ${groupLower}`}</h2>
+					{offersIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={offersIntroHtml}></p>
+					)}
+					<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+						{offersBlocks.map((b) => (
+							<div class="rounded-2xl p-5" style="background-color: var(--color-surface); border: 1px solid rgba(0,0,0,0.06); border-left: 4px solid var(--color-gold);">
+								<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{b.heading}</h3>
+								<p class="mt-2 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.bodyHtml}></p>
+							</div>
+						))}
+					</div>
+				</div>
+			</section>
+		)}
+
+		<!-- Why the Father's Heart Bible™ for <group> -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{whyHeading || `Why the Father's Heart Bible™ for ${groupLower}`}</h2>
+				<div class="mt-8 space-y-8">
+					{whyBlocks.map((b) => (
+						<div>
+							<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{b.heading}</h3>
+							<p class="mt-3 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.bodyHtml}></p>
+						</div>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<!-- His Word will not return void -->
+		{wordBodyHtml && (
+			<section class="px-6 py-14 lg:px-8 lg:py-20" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-3xl text-center">
+					<div class="mx-auto mb-6 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{wordHeading || 'His Word will not return void'}</h2>
+					<div class="mt-5 text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted);" set:html={wordBodyHtml}></div>
+				</div>
+			</section>
+		)}
+
+		<!-- What our Father says to <group> — first person, from the Father -->
+		<section class="px-6 py-14 lg:px-8 lg:py-20" style={`background-color: ${TINT_PINK};`}>
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight text-center" style="font-family: var(--font-serif); color: var(--color-ink);">{fatherSaysHeading || `What our Father says to ${groupLower}`}</h2>
+				<div class="mt-7 space-y-5 text-xl lg:text-2xl leading-relaxed italic" style="font-family: var(--font-serif); color: var(--color-ink);" set:html={fatherSaysHtml}></div>
+			</div>
+		</section>
+
+		<!-- A prayer for <group> -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-2xl">
+				<div class="mx-auto mb-6 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
+				<h2 class="text-2xl md:text-3xl font-light leading-tight text-center" style="font-family: var(--font-serif); color: var(--color-ink);">{prayerHeading || `A prayer for ${groupLower}`}</h2>
+				<div class="mt-6 space-y-4 text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted);" set:html={prayerHtml}></div>
+			</div>
+		</section>
+
+		<!-- Keep reading -->
+		{keepReadingHtml && (
+			<section class="px-6 py-12 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-3xl">
+					<h2 class="text-xl md:text-2xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Keep reading</h2>
+					<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={keepReadingHtml}></p>
+				</div>
+			</section>
+		)}
+
+		<!-- FAQ -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="mt-7 space-y-4">
+					{faqs.map((f) => (
+						<details class="rounded-2xl px-5 py-4" style={`background-color: ${TINT_PINK}; border: 1px solid rgba(0,0,0,0.06);`}>
+							<summary class="cursor-pointer text-lg font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</summary>
+							<p class="mt-3 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p>
+						</details>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<!-- Resources (authority links) -->
+		{resources.length > 0 && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-3xl">
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{resourcesHeading || `For ${groupLower}: where to turn`}</h2>
+					{resourcesIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={resourcesIntroHtml}></p>
+					)}
+					<ul class="mt-7 grid grid-cols-1 md:grid-cols-2 gap-3">
+						{resources.map((r) => (
+							<li>
+								<a href={r.url} target="_blank" rel="noopener noreferrer" class="flex items-center justify-between gap-3 rounded-xl px-5 py-4 no-underline transition-opacity hover:opacity-90" style="background-color: var(--color-surface); border: 1px solid rgba(0,0,0,0.06);">
+									<span class="text-base font-medium leading-snug" style="font-family: var(--font-sans); color: var(--color-ink);">{r.label}</span>
+									<span class="shrink-0 text-sm font-semibold" style="color: var(--color-brand);" aria-hidden="true">&nearr;</span>
+								</a>
+							</li>
+						))}
+					</ul>
+				</div>
+			</section>
+		)}
+
+		<!-- Bottom photo gallery -->
+		{galleryBottom.length > 0 && (
+			<section class="px-6 pt-10 pb-4 lg:px-8 lg:pt-14" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-5xl">
+					<div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+						{galleryBottom.map((p) => (
+							<img src={`${p.src}?w=600&h=420&fit=crop&crop=entropy&fm=webp&q=70`} srcset={`${p.src}?w=400&h=280&fit=crop&crop=entropy&fm=webp&q=68 400w, ${p.src}?w=600&h=420&fit=crop&crop=entropy&fm=webp&q=70 600w`} sizes="(max-width: 767px) 45vw, 23vw" alt={p.alt} width="600" height="420" class="w-full h-36 md:h-48 object-cover rounded-xl" style="border: 1px solid rgba(0,0,0,0.06);" loading="lazy" decoding="async" />
+						))}
+					</div>
+					{galleryBottomCreditHtml && (
+						<p class="mt-3 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={galleryBottomCreditHtml}></p>
+					)}
+				</div>
+			</section>
+		)}
+
+		<!-- Closing CTA — read FHB free, with the film (https://youtu.be/Ld4_H5XxrLk) -->
+		<section class="px-6 py-14 lg:px-8 lg:py-20" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{ctaBottomHeading || 'Read the Father’s Heart Bible™ free'}</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaBottomBodyHtml}></p>
+				<div class="mx-auto mt-8 max-w-2xl">
+					<iframe class="lg:hidden block w-full overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);" src={`https://www.youtube-nocookie.com/embed/${ctaVideoId}?rel=0&playsinline=1`} title="The Father's Heart Bible" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+					<button type="button" id="cta-video-facade" class="group relative hidden lg:block w-full overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);" aria-label="Play the Father's Heart Bible film" data-video-id={ctaVideoId}>
+						<img src={`https://i.ytimg.com/vi/${ctaVideoId}/hqdefault.jpg`} alt="Watch: the Father's Heart Bible" width="480" height="360" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+						<span aria-hidden="true" class="absolute inset-0" style="background: rgba(36,27,23,0.12);"></span>
+						<span aria-hidden="true" class="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110" style="width: 4.5rem; height: 4.5rem; transform: translate(-50%,-50%); background: rgba(255,255,255,0.92); border: 2px solid #FFFFFF; box-shadow: 0 4px 18px rgba(0,0,0,0.4);">
+							<svg width="26" height="26" viewBox="0 0 24 24" fill="var(--color-brand)" style="margin-left: 3px;"><path d="M8 5v14l11-7z"></path></svg>
+						</span>
+					</button>
+				</div>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-8 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Start reading<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+		<script is:inline>
+			(() => {
+				const btn = document.getElementById('cta-video-facade');
+				if (!btn) return;
+				btn.addEventListener('click', () => {
+					const id = btn.dataset.videoId;
+					const iframe = document.createElement('iframe');
+					iframe.style.cssText = 'display:block;width:100%;aspect-ratio:16/9;height:auto;border:0;border-radius:0.75rem;';
+					iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+					iframe.allowFullscreen = true;
+					iframe.title = "The Father's Heart Bible";
+					iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+					btn.replaceWith(iframe);
+				});
+			})();
+		</script>
+	</main>
+</Layout>
