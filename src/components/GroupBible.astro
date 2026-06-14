@@ -504,12 +504,12 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 					)}
 					<div class="mt-8 space-y-5">
 						{voices.map((v) => (
-							<figure class="rounded-2xl p-6" style="background-color: var(--color-surface-low); border: 1px solid rgba(0,0,0,0.06); border-left: 4px solid var(--color-gold);">
-								<blockquote class="text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.quote}&rdquo;</blockquote>
-								<figcaption class="mt-4 flex items-center gap-3 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">
-									{v.photo && (<img src={`${v.photo}?w=200&h=200&fit=crop&crop=top&fm=webp&q=75`} alt={v.name} width="96" height="96" class="rounded-full object-cover shrink-0" style="width: 96px; height: 96px; border: 1px solid var(--color-hairline);" loading="lazy" decoding="async" />)}
-									<span><span class="font-semibold" style="color: var(--color-ink);">{v.name}</span> &mdash; {v.role}</span>
-								</figcaption>
+							<figure class="rounded-2xl p-6 flex items-start gap-5" style="background-color: var(--color-surface-low); border: 1px solid rgba(0,0,0,0.06); border-left: 4px solid var(--color-gold);">
+								{v.photo && (<img src={`${v.photo}?w=200&h=200&fit=crop&crop=top&fm=webp&q=75`} alt={v.name} width="96" height="96" class="rounded-full object-cover shrink-0" style="width: 96px; height: 96px; border: 1px solid var(--color-hairline);" loading="lazy" decoding="async" />)}
+								<div>
+									<blockquote class="text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.quote}&rdquo;</blockquote>
+									<figcaption class="mt-3 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><span class="font-semibold" style="color: var(--color-ink);">{v.name}</span> &mdash; {v.role}</figcaption>
+								</div>
 							</figure>
 						))}
 					</div>
