@@ -109,6 +109,14 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/42f1fa91a001338ac6641bd0ec7505b6f28b5e20-1880x1253.jpg',
 	},
 	{
+		slug: 'italy',
+		country: 'Italy',
+		title: 'The Bible in Italy',
+		blurb:
+			'The heart of Western Christianity — Rome, the Vatican, and centuries of sacred art — where the Father’s Heart Bible™ invites a people who revere the Church to meet the Father personally in Scripture. Italian among our priorities.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/04152bca121aec87b9a859e38f29cce4f4794b31-1880x1177.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
