@@ -398,9 +398,10 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 		<!-- Standalone pull-quote (clean, citable) -->
 		{pullQuote && (
 			<section class="px-6 py-10 lg:px-8 lg:py-12" style="background-color: var(--color-surface-low);">
-				<figure class="mx-auto max-w-3xl text-center">
-					<blockquote class="text-2xl md:text-3xl font-light leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{pullQuote}&rdquo;</blockquote>
-				</figure>
+				<div class="mx-auto max-w-3xl text-center">
+					<div class="mx-auto mb-5 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
+					<p class="text-2xl md:text-3xl font-light leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{pullQuote}</p>
+				</div>
 			</section>
 		)}
 
@@ -438,6 +439,23 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 				</div>
 			</div>
 		</section>
+
+		<!-- Free PDF gift card (library-style) — under the scriptures, full cover -->
+		{pdf && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-md">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-4 text-center" style="color: var(--color-gold); font-family: var(--font-sans);">A free gift for you</p>
+					<article class="overflow-hidden rounded-2xl" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+						<img src={pdf.coverUrl} alt={`${pdf.title} — front cover`} class="block w-full h-auto" loading="lazy" decoding="async" />
+						<div class="p-6 text-center">
+							<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{pdf.title}</h3>
+							<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{pdf.description}</p>
+							<a href={pdf.fileUrl} target="_blank" rel="noopener" class="inline-flex items-center gap-2 mt-5 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">{pdf.buttonText || 'Download the PDF'}<span aria-hidden="true">&rarr;</span></a>
+						</div>
+					</article>
+				</div>
+			</section>
+		)}
 
 		<!-- What our Father offers <group> -->
 		{offersBlocks.length > 0 && (
@@ -543,23 +561,6 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 				<div class="mx-auto max-w-3xl">
 					<h2 class="text-xl md:text-2xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Keep reading</h2>
 					<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={keepReadingHtml}></p>
-				</div>
-			</section>
-		)}
-
-		<!-- Free PDF gift card (library-style) -->
-		{pdf && (
-			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
-				<div class="mx-auto max-w-md">
-					<p class="text-xs font-semibold uppercase tracking-widest mb-4 text-center" style="color: var(--color-gold); font-family: var(--font-sans);">A free gift for you</p>
-					<article class="overflow-hidden rounded-2xl" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
-						<img src={pdf.coverUrl} alt={pdf.title} class="w-full h-52 object-cover" loading="lazy" decoding="async" />
-						<div class="p-6 text-center">
-							<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{pdf.title}</h3>
-							<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{pdf.description}</p>
-							<a href={pdf.fileUrl} target="_blank" rel="noopener" class="inline-flex items-center gap-2 mt-5 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">{pdf.buttonText || 'Download the PDF'}<span aria-hidden="true">&rarr;</span></a>
-						</div>
-					</article>
 				</div>
 			</section>
 		)}
