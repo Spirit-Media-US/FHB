@@ -125,6 +125,14 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/803235d0ba419715e9951124102b1577d840e5fb-1880x1253.jpg',
 	},
 	{
+		slug: 'pakistan',
+		country: 'Pakistan',
+		title: 'The Bible in Pakistan',
+		blurb:
+			'A land of soaring mountains and a faithful, enduring church — where the Father’s Heart Bible™ longs to reveal, in Urdu and Punjabi, a Father near to the poor, the persecuted, and the orphan. Both languages among our priorities.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60703be00855558d3021775ea5b4d14a659e1144-1880x1153.jpg',
+	},
+	{
 		slug: 'india',
 		country: 'India',
 		title: 'The Bible in India',
