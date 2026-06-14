@@ -19,6 +19,7 @@
 // FHB COLOR SCHEME ONLY — no per-group colors. Links/accents = --color-brand
 // (magenta), dividers = --color-gold, buttons = the homepage #FFD9E0/#4A4A4A.
 import Layout from '../layouts/Layout.astro';
+import AuthorBio from './AuthorBio.astro';
 
 export interface GroupStat {
 	value: string;
@@ -33,6 +34,7 @@ export interface GroupVerse {
 	slug: string; // /read book slug, e.g. "zephaniah"
 	ch: number;
 	text: string;
+	note?: string; // one-line "why it's for you" — makes each verse a self-contained, extractable answer
 }
 export interface GroupBlock {
 	heading: string;
@@ -188,6 +190,28 @@ const breadcrumbSchema = {
 		{ '@type': 'ListItem', position: 3, name: group, item: PAGE_URL },
 	],
 };
+// Author entity (E-E-A-T) — matches the /guides Person schema (sameAs to
+// Kevin's external profiles); engines weight author presence when choosing
+// between equally-structured pages.
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: "Lead Translator, Father's Heart Bible | CEO, Spirit Media Publishing",
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
 const collectionSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'CollectionPage',
@@ -195,6 +219,7 @@ const collectionSchema = {
 	description,
 	url: PAGE_URL,
 	inLanguage: 'en',
+	author: KEVIN_WHITE_AUTHOR,
 	...(lastUpdatedIso ? { dateModified: lastUpdatedIso } : {}),
 	isPartOf: {
 		'@type': 'WebSite',
@@ -248,9 +273,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 					<span style="color: var(--color-ink);">{group}</span>
 				</nav>
 				<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={directAnswerHtml}></p>
-				{lastUpdated && (
-					<p class="mt-3 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);">Last updated {lastUpdated}</p>
-				)}
+				<p class="mt-3 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">By <a href="/the-fathers-heart-bible/lead-translator/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; Lead Translator, Father&rsquo;s Heart Bible&trade;{lastUpdated && <span> &middot; Last updated {lastUpdated}</span>}</p>
 				<div class="mt-6 rounded-xl px-5 py-4" style={`background-color: ${TINT_PINK}; border-left: 4px solid var(--color-gold);`}>
 					<p class="text-base font-semibold leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);"><span class="font-bold uppercase text-sm tracking-widest mr-2" style="color: var(--color-brand);">Key takeaway</span>{keyTakeaway}</p>
 				</div>
@@ -332,6 +355,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 					{verses.map((v) => (
 						<a href={`https://fathersheartbible.com/read/${v.slug}/${v.ch}`} class="block rounded-2xl p-5 no-underline transition-opacity hover:opacity-90" style={`background-color: ${TINT_PINK}; border: 1px solid rgba(0,0,0,0.06);`}>
 							<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.text}&rdquo;</p>
+							{v.note && (<p class="mt-2 text-sm leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{v.note}</p>)}
 							<span class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">{v.ref}<span aria-hidden="true">&rarr;</span></span>
 						</a>
 					))}
@@ -426,6 +450,13 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				</div>
 			</div>
 		</section>
+
+		<!-- Author bio (E-E-A-T: real-face author card + link to lead-translator page) -->
+		<div class="px-6 lg:px-8">
+			<div class="mx-auto max-w-3xl">
+				<AuthorBio author="Kevin White" />
+			</div>
+		</div>
 
 		<!-- Resources (authority links) -->
 		{resources.length > 0 && (
