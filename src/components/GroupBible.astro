@@ -451,13 +451,6 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 			</div>
 		</section>
 
-		<!-- Author bio (E-E-A-T: real-face author card + link to lead-translator page) -->
-		<div class="px-6 lg:px-8">
-			<div class="mx-auto max-w-3xl">
-				<AuthorBio author="Kevin White" />
-			</div>
-		</div>
-
 		<!-- Resources (authority links) -->
 		{resources.length > 0 && (
 			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
@@ -530,5 +523,12 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				});
 			})();
 		</script>
+
+		<!-- Author bio (E-E-A-T) — at the page bottom, above the shared footer -->
+		<div class="px-6 lg:px-8" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<AuthorBio author="Kevin White" />
+			</div>
+		</div>
 	</main>
 </Layout>
