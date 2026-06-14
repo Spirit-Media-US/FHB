@@ -65,17 +65,25 @@ const unlocks: UnlockRow[] = [
 		flag: '🇮🇩',
 		parenthetical: 'Largest Muslim-majority nation',
 		reach: '199M',
+		country: { slug: 'indonesia', label: 'Indonesia' },
 	},
 	{ language: 'Bengali', flag: '🇧🇩', reach: '272M', country: { slug: 'india', label: 'India' } },
-	{ language: 'Urdu', flag: '🇵🇰', reach: '231M', country: { slug: 'india', label: 'India' } },
-	{ language: 'Russian', flag: '🇷🇺', reach: '258M' },
-	{ language: 'German', flag: '🇩🇪', reach: '135M' },
-	{ language: 'Japanese', flag: '🇯🇵', reach: '125M' },
+	{ language: 'Urdu', flag: '🇵🇰', reach: '231M', country: { slug: 'pakistan', label: 'Pakistan' } },
+	{ language: 'Russian', flag: '🇷🇺', reach: '258M', country: { slug: 'russia', label: 'Russia' } },
+	{ language: 'German', flag: '🇩🇪', reach: '135M', country: { slug: 'germany', label: 'Germany' } },
+	{ language: 'Japanese', flag: '🇯🇵', reach: '125M', country: { slug: 'japan', label: 'Japan' } },
 	{
 		language: 'Nigerian Pidgin',
 		flag: '🇳🇬',
 		reach: '121M',
 		country: { slug: 'nigeria', label: 'Nigeria' },
+	},
+	{
+		language: 'Punjabi',
+		flag: '🇵🇰',
+		parenthetical: 'Pakistan’s most-spoken tongue',
+		reach: '113M',
+		country: { slug: 'pakistan', label: 'Pakistan' },
 	},
 	{ language: 'Marathi', flag: '🇮🇳', reach: '99M', country: { slug: 'india', label: 'India' } },
 	{ language: 'Telugu', flag: '🇮🇳', reach: '96M', country: { slug: 'india', label: 'India' } },
@@ -85,15 +93,36 @@ const unlocks: UnlockRow[] = [
 		reach: '90M',
 		country: { slug: 'philippines', label: 'Philippines' },
 	},
-	{ language: 'Turkish', flag: '🇹🇷', reach: '88M' },
+	{ language: 'Turkish', flag: '🇹🇷', reach: '88M', country: { slug: 'turkey', label: 'Turkey' } },
 	{ language: 'Tamil', flag: '🇮🇳', reach: '86M', country: { slug: 'india', label: 'India' } },
-	{ language: 'Yue Chinese', flag: '🇭🇰', reach: '86M' },
+	{
+		language: 'Yue Chinese',
+		flag: '🇭🇰',
+		parenthetical: 'Cantonese · Hong Kong + diaspora',
+		reach: '86M',
+		country: { slug: 'hong-kong', label: 'Hong Kong' },
+	},
 	{
 		language: 'Vietnamese',
 		flag: '🇻🇳',
-		parenthetical: 'Among the world\u2019s major tongues \u00b7 within reach of most of humanity',
+		parenthetical: 'Vietnam’s fast-growing church',
 		reach: '85M',
 		highlight: true,
+		country: { slug: 'vietnam', label: 'Vietnam' },
+	},
+	{
+		language: 'Korean',
+		flag: '🇰🇷',
+		parenthetical: 'A great missionary-sending church',
+		reach: '82M',
+		country: { slug: 'south-korea', label: 'South Korea' },
+	},
+	{
+		language: 'Persian (Farsi)',
+		flag: '🇮🇷',
+		parenthetical: 'A fast-growing, searching church',
+		reach: '80M',
+		country: { slug: 'iran', label: 'Iran' },
 	},
 	{
 		language: 'Swahili',
@@ -101,6 +130,20 @@ const unlocks: UnlockRow[] = [
 		parenthetical: 'East Africa\u2019s lingua franca',
 		reach: '80M',
 		country: { slug: 'kenya', label: 'Kenya' },
+	},
+	{
+		language: 'Italian',
+		flag: '\ud83c\uddee\ud83c\uddf9',
+		parenthetical: 'The heart of Western Christianity',
+		reach: '67M',
+		country: { slug: 'italy', label: 'Italy' },
+	},
+	{
+		language: 'Thai',
+		flag: '\ud83c\uddf9\ud83c\udded',
+		parenthetical: 'A gentle, unreached Buddhist nation',
+		reach: '60M',
+		country: { slug: 'thailand', label: 'Thailand' },
 	},
 	{
 		language: 'Amharic',
@@ -138,6 +181,10 @@ const pledgeSubject = (row: UnlockRow) => `Pledge to Sponsor ${row.sponsor || ro
 				Each language opens for a one-time <strong style="color: var(--color-primary);">$50,000</strong> —
 				full translation, print, digital, and audio. Ranked by reach, these tongues already put the Bible
 				within reach of <strong style="color: var(--color-primary);">most of humanity</strong> &mdash; and the list keeps growing.
+			</p>
+			<p class="mt-5 text-base md:text-lg font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">
+				<strong style="color: var(--color-primary);">6.5 billion in raw reach</strong> &mdash;
+				<strong style="color: var(--color-primary);">70% of the world&rsquo;s people</strong> in unique coverage.
 			</p>
 		</header>
 

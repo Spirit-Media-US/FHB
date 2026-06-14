@@ -6,7 +6,6 @@
 // "why FHB" blocks, scripture sampler, keep-reading links, FAQ, and read-first
 // CTAs. Architecture rules (read-first CTA, English-first) live in
 // memory/project_fhb_country_pages.md. Mirror the /verses + /guides patterns.
-import { NATIONS } from '../data/nations';
 import Layout from '../layouts/Layout.astro';
 
 export interface CountryStat {
@@ -68,6 +67,9 @@ export interface Props {
 	// Sanity crop mode for the hero (default 'entropy'). Use a focal point when
 	// entropy picks the wrong region, e.g. 'focalpoint&fp-x=0.49&fp-y=0.3'.
 	heroCrop?: string;
+	// Optional Sanity brightness adjustment for the hero (-100..100). Positive
+	// lightens a too-dark hero image, e.g. heroBrightness={18}.
+	heroBrightness?: number;
 	directAnswerHtml: string;
 	keyTakeaway: string;
 	glanceIntroHtml: string;
@@ -142,6 +144,7 @@ const {
 	heroBase,
 	heroAlt,
 	heroCrop = 'entropy',
+	heroBrightness,
 	directAnswerHtml,
 	keyTakeaway,
 	glanceIntroHtml,
@@ -190,7 +193,6 @@ const {
 } = Astro.props;
 
 const PAGE_URL = `https://fathersheartbible.com/bible-in/${slug}/`;
-const otherNations = NATIONS.filter((n) => n.slug !== slug);
 
 // --- Sponsor-a-translation maths (bottom section) ---
 // Each language unlocks for a one-time $50,000 (translation + print + digital +
@@ -245,7 +247,8 @@ const SPONSOR_VIDEO_ID = 'eD06eSXd2uU';
 // kevin@… never appears in the served HTML.
 const pledgeOnclick =
 	"event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent(this.dataset.subj)";
-const HERO_IMG = `${heroBase}?w=1400&h=560&fit=crop&crop=${heroCrop}&fm=webp&q=72`;
+const HERO_BRI = heroBrightness != null ? `&bri=${heroBrightness}` : '';
+const HERO_IMG = `${heroBase}?w=1400&h=560&fit=crop&crop=${heroCrop}${HERO_BRI}&fm=webp&q=72`;
 const OG_IMG = `${heroBase}?w=1200&h=630&fit=crop&crop=${heroCrop}&fm=jpg&q=80`;
 
 const breadcrumbSchema = {
@@ -729,9 +732,6 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 			<div class="mx-auto max-w-4xl text-center">
 				<p class="text-xs leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
 					<span class="font-semibold" style="color: var(--color-ink);">The Father&rsquo;s Heart Bible&trade; around the world</span> &mdash; read free online, country by country.
-					{otherNations.length > 0 && (
-						<span>{' '}Also explore: {otherNations.map((n, i) => (<>{i > 0 && <span aria-hidden="true"> &middot; </span>}<a href={`/bible-in/${n.slug}/`} style="color: var(--color-brand);" class="hover:underline">{n.country}</a></>))}.</span>
-					)}
 					{' '}<a href="/bible-in/" style="color: var(--color-brand);" class="hover:underline font-semibold">Browse all nations &rarr;</a>
 				</p>
 			</div>
