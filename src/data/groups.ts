@@ -36,11 +36,18 @@ export const GROUPS: Group[] = [
 			'For the ones who carry everyone else’s weight — a Bible that lets you be fathered before you shepherd, because even the shepherd needs a Shepherd. Before you’re a pastor, you’re a son.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/141479390101f73507ff3662dec8e5c8e1427284-1100x733.jpg',
 	},
+	{
+		slug: 'student-ministry',
+		group: 'Student Ministry',
+		title: 'For Student Ministry',
+		blurb:
+			'For the ones who pour into the next generation on a shoestring and a prayer — be fathered before you disciple. The greatest thing you can give a student is a Father.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/b45c3bd7ee5def39ee3a49ba81bcb0e5c0efa90c-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
 export const UPCOMING_GROUPS: string[] = [
-	'Student Ministry',
 	"Children's Ministry",
 	'Church Staff',
 	'Fathers',
