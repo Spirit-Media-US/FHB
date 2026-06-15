@@ -116,11 +116,18 @@ export const GROUPS: Group[] = [
 			'Grades, the group chat, the future everyone keeps asking about — the pressure is real. But your worth was never your GPA or your follower count. You are the Father’s beloved, right now, before you achieve a thing.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/fac90f9adfb087bc989fc5f6164da137218f7a06-1100x733.jpg',
 	},
+	{
+		slug: 'college-students',
+		group: 'College Students',
+		title: 'For College Students',
+		blurb:
+			'Away from home, building a life, carrying the pressure of who you’re becoming. Wherever you land, you have a Father who already knows your name — and runs to meet you. You belong to Him before you belong anywhere.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/04309eb88e068e4d4992c25c70c914c90b64b061-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
 export const UPCOMING_GROUPS: string[] = [
-	'College Students',
 	'Teachers, Doctors & Public Servants',
 	'Public Safety & Active Military',
 	'Veterans',
