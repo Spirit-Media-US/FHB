@@ -24,6 +24,7 @@ interface Preview {
 	langName: string;
 	langCode: string;
 	register?: string;
+	note?: string;
 	chapters: Chapter[];
 }
 export interface Props {
@@ -47,9 +48,15 @@ const multi = previews.length > 1;
 			{multi && (
 				<h4 class="text-lg font-medium" style="font-family: var(--font-serif); color: var(--color-ink);">{p.langName} ({p.language})</h4>
 			)}
-			{p.register && (
-				<p class="mt-2 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);">Register: {p.register}</p>
-			)}
+			<div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+				{p.note && (
+					<span class="inline-block text-xs font-semibold uppercase tracking-wide rounded-full px-3 py-1"
+						style="color: #C77B0E; border: 1px solid #C77B0E;">{p.note}</span>
+				)}
+				{p.register && (
+					<span class="text-xs" style="font-family: var(--font-sans); color: var(--color-muted);">Register: {p.register}</span>
+				)}
+			</div>
 
 			{p.chapters.map((c, ci) => (
 				<details class="mt-4 rounded-2xl overflow-hidden" style="border: 1px solid var(--color-hairline);" open={!multi && ci === 0}>
