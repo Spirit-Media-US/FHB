@@ -1,0 +1,205 @@
+---
+// /bible-for/student-ministry — group #3 in the "A Father For" series. Data
+// only; rendered by <GroupBible>. Group 3 of the church-professional 5, so it
+// carries the declaration: "You are a beloved son or daughter — not a slave,
+// not a servant, not a tool, not a performer." Mirrors worship-leaders/pastors.
+import GroupBible from '../../components/GroupBible.astro';
+
+const verses = [
+	{
+		ref: '1 Timothy 4:12',
+		slug: '1-timothy',
+		ch: 4,
+		text: 'Let no one despise you for your youth, but set the believers an example in speech, in conduct, in love, in faith, in purity.',
+		note: 'Underpaid, underestimated, often the youngest voice in the room — your Father does not despise you, and neither should you.',
+	},
+	{
+		ref: 'Matthew 19:14',
+		slug: 'matthew',
+		ch: 19,
+		text: 'Let the little children come to me and do not hinder them, for to such belongs the kingdom of heaven.',
+		note: 'The heart you carry for teenagers is the heart of Jesus Himself — He always made room for the young.',
+	},
+	{
+		ref: '2 Timothy 1:7',
+		slug: '2-timothy',
+		ch: 1,
+		text: 'For God gave us a spirit not of fear but of power and of love and of self-control.',
+		note: 'Written to a young leader. The same Spirit that steadied Timothy steadies you on the hardest nights.',
+	},
+	{
+		ref: 'Deuteronomy 6:6',
+		slug: 'deuteronomy',
+		ch: 6,
+		text: 'And these words that I command you today shall be on your heart. You shall teach them diligently to your children, and shall talk of them when you sit in your house.',
+		note: 'Discipling the next generation is not a side program to God — it is His central strategy across every generation.',
+	},
+	{
+		ref: 'Isaiah 40:11',
+		slug: 'isaiah',
+		ch: 40,
+		text: 'He will tend his flock like a shepherd; he will gather the lambs in his arms, and gently lead those that are with young.',
+		note: 'You gather lambs every week. He gathers you too — and gently leads the one who is leading the young.',
+	},
+	{
+		ref: '1 John 4:19',
+		slug: '1-john',
+		ch: 4,
+		text: 'We love because our Father first loved us.',
+		note: 'You can only give what you have received. His love comes first; your ministry is the overflow.',
+	},
+	{
+		ref: 'Mark 10:16',
+		slug: 'mark',
+		ch: 10,
+		text: 'And he took them in his arms and blessed them, laying his hands on them.',
+		note: 'This is the posture you imitate every week — and the posture your Father takes toward you.',
+	},
+	{
+		ref: 'Galatians 4:7',
+		slug: 'galatians',
+		ch: 4,
+		text: 'So you are no longer a slave, but a son, and if a son, then an heir through our Father.',
+		note: 'Before you are a youth pastor, an intern, or a volunteer, you are a son or daughter — and an heir.',
+	},
+	{
+		ref: 'Zephaniah 3:17',
+		slug: 'zephaniah',
+		ch: 3,
+		text: 'Your Father is in your midst, a mighty one who will save; he will rejoice over you with gladness; he will quiet you by his love; he will exult over you with loud singing.',
+		note: 'You pour encouragement into students every week. Your Father is rejoicing and singing over you.',
+	},
+];
+
+const faqs = [
+	{
+		question: 'What are good Bible verses for youth pastors and student ministry leaders?',
+		answer:
+			"1 Timothy 4:12 (let no one despise you for your youth), 2 Timothy 1:7 (a spirit of power, love, and self-control), Matthew 19:14 (let the children come to me), Deuteronomy 6:6-7 (teach them diligently), and 1 John 4:19 (we love because He first loved us) all speak directly to those who serve the next generation. Read and hear them free in the Father's Heart Bible™ at fathersheartbible.com/read.",
+	},
+	{
+		question: 'How can a youth pastor avoid burnout?',
+		answer:
+			"Youth-ministry burnout grows from short tenure, low pay, unrealistic parental expectations, teen apathy, and feeling unappreciated — usually while running on empty. You cannot give what you have not received. Leaders who last guard a private life with the Father (1 John 4:19), refuse to carry the ministry alone, and root their identity in sonship rather than results. Many begin by reading the Father's Heart Bible™ daily simply to be fathered before they disciple.",
+	},
+	{
+		question: 'What does the Bible say about ministering to teenagers and young people?',
+		answer:
+			"Scripture takes the young seriously: Jesus welcomed children and rebuked those who hindered them (Matthew 19:14, Mark 10:16), and God's plan is for each generation to pass faith to the next (Deuteronomy 6, 2 Timothy 1:5). In the Father's Heart Bible™ you can read these passages free, with audio, and hear a Father who has always made room for the young.",
+	},
+	{
+		question: 'Is there a free online Bible with audio for student ministry?',
+		answer:
+			"Yes. The Father's Heart Bible™ is free to read and listen to online — no account, no purchase, no app — which makes it easy to share with a whole youth group. Open fathersheartbible.com/read on any phone, read or hear any book, and send students straight to a chapter.",
+	},
+	{
+		question: "What makes the Father's Heart Bible™ different for student ministry?",
+		answer:
+			'It is the first English translation to reveal God as Father wherever Scripture reveals Him as Father — which is exactly what many teenagers most need to hear in a generation marked by absent fathers and anxiety. For leaders, it reframes discipleship: you introduce students to a Father, not just a religion, and you come to the text first as His child yourself.',
+	},
+	{
+		question: 'What does the Bible say to a discouraged or unappreciated youth leader?',
+		answer:
+			"You may feel invisible, but you are not. 1 Timothy 4:12 says your youth and your labor are not to be despised, and Galatians 6:9 promises that those who do not give up will reap a harvest in due season. The reward of student ministry is rarely immediate — but the Father who sees in secret is keeping account. Read these passages free in the Father's Heart Bible™.",
+	},
+	{
+		question: 'What does the Bible say to a youth pastor who feels like quitting?',
+		answer:
+			"The fruit of student ministry often shows up years later, long after a leader stops counting. Galatians 6:9 says, 'Let us not grow weary of doing good, for in due season we will reap, if we do not give up.' If you are at the end of yourself, the Father's Heart Bible™ lets you read that promise and Jesus' invitation to the weary (Matthew 11:28) free, with audio — and meet a Father who restores His worn-out servants.",
+	},
+];
+---
+
+<GroupBible
+	slug="student-ministry"
+	group="Student Ministry"
+	groupLower="student ministry leaders"
+	lastUpdated="June 2026"
+	lastUpdatedIso="2026-06-14"
+	title="Bible Verses for Youth Pastors — Read Free with Audio | Father's Heart Bible™"
+	description="Bible verses & encouragement for youth pastors and student ministry, free with audio — meet the Father in the Father's Heart Bible™ before you disciple."
+	h1="The Bible for Student Ministry"
+	heroEyebrow="A Father For"
+	heroSubhead="For the ones who pour into the next generation on a shoestring and a prayer: a Bible that lets you be fathered before you disciple anyone else."
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/b45c3bd7ee5def39ee3a49ba81bcb0e5c0efa90c-1100x733.jpg"
+	heroAlt="Teenagers worshipping with hands raised under stage lights"
+	heroObjectPosition="center center"
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">If you serve in student ministry, the Father&rsquo;s Heart Bible&trade; is for you.</strong> Youth pastors, interns, small-group leaders, volunteers &mdash; everyone who shows up for teenagers when no one else will. You disciple a generation marked by anxiety and absent fathers, often underpaid and underappreciated, and frequently running on empty yourself. The <a href=\"https://fathersheartbible.com/read\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is a fresh English translation you can read and <em>listen to</em> free on any phone &mdash; and it reveals God as <em>Father</em>, the very thing your students most need to hear. Whether you&rsquo;re searching for &ldquo;Bible verses for youth pastors,&rdquo; &ldquo;encouragement for student ministry,&rdquo; or a way through youth-ministry burnout, it begins in one place: before you disciple anyone, you are a beloved child being fathered.`}
+	keyTakeaway="The greatest thing you can give a teenager is a Father — and you cannot give what you have not received. So before you disciple anyone else, your Father invites you to be fathered, filled, and delighted in first."
+	painsHeading="The weight student ministry leaders carry"
+	painsIntroHtml={`Student ministry is one of the most demanding and least resourced roles in the church. Long hours, low pay, lock-ins and camps and crises, parents who expect everything and teenagers who sometimes seem to care about nothing &mdash; and the quiet ache of pouring years into kids whose fruit you may never see. The toll is real, and it shows up early.`}
+	painStats={[
+		{ value: '~18 months', label: 'the average tenure of a youth pastor before moving on — among the shortest in ministry' },
+		{ value: '~80%', label: 'of pastors experience burnout at some point — youth leaders often carry it early and alone' },
+		{ value: '54%', label: 'of pastors often feel their ministry work is unappreciated' },
+		{ value: '51%', label: 'say they have little to no help managing their workload' },
+		{ value: 'Lowest paid', label: 'youth and associate roles earn far less than senior pastors, and many are bivocational' },
+		{ value: 'Parents & apathy', label: 'unrealistic parental expectations and teen apathy rank among the top drivers of youth-leader burnout' },
+	]}
+	painsBodyHtml={`<p>It is a calling that can quietly become a grind: invisible labor, weekend after weekend, measured by attendance numbers and judged by parents, with the deepest results hidden for years. Many student ministry leaders arrive at the same question their students are asking &mdash; <em>am I actually loved here, or only useful until someone better comes along?</em></p><p>These are not signs of weak faith or wrong calling. They are the symptoms of a son or daughter giving out a fathering they are not receiving. There is a Father who sees every unseen hour, and who is after the leader before He is after the results.</p>`}
+	painsSources={[
+		{ label: 'Greg Stier — youth ministry burnout', url: 'https://gregstier.org/the-1-reason-for-youth-ministry-burnout/' },
+		{ label: 'Soul Shepherding — pastor stress statistics', url: 'https://www.soulshepherding.org/pastors-under-stress/' },
+		{ label: '2024 Youth Pastor Compensation Report', url: 'https://5045578.fs1.hubspotusercontent-na1.net/hubfs/5045578/Playbooks%20and%20Downloadables/The%202024%20Youth%20Pastor%20Compensation%20Report.pdf' },
+	]}
+	declarationHtml={`You are a <span style=\"color: var(--color-gold);\">beloved son</span> or <span style=\"color: var(--color-gold);\">daughter</span>.<br />Not a slave. Not a servant. Not a tool. Not a performer.`}
+	aFatherHeading="A Father for student ministry"
+	aFatherBodyHtml={`<p>The answer to a worn-out youth leader is not a better curriculum, a bigger budget, or a more impressive event. It is not even more passion for teenagers. The answer is a <strong style=\"color: var(--color-ink);\">Father</strong> &mdash; a holy Father for a beloved son or daughter who happens to be pouring into the young.</p><p>You spend your life fathering and mothering other people&rsquo;s children &mdash; chasing the wanderers, sitting with the broken, celebrating the small wins no one else notices. But you cannot hand students a Father&rsquo;s love you are not receiving yourself. Before you were on staff, before your first retreat, before a single student trusted you, you were a child of God &mdash; and that is still the truest thing about you.</p><p>So you wake up tomorrow not first to disciple, and not first to fill a room &mdash; but to be <em>loved</em> by your Father. Ministry is what overflows after. He is not grading your attendance; He is delighting in His child. And the very gift you long to give your students &mdash; a Father &mdash; is the gift He is giving you first.</p>`}
+	gallery={[
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/2f02877509b969b06572abbba7303b244587fe22-1100x733.jpg', alt: 'A youth leader warmly encouraging a teenager in a church' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/2c8b2b0c013bf42015d8795521caf27e9276b577-1100x729.jpg', alt: 'A leader teaching a circle of teenage boys outdoors' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/01112bae4ac893371685cfb295b8add3d7e0df24-1100x734.jpg', alt: 'Teenagers worshipping with hands on their hearts' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/3f768dd6d45d5ad8ac00def0c6392c65547b2540-1100x733.jpg', alt: 'A young man in tears praying among other youth' },
+	]}
+	galleryCreditHtml={`Photos via <a href=\"https://www.pexels.com/\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Pexels</a>.`}
+	voiceHeading="Bible verses for student ministry: the Father's voice"
+	voiceIntroHtml={`Nine Bible verses for student ministry leaders in the Father&rsquo;s Heart Bible&trade; &mdash; each one a word from the Father to the one who pours into the next generation. Tap any reference to read and listen free.`}
+	verses={verses}
+	pullQuote="The greatest thing you can give a student is a Father — so let yourself be fathered first."
+	offersHeading="What “our Father” offers you"
+	offersIntroHtml={`Student ministry leaders give and give. Here is what the Father gives <em>you</em> &mdash; not for your ministry, but for being His.`}
+	offersBlocks={[
+		{ heading: 'A worth that ignores your age and your numbers', bodyHtml: `Where you feel dismissed as too young or measured by attendance, the Father says <a href=\"https://fathersheartbible.com/read/1-timothy/4\" style=\"color: var(--color-brand);\" class=\"hover:underline\">let no one despise you for your youth.</a> Your value is His delight in you, not the size of the room.` },
+		{ heading: 'Courage in place of fear', bodyHtml: `On the nights you feel out of your depth, He gives <a href=\"https://fathersheartbible.com/read/2-timothy/1\" style=\"color: var(--color-brand);\" class=\"hover:underline\">a spirit of power and love and self-control</a> &mdash; the same Spirit that steadied a young Timothy steadies you.` },
+		{ heading: 'A love you receive before you pour out', bodyHtml: `<a href=\"https://fathersheartbible.com/read/1-john/4\" style=\"color: var(--color-brand);\" class=\"hover:underline\">&ldquo;We love because our Father first loved you.&rdquo;</a> You were never meant to be the source &mdash; only a child who drinks first, then gives the overflow.` },
+		{ heading: 'A name beyond the role', bodyHtml: `When the title is gone, you are still His <a href=\"https://fathersheartbible.com/read/galatians/4\" style=\"color: var(--color-brand);\" class=\"hover:underline\">son or daughter and heir</a>, not His intern. Your worth is your place in the family, not your last lock-in.` },
+	]}
+	whyHeading="Why the Father's Heart Bible™ for student ministry"
+	whyBlocks={[
+		{ heading: 'It gives your students the Father they ache for', bodyHtml: `This generation carries a profound father-wound. The Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture does &mdash; from <a href=\"https://fathersheartbible.com/read/genesis/1\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Genesis 1</a> onward &mdash; so the teenagers you serve meet not a distant deity, but the Father they were made for.` },
+		{ heading: 'It refills the leader', bodyHtml: `Free to <a href=\"https://fathersheartbible.com/read\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read online</a> with audio on every chapter, it&rsquo;s built for the real week of student ministry &mdash; come to be fathered before you plan the lesson, and let Scripture feed <em>you</em> before you feed anyone else.` },
+		{ heading: 'It is easy to put in a student’s hands', bodyHtml: `No purchase, no app, no sign-up &mdash; just a link. Send a student straight to a chapter with audio, or point them to our <a href=\"/guides/where-to-start-reading-the-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">where-to-start guide</a> and <a href=\"/verses/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">verses by topic</a>.` },
+	]}
+	voicesHeading="What these voices tell young hearts"
+	voicesIntroHtml={`Some of the people God has used most powerfully with the young built their whole message on one truth: you are already loved by your Father. In their own words:`}
+	voices={[
+		{ quote: 'If God can use a man without arms and legs to be His hands and feet, then He will certainly use any willing heart.', name: 'Nick Vujicic', role: 'born without limbs, he has told millions of students they are loved by God', photo: 'https://cdn.sanity.io/images/rusi1hyi/production/5728883c578a54eeeb5b851529274632dc1045b4-500x667.jpg' },
+		{ quote: 'Sometimes when you’re in a dark place you think you’ve been buried, but you’ve actually been planted.', name: 'Christine Caine', role: 'founder of A21 and a voice to a generation of young people', photo: 'https://cdn.sanity.io/images/rusi1hyi/production/8e74e50580e7c051ecbe3f35ee66becaddd569ea-500x617.jpg' },
+		{ quote: 'God loves you as though you are the only person in the world, and He loves everyone the way He loves you.', name: 'Billy Graham', role: 'who began as Youth for Christ’s first full-time evangelist', photo: 'https://cdn.sanity.io/images/rusi1hyi/production/a44c11246e4b8c31c1b8d35672186329650bcfb4-500x688.jpg' },
+	]}
+	voicesCreditHtml={`Photos via <a href="https://commons.wikimedia.org/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Wikimedia Commons</a> &mdash; Nick Vujicic (Gage Skidmore, CC BY-SA 2.0), Christine Caine (Willow Creek D/CH, CC BY 2.0), Billy Graham (Warren K. Leffler, public domain).`}
+	pdf={{
+		title: 'Daily Affirmations',
+		description: "A 31-day journey of affirmations in the Father's voice and yours — intimacy, identity, and inheritance.",
+		coverUrl: 'https://assets.spiritmediapublishing.com/FHB/daily-affirmations-cover.webp',
+		fileUrl: 'https://assets.spiritmediapublishing.com/FHB/daily-affirmations.pdf',
+		buttonText: 'Download the PDF',
+	}}
+	wordHeading="His Word will not return void"
+	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word does what He sends it to do. The seeds you plant in students who seem unreachable will not come back empty &mdash; the harvest is often hidden for years, but it is never lost, and the Word is at work in <em>you</em> too.</p><p class=\"mt-4\" style=\"color: var(--color-ink);\">&ldquo;My word&hellip; will not return to me empty, but will accomplish that which I purpose.&rdquo; <span style=\"color: var(--color-muted);\">&mdash; Isaiah 55:11</span></p>`}
+	fatherSaysHeading="What the Father says over you"
+	fatherSaysHtml={`<p>&ldquo;Beloved, long before you led a single student, I delighted in you. You are not My volunteer; you are My child. I did not call you because I needed someone to fill a room &mdash; I called you because I love you, and I wanted you close.</p><p>You give so much to the young. Let Me give to you. You do not have to see the harvest to trust that I am keeping it. Put down the weight of every student you fear you are losing &mdash; I am the Good Shepherd, and not one of them is hidden from Me. Let Me father you in the unseen hours no one claps for. Then go and pour out &mdash; not to be appreciated, but because you are already loved. I am your Father, and you are Mine.&rdquo;</p>`}
+	prayerHeading="A prayer for student ministry leaders"
+	prayerHtml={`<p>Our Father, we thank You and praise You for everyone who serves in student ministry &mdash; the youth pastors, interns, leaders, and volunteers who chase the wanderers, sit with the broken, and pour years into teenagers who may never say thank you. Let them hear Your whisper above every critical parent and every empty seat. Let them encounter Your love &mdash; not as a lesson they teach, but as a weight they feel &mdash; and experience Your delight over them, apart from any number or outcome.</p><p>Give them grace to prioritize intimacy with You above their performance, to receive their identity as Your sons and daughters before they ever lead, and to know that the young people they love are loved by You first. Father, be the one who fathers these who father others. Carry what they cannot. Lift the discouragement of unseen labor, and give them eyes to trust a harvest they may not live to see.</p><p>I pray Your protection over them from the enemy, from temptation, from burnout, and from despair. Let them know there is no condemnation in You. Let them know You, their Father, as their true inheritance and reward, for every other gift pales beside the gift of You. And may they wake up every single day under the pour of their heavenly Father&rsquo;s heart for them.</p><p>In Jesus&rsquo; name, amen.</p>`}
+	galleryBottom={[
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/1438aabf11bdf55483e43ac0b1e171fef07af220-1100x733.jpg', alt: 'A diverse group of teenagers laughing together' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/51b2c328bbccbe7be04cb6a076d6b2a168f41509-1100x733.jpg', alt: 'Four young friends walking and laughing together' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/ab51250aee0849b188bb8513b8c3bb632a8daa85-1100x733.jpg', alt: 'A leader praying with a teenage girl' },
+		{ src: 'https://cdn.sanity.io/images/rusi1hyi/production/15a93b6d300891a9e3dad1200632c313fc68c0ad-1100x726.jpg', alt: 'Young people serving in a church service' },
+	]}
+	galleryBottomCreditHtml={`Photos via <a href=\"https://www.pexels.com/\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Pexels</a>.`}
+	keepReadingHtml={`Begin with the <a href=\"https://fathersheartbible.com/read\" style=\"color: var(--color-brand);\" class=\"hover:underline\">whole Bible free online with audio</a>, learn <a href=\"/the-fathers-heart-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">why the Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href=\"/guides/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Bible reading guides</a> &mdash; including <a href=\"/guides/where-to-start-reading-the-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">where to start</a> and <a href=\"/guides/how-to-pray/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">how to pray</a>. Or meet fellow servants in <a href=\"/bible-for/pastors/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">the Bible for pastors</a> and <a href=\"/bible-for/worship-leaders/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">worship leaders</a>.`}
+	faqs={faqs}
+	ctaBottomHeading="Be fathered before you disciple"
+	ctaBottomBodyHtml={`Watch the story behind the Father&rsquo;s Heart Bible&trade; &mdash; the translation that gives a fatherless generation the Father they ache for. Then come and be fed, so what you give your students overflows from what you&rsquo;ve received.`}
+/>
