@@ -7,6 +7,7 @@
 // CTAs. Architecture rules (read-first CTA, English-first) live in
 // memory/project_fhb_country_pages.md. Mirror the /verses + /guides patterns.
 import Layout from '../layouts/Layout.astro';
+import TranslationPreview from './TranslationPreview.astro';
 
 export interface CountryStat {
 	label: string;
@@ -106,6 +107,8 @@ export interface Props {
 	opportunityHeading?: string;
 	opportunityIntroHtml?: string;
 	languages?: CountryLanguage[];
+	// Side-by-side FHB-English | target-language draft previews (Gen 1 / John 3 etc.)
+	translationPreviews?: any[];
 	// Optional: override the featured $50,000 sponsor cards with explicit items
 	// (e.g. English print + ComfortLeather™ on the USA page, where the language
 	// is already free to READ online but PUBLISHING it still needs sponsorship).
@@ -181,6 +184,7 @@ const {
 	opportunityHeading,
 	opportunityIntroHtml,
 	languages = [],
+	translationPreviews = [],
 	sponsorFeatured,
 	sponsorIntroHtml,
 	sponsorVisionHtml,
@@ -504,6 +508,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 						})}
 					</ul>
 					<p class="mt-6 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Every language is a door. If you feel called to help open one, you can <a href="/partner" style="color: var(--color-brand);" class="hover:underline">sponsor a translation</a> &mdash; or simply <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">start reading the editions available today</a>.</p>
+					{translationPreviews.length > 0 && <TranslationPreview previews={translationPreviews} />}
 				</div>
 			</section>
 		)}
