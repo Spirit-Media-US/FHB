@@ -100,11 +100,18 @@ export const GROUPS: Group[] = [
 			'God made you, He knows your name, and He loves you no matter what. Whatever you feel — happy, scared, or sad — your Father in heaven is right there. You are already His.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/b6b75279717c8b01ee135bc9ff7e6ec3a00a8943-1100x733.jpg',
 	},
+	{
+		slug: 'middle-schoolers',
+		group: 'Middle Schoolers',
+		title: 'For Middle Schoolers',
+		blurb:
+			'The hardest social years — but you don’t have to earn your place. You are already the Father’s beloved, fully known and fully loved, exactly as you are.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/19b4f2ef59eb9833669da4469c68d89243f0e292-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
 export const UPCOMING_GROUPS: string[] = [
-	'Middle Schoolers',
 	'High Schoolers',
 	'College Students',
 	'Teachers, Doctors & Public Servants',
