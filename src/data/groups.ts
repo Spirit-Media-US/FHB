@@ -60,11 +60,18 @@ export const GROUPS: Group[] = [
 			'For the unseen people who keep the church running — production, office, kids, care, facilities, hospitality. You are a son or daughter, not a function. Be fathered, not just used.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/44e4507faf6933673ce0293a680e81e3fa8a9b46-1100x733.jpg',
 	},
+	{
+		slug: 'fathers',
+		group: 'Fathers',
+		title: 'For Fathers',
+		blurb:
+			'For every man raising children — biological, adoptive, step, grand, or spiritual. You cannot give a fathering you have not received. Meet the perfect Father, and father from the overflow.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/33c30e379cae250d1419883d9bd47fbe9271c165-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
 export const UPCOMING_GROUPS: string[] = [
-	'Fathers',
 	'Mothers',
 	'Husbands',
 	'Wives',
