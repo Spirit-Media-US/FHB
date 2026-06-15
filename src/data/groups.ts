@@ -52,11 +52,18 @@ export const GROUPS: Group[] = [
 			'For the ones who pour into the youngest and the unseen — Sunday school, nursery, AWANA, VBS. Be fathered first, so you have a Father’s love to hand down.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/e045aebbb231fc15abf4e08124c7992a5f94aaf6-1100x733.jpg',
 	},
+	{
+		slug: 'church-staff',
+		group: 'Church Staff',
+		title: 'For Church Staff',
+		blurb:
+			'For the unseen people who keep the church running — production, office, kids, care, facilities, hospitality. You are a son or daughter, not a function. Be fathered, not just used.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/44e4507faf6933673ce0293a680e81e3fa8a9b46-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
 export const UPCOMING_GROUPS: string[] = [
-	'Church Staff',
 	'Fathers',
 	'Mothers',
 	'Husbands',
