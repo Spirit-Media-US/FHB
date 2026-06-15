@@ -92,12 +92,18 @@ export const GROUPS: Group[] = [
 			'For the woman who longs to be seen and cherished — you already are, by a Father who delights in you. Loved and secure in Him before any spouse, you can love from fullness, not lack.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/820c2a84b9104b22bbfec30863c9dd8fb9527c5d-1100x733.jpg',
 	},
+	{
+		slug: 'children',
+		group: 'Children',
+		title: 'For Children',
+		blurb:
+			'God made you, He knows your name, and He loves you no matter what. Whatever you feel — happy, scared, or sad — your Father in heaven is right there. You are already His.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/b6b75279717c8b01ee135bc9ff7e6ec3a00a8943-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
 export const UPCOMING_GROUPS: string[] = [
-	'Wives',
-	'Children',
 	'Middle Schoolers',
 	'High Schoolers',
 	'College Students',
