@@ -84,6 +84,14 @@ export const GROUPS: Group[] = [
 			'You are called to love your wife as Christ loved the church — but you can only give a love you have first received. Be loved by the Father, and love her from the overflow.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/ac43cb84a89c3e14d1c6955600450974dd39e7e4-1100x790.jpg',
 	},
+	{
+		slug: 'wives',
+		group: 'Wives',
+		title: 'For Wives',
+		blurb:
+			'For the woman who longs to be seen and cherished — you already are, by a Father who delights in you. Loved and secure in Him before any spouse, you can love from fullness, not lack.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/820c2a84b9104b22bbfec30863c9dd8fb9527c5d-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
