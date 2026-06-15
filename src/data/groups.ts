@@ -76,11 +76,18 @@ export const GROUPS: Group[] = [
 			'For every woman who pours out — biological, adoptive, step, foster, grand, or spiritual. You are His beloved daughter before you are anyone’s mother. Receive His love, and mother from the overflow.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/fa0c017cfeeb1be89a520309e6db7de4f6f88993-1100x733.jpg',
 	},
+	{
+		slug: 'husbands',
+		group: 'Husbands',
+		title: 'For Husbands',
+		blurb:
+			'You are called to love your wife as Christ loved the church — but you can only give a love you have first received. Be loved by the Father, and love her from the overflow.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/ac43cb84a89c3e14d1c6955600450974dd39e7e4-1100x790.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
 export const UPCOMING_GROUPS: string[] = [
-	'Husbands',
 	'Wives',
 	'Children',
 	'Middle Schoolers',
