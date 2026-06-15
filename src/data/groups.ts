@@ -68,11 +68,18 @@ export const GROUPS: Group[] = [
 			'For every man raising children — biological, adoptive, step, grand, or spiritual. You cannot give a fathering you have not received. Meet the perfect Father, and father from the overflow.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/33c30e379cae250d1419883d9bd47fbe9271c165-1100x733.jpg',
 	},
+	{
+		slug: 'mothers',
+		group: 'Mothers',
+		title: 'For Mothers',
+		blurb:
+			'For every woman who pours out — biological, adoptive, step, foster, grand, or spiritual. You are His beloved daughter before you are anyone’s mother. Receive His love, and mother from the overflow.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/fa0c017cfeeb1be89a520309e6db7de4f6f88993-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
 export const UPCOMING_GROUPS: string[] = [
-	'Mothers',
 	'Husbands',
 	'Wives',
 	'Children',
