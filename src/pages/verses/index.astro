@@ -47,7 +47,35 @@ const breadcrumbSchema = {
 		{ '@type': 'ListItem', position: 2, name: 'Bible Verses by Topic', item: PAGE_URL },
 	],
 };
-const jsonLd = [collectionSchema, breadcrumbSchema];
+// Hub FAQ — visible AND FAQPage schema (AEO). Targets real "Bible verses about…" intent.
+const FAQS = [
+	{
+		q: 'What does the Bible say about anxiety, fear, and worry?',
+		a: 'Again and again, Scripture tells the anxious heart, "Do not fear, for I am with you." Verses like Philippians 4:6-7 invite you to hand your worries to God and receive a peace beyond understanding. Browse our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">verses by topic</a> above, or read them in context free at <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">fathersheartbible.com/read</a>.',
+	},
+	{
+		q: 'What are the best Bible verses for strength and hard times?',
+		a: 'Passages like Isaiah 41:10, Psalm 46, and Philippians 4:13 have carried people through their hardest seasons for centuries. Each topic page above gathers the most-loved verses on strength, healing, faith, and love — every one of them showing a Father who stays close in the storm.',
+	},
+	{
+		q: "How do I find a Bible verse for what I'm going through?",
+		a: "Start with the topic that fits your moment — anxiety, strength, healing, faith, or love — using the cards above. Each gathers Scripture on that theme, with the Father's heart drawn out, and links you straight into the full chapter to read or hear free.",
+	},
+	{
+		q: 'Are these Bible verses free to read and listen to?',
+		a: 'Yes — every verse here links into the Father\'s Heart Bible™, free to <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">read online with audio</a> on any device, with no account, no purchase, and no app.',
+	},
+];
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.q,
+		acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/<[^>]+>/g, '') },
+	})),
+};
+const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 ---
 
 <Layout
@@ -94,6 +122,21 @@ const jsonLd = [collectionSchema, breadcrumbSchema];
 					))}
 				</div>
 				<p class="mt-8 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Looking for Scripture for a specific calling? See <a href="/bible-for/worship-leaders/" style="color: var(--color-brand);" class="hover:underline">Bible verses for worship leaders</a> &mdash; part of our growing <em>A Father For</em> series, with the Father&rsquo;s own words for who you are.</p>
+			</div>
+		</section>
+
+		<section id="hub-faq" class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface); scroll-margin-top: 1.5rem;">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-gold); font-family: var(--font-sans);">Questions &amp; answers</p>
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Finding the verse you need</h2>
+				<dl class="mt-8 space-y-7">
+					{FAQS.map((f) => (
+						<div>
+							<dt class="text-lg font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{f.q}</dt>
+							<dd class="mt-2 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={f.a}></dd>
+						</div>
+					))}
+				</dl>
 			</div>
 		</section>
 
