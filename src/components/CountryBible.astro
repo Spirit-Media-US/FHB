@@ -1,4 +1,5 @@
 ---
+import { previewsForLanguages } from '../data/translation-previews';
 // CountryBible — reusable template for the /bible-in/<country> hub.
 // Each country page (src/pages/bible-in/<slug>.astro) supplies a data object;
 // this component renders the full SEO/AEO layout: hero (flag + country colors),
@@ -195,6 +196,11 @@ const {
 	ctaMidBodyHtml,
 	ctaBottomBodyHtml,
 } = Astro.props;
+
+// Previews: explicit prop wins; otherwise auto-derive from this country's language list.
+const _autoPreviews = previewsForLanguages((languages || []).map((l) => l.language));
+const _previews =
+	translationPreviews && translationPreviews.length ? translationPreviews : _autoPreviews;
 
 const PAGE_URL = `https://fathersheartbible.com/bible-in/${slug}/`;
 
@@ -508,7 +514,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 						})}
 					</ul>
 					<p class="mt-6 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Every language is a door. If you feel called to help open one, you can <a href="/partner" style="color: var(--color-brand);" class="hover:underline">sponsor a translation</a> &mdash; or simply <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">start reading the editions available today</a>.</p>
-					{translationPreviews.length > 0 && <TranslationPreview previews={translationPreviews} />}
+					{_previews.length > 0 && <TranslationPreview previews={_previews} />}
 				</div>
 			</section>
 		)}
