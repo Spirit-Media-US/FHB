@@ -10,6 +10,7 @@ export interface PreviewData {
 	langCode: string;
 	tier?: number;
 	register?: string;
+	note?: string;
 	aliases?: string[];
 	// biome-ignore lint/suspicious/noExplicitAny: chapter shape lives in TranslationPreview.astro
 	chapters: any[];
