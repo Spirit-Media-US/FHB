@@ -1,0 +1,88 @@
+---
+// Side-by-side FHB-English | target-language Scripture preview for the
+// /bible-in country pages' "Sponsor a translation" section.
+//
+// Per Kevin (2026-06-15): do NOT add any draft / "AI-assisted" / "pending review"
+// disclaimer badge to these previews. The data contract here is exactly what the
+// translation-preview pipeline emits per language
+// (src/data/translation-previews/<code>.json).
+
+interface Verse {
+	n: number;
+	en: string;
+	tr: string;
+}
+interface Chapter {
+	refEn: string;
+	refTr: string;
+	readSlug: string;
+	ch: number;
+	verses: Verse[];
+}
+interface Preview {
+	language: string;
+	langName: string;
+	langCode: string;
+	register?: string;
+	chapters: Chapter[];
+}
+export interface Props {
+	previews: Preview[];
+}
+const { previews } = Astro.props;
+const multi = previews.length > 1;
+---
+
+<div class="mt-10" id="translation-preview">
+	<h3 class="text-xl md:text-2xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+		A preview in the Father&rsquo;s voice
+	</h3>
+	<p class="mt-2 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+		Read the opening of Scripture side by side — the English Father&rsquo;s Heart Bible on the left,
+		{multi ? ' each language' : ` ${previews[0].language}`} on the right.
+	</p>
+
+	{previews.map((p) => (
+		<div class={multi ? 'mt-8' : 'mt-6'}>
+			{multi && (
+				<h4 class="text-lg font-medium" style="font-family: var(--font-serif); color: var(--color-ink);">{p.langName} ({p.language})</h4>
+			)}
+			{p.register && (
+				<p class="mt-2 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);">Register: {p.register}</p>
+			)}
+
+			{p.chapters.map((c, ci) => (
+				<details class="mt-4 rounded-2xl overflow-hidden" style="border: 1px solid var(--color-hairline);" open={!multi && ci === 0}>
+					<summary class="cursor-pointer select-none px-5 py-3.5 flex items-center justify-between gap-4"
+						style="background-color: var(--color-surface-low); font-family: var(--font-sans);">
+						<span class="font-semibold" style="color: var(--color-ink);">{c.refEn} &middot; {c.refTr}</span>
+						<span class="text-xs" style="color: var(--color-muted);">{c.verses.length} verses</span>
+					</summary>
+					<div role="table" style="background-color: var(--color-surface);">
+						<div role="row" class="hidden md:grid md:grid-cols-2 gap-px text-xs font-semibold uppercase tracking-wide"
+							style="font-family: var(--font-sans); color: var(--color-muted); border-bottom: 1px solid var(--color-hairline);">
+							<div class="px-5 py-2">Father&rsquo;s Heart Bible (English)</div>
+							<div class="px-5 py-2">{p.langName}</div>
+						</div>
+						{c.verses.map((v) => (
+							<div role="row" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 px-5 py-3"
+								style="border-bottom: 1px solid var(--color-hairline);">
+								<p class="text-base leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">
+									<span class="text-xs align-super" style="color: var(--color-brand);">{v.n}</span> {v.en}
+								</p>
+								<p class="text-base leading-relaxed" lang={p.langCode} style="font-family: var(--font-serif); color: var(--color-ink);">
+									<span class="text-xs align-super" style="color: var(--color-brand);">{v.n}</span> {v.tr}
+								</p>
+							</div>
+						))}
+					</div>
+				</details>
+			))}
+		</div>
+	))}
+
+	<p class="mt-5 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+		A complete edition &mdash; every book, print and digital, with audio &mdash; is unlocked when this language is sponsored.
+		<a href="/partner" style="color: var(--color-brand);" class="hover:underline">Sponsor this translation &rarr;</a>
+	</p>
+</div>
