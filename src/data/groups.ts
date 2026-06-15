@@ -219,3 +219,68 @@ export const GROUPS: Group[] = [
 // caregiver and first-responder/military splits). "Public Service" (police, fire,
 // rescue, ambulance) is covered by /bible-for/first-responders. Nothing pending.
 export const UPCOMING_GROUPS: string[] = [];
+
+// "A Father for those of every faith & background" — outreach pages that meet
+// people of the world's major religions (and the religiously unaffiliated) where
+// most experience God as a distant deity bound by rules, and gently introduce the
+// loving Heavenly Father. Written with deep respect; we love those we disagree
+// with and long for them to know His Father-heart. Rendered in their own hub
+// subsection (see bible-for/index.astro), not mixed with the life-situation grid.
+export const FAITH_GROUPS: Group[] = [
+	{
+		slug: 'catholics',
+		group: 'Catholics',
+		title: 'For Catholics',
+		blurb:
+			'You carry a rich heritage — the Trinity, Christ, the prayer Jesus taught. Yet many relate to God through duty and a sense of earning His favor. You don’t have to earn what is already yours: you are His beloved child by grace.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/ebe9faa99573303b1c3c2967f0767ea5596f68d3-1100x733.jpg',
+	},
+	{
+		slug: 'jews',
+		group: 'The Jewish People',
+		title: 'For the Jewish People',
+		blurb:
+			'The God of Abraham, Isaac, and Jacob reveals Himself as Father in your own Scriptures. “You, O LORD, are our Father.” He longs to be known not only as Sovereign and Lawgiver, but as a Father of everlasting compassion.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/15ba9fd33c63facc3baac59714726f7cc7bfeb06-1100x825.jpg',
+	},
+	{
+		slug: 'muslims',
+		group: 'Muslims',
+		title: 'For Muslims',
+		blurb:
+			'You know the discipline of prayer and the hunger to honor a great and merciful God. He longs to be known by you not only as Master, but as a near and loving Father who calls you His own beloved child.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6dd5f70638c76cbdf5e59270949f264be0ac434a-1100x735.jpg',
+	},
+	{
+		slug: 'hindus',
+		group: 'Hindus',
+		title: 'For Hindus',
+		blurb:
+			'You carry a profound spiritual hunger — the longing to know the divine and find rest. The divine you long for is one personal Father who knows your name, is near to you now, and loves you as His child by grace.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/4806a4909ce1a92df802eb826ca1d7a71959cee0-1100x733.jpg',
+	},
+	{
+		slug: 'buddhists',
+		group: 'Buddhists',
+		title: 'For Buddhists',
+		blurb:
+			'The Buddhist path holds deep wisdom about suffering and compassion. You do not have to carry the suffering alone or strive your way to peace — there is a personal Father who meets you in your pain and gives you rest.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/1593531b29a717c8e39a97577a253c14e9807a06-1100x733.jpg',
+	},
+	{
+		slug: 'sikhs',
+		group: 'Sikhs',
+		title: 'For Sikhs',
+		blurb:
+			'You devote your heart to the one God and live it out in honest work, equality, and selfless service. The one God you love longs to be known as a personal Father — near and tender — who calls you His child by grace.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/e83d5889cb68eac4987b21065ca3a3cd96d8e58c-1100x734.jpg',
+	},
+	{
+		slug: 'spiritually-curious',
+		group: 'The Spiritually Curious',
+		title: 'For Skeptics & the Spiritually Curious',
+		blurb:
+			'Atheist, agnostic, deconstructing, or just done with religion. Maybe the God you walked away from — distant, angry, a list of rules — was never the real One. There’s a Father worth meeting. Read it yourself, free, and decide.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/b51d0e4f69a4c96354e58c83f3452b96b9537545-1100x733.jpg',
+	},
+];
