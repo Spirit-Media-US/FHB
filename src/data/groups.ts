@@ -108,11 +108,18 @@ export const GROUPS: Group[] = [
 			'The hardest social years — but you don’t have to earn your place. You are already the Father’s beloved, fully known and fully loved, exactly as you are.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/19b4f2ef59eb9833669da4469c68d89243f0e292-1100x733.jpg',
 	},
+	{
+		slug: 'high-schoolers',
+		group: 'High Schoolers',
+		title: 'For High Schoolers',
+		blurb:
+			'Grades, the group chat, the future everyone keeps asking about — the pressure is real. But your worth was never your GPA or your follower count. You are the Father’s beloved, right now, before you achieve a thing.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/fac90f9adfb087bc989fc5f6164da137218f7a06-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
 export const UPCOMING_GROUPS: string[] = [
-	'High Schoolers',
 	'College Students',
 	'Teachers, Doctors & Public Servants',
 	'Public Safety & Active Military',
