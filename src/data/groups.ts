@@ -215,4 +215,7 @@ export const GROUPS: Group[] = [
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
-export const UPCOMING_GROUPS: string[] = ['Public Servants'];
+// Series complete: all 20 planned groups are live (24 pages after the approved
+// caregiver and first-responder/military splits). "Public Service" (police, fire,
+// rescue, ambulance) is covered by /bible-for/first-responders. Nothing pending.
+export const UPCOMING_GROUPS: string[] = [];
