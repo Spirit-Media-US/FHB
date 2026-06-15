@@ -226,6 +226,70 @@ export const UPCOMING_GROUPS: string[] = [];
 // loving Heavenly Father. Written with deep respect; we love those we disagree
 // with and long for them to know His Father-heart. Rendered in their own hub
 // subsection (see bible-for/index.astro), not mixed with the life-situation grid.
+// Hub sections: the life-situation pages (GROUPS) grouped into labeled thematic
+// sections, each with its own eyebrow + heading + intro (same style as the faith
+// section). Order here = order on the hub. Every GROUPS slug must appear in
+// exactly one section's `slugs`. The faith outreach (FAITH_GROUPS) renders as its
+// own section after these (see bible-for/index.astro).
+export interface HubSection {
+	key: string;
+	eyebrow: string;
+	heading: string;
+	intro: string; // may contain inline HTML
+	slugs: string[];
+}
+
+export const SECTIONS: HubSection[] = [
+	{
+		key: 'church',
+		eyebrow: 'A Father for the church',
+		heading: 'For those who serve the church',
+		intro:
+			'You pour out for everyone else — leading, teaching, shepherding, serving behind the scenes. Before you carry the room, the class, or the calling, you are a beloved son or daughter. Be fathered first, and minister from the overflow.',
+		slugs: ['worship-leaders', 'pastors', 'student-ministry', 'childrens-ministry', 'church-staff'],
+	},
+	{
+		key: 'family',
+		eyebrow: 'A Father for the home',
+		heading: 'For families & marriages',
+		intro:
+			'You can only give a love you have first received. Whether you are raising children or building a marriage, meet the perfect Father — and love your family from the fullness of being loved by Him.',
+		slugs: ['fathers', 'mothers', 'husbands', 'wives'],
+	},
+	{
+		key: 'young',
+		eyebrow: 'A Father for the young',
+		heading: 'For children, students & the next generation',
+		intro:
+			'From the youngest child to the college senior, you do not have to earn your place or prove your worth. You are already the Father’s beloved — fully known and fully loved, exactly as you are, right now.',
+		slugs: ['children', 'middle-schoolers', 'high-schoolers', 'college-students'],
+	},
+	{
+		key: 'caregivers',
+		eyebrow: 'A Father for the caregiver',
+		heading: 'For those who care & heal',
+		intro:
+			'You carry others through their hardest days — but who carries you? You cannot pour from an empty cup. Meet the Father who tends the caregiver, so you give from the overflow of being held, not the edge of empty.',
+		slugs: ['teachers', 'nurses', 'doctors'],
+	},
+	{
+		key: 'serve',
+		eyebrow: 'A Father for those who serve',
+		heading: 'For those who serve & protect',
+		intro:
+			'You run toward danger, stand the post, and carry what most will never see — and you were never meant to carry it alone. Meet the Father who runs toward you, who sees what you have seen, and stays.',
+		slugs: ['first-responders', 'military', 'veterans'],
+	},
+	{
+		key: 'hardest',
+		eyebrow: 'A Father in the hardest seasons',
+		heading: 'For the hardest seasons',
+		intro:
+			'When life breaks — a diagnosis, an addiction, a marriage ending, a prison cell, a devastating loss — you are not alone, and you are not beyond His reach. Meet the Father who is close to the brokenhearted and never turns away.',
+		slugs: ['incarcerated', 'cancer', 'addiction', 'divorce', 'grief'],
+	},
+];
+
 export const FAITH_GROUPS: Group[] = [
 	{
 		slug: 'catholics',

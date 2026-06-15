@@ -6,7 +6,7 @@
 // shipping /bible-for/<slug>.astro and moving its name into GROUPS in
 // src/data/groups.ts. FHB color scheme. Read-first per the architecture rules
 // in memory/reference_group_page_builder.md.
-import { FAITH_GROUPS, GROUPS, UPCOMING_GROUPS } from '../../data/groups';
+import { FAITH_GROUPS, GROUPS, SECTIONS, UPCOMING_GROUPS } from '../../data/groups';
 import Layout from '../../layouts/Layout.astro';
 
 const PAGE_URL = 'https://fathersheartbible.com/bible-for/';
@@ -52,6 +52,10 @@ const breadcrumbSchema = {
 	],
 };
 const jsonLd = [collectionSchema, breadcrumbSchema];
+
+// Look up a group card by slug, preserving the order declared in each section.
+const bySlug = new Map(GROUPS.map((g) => [g.slug, g]));
+const sectionCards = (slugs: string[]) => slugs.map((s) => bySlug.get(s)).filter(Boolean);
 ---
 
 <Layout
@@ -90,53 +94,59 @@ const jsonLd = [collectionSchema, breadcrumbSchema];
 		</section>
 
 		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
-			<div class="mx-auto max-w-4xl">
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{GROUPS.map((g) => (
-						<a href={`/bible-for/${g.slug}/`} class="block rounded-2xl overflow-hidden no-underline transition-all hover:opacity-95" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
-							<img src={`${g.img}?w=800&h=460&fit=crop&crop=entropy&fm=webp&q=70`} alt={g.title} width="800" height="460" class="w-full h-44 object-cover" loading="lazy" decoding="async" />
-							<div class="p-5">
-								<h2 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{g.title}</h2>
-								<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{g.blurb}</p>
-								<span class="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">Read more <span aria-hidden="true">&rarr;</span></span>
-							</div>
-						</a>
-					))}
+			<div class="mx-auto max-w-4xl space-y-14">
+				{SECTIONS.map((section, idx) => (
+					<div>
+						<div class={`mb-8${idx > 0 ? ' pt-10' : ''}`} style={idx > 0 ? 'border-top: 1px solid var(--color-hairline);' : ''}>
+							<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-gold); font-family: var(--font-sans);">{section.eyebrow}</p>
+							<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{section.heading}</h2>
+							<p class="mt-4 max-w-2xl text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={section.intro}></p>
+						</div>
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							{sectionCards(section.slugs).map((g) => (
+								<a href={`/bible-for/${g.slug}/`} class="block rounded-2xl overflow-hidden no-underline transition-all hover:opacity-95" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+									<img src={`${g.img}?w=800&h=460&fit=crop&crop=entropy&fm=webp&q=70`} alt={g.title} width="800" height="460" class="w-full h-44 object-cover" loading="lazy" decoding="async" />
+									<div class="p-5">
+										<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{g.title}</h3>
+										<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{g.blurb}</p>
+										<span class="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">Read more <span aria-hidden="true">&rarr;</span></span>
+									</div>
+								</a>
+							))}
+						</div>
+					</div>
+				))}
+
+				<div>
+					<div class="mb-8 pt-10" style="border-top: 1px solid var(--color-hairline);">
+						<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-gold); font-family: var(--font-sans);">A Father for those of every faith</p>
+						<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Wherever you&rsquo;re coming from</h2>
+						<p class="mt-4 max-w-2xl text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Most of the world meets God as a distant deity with rules to keep. We believe He is, before anything else, a loving <strong style="color: var(--color-ink);">Father</strong>. These pages are written with deep respect for those of other faiths and none &mdash; because we love you, and long for you to know His heart for you.</p>
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						{FAITH_GROUPS.map((g) => (
+							<a href={`/bible-for/${g.slug}/`} class="block rounded-2xl overflow-hidden no-underline transition-all hover:opacity-95" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+								<img src={`${g.img}?w=800&h=460&fit=crop&crop=entropy&fm=webp&q=70`} alt={g.title} width="800" height="460" class="w-full h-44 object-cover" loading="lazy" decoding="async" />
+								<div class="p-5">
+									<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{g.title}</h3>
+									<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{g.blurb}</p>
+									<span class="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">Read more <span aria-hidden="true">&rarr;</span></span>
+								</div>
+							</a>
+						))}
+					</div>
 				</div>
 
 				{UPCOMING_GROUPS.length > 0 && (
-					<div class="mt-12">
+					<div class="pt-10" style="border-top: 1px solid var(--color-hairline);">
 						<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-gold); font-family: var(--font-sans);">More on the way</p>
 						<ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2.5">
 							{UPCOMING_GROUPS.map((name) => (
 								<li class="text-base leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{name}</li>
 							))}
 						</ul>
-						<p class="mt-6 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">A Father for every calling and season &mdash; new pages are being added. <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">Start reading free</a> while you wait.</p>
 					</div>
 				)}
-			</div>
-		</section>
-
-		<section class="px-6 pt-4 pb-10 lg:px-8 lg:pb-14" style="background-color: var(--color-surface);">
-			<div class="mx-auto max-w-4xl">
-				<div class="mb-8 pt-8" style="border-top: 1px solid var(--color-hairline);">
-					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-gold); font-family: var(--font-sans);">A Father for those of every faith</p>
-					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Wherever you&rsquo;re coming from</h2>
-					<p class="mt-4 max-w-2xl text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Most of the world meets God as a distant deity with rules to keep. We believe He is, before anything else, a loving <strong style="color: var(--color-ink);">Father</strong>. These pages are written with deep respect for those of other faiths and none &mdash; because we love you, and long for you to know His heart for you.</p>
-				</div>
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{FAITH_GROUPS.map((g) => (
-						<a href={`/bible-for/${g.slug}/`} class="block rounded-2xl overflow-hidden no-underline transition-all hover:opacity-95" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
-							<img src={`${g.img}?w=800&h=460&fit=crop&crop=entropy&fm=webp&q=70`} alt={g.title} width="800" height="460" class="w-full h-44 object-cover" loading="lazy" decoding="async" />
-							<div class="p-5">
-								<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{g.title}</h3>
-								<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{g.blurb}</p>
-								<span class="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">Read more <span aria-hidden="true">&rarr;</span></span>
-							</div>
-						</a>
-					))}
-				</div>
 			</div>
 		</section>
 
