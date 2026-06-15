@@ -44,11 +44,18 @@ export const GROUPS: Group[] = [
 			'For the ones who pour into the next generation on a shoestring and a prayer — be fathered before you disciple. The greatest thing you can give a student is a Father.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/b45c3bd7ee5def39ee3a49ba81bcb0e5c0efa90c-1100x733.jpg',
 	},
+	{
+		slug: 'childrens-ministry',
+		group: "Children's Ministry",
+		title: 'For Children’s Ministry',
+		blurb:
+			'For the ones who pour into the youngest and the unseen — Sunday school, nursery, AWANA, VBS. Be fathered first, so you have a Father’s love to hand down.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/e045aebbb231fc15abf4e08124c7992a5f94aaf6-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
 export const UPCOMING_GROUPS: string[] = [
-	"Children's Ministry",
 	'Church Staff',
 	'Fathers',
 	'Mothers',
