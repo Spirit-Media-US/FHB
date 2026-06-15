@@ -124,11 +124,35 @@ export const GROUPS: Group[] = [
 			'Away from home, building a life, carrying the pressure of who you’re becoming. Wherever you land, you have a Father who already knows your name — and runs to meet you. You belong to Him before you belong anywhere.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/04309eb88e068e4d4992c25c70c914c90b64b061-1100x733.jpg',
 	},
+	{
+		slug: 'teachers',
+		group: 'Teachers',
+		title: 'For Teachers',
+		blurb:
+			'You give and give to a room full of kids who need everything — and you cannot pour from an empty cup. Meet the Father who fills you first, so you teach from the overflow of being loved, not the strain of being depleted.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/a7cbadd7631954d2e712faad03d1521522c5dabe-1100x733.jpg',
+	},
+	{
+		slug: 'nurses',
+		group: 'Nurses',
+		title: 'For Nurses',
+		blurb:
+			'You carry others through their worst days — but who carries you? Meet the Father who tends the caregiver, so you nurse from the overflow of being held, not the edge of empty.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6dc31c86e6218eb1872b07819100f2c1b12a9adb-1100x825.jpg',
+	},
+	{
+		slug: 'doctors',
+		group: 'Doctors',
+		title: 'For Doctors',
+		blurb:
+			'You hold others’ lives in your hands — but you were never meant to be God. Meet the Father who carries the one who carries everyone, so you practice from rest, not the impossible weight of being everything.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/84b3300e36554d7ce34920dafbb6c72bbb55325d-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
 export const UPCOMING_GROUPS: string[] = [
-	'Teachers, Doctors & Public Servants',
+	'Public Servants',
 	'Public Safety & Active Military',
 	'Veterans',
 	'The Incarcerated & the Suffering',
