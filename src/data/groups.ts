@@ -232,7 +232,8 @@ export const UPCOMING_GROUPS: string[] = [];
 // exactly one section's `slugs`. The faith outreach (FAITH_GROUPS) renders as its
 // own section after these (see bible-for/index.astro).
 export interface HubSection {
-	key: string;
+	key: string; // also the anchor id on the hub (#<key>)
+	short: string; // jump-nav chip label
 	eyebrow: string;
 	heading: string;
 	intro: string; // may contain inline HTML
@@ -242,6 +243,7 @@ export interface HubSection {
 export const SECTIONS: HubSection[] = [
 	{
 		key: 'church',
+		short: 'The church',
 		eyebrow: 'A Father for the church',
 		heading: 'For those who serve the church',
 		intro:
@@ -250,6 +252,7 @@ export const SECTIONS: HubSection[] = [
 	},
 	{
 		key: 'family',
+		short: 'Family & marriage',
 		eyebrow: 'A Father for the home',
 		heading: 'For families & marriages',
 		intro:
@@ -258,6 +261,7 @@ export const SECTIONS: HubSection[] = [
 	},
 	{
 		key: 'young',
+		short: 'The young',
 		eyebrow: 'A Father for the young',
 		heading: 'For children, students & the next generation',
 		intro:
@@ -266,6 +270,7 @@ export const SECTIONS: HubSection[] = [
 	},
 	{
 		key: 'caregivers',
+		short: 'Care & heal',
 		eyebrow: 'A Father for the caregiver',
 		heading: 'For those who care & heal',
 		intro:
@@ -274,6 +279,7 @@ export const SECTIONS: HubSection[] = [
 	},
 	{
 		key: 'serve',
+		short: 'Serve & protect',
 		eyebrow: 'A Father for those who serve',
 		heading: 'For those who serve & protect',
 		intro:
@@ -282,6 +288,7 @@ export const SECTIONS: HubSection[] = [
 	},
 	{
 		key: 'hardest',
+		short: 'Hardest seasons',
 		eyebrow: 'A Father in the hardest seasons',
 		heading: 'For the hardest seasons',
 		intro:
