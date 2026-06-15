@@ -10,10 +10,38 @@ import { FAITH_GROUPS, GROUPS, SECTIONS, UPCOMING_GROUPS } from '../../data/grou
 import Layout from '../../layouts/Layout.astro';
 
 const PAGE_URL = 'https://fathersheartbible.com/bible-for/';
-const TITLE =
-	"A Father For You — Bible Verses & Encouragement for Every Calling | Father's Heart Bible™";
+const TITLE = "A Father for You — Bible Verses for Every Person & Season | Father's Heart Bible™";
 const DESCRIPTION =
-	"Whatever you carry, the Father's Heart Bible™ has a word for you — free with audio. Bible verses & encouragement for worship leaders, pastors, parents & more.";
+	"Free Bible verses & encouragement for women, men, teens, parents, pastors, the grieving & more — with audio. Meet God as a loving Father in the Father's Heart Bible™.";
+
+// Hub FAQ — rendered visibly AND as FAQPage schema (AEO). Keep answers tight,
+// direct-answer style, with the Father angle and a free-to-read pointer.
+const FAQS = [
+	{
+		q: 'Who is the Bible for?',
+		a: 'The Bible is for every person — whoever you are and whatever you carry. The Father\'s Heart Bible™ has a word from your Father for every season of life: for parents and children, for those who serve and those who suffer, and for people of every background. Browse by who you are above, then read it free with audio at <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">fathersheartbible.com/read</a>.',
+	},
+	{
+		q: 'What does the Bible say about God as a Father?',
+		a: 'From the very beginning, Scripture reveals God not as a distant deity but as a loving Father. Jesus taught us to pray "Our Father," and the New Testament invites us to call Him "Abba" — Father (Romans 8:15). The Father\'s Heart Bible™ is the first English translation to reveal God as Father wherever Scripture reveals Him as Father, so His Father-heart is visible on every page.',
+	},
+	{
+		q: 'Are there Bible verses for my specific situation?',
+		a: 'Yes. There are Bible verses and encouragement here for parents, students, teachers, nurses, doctors, first responders, the military and veterans, and for the hardest seasons — grief, cancer, addiction, divorce, and prison — as well as for people of every faith and background. Find the page that fits your life above.',
+	},
+	{
+		q: 'Does God love me?',
+		a: 'Yes. You are not loved because of what you achieve, earn, or maintain — you are loved because you are His. He is not a scorekeeper waiting to catch you; He is a Father who runs to meet the one coming home (Luke 15:20), no matter your past or your background.',
+	},
+	{
+		q: 'Is the Father’s Heart Bible really free?',
+		a: 'Yes — completely free. You can <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">read the whole Bible online with audio</a> on any device, with no account, no purchase, and no app to download.',
+	},
+	{
+		q: 'How do I start reading the Bible?',
+		a: 'Start small and start free. Pick the page above that fits your life, or open a Gospel like John and read or listen to one chapter. <a href="/guides/how-to-pray/" style="color: var(--color-brand);" class="hover:underline">Our how-to-pray guide</a> and <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">verses by topic</a> can help you find words for whatever you are facing.',
+	},
+];
 
 const HERO_BASE =
 	'https://cdn.sanity.io/images/rusi1hyi/production/00eb714332ca6fbd0270ee88ab774af3cb45aa4d-5434x3596.jpg';
@@ -42,6 +70,19 @@ const collectionSchema = {
 			url: `https://fathersheartbible.com/bible-for/${g.slug}/`,
 		})),
 	},
+	speakable: {
+		'@type': 'SpeakableSpecification',
+		cssSelector: ['#hub-overview', '#hub-faq'],
+	},
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.q,
+		acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/<[^>]+>/g, '') },
+	})),
 };
 const breadcrumbSchema = {
 	'@context': 'https://schema.org',
@@ -51,7 +92,7 @@ const breadcrumbSchema = {
 		{ '@type': 'ListItem', position: 2, name: 'A Father For', item: PAGE_URL },
 	],
 };
-const jsonLd = [collectionSchema, breadcrumbSchema];
+const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 
 // Look up a group card by slug, preserving the order declared in each section.
 const bySlug = new Map(GROUPS.map((g) => [g.slug, g]));
@@ -87,16 +128,27 @@ const sectionCards = (slugs: string[]) => slugs.map((s) => bySlug.get(s)).filter
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
 					<span style="color: var(--color-ink);">A Father For</span>
 				</nav>
-				<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-					The answer to what you carry is not another duty, and not a distant God &mdash; it is a holy <strong style="color: var(--color-ink);">Father</strong> for a beloved son or daughter. The <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and hear online, and it speaks His own voice over every calling and season. Find yours below.
-				</p>
+				<div id="hub-overview">
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);">
+						<strong>Whoever you are, there is a word from the Father for you.</strong> The <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> gathers free Bible verses and encouragement for every person and season &mdash; for <a href="#family" style="color: var(--color-brand);" class="hover:underline">parents</a>, <a href="#young" style="color: var(--color-brand);" class="hover:underline">children and students</a>, <a href="#caregivers" style="color: var(--color-brand);" class="hover:underline">teachers, nurses and doctors</a>, <a href="#serve" style="color: var(--color-brand);" class="hover:underline">first responders and the military</a>, <a href="#hardest" style="color: var(--color-brand);" class="hover:underline">those in the hardest seasons</a>, and <a href="#every-faith" style="color: var(--color-brand);" class="hover:underline">people of every faith and background</a>.
+					</p>
+					<p class="mt-4 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						The answer to what you carry is not another duty, and not a distant God &mdash; it is a holy <strong style="color: var(--color-ink);">Father</strong> for a beloved son or daughter. Every page is free to read and hear online, speaks His own voice over your life, and points you back to <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">the whole Bible with audio</a>. Find yours below &mdash; or explore <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">verses by topic</a>.
+					</p>
+				</div>
+				<nav aria-label="Jump to a section" class="mt-6 flex flex-wrap gap-2">
+					{SECTIONS.map((s) => (
+						<a href={`#${s.key}`} class="inline-block rounded-full px-4 py-1.5 text-sm font-medium no-underline transition-opacity hover:opacity-80" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline); color: var(--color-ink); font-family: var(--font-sans);">{s.short}</a>
+					))}
+					<a href="#every-faith" class="inline-block rounded-full px-4 py-1.5 text-sm font-medium no-underline transition-opacity hover:opacity-80" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline); color: var(--color-ink); font-family: var(--font-sans);">Every faith</a>
+				</nav>
 			</div>
 		</section>
 
 		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
 			<div class="mx-auto max-w-4xl space-y-14">
 				{SECTIONS.map((section, idx) => (
-					<div>
+					<div id={section.key} style="scroll-margin-top: 1.5rem;">
 						<div class={`mb-8${idx > 0 ? ' pt-10' : ''}`} style={idx > 0 ? 'border-top: 1px solid var(--color-hairline);' : ''}>
 							<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-gold); font-family: var(--font-sans);">{section.eyebrow}</p>
 							<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{section.heading}</h2>
@@ -117,7 +169,7 @@ const sectionCards = (slugs: string[]) => slugs.map((s) => bySlug.get(s)).filter
 					</div>
 				))}
 
-				<div>
+				<div id="every-faith" style="scroll-margin-top: 1.5rem;">
 					<div class="mb-8 pt-10" style="border-top: 1px solid var(--color-hairline);">
 						<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-gold); font-family: var(--font-sans);">A Father for those of every faith</p>
 						<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Wherever you&rsquo;re coming from</h2>
@@ -147,6 +199,21 @@ const sectionCards = (slugs: string[]) => slugs.map((s) => bySlug.get(s)).filter
 						</ul>
 					</div>
 				)}
+			</div>
+		</section>
+
+		<section id="hub-faq" class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface); scroll-margin-top: 1.5rem;">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-gold); font-family: var(--font-sans);">Questions &amp; answers</p>
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Who the Bible is for &mdash; and how to begin</h2>
+				<dl class="mt-8 space-y-7">
+					{FAQS.map((f) => (
+						<div>
+							<dt class="text-lg font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{f.q}</dt>
+							<dd class="mt-2 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={f.a}></dd>
+						</div>
+					))}
+				</dl>
 			</div>
 		</section>
 
