@@ -172,13 +172,47 @@ export const GROUPS: Group[] = [
 			'You served, you sacrificed, you carry what most will never see. You were never forgotten — and never meant to carry it alone. Meet the Father who welcomes you home and gives you a name beyond the uniform.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/754e1eadc7743bff7e1d0df927a35bff2806ae31-1100x734.jpg',
 	},
+	{
+		slug: 'incarcerated',
+		group: 'The Incarcerated',
+		title: 'For the Incarcerated',
+		blurb:
+			'No wall can keep out the Father’s love. You are not your worst day or your sentence — you are still His, and He has not forgotten you. For those inside, their families, and those coming home.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/b7a14820ffedff5585c1df47a2a7fc206d0f4b63-1100x733.jpg',
+	},
+	{
+		slug: 'cancer',
+		group: 'Those Facing Cancer',
+		title: 'For Those Facing Cancer',
+		blurb:
+			'Even in the valley, you do not walk alone. Meet the Father who is near to the brokenhearted — who holds you through every scan and treatment and never leaves your side. For patients and the ones who love them.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/472476e577dd1d4cc1e1f42776a4f7ad57245212-1100x733.jpg',
+	},
+	{
+		slug: 'addiction',
+		group: 'Those Facing Addiction',
+		title: 'For Those Facing Addiction',
+		blurb:
+			'You are not your addiction, and you are not beyond His reach. Meet the prodigal’s Father who runs down the road to the one coming home — no lecture, no rejection, only arms open.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/89374a8de11cbbabb93a238ef081f850baaa1214-1100x825.jpg',
+	},
+	{
+		slug: 'divorce',
+		group: 'Those Facing Divorce',
+		title: 'For Those Facing Divorce',
+		blurb:
+			'Even when a covenant is broken, His covenant with you is not. Meet the Father who is close to the brokenhearted — who will never leave you, and never stops calling you His beloved.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/853e41fc98832dbedaf6a9a5b5f3c91d61744ef4-1100x733.jpg',
+	},
+	{
+		slug: 'grief',
+		group: 'Those Grieving a Loss',
+		title: 'For Those Grieving a Loss',
+		blurb:
+			'There is no grief too heavy for the Father to hold with you. He is close to the brokenhearted, He keeps every tear, and He has not turned away. For those walking through devastating loss.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/88b47dc15aa46bc5d5348640ad634e5a278b804c-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
-export const UPCOMING_GROUPS: string[] = [
-	'Public Servants',
-	'The Incarcerated & the Suffering',
-	'Those Facing Addiction',
-	'Those Facing Divorce',
-	'Those Touched by Loss',
-];
+export const UPCOMING_GROUPS: string[] = ['Public Servants'];
