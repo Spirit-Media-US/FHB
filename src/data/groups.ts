@@ -212,6 +212,54 @@ export const GROUPS: Group[] = [
 			'There is no grief too heavy for the Father to hold with you. He is close to the brokenhearted, He keeps every tear, and He has not turned away. For those walking through devastating loss.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/88b47dc15aa46bc5d5348640ad634e5a278b804c-1100x733.jpg',
 	},
+	{
+		slug: 'women',
+		group: 'Women',
+		title: 'For Women',
+		blurb:
+			'For every woman who carries more than anyone sees — and is still told to keep giving. Before you are anyone’s everything, you are His beloved daughter. Meet the Father who delights in you and fills you from His own fullness.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/0ed6645cb5c7a762c47f63de5219b0a044df0bc0-1100x733.jpg',
+	},
+	{
+		slug: 'men',
+		group: 'Men',
+		title: 'For Men',
+		blurb:
+			'For every man handed a scoreboard instead of a Father, carrying the weight in silence. You were made to be a son before you are a provider. Meet the Father who is proud of you — not for what you produce, but because you are His.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/b4df7334c56483e6275698ad732a6235fe9a8d93-1100x733.jpg',
+	},
+	{
+		slug: 'singles',
+		group: 'Singles',
+		title: 'For Singles',
+		blurb:
+			'Single by season or by choice — the ache of waiting and the pressure to “complete” your life are real. You are already whole and fully His. Meet the Father who is near to you now, not someday.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3486a4fb70ba996fefab5cc1f6af99652bb38501-1100x782.jpg',
+	},
+	{
+		slug: 'teenagers',
+		group: 'Teenagers',
+		title: 'For Teenagers',
+		blurb:
+			'Measured by grades, group chats, and follower counts, you carry a pressure no one sees. Your worth was never your performance. Meet the Father who calls you His own — right now, before you achieve a thing.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/1a299e6ee48b3395c597e529293b643b06101bef-1100x733.jpg',
+	},
+	{
+		slug: 'kids',
+		group: 'Kids',
+		title: 'For Kids',
+		blurb:
+			'Bible verses for kids in words they can hold onto — for parents, grandparents, and anyone raising little ones. The simplest truth there is: God made them, knows their name, and loves them no matter what.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/039477d5714618954fbea1598e12a42505f442bb-1100x733.jpg',
+	},
+	{
+		slug: 'graduates',
+		group: 'Graduates',
+		title: 'For Graduates',
+		blurb:
+			'Cap, gown, and the question everyone keeps asking: what now? Wherever you are headed, you do not go alone. Meet the Father who knows the plans He has for you and walks with you into what is next.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6aa4495c67149bf645571da8643b1f5c3049e17-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
@@ -252,12 +300,12 @@ export const SECTIONS: HubSection[] = [
 	},
 	{
 		key: 'family',
-		short: 'Family & marriage',
-		eyebrow: 'A Father for the home',
-		heading: 'For families & marriages',
+		short: 'Individuals & family',
+		eyebrow: 'A Father for every life',
+		heading: 'For individuals, families & marriages',
 		intro:
-			'You can only give a love you have first received. Whether you are raising children or building a marriage, meet the perfect Father — and love your family from the fullness of being loved by Him.',
-		slugs: ['fathers', 'mothers', 'husbands', 'wives'],
+			'Before any role you carry — spouse, parent, or simply yourself — you are a beloved son or daughter. You can only give a love you have first received. Meet the perfect Father, and live and love your family from the fullness of being loved by Him.',
+		slugs: ['women', 'men', 'singles', 'husbands', 'wives', 'fathers', 'mothers'],
 	},
 	{
 		key: 'young',
@@ -265,8 +313,16 @@ export const SECTIONS: HubSection[] = [
 		eyebrow: 'A Father for the young',
 		heading: 'For children, students & the next generation',
 		intro:
-			'From the youngest child to the college senior, you do not have to earn your place or prove your worth. You are already the Father’s beloved — fully known and fully loved, exactly as you are, right now.',
-		slugs: ['children', 'middle-schoolers', 'high-schoolers', 'college-students'],
+			'From the youngest child to the new graduate, you do not have to earn your place or prove your worth. You are already the Father’s beloved — fully known and fully loved, exactly as you are, right now.',
+		slugs: [
+			'kids',
+			'children',
+			'teenagers',
+			'middle-schoolers',
+			'high-schoolers',
+			'college-students',
+			'graduates',
+		],
 	},
 	{
 		key: 'caregivers',
