@@ -260,6 +260,38 @@ export const GROUPS: Group[] = [
 			'Cap, gown, and the question everyone keeps asking: what now? Wherever you are headed, you do not go alone. Meet the Father who knows the plans He has for you and walks with you into what is next.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6aa4495c67149bf645571da8643b1f5c3049e17-1100x733.jpg',
 	},
+	{
+		slug: 'athletes',
+		group: 'Athletes',
+		title: 'For Athletes',
+		blurb:
+			'For the competitor measured by the scoreboard — you are a beloved son or daughter before any win or loss. Meet the Father who delights in you when you triumph and when you fall short, not for what you achieve, but because you are His.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/d17392da292d6f6976f7a5ba14487e45292b28b5-1100x733.jpg',
+	},
+	{
+		slug: 'widows',
+		group: 'Widows',
+		title: 'For Widows',
+		blurb:
+			'Scripture calls God a Father to the fatherless and a defender of widows. In the empty house and the silent grief, you are not forgotten — meet the Father who is close to the brokenhearted and never turns away. For widows and widowers.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/e6cfbdce300971f2c17438d108dee155b04d8d5b-1100x733.jpg',
+	},
+	{
+		slug: 'new-parents',
+		group: 'New Parents',
+		title: 'For New Moms & New Parents',
+		blurb:
+			'Exhausted, overwhelmed, and afraid of getting it wrong — every new parent feels it. Before you can parent, you are parented: meet the Father who knit your child together and holds you both.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f7771f5ffa425599eb2a26ab1eb5173978e2f9ad-1100x733.jpg',
+	},
+	{
+		slug: 'financial-hardship',
+		group: 'Those Facing Financial Hardship',
+		title: 'For Those Facing Financial Hardship',
+		blurb:
+			'When the bills outpace the paycheck, the worry can swallow everything. Your worth was never your bank balance. Meet the Father who feeds the birds, knows what you need, and will never leave you.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/2be93211317f30137b14f698c57572d6535c1c33-1100x733.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
@@ -305,7 +337,7 @@ export const SECTIONS: HubSection[] = [
 		heading: 'For individuals, families & marriages',
 		intro:
 			'Before any role you carry — spouse, parent, or simply yourself — you are a beloved son or daughter. You can only give a love you have first received. Meet the perfect Father, and live and love your family from the fullness of being loved by Him.',
-		slugs: ['women', 'men', 'singles', 'husbands', 'wives', 'fathers', 'mothers'],
+		slugs: ['women', 'men', 'singles', 'husbands', 'wives', 'new-parents', 'fathers', 'mothers'],
 	},
 	{
 		key: 'young',
@@ -323,6 +355,15 @@ export const SECTIONS: HubSection[] = [
 			'college-students',
 			'graduates',
 		],
+	},
+	{
+		key: 'everyday',
+		short: 'Everyday & callings',
+		eyebrow: 'A Father in the everyday',
+		heading: 'For everyday life & callings',
+		intro:
+			'On the field, at the desk, in the ordinary days no one applauds — you were never meant to be defined by what you achieve. Meet the Father who delights in you apart from any performance, and walks every ordinary day with you.',
+		slugs: ['athletes'],
 	},
 	{
 		key: 'caregivers',
@@ -348,8 +389,16 @@ export const SECTIONS: HubSection[] = [
 		eyebrow: 'A Father in the hardest seasons',
 		heading: 'For the hardest seasons',
 		intro:
-			'When life breaks — a diagnosis, an addiction, a marriage ending, a prison cell, a devastating loss — you are not alone, and you are not beyond His reach. Meet the Father who is close to the brokenhearted and never turns away.',
-		slugs: ['incarcerated', 'cancer', 'addiction', 'divorce', 'grief'],
+			'When life breaks — a diagnosis, an addiction, a marriage ending, the loss of a spouse, a prison cell, a season of going without — you are not alone, and you are not beyond His reach. Meet the Father who is close to the brokenhearted and never turns away.',
+		slugs: [
+			'incarcerated',
+			'cancer',
+			'addiction',
+			'divorce',
+			'grief',
+			'widows',
+			'financial-hardship',
+		],
 	},
 ];
 
