@@ -148,13 +148,35 @@ export const GROUPS: Group[] = [
 			'You hold others’ lives in your hands — but you were never meant to be God. Meet the Father who carries the one who carries everyone, so you practice from rest, not the impossible weight of being everything.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/84b3300e36554d7ce34920dafbb6c72bbb55325d-1100x733.jpg',
 	},
+	{
+		slug: 'first-responders',
+		group: 'First Responders',
+		title: 'For First Responders',
+		blurb:
+			'You run toward what everyone else runs from, carrying calls no one should have to carry. Meet the Father who runs toward you — who sees what you’ve seen and stays.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6b5222bc14effb6cedb9f1f7a87aeb73c39fc24e-1100x733.jpg',
+	},
+	{
+		slug: 'military',
+		group: 'Active Military',
+		title: 'For the Military',
+		blurb:
+			'Wherever you are deployed, you are not beyond His reach. Meet the Father who goes with you — who never leaves His post, and who holds the family waiting at home.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/7897521da975af184c679fedb9d2c92c27302382-1100x803.jpg',
+	},
+	{
+		slug: 'veterans',
+		group: 'Veterans',
+		title: 'For Veterans',
+		blurb:
+			'You served, you sacrificed, you carry what most will never see. You were never forgotten — and never meant to carry it alone. Meet the Father who welcomes you home and gives you a name beyond the uniform.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/754e1eadc7743bff7e1d0df927a35bff2806ae31-1100x734.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
 export const UPCOMING_GROUPS: string[] = [
 	'Public Servants',
-	'Public Safety & Active Military',
-	'Veterans',
 	'The Incarcerated & the Suffering',
 	'Those Facing Addiction',
 	'Those Facing Divorce',
