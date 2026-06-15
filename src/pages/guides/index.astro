@@ -49,7 +49,35 @@ const breadcrumbSchema = {
 		{ '@type': 'ListItem', position: 2, name: 'Guides', item: PAGE_URL },
 	],
 };
-const jsonLd = [collectionSchema, breadcrumbSchema];
+// Hub FAQ — visible AND FAQPage schema (AEO). Targets real beginner "how to read the Bible" intent.
+const FAQS = [
+	{
+		q: 'How do I start reading the Bible as a beginner?',
+		a: 'Start small and start free. A good first step is one of the Gospels — try the Gospel of John — reading or listening to a chapter at a time. Our <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where-to-start guide</a> walks you through it, and you can read along free with audio at <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">fathersheartbible.com/read</a>.',
+	},
+	{
+		q: 'In what order should I read the Bible?',
+		a: "You don't have to read front to back. Many beginners start with a Gospel to meet Jesus, then Genesis for the story's beginning, then a Psalm a day for prayer. Our reading-order guides above lay out simple, unintimidating paths through Scripture.",
+	},
+	{
+		q: 'How do I understand what the Bible means?',
+		a: "Read it as one unfolding story that leads to Jesus, notice who God shows Himself to be, and ask what it reveals about the Father's heart. Our how-to-read and how-to-study guides above give you simple tools — context, prayer, and a few questions to ask of any passage.",
+	},
+	{
+		q: 'Are these Bible study guides free?',
+		a: 'Yes — every guide here is completely free, and each one links into the Father\'s Heart Bible™, free to <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">read online with audio</a> with no account, no purchase, and no app.',
+	},
+];
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.q,
+		acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/<[^>]+>/g, '') },
+	})),
+};
+const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 ---
 
 <Layout
@@ -82,6 +110,21 @@ const jsonLd = [collectionSchema, breadcrumbSchema];
 		</section>
 
 		<HowToHubCards bg="var(--color-surface)" />
+
+		<section id="hub-faq" class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface); scroll-margin-top: 1.5rem;">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-gold); font-family: var(--font-sans);">Questions &amp; answers</p>
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Starting to read the Bible</h2>
+				<dl class="mt-8 space-y-7">
+					{FAQS.map((f) => (
+						<div>
+							<dt class="text-lg font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{f.q}</dt>
+							<dd class="mt-2 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={f.a}></dd>
+						</div>
+					))}
+				</dl>
+			</div>
+		</section>
 
 		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-2xl text-center">
