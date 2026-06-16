@@ -47,7 +47,9 @@ export default defineConfig({
 			// excluded (never advertise the login page). /read/* added from the
 			// manifest above.
 			customPages: [
-				`${SITE}/about`,
+				// /about (community-served) is noindex — do NOT advertise it in the
+				// sitemap (avoids GSC "Submitted URL marked noindex"). Re-add only when
+				// the community team makes it indexable.
 				`${SITE}/contributors`,
 				`${SITE}/groups`,
 				`${SITE}/library`,
