@@ -4,6 +4,7 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "node scripts/sync-chrome.mjs && astro dev",
+		"prebuild": "sh -c 'if [ -f /home/deploy/bin/navfooter-lock.mjs ]; then node /home/deploy/bin/navfooter-lock.mjs check; else echo navfooter-lock-absent-skip; fi'",
 		"build": "rm -rf public/studio && sanity build public/studio --yes && node scripts/sync-translations.mjs && node scripts/sync-chrome.mjs && astro build && node scripts/async-css.mjs && node scripts/100club-verify.mjs && node scripts/aeo-validate.mjs",
 		"preview": "astro preview",
 		"check": "biome check --write",
