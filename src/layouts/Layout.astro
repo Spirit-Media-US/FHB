@@ -23,6 +23,10 @@ interface Props {
 	jsonLd?: Record<string, any> | Record<string, any>[];
 	preloadImageMobile?: string;
 	preloadImageDesktop?: string;
+	// Set on any page rendering a YouTube facade — warms the poster CDN
+	// (i.ytimg.com) + the iframe origin so the cross-origin handshake isn't on
+	// the LCP/interaction critical path. See video-preconnect rule.
+	youtube?: boolean;
 	// Open Graph article metadata — set pageType="article" on blog post pages
 	// to emit og:type=article + article:* meta. Other pages use og:type=website.
 	pageType?: 'website' | 'article';
@@ -42,6 +46,7 @@ const {
 	jsonLd,
 	preloadImageMobile,
 	preloadImageDesktop,
+	youtube = false,
 	pageType = 'website',
 	articleAuthor,
 	articlePublishedTime,
@@ -132,6 +137,15 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 
 		<!-- Preconnect to Sanity CDN (hero images) -->
 		<link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
+
+		{youtube && (
+			<>
+				{/* YouTube facade on this page — warm the poster CDN + iframe origin. */}
+				<link rel="preconnect" href="https://i.ytimg.com" crossorigin />
+				<link rel="dns-prefetch" href="https://i.ytimg.com" />
+				<link rel="dns-prefetch" href="https://www.youtube-nocookie.com" />
+			</>
+		)}
 
 		<!-- Preconnect + preload self-hosted fonts (R2) — @font-face declarations live in src/styles/global.css -->
 		<!-- Preload the TWO weights actually used above the fold: Epilogue-500 (H1 font-medium) + Manrope-400 (body) -->
