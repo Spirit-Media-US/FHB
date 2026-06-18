@@ -292,6 +292,38 @@ export const GROUPS: Group[] = [
 			'When the bills outpace the paycheck, the worry can swallow everything. Your worth was never your bank balance. Meet the Father who feeds the birds, knows what you need, and will never leave you.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/2be93211317f30137b14f698c57572d6535c1c33-1100x733.jpg',
 	},
+	{
+		slug: 'work',
+		group: 'Work',
+		title: 'For Work',
+		blurb:
+			'For the one worn down by the grind, the pressure to produce, the fear of falling behind — your worth was never your output. Meet the Father who delights in you apart from anything you achieve, and walks every ordinary workday with you.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/bbe8047ea8b8e6a59e6f99d8f615fd03cc2760b8-1880x1253.jpg',
+	},
+	{
+		slug: 'leaders',
+		group: 'Leaders',
+		title: 'For Leaders',
+		blurb:
+			'For the one who carries the decisions and the people, who feels the loneliness at the top — you were a beloved son or daughter long before you led anyone. Lead from the security of being fathered first.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/a12bd8e6df4a19186d5d5e8de0501874e67f6334-1880x1253.jpg',
+	},
+	{
+		slug: 'marriage',
+		group: 'Marriage',
+		title: 'For Marriage',
+		blurb:
+			'For two people learning to love when it is hard — you can only give a love you have first received. Meet the Father who fills you, so you love your spouse from overflow, not from empty.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/18ed88d0892d16ed4315af292074499e0d787910-1880x1253.jpg',
+	},
+	{
+		slug: 'family-caregivers',
+		group: 'Family Caregivers',
+		title: 'For Family Caregivers',
+		blurb:
+			'For the one carrying an aging parent, a sick spouse, a child who needs more — who carries you? Meet the Father who tends the caregiver, so you give from the overflow of being held, not the edge of empty.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/17bf391959c34edef16f696e2dce16e431b54453-1880x1253.jpg',
+	},
 ];
 
 // The remaining roadmap (build order). Names shown on the hub as "on the way".
@@ -337,7 +369,17 @@ export const SECTIONS: HubSection[] = [
 		heading: 'For individuals, families & marriages',
 		intro:
 			'Before any role you carry — spouse, parent, or simply yourself — you are a beloved son or daughter. You can only give a love you have first received. Meet the perfect Father, and live and love your family from the fullness of being loved by Him.',
-		slugs: ['women', 'men', 'singles', 'husbands', 'wives', 'new-parents', 'fathers', 'mothers'],
+		slugs: [
+			'women',
+			'men',
+			'singles',
+			'husbands',
+			'wives',
+			'marriage',
+			'new-parents',
+			'fathers',
+			'mothers',
+		],
 	},
 	{
 		key: 'young',
@@ -363,7 +405,7 @@ export const SECTIONS: HubSection[] = [
 		heading: 'For everyday life & callings',
 		intro:
 			'On the field, at the desk, in the ordinary days no one applauds — you were never meant to be defined by what you achieve. Meet the Father who delights in you apart from any performance, and walks every ordinary day with you.',
-		slugs: ['athletes'],
+		slugs: ['athletes', 'work', 'leaders'],
 	},
 	{
 		key: 'caregivers',
@@ -372,7 +414,7 @@ export const SECTIONS: HubSection[] = [
 		heading: 'For those who care & heal',
 		intro:
 			'You carry others through their hardest days — but who carries you? You cannot pour from an empty cup. Meet the Father who tends the caregiver, so you give from the overflow of being held, not the edge of empty.',
-		slugs: ['teachers', 'nurses', 'doctors'],
+		slugs: ['teachers', 'nurses', 'doctors', 'family-caregivers'],
 	},
 	{
 		key: 'serve',
