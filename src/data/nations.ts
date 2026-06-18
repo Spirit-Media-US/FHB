@@ -91,6 +91,14 @@ export const NATIONS: Nation[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60703be00855558d3021775ea5b4d14a659e1144-1880x1153.jpg',
 	},
 	{
+		slug: 'bangladesh',
+		country: 'Bangladesh',
+		title: 'The Bible in Bangladesh',
+		blurb:
+			'The great delta of rivers and a small, faithful church — where the Father’s Heart Bible™ longs to reveal, in Bengali, a Father near to the poor, the flood-struck, the refugee, and the orphan. Bengali among our priorities.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/9a83509fd06bda959d391fbcea62027296bae455-1880x1253.jpg',
+	},
+	{
 		slug: 'indonesia',
 		country: 'Indonesia',
 		title: 'The Bible in Indonesia',
