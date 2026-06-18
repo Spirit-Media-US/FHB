@@ -18,6 +18,7 @@
 //
 // FHB COLOR SCHEME ONLY — no per-group colors. Links/accents = --color-brand
 // (magenta), dividers = --color-gold, buttons = the homepage #FFD9E0/#4A4A4A.
+import { FAITH_GROUPS, GROUPS, type Group, SECTIONS } from '../data/groups';
 import Layout from '../layouts/Layout.astro';
 import AuthorBio from './AuthorBio.astro';
 
@@ -297,7 +298,37 @@ const faqSchema = {
 		acceptedAnswer: { '@type': 'Answer', text: f.answer },
 	})),
 };
-const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
+// VideoObject — the FHB intro film embedded in the closing CTA (video rich results + indexing).
+const filmSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'VideoObject',
+	name: "The Father's Heart Bible — Introduction",
+	description:
+		"An introduction to the Father's Heart Bible — a fresh English translation that reveals God as a loving Father throughout Scripture.",
+	thumbnailUrl: `https://i.ytimg.com/vi/${ctaVideoId}/hqdefault.jpg`,
+	uploadDate: '2026-06-11',
+	contentUrl: `https://youtu.be/${ctaVideoId}`,
+	embedUrl: `https://www.youtube.com/embed/${ctaVideoId}`,
+	publisher: {
+		'@type': 'Organization',
+		name: "Father's Heart Bible",
+		url: 'https://fathersheartbible.com/',
+	},
+};
+const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList, filmSchema];
+
+// Internal cross-links — sibling pages in this group's hub section (or faith series),
+// for topical clustering + link-equity distribution across the "A Father For" series.
+const _allFor = [...GROUPS, ...FAITH_GROUPS];
+const _sec = SECTIONS.find((s) => s.slugs.includes(slug));
+let _sibSlugs = _sec ? _sec.slugs.filter((s) => s !== slug) : [];
+if (!_sec && FAITH_GROUPS.some((g) => g.slug === slug)) {
+	_sibSlugs = FAITH_GROUPS.filter((g) => g.slug !== slug).map((g) => g.slug);
+}
+const relatedGroups: Group[] = _sibSlugs
+	.map((s) => _allFor.find((g) => g.slug === s))
+	.filter((g): g is Group => Boolean(g))
+	.slice(0, 6);
 ---
 
 <Layout
@@ -564,12 +595,26 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 			</div>
 		</section>
 
-		<!-- Keep reading -->
-		{keepReadingHtml && (
+		<!-- Keep reading + related pages in this series (internal cross-links) -->
+		{(keepReadingHtml || relatedGroups.length > 0) && (
 			<section class="px-6 py-12 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
 				<div class="mx-auto max-w-3xl">
 					<h2 class="text-xl md:text-2xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Keep reading</h2>
-					<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={keepReadingHtml}></p>
+					{keepReadingHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={keepReadingHtml}></p>
+					)}
+					{relatedGroups.length > 0 && (
+						<div class="mt-7">
+							<p class="text-sm font-semibold uppercase tracking-widest mb-3" style="color: var(--color-gold); font-family: var(--font-sans);">More in this series</p>
+							<ul class="flex flex-wrap gap-2.5" style="list-style: none; padding: 0; margin: 0;">
+								{relatedGroups.map((g) => (
+									<li>
+										<a href={`/bible-for/${g.slug}/`} class="inline-flex items-center rounded-full px-3.5 py-1.5 text-sm no-underline transition-opacity hover:opacity-80" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline); color: var(--color-brand); font-family: var(--font-sans);">{g.title}</a>
+									</li>
+								))}
+							</ul>
+						</div>
+					)}
 				</div>
 			</section>
 		)}
