@@ -240,6 +240,13 @@ export default {
 			description: 'For search engine results (optimal length: 150-160 characters)',
 		},
 		{
+			name: 'ogDescription',
+			title: 'Social / OG Description',
+			type: 'string',
+			description:
+				'Answer-forward share blurb used for og:description + twitter:description (social cards + AI answer engines). Distinct from the SEO Description above. Falls back to the excerpt when empty. Optimal length: ~150-200 characters.',
+		},
+		{
 			name: 'aeoApprovedBy',
 			title: 'AEO Editorial Approval — Approved By',
 			type: 'string',
