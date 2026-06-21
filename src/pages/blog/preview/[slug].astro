@@ -1,24 +1,20 @@
 ---
-// Dev-only preview route. Mirrors src/pages/blog/[slug].astro but reads from
-// `previewClient` (perspective: 'drafts') so editors can review unpublished
-// changes at https://dev.fathersheartbible.pages.dev/blog/preview/<slug>/.
-//
-// Generated only when PUBLIC_PREVIEW_DRAFTS=1 is set at build time
-// (deploy-preview.sh sets it on the dev branch). Production builds
-// (deploy-live.sh) leave it unset, so getStaticPaths returns [] and no
-// preview pages are emitted into prod dist/.
-//
-// Keep this file structurally identical to ../[slug].astro — when one changes,
-// update the other.
 import AuthorBio from '../../../components/AuthorBio.astro';
+import BlogAudioPlayer from '../../../components/BlogAudioPlayer.astro';
 import BlogCTA from '../../../components/BlogCTA.astro';
 import ChapterEmbed from '../../../components/ChapterEmbed.astro';
+import FeatureChapter from '../../../components/FeatureChapter.astro';
+import HowToHubCards from '../../../components/HowToHubCards.astro';
 import PullQuote from '../../../components/PullQuote.astro';
 import RelatedPosts from '../../../components/RelatedPosts.astro';
+import ReviewLink from '../../../components/ReviewLink.astro';
 import ShareBar from '../../../components/ShareBar.astro';
 import Layout from '../../../layouts/Layout.astro';
 import { previewClient, urlFor } from '../../../lib/sanity';
 
+// Dev-only draft preview. Emitted only when PUBLIC_PREVIEW_DRAFTS=1 (deploy-preview
+// sets it on dev; prod builds leave it unset so getStaticPaths returns [] and no
+// preview pages ship to production). Reads from previewClient (perspective: drafts).
 export async function getStaticPaths() {
 	if (import.meta.env.PUBLIC_PREVIEW_DRAFTS !== '1') return [];
 	const posts = await previewClient.fetch(
@@ -37,7 +33,8 @@ if (!post) {
 	return Astro.redirect('/blog');
 }
 
-// Slugify heading text for jump-link anchors. Keep this in sync with ../[slug].astro.
+// Slugify heading text for jump-link anchors. Lowercases, strips punctuation,
+// collapses whitespace to single hyphens. Keep this in sync with preview/[slug].astro.
 function slugifyHeading(s: string): string {
 	return s
 		.toLowerCase()
@@ -45,6 +42,82 @@ function slugifyHeading(s: string): string {
 		.replace(/[^\w\s-]/g, '')
 		.trim()
 		.replace(/\s+/g, '-');
+}
+
+// ── Sentence-highlight alignment ────────────────────────────────────────────
+// These two pure functions MUST stay byte-identical to the copy in
+// community/scripts/generate-blog-audio.mjs — they decide which blocks get a
+// highlight span and where sentences split, so the on-page <span data-seg="sN">
+// line up 1:1 with the audio marks (sN) the generator wrote to the sidecar.
+// `segState` is the running sentence counter, shared across every block in body
+// order (it must advance only on highlightable prose — exactly like the audio).
+const segState = { id: 0 };
+function sentenceRanges(text: string): [number, number][] {
+	if (!text) return [];
+	const ranges: [number, number][] = [];
+	let last = 0;
+	const re = /[.!?]+["'”’)\]]*\s+/g;
+	let m: RegExpExecArray | null = re.exec(text);
+	while (m) {
+		const end = m.index + m[0].length;
+		ranges.push([last, end]);
+		last = end;
+		m = re.exec(text);
+	}
+	if (last < text.length) ranges.push([last, text.length]);
+	return ranges.filter(([a, b]) => text.slice(a, b).trim());
+}
+function isHighlightBlock(b: any): boolean {
+	if (!b || b._type !== 'block') return false;
+	const text = (b.children || [])
+		.map((c: any) => c?.text || '')
+		.join('')
+		.trim();
+	if (!text) return false;
+	if (/^\{[\w]+\}\s*[—–-]\s*\{[\w]+\}$/.test(text)) return false; // chapter marker
+	if (/^By\s.+/.test(text) && /Updated/i.test(text)) return false; // byline
+	if (/^Jump to:/i.test(text)) return false; // mini-TOC
+	if (b.style === 'blockquote' && !/^Key takeaway/i.test(text)) return false; // CTA callouts
+	return true;
+}
+
+// Build a block's inner HTML as one <span data-seg> per sentence, preserving
+// inline marks (bold/italic/links) by slicing the formatting runs to each
+// sentence range. Advances segState.id so the spans match the audio's sN marks.
+function sentenceSpans(children: any[], linkByKey: Record<string, string>): string {
+	let full = '';
+	const runs: { start: number; end: number; marks: any[] }[] = [];
+	for (const c of children) {
+		const text = c?.text || '';
+		const start = full.length;
+		full += text;
+		runs.push({ start, end: full.length, marks: Array.isArray(c?.marks) ? c.marks : [] });
+	}
+	const wrap = (sub: string, marks: any[]): string => {
+		let t = sub;
+		if (marks.includes('strong')) t = `<strong>${t}</strong>`;
+		if (marks.includes('em')) t = `<em>${t}</em>`;
+		const linkKey = marks.find((m: any) => typeof m === 'string' && linkByKey[m]);
+		if (linkKey) {
+			const href = linkByKey[linkKey];
+			const isExternal = /^https?:\/\//i.test(href);
+			const targetAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+			t = `<a href="${href}" style="color: var(--color-brand);" class="hover:underline"${targetAttrs}>${t}</a>`;
+		}
+		return t;
+	};
+	let out = '';
+	for (const [a, b] of sentenceRanges(full)) {
+		const id = `s${segState.id++}`;
+		let inner = '';
+		for (const r of runs) {
+			const s = Math.max(a, r.start);
+			const e = Math.min(b, r.end);
+			if (s < e) inner += wrap(full.slice(s, e), r.marks);
+		}
+		out += `<span class="ba-seg" data-seg="${id}">${inner}</span>`;
+	}
+	return out;
 }
 
 function renderPortableText(blocks: any[]): string {
@@ -86,6 +159,9 @@ function renderPortableText(blocks: any[]): string {
 				return text;
 			})
 			.join('');
+		// Highlightable prose gets per-sentence spans (with sN ids) so the audio
+		// player can light up the sentence being read; everything else renders flat.
+		const inner = isHighlightBlock(block) ? sentenceSpans(children, linkByKey) : textContent;
 		const listItem = block.listItem;
 		if (listItem === 'bullet' || listItem === 'number') {
 			if (listType && listType !== listItem) closeList();
@@ -96,20 +172,20 @@ function renderPortableText(blocks: any[]): string {
 						? '<ol class="list-decimal pl-7 my-6 space-y-2 text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">'
 						: '<ul class="list-disc pl-7 my-6 space-y-2 text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">';
 			}
-			html += `<li>${textContent}</li>`;
+			html += `<li>${inner}</li>`;
 			continue;
 		}
 		closeList();
 		const style = block.style || 'normal';
 		if (style === 'h2') {
 			const id = slugifyHeading(rawText);
-			html += `<h2 id="${id}" class="text-2xl font-bold mt-12 mb-4 scroll-mt-24" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h2>`;
+			html += `<h2 id="${id}" class="text-2xl font-bold mt-12 mb-4 scroll-mt-24" style="font-family: var(--font-serif); color: var(--color-ink);">${inner}</h2>`;
 		} else if (style === 'h3') {
-			html += `<h3 class="text-xl font-bold mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">${textContent}</h3>`;
+			html += `<h3 class="text-xl font-bold mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">${inner}</h3>`;
 		} else if (style === 'blockquote') {
-			html += `<blockquote class="my-6 px-6 py-5 lg:px-8 rounded-2xl text-lg leading-relaxed" style="background-color: #fdf2f5; border: 1px solid #f9d6e0; font-family: var(--font-serif); color: var(--color-ink);">${textContent}</blockquote>`;
+			html += `<blockquote class="my-6 px-6 py-5 lg:px-8 rounded-2xl text-lg leading-relaxed" style="background-color: #fdf2f5; border: 1px solid #f9d6e0; font-family: var(--font-serif); color: var(--color-ink);">${inner}</blockquote>`;
 		} else {
-			html += `<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">${textContent}</p>`;
+			html += `<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">${inner}</p>`;
 		}
 	}
 	closeList();
@@ -127,14 +203,28 @@ const modifiedDate =
 		? formatDate(post.dateModified)
 		: null;
 const heroImage = post.heroImage
-	? urlFor(post.heroImage).width(1200).format('webp').url()
+	? urlFor(post.heroImage).width(1200).quality(72).format('webp').url()
+	: '/fhb-logo.png';
+// Mobile hero variant — the 1200w hero was ~123KB and shipped to phones too,
+// dragging mobile LCP. Serve a 640w variant + preload it (below).
+const heroImageMobile = post.heroImage
+	? urlFor(post.heroImage).width(640).quality(70).format('webp').url()
 	: '/fhb-logo.png';
 const author = post.author || 'Kevin White';
 const tags = post.tags || [];
 
+// Body is rendered block-by-block so we can interleave custom block types
+// (currently `fhbChapter` → <ChapterEmbed>). Runs of regular `block` items
+// are batched into single HTML fragments to preserve normal portable-text
+// behavior; `fhbChapter` items break the run and render the component.
+// A `fhbChapter` block renders the older text-only <ChapterEmbed> by default.
+// When the block carries an optional `slug` (the reader url slug, e.g. "john"),
+// it upgrades to <FeatureChapter> — real reader text + working audio + an
+// "Open <ref> in the reader" link, matching the guide pages. Old posts have no
+// slug, so they keep their current ChapterEmbed rendering untouched.
 type BodySegment =
 	| { kind: 'html'; html: string }
-	| { kind: 'chapter'; book: string; chapter: number }
+	| { kind: 'chapter'; book: string; chapter: number; slug?: string; verseLimit?: number }
 	| { kind: 'image'; src: string; alt: string; caption?: string }
 	| { kind: 'pullquote'; quote: string; attribution?: string };
 
@@ -150,7 +240,13 @@ function segmentBody(blocks: any[]): BodySegment[] {
 	for (const b of blocks || []) {
 		if (b?._type === 'fhbChapter') {
 			flush();
-			segments.push({ kind: 'chapter', book: b.book, chapter: b.chapter });
+			segments.push({
+				kind: 'chapter',
+				book: b.book,
+				chapter: b.chapter,
+				slug: b.slug,
+				verseLimit: b.verseLimit,
+			});
 		} else if (b?._type === 'image' && b?.asset) {
 			flush();
 			const src = urlFor(b).width(1000).format('webp').url();
@@ -168,6 +264,21 @@ function segmentBody(blocks: any[]): BodySegment[] {
 
 const bodySegments = segmentBody(post.body || []);
 
+// Sentence timings for the audio player's synced highlight. Fetched at BUILD
+// time (server-side — the page's CSP connect-src can't reach the media host from
+// the browser) and inlined. Absent/old sidecar → no highlight, audio still works.
+const audioBase = `https://media.spiritmediapublishing.com/audio/blog/en/${post.slug.current}`;
+let audioTimings: { id: string; t: number }[] = [];
+try {
+	const meta = await fetch(`${audioBase}.json`).then((r) => (r.ok ? r.json() : null));
+	if (meta && Array.isArray(meta.segments)) audioTimings = meta.segments;
+} catch {
+	/* no narration yet → highlight disabled */
+}
+
+// Kevin White's author entity, with sameAs links to his real-world properties.
+// Inlined as a Person schema on every blog post so AI engines / search crawlers
+// can resolve "Kevin White" as the same author across the web (E-E-A-T signal).
 const KEVIN_WHITE_AUTHOR = {
 	'@type': 'Person',
 	'@id': 'https://kevinwhite.us/#person',
@@ -191,7 +302,36 @@ const KEVIN_WHITE_AUTHOR = {
 
 const postUrl = `https://fathersheartbible.com/blog/${post.slug.current}`;
 
+// Normalize dateModified — accept full ISO datetime or fall back to publishDate.
 const dateModified = post.dateModified || post.publishDate;
+
+// Publish posts under the FATHER'S HEART BIBLE brand entity (matches the @id
+// defined on the homepage), with Spirit Media as the parent org. This ties
+// branded "Father's Heart Bible" searches + the knowledge graph to the FHB
+// brand while preserving the Spirit Media relationship.
+const FHB_PUBLISHER = {
+	'@type': 'Organization',
+	'@id': 'https://fathersheartbible.com/#organization',
+	name: "Father's Heart Bible",
+	url: 'https://fathersheartbible.com',
+	logo: { '@type': 'ImageObject', url: 'https://fathersheartbible.com/fhb-logo.png' },
+	parentOrganization: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+};
+
+// Plain-text word count from the body blocks (AEO/SEO length signal).
+const wordCount = (post.body || [])
+	.filter((b: any) => b?._type === 'block')
+	.map((b: any) =>
+		Array.isArray(b.children) ? b.children.map((c: any) => c?.text || '').join('') : '',
+	)
+	.join(' ')
+	.split(/\s+/)
+	.filter(Boolean).length;
 
 const blogPostingSchema = {
 	'@context': 'https://schema.org',
@@ -200,22 +340,26 @@ const blogPostingSchema = {
 	description: post.excerpt || post.seoDescription || post.title,
 	image: heroImage,
 	author: KEVIN_WHITE_AUTHOR,
-	publisher: {
-		'@type': 'Organization',
-		'@id': 'https://spiritmediapublishing.com/#organization',
-		name: 'Spirit Media Publishing',
-		url: 'https://spiritmediapublishing.com',
-	},
+	publisher: FHB_PUBLISHER,
 	url: postUrl,
 	mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
 	datePublished: post.publishDate,
 	dateModified,
 	inLanguage: 'en-US',
+	wordCount,
+	// Speakable — tells voice assistants / AI Overviews which parts to read
+	// aloud (the title + the summary/direct answer). Targets stable classes on
+	// the article header below.
+	speakable: {
+		'@type': 'SpeakableSpecification',
+		cssSelector: ['.post-title', '.post-summary'],
+	},
 	isPartOf: {
 		'@type': 'Blog',
 		'@id': 'https://fathersheartbible.com/blog/#blog',
 		name: "Father's Heart Bible Blog",
 		url: 'https://fathersheartbible.com/blog/',
+		publisher: { '@id': 'https://fathersheartbible.com/#organization' },
 	},
 	keywords: tags.join(', '),
 	articleSection: tags[0] || undefined,
@@ -231,6 +375,9 @@ const breadcrumbSchema = {
 	],
 };
 
+// FAQPage schema — only emitted when the post defines FAQ pairs in Sanity.
+// Each H2 Q&A in the SMP Gold-Level structure is a natural FAQ item; AI
+// engines (AI Overviews, Perplexity) extract these verbatim.
 const faqs = Array.isArray(post.faqs) ? post.faqs : [];
 const faqSchema =
 	faqs.length > 0
@@ -254,8 +401,12 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
   title={`[PREVIEW] ${post.seoTitle || `${post.title} | Father's Heart Bible Blog`}`}
   description={post.seoDescription || post.excerpt || "Read this article on the Father's Heart Bible blog."}
   ogDescription={post.ogDescription || post.excerpt}
-  image={heroImage}
+  image={post.ogImage || heroImage}
+  imageAlt={post.ogImageAlt || post.heroImage?.alt}
   jsonLd={jsonLd}
+  darkHero={true}
+  preloadImageMobile={heroImageMobile}
+  preloadImageDesktop={heroImage}
   pageType="article"
   articleAuthor={author}
   articlePublishedTime={post.publishDate}
@@ -264,23 +415,26 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
   noindex={true}
 >
 
-  <!-- Preview banner so it's unmistakable this is a draft view -->
+  <!-- Preview banner so it's unmistakable this is an unpublished draft view -->
   <div style="background-color: #fef3c7; border-bottom: 1px solid #fcd34d; padding: 12px 24px; margin-top: 80px; font-family: var(--font-sans); color: #78350f; text-align: center; font-size: 14px; font-weight: 600;">
     🟡 DRAFT PREVIEW — this URL renders the unpublished Sanity draft.
   </div>
 
   <main id="main-content">
-    <!-- HERO IMAGE -->
-    <div class="w-full">
-      <img src={heroImage} alt={post.heroImage?.alt || post.title} class="w-full h-72 lg:h-[600px] object-cover" style="object-position: center center;" />
+    <!-- HERO IMAGE — full-bleed, starts at top behind the transparent nav (matches homepage/guides) -->
+    <div class="relative w-full overflow-hidden h-72 lg:h-[600px]">
+      <img src={heroImage} srcset={`${heroImageMobile} 640w, ${heroImage} 1200w`} sizes="(max-width: 1023px) 640px, 1200px" alt={post.heroImage?.alt || post.title} class="absolute inset-0 w-full h-full object-cover" style="object-position: center center;" fetchpriority="high" decoding="async" />
+      <!-- Top scrim: keeps the transparent header's white logo/nav/CTA legible even
+           over bright hero imagery (e.g. a sunlit sky). Taller + darker than before. -->
+      <div class="absolute inset-x-0 top-0 z-10" style="height: 220px; background: linear-gradient(to bottom, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.32) 45%, rgba(0,0,0,0));"></div>
     </div>
 
     <!-- POST HEADER -->
     <section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
       <div class="mx-auto max-w-3xl">
         <a href="/blog/" class="inline-flex items-center gap-1.5 text-sm font-semibold hover:opacity-80 transition-opacity mb-5 no-underline" style="color: var(--color-brand);">&larr; Back to Blog</a>
-        <h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{post.title}</h1>
-        {post.excerpt && <p class="mt-3 text-lg leading-relaxed max-w-2xl" style="font-family: var(--font-sans); color: var(--color-muted);">{post.excerpt}</p>}
+        <h1 class="post-title text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{post.title}</h1>
+        {post.excerpt && <p class="post-summary mt-3 text-lg leading-relaxed max-w-2xl" style="font-family: var(--font-sans); color: var(--color-muted);">{post.excerpt}</p>}
         <div class="flex items-center gap-3 mt-4 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
           <span>By <span class="font-semibold" style="color: var(--color-ink);">{author}</span></span>
           <span>&middot;</span>
@@ -313,9 +467,12 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
     <!-- POST CONTENT -->
     <section class="px-6 py-10 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
       <div class="mx-auto max-w-3xl space-y-4">
+        <BlogAudioPlayer src={`${audioBase}.mp3`} timings={audioTimings} />
         {bodySegments.map((seg) =>
           seg.kind === 'chapter'
-            ? <ChapterEmbed book={seg.book} chapter={seg.chapter} />
+            ? (seg.slug
+                ? <FeatureChapter book={seg.book} slug={seg.slug} chapter={seg.chapter} verseLimit={seg.verseLimit} playable={true} />
+                : <ChapterEmbed book={seg.book} chapter={seg.chapter} />)
             : seg.kind === 'image'
               ? <figure class="my-8">
                   <img src={seg.src} alt={seg.alt} class="w-full max-w-md mx-auto rounded-lg shadow-sm" loading="lazy" decoding="async" />
@@ -329,14 +486,18 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
       </div>
     </section>
 
-    <!-- AUTHOR BIO -->
+    <!-- SHARE BAR -->
     <AuthorBio author={author} />
 
-    <!-- SHARE BAR -->
     <ShareBar title={post.title} url={`https://fathersheartbible.com/blog/${post.slug.current}`} />
+
+    <ReviewLink class="mt-8" />
 
     <!-- RELATED POSTS -->
     <RelatedPosts currentSlug={`/blog/${post.slug.current}`} currentTags={tags} />
+
+    <!-- HOW-TO HUB — cross-link the guide cluster from every blog post -->
+    <HowToHubCards heading="Bible Reading Guides" />
   </main>
 
 </Layout>
