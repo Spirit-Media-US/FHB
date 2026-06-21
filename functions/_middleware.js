@@ -13,6 +13,8 @@
 const GATED = [
 	// "Why the Father Gives Wisdom and Tools" — go live Mon 2026-06-22 09:00 ET (13:00 UTC)
 	{ slug: 'why-the-father-gives-wisdom-and-tools', reveal: '2026-06-22T13:00:00Z' },
+	// "The Father of Honor" — go live Wed 2026-06-24 09:00 ET (13:00 UTC)
+	{ slug: 'the-father-of-honor-starving-world', reveal: '2026-06-24T13:00:00Z' },
 ];
 
 export async function onRequest(context) {
