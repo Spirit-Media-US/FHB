@@ -253,6 +253,7 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
 <Layout
   title={`[PREVIEW] ${post.seoTitle || `${post.title} | Father's Heart Bible Blog`}`}
   description={post.seoDescription || post.excerpt || "Read this article on the Father's Heart Bible blog."}
+  ogDescription={post.ogDescription || post.excerpt}
   image={heroImage}
   jsonLd={jsonLd}
   pageType="article"
