@@ -11,10 +11,11 @@
 // instant. To change a time after deploy, edit here and redeploy. Remove the
 // entry once a post is permanently live (harmless to leave; it just no-ops).
 const GATED = [
-	// "Why the Father Gives Wisdom and Tools" — go live Mon 2026-06-22 09:00 ET (13:00 UTC)
-	{ slug: 'why-the-father-gives-wisdom-and-tools', reveal: '2026-06-22T13:00:00Z' },
 	// "The Father of Honor" — go live Wed 2026-06-24 09:00 ET (13:00 UTC)
 	{ slug: 'the-father-of-honor-starving-world', reveal: '2026-06-24T13:00:00Z' },
+	// "Marriage Is Not His or Hers but Ours" — go live Thu 2026-06-25 09:00 ET (13:00 UTC)
+	{ slug: 'marriage-is-not-his-or-hers-but-ours', reveal: '2026-06-25T13:00:00Z' },
+	// (The Tools/Wisdom post goes live immediately — no embargo — so it is not gated.)
 ];
 
 export async function onRequest(context) {
