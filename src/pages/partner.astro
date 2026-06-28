@@ -17,6 +17,38 @@ const seoDescription =
 	"Sharing our Father with every nation, tribe, and tongue — 25 languages reaching 75% of humanity. Partner with us to take the Father's Heart Bible to the nations.";
 const heroHeading = 'Sharing Our Father';
 
+// Featured blog card ("The Father's Vision") shown under the give-by-check box.
+const visionPost =
+	await sanityClient.fetch(`*[_type == "blogPost" && slug.current == "the-fathers-vision"][0] {
+    "slug": "/blog/" + slug.current,
+    title,
+    excerpt,
+    "image": coalesce(heroImage.asset->url + "?w=800&auto=format", "/fhb-logo.png"),
+    "author": coalesce(author, "Kevin White"),
+    "date": publishDate,
+    tags
+  }`);
+const MONTHS = [
+	'January',
+	'February',
+	'March',
+	'April',
+	'May',
+	'June',
+	'July',
+	'August',
+	'September',
+	'October',
+	'November',
+	'December',
+];
+const visionDate = visionPost?.date
+	? (() => {
+			const d = new Date(visionPost.date);
+			return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+		})()
+	: '';
+
 // ── PAGE 1 — Production Timeline (matches the partner brochure) ──
 const timeline = [
 	{ when: 'June 21, 2026', what: 'English opens online for reading or listening' },
@@ -128,12 +160,14 @@ const partnershipFaq = [
 		<!-- ═══════════════ HERO ═══════════════ -->
 		<VideoHeroInner
 			imageSrc="https://cdn.sanity.io/images/rusi1hyi/production/a323755d51d350e216d2fb38cd857df127609f67-1537x1023.png?w=1920&q=80&auto=format"
-			headingLift="1in"
-			heading={heroHeading}
+			heading=""
 		/>
 
-		<!-- ═══════════════ PAGE 1 — invitation, timeline, you're invited ═══════════════ -->
+		<!-- ═══════════════ PAGE 1 — title, invitation, timeline, you're invited ═══════════════ -->
 		<Section variant="light">
+			<h1 class="text-center font-light leading-[0.95] mb-8 text-6xl md:text-8xl" style="font-family: var(--font-serif); color: var(--color-ink);" data-reveal>
+				Sharing <span style="color: var(--color-brand);">Our</span> Father
+			</h1>
 			<div class="max-w-3xl mx-auto text-center mb-12" data-reveal>
 				<p class="text-base md:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
 					A fresh translation from the original Hebrew, Aramaic, and Greek that lets you hear God as He truly is: your Father.
@@ -160,19 +194,17 @@ const partnershipFaq = [
 				</div>
 
 				<!-- You're Invited -->
-				<div class="rounded-2xl p-7 md:p-8 h-full flex flex-col" style="background: #FFE1E8; border: 1px solid var(--color-hairline);" data-reveal>
-					<div class="flex items-center gap-4 mb-4">
-						<img
-							src="https://cdn.sanity.io/images/pmowd8uo/production/3dc19194b19b5c804633ad324a893237ab692da5-1583x2048.png?w=240&h=240&fit=crop&fm=webp&q=80"
-							alt="Kevin and Shelly White"
-							width="96" height="96" loading="lazy" decoding="async"
-							class="rounded-full object-cover shrink-0"
-							style="width: 80px; height: 80px; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.14);"
-						/>
-						<p class="text-xs font-semibold tracking-widest uppercase" style="font-family: var(--font-sans); color: var(--color-brand);">
-							You're Invited
-						</p>
-					</div>
+				<div class="rounded-2xl p-7 md:p-8" style="background: #FFE1E8; border: 1px solid var(--color-hairline);" data-reveal>
+					<img
+						src="https://cdn.sanity.io/images/pmowd8uo/production/3dc19194b19b5c804633ad324a893237ab692da5-1583x2048.png?w=400&h=400&fit=crop&fm=webp&q=80"
+						alt="Kevin and Shelly White"
+						width="150" height="150" loading="lazy" decoding="async"
+						class="rounded-full object-cover"
+						style="float: right; width: 150px; height: 150px; margin: 0 0 0.75rem 1.25rem; border: 2px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.16);"
+					/>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">
+						You're Invited
+					</p>
 					<div class="space-y-4" style="font-family: var(--font-sans); color: #3F3338;">
 						<p class="leading-relaxed">
 							For most of our lives we knew God as Lord, King, and Savior — all true. But it took us years to know Him the way Jesus did: as <strong style="color: var(--color-ink);">Father</strong>. That one word changes everything.
@@ -182,20 +214,13 @@ const partnershipFaq = [
 						</p>
 						<p class="leading-relaxed">We're taking it to the nations. We'd love for you to come with us.</p>
 					</div>
-					<div class="mt-5 pt-4" style="border-top: 1px solid var(--color-hairline);">
+					<div class="mt-5 pt-4" style="border-top: 1px solid var(--color-hairline); clear: both;">
 						<p style="font-family: var(--font-serif); font-weight: 700; color: var(--color-ink);">— Kevin and Shelly White</p>
 						<p class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">Spirit Media Publishing</p>
 					</div>
 				</div>
 			</div>
 
-			<!-- Verse -->
-			<div class="max-w-2xl mx-auto text-center mt-12 pt-7" style="border-top: 1px solid var(--color-hairline);" data-reveal>
-				<p style="font-family: var(--font-serif); font-style: italic; font-size: 18px; line-height: 1.4; color: var(--color-brand);">
-					“I will be their Father, and they will be my sons and daughters”
-				</p>
-				<p class="mt-2 text-xs font-bold tracking-widest uppercase" style="font-family: var(--font-sans); color: var(--color-brand-dark, var(--color-brand));">Revelation 21:7</p>
-			</div>
 		</Section>
 
 		<!-- ═══════════════ MAKE A GIFT ═══════════════ -->
@@ -235,6 +260,28 @@ const partnershipFaq = [
 							Write <strong style="color: var(--color-ink);">&ldquo;FHB&rdquo;</strong> in the memo so your gift supports the Father&rsquo;s Heart Bible&trade;. All gifts are tax-deductible as allowed by the IRS.
 						</p>
 					</div>
+
+					<!-- The Father's Vision blog card (restored) -->
+					{visionPost && (
+						<a href={visionPost.slug} class="group mt-5 block rounded-2xl border overflow-hidden transition-shadow hover:shadow-md" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
+							<div class="overflow-hidden h-40">
+								<img src={visionPost.image} alt={visionPost.title} width="800" height="320" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style="object-position: center top;" />
+							</div>
+							<div class="p-6">
+								<div class="flex flex-wrap gap-1.5 mb-3">
+									{(visionPost.tags || []).slice(0, 2).map((t: string) => (
+										<span class="text-xs font-semibold rounded-full px-2.5 py-0.5" style="color: var(--color-muted); background-color: var(--color-surface-low);">{t}</span>
+									))}
+								</div>
+								<h3 class="text-xl font-bold mb-2 leading-snug" style="font-family: var(--font-serif); color: var(--color-brand);">{visionPost.title}</h3>
+								<p class="text-sm mb-4 leading-relaxed line-clamp-3" style="font-family: var(--font-sans); color: var(--color-muted);">{visionPost.excerpt || ''}</p>
+								<div class="flex items-center justify-between text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+									<span>{visionPost.author} · {visionDate}</span>
+									<span class="font-semibold group-hover:underline" style="color: var(--color-brand);">Read &rarr;</span>
+								</div>
+							</div>
+						</a>
+					)}
 				</div>
 			</div>
 
@@ -287,16 +334,16 @@ const partnershipFaq = [
 						class="block w-full"
 					/>
 					<!-- key, across the top of Antarctica (matches the brochure) -->
-					<div class="absolute left-1/2 -translate-x-1/2 flex gap-4 px-3.5 py-1.5 rounded-lg whitespace-nowrap"
-						style="bottom: 13%; background: rgba(255,255,255,0.92); border: 1px solid #e6e0e2; font-family: var(--font-sans); font-size: 11px; font-weight: 600; color: var(--color-ink);">
-						<span class="flex items-center gap-1.5"><span class="inline-block w-2.5 h-2.5 rounded-sm" style="background:#ffbed0; border:1px solid #ef96ac;"></span>Reached by the 25 languages — ~6.5B people</span>
-						<span class="flex items-center gap-1.5"><span class="inline-block w-2.5 h-2.5 rounded-sm" style="background:#e7e7e3; border:1px solid #d2d2cd;"></span>Not yet reached</span>
+					<div class="absolute left-1/2 -translate-x-1/2 flex gap-6 px-6 py-3 rounded-xl whitespace-nowrap"
+						style="bottom: 13%; background: rgba(255,255,255,0.94); border: 1px solid #e6e0e2; box-shadow: 0 2px 10px rgba(0,0,0,0.10); font-family: var(--font-sans); font-size: 15px; font-weight: 600; color: var(--color-ink);">
+						<span class="flex items-center gap-2"><span class="inline-block w-4 h-4 rounded-sm" style="background:#ffbed0; border:1px solid #ef96ac;"></span>Reached by the 25 languages — ~6.5B people</span>
+						<span class="flex items-center gap-2"><span class="inline-block w-4 h-4 rounded-sm" style="background:#e7e7e3; border:1px solid #d2d2cd;"></span>Not yet reached</span>
 					</div>
 				</div>
 
 				<div class="text-center mt-7" data-reveal>
 					<p class="text-2xl font-bold tracking-[0.16em] uppercase" style="font-family: var(--font-serif); color: #7c7c80;">The Father</p>
-					<p class="text-xl italic font-bold leading-tight mt-1" style="font-family: var(--font-serif); color: var(--color-brand-dark, var(--color-brand));">No greater<br />gift or legacy.</p>
+					<p class="text-xl italic font-bold leading-tight mt-1" style="font-family: var(--font-serif); color: var(--color-brand-dark, var(--color-brand));">No greater gift or legacy.</p>
 				</div>
 			</div>
 		</Section>
