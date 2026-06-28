@@ -161,9 +161,18 @@ const partnershipFaq = [
 
 				<!-- You're Invited -->
 				<div class="rounded-2xl p-7 md:p-8 h-full flex flex-col" style="background: #FFE1E8; border: 1px solid var(--color-hairline);" data-reveal>
-					<p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">
-						You're Invited
-					</p>
+					<div class="flex items-center gap-4 mb-4">
+						<img
+							src="https://cdn.sanity.io/images/pmowd8uo/production/3dc19194b19b5c804633ad324a893237ab692da5-1583x2048.png?w=240&h=240&fit=crop&fm=webp&q=80"
+							alt="Kevin and Shelly White"
+							width="96" height="96" loading="lazy" decoding="async"
+							class="rounded-full object-cover shrink-0"
+							style="width: 80px; height: 80px; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.14);"
+						/>
+						<p class="text-xs font-semibold tracking-widest uppercase" style="font-family: var(--font-sans); color: var(--color-brand);">
+							You're Invited
+						</p>
+					</div>
 					<div class="space-y-4" style="font-family: var(--font-sans); color: #3F3338;">
 						<p class="leading-relaxed">
 							For most of our lives we knew God as Lord, King, and Savior — all true. But it took us years to know Him the way Jesus did: as <strong style="color: var(--color-ink);">Father</strong>. That one word changes everything.
@@ -270,13 +279,12 @@ const partnershipFaq = [
 					</h2>
 				</header>
 
-				<div class="relative mx-auto" style="max-width: 720px;" data-reveal>
+				<div class="relative" style="width: 100vw; max-width: 100vw; margin-left: calc(50% - 50vw);" data-reveal>
 					<img
 						src="https://assets.spiritmediapublishing.com/FHB/partner/world-reach-map.jpg"
 						alt="World map — the 25 languages reaching about 75% of humanity"
 						width="1600" height="1262" loading="lazy" decoding="async"
-						class="w-full rounded-2xl"
-						style="border: 1px solid var(--color-hairline);"
+						class="block w-full"
 					/>
 					<!-- key, across the top of Antarctica (matches the brochure) -->
 					<div class="absolute left-1/2 -translate-x-1/2 flex gap-4 px-3.5 py-1.5 rounded-lg whitespace-nowrap"
@@ -297,20 +305,31 @@ const partnershipFaq = [
 		<Section variant="soft">
 			<div class="max-w-4xl mx-auto">
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-					{languages.map(({ name, code, region, reach, live }) => (
-						<div class="grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl" style={`border: 1px solid var(--color-hairline); background: ${live ? '#FFE1E8' : 'var(--color-surface)'};`}>
+					<!-- English featured, top-left -->
+					<div class="grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl" style="border: 1px solid var(--color-hairline); background: #FFE1E8;">
+						<img src={`/flags/${languages[0].code}.svg`} alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" />
+						<span class="min-w-0">
+							<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">{languages[0].name}</span>
+							<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">{languages[0].region}</span>
+						</span>
+						<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand-dark, var(--color-brand));">{languages[0].reach}</span>
+					</div>
+					<!-- tagline, top-right beside English (matches the brochure) -->
+					<div class="flex items-center justify-center text-center px-4 py-2.5 text-lg italic font-bold" style="font-family: var(--font-serif); color: var(--color-brand);">
+						A new language published monthly
+					</div>
+					<!-- the other 24 languages -->
+					{languages.slice(1).map(({ name, code, region, reach }) => (
+						<div class="grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl" style="border: 1px solid var(--color-hairline); background: var(--color-surface);">
 							<img src={`/flags/${code}.svg`} alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" />
 							<span class="min-w-0">
 								<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">{name}</span>
 								<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">{region}</span>
 							</span>
-							<span class="text-[15px] font-extrabold" style={`font-family: var(--font-sans); color: ${live ? 'var(--color-brand-dark, var(--color-brand))' : 'var(--color-brand)'};`}>{reach}</span>
+							<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand);">{reach}</span>
 						</div>
 					))}
 				</div>
-				<p class="text-center mt-8 text-lg italic font-bold" style="font-family: var(--font-serif); color: var(--color-brand);">
-					A new language published monthly
-				</p>
 			</div>
 		</Section>
 
@@ -343,7 +362,11 @@ const partnershipFaq = [
 					</p>
 				</header>
 
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-12" data-reveal>
+				<div class="relative grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-12" data-reveal>
+					<!-- short arrow pointing right, between the two columns (desktop) -->
+					<div class="hidden md:flex absolute left-1/2 top-1/2 items-center justify-center rounded-full" style="width: 46px; height: 46px; transform: translate(-50%, -50%); background: #fff; box-shadow: 0 3px 12px rgba(0,0,0,0.18); z-index: 3;" aria-hidden="true">
+						<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="18" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+					</div>
 					<!-- Our Pains -->
 					<div class="rounded-2xl p-6" style="background: #41454B;">
 						<p class="font-bold text-lg" style="font-family: var(--font-serif); color: #fff;">Our Pains</p>
