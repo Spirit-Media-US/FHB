@@ -40,4 +40,10 @@ export const VERSE_TOPICS: VerseTopic[] = [
 		blurb: 'The God who heals body and heart — and the healing that comes through Christ.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg',
 	},
+	{
+		slug: 'god-as-father',
+		title: 'Bible Verses About God as Father',
+		blurb: 'He names Himself your Father, Jesus revealed Him, and in Christ you are His child.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg',
+	},
 ];
