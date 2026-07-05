@@ -22,7 +22,8 @@ try {
 		const chapters = [
 			...new Set([...(entry.lockedChapters || []), ...(entry.readingEditionChapters || [])]),
 		].sort((a, b) => a - b);
-		readPages.push(`${SITE}/read/${slug}/`);
+		// NOTE: the /read/<book>/ landing page 302-redirects to chapter 1, so we do
+		// NOT list it (avoids GSC "Page with redirect") — only the canonical chapters.
 		for (const n of chapters) readPages.push(`${SITE}/read/${slug}/${n}/`);
 	}
 } catch {
@@ -65,7 +66,8 @@ export default defineConfig({
 			filter: (page) =>
 				!page.includes('/privacy') &&
 				!page.includes('/terms') &&
-				!page.includes('/blog/preview'),
+				!page.includes('/blog/preview') &&
+				!page.includes('/join'),
 			serialize(item) {
 				const now = new Date().toISOString();
 				const url = item.url;
