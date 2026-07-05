@@ -101,10 +101,11 @@ const fhbiCoverUrl = fhbCoverSanity
 
 // Hero video array — prefer Sanity, fall back to hardcoded
 const heroVideosFromSanity = media?.homePageHeroVideos;
-// People photos — apply Sanity CDN transforms to shrink multi-MB originals
-const photo1 = sanityTransform(media?.peoplePhoto1Url || '', 800, 72);
-const photo2 = sanityTransform(media?.peoplePhoto2Url || '', 800, 72);
-const photo3 = sanityTransform(media?.peoplePhoto3Url || '', 800, 72);
+// People + FHB print photos (hardcoded to R2 — this band now shows the print
+// edition in real hands regardless of the Sanity peoplePhoto fields).
+const photo1 = 'https://assets.spiritmediapublishing.com/FHB/print/people-1.webp';
+const photo2 = 'https://assets.spiritmediapublishing.com/FHB/print/people-2.webp';
+const photo3 = 'https://assets.spiritmediapublishing.com/FHB/print/people-3.webp';
 const communityUrl = media?.communityUrl || '/join';
 const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 ---
@@ -861,7 +862,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					{photo1 && (
 						<img
 							src={photo1}
-							alt="Reader with the Father's Heart Bible"
+							alt="A woman reading the Father's Heart Bible by a sunlit window"
 							class="w-full aspect-square object-cover"
 							loading="lazy"
 							decoding="async"
@@ -872,7 +873,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					{photo2 && (
 						<img
 							src={photo2}
-							alt="Community in reflection with Scripture"
+							alt="A father and son reading the Father's Heart Bible together"
 							class="w-full aspect-square object-cover"
 							loading="lazy"
 							decoding="async"
@@ -883,7 +884,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					{photo3 && (
 						<img
 							src={photo3}
-							alt="Belonging and encounter with the Father's word"
+							alt="A grandmother and granddaughter reading the Father's Heart Bible"
 							class="w-full aspect-square object-cover"
 							loading="lazy"
 							decoding="async"
