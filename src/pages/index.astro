@@ -80,12 +80,10 @@ function sanityTransform(url: string, w: number, q = 75): string {
 // the alpha channel through WebP, so the parent section background shows
 // through naturally — no .bg() needed, no edge mismatch.
 const bibleCoverImageFromSanity = media?.bibleCoverImage;
-const bookCoverUrl = bibleCoverImageFromSanity
-	? urlFor(bibleCoverImageFromSanity).width(512).format('webp').quality(72).auto('format').url()
-	: 'https://assets.spiritmediapublishing.com/FHB/print/portrait-512.webp';
-const bookCoverUrl640 = bibleCoverImageFromSanity
-	? urlFor(bibleCoverImageFromSanity).width(640).format('webp').quality(72).auto('format').url()
-	: 'https://assets.spiritmediapublishing.com/FHB/print/portrait-640.webp';
+// Print-edition portrait (A011). Hardcoded to the R2 asset on purpose — this
+// slot now shows the print photo regardless of the Sanity bibleCoverImage field.
+const bookCoverUrl = 'https://assets.spiritmediapublishing.com/FHB/print/portrait-512.webp';
+const bookCoverUrl640 = 'https://assets.spiritmediapublishing.com/FHB/print/portrait-640.webp';
 const bookCoverSrcset = `${bookCoverUrl} 512w, ${bookCoverUrl640} 640w`;
 const bookCoverSizes = '(max-width: 767px) 256px, 320px';
 
