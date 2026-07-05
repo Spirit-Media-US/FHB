@@ -47,7 +47,7 @@ const seoDescription =
 // Evergreen hero. The June 2026 Father's-Day "first public reading" launch copy
 // was retired 2026-06-22 now that the launch has passed and the full canon is live.
 const heroEyebrow = 'Free to Read';
-const heroHeadingLine1 = 'The Bible that reveals God as your Father.';
+const heroHeadingLine1 = 'Now in Print';
 const heroSubheading =
 	'The complete Father\u2019s Heart Bible\u2122 \u2014 Genesis to Revelation \u2014 is free to read online, with verse-by-verse audio.';
 const heroSubheading2 =
@@ -61,9 +61,9 @@ const heroVideoSrc =
 // 2.3s emulated CPU decode delay on Lighthouse mobile). R2 URLs preloaded via
 // fetchpriority=high in Layout.astro, promoted to HTTP/2 103 Early Hints by
 // CF Pages via _headers Link: directive. Sanity hero fields ignored here.
-const heroMobile = 'https://assets.spiritmediapublishing.com/FHB/hero-mobile.webp';
-const heroTablet = 'https://assets.spiritmediapublishing.com/FHB/hero-tablet.webp';
-const heroDesktop = 'https://assets.spiritmediapublishing.com/FHB/hero-desktop.webp';
+const heroMobile = 'https://assets.spiritmediapublishing.com/FHB/hero-print-mobile.webp';
+const heroTablet = 'https://assets.spiritmediapublishing.com/FHB/hero-print-tablet.webp';
+const heroDesktop = 'https://assets.spiritmediapublishing.com/FHB/hero-print-desktop.webp';
 
 // Helper — append Sanity CDN transforms to any cdn.sanity.io URL safely
 function sanityTransform(url: string, w: number, q = 75): string {
@@ -262,7 +262,9 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 1.5s ease;opacity:1"
 				/>
 			</picture>
-			<div id="hero-video-slot" data-hero-src={heroVideoSrc || ''} aria-hidden="true"></div>
+			{/* Hero video disabled — the print-edition photo IS the hero now. Removing
+			    this slot makes the desktop video-rotation script a no-op (it bails when
+			    #hero-video-slot is absent), so the poster photo stays put. */}
 			<!-- Dark overlay: keeps the transparent header's white logo/nav/CTA legible
 			     at the top and the white heading legible at the bottom, while the
 			     poster/video still reads through the lighter middle. -->
