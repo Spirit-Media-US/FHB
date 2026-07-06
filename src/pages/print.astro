@@ -40,6 +40,23 @@ const tiers = [
 const ladder = tiers.map((t) => `${t.qty.toLocaleString()}+ save ${t.pct}%`).join(' · ');
 
 const RETAIL = '$39.99';
+
+// FHB scripture cards — the Father's voice from first page to last (text pulled
+// from the reader content).
+const verses = [
+	{
+		ref: 'Genesis 1:1',
+		text: 'In the beginning, our Heavenly Father created the heavens and the earth.',
+	},
+	{
+		ref: 'John 3:16',
+		text: 'For our Father so loved the world, that he gave his one and only Son, that whoever believes in him should not perish but have eternal life.',
+	},
+	{
+		ref: 'Revelation 21:7',
+		text: 'The one who conquers will inherit these things, and I will be his Father, and he will be my son.',
+	},
+];
 ---
 
 <Layout
@@ -80,6 +97,22 @@ const RETAIL = '$39.99';
 				))}
 			</div>
 			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin-top: 2rem;">Hardback editions coming soon.</p>
+		</Section>
+
+		<!-- ═══════════════ SCRIPTURE CARDS ═══════════════ -->
+		<Section variant="soft">
+			<div class="text-center mb-8">
+				<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Hear the Father</p>
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">His voice, from the first page to the last</h2>
+			</div>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+				{verses.map((v) => (
+					<div class="rounded-2xl p-7 flex flex-col" style="background: #fff; border: 1px solid var(--color-hairline);">
+						<p style="font-family: var(--font-serif); font-style: italic; font-size: 1.08rem; line-height: 1.65; color: var(--color-ink); margin: 0; flex: 1;">“{v.text}”</p>
+						<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.03em; color: var(--color-brand); margin: 1.25rem 0 0;">{v.ref} · Father's Heart Bible™</p>
+					</div>
+				))}
+			</div>
 		</Section>
 
 		<!-- ═══════════════ BULK ORDERS ═══════════════ -->
