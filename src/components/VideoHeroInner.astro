@@ -4,6 +4,7 @@ interface Props {
 	imageSrc?: string;
 	imagePosition?: string;
 	headingLift?: string;
+	href?: string;
 	heading: string;
 	subheading?: string;
 	primaryCtaLabel?: string;
@@ -17,6 +18,7 @@ const {
 	imageSrc,
 	imagePosition = 'center',
 	headingLift = '0',
+	href,
 	heading,
 	subheading,
 	primaryCtaLabel,
@@ -75,6 +77,9 @@ const heroSrcMain = hasW ? imageSrc.replace(/([?&])w=\d+/, '$1w=1280') : imageSr
 		style="background: linear-gradient(to bottom, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.18) 32%, rgba(0,0,0,0.30) 65%, rgba(0,0,0,0.62) 100%);"
 		aria-hidden="true"
 	></div>
+	{href && (
+		<a href={href} aria-label="See the Father's Heart Bible print editions" class="absolute inset-0 z-[2]"></a>
+	)}
 	<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-10 md:pb-16 lg:pb-24">
 		<h1
 			class="text-4xl md:text-6xl font-medium leading-snug tracking-tight"
