@@ -1,18 +1,17 @@
 // /print-checkout — bulk print-order checkout (Cloudflare Pages Function).
 //
-//   POST /print-checkout  { color: "plum"|"charcoal"|"white", tier: 10|50|100 }
+//   POST /print-checkout  { counts: { plum, charcoal, white } }   (mix & match)
 //     → { url }            Stripe Checkout Session URL (redirect the browser)
+//     → { error:"below_minimum" } when combined total < 25
 //     → { disabled: true } when no Stripe key is bound (dev / not-yet-live)
 //
-// Physical goods: Stripe Checkout collects payment + a US shipping address;
-// fulfillment is handled off-Stripe (POD / manual). Prices are authoritative
-// HERE (server-side) so the browser can't tamper with amounts.
+// The COMBINED total across editions sets the per-unit volume price (TIERS).
+// One Stripe line item per edition ordered. Physical goods: Checkout collects
+// payment + a US shipping address; fulfillment is off-Stripe (POD / manual).
+// Prices are authoritative HERE (server-side) so the browser can't tamper.
 //
 // NB: path is /print-checkout, not /api/* — the apex router proxies /api/* to
 // the community app, so this marketing function must live off that prefix.
-//
-// ⚠️ BULK PRICES BELOW ARE PLACEHOLDERS — Kevin sets the real per-unit prices.
-//    Single retail paperback is $39.99 (Amazon). Change PRICE_CENTS and redeploy.
 
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
