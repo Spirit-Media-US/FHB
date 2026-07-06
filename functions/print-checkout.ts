@@ -26,7 +26,7 @@ type Color = (typeof COLORS)[number];
 // deep 35–60% church norm applies to $2–4 outreach bibles, not a premium POD book.
 // ⚠️ Kevin's final call on prices. MUST match print.astro `tiers`.
 const PRICE_CENTS: Record<number, number> = {
-	25: 3299, // ~18% off
+	25: 3279, // 18% off
 	50: 2999, // ~25% off
 	100: 2799, // ~30% off
 	250: 2599, // ~35% off

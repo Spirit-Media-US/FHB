@@ -28,10 +28,10 @@ const editions = [
 // Bulk tiers — per-unit price MUST match functions/print-checkout.ts PRICE_CENTS.
 // ⚠️ PLACEHOLDER prices off the $39.99 retail — Kevin sets the real numbers.
 const tiers = [
-	{ qty: 25, unit: 32.99 },
-	{ qty: 50, unit: 29.99 },
-	{ qty: 100, unit: 27.99 },
-	{ qty: 250, unit: 25.99 },
+	{ qty: 25, unit: 32.79, pct: 18 },
+	{ qty: 50, unit: 29.99, pct: 25 },
+	{ qty: 100, unit: 27.99, pct: 30 },
+	{ qty: 250, unit: 25.99, pct: 35 },
 ];
 
 const RETAIL = '$39.99';
@@ -99,8 +99,9 @@ const RETAIL = '$39.99';
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">2 · Choose a quantity</p>
 					<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
 						{tiers.map((t, i) => (
-							<button type="button" class="bulk-tier rounded-xl text-center" data-tier={t.qty} data-total={(t.qty * t.unit).toFixed(2)} aria-pressed={i === 0 ? 'true' : 'false'} style="font-family: var(--font-sans); padding: 0.9rem 0.5rem; border: 1.5px solid var(--color-hairline); background: #fff; cursor: pointer;">
-								<span style="display: block; font-size: 1.35rem; font-weight: 700; color: var(--color-ink);">{t.qty}</span>
+							<button type="button" class="bulk-tier rounded-xl text-center" data-tier={t.qty} data-total={(t.qty * t.unit).toFixed(2)} aria-pressed={i === 0 ? 'true' : 'false'} style="font-family: var(--font-sans); padding: 0.6rem 0.5rem 0.9rem; border: 1.5px solid var(--color-hairline); background: #fff; cursor: pointer;">
+								<span style="display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.02em; color: #a0004c;">Save {t.pct}%</span>
+								<span style="display: block; font-size: 1.35rem; font-weight: 700; color: var(--color-ink); margin-top: 0.15rem;">{t.qty}</span>
 								<span style="display: block; font-size: 0.8rem; color: var(--color-muted);">copies · ${t.unit.toFixed(2)} ea</span>
 							</button>
 						))}
@@ -119,6 +120,13 @@ const RETAIL = '$39.99';
 				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.8rem; margin-top: 1rem;">Free shipping included · sales tax calculated at checkout · one edition per bulk order. Need more than 250? <a href="mailto:hello@spiritmediapublishing.com?subject=FHB%20bulk%20order%20(250%2B)" style="color: var(--color-brand); text-decoration: underline;">Contact us</a>.</p>
 			</div>
 		</Section>
+
+		<!-- ═══════════════ PEOPLE BAND (variety of readers with FHB) ═══════════════ -->
+		<div class="grid grid-cols-1 sm:grid-cols-3">
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/people-1.webp" alt="A woman reading the Father's Heart Bible by a sunlit window" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/people-2.webp" alt="A father and son reading the Father's Heart Bible together" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/people-3.webp" alt="A grandmother and granddaughter reading the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+		</div>
 	</main>
 </Layout>
 
@@ -128,7 +136,7 @@ const RETAIL = '$39.99';
 		if (!root) return;
 		let color = 'plum';
 		let tier = 25;
-		let total = '824.75';
+		let total = '819.75';
 		const fmt = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 		const out = root.querySelector('[data-total-out]');
 		const msg = root.querySelector('[data-bulk-msg]');
