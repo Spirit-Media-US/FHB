@@ -27,18 +27,54 @@ const editions = [
 
 // Bulk tiers — per-unit price MUST match functions/print-checkout.ts PRICE_CENTS.
 // ⚠️ PLACEHOLDER prices off the $39.99 retail — Kevin sets the real numbers.
+// Volume ladder — combined total across editions sets the per-unit price.
+// MUST match functions/print-checkout.ts TIERS.
 const tiers = [
-	{ qty: 25, unit: 32.99 },
-	{ qty: 50, unit: 29.99 },
-	{ qty: 100, unit: 27.99 },
-	{ qty: 250, unit: 25.99 },
+	{ qty: 25, unit: 32.79, pct: 18 },
+	{ qty: 50, unit: 29.99, pct: 25 },
+	{ qty: 100, unit: 27.99, pct: 30 },
+	{ qty: 250, unit: 25.99, pct: 35 },
+	{ qty: 500, unit: 23.99, pct: 40 },
+	{ qty: 1000, unit: 21.99, pct: 45 },
 ];
+const ladder = tiers.map((t) => `${t.qty.toLocaleString()}+ save ${t.pct}%`).join(' · ');
 
 const RETAIL = '$39.99';
+
+// FHB scripture cards — the Father's voice from first page to last (text pulled
+// from the reader content).
+const verses = [
+	{
+		ref: 'Genesis 1:1',
+		text: 'In the beginning, our Heavenly Father created the heavens and the earth.',
+		hl: ['our Heavenly Father'],
+	},
+	{
+		ref: 'John 3:16',
+		text: 'For our Father so loved the world, that he gave his one and only Son, that whoever believes in him should not perish but have eternal life.',
+		hl: ['our Father'],
+	},
+	{
+		ref: '2 Corinthians 6:18',
+		text: 'I will be a Father to you and you will be sons and daughters to me, says our Father, the Almighty.',
+		hl: ['a Father', 'sons and daughters', 'our Father'],
+	},
+];
+// Wrap the Father-identity phrases in a light-pink highlighter mark.
+function markFather(text: string, phrases: string[]): string {
+	let out = text;
+	for (const p of phrases) {
+		out = out.replace(
+			p,
+			`<mark style="background:#ffd6e4;color:inherit;padding:0.02em 0.2em;border-radius:3px;">${p}</mark>`,
+		);
+	}
+	return out;
+}
 ---
 
 <Layout
-	title="Buy a Bible in Print — Father's Heart Bible™: An Intimate Translation"
+	title="Now in Print — Father's Heart Bible™: An Intimate Translation"
 	description="The Father's Heart Bible™: An Intimate Translation is now in print — a fresh Bible translation that reveals God as your Father. Buy a copy, or order in bulk for your church. Come home to your Father."
 	image="https://assets.spiritmediapublishing.com/FHB/share/fhb-og-print.jpg"
 	imageAlt="Friends reading the Father's Heart Bible™ print edition — now in three editions"
@@ -48,7 +84,8 @@ const RETAIL = '$39.99';
 		<!-- ═══════════════ HERO ═══════════════ (shared component — same size as other pages) -->
 		<VideoHeroInner
 			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/partner-hero.webp"
-			heading="Order in Bulk and Save"
+			heading="Now in Print"
+			subheading="Order a copy for yourself, or in bulk to share."
 		/>
 
 		<!-- ═══════════════ THREE EDITIONS ═══════════════ -->
@@ -76,48 +113,77 @@ const RETAIL = '$39.99';
 			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin-top: 2rem;">Hardback editions coming soon.</p>
 		</Section>
 
+		<!-- ═══════════════ SCRIPTURE CARDS ═══════════════ -->
+		<Section variant="soft" class="!pb-2 md:!pb-4">
+			<div class="text-center mb-8">
+				<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Hear the Father</p>
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">His voice, from the first page to the last</h2>
+			</div>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+				{verses.map((v) => (
+					<div class="rounded-2xl p-7 flex flex-col" style="background: #fff; border: 1px solid var(--color-hairline);">
+						<p style="font-family: var(--font-serif); font-style: italic; font-size: 1.08rem; line-height: 1.65; color: var(--color-ink); margin: 0; flex: 1;" set:html={`“${markFather(v.text, v.hl)}”`}></p>
+						<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.03em; color: var(--color-brand); margin: 1.25rem 0 0;">{v.ref} · Father's Heart Bible™</p>
+					</div>
+				))}
+			</div>
+		</Section>
+
 		<!-- ═══════════════ BULK ORDERS ═══════════════ -->
-		<Section variant="soft">
+		<Section variant="soft" class="!pt-2 md:!pt-4">
 			<div class="max-w-3xl mx-auto">
 				<div class="text-center mb-8">
-					<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Bulk &amp; Church Orders</p>
-					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Order in quantity</h2>
-					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 32rem;">Bring the Father's heart to your whole congregation, group, or outreach. Choose an edition and a quantity — checkout is secure.</p>
+					<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Bulk Order Discounts</p>
+					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Order in Bulk and Save</h2>
+					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 32rem;">Bring the Father's heart to your whole business, congregation, or community. Mix and match editions — your combined total sets the discount.</p>
 				</div>
 
 				<div class="rounded-2xl p-6 md:p-8" style="background: #fff; border: 1px solid var(--color-hairline);" data-bulk>
-					<!-- Color -->
-					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">1 · Choose an edition</p>
-					<div class="flex flex-wrap gap-2 mb-6" role="group" aria-label="Choose an edition">
-						{editions.map((e, i) => (
-							<button type="button" class="bulk-color rounded-full font-semibold" data-color={e.slug} aria-pressed={i === 0 ? 'true' : 'false'} style="font-family: var(--font-sans); font-size: 0.9rem; padding: 0.5rem 1.1rem; border: 1.5px solid var(--color-hairline); background: #fff; color: var(--color-ink); cursor: pointer;">{e.color}</button>
+					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Volume discounts — the more you order, the more you save</p>
+					<div class="grid grid-cols-3 gap-2 mb-6">
+						{tiers.map((t) => (
+							<div class="tier-card rounded-xl text-center" data-tier-min={t.qty} style="padding: 0.7rem 0.4rem; border: 1.5px solid #ffd0e0; background: #ffe9f0;">
+								<span style="display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.02em; color: #a0004c;">Save {t.pct}%</span>
+								<span style="display: block; font-size: 1.15rem; font-weight: 700; color: var(--color-ink); margin-top: 0.1rem; line-height: 1.1;">{t.qty.toLocaleString()}+</span>
+								<span style="display: block; font-size: 0.78rem; color: var(--color-muted);">${t.unit.toFixed(2)} ea</span>
+							</div>
 						))}
 					</div>
 
-					<!-- Quantity -->
-					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">2 · Choose a quantity</p>
-					<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-						{tiers.map((t, i) => (
-							<button type="button" class="bulk-tier rounded-xl text-center" data-tier={t.qty} data-total={(t.qty * t.unit).toFixed(2)} aria-pressed={i === 0 ? 'true' : 'false'} style="font-family: var(--font-sans); padding: 0.9rem 0.5rem; border: 1.5px solid var(--color-hairline); background: #fff; cursor: pointer;">
-								<span style="display: block; font-size: 1.35rem; font-weight: 700; color: var(--color-ink);">{t.qty}</span>
-								<span style="display: block; font-size: 0.8rem; color: var(--color-muted);">copies · ${t.unit.toFixed(2)} ea</span>
-							</button>
+					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Choose how many of each edition</p>
+					<div style="display: flex; flex-direction: column; gap: 0.65rem;">
+						{editions.map((e) => (
+							<div class="flex items-center gap-3">
+								<img src={e.img} alt="" width="700" height="1170" loading="lazy" decoding="async" style="width: 68px; height: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.18));" />
+								<span style="flex: 1; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">English Paperback ({e.color} Edition)</span>
+								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
+									<button type="button" class="qty-step" data-color={e.slug} data-dir="-1" aria-label={`Fewer ${e.color}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
+									<input type="number" class="qty-in" data-color={e.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.color} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
+									<button type="button" class="qty-step" data-color={e.slug} data-dir="1" aria-label={`More ${e.color}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
+								</div>
+							</div>
 						))}
 					</div>
 
-					<!-- Summary + checkout -->
-					<div class="flex flex-wrap items-center justify-between gap-4 pt-4" style="border-top: 1px solid var(--color-hairline);">
+					<div class="flex flex-wrap items-center justify-between gap-4 pt-4 mt-5" style="border-top: 1px solid var(--color-hairline);">
 						<div>
-							<span style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem;">Total · free shipping</span>
-							<div data-total-out style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700;"></div>
+							<span style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem;"><span data-count>0</span> copies · <span data-save style="color: #a0004c; font-weight: 700;">—</span> · free shipping</span>
+							<div data-total-out style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700;">$0.00</div>
 						</div>
 						<button type="button" data-checkout class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-brand); color: #fff; padding: 0.8rem 1.8rem; border: 0; cursor: pointer; font-size: 1rem;">Checkout →</button>
 					</div>
 					<p data-bulk-msg style="font-family: var(--font-sans); font-size: 0.85rem; color: var(--color-muted); margin: 0.75rem 0 0; display: none;"></p>
 				</div>
-				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.8rem; margin-top: 1rem;">Free shipping included · sales tax calculated at checkout · one edition per bulk order. Need more than 250? <a href="mailto:hello@spiritmediapublishing.com?subject=FHB%20bulk%20order%20(250%2B)" style="color: var(--color-brand); text-decoration: underline;">Contact us</a>.</p>
+				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.8rem; margin-top: 1rem;">25-copy minimum · free shipping · sales tax calculated at checkout · mix editions freely. Need more than 1,000? <a href="mailto:hello@spiritmediapublishing.com?subject=FHB%20bulk%20order%20(1000%2B)" style="color: var(--color-brand); text-decoration: underline;">Contact us</a>.</p>
 			</div>
 		</Section>
+
+		<!-- ═══════════════ PEOPLE BAND (variety of readers with FHB) ═══════════════ -->
+		<div class="grid grid-cols-1 sm:grid-cols-3">
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/print-band-white.webp" alt="A man reading the White edition of the Father's Heart Bible in a cafe" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/people-2.webp" alt="A father and son reading the Father's Heart Bible together" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/people-3.webp" alt="A grandmother and granddaughter reading the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+		</div>
 	</main>
 </Layout>
 
@@ -125,39 +191,81 @@ const RETAIL = '$39.99';
 	(() => {
 		const root = document.querySelector('[data-bulk]');
 		if (!root) return;
-		let color = 'plum';
-		let tier = 25;
-		let total = '824.75';
+		const MIN = 25;
+		// total → per-unit price + % (highest tier the total qualifies for). Mirrors print-checkout.ts.
+		const TIERS = [
+			{ min: 1000, unit: 21.99, pct: 45 },
+			{ min: 500, unit: 23.99, pct: 40 },
+			{ min: 250, unit: 25.99, pct: 35 },
+			{ min: 100, unit: 27.99, pct: 30 },
+			{ min: 50, unit: 29.99, pct: 25 },
+			{ min: 25, unit: 32.79, pct: 18 },
+		];
+		const tierFor = (t) => TIERS.find((x) => t >= x.min) || null;
 		const fmt = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+		const counts = { plum: 0, charcoal: 0, white: 0 };
 		const out = root.querySelector('[data-total-out]');
+		const countEl = root.querySelector('[data-count]');
+		const saveEl = root.querySelector('[data-save]');
 		const msg = root.querySelector('[data-bulk-msg]');
-		const paint = () => { if (out) out.textContent = fmt(total); };
-		const setPressed = (nodes, match) => nodes.forEach((n) => {
-			const on = match(n);
-			n.setAttribute('aria-pressed', on ? 'true' : 'false');
-			n.style.borderColor = on ? 'var(--color-brand)' : 'var(--color-hairline)';
-			n.style.background = on ? 'rgba(182,0,87,0.06)' : '#fff';
-		});
-		const colors = [...root.querySelectorAll('.bulk-color')];
-		const tprices = [...root.querySelectorAll('.bulk-tier')];
-		colors.forEach((b) => b.addEventListener('click', () => { color = b.dataset.color; setPressed(colors, (n) => n === b); }));
-		tprices.forEach((b) => b.addEventListener('click', () => { tier = Number(b.dataset.tier); total = b.dataset.total; setPressed(tprices, (n) => n === b); paint(); }));
-		setPressed(colors, (n) => n.dataset.color === color);
-		setPressed(tprices, (n) => Number(n.dataset.tier) === tier);
-		paint();
-
 		const btn = root.querySelector('[data-checkout]');
+		const cards = [...root.querySelectorAll('.tier-card')];
+		const highlight = (min) => cards.forEach((c) => {
+			const on = min !== null && Number(c.dataset.tierMin) === min;
+			c.style.borderColor = on ? 'var(--color-brand)' : '#ffd0e0';
+			c.style.background = on ? '#ffd0e0' : '#ffe9f0';
+		});
+
+		function recompute() {
+			const total = counts.plum + counts.charcoal + counts.white;
+			const tier = tierFor(total);
+			highlight(tier ? tier.min : null);
+			if (countEl) countEl.textContent = String(total);
+			if (tier) {
+				if (saveEl) saveEl.textContent = 'Save ' + tier.pct + '%';
+				if (out) out.textContent = fmt(total * tier.unit);
+				if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
+				if (msg) msg.style.display = 'none';
+			} else {
+				if (saveEl) saveEl.textContent = '—';
+				if (out) out.textContent = '$0.00';
+				if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; }
+				if (msg) {
+					msg.style.display = 'block';
+					msg.textContent = total === 0
+						? 'Add copies above to begin (25-copy minimum for bulk pricing).'
+						: 'Add ' + (MIN - total) + ' more to reach the 25-copy minimum.';
+				}
+			}
+		}
+
+		const inputs = [...root.querySelectorAll('.qty-in')];
+		const inputFor = (c) => inputs.find((i) => i.dataset.color === c);
+		inputs.forEach((inp) => inp.addEventListener('input', () => {
+			let v = parseInt(inp.value, 10); if (!Number.isFinite(v) || v < 0) v = 0;
+			counts[inp.dataset.color] = v; recompute();
+		}));
+		root.querySelectorAll('.qty-step').forEach((b) => b.addEventListener('click', () => {
+			const c = b.dataset.color; const dir = Number(b.dataset.dir);
+			counts[c] = Math.max(0, counts[c] + dir);
+			const inp = inputFor(c); if (inp) inp.value = String(counts[c]);
+			recompute();
+		}));
+		recompute();
+
 		btn?.addEventListener('click', async () => {
+			if (btn.disabled) return;
+			const label = btn.textContent;
 			btn.disabled = true; btn.textContent = 'Starting checkout…';
 			try {
-				const r = await fetch('/print-checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ color, tier }) });
+				const r = await fetch('/print-checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ counts }) });
 				const d = await r.json();
 				if (d.url) { window.location.href = d.url; return; }
-				if (msg) { msg.style.display = 'block'; msg.textContent = d.disabled ? 'Bulk checkout is opening soon — check back shortly.' : 'Sorry, something went wrong starting checkout. Please try again.'; }
+				if (msg) { msg.style.display = 'block'; msg.textContent = d.disabled ? 'Bulk checkout is opening soon — check back shortly.' : (d.error === 'below_minimum' ? 'A 25-copy minimum is required for bulk pricing.' : 'Sorry, something went wrong starting checkout. Please try again.'); }
 			} catch {
 				if (msg) { msg.style.display = 'block'; msg.textContent = 'Network error — please try again.'; }
 			}
-			btn.disabled = false; btn.textContent = 'Checkout →';
+			btn.disabled = false; btn.textContent = label;
 		});
 	})();
 </script>
