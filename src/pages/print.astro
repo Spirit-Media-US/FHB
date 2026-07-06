@@ -27,10 +27,10 @@ const editions = [
 // Bulk tiers — per-unit price MUST match functions/print-checkout.ts PRICE_CENTS.
 // ⚠️ PLACEHOLDER prices off the $39.99 retail — Kevin sets the real numbers.
 const tiers = [
-	{ qty: 25, unit: 25.99 },
-	{ qty: 50, unit: 22.99 },
-	{ qty: 100, unit: 20.99 },
-	{ qty: 250, unit: 17.99 },
+	{ qty: 25, unit: 32.99 },
+	{ qty: 50, unit: 29.99 },
+	{ qty: 100, unit: 27.99 },
+	{ qty: 250, unit: 25.99 },
 ];
 
 const RETAIL = '$39.99';
@@ -129,7 +129,7 @@ const RETAIL = '$39.99';
 		if (!root) return;
 		let color = 'plum';
 		let tier = 25;
-		let total = '649.75';
+		let total = '824.75';
 		const fmt = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 		const out = root.querySelector('[data-total-out]');
 		const msg = root.querySelector('[data-bulk-msg]');

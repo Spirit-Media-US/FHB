@@ -21,14 +21,15 @@ interface Env {
 const COLORS = ['plum', 'charcoal', 'white'] as const;
 type Color = (typeof COLORS)[number];
 
-// Best-practice church/ministry volume tiers (25/50/100/250), ~35–60% off the
-// $39.99 retail, FREE SHIPPING baked into the per-unit price.
-// ⚠️ Confirm these clear POD unit cost before go-live. MUST match print.astro `tiers`.
+// Volume tiers (25/50/100/250). Discounts are modest (~18–35% off the $39.99
+// retail) because POD print cost is $12.41/unit + free shipping baked in — the
+// deep 35–60% church norm applies to $2–4 outreach bibles, not a premium POD book.
+// ⚠️ Kevin's final call on prices. MUST match print.astro `tiers`.
 const PRICE_CENTS: Record<number, number> = {
-	25: 2599, // ~35% off
-	50: 2299, // ~43% off
-	100: 2099, // ~48% off
-	250: 1799, // ~55% off
+	25: 3299, // ~18% off
+	50: 2999, // ~25% off
+	100: 2799, // ~30% off
+	250: 2599, // ~35% off
 };
 
 // Physical books have no book-specific Stripe tax code; use General – Tangible
