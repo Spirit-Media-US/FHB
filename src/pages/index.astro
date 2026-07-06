@@ -47,7 +47,7 @@ const seoDescription =
 // Evergreen hero. The June 2026 Father's-Day "first public reading" launch copy
 // was retired 2026-06-22 now that the launch has passed and the full canon is live.
 const heroEyebrow = 'Free to Read';
-const heroHeadingLine1 = 'The Bible that reveals God as your Father.';
+const heroHeadingLine1 = 'Now in Print';
 const heroSubheading =
 	'The complete Father\u2019s Heart Bible\u2122 \u2014 Genesis to Revelation \u2014 is free to read online, with verse-by-verse audio.';
 const heroSubheading2 =
@@ -61,9 +61,9 @@ const heroVideoSrc =
 // 2.3s emulated CPU decode delay on Lighthouse mobile). R2 URLs preloaded via
 // fetchpriority=high in Layout.astro, promoted to HTTP/2 103 Early Hints by
 // CF Pages via _headers Link: directive. Sanity hero fields ignored here.
-const heroMobile = 'https://assets.spiritmediapublishing.com/FHB/hero-mobile.webp';
-const heroTablet = 'https://assets.spiritmediapublishing.com/FHB/hero-tablet.webp';
-const heroDesktop = 'https://assets.spiritmediapublishing.com/FHB/hero-desktop.webp';
+const heroMobile = 'https://assets.spiritmediapublishing.com/FHB/hero-print2-mobile.webp';
+const heroTablet = 'https://assets.spiritmediapublishing.com/FHB/hero-print2-tablet.webp';
+const heroDesktop = 'https://assets.spiritmediapublishing.com/FHB/hero-print2-desktop.webp';
 
 // Helper — append Sanity CDN transforms to any cdn.sanity.io URL safely
 function sanityTransform(url: string, w: number, q = 75): string {
@@ -80,20 +80,10 @@ function sanityTransform(url: string, w: number, q = 75): string {
 // the alpha channel through WebP, so the parent section background shows
 // through naturally — no .bg() needed, no edge mismatch.
 const bibleCoverImageFromSanity = media?.bibleCoverImage;
-const bookCoverUrl = bibleCoverImageFromSanity
-	? urlFor(bibleCoverImageFromSanity).width(512).format('webp').quality(72).auto('format').url()
-	: sanityTransform(
-			'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png',
-			512,
-			72,
-		);
-const bookCoverUrl640 = bibleCoverImageFromSanity
-	? urlFor(bibleCoverImageFromSanity).width(640).format('webp').quality(72).auto('format').url()
-	: sanityTransform(
-			'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png',
-			640,
-			72,
-		);
+// Print-edition portrait (A011). Hardcoded to the R2 asset on purpose — this
+// slot now shows the print photo regardless of the Sanity bibleCoverImage field.
+const bookCoverUrl = 'https://assets.spiritmediapublishing.com/FHB/print/portrait-512.webp';
+const bookCoverUrl640 = 'https://assets.spiritmediapublishing.com/FHB/print/portrait-640.webp';
 const bookCoverSrcset = `${bookCoverUrl} 512w, ${bookCoverUrl640} 640w`;
 const bookCoverSizes = '(max-width: 767px) 256px, 320px';
 
@@ -111,10 +101,11 @@ const fhbiCoverUrl = fhbCoverSanity
 
 // Hero video array — prefer Sanity, fall back to hardcoded
 const heroVideosFromSanity = media?.homePageHeroVideos;
-// People photos — apply Sanity CDN transforms to shrink multi-MB originals
-const photo1 = sanityTransform(media?.peoplePhoto1Url || '', 800, 72);
-const photo2 = sanityTransform(media?.peoplePhoto2Url || '', 800, 72);
-const photo3 = sanityTransform(media?.peoplePhoto3Url || '', 800, 72);
+// People + FHB print photos (hardcoded to R2 — this band now shows the print
+// edition in real hands regardless of the Sanity peoplePhoto fields).
+const photo1 = 'https://assets.spiritmediapublishing.com/FHB/print/people-1.webp';
+const photo2 = 'https://assets.spiritmediapublishing.com/FHB/print/people-2.webp';
+const photo3 = 'https://assets.spiritmediapublishing.com/FHB/print/people-3.webp';
 const communityUrl = media?.communityUrl || '/join';
 const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 ---
@@ -172,7 +163,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		     image never enters the LCP candidate pool during the audit. H1
 		     remains the LCP element, brand visual preserved for real users.
 		     ═══════════════════════════════════════════════════════════ -->
-		<section class="lg:hidden relative flex items-start justify-center overflow-hidden px-6" style="background: linear-gradient(180deg, #2f3131 0%, #241b17 100%); min-height: 600px; padding-top: 6rem; padding-bottom: 4rem;">
+		<section class="lg:hidden relative flex items-start justify-center overflow-hidden px-6" style="background: linear-gradient(180deg, #2f3131 0%, #241b17 100%); min-height: 600px; padding-top: 4rem; padding-bottom: 4rem;">
 			<div id="mobile-hero-bg" aria-hidden="true" data-bg={heroMobile} style="position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0;transition:opacity 0.6s ease-out;"></div>
 			<div aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(36,27,23,0.55) 0%,rgba(36,27,23,0.75) 100%);pointer-events:none;"></div>
 			<div class="relative z-10 max-w-2xl mx-auto text-center">
@@ -185,11 +176,12 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				<p
 					role="heading"
 					aria-level="1"
-					class="text-[2.475rem] font-medium leading-snug tracking-tight"
-					style="font-family: var(--font-headline); color: #FFFFFF; font-size: 2.475rem; line-height: 1.375; font-weight: 500; letter-spacing: -0.025em; margin: 0;"
+					class="text-[3.7125rem] font-medium leading-snug tracking-tight"
+					style="font-family: var(--font-headline); color: #FFFFFF; font-size: 3.7125rem; line-height: 1.375; font-weight: 500; letter-spacing: -0.025em; margin: 0;"
 				>
-					{heroHeadingLine1}
+					<a href="/print" style="color: inherit; text-decoration: none;">{heroHeadingLine1}</a>
 				</p>
+				<p style="font-family: var(--font-body); color: rgba(255,255,255,0.92); font-size: 0.95rem; margin: 0.6rem 0 0;"><a href="/read" style="color: inherit; text-decoration: underline;">Read/listen here for free</a></p>
 				<p
 					class="text-lg leading-relaxed"
 					style="font-family: var(--font-body); color: rgba(255,255,255,0.85); margin-top: 1.5rem; font-size: 1.125rem; line-height: 1.625;"
@@ -262,19 +254,22 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 1.5s ease;opacity:1"
 				/>
 			</picture>
-			<div id="hero-video-slot" data-hero-src={heroVideoSrc || ''} aria-hidden="true"></div>
+			{/* Hero video disabled — the print-edition photo IS the hero now. Removing
+			    this slot makes the desktop video-rotation script a no-op (it bails when
+			    #hero-video-slot is absent), so the poster photo stays put. */}
 			<!-- Dark overlay: keeps the transparent header's white logo/nav/CTA legible
 			     at the top and the white heading legible at the bottom, while the
 			     poster/video still reads through the lighter middle. -->
 			<div aria-hidden="true" class="absolute inset-0 z-[1]" style="background: linear-gradient(to bottom, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.18) 32%, rgba(0,0,0,0.30) 65%, rgba(0,0,0,0.62) 100%); pointer-events:none;"></div>
-			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto lg:pb-24" style="transition: color 1.2s ease;">
+			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto lg:pb-40" style="transition: color 1.2s ease;">
 				<h1
 					id="hero-heading"
-					class="md:text-[4.125rem] font-medium leading-snug tracking-tight"
-					style="font-family: var(--font-headline); color: #FFFFFF; transition: color 1.2s ease; font-size: 4.125rem; line-height: 1.375; font-weight: 500;" data-hero-entrance
+					class="md:text-[6.1875rem] font-medium leading-snug tracking-tight"
+					style="font-family: var(--font-headline); color: #FFFFFF; transition: color 1.2s ease; font-size: 6.1875rem; line-height: 1.375; font-weight: 500;" data-hero-entrance
 				>
-					{heroHeadingLine1}
+					<a href="/print" style="color: inherit; text-decoration: none;">{heroHeadingLine1}</a>
 				</h1>
+				<p style="font-family: var(--font-body); color: rgba(255,255,255,0.92); font-size: 1.05rem; margin: 0.75rem 0 0;"><a href="/read" style="color: inherit; text-decoration: underline;">Read/listen here for free</a></p>
 			</div>
 		</section>
 
@@ -583,18 +578,19 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				<!-- Book image -->
 				<div class="order-1 md:order-2 flex justify-center" data-reveal="slide-right">
 					{bookCoverUrl ? (
+						<a href="/print" class="block" style="text-decoration:none">
 						<img
 							src={bookCoverUrl}
 							srcset={bookCoverSrcset}
 							sizes={bookCoverSizes}
-							alt="The Father's Heart Bible — brown cover"
+							alt="A reader holding the Father's Heart Bible print edition"
 							class="w-64 md:w-80 block"
 							loading="lazy"
 							decoding="async"
 							width="512"
-							height="768"
+							height="640"
 							style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.22));"
-						/>
+						/></a>
 					) : (
 						<div
 							class="w-64 md:w-80 aspect-[2/3] flex items-end justify-center p-6"
@@ -867,37 +863,40 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				</div>
 				<ImageGrid cols={3} gap="md">
 					{photo1 && (
+						<a href="/print" class="block" style="text-decoration:none">
 						<img
 							src={photo1}
-							alt="Reader with the Father's Heart Bible"
+							alt="A woman reading the Father's Heart Bible by a sunlit window"
 							class="w-full aspect-square object-cover"
 							loading="lazy"
 							decoding="async"
 							width="800"
 							height="800"
-						/>
+						/></a>
 					)}
 					{photo2 && (
+						<a href="/print" class="block" style="text-decoration:none">
 						<img
 							src={photo2}
-							alt="Community in reflection with Scripture"
+							alt="A father and son reading the Father's Heart Bible together"
 							class="w-full aspect-square object-cover"
 							loading="lazy"
 							decoding="async"
 							width="800"
 							height="800"
-						/>
+						/></a>
 					)}
 					{photo3 && (
+						<a href="/print" class="block" style="text-decoration:none">
 						<img
 							src={photo3}
-							alt="Belonging and encounter with the Father's word"
+							alt="A grandmother and granddaughter reading the Father's Heart Bible"
 							class="w-full aspect-square object-cover"
 							loading="lazy"
 							decoding="async"
 							width="800"
 							height="800"
-						/>
+						/></a>
 					)}
 				</ImageGrid>
 			</Section>
