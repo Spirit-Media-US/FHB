@@ -21,16 +21,19 @@ interface Env {
 const COLORS = ['plum', 'charcoal', 'white'] as const;
 type Color = (typeof COLORS)[number];
 
-// Volume tiers (25/50/100/250). Discounts are modest (~18–35% off the $39.99
-// retail) because POD print cost is $12.41/unit + free shipping baked in — the
-// deep 35–60% church norm applies to $2–4 outreach bibles, not a premium POD book.
-// ⚠️ Kevin's final call on prices. MUST match print.astro `tiers`.
-const PRICE_CENTS: Record<number, number> = {
-	25: 3279, // 18% off
-	50: 2999, // ~25% off
-	100: 2799, // ~30% off
-	250: 2599, // ~35% off
-};
+// Volume tiers — the COMBINED total across editions (mix-and-match) sets the
+// per-unit price. 18–45% off the $39.99 retail; POD print cost is $12.41/unit +
+// free shipping baked in. MUST match print.astro `tiers`. 25-copy minimum.
+const MIN_QTY = 25;
+const TIERS: { min: number; cents: number }[] = [
+	{ min: 1000, cents: 2199 }, // 45% off
+	{ min: 500, cents: 2399 }, // 40% off
+	{ min: 250, cents: 2599 }, // 35% off
+	{ min: 100, cents: 2799 }, // 30% off
+	{ min: 50, cents: 2999 }, // 25% off
+	{ min: 25, cents: 3279 }, // 18% off
+];
+const unitFor = (total: number): number | null => TIERS.find((t) => total >= t.min)?.cents ?? null;
 
 // Physical books have no book-specific Stripe tax code; use General – Tangible
 // Goods. Stripe Tax then applies each state's rules for tangible goods.
@@ -61,17 +64,24 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 			headers: { 'content-type': 'application/json' },
 		});
 
-	let payload: { color?: string; tier?: number };
+	let payload: { counts?: Record<string, number> };
 	try {
 		payload = await request.json();
 	} catch {
 		return json({ error: 'bad_request' }, 400);
 	}
 
-	const color = payload.color as Color;
-	const tier = Number(payload.tier);
-	if (!COLORS.includes(color) || !PRICE_CENTS[tier]) {
-		return json({ error: 'invalid_selection' }, 400);
+	// Normalize per-edition counts (mix-and-match).
+	const counts: Record<Color, number> = { plum: 0, charcoal: 0, white: 0 };
+	for (const c of COLORS) {
+		const n = Math.floor(Number(payload.counts?.[c] ?? 0));
+		if (!Number.isFinite(n) || n < 0) return json({ error: 'invalid_selection' }, 400);
+		counts[c] = n;
+	}
+	const total = COLORS.reduce((s, c) => s + counts[c], 0);
+	const unit = unitFor(total);
+	if (total < MIN_QTY || unit === null) {
+		return json({ error: 'below_minimum', min: MIN_QTY }, 400);
 	}
 
 	// Gate: no key bound (dev / pre-launch) → tell the page to show "coming soon".
@@ -80,30 +90,42 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	}
 
 	const origin = new URL(request.url).origin;
-	const unit = PRICE_CENTS[tier];
-	const form = encodeForm({
+	const pctOff = Math.round((1 - unit / 3999) * 100);
+	const form: Record<string, string | number> = {
 		mode: 'payment',
 		success_url: `${origin}/print?order=success`,
 		cancel_url: `${origin}/print?order=canceled`,
 		// Stripe Tax auto-calculates sales tax from the shipping address.
 		'automatic_tax[enabled]': 'true',
-		'line_items[0][quantity]': tier,
-		'line_items[0][price_data][currency]': 'usd',
-		'line_items[0][price_data][unit_amount]': unit,
-		// Prices are tax-exclusive (US convention) — tax is added on top at checkout.
-		'line_items[0][price_data][tax_behavior]': 'exclusive',
-		'line_items[0][price_data][product_data][name]': `Father's Heart Bible — ${titleCase(color)} Paperback`,
-		'line_items[0][price_data][product_data][description]': `Bulk order of ${tier} copies (${titleCase(color)} edition) · Free shipping`,
-		'line_items[0][price_data][product_data][images][0]': COVER[color],
-		'line_items[0][price_data][product_data][tax_code]': TAX_CODE,
 		// Free shipping (baked into the per-unit price); address still collected
 		// for tax calculation + fulfillment.
 		'shipping_address_collection[allowed_countries][0]': 'US',
 		'phone_number_collection[enabled]': 'true',
 		'metadata[kind]': 'print_bulk',
-		'metadata[color]': color,
-		'metadata[tier]': tier,
-	});
+		'metadata[total]': total,
+		'metadata[pct_off]': pctOff,
+		'metadata[breakdown]': COLORS.filter((c) => counts[c] > 0)
+			.map((c) => `${c}:${counts[c]}`)
+			.join(','),
+	};
+	// One line item per edition ordered, all at the volume-tier unit price.
+	let li = 0;
+	for (const c of COLORS) {
+		if (counts[c] <= 0) continue;
+		const p = `line_items[${li}]`;
+		form[`${p}[quantity]`] = counts[c];
+		form[`${p}[price_data][currency]`] = 'usd';
+		form[`${p}[price_data][unit_amount]`] = unit;
+		form[`${p}[price_data][tax_behavior]`] = 'exclusive';
+		form[`${p}[price_data][product_data][name]`] =
+			`Father's Heart Bible — ${titleCase(c)} Paperback`;
+		form[`${p}[price_data][product_data][description]`] =
+			`Bulk (${total} copies, ${pctOff}% off) · Free shipping`;
+		form[`${p}[price_data][product_data][images][0]`] = COVER[c];
+		form[`${p}[price_data][product_data][tax_code]`] = TAX_CODE;
+		li++;
+	}
+	const formStr = encodeForm(form);
 
 	const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
 		method: 'POST',
@@ -112,7 +134,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'Stripe-Version': '2024-12-18.acacia',
 		},
-		body: form,
+		body: formStr,
 	});
 	const data = (await res.json()) as { url?: string; error?: { message?: string } };
 	if (!res.ok || !data.url) {
