@@ -27,9 +27,10 @@ const editions = [
 // Bulk tiers — per-unit price MUST match functions/print-checkout.ts PRICE_CENTS.
 // ⚠️ PLACEHOLDER prices off the $39.99 retail — Kevin sets the real numbers.
 const tiers = [
-	{ qty: 10, unit: 34.99 },
-	{ qty: 50, unit: 29.99 },
-	{ qty: 100, unit: 27.99 },
+	{ qty: 25, unit: 25.99 },
+	{ qty: 50, unit: 22.99 },
+	{ qty: 100, unit: 20.99 },
+	{ qty: 250, unit: 17.99 },
 ];
 
 const RETAIL = '$39.99';
@@ -97,7 +98,7 @@ const RETAIL = '$39.99';
 
 					<!-- Quantity -->
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">2 · Choose a quantity</p>
-					<div class="grid grid-cols-3 gap-3 mb-6">
+					<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
 						{tiers.map((t, i) => (
 							<button type="button" class="bulk-tier rounded-xl text-center" data-tier={t.qty} data-total={(t.qty * t.unit).toFixed(2)} aria-pressed={i === 0 ? 'true' : 'false'} style="font-family: var(--font-sans); padding: 0.9rem 0.5rem; border: 1.5px solid var(--color-hairline); background: #fff; cursor: pointer;">
 								<span style="display: block; font-size: 1.35rem; font-weight: 700; color: var(--color-ink);">{t.qty}</span>
@@ -109,14 +110,14 @@ const RETAIL = '$39.99';
 					<!-- Summary + checkout -->
 					<div class="flex flex-wrap items-center justify-between gap-4 pt-4" style="border-top: 1px solid var(--color-hairline);">
 						<div>
-							<span style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem;">Total</span>
+							<span style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem;">Total · free shipping</span>
 							<div data-total-out style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700;"></div>
 						</div>
 						<button type="button" data-checkout class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-brand); color: #fff; padding: 0.8rem 1.8rem; border: 0; cursor: pointer; font-size: 1rem;">Checkout →</button>
 					</div>
 					<p data-bulk-msg style="font-family: var(--font-sans); font-size: 0.85rem; color: var(--color-muted); margin: 0.75rem 0 0; display: none;"></p>
 				</div>
-				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.8rem; margin-top: 1rem;">Prices shown are placeholders pending final bulk pricing. Shipping is collected at checkout; each bulk order is a single edition.</p>
+				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.8rem; margin-top: 1rem;">Free shipping included · sales tax calculated at checkout · one edition per bulk order. Need more than 250? <a href="mailto:hello@spiritmediapublishing.com?subject=FHB%20bulk%20order%20(250%2B)" style="color: var(--color-brand); text-decoration: underline;">Contact us</a>.</p>
 			</div>
 		</Section>
 	</main>
@@ -127,8 +128,8 @@ const RETAIL = '$39.99';
 		const root = document.querySelector('[data-bulk]');
 		if (!root) return;
 		let color = 'plum';
-		let tier = 10;
-		let total = '349.90';
+		let tier = 25;
+		let total = '649.75';
 		const fmt = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 		const out = root.querySelector('[data-total-out]');
 		const msg = root.querySelector('[data-bulk-msg]');

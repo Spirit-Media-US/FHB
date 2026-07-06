@@ -21,12 +21,19 @@ interface Env {
 const COLORS = ['plum', 'charcoal', 'white'] as const;
 type Color = (typeof COLORS)[number];
 
-// Per-unit price in cents, by bulk tier. PLACEHOLDER discount curve off $39.99.
+// Best-practice church/ministry volume tiers (25/50/100/250), ~35–60% off the
+// $39.99 retail, FREE SHIPPING baked into the per-unit price.
+// ⚠️ Confirm these clear POD unit cost before go-live. MUST match print.astro `tiers`.
 const PRICE_CENTS: Record<number, number> = {
-	10: 3499, // ~12% off
-	50: 2999, // ~25% off
-	100: 2799, // ~30% off
+	25: 2599, // ~35% off
+	50: 2299, // ~43% off
+	100: 2099, // ~48% off
+	250: 1799, // ~55% off
 };
+
+// Physical books have no book-specific Stripe tax code; use General – Tangible
+// Goods. Stripe Tax then applies each state's rules for tangible goods.
+const TAX_CODE = 'txcd_99999999';
 
 const COVER: Record<Color, string> = {
 	plum: 'https://assets.spiritmediapublishing.com/FHB/print/edition-plum.webp',
@@ -77,12 +84,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		mode: 'payment',
 		success_url: `${origin}/print?order=success`,
 		cancel_url: `${origin}/print?order=canceled`,
+		// Stripe Tax auto-calculates sales tax from the shipping address.
+		'automatic_tax[enabled]': 'true',
 		'line_items[0][quantity]': tier,
 		'line_items[0][price_data][currency]': 'usd',
 		'line_items[0][price_data][unit_amount]': unit,
+		// Prices are tax-exclusive (US convention) — tax is added on top at checkout.
+		'line_items[0][price_data][tax_behavior]': 'exclusive',
 		'line_items[0][price_data][product_data][name]': `Father's Heart Bible — ${titleCase(color)} Paperback`,
-		'line_items[0][price_data][product_data][description]': `Bulk order of ${tier} copies (${titleCase(color)} edition)`,
+		'line_items[0][price_data][product_data][description]': `Bulk order of ${tier} copies (${titleCase(color)} edition) · Free shipping`,
 		'line_items[0][price_data][product_data][images][0]': COVER[color],
+		'line_items[0][price_data][product_data][tax_code]': TAX_CODE,
+		// Free shipping (baked into the per-unit price); address still collected
+		// for tax calculation + fulfillment.
 		'shipping_address_collection[allowed_countries][0]': 'US',
 		'phone_number_collection[enabled]': 'true',
 		'metadata[kind]': 'print_bulk',
