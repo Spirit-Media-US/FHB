@@ -142,7 +142,7 @@ function markFather(text: string, phrases: string[]): string {
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Volume discounts — the more you order, the more you save</p>
 					<div class="grid grid-cols-3 gap-2 mb-6">
 						{tiers.map((t) => (
-							<div class="tier-card rounded-xl text-center" data-tier-min={t.qty} style="padding: 0.7rem 0.4rem; border: 1.5px solid var(--color-hairline); background: #fff;">
+							<div class="tier-card rounded-xl text-center" data-tier-min={t.qty} style="padding: 0.7rem 0.4rem; border: 1.5px solid #ffd0e0; background: #ffe9f0;">
 								<span style="display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.02em; color: #a0004c;">Save {t.pct}%</span>
 								<span style="display: block; font-size: 1.15rem; font-weight: 700; color: var(--color-ink); margin-top: 0.1rem; line-height: 1.1;">{t.qty.toLocaleString()}+</span>
 								<span style="display: block; font-size: 0.78rem; color: var(--color-muted);">${t.unit.toFixed(2)} ea</span>
@@ -212,8 +212,8 @@ function markFather(text: string, phrases: string[]): string {
 		const cards = [...root.querySelectorAll('.tier-card')];
 		const highlight = (min) => cards.forEach((c) => {
 			const on = min !== null && Number(c.dataset.tierMin) === min;
-			c.style.borderColor = on ? 'var(--color-brand)' : 'var(--color-hairline)';
-			c.style.background = on ? 'rgba(182,0,87,0.06)' : '#fff';
+			c.style.borderColor = on ? 'var(--color-brand)' : '#ffd0e0';
+			c.style.background = on ? '#ffd0e0' : '#ffe9f0';
 		});
 
 		function recompute() {
