@@ -92,9 +92,18 @@ const RETAIL = '$39.99';
 				</div>
 
 				<div class="rounded-2xl p-6 md:p-8" style="background: #fff; border: 1px solid var(--color-hairline);" data-bulk>
-					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.3rem;">Choose how many of each edition</p>
-					<p style="font-family: var(--font-sans); font-size: 0.78rem; color: var(--color-muted); margin: 0 0 1.25rem;">{ladder}</p>
+					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Volume discounts — the more you order, the more you save</p>
+					<div class="grid grid-cols-3 gap-2 mb-6">
+						{tiers.map((t) => (
+							<div class="tier-card rounded-xl text-center" data-tier-min={t.qty} style="padding: 0.7rem 0.4rem; border: 1.5px solid var(--color-hairline); background: #fff;">
+								<span style="display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.02em; color: #a0004c;">Save {t.pct}%</span>
+								<span style="display: block; font-size: 1.15rem; font-weight: 700; color: var(--color-ink); margin-top: 0.1rem; line-height: 1.1;">{t.qty.toLocaleString()}+</span>
+								<span style="display: block; font-size: 0.78rem; color: var(--color-muted);">${t.unit.toFixed(2)} ea</span>
+							</div>
+						))}
+					</div>
 
+					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Choose how many of each edition</p>
 					<div style="display: flex; flex-direction: column; gap: 0.65rem;">
 						{editions.map((e) => (
 							<div class="flex items-center gap-3">
@@ -124,7 +133,7 @@ const RETAIL = '$39.99';
 
 		<!-- ═══════════════ PEOPLE BAND (variety of readers with FHB) ═══════════════ -->
 		<div class="grid grid-cols-1 sm:grid-cols-3">
-			<img src="https://assets.spiritmediapublishing.com/FHB/print/people-1.webp" alt="A woman reading the Father's Heart Bible by a sunlit window" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/print-band-white.webp" alt="A man reading the White edition of the Father's Heart Bible in a cafe" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
 			<img src="https://assets.spiritmediapublishing.com/FHB/print/people-2.webp" alt="A father and son reading the Father's Heart Bible together" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
 			<img src="https://assets.spiritmediapublishing.com/FHB/print/people-3.webp" alt="A grandmother and granddaughter reading the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
 		</div>
@@ -153,10 +162,17 @@ const RETAIL = '$39.99';
 		const saveEl = root.querySelector('[data-save]');
 		const msg = root.querySelector('[data-bulk-msg]');
 		const btn = root.querySelector('[data-checkout]');
+		const cards = [...root.querySelectorAll('.tier-card')];
+		const highlight = (min) => cards.forEach((c) => {
+			const on = min !== null && Number(c.dataset.tierMin) === min;
+			c.style.borderColor = on ? 'var(--color-brand)' : 'var(--color-hairline)';
+			c.style.background = on ? 'rgba(182,0,87,0.06)' : '#fff';
+		});
 
 		function recompute() {
 			const total = counts.plum + counts.charcoal + counts.white;
 			const tier = tierFor(total);
+			highlight(tier ? tier.min : null);
 			if (countEl) countEl.textContent = String(total);
 			if (tier) {
 				if (saveEl) saveEl.textContent = 'Save ' + tier.pct + '%';
