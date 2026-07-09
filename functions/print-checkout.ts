@@ -9,9 +9,8 @@
 // The COMBINED total across all editions AND bindings sets the volume tier
 // (mix & match). ONE consistent discount ladder (10–40%) applies to both
 // bindings, each priced off its own retail — paperback $39.99, hardback
-// $44.99 with a $27.00 floor at the top tier (a true 40% would be $26.99).
-// One Stripe line item per edition+binding ordered. Physical goods: Checkout
-// collects
+// $44.99. One Stripe line item per edition+binding ordered. Physical goods:
+// Checkout collects
 // payment + a US shipping address; fulfillment is off-Stripe (POD / manual).
 // Prices are authoritative HERE (server-side) so the browser can't tamper.
 //
@@ -32,7 +31,7 @@ type Binding = (typeof BINDINGS)[number];
 // MUST match src/pages/print.astro `tiers`.
 const MIN_QTY = 25;
 const TIERS: { min: number; pct: number; pb: number; hb: number }[] = [
-	{ min: 1000, pct: 40, pb: 2399, hb: 2700 }, // HB floored at $27.00
+	{ min: 1000, pct: 40, pb: 2399, hb: 2699 },
 	{ min: 500, pct: 35, pb: 2599, hb: 2924 },
 	{ min: 250, pct: 30, pb: 2799, hb: 3149 },
 	{ min: 100, pct: 25, pb: 2999, hb: 3374 }, // deliberate 10-pt cliff at 100

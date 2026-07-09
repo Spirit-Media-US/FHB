@@ -31,7 +31,6 @@ const editions = [
 // Volume ladder — the COMBINED total across all editions and bindings sets
 // the tier. ONE consistent discount % applies to both bindings, each off its
 // own retail (unit = paperback off $39.99, unitHb = hardback off $44.99).
-// HB 1000+ is floored at a flat $27.00 (a true 40% would be $26.99).
 // MUST match functions/print-checkout.ts TIERS.
 const tiers = [
 	{ qty: 25, pct: 10, unit: 35.99, unitHb: 40.49 },
@@ -39,7 +38,7 @@ const tiers = [
 	{ qty: 100, pct: 25, unit: 29.99, unitHb: 33.74 },
 	{ qty: 250, pct: 30, unit: 27.99, unitHb: 31.49 },
 	{ qty: 500, pct: 35, unit: 25.99, unitHb: 29.24 },
-	{ qty: 1000, pct: 40, unit: 23.99, unitHb: 27.0 },
+	{ qty: 1000, pct: 40, unit: 23.99, unitHb: 26.99 },
 ];
 
 const RETAIL = '$39.99';
@@ -222,7 +221,7 @@ function markFather(text: string, phrases: string[]): string {
 		const RETAIL_PB = 39.99;
 		const RETAIL_HB = 44.99;
 		const TIERS = [
-			{ min: 1000, pct: 40, unit: 23.99, unitHb: 27.0 },
+			{ min: 1000, pct: 40, unit: 23.99, unitHb: 26.99 },
 			{ min: 500, pct: 35, unit: 25.99, unitHb: 29.24 },
 			{ min: 250, pct: 30, unit: 27.99, unitHb: 31.49 },
 			{ min: 100, pct: 25, unit: 29.99, unitHb: 33.74 },
