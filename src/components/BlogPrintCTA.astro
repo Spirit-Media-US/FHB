@@ -1,0 +1,40 @@
+---
+// "Now in Print" ad — shown at the foot of a blog post when the post has
+// `printCta: true`. A single cohesive ad card (photo + copy + button) that
+// replaces the standing Free-to-Read <BlogCTA> for print-promoting posts.
+// Reusable across the Father-blog series.
+const img = 'https://assets.spiritmediapublishing.com/FHB/print/print-band-white.webp';
+---
+
+<aside class="my-12 rounded-2xl overflow-hidden grid md:grid-cols-2 items-stretch"
+       style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+  <img
+    src={img}
+    alt="A reader holds the white print edition of the Father's Heart Bible, its cover reading “Father's Heart Bible — An Intimate Translation.”"
+    class="w-full h-56 md:h-full object-cover"
+    loading="lazy" decoding="async"
+  />
+  <div class="px-6 py-10 lg:px-10 lg:py-12 text-center md:text-left flex flex-col justify-center">
+    <p class="text-xs font-semibold uppercase tracking-widest mb-3"
+       style="color: #a04060; font-family: var(--font-sans);">
+      Now in Print
+    </p>
+    <p class="text-2xl md:text-3xl font-light leading-tight"
+       style="font-family: var(--font-serif); color: var(--color-ink);">
+      Hold the Father&rsquo;s heart in your hands
+    </p>
+    <p class="mt-4 text-base lg:text-lg leading-relaxed"
+       style="font-family: var(--font-sans); color: var(--color-muted);">
+      The complete Father&rsquo;s Heart Bible is now available in three print editions &mdash;
+      a translation made to reveal the Father&rsquo;s heart on every page.
+    </p>
+    <a
+      href="https://fathersheartbible.com/print/"
+      class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90 self-center md:self-start"
+      style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);"
+    >
+      Order Your Copy
+      <span aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+</aside>
