@@ -7,7 +7,7 @@
 //     → { disabled: true } when no Stripe key is bound (dev / not-yet-live)
 //
 // The COMBINED total across all editions AND bindings sets the volume tier
-// (mix & match). ONE consistent discount ladder (15–40%) applies to both
+// (mix & match). ONE consistent discount ladder (10–40%) applies to both
 // bindings, each priced off its own retail — paperback $39.99, hardback
 // $44.99 with a $27.00 floor at the top tier (a true 40% would be $26.99).
 // One Stripe line item per edition+binding ordered. Physical goods: Checkout
@@ -35,9 +35,9 @@ const TIERS: { min: number; pct: number; pb: number; hb: number }[] = [
 	{ min: 1000, pct: 40, pb: 2399, hb: 2700 }, // HB floored at $27.00
 	{ min: 500, pct: 35, pb: 2599, hb: 2924 },
 	{ min: 250, pct: 30, pb: 2799, hb: 3149 },
-	{ min: 100, pct: 25, pb: 2999, hb: 3374 },
-	{ min: 50, pct: 20, pb: 3199, hb: 3599 },
-	{ min: 25, pct: 15, pb: 3399, hb: 3824 },
+	{ min: 100, pct: 25, pb: 2999, hb: 3374 }, // deliberate 10-pt cliff at 100
+	{ min: 50, pct: 15, pb: 3399, hb: 3824 },
+	{ min: 25, pct: 10, pb: 3599, hb: 4049 },
 ];
 const tierFor = (total: number) => TIERS.find((t) => total >= t.min) ?? null;
 

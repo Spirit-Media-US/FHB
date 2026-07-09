@@ -34,8 +34,8 @@ const editions = [
 // HB 1000+ is floored at a flat $27.00 (a true 40% would be $26.99).
 // MUST match functions/print-checkout.ts TIERS.
 const tiers = [
-	{ qty: 25, pct: 15, unit: 33.99, unitHb: 38.24 },
-	{ qty: 50, pct: 20, unit: 31.99, unitHb: 35.99 },
+	{ qty: 25, pct: 10, unit: 35.99, unitHb: 40.49 },
+	{ qty: 50, pct: 15, unit: 33.99, unitHb: 38.24 },
 	{ qty: 100, pct: 25, unit: 29.99, unitHb: 33.74 },
 	{ qty: 250, pct: 30, unit: 27.99, unitHb: 31.49 },
 	{ qty: 500, pct: 35, unit: 25.99, unitHb: 29.24 },
@@ -225,8 +225,8 @@ function markFather(text: string, phrases: string[]): string {
 			{ min: 500, pct: 35, unit: 25.99, unitHb: 29.24 },
 			{ min: 250, pct: 30, unit: 27.99, unitHb: 31.49 },
 			{ min: 100, pct: 25, unit: 29.99, unitHb: 33.74 },
-			{ min: 50, pct: 20, unit: 31.99, unitHb: 35.99 },
-			{ min: 25, pct: 15, unit: 33.99, unitHb: 38.24 },
+			{ min: 50, pct: 15, unit: 33.99, unitHb: 38.24 },
+			{ min: 25, pct: 10, unit: 35.99, unitHb: 40.49 },
 		];
 		const tierFor = (t) => TIERS.find((x) => t >= x.min) || null;
 		const fmt = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
