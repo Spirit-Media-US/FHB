@@ -2,6 +2,7 @@
 import AuthorBio from '../../../components/AuthorBio.astro';
 import BlogAudioPlayer from '../../../components/BlogAudioPlayer.astro';
 import BlogCTA from '../../../components/BlogCTA.astro';
+import BlogPrintCTA from '../../../components/BlogPrintCTA.astro';
 import ChapterEmbed from '../../../components/ChapterEmbed.astro';
 import FeatureChapter from '../../../components/FeatureChapter.astro';
 import HowToHubCards from '../../../components/HowToHubCards.astro';
@@ -482,7 +483,7 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
                 ? <PullQuote quote={seg.quote} attribution={seg.attribution} />
                 : <div set:html={seg.html} />
         )}
-        <BlogCTA />
+        {post.printCta ? <BlogPrintCTA /> : <BlogCTA />}
       </div>
     </section>
 

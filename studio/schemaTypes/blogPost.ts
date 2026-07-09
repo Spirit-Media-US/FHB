@@ -260,6 +260,13 @@ export default {
 			description:
 				'When the editorial approval was recorded. Stale (>12 months) or missing fails the AEO audit. Bump on every substantive rewrite.',
 		},
+		{
+			name: 'printCta',
+			title: 'Show "Now in Print" ad at foot',
+			type: 'boolean',
+			description:
+				'When true, the post ends with the "Now in Print" ad (photo + link to /print/) instead of the standing "Free to Read" CTA. Use for print-promoting posts; the Free-to-Read / Listen invitation still appears mid-post.',
+		},
 	],
 	preview: {
 		select: { title: 'title', subtitle: 'author', date: 'publishDate' },
