@@ -3,43 +3,47 @@ import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Three paperback editions live on Amazon. Hardback editions follow once published.
+// Three editions on Amazon, each in paperback (asin) and hardback (hbAsin).
 const editions = [
 	{
 		color: 'Plum',
 		slug: 'plum',
 		asin: 'B0H6S2MCY9',
+		hbAsin: 'B0H86787P1',
 		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-plum.webp',
 	},
 	{
 		color: 'Charcoal',
 		slug: 'charcoal',
 		asin: 'B0H6S72QPD',
+		hbAsin: 'B0H86Z7Y9B',
 		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-charcoal.webp',
 	},
 	{
 		color: 'White',
 		slug: 'white',
 		asin: 'B0H6S51GHR',
+		hbAsin: 'B0H86GKMBP',
 		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-white.webp',
 	},
 ];
 
-// Bulk tiers — per-unit price MUST match functions/print-checkout.ts PRICE_CENTS.
-// ⚠️ PLACEHOLDER prices off the $39.99 retail — Kevin sets the real numbers.
-// Volume ladder — combined total across editions sets the per-unit price.
+// Volume ladder — the COMBINED total across all editions and bindings sets
+// the tier. ONE consistent discount % applies to both bindings, each off its
+// own retail (unit = paperback off $39.99, unitHb = hardback off $44.99).
+// HB 1000+ is floored at a flat $27.00 (a true 40% would be $26.99).
 // MUST match functions/print-checkout.ts TIERS.
 const tiers = [
-	{ qty: 25, unit: 32.79, pct: 18 },
-	{ qty: 50, unit: 29.99, pct: 25 },
-	{ qty: 100, unit: 27.99, pct: 30 },
-	{ qty: 250, unit: 25.99, pct: 35 },
-	{ qty: 500, unit: 23.99, pct: 40 },
-	{ qty: 1000, unit: 21.99, pct: 45 },
+	{ qty: 25, pct: 15, unit: 33.99, unitHb: 38.24 },
+	{ qty: 50, pct: 20, unit: 31.99, unitHb: 35.99 },
+	{ qty: 100, pct: 25, unit: 29.99, unitHb: 33.74 },
+	{ qty: 250, pct: 30, unit: 27.99, unitHb: 31.49 },
+	{ qty: 500, pct: 35, unit: 25.99, unitHb: 29.24 },
+	{ qty: 1000, pct: 40, unit: 23.99, unitHb: 27.0 },
 ];
-const ladder = tiers.map((t) => `${t.qty.toLocaleString()}+ save ${t.pct}%`).join(' · ');
 
 const RETAIL = '$39.99';
+const RETAIL_HB = '$44.99';
 
 // FHB scripture cards — the Father's voice from first page to last (text pulled
 // from the reader content).
@@ -92,25 +96,33 @@ function markFather(text: string, phrases: string[]): string {
 		<Section variant="light">
 			<div class="text-center mb-10">
 				<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Single Copies</p>
-				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Three paperback editions</h2>
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Three editions, two bindings</h2>
 			</div>
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-10 max-w-4xl mx-auto">
 				{editions.map((e) => (
 					<div class="flex flex-col items-center text-center rounded-2xl p-6" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
-						<img src={e.img} alt={`Father's Heart Bible — ${e.color} paperback edition`} width="700" height="1170" loading="lazy" decoding="async" class="block" style="width: 180px; height: auto; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.18));" />
-						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 1.25rem 0 0.25rem;">{e.color} Edition</h3>
-						<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.95rem; margin: 0 0 1rem;">Paperback · {RETAIL}</p>
-						<a
-							href={`https://www.amazon.com/dp/${e.asin}`}
-							target="_blank"
-							rel="noopener"
-							class="inline-flex items-center justify-center rounded-full font-semibold"
-							style="font-family: var(--font-sans); background: var(--color-brand); color: #fff; padding: 0.7rem 1.4rem; text-decoration: none; font-size: 0.95rem;"
-						>Buy on Amazon →</a>
+						<img src={e.img} alt={`Father's Heart Bible — ${e.color} edition`} width="700" height="1170" loading="lazy" decoding="async" class="block" style="width: 180px; height: auto; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.18));" />
+						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 1.25rem 0 1rem;">{e.color} Edition</h3>
+						<div class="flex flex-col gap-2 w-full" style="max-width: 13rem;">
+							<a
+								href={`https://www.amazon.com/dp/${e.asin}`}
+								target="_blank"
+								rel="noopener"
+								class="inline-flex items-center justify-center rounded-full font-semibold"
+								style="font-family: var(--font-sans); background: var(--color-brand); color: #fff; padding: 0.7rem 1.4rem; text-decoration: none; font-size: 0.9rem;"
+							>Paperback · {RETAIL} →</a>
+							<a
+								href={`https://www.amazon.com/dp/${e.hbAsin}`}
+								target="_blank"
+								rel="noopener"
+								class="inline-flex items-center justify-center rounded-full font-semibold"
+								style="font-family: var(--font-sans); background: #fff; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.7rem 1.4rem; text-decoration: none; font-size: 0.9rem;"
+							>Hardback · {RETAIL_HB} →</a>
+						</div>
 					</div>
 				))}
 			</div>
-			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin-top: 2rem;">Hardback editions coming soon.</p>
+			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin-top: 2rem;">Both bindings ship from Amazon.</p>
 		</Section>
 
 		<!-- ═══════════════ SCRIPTURE CARDS ═══════════════ -->
@@ -135,7 +147,7 @@ function markFather(text: string, phrases: string[]): string {
 				<div class="text-center mb-8">
 					<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Bulk Order Discounts</p>
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Order in Bulk and Save</h2>
-					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 32rem;">Bring the Father's heart to your whole business, congregation, or community. Mix and match editions — your combined total sets the discount.</p>
+					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 32rem;">Bring the Father's heart to your whole business, congregation, or community. Mix and match editions and bindings — your combined total sets the discount.</p>
 				</div>
 
 				<div class="rounded-2xl p-6 md:p-8" style="background: #fff; border: 1px solid var(--color-hairline);" data-bulk>
@@ -145,7 +157,8 @@ function markFather(text: string, phrases: string[]): string {
 							<div class="tier-card rounded-xl text-center" data-tier-min={t.qty} style="padding: 0.7rem 0.4rem; border: 1.5px solid #ffd0e0; background: #ffe9f0;">
 								<span style="display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.02em; color: #a0004c;">Save {t.pct}%</span>
 								<span style="display: block; font-size: 1.15rem; font-weight: 700; color: var(--color-ink); margin-top: 0.1rem; line-height: 1.1;">{t.qty.toLocaleString()}+</span>
-								<span style="display: block; font-size: 0.78rem; color: var(--color-muted);">${t.unit.toFixed(2)} ea</span>
+								<span style="display: block; font-size: 0.74rem; color: var(--color-muted); margin-top: 0.15rem;">PB ${t.unit.toFixed(2)} ea</span>
+								<span style="display: block; font-size: 0.74rem; color: var(--color-muted);">HB ${t.unitHb.toFixed(2)} ea</span>
 							</div>
 						))}
 					</div>
@@ -157,9 +170,20 @@ function markFather(text: string, phrases: string[]): string {
 								<img src={e.img} alt="" width="700" height="1170" loading="lazy" decoding="async" style="width: 68px; height: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.18));" />
 								<span style="flex: 1; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">English Paperback ({e.color} Edition)</span>
 								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
-									<button type="button" class="qty-step" data-color={e.slug} data-dir="-1" aria-label={`Fewer ${e.color}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
-									<input type="number" class="qty-in" data-color={e.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.color} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
-									<button type="button" class="qty-step" data-color={e.slug} data-dir="1" aria-label={`More ${e.color}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
+									<button type="button" class="qty-step" data-color={e.slug} data-dir="-1" aria-label={`Fewer ${e.color} paperback`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
+									<input type="number" class="qty-in" data-color={e.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.color} paperback quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
+									<button type="button" class="qty-step" data-color={e.slug} data-dir="1" aria-label={`More ${e.color} paperback`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
+								</div>
+							</div>
+						))}
+						{editions.map((e) => (
+							<div class="flex items-center gap-3">
+								<img src={e.img} alt="" width="700" height="1170" loading="lazy" decoding="async" style="width: 68px; height: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.18));" />
+								<span style="flex: 1; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">English Hardback ({e.color} Edition)</span>
+								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
+									<button type="button" class="qty-step" data-color={`${e.slug}_hb`} data-dir="-1" aria-label={`Fewer ${e.color} hardback`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
+									<input type="number" class="qty-in" data-color={`${e.slug}_hb`} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.color} hardback quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
+									<button type="button" class="qty-step" data-color={`${e.slug}_hb`} data-dir="1" aria-label={`More ${e.color} hardback`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
 								</div>
 							</div>
 						))}
@@ -174,7 +198,7 @@ function markFather(text: string, phrases: string[]): string {
 					</div>
 					<p data-bulk-msg style="font-family: var(--font-sans); font-size: 0.85rem; color: var(--color-muted); margin: 0.75rem 0 0; display: none;"></p>
 				</div>
-				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.8rem; margin-top: 1rem;">25-copy minimum · free shipping · sales tax calculated at checkout · mix editions freely. Need more than 1,000? <a href="mailto:hello@spiritmediapublishing.com?subject=FHB%20bulk%20order%20(1000%2B)" style="color: var(--color-brand); text-decoration: underline;">Contact us</a>.</p>
+				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.8rem; margin-top: 1rem;">25-copy minimum · free shipping · sales tax calculated at checkout · mix editions and bindings freely. Need more than 1,000? <a href="mailto:hello@spiritmediapublishing.com?subject=FHB%20bulk%20order%20(1000%2B)" style="color: var(--color-brand); text-decoration: underline;">Contact us</a>.</p>
 			</div>
 		</Section>
 
@@ -192,18 +216,23 @@ function markFather(text: string, phrases: string[]): string {
 		const root = document.querySelector('[data-bulk]');
 		if (!root) return;
 		const MIN = 25;
-		// total → per-unit price + % (highest tier the total qualifies for). Mirrors print-checkout.ts.
+		// Combined total → tier. One consistent % for both bindings, each off its
+		// own retail (unit = paperback, unitHb = hardback). Mirrors print-checkout.ts.
+		const RETAIL_PB = 39.99;
+		const RETAIL_HB = 44.99;
 		const TIERS = [
-			{ min: 1000, unit: 21.99, pct: 45 },
-			{ min: 500, unit: 23.99, pct: 40 },
-			{ min: 250, unit: 25.99, pct: 35 },
-			{ min: 100, unit: 27.99, pct: 30 },
-			{ min: 50, unit: 29.99, pct: 25 },
-			{ min: 25, unit: 32.79, pct: 18 },
+			{ min: 1000, pct: 40, unit: 23.99, unitHb: 27.0 },
+			{ min: 500, pct: 35, unit: 25.99, unitHb: 29.24 },
+			{ min: 250, pct: 30, unit: 27.99, unitHb: 31.49 },
+			{ min: 100, pct: 25, unit: 29.99, unitHb: 33.74 },
+			{ min: 50, pct: 20, unit: 31.99, unitHb: 35.99 },
+			{ min: 25, pct: 15, unit: 33.99, unitHb: 38.24 },
 		];
 		const tierFor = (t) => TIERS.find((x) => t >= x.min) || null;
 		const fmt = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-		const counts = { plum: 0, charcoal: 0, white: 0 };
+		const counts = { plum: 0, charcoal: 0, white: 0, plum_hb: 0, charcoal_hb: 0, white_hb: 0 };
+		const PB_KEYS = ['plum', 'charcoal', 'white'];
+		const HB_KEYS = ['plum_hb', 'charcoal_hb', 'white_hb'];
 		const out = root.querySelector('[data-total-out]');
 		const countEl = root.querySelector('[data-count]');
 		const saveEl = root.querySelector('[data-save]');
@@ -217,13 +246,16 @@ function markFather(text: string, phrases: string[]): string {
 		});
 
 		function recompute() {
-			const total = counts.plum + counts.charcoal + counts.white;
+			const pbTotal = PB_KEYS.reduce((s, k) => s + counts[k], 0);
+			const hbTotal = HB_KEYS.reduce((s, k) => s + counts[k], 0);
+			const total = pbTotal + hbTotal;
 			const tier = tierFor(total);
 			highlight(tier ? tier.min : null);
 			if (countEl) countEl.textContent = String(total);
 			if (tier) {
-				if (saveEl) saveEl.textContent = 'Save ' + tier.pct + '%';
-				if (out) out.textContent = fmt(total * tier.unit);
+				const saved = pbTotal * (RETAIL_PB - tier.unit) + hbTotal * (RETAIL_HB - tier.unitHb);
+				if (saveEl) saveEl.textContent = 'Save ' + tier.pct + '% (' + fmt(saved) + ')';
+				if (out) out.textContent = fmt(pbTotal * tier.unit + hbTotal * tier.unitHb);
 				if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
 				if (msg) msg.style.display = 'none';
 			} else {
