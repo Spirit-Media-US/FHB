@@ -193,6 +193,65 @@ export default {
 						},
 					},
 				},
+				{
+					type: 'object',
+					name: 'blogTable',
+					title: 'Table',
+					description:
+						'Gold-Level milestone #30 — extraction table (translation-rendering, verse reference, comparison, word study, timeline, diagnostic, data). AI engines extract tables at very high rates. Cells accept [text](url) markdown links, e.g. [Romans 8:15](https://fathersheartbible.com/read/romans/8).',
+					fields: [
+						{
+							name: 'caption',
+							title: 'Caption (optional)',
+							type: 'string',
+							description: 'Short label rendered above the table (also read by screen readers).',
+						},
+						{
+							name: 'headerRow',
+							title: 'First row is a header row',
+							type: 'boolean',
+							initialValue: true,
+						},
+						{
+							name: 'rows',
+							title: 'Rows',
+							type: 'array',
+							of: [
+								{
+									type: 'object',
+									name: 'tableRow',
+									title: 'Row',
+									fields: [
+										{
+											name: 'cells',
+											title: 'Cells',
+											type: 'array',
+											of: [{ type: 'string' }],
+											validation: (Rule: any) => Rule.required().min(2),
+										},
+									],
+									preview: {
+										select: { cells: 'cells' },
+										prepare(s: any) {
+											return { title: (s.cells || []).join(' | ').slice(0, 80) };
+										},
+									},
+								},
+							],
+							validation: (Rule: any) => Rule.required().min(2),
+						},
+					],
+					preview: {
+						select: { caption: 'caption', rows: 'rows' },
+						prepare(s: any) {
+							const first = ((s.rows && s.rows[0] && s.rows[0].cells) || []).join(' | ');
+							return {
+								title: `Table: ${s.caption || first.slice(0, 60)}`,
+								subtitle: `${(s.rows || []).length} rows`,
+							};
+						},
+					},
+				},
 			],
 		},
 		{
