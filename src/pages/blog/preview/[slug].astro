@@ -229,6 +229,42 @@ type BodySegment =
 	| { kind: 'image'; src: string; alt: string; caption?: string }
 	| { kind: 'pullquote'; quote: string; attribution?: string };
 
+// blogTable → real <table> (Gold milestone #30 — AI engines extract tables at
+// very high rates). Cells are plain strings; [text](url) renders as a link so
+// verse tables can point into /read. Wide tables scroll inside their own box.
+function renderBlogTable(b: any): string {
+	const esc = (s: any) =>
+		String(s ?? '')
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;');
+	const cell = (s: any) =>
+		esc(s).replace(
+			/\[([^\]]+)\]\((\/[^)\s]+|https?:\/\/[^)\s]+)\)/g,
+			'<a href="$2" class="underline underline-offset-2">$1</a>',
+		);
+	const rows = Array.isArray(b?.rows) ? b.rows : [];
+	if (!rows.length) return '';
+	const hasHeader = b?.headerRow !== false;
+	let out =
+		'<div class="my-8 overflow-x-auto"><table class="w-full border-collapse text-sm" style="font-family: var(--font-sans);">';
+	if (b?.caption) {
+		out += `<caption class="mb-2 text-left text-sm font-semibold" style="caption-side: top; color: var(--color-muted);">${cell(b.caption)}</caption>`;
+	}
+	rows.forEach((r: any, i: number) => {
+		const cells = Array.isArray(r?.cells) ? r.cells : [];
+		const isHead = hasHeader && i === 0;
+		const tag = isHead ? 'th' : 'td';
+		const style = isHead
+			? 'border-bottom: 2px solid var(--color-hairline); color: var(--color-ink); text-align: left;'
+			: 'border-bottom: 1px solid var(--color-hairline); color: var(--color-ink);';
+		out += `<tr>${cells.map((c: any) => `<${tag} class="px-3 py-2 align-top" style="${style}">${cell(c)}</${tag}>`).join('')}</tr>`;
+	});
+	out += '</table></div>';
+	return out;
+}
+
 function segmentBody(blocks: any[]): BodySegment[] {
 	const segments: BodySegment[] = [];
 	let buf: any[] = [];
@@ -255,6 +291,9 @@ function segmentBody(blocks: any[]): BodySegment[] {
 		} else if (b?._type === 'pullQuote') {
 			flush();
 			segments.push({ kind: 'pullquote', quote: b.quote || '', attribution: b.attribution });
+		} else if (b?._type === 'blogTable') {
+			flush();
+			segments.push({ kind: 'html', html: renderBlogTable(b) });
 		} else {
 			buf.push(b);
 		}
@@ -296,8 +335,8 @@ const KEVIN_WHITE_AUTHOR = {
 		'https://kevinwhite.us/about/',
 		'https://www.linkedin.com/in/kevinwhiteus/',
 		'https://www.youtube.com/@KevinWhiteus',
-		'https://www.amazon.com/Fathers-Heart-Beloved-Identity-Heavenly-ebook/dp/B0GQJQLMTC',
-		'https://spiritmediapublishing.com',
+		'https://thekevinwhiteshow.podbean.com/',
+		'https://www.amazon.com/stores/author/B08LZYTR2B',
 	],
 };
 
