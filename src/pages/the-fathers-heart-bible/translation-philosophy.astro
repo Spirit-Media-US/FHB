@@ -1,0 +1,243 @@
+---
+// Phase-2 AEO content block (Kevin-approved scope 2026-07-13) — the dedicated
+// translation-philosophy page (the esv.org/about/translation-philosophy pattern
+// engines cite on "which translation" queries). Content is CONDENSED FROM THE
+// APPROVED COPY on /the-fathers-heart-bible/ (its §"faithful translation",
+// §method, and FAQ blocks) — no new translation claims introduced here.
+import AuthorBio from '../../components/AuthorBio.astro';
+import FeatureChapter from '../../components/FeatureChapter.astro';
+import ReviewLink from '../../components/ReviewLink.astro';
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/the-fathers-heart-bible/translation-philosophy';
+const TITLE = "Translation Philosophy — How the Father's Heart Bible™ Is Translated";
+const DESCRIPTION =
+	"The Father's Heart Bible™ translation philosophy: an interpretive translation from the original Hebrew, Aramaic, and Greek that renders God as Father wherever Scripture reveals Him.";
+const PUBLISHED = '2026-07-13';
+const MODIFIED = '2026-07-13';
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg';
+const HERO_ALT = 'An open Bible with study notes in soft light';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: 'Founder & CEO, Spirit Media Publishing',
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+const FAQS = [
+	{
+		question: "Is the Father's Heart Bible a paraphrase?",
+		answer:
+			'No. FHB is an interpretive translation grounded in the original Hebrew, Greek, and Aramaic — not a loosely reworded paraphrase. Translation choices are footnoted and traceable to the source text, and the work follows a documented methodology of canon-wide consistency.',
+	},
+	{
+		question:
+			"Why does the Father's Heart Bible say 'our Father' where other Bibles say 'the LORD'?",
+		answer:
+			"The Father's Heart Bible™ is an interpretive English translation that reveals God as Father wherever Scripture reveals Him. Where the Hebrew text uses YHWH — the personal covenant name — in a relational context, FHB renders it 'our Father,' recovering the warmth the name carried for Israel and continuing the apostles' own hermeneutic on the page. Elsewhere the customary rendering is kept, and Adonai and Kurios are always rendered 'Lord.'",
+	},
+	{
+		question: 'What original texts is it translated from?',
+		answer:
+			'It is translated from the original languages — the Hebrew and Aramaic of the Old Testament and the Greek of the New Testament — not adapted from any existing English Bible. Old Testament readings are weighed against the Masoretic Hebrew; the New Testament follows the modern critical text carried in the major modern translations, keeping company with their consensus where manuscripts differ.',
+	},
+	{
+		question: "Who translated the Father's Heart Bible?",
+		answer:
+			'It was produced through a structured, rule-governed translation process built for this work, in which AI language tools rendered the text and footnotes directly from the original Hebrew, Aramaic, and Greek, guided by more than 160 translation rules, with successive review passes and difficult readings cross-checked against the Hebrew and independent references. The rules and every interpretive decision are the work of Kevin White of Spirit Media Publishing, who led the process and takes responsibility for every rendering; it is not the work of a translation committee.',
+	},
+	{
+		question: 'Does it add to or take away from Scripture?',
+		answer:
+			"No. The Father's Heart Bible™ does not add to Scripture's meaning, nor take away from it. It is a faithful translation of the original Hebrew, Aramaic, and Greek that recovers an emphasis already present in the text: the revelation of God as Father. Renderings that make that revelation explicit are marked with brief notes so the reader sees both what the text says and what has been drawn from it.",
+	},
+];
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: "How the Father's Heart Bible™ Is Translated — Translation Philosophy",
+	description: DESCRIPTION,
+	image: OG_IMG,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	about: {
+		'@type': 'Book',
+		'@id': 'https://fathersheartbible.com/#book',
+		name: "The Father's Heart Bible: An Intimate Translation",
+	},
+	datePublished: PUBLISHED,
+	dateModified: MODIFIED,
+	inLanguage: 'en-US',
+	articleSection: 'About the Translation',
+	keywords:
+		"father's heart bible translation, FHB translation philosophy, bible translation that reveals God as father, interpretive translation",
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: "The Father's Heart Bible",
+			item: 'https://fathersheartbible.com/the-fathers-heart-bible/',
+		},
+		{ '@type': 'ListItem', position: 3, name: 'Translation Philosophy', item: PAGE_URL },
+	],
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [articleSchema, breadcrumbSchema, faqSchema];
+const TOC = [
+	{ id: 'what-kind', label: 'What kind of translation' },
+	{ id: 'the-names', label: 'The names English flattened' },
+	{ id: 'the-rules', label: 'The rendering rules' },
+	{ id: 'the-text', label: 'Textual basis' },
+	{ id: 'the-process', label: 'How it was produced' },
+	{ id: 'faq', label: 'FAQ' },
+];
+---
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={PUBLISHED}
+	articleSection="About the Translation"
+	articleTags={['translation philosophy', "father's heart bible", 'bible translation']}
+	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
+			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
+		</section>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/the-fathers-heart-bible/" class="hover:underline">The Father&rsquo;s Heart Bible</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Translation Philosophy</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">About the Translation</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">How the Father&rsquo;s Heart Bible&trade; Is Translated</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; leading the Father&rsquo;s Heart Bible&trade; translation</span>
+					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<strong style="color: var(--color-ink);">The Father&rsquo;s Heart Bible&trade; is an interpretive English translation from the original Hebrew, Aramaic, and Greek that renders God as <em>Father</em> wherever Scripture reveals Him.</strong> It does not add to Scripture&rsquo;s meaning, nor take away from it; it recovers an emphasis already present in the text. On the familiar spectrum from word-for-word to thought-for-thought, it renders the meaning of the original in clear, contemporary English &mdash; and at chosen places makes explicit the Father&rsquo;s identity, presence, and voice the text already carries, with brief notes so the reader sees both what the text says and what has been drawn from it. This page explains the philosophy behind those choices: what was translated, by what rules, from which texts, and by whom.
+				</p>
+
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">FHB lets the Hebrew and Greek speak a distinction they always made &mdash; between a deity to be appeased and a Father to be received &mdash; and shows its work in footnotes as it does.</p>
+				</aside>
+
+				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>
+					<ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
+						{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}
+					</ul>
+				</nav>
+
+				<h2 id="what-kind" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">What kind of translation is it?</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">An <em>interpretive translation</em> &mdash; not a paraphrase, and not a word-for-word interlinear. It renders the meaning of the original languages in clear, contemporary English, and at chosen places makes explicit what the text already carries about the Father. Consider the best-known verse in the Bible: &ldquo;For God so loved the world that he gave his one and only Son&rdquo; (John 3:16). The Greek word rendered &ldquo;God&rdquo; is <em>theos</em>, and here it plainly means the Father &mdash; the One who sends and gives the Son. The Father&rsquo;s Heart Bible&trade; makes the obvious explicit: <em>&ldquo;For our Father so loved the world that he gave his one and only Son.&rdquo;</em> This is not addition. It is revealing what the text has been saying the whole time. Its emphasis on the Father is its distinctive purpose, and it stands within historic, Trinitarian Christian belief.</p>
+
+				<h2 id="the-names" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The names centuries of English flattened</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The original languages carry distinctions that centuries of English flattened. Hebrew speaks of God by many names: <em>Elohim</em>, <em>El Shaddai</em>, <em>Adonai</em>, the covenant name <em>YHWH</em> &mdash; and also, tenderly, as <em>Ab</em>, Father. The translation tradition gathered nearly all of these under &ldquo;God&rdquo; and &ldquo;the LORD.&rdquo; Something true was preserved, but something true was also lost: a near and personal Father came to sound like a remote and impersonal deity. The apostles already read these differences and applied them &mdash; Joel 2:32&rsquo;s promise in the covenant name is applied to Jesus in Romans 10:13. The Father&rsquo;s Heart Bible&trade; does that work on the page rather than leaving it for the reader to assemble.</p>
+
+				<FeatureChapter book="John" slug="john" chapter={3} verseLimit={16} />
+
+				<h2 id="the-rules" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The rendering rules</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Where a word for God stands in a clearly relational or covenantal setting, it is rendered <em>&ldquo;our Father.&rdquo;</em> Elsewhere the customary rendering is kept &mdash; and <em>Adonai</em> and <em>Kurios</em> are always rendered &ldquo;Lord.&rdquo; At Genesis 1:1, &ldquo;God&rdquo; (<em>Elohim</em>) is rendered &ldquo;our Heavenly Father.&rdquo; Some choices are marked with a brief note, including where the original carries no divine name, so the reader sees both what the text says and what has been drawn from it. These notes serve the reader rather than the scholar: they point to a key choice or a difference among the manuscripts. Some renderings are therefore theological as well as lexical &mdash; stated openly, footnoted, and consistent across the whole canon.</p>
+
+				<h2 id="the-text" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The textual basis</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The Father&rsquo;s Heart Bible&trade; is translated from the original languages &mdash; the Hebrew and Aramaic of the Old Testament and the Greek of the New Testament &mdash; not adapted from any existing English Bible. Its Old Testament readings are weighed against the Masoretic Hebrew, and its New Testament follows the modern critical text as carried in the major modern translations; where the manuscripts differ, it keeps company with their consensus. Standard Hebrew and Greek reference works are gratefully acknowledged; its English text, notes, and headings are its own.</p>
+
+				<h2 id="the-process" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">How it was produced &mdash; and who answers for it</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The Father&rsquo;s Heart Bible&trade; was produced through a structured, rule-governed translation process built for this work, bringing the consistency and reach of modern language technology to the ancient task of translation. Within that process, AI language tools rendered the text and footnotes directly from the original Hebrew, Aramaic, and Greek, guided by more than 160 translation rules; each book was then carried through successive passes, its most difficult readings cross-checked against the Hebrew and independent references, before being reviewed and finalized. The rules and every interpretive decision are the work of <a href="/the-fathers-heart-bible/leadership/" style="color: var(--color-brand);" class="hover:underline">Kevin White</a> of Spirit Media Publishing, who led the process; other readers reviewed it and offered feedback. It is not the work of a translation committee; every rendering is our own, and our own responsibility. We say this plainly because trust is earned by showing your work &mdash; which is also why the choices are footnoted on the page where you can weigh them yourself.</p>
+
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Test it against the text</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">The best way to weigh a translation philosophy is to read it. Open any chapter free, with audio and footnotes, and see the Father the text has revealed all along.</p>
+					<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a>
+				</aside>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="space-y-6">
+					{FAQS.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Keep going: read <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">the full story of the Father&rsquo;s Heart Bible&trade;</a>, meet the <a href="/the-fathers-heart-bible/leadership/" style="color: var(--color-brand);" class="hover:underline">leadership</a>, browse <a href="/guides/father-heart-of-god-resources/" style="color: var(--color-brand);" class="hover:underline">father heart of God resources</a>, or get a <a href="/print/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">A fresh translation from the original Hebrew, Aramaic, and Greek that reveals God as a loving Father &mdash; free online with audio, no app, no account.</p>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<ReviewLink class="mb-10" />
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>
