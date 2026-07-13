@@ -238,16 +238,12 @@ const jsonLd = [
 				<h1 class="post-title text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
 					{msg.title}
 				</h1>
-				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
-					<span>
-						Received and written by <span class="font-semibold" style="color: var(--color-ink);">{receivedBy}</span>
-					</span>
-					{publishDate && (
-						<>
-							<span>&middot;</span>
-							<span>{publishDate}</span>
-						</>
-					)}
+				<div class="mt-5 pb-8 text-sm border-b" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<p class="m-0">
+						By <span class="font-semibold" style="color: var(--color-ink);">{receivedBy}</span>,
+						founder of Spirit Media Publishing, the publisher of Father&rsquo;s Heart
+						Bible&trade;.{publishDate && <> Updated {publishDate}.</>}
+					</p>
 				</div>
 			</div>
 		</section>
@@ -282,16 +278,16 @@ const jsonLd = [
 						Every message is measured against the written word. These passages anchor this one
 						&mdash; from the Father&rsquo;s Heart Bible&trade;, free to read online.
 					</p>
-					<div class="space-y-10">
+					<div class="space-y-6">
 						{scriptures.map((s: any) => (
-							<figure class="m-0 pl-6" style="border-left: 3px solid #f9d6e0;">
-								<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: #a04060; font-family: var(--font-sans);">
+							<figure class="m-0 px-6 py-6 lg:px-8 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+								<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: #a04060; font-family: var(--font-sans);">
 									{s.reference}
 								</p>
 								<blockquote class="m-0 text-xl leading-relaxed font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
 									{s.text}
 								</blockquote>
-								<figcaption class="mt-3 text-sm" style="font-family: var(--font-sans);">
+								<figcaption class="mt-4 text-sm" style="font-family: var(--font-sans);">
 									<a href={s.readUrl} class="font-semibold no-underline hover:underline" style="color: var(--color-brand);">
 										Read the whole chapter &rarr;
 									</a>
