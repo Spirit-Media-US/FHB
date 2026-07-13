@@ -124,6 +124,10 @@ export interface Props {
 	galleryBottom?: GroupPhoto[];
 	galleryBottomCreditHtml?: string;
 	keepReadingHtml?: string;
+	whichBibleHeading?: string;
+	whichBibleIntroHtml?: string;
+	whichBibleRows?: { edition: string; bestFor: string; style: string; access: string }[];
+	whichBibleNoteHtml?: string;
 	faqs: GroupFaq[];
 	resourcesHeading?: string;
 	resourcesIntroHtml?: string;
@@ -187,6 +191,12 @@ const {
 	galleryBottom = [],
 	galleryBottomCreditHtml,
 	keepReadingHtml,
+	// "Which Bible for this reader" — honest edition-comparison section (the gift/product
+	// intent AI engines cite publishers on). Rows: { edition, bestFor, style, access }.
+	whichBibleHeading,
+	whichBibleIntroHtml,
+	whichBibleRows = [],
+	whichBibleNoteHtml,
 	faqs,
 	resourcesHeading,
 	resourcesIntroHtml,
@@ -206,6 +216,7 @@ const toc = [
 	offersBlocks.length > 0 && { label: 'What the Father offers', href: '#offers' },
 	{ label: 'What the Father says', href: '#father-says' },
 	{ label: 'A prayer', href: '#prayer' },
+	whichBibleRows.length > 0 && { label: 'Which Bible?', href: '#which-bible' },
 	{ label: 'FAQ', href: '#faq' },
 ].filter(Boolean) as { label: string; href: string }[];
 
@@ -315,7 +326,79 @@ const filmSchema = {
 		url: 'https://fathersheartbible.com/',
 	},
 };
-const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList, filmSchema];
+// Book schema with real offers — the product entity AI engines cite publishers on
+// (the Zondervan/Tyndale pattern). Audience-aware per page; publisher links to the
+// SMP Organization @id so the cross-site entity graph resolves.
+const bookSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Book',
+	'@id': 'https://fathersheartbible.com/#book',
+	name: "The Father's Heart Bible: An Intimate Translation",
+	description:
+		'A fresh English Bible translation from the original Hebrew, Aramaic, and Greek that reveals God as a loving Father wherever Scripture reveals Him — free to read and listen to online, with print editions available.',
+	inLanguage: 'en',
+	url: 'https://fathersheartbible.com/',
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	audience: { '@type': 'PeopleAudience', audienceType: group },
+	potentialAction: {
+		'@type': 'ReadAction',
+		target: 'https://fathersheartbible.com/read',
+	},
+	workExample: [
+		{
+			'@type': 'Book',
+			bookFormat: 'https://schema.org/EBook',
+			name: "The Father's Heart Bible — Free Online (with audio)",
+			url: 'https://fathersheartbible.com/read',
+			offers: {
+				'@type': 'Offer',
+				price: '0',
+				priceCurrency: 'USD',
+				availability: 'https://schema.org/InStock',
+				url: 'https://fathersheartbible.com/read',
+			},
+		},
+		{
+			'@type': 'Book',
+			bookFormat: 'https://schema.org/Paperback',
+			name: "The Father's Heart Bible — Paperback",
+			url: 'https://fathersheartbible.com/print',
+			offers: {
+				'@type': 'Offer',
+				price: '39.99',
+				priceCurrency: 'USD',
+				availability: 'https://schema.org/InStock',
+				url: 'https://fathersheartbible.com/print',
+			},
+		},
+		{
+			'@type': 'Book',
+			bookFormat: 'https://schema.org/Hardcover',
+			name: "The Father's Heart Bible — Hardback",
+			url: 'https://fathersheartbible.com/print',
+			offers: {
+				'@type': 'Offer',
+				price: '44.99',
+				priceCurrency: 'USD',
+				availability: 'https://schema.org/InStock',
+				url: 'https://fathersheartbible.com/print',
+			},
+		},
+	],
+};
+const jsonLd = [
+	collectionSchema,
+	breadcrumbSchema,
+	faqSchema,
+	versesItemList,
+	filmSchema,
+	bookSchema,
+];
 
 // Internal cross-links — sibling pages in this group's hub section (or faith series),
 // for topical clustering + link-equity distribution across the "A Father For" series.
@@ -615,6 +698,47 @@ const relatedGroups: Group[] = _sibSlugs
 							</ul>
 						</div>
 					)}
+				</div>
+			</section>
+		)}
+
+		<!-- Which Bible for this reader — honest edition comparison (gift/product intent) -->
+		{whichBibleRows.length > 0 && (
+			<section id="which-bible" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-4xl">
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{whichBibleHeading || `Which Bible for ${groupLower}?`}</h2>
+					{whichBibleIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={whichBibleIntroHtml}></p>
+					)}
+					<div class="mt-7 overflow-x-auto rounded-2xl" style="border: 1px solid rgba(0,0,0,0.08);">
+						<table class="w-full text-left" style="font-family: var(--font-sans); border-collapse: collapse; min-width: 640px;">
+							<thead>
+								<tr style="background-color: var(--color-surface);">
+									<th scope="col" class="px-4 py-3 text-sm font-semibold" style="color: var(--color-ink);">Edition</th>
+									<th scope="col" class="px-4 py-3 text-sm font-semibold" style="color: var(--color-ink);">Best for</th>
+									<th scope="col" class="px-4 py-3 text-sm font-semibold" style="color: var(--color-ink);">Translation style</th>
+									<th scope="col" class="px-4 py-3 text-sm font-semibold" style="color: var(--color-ink);">Access &amp; cost</th>
+								</tr>
+							</thead>
+							<tbody>
+								{whichBibleRows.map((r, i) => (
+									<tr style={`border-top: 1px solid rgba(0,0,0,0.06); ${i === 0 ? 'background-color: rgba(212,175,55,0.07);' : ''}`}>
+										<td class="px-4 py-3 text-sm font-medium align-top" style="color: var(--color-ink);" set:html={r.edition}></td>
+										<td class="px-4 py-3 text-sm align-top" style="color: var(--color-muted);" set:html={r.bestFor}></td>
+										<td class="px-4 py-3 text-sm align-top" style="color: var(--color-muted);" set:html={r.style}></td>
+										<td class="px-4 py-3 text-sm align-top" style="color: var(--color-muted);" set:html={r.access}></td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+					{whichBibleNoteHtml && (
+						<p class="mt-4 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={whichBibleNoteHtml}></p>
+					)}
+					<div class="mt-6 flex flex-wrap gap-3">
+						<a href="https://fathersheartbible.com/read" class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="background-color: var(--color-brand); color: #fff; font-family: var(--font-sans);">Read the Father's Heart Bible™ free</a>
+						<a href="/print" class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="border: 1.5px solid var(--color-brand); color: var(--color-brand); font-family: var(--font-sans);">Get the print edition</a>
+					</div>
 				</div>
 			</section>
 		)}
