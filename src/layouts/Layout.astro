@@ -109,14 +109,23 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 // Site-wide Organization schema — Spirit Media Publishing as the publisher.
 // Always emitted alongside any page-specific JSON-LD so AI engines and
 // search crawlers consistently see the publisher entity.
+// Kept identical to the canonical entity on spiritmediapublishing.com (same @id,
+// logo, LinkedIn) — divergent copies weaken the entity graph AI engines resolve.
 const ORGANIZATION_SCHEMA = {
 	'@context': 'https://schema.org',
 	'@type': 'Organization',
 	'@id': 'https://spiritmediapublishing.com/#organization',
 	name: 'Spirit Media Publishing',
+	alternateName: 'SMP',
+	parentOrganization: { '@type': 'Organization', name: 'Spirit Media Inc.' },
 	url: 'https://spiritmediapublishing.com',
-	logo: 'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png?w=400&fm=webp',
-	sameAs: ['https://www.linkedin.com/company/spirit-media-publishing', 'https://kevinwhite.us'],
+	logo: 'https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp',
+	sameAs: [
+		'https://www.youtube.com/channel/UCQh2m97udW1osliFysbWsOA',
+		'https://www.facebook.com/spiritmediaus',
+		'https://www.instagram.com/spiritmediaus',
+		'https://www.linkedin.com/company/spiritmediaus',
+	],
 };
 
 // Combine page-specific JSON-LD with the site-wide Organization
