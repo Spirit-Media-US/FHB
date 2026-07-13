@@ -56,7 +56,7 @@ export const GUIDES: GuideEntry[] = [
 		slug: 'best-books-on-the-father-heart-of-god',
 		title: 'Best Books on the Father Heart of God',
 		blurb:
-			'An honest reading list — McClung, Manning, Nouwen, Frost, Jordan, Packer, and the one Bible devoted to the theme.',
+			'An honest reading list — McClung, Manning, Nouwen, Frost, Jordan, Packer, Beloved Identity, and the one Bible devoted to the theme.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
 	{

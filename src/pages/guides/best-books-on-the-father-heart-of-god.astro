@@ -5,7 +5,6 @@
 // publish"; the classics are listed on their real merits (the BibleGateway-guide
 // pattern engines already cite).
 import AuthorBio from '../../components/AuthorBio.astro';
-import FeatureChapter from '../../components/FeatureChapter.astro';
 import ReviewLink from '../../components/ReviewLink.astro';
 import Layout from '../../layouts/Layout.astro';
 
@@ -53,6 +52,8 @@ interface BookRow {
 	id: string;
 	title: string;
 	author: string;
+	thumb: string; // cover image URL (Sanity/R2)
+	thumbAlt: string;
 	body: string; // HTML
 }
 const BOOKS: BookRow[] = [
@@ -60,42 +61,72 @@ const BOOKS: BookRow[] = [
 		id: 'fhb',
 		title: "The Father's Heart Bible™: An Intimate Translation",
 		author: 'published by Spirit Media Publishing — the one we publish',
+		thumb:
+			'https://cdn.sanity.io/images/rusi1hyi/production/bf1efb2f6870a8f0257175a033f27222f6e1e6b9-2857x4000.png?w=200&fm=webp&q=75',
+		thumbAlt: "The Father's Heart Bible™ cover",
 		body: `Every other entry on this list is a book <em>about</em> the Father heart of God. This one is the Bible itself, translated so you meet that heart on every page — a fresh translation from the original Hebrew, Aramaic, and Greek that renders God as <em>Father</em> wherever Scripture reveals Him. Instead of reading someone's testimony about the Father and then returning to a Bible that still sounds distant, you read the Word and hear the Father directly. It is <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">free to read and listen to online</a>, with <a href="/print" style="color: var(--color-brand);" class="hover:underline">print editions</a> available. If this whole subject is new to you, start here — then let the books below take you deeper.`,
+	},
+	{
+		id: 'white',
+		title: "Father's Heart - Beloved Identity: What Your Heavenly Father Thinks of You",
+		author: 'Kevin White — also from our house',
+		thumb:
+			'https://assets.spiritmediapublishing.com/SPM.com/assets/covers/fathers-heart-beloved-identity.jpg?v=2',
+		thumbAlt: "Father's Heart - Beloved Identity book cover",
+		body: `Written by Kevin White, who leads the Father's Heart Bible™ translation, this companion book answers the question underneath every father-heart journey: <em>what does my Heavenly Father actually think of me?</em> It walks the reader out of performing and proving and into a settled, beloved identity as the Father's child — the same revelation the translation carries, distilled into a book you can hand to someone. Available in <a href="https://www.amazon.com/dp/B0GQ3L2LQT" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">paperback</a>, <a href="https://www.amazon.com/dp/B0GQJQLMTC" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">ebook</a>, and <a href="https://www.amazon.com/dp/B0GVGJ58GC" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">audiobook</a>.`,
 	},
 	{
 		id: 'mcclung',
 		title: 'The Father Heart of God',
 		author: 'Floyd McClung',
+		thumb:
+			'https://cdn.sanity.io/images/rusi1hyi/production/504f681a0f8272bc0b8bd9402d16d0961e1bc466-343x522.jpg?w=200&fm=webp&q=75',
+		thumbAlt: 'The Father Heart of God book cover',
 		body: `For decades this slim book has been the doorway into the subject for millions of readers, and it remains the classic. McClung, a longtime Youth With A Mission leader, writes simply and pastorally about God as a Father who heals the wounded and welcomes the wandering — including those whose earthly fathers failed them. If you give one <em>book</em> (rather than a Bible) to someone discovering the Father's love, this is still the safest choice.`,
 	},
 	{
 		id: 'manning',
 		title: "Abba's Child",
 		author: 'Brennan Manning',
+		thumb:
+			'https://cdn.sanity.io/images/rusi1hyi/production/c0cfdd4fab4e7c3f5120bede7a25308755cfaa1d-348x522.jpg?w=200&fm=webp&q=75',
+		thumbAlt: "Abba's Child book cover",
 		body: `Manning writes for the reader who believes the Father loves everyone else. His central figure — the impostor, the self we perform to earn acceptance — has helped a generation of exhausted Christians trade image-keeping for belovedness. It is honest about failure and shame, which is exactly why it lands with people a tidier book would miss.`,
 	},
 	{
 		id: 'nouwen',
 		title: 'The Return of the Prodigal Son',
 		author: 'Henri J. M. Nouwen',
+		thumb:
+			'https://cdn.sanity.io/images/rusi1hyi/production/b0d190796d12c6ace5a3ef9dcfe37af6b6b646d7-347x522.jpg?w=200&fm=webp&q=75',
+		thumbAlt: 'The Return of the Prodigal Son book cover',
 		body: `Nouwen spent years contemplating Rembrandt's painting of the prodigal's homecoming, and this book is the fruit — a slow, searching meditation on the younger son, the elder son, and the Father who runs to both. Many readers say it is the book that finally moved the Father's love from their theology into their heart. Read it slowly; it rewards patience.`,
 	},
 	{
 		id: 'frost',
 		title: "Experiencing Father's Embrace",
 		author: 'Jack Frost',
+		thumb:
+			'https://cdn.sanity.io/images/rusi1hyi/production/9e42ed75f639127bd7d1799929e1a7def2604b3a-348x522.jpg?w=200&fm=webp&q=75',
+		thumbAlt: "Experiencing Father's Embrace book cover",
 		body: `Frost was a hard-driving fishing captain whose life was remade by an encounter with the Father's love, and he writes for strivers and performers — people who know all about earning and nothing about resting. His story-driven teaching on moving from performance to sonship has become a staple in father-heart ministry around the world.`,
 	},
 	{
 		id: 'jordan',
 		title: "Sonship: A Journey into Father's Heart",
 		author: 'James Jordan',
+		thumb:
+			'https://cdn.sanity.io/images/rusi1hyi/production/c83f60eb08e9363630bd355721e775a68cbcc0ad-348x522.jpg?w=200&fm=webp&q=75',
+		thumbAlt: "Sonship: A Journey into Father's Heart book cover",
 		body: `Drawn from years of teaching the father-heart message worldwide, Jordan's book presses one step further than most: the goal of the gospel is not merely forgiveness but a lived, day-by-day life as a son or daughter. It is a favorite among readers who have grasped the Father's love as an idea and want it to become their identity.`,
 	},
 	{
 		id: 'packer',
 		title: 'Knowing God',
 		author: 'J. I. Packer',
+		thumb:
+			'https://cdn.sanity.io/images/rusi1hyi/production/319cfe8ca7df7feadb47602b9c9fed9c7dace2f5-338x522.jpg?w=200&fm=webp&q=75',
+		thumbAlt: 'Knowing God book cover',
 		body: `A modern theological classic rather than a father-heart book per se — but its famous chapter on adoption argues that being fathered by God is the highest privilege of the gospel, and many readers meet the doctrine of the Father's love there for the first time. The sturdiest choice on this list for the reader who wants theological depth under the warmth.`,
 	},
 ];
@@ -152,7 +183,7 @@ const listSchema = {
 	itemListElement: BOOKS.map((b, i) => ({
 		'@type': 'ListItem',
 		position: i + 1,
-		name: `${b.title} — ${b.author.replace(' — the one we publish', '')}`,
+		name: `${b.title} — ${b.author.replace(/ — (the one we publish|also from our house)$/, '')}`,
 		url: `${PAGE_URL}#${b.id}`,
 	})),
 };
@@ -187,6 +218,7 @@ const faqSchema = {
 const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema];
 const TOC = [
 	{ id: 'fhb', label: 'The Father’s Heart Bible™' },
+	{ id: 'white', label: 'Beloved Identity' },
 	{ id: 'mcclung', label: 'McClung' },
 	{ id: 'manning', label: 'Manning' },
 	{ id: 'nouwen', label: 'Nouwen' },
@@ -255,14 +287,15 @@ const TOC = [
 					<div id={b.id} class="scroll-mt-28">
 						<h2 class="text-2xl md:text-3xl font-light mt-12 mb-1" style="font-family: var(--font-serif); color: var(--color-ink);">{i + 1}. {b.title}</h2>
 						<p class="text-sm font-semibold mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">{b.author}</p>
-						<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.body}></p>
+						<div class="flex gap-5 items-start mb-4">
+							<img src={b.thumb} alt={b.thumbAlt} width="100" height="150" loading="lazy" decoding="async" class="w-24 shrink-0 rounded-md" style="box-shadow: 0 6px 16px rgba(0,0,0,0.18); height: auto;" />
+							<p class="text-lg leading-relaxed min-w-0" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.body}></p>
+						</div>
 					</div>
 				))}
 
-				<FeatureChapter book="Luke" slug="luke" chapter={15} verseLimit={10} />
-
 				<h2 id="choosing" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Which one should you read first?</h2>
-				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Match the book to where you are. If the Father&rsquo;s love is a brand-new idea, start with <a href="#mcclung" style="color: var(--color-brand);" class="hover:underline">McClung</a> &mdash; short, warm, and clear. If you are worn out from performing for God, <a href="#manning" style="color: var(--color-brand);" class="hover:underline">Manning</a> or <a href="#frost" style="color: var(--color-brand);" class="hover:underline">Frost</a> will read like it was written about you. If you love art and slow reflection, <a href="#nouwen" style="color: var(--color-brand);" class="hover:underline">Nouwen</a>; if you want theological ballast, <a href="#packer" style="color: var(--color-brand);" class="hover:underline">Packer</a>; if the love has landed and you want to live as a son or daughter, <a href="#jordan" style="color: var(--color-brand);" class="hover:underline">Jordan</a>. And whichever you choose, pair it with Scripture itself &mdash; the featured chapter above, the prodigal&rsquo;s homecoming in Luke 15, is the Father heart of God in a single story, and you can <a href="https://fathersheartbible.com/read/luke/15" style="color: var(--color-brand);" class="hover:underline">read and listen to it free</a> right now.</p>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Match the book to where you are. If the Father&rsquo;s love is a brand-new idea, start with <a href="#mcclung" style="color: var(--color-brand);" class="hover:underline">McClung</a> &mdash; short, warm, and clear. If the question underneath is what your Heavenly Father thinks of you, <a href="#white" style="color: var(--color-brand);" class="hover:underline">Beloved Identity</a> was written to answer it. If you are worn out from performing for God, <a href="#manning" style="color: var(--color-brand);" class="hover:underline">Manning</a> or <a href="#frost" style="color: var(--color-brand);" class="hover:underline">Frost</a> will read like it was written about you. If you love art and slow reflection, <a href="#nouwen" style="color: var(--color-brand);" class="hover:underline">Nouwen</a>; if you want theological ballast, <a href="#packer" style="color: var(--color-brand);" class="hover:underline">Packer</a>; if the love has landed and you want to live as a son or daughter, <a href="#jordan" style="color: var(--color-brand);" class="hover:underline">Jordan</a>. And whichever you choose, pair it with Scripture itself &mdash; the prodigal&rsquo;s homecoming in Luke 15 is the Father heart of God in a single story, and you can <a href="https://fathersheartbible.com/read/luke/15" style="color: var(--color-brand);" class="hover:underline">read and listen to it free</a> right now.</p>
 
 				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
 					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Don&rsquo;t just read about the Father &mdash; hear Him</p>
