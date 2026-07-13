@@ -1,0 +1,300 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { urlFor } from '../lib/sanity';
+// Shared renderer for a Messages from the Father post — used by both
+// /words/[slug] (published) and /words/preview/[slug] (drafts) so the two
+// can never drift. The word itself renders whole, in Father-voice styling,
+// with zero scaffolding; supporting FHB scriptures, the optional prophecy-
+// training section, the series join form, and the read/print CTA follow it.
+import ShareBar from './ShareBar.astro';
+import WordsJoin from './WordsJoin.astro';
+
+interface Props {
+	msg: any;
+	noindex?: boolean;
+}
+const { msg, noindex = false } = Astro.props;
+
+const esc = (s: string) =>
+	s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+// Minimal portable-text renderer (blocks + strong/em/link marks). The word's
+// paragraphs get Father-voice styling; the training section gets standard prose
+// with h2/h3 support.
+function renderBlocks(blocks: any[], voice: 'word' | 'prose'): string {
+	if (!Array.isArray(blocks)) return '';
+	let html = '';
+	for (const block of blocks) {
+		if (!block || block._type !== 'block') continue;
+		const children = Array.isArray(block.children) ? block.children : [];
+		const markDefs = Array.isArray(block.markDefs) ? block.markDefs : [];
+		const linkByKey: Record<string, string> = {};
+		for (const md of markDefs) {
+			if (md && md._type === 'link' && md._key && md.href) linkByKey[md._key] = md.href;
+		}
+		const inner = children
+			.map((child: any) => {
+				if (!child) return '';
+				let text = esc(child.text || '');
+				const marks = Array.isArray(child.marks) ? child.marks : [];
+				if (marks.includes('strong')) text = `<strong>${text}</strong>`;
+				if (marks.includes('em')) text = `<em>${text}</em>`;
+				const linkKey = marks.find((m: any) => typeof m === 'string' && linkByKey[m]);
+				if (linkKey) {
+					const href = linkByKey[linkKey];
+					const isExternal =
+						/^https?:\/\//i.test(href) && !href.startsWith('https://fathersheartbible.com');
+					const targetAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+					text = `<a href="${href}" style="color: var(--color-brand);" class="hover:underline"${targetAttrs}>${text}</a>`;
+				}
+				return text;
+			})
+			.join('');
+		const style = block.style || 'normal';
+		if (voice === 'word') {
+			html += `<p class="text-xl leading-loose mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">${inner}</p>`;
+		} else if (style === 'h2') {
+			html += `<h2 class="text-2xl font-bold mt-12 mb-4 scroll-mt-24" style="font-family: var(--font-serif); color: var(--color-ink);">${inner}</h2>`;
+		} else if (style === 'h3') {
+			html += `<h3 class="text-xl font-bold mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">${inner}</h3>`;
+		} else {
+			html += `<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">${inner}</p>`;
+		}
+	}
+	return html;
+}
+
+const wordHtml = renderBlocks(msg.body || [], 'word');
+const trainingHtml = renderBlocks(msg.training || [], 'prose');
+const scriptures = Array.isArray(msg.supportingScriptures) ? msg.supportingScriptures : [];
+
+const formatDate = (dateString: string) =>
+	new Date(dateString).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+const publishDate = msg.publishDate ? formatDate(msg.publishDate) : '';
+
+const heroImage = msg.heroImage
+	? urlFor(msg.heroImage).width(1200).quality(72).format('webp').url()
+	: '';
+const heroImageMobile = msg.heroImage
+	? urlFor(msg.heroImage).width(640).quality(70).format('webp').url()
+	: '';
+
+const receivedBy = msg.receivedBy || 'Kevin White';
+const postUrl = `https://fathersheartbible.com/words/${msg.slug.current}`;
+
+// Same unified author entity as the blog (E-E-A-T: visible human steward).
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: 'Founder & CEO, Spirit Media Publishing',
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://thekevinwhiteshow.podbean.com/',
+		'https://www.amazon.com/stores/author/B08LZYTR2B',
+	],
+};
+
+const FHB_PUBLISHER = {
+	'@type': 'Organization',
+	'@id': 'https://fathersheartbible.com/#organization',
+	name: "Father's Heart Bible",
+	url: 'https://fathersheartbible.com',
+	logo: { '@type': 'ImageObject', url: 'https://fathersheartbible.com/fhb-logo.png' },
+	parentOrganization: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+};
+
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BlogPosting',
+		headline: msg.title,
+		description: msg.excerpt || msg.seoDescription || msg.title,
+		...(heroImage ? { image: heroImage } : {}),
+		author: KEVIN_WHITE_AUTHOR,
+		publisher: FHB_PUBLISHER,
+		url: postUrl,
+		mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
+		datePublished: msg.publishDate,
+		inLanguage: 'en-US',
+		genre: 'Devotional',
+		speakable: { '@type': 'SpeakableSpecification', cssSelector: ['.post-title', '.words-body'] },
+		isPartOf: {
+			'@type': 'CollectionPage',
+			'@id': 'https://fathersheartbible.com/words/#collection',
+			name: 'Messages from the Father',
+			url: 'https://fathersheartbible.com/words/',
+		},
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{
+				'@type': 'ListItem',
+				position: 2,
+				name: 'Messages from the Father',
+				item: 'https://fathersheartbible.com/words/',
+			},
+			{ '@type': 'ListItem', position: 3, name: msg.title, item: postUrl },
+		],
+	},
+];
+---
+
+<Layout
+	title={msg.seoTitle || `${msg.title} | Father's Heart Bible™`}
+	description={msg.seoDescription || msg.excerpt || 'A message from the Father, received in prayer and tested against Scripture.'}
+	ogDescription={msg.ogDescription || msg.excerpt}
+	image={heroImage || undefined}
+	imageAlt={msg.heroImage?.alt}
+	noindex={noindex}
+	jsonLd={jsonLd}
+	darkHero={!!heroImage}
+	preloadImageMobile={heroImageMobile || undefined}
+	preloadImageDesktop={heroImage || undefined}
+	pageType="article"
+	articleAuthor={receivedBy}
+	articlePublishedTime={msg.publishDate}
+	articleSection="Messages from the Father"
+>
+	<main id="main-content">
+		{heroImage && (
+			<div class="relative w-full overflow-hidden h-72 lg:h-[520px]">
+				<img
+					src={heroImage}
+					srcset={`${heroImageMobile} 640w, ${heroImage} 1200w`}
+					sizes="(max-width: 1023px) 640px, 1200px"
+					alt={msg.heroImage?.alt || msg.title}
+					class="absolute inset-0 w-full h-full object-cover"
+					style="object-position: center center;"
+					fetchpriority="high"
+					decoding="async"
+				/>
+				<div
+					class="absolute inset-x-0 top-0 z-10"
+					style="height: 220px; background: linear-gradient(to bottom, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.32) 45%, rgba(0,0,0,0));"
+				></div>
+			</div>
+		)}
+
+		<!-- HEADER -->
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<a
+					href="/words/"
+					class="inline-flex items-center gap-1.5 text-sm font-semibold hover:opacity-80 transition-opacity mb-5 no-underline"
+					style="color: var(--color-brand);"
+				>
+					&larr; Messages from the Father
+				</a>
+				{msg.audience && (
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: #a04060; font-family: var(--font-sans);">
+						A word for {msg.audience}
+					</p>
+				)}
+				<h1 class="post-title text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+					{msg.title}
+				</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>
+						Received and written by <span class="font-semibold" style="color: var(--color-ink);">{receivedBy}</span>
+					</span>
+					{publishDate && (
+						<>
+							<span>&middot;</span>
+							<span>{publishDate}</span>
+						</>
+					)}
+				</div>
+			</div>
+		</section>
+
+		<!-- THE WORD -->
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<article class="words-body mx-auto max-w-3xl">
+				<div set:html={wordHtml} />
+			</article>
+		</section>
+
+		<!-- SUPPORTING SCRIPTURES -->
+		{scriptures.length > 0 && (
+			<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-3xl">
+					<h2 class="text-2xl font-bold mb-8" style="font-family: var(--font-serif); color: var(--color-ink);">
+						Scriptures to enter in
+					</h2>
+					<div class="space-y-8">
+						{scriptures.map((s: any) => (
+							<figure class="m-0">
+								<blockquote class="m-0 px-6 py-5 lg:px-8 rounded-2xl text-lg leading-relaxed" style="background-color: #fdf2f5; border: 1px solid #f9d6e0; font-family: var(--font-serif); color: var(--color-ink);">
+									{s.text}
+								</blockquote>
+								<figcaption class="mt-2 text-sm" style="font-family: var(--font-sans);">
+									<a href={s.readUrl} class="font-semibold no-underline hover:underline" style="color: var(--color-brand);">
+										{s.reference} &mdash; Father&rsquo;s Heart Bible&trade; &rarr;
+									</a>
+								</figcaption>
+							</figure>
+						))}
+					</div>
+				</div>
+			</section>
+		)}
+
+		<!-- TRAINING -->
+		{trainingHtml && (
+			<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-3xl">
+					{msg.trainingTitle && (
+						<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: #a04060; font-family: var(--font-sans);">
+							Growing in the prophetic
+						</p>
+					)}
+					<div set:html={trainingHtml} />
+				</div>
+			</section>
+		)}
+
+		<!-- JOIN + FHB CTA -->
+		<section class="px-6 lg:px-8" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<WordsJoin />
+				<aside class="mb-12 px-6 py-8 rounded-2xl text-center" style="border: 1px solid var(--color-hairline);">
+					<p class="text-lg font-light max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">
+						Meet the Father on every page of His word.
+					</p>
+					<div class="mt-5 flex flex-wrap items-center justify-center gap-3" style="font-family: var(--font-sans);">
+						<a href="/read" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A;">
+							Read &amp; listen free online
+						</a>
+						<a href="/print/" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="border: 1px solid var(--color-hairline); color: var(--color-ink);">
+							Now in print &rarr;
+						</a>
+					</div>
+				</aside>
+			</div>
+		</section>
+
+		<ShareBar title={msg.title} url={postUrl} />
+	</main>
+</Layout>

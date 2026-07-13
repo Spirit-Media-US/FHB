@@ -3,6 +3,7 @@ import bibleTranslation from './bibleTranslation';
 import blogPost from './blogPost';
 import downloadContent from './downloadContent';
 import faq from './faq';
+import fatherMessage from './fatherMessage';
 import joinContent from './joinContent';
 import page from './page';
 import partner from './partner';
@@ -17,6 +18,7 @@ import siteSettings from './siteSettings';
 
 export const schemaTypes = [
 	blogPost,
+	fatherMessage,
 	bibleTranslation,
 	siteSettings,
 	page,
