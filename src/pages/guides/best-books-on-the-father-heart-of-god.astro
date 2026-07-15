@@ -15,11 +15,11 @@ const DESCRIPTION =
 const PUBLISHED = '2026-07-13';
 const MODIFIED = '2026-07-15';
 
-const HERO_BASE =
-	'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg';
-const HERO_ALT = 'An open Bible resting in warm light';
-const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
-const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+// Hero uses OUR FHB mock-up (T001) per the mock-ups-only hero rule, hosted on R2.
+const HERO_1400 = 'https://assets.spiritmediapublishing.com/FHB/heroes/best-books-hero-1400.webp';
+const HERO_640 = 'https://assets.spiritmediapublishing.com/FHB/heroes/best-books-hero-640.webp';
+const HERO_ALT = 'A young man smiling as he holds the Father’s Heart Bible at his desk';
+const OG_IMG = 'https://assets.spiritmediapublishing.com/FHB/heroes/best-books-hero-og.jpg';
 
 const formatDate = (iso: string) =>
 	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
@@ -57,6 +57,15 @@ interface BookRow {
 	body: string; // HTML
 	known?: boolean; // "Personally Known" badge — an author Kevin & Shelly know personally
 }
+// Books whose author/ministry also appears on the FH Ministries page — cross-linked.
+const MINISTRY_OF: Record<string, string> = {
+	'abba-foundation': 'wood',
+	'abba-factor': 'wood',
+	steen: 'steen',
+	frost: 'shiloh',
+	jordan: 'fatherheart',
+	fll: 'fll',
+};
 const BOOKS: BookRow[] = [
 	{
 		id: 'fhb',
@@ -121,20 +130,11 @@ const BOOKS: BookRow[] = [
 		body: `Drawn from years of teaching the father-heart message worldwide, Jordan's book presses one step further than most: the goal of the gospel is not merely forgiveness but a lived, day-by-day life as a son or daughter. It is a favorite among readers who have grasped the Father's love as an idea and want it to become their identity.`,
 	},
 	{
-		id: 'packer',
-		title: 'Knowing God',
-		author: 'J. I. Packer',
-		thumb:
-			'https://cdn.sanity.io/images/rusi1hyi/production/319cfe8ca7df7feadb47602b9c9fed9c7dace2f5-338x522.jpg?w=200&fm=webp&q=75',
-		thumbAlt: 'Knowing God book cover',
-		body: `A modern theological classic rather than a father-heart book per se — but its famous chapter on adoption argues that being fathered by God is the highest privilege of the gospel, and many readers meet the doctrine of the Father's love there for the first time. The sturdiest choice on this list for the reader who wants theological depth under the warmth.`,
-	},
-	{
 		id: 'abba-foundation',
 		title: 'The Abba Foundation',
 		author: 'Chiqui Polo-Wood',
 		known: true,
-		thumb: 'https://m.media-amazon.com/images/I/81JEJqGlECL._SY522_.jpg',
+		thumb: 'https://assets.spiritmediapublishing.com/FHB/book-covers/abba-foundation.webp',
 		thumbAlt: 'The Abba Foundation book cover',
 		body: `Subtitled <em>Knowing the Father through the Eyes of Jesus</em>, this is the opening book of the Wood family's Abba Series and the most on-theme of the three. Dr. Chiqui Polo-Wood — a pastor and academic dean who, with her husband Kerry, has spent decades discipling leaders toward the Father's heart — builds a framework for meeting God as the same Abba Jesus revealed Him to be. Warm, ordered, and pastoral, it is a strong first read for anyone who wants the Father's love with a teacher's clarity underneath it. Available on <a href="https://www.amazon.com/dp/B079Z8J4YN" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Amazon</a>.`,
 	},
@@ -143,7 +143,7 @@ const BOOKS: BookRow[] = [
 		title: 'The Abba Factor',
 		author: 'Kerry Wood',
 		known: true,
-		thumb: 'https://m.media-amazon.com/images/I/81OKdKyVWvL._SY522_.jpg',
+		thumb: 'https://assets.spiritmediapublishing.com/FHB/book-covers/abba-factor.webp',
 		thumbAlt: 'The Abba Factor book cover',
 		body: `The second book in the Abba Series, <em>Knowing Yourself Through the Eyes of Jesus</em>, turns from who the Father is to who you are in His sight. Dr. Kerry Wood writes for the believer who grasps the Father's love as doctrine but hasn't yet let it settle their identity — the same ground our own <a href="#white" style="color: var(--color-brand);" class="hover:underline">Beloved Identity</a> walks, from a different teacher's hand. It pairs naturally with <a href="#abba-foundation" style="color: var(--color-brand);" class="hover:underline">The Abba Foundation</a>. Available on <a href="https://www.amazon.com/dp/B07B8RJDMG" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Amazon</a>.`,
 	},
@@ -152,9 +152,17 @@ const BOOKS: BookRow[] = [
 		title: 'First Love Reset',
 		author: 'Dr. Sandra Steen',
 		known: true,
-		thumb: 'https://m.media-amazon.com/images/I/71LIg9wj-xL._SY522_.jpg',
+		thumb: 'https://assets.spiritmediapublishing.com/FHB/book-covers/steen.webp',
 		thumbAlt: 'First Love Reset book cover',
 		body: `<em>8 Strategies to Renew Your Heart, Refresh Your Spirit, and Reignite Your Passion for God</em> — Dr. Sandra Steen's book is less a study of the Father than an invitation back to Him when love has cooled to routine. Practical and pastoral, it's built for the reader who once burned bright and wants that first-love nearness restored. A fitting companion to the reflective titles above when the need is renewal rather than introduction. Available on <a href="https://www.amazon.com/dp/B0FS3YCG5S" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Amazon</a>.`,
+	},
+	{
+		id: 'fll',
+		title: "Father's Love Letter: An Intimate Message from God to You",
+		author: 'Barry Adams',
+		thumb: 'https://assets.spiritmediapublishing.com/FHB/book-covers/fll.webp',
+		thumbAlt: "Father's Love Letter book cover",
+		body: `Barry Adams took paraphrased passages from across Scripture and wove them into a single tender letter, written as if the Father were speaking straight to you. What began in 1999 as a sermon illustration has since reached millions in more than a hundred languages — and this is the book edition of that message. Short enough to read in one sitting, it is a gentle, disarming doorway into the Father's affection for anyone who struggles to believe He could feel that way about them. Available on <a href="https://www.amazon.com/dp/0875099998" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Amazon</a>.`,
 	},
 ];
 
@@ -187,7 +195,7 @@ const FAQS = [
 	{
 		question: 'Are these books all from the same tradition?',
 		answer:
-			'No — and that is a strength. The list spans a YWAM missionary (McClung), a Catholic contemplative (Nouwen), a former Franciscan priest (Manning), father-heart ministry leaders (Frost, Jordan), and a Reformed theologian (Packer). The Father heart of God is not the property of one stream; these authors reach the same revelation from very different starting points.',
+			'No — and that is a strength. The list spans a YWAM missionary (McClung), a Catholic contemplative (Nouwen), a former Franciscan priest (Manning), father-heart ministry leaders (Frost, Jordan), and teachers we know personally (the Woods, Sandra Steen). The Father heart of God is not the property of one stream; these authors reach the same revelation from very different starting points.',
 	},
 ];
 
@@ -261,8 +269,8 @@ const TOC = [
 	{ id: 'frost', label: 'Experiencing Father’s Embrace' },
 	{ id: 'mcclung', label: 'The Father Heart of God' },
 	{ id: 'white', label: 'Beloved Identity' },
+	{ id: 'fll', label: 'Father’s Love Letter' },
 	{ id: 'steen', label: 'First Love Reset' },
-	{ id: 'packer', label: 'Knowing God' },
 	{ id: 'nouwen', label: 'Return of the Prodigal Son' },
 	{ id: 'jordan', label: 'Sonship' },
 	{ id: 'choosing', label: 'Which one first?' },
@@ -280,12 +288,12 @@ const TOC = [
 	articlePublishedTime={PUBLISHED}
 	articleSection="Bible Reading Guides"
 	articleTags={['father heart of God', 'best books', 'reading list']}
-	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
-	preloadImageDesktop={HERO_IMG}
+	preloadImageMobile={HERO_640}
+	preloadImageDesktop={HERO_1400}
 >
 	<main id="main-content">
 		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
-			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<img src={HERO_1400} srcset={`${HERO_640} 640w, ${HERO_1400} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
 			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
 		</section>
 
@@ -338,11 +346,14 @@ const TOC = [
 							<img src={b.thumb} alt={b.thumbAlt} width="100" height="150" loading="lazy" decoding="async" class="w-24 shrink-0 rounded-md" style="box-shadow: 0 6px 16px rgba(0,0,0,0.18); height: auto;" />
 							<p class="text-lg leading-relaxed min-w-0" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.body}></p>
 						</div>
+						{MINISTRY_OF[b.id] && (
+							<p class="text-sm mb-4"><a href={`/guides/father-heart-of-god-ministries/#${MINISTRY_OF[b.id]}`} class="hover:underline font-semibold" style="color: var(--color-brand);">Meet {b.author} on our Father-heart ministries list <span aria-hidden="true">&rarr;</span></a></p>
+						)}
 					</div>
 				))}
 
 				<h2 id="choosing" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Which one should you read first?</h2>
-				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Match the book to where you are. If the Father&rsquo;s love is a brand-new idea, start with <a href="#mcclung" style="color: var(--color-brand);" class="hover:underline">McClung</a> &mdash; short, warm, and clear. If the question underneath is what your Heavenly Father thinks of you, <a href="#white" style="color: var(--color-brand);" class="hover:underline">Beloved Identity</a> was written to answer it. If you are worn out from performing for God, <a href="#manning" style="color: var(--color-brand);" class="hover:underline">Manning</a> or <a href="#frost" style="color: var(--color-brand);" class="hover:underline">Frost</a> will read like it was written about you. If you love art and slow reflection, <a href="#nouwen" style="color: var(--color-brand);" class="hover:underline">Nouwen</a>; if you want theological ballast, <a href="#packer" style="color: var(--color-brand);" class="hover:underline">Packer</a>; if the love has landed and you want to live as a son or daughter, <a href="#jordan" style="color: var(--color-brand);" class="hover:underline">Jordan</a>. And whichever you choose, pair it with Scripture itself &mdash; the prodigal&rsquo;s homecoming in Luke 15 is the Father heart of God in a single story, and you can <a href="https://fathersheartbible.com/read/luke/15" style="color: var(--color-brand);" class="hover:underline">read and listen to it free</a> right now.</p>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Match the book to where you are. If the Father&rsquo;s love is a brand-new idea, start with <a href="#mcclung" style="color: var(--color-brand);" class="hover:underline">McClung</a> &mdash; short, warm, and clear. If the question underneath is what your Heavenly Father thinks of you, <a href="#white" style="color: var(--color-brand);" class="hover:underline">Beloved Identity</a> was written to answer it. If you are worn out from performing for God, <a href="#manning" style="color: var(--color-brand);" class="hover:underline">Manning</a> or <a href="#frost" style="color: var(--color-brand);" class="hover:underline">Frost</a> will read like it was written about you. If you love art and slow reflection, <a href="#nouwen" style="color: var(--color-brand);" class="hover:underline">Nouwen</a>; if the love has landed and you want to live as a son or daughter, <a href="#jordan" style="color: var(--color-brand);" class="hover:underline">Jordan</a>. And whichever you choose, pair it with Scripture itself &mdash; the prodigal&rsquo;s homecoming in Luke 15 is the Father heart of God in a single story, and you can <a href="https://fathersheartbible.com/read/luke/15" style="color: var(--color-brand);" class="hover:underline">read and listen to it free</a> right now.</p>
 
 				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
 					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Don&rsquo;t just read about the Father &mdash; hear Him</p>
