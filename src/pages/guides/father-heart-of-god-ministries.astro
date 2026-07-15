@@ -16,11 +16,11 @@ const DESCRIPTION =
 const PUBLISHED = '2026-07-15';
 const MODIFIED = '2026-07-15';
 
-const HERO_BASE =
-	'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg';
-const HERO_ALT = 'An open Bible with morning light across its pages';
-const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
-const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+// Hero uses OUR FHB mock-up (M001) per the mock-ups-only hero rule, hosted on R2.
+const HERO_1400 = 'https://assets.spiritmediapublishing.com/FHB/heroes/ministries-hero-1400.webp';
+const HERO_640 = 'https://assets.spiritmediapublishing.com/FHB/heroes/ministries-hero-640.webp';
+const HERO_ALT = 'Three generations reading the Father’s Heart Bible together by the fire';
+const OG_IMG = 'https://assets.spiritmediapublishing.com/FHB/heroes/ministries-hero-og.jpg';
 
 const formatDate = (iso: string) =>
 	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
@@ -160,6 +160,28 @@ const MINISTRIES: Ministry[] = [
 	},
 ];
 
+// Alpha order by surname / ministry name (Kevin 2026-07-15).
+const SORT_KEY: Record<string, string> = {
+	fatherheart: 'Fatherheart Ministries',
+	fll: 'Fathers Love Letter',
+	galpin: 'Galpin',
+	hetland: 'Hetland',
+	kohler: 'Kohler',
+	ladu: 'LaDu',
+	shiloh: 'Shiloh Place',
+	steen: 'Steen',
+	wood: 'Wood',
+};
+// Verified official photos hosted on R2; entries without one fall back to a monogram tile.
+const PHOTO: Record<string, string> = {
+	fatherheart: 'https://assets.spiritmediapublishing.com/FHB/ministries/min-fatherheart.webp',
+	hetland: 'https://assets.spiritmediapublishing.com/FHB/ministries/min-hetland.webp',
+	shiloh: 'https://assets.spiritmediapublishing.com/FHB/ministries/min-shiloh.webp',
+};
+const ORDERED_MIN = [...MINISTRIES].sort((a, b) =>
+	(SORT_KEY[a.id] ?? a.name).localeCompare(SORT_KEY[b.id] ?? b.name, 'en'),
+);
+
 const FAQS = [
 	{
 		question: 'Which ministries teach the Father heart of God?',
@@ -209,7 +231,7 @@ const listSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'ItemList',
 	name: 'Father Heart of God Ministries We Recommend',
-	itemListElement: MINISTRIES.map((m, i) => ({
+	itemListElement: ORDERED_MIN.map((m, i) => ({
 		'@type': 'ListItem',
 		position: i + 1,
 		name: m.name,
@@ -252,12 +274,12 @@ const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema];
 	articlePublishedTime={PUBLISHED}
 	articleSection="Bible Reading Guides"
 	articleTags={['father heart of God', 'ministries', 'sonship']}
-	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
-	preloadImageDesktop={HERO_IMG}
+	preloadImageMobile={HERO_640}
+	preloadImageDesktop={HERO_1400}
 >
 	<main id="main-content">
 		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
-			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<img src={HERO_1400} srcset={`${HERO_640} 640w, ${HERO_1400} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
 			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
 		</section>
 
@@ -292,21 +314,32 @@ const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema];
 					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">Good teachers point past themselves. Every voice on this page leads to the same place &mdash; the Father&rsquo;s heart revealed in Scripture. Let them guide you there, then read it for yourself.</p>
 				</aside>
 
-				{MINISTRIES.map((m) => (
-					<div id={m.id} class="scroll-mt-28 mt-10 px-6 py-6 rounded-2xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
-						<div class="flex items-center gap-2 flex-wrap mb-1">
-							<h2 class="text-2xl md:text-3xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">{m.name}</h2>
-							{m.known && (<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold" style="background-color: #fdf2f5; color: var(--color-brand); border: 1px solid #f9d6e0;"><span aria-hidden="true">&#10003;</span> Personally Known</span>)}
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+					{ORDERED_MIN.map((m) => (
+						<div id={m.id} class="scroll-mt-28 rounded-2xl overflow-hidden flex flex-col" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+							{PHOTO[m.id] ? (
+								<img src={PHOTO[m.id]} alt={m.name} width="800" height="520" loading="lazy" decoding="async" class="w-full h-52 object-cover" style="object-position: center top;" />
+							) : (
+								<div class="w-full h-52 flex items-center justify-center" style="background-color: #fdf2f5;" aria-hidden="true">
+									<span class="text-5xl font-light" style="font-family: var(--font-serif); color: var(--color-brand);">{(SORT_KEY[m.id] ?? m.name).charAt(0)}</span>
+								</div>
+							)}
+							<div class="p-6 flex flex-col grow">
+								<div class="flex items-center gap-2 flex-wrap mb-1">
+									<h2 class="text-xl md:text-2xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">{m.name}</h2>
+									{m.known && (<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold" style="background-color: #fdf2f5; color: var(--color-brand); border: 1px solid #f9d6e0;"><span aria-hidden="true">&#10003;</span> Personally Known</span>)}
+								</div>
+								<p class="text-sm font-semibold mb-3" style="font-family: var(--font-sans); color: var(--color-brand);">{m.role}</p>
+								<p class="text-base leading-relaxed mb-4 grow" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={m.blurb}></p>
+								<ul class="flex flex-wrap gap-x-4 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
+									{m.links.map((l) => (
+										<li><a href={l.href} target="_blank" rel="noopener noreferrer" class="hover:underline" style="color: var(--color-brand);">{l.label}<span aria-hidden="true"> &nearr;</span></a></li>
+									))}
+								</ul>
+							</div>
 						</div>
-						<p class="text-sm font-semibold mb-3" style="font-family: var(--font-sans); color: var(--color-brand);">{m.role}</p>
-						<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={m.blurb}></p>
-						<ul class="flex flex-wrap gap-x-4 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
-							{m.links.map((l) => (
-								<li><a href={l.href} target="_blank" rel="noopener noreferrer" class="hover:underline" style="color: var(--color-brand);">{l.label}<span aria-hidden="true"> &nearr;</span></a></li>
-							))}
-						</ul>
-					</div>
-				))}
+					))}
+				</div>
 
 				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
 					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Every voice here points to one Father</p>

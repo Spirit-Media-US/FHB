@@ -158,6 +158,16 @@ const BOOKS: BookRow[] = [
 	},
 ];
 
+// Alpha order by title (ignoring a leading article), with the FHB Bible pinned first.
+const PINNED_ID = 'fhb';
+const stripArticle = (s: string) => s.replace(/^(the|a|an)\s+/i, '').trim();
+const ORDERED_BOOKS = [
+	...BOOKS.filter((b) => b.id === PINNED_ID),
+	...BOOKS.filter((b) => b.id !== PINNED_ID).sort((a, b) =>
+		stripArticle(a.title).localeCompare(stripArticle(b.title), 'en'),
+	),
+];
+
 const FAQS = [
 	{
 		question: 'What is the best book on the Father heart of God?',
@@ -207,7 +217,7 @@ const listSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'ItemList',
 	name: 'Best Books on the Father Heart of God',
-	itemListElement: BOOKS.map((b, i) => ({
+	itemListElement: ORDERED_BOOKS.map((b, i) => ({
 		'@type': 'ListItem',
 		position: i + 1,
 		name: `${b.title} — ${b.author.replace(/ — (the one we publish|also from our house)$/, '')}`,
@@ -245,16 +255,16 @@ const faqSchema = {
 const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema];
 const TOC = [
 	{ id: 'fhb', label: 'The Father’s Heart Bible™' },
+	{ id: 'abba-factor', label: 'The Abba Factor' },
+	{ id: 'abba-foundation', label: 'The Abba Foundation' },
+	{ id: 'manning', label: 'Abba’s Child' },
+	{ id: 'frost', label: 'Experiencing Father’s Embrace' },
+	{ id: 'mcclung', label: 'The Father Heart of God' },
 	{ id: 'white', label: 'Beloved Identity' },
-	{ id: 'mcclung', label: 'McClung' },
-	{ id: 'manning', label: 'Manning' },
-	{ id: 'nouwen', label: 'Nouwen' },
-	{ id: 'frost', label: 'Frost' },
-	{ id: 'jordan', label: 'Jordan' },
-	{ id: 'packer', label: 'Packer' },
-	{ id: 'abba-foundation', label: 'Chiqui Polo-Wood' },
-	{ id: 'abba-factor', label: 'Kerry Wood' },
-	{ id: 'steen', label: 'Sandra Steen' },
+	{ id: 'steen', label: 'First Love Reset' },
+	{ id: 'packer', label: 'Knowing God' },
+	{ id: 'nouwen', label: 'Return of the Prodigal Son' },
+	{ id: 'jordan', label: 'Sonship' },
 	{ id: 'choosing', label: 'Which one first?' },
 	{ id: 'faq', label: 'FAQ' },
 ];
@@ -317,7 +327,7 @@ const TOC = [
 					</ul>
 				</nav>
 
-				{BOOKS.map((b, i) => (
+				{ORDERED_BOOKS.map((b, i) => (
 					<div id={b.id} class="scroll-mt-28">
 						<h2 class="text-2xl md:text-3xl font-light mt-12 mb-1" style="font-family: var(--font-serif); color: var(--color-ink);">{i + 1}. {b.title}</h2>
 						<p class="text-sm font-semibold mb-4 flex items-center gap-2 flex-wrap" style="font-family: var(--font-sans); color: var(--color-brand);">
