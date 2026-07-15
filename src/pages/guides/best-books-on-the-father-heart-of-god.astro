@@ -363,9 +363,18 @@ const TOC = [
 				</aside>
 
 				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
-				<div class="space-y-6">
-					{FAQS.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				<div class="space-y-3">
+					{FAQS.map((f) => (
+						<details class="group rounded-xl overflow-hidden" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+							<summary class="flex items-center justify-between gap-4 cursor-pointer list-none px-5 py-4">
+								<h3 class="text-lg md:text-xl font-medium m-0" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3>
+								<span class="shrink-0 transition-transform duration-200 group-open:rotate-45" style="color: var(--color-brand); font-size: 1.5rem; line-height: 1;" aria-hidden="true">+</span>
+							</summary>
+							<p class="px-5 pb-5 -mt-1 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p>
+						</details>
+					))}
 				</div>
+				<style>details > summary::-webkit-details-marker { display: none; }</style>
 
 				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
 					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
