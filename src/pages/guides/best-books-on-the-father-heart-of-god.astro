@@ -10,16 +10,16 @@ import ReviewLink from '../../components/ReviewLink.astro';
 import Layout from '../../layouts/Layout.astro';
 
 const PAGE_URL = 'https://fathersheartbible.com/guides/best-books-on-the-father-heart-of-god';
-const TITLE = "Best Books on the Father Heart of God — An Honest List | Father's Heart Bible™";
+const TITLE = "Best Books on Receiving our Father's Heart — An Honest List | Father's Heart Bible™";
 const DESCRIPTION =
-	'The best books on the Father heart of God: Floyd McClung’s classic, Brennan Manning, Henri Nouwen, Jack Frost, James Jordan — and the one Bible translation devoted to the theme.';
+	'The best books on receiving our Father’s heart: Floyd McClung’s classic, Brennan Manning, Henri Nouwen, Jack Frost, James Jordan — and the one Bible translation devoted to the theme.';
 const PUBLISHED = '2026-07-13';
 const MODIFIED = '2026-07-15';
 
 // Hero uses OUR FHB mock-up (T001) per the mock-ups-only hero rule, hosted on R2.
 const HERO_1400 = 'https://assets.spiritmediapublishing.com/FHB/heroes/best-books-hero-1400.webp';
 const HERO_640 = 'https://assets.spiritmediapublishing.com/FHB/heroes/best-books-hero-640.webp';
-const HERO_ALT = 'A young man smiling as he holds the Father’s Heart Bible at his desk';
+const HERO_ALT = 'A family reading the Father’s Heart Bible together on the couch';
 const OG_IMG = 'https://assets.spiritmediapublishing.com/FHB/heroes/best-books-hero-og.jpg';
 
 const formatDate = (iso: string) =>
@@ -179,7 +179,7 @@ const ORDERED_BOOKS = [
 
 const FAQS = [
 	{
-		question: 'What is the best book on the Father heart of God?',
+		question: 'What is the best book on receiving our Father’s heart?',
 		answer:
 			"For a book about the Father's heart, start with Floyd McClung's The Father Heart of God — it has been the trusted classic introduction for decades. To meet the Father's heart directly in Scripture rather than reading about it, the Father's Heart Bible™ is a fresh translation devoted entirely to that revelation, free to read and listen to online at fathersheartbible.com/read.",
 	},
@@ -196,14 +196,14 @@ const FAQS = [
 	{
 		question: 'Are these books all from the same tradition?',
 		answer:
-			'No — and that is a strength. The list spans a YWAM missionary (McClung), a Catholic contemplative (Nouwen), a former Franciscan priest (Manning), father-heart ministry leaders (Frost, Jordan), and teachers we know personally (the Woods, Sandra Steen). The Father heart of God is not the property of one stream; these authors reach the same revelation from very different starting points.',
+			'No — and that is a strength. The list spans a YWAM missionary (McClung), a Catholic contemplative (Nouwen), a former Franciscan priest (Manning), father-heart ministry leaders (Frost, Jordan), and teachers we know personally (the Woods, Sandra Steen). Our Father’s heart is not the property of one stream; these authors reach the same revelation from very different starting points.',
 	},
 ];
 
 const articleSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'Article',
-	headline: 'Best Books on the Father Heart of God — An Honest List',
+	headline: 'Best Books on Receiving our Father’s Heart — An Honest List',
 	description: DESCRIPTION,
 	image: OG_IMG,
 	author: KEVIN_WHITE_AUTHOR,
@@ -220,12 +220,12 @@ const articleSchema = {
 	inLanguage: 'en-US',
 	articleSection: 'Bible Reading Guides',
 	keywords:
-		'best books on the father heart of God, father heart of God books, Floyd McClung, Abba’s Child, father heart of God reading list',
+		'best books on the father’s heart, receiving the Father’s heart, Floyd McClung, Abba’s Child, father’s heart reading list',
 };
 const listSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'ItemList',
-	name: 'Best Books on the Father Heart of God',
+	name: 'Best Books on Receiving our Father’s Heart',
 	itemListElement: ORDERED_BOOKS.map((b, i) => ({
 		'@type': 'ListItem',
 		position: i + 1,
@@ -247,7 +247,7 @@ const breadcrumbSchema = {
 		{
 			'@type': 'ListItem',
 			position: 3,
-			name: 'Best Books on the Father Heart of God',
+			name: 'Best Books on Receiving our Father’s Heart',
 			item: PAGE_URL,
 		},
 	],
@@ -288,13 +288,13 @@ const TOC = [
 	articleAuthor="Kevin White"
 	articlePublishedTime={PUBLISHED}
 	articleSection="Bible Reading Guides"
-	articleTags={['father heart of God', 'best books', 'reading list']}
+	articleTags={['father’s heart', 'best books', 'reading list']}
 	preloadImageMobile={HERO_640}
 	preloadImageDesktop={HERO_1400}
 >
 	<main id="main-content">
 		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
-			<img src={HERO_1400} srcset={`${HERO_640} 640w, ${HERO_1400} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<img src={HERO_1400} srcset={`${HERO_640} 640w, ${HERO_1400} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center;" fetchpriority="high" decoding="async" />
 			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
 		</section>
 
@@ -303,10 +303,10 @@ const TOC = [
 				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
 					<a href="/guides/" class="hover:underline">Guides</a><span class="px-1.5" aria-hidden="true">/</span>
-					<span style="color: var(--color-ink);">Best Books on the Father Heart of God</span>
+					<span style="color: var(--color-ink);">Best Books on Receiving our Father’s Heart</span>
 				</nav>
 				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Reading List</p>
-				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Best Books on the Father Heart of God</h1>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Best Books on Receiving our Father’s Heart</h1>
 				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
 					<span>By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; leading the Father&rsquo;s Heart Bible&trade; translation</span>
 					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
@@ -317,7 +317,7 @@ const TOC = [
 		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
 			<div class="mx-auto max-w-3xl">
 				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">
-					The best books on the Father heart of God are Floyd McClung&rsquo;s classic <em>The Father Heart of God</em>, Brennan Manning&rsquo;s <em>Abba&rsquo;s Child</em>, Henri Nouwen&rsquo;s <em>The Return of the Prodigal Son</em>, Jack Frost&rsquo;s <em>Experiencing Father&rsquo;s Embrace</em>, and James Jordan&rsquo;s <em>Sonship</em> &mdash; and one entry that isn&rsquo;t a book about the Father at all, but the Bible translated to reveal Him: the Father&rsquo;s Heart Bible&trade;. These books have carried the Father&rsquo;s love to millions of readers across every stream of the church. We publish the one at the top; the rest are here purely on their merits.
+					The best books on receiving our Father&rsquo;s heart are Floyd McClung&rsquo;s classic <em>The Father Heart of God</em>, Brennan Manning&rsquo;s <em>Abba&rsquo;s Child</em>, Henri Nouwen&rsquo;s <em>The Return of the Prodigal Son</em>, Jack Frost&rsquo;s <em>Experiencing Father&rsquo;s Embrace</em>, and James Jordan&rsquo;s <em>Sonship</em> &mdash; and one entry that isn&rsquo;t a book about the Father at all, but the Bible translated to reveal Him: the Father&rsquo;s Heart Bible&trade;. These books have carried the Father&rsquo;s love to millions of readers across every stream of the church. We publish the one at the top; the rest are here purely on their merits.
 				</p>
 
 				<p class="text-base leading-relaxed mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">
@@ -355,7 +355,7 @@ const TOC = [
 
 				<h2 id="choosing" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Which one should you read first?</h2>
 				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Match the book to where you are. New to the Father&rsquo;s love? Start with <a href="#mcclung" style="color: var(--color-brand);" class="hover:underline">McClung</a> &mdash; short, warm, and clear. Wondering what your Heavenly Father thinks of you? <a href="#white" style="color: var(--color-brand);" class="hover:underline">Beloved Identity</a> was written to answer it. Worn out from performing for God? <a href="#manning" style="color: var(--color-brand);" class="hover:underline">Manning</a> or <a href="#frost" style="color: var(--color-brand);" class="hover:underline">Frost</a> will read like it was written about you.</p>
-				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Drawn to art and slow reflection? <a href="#nouwen" style="color: var(--color-brand);" class="hover:underline">Nouwen</a>. Ready to live as a son or daughter? <a href="#jordan" style="color: var(--color-brand);" class="hover:underline">Jordan</a>. Whichever you choose, pair it with Scripture &mdash; the prodigal&rsquo;s homecoming in <a href="https://fathersheartbible.com/read/luke/15" style="color: var(--color-brand);" class="hover:underline">Luke 15</a> is the Father heart of God in a single story.</p>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Drawn to art and slow reflection? <a href="#nouwen" style="color: var(--color-brand);" class="hover:underline">Nouwen</a>. Ready to live as a son or daughter? <a href="#jordan" style="color: var(--color-brand);" class="hover:underline">Jordan</a>. Whichever you choose, pair it with Scripture &mdash; the prodigal&rsquo;s homecoming in <a href="https://fathersheartbible.com/read/luke/15" style="color: var(--color-brand);" class="hover:underline">Luke 15</a> is our Father&rsquo;s heart in a single story.</p>
 
 				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
 					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Don&rsquo;t just read about the Father &mdash; hear Him</p>
@@ -379,7 +379,7 @@ const TOC = [
 
 				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
 					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-						Keep going: meet the <a href="/guides/father-heart-of-god-ministries/" style="color: var(--color-brand);" class="hover:underline">ministries and voices on the Father&rsquo;s heart</a> we recommend, browse the <a href="/guides/father-heart-of-god-resources/" style="color: var(--color-brand);" class="hover:underline">Father heart of God resource hub</a>, learn <a href="/the-fathers-heart-bible/translation-philosophy/" style="color: var(--color-brand);" class="hover:underline">how the Father&rsquo;s Heart Bible&trade; is translated</a>, or find <a href="/verses/god-as-father/" style="color: var(--color-brand);" class="hover:underline">verses about God as Father</a>. There&rsquo;s a Bible for your exact season in the <a href="/bible-for/" style="color: var(--color-brand);" class="hover:underline">A Father For series</a>.
+						Keep going: meet the <a href="/guides/father-heart-of-god-ministries/" style="color: var(--color-brand);" class="hover:underline">ministries and voices on the Father&rsquo;s heart</a> we recommend, browse the <a href="/guides/father-heart-of-god-resources/" style="color: var(--color-brand);" class="hover:underline">our Father&rsquo;s heart resource hub</a>, learn <a href="/the-fathers-heart-bible/translation-philosophy/" style="color: var(--color-brand);" class="hover:underline">how the Father&rsquo;s Heart Bible&trade; is translated</a>, or find <a href="/verses/god-as-father/" style="color: var(--color-brand);" class="hover:underline">verses about God as Father</a>. There&rsquo;s a Bible for your exact season in the <a href="/bible-for/" style="color: var(--color-brand);" class="hover:underline">A Father For series</a>.
 					</p>
 				</div>
 			</div>

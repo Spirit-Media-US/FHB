@@ -54,9 +54,9 @@ export const GUIDES: GuideEntry[] = [
 	},
 	{
 		slug: 'best-books-on-the-father-heart-of-god',
-		title: 'Best Books on the Father Heart of God',
+		title: 'Best Books on Receiving our Father’s Heart',
 		blurb:
-			'An honest reading list — McClung, Manning, Nouwen, Frost, Jordan, Packer, Beloved Identity, and the one Bible devoted to the theme.',
+			'An honest reading list — McClung, Manning, Nouwen, Frost, Jordan, the Woods, Sandra Steen, Beloved Identity, and the one Bible devoted to the theme.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
 	{
@@ -68,9 +68,9 @@ export const GUIDES: GuideEntry[] = [
 	},
 	{
 		slug: 'father-heart-of-god-ministries',
-		title: 'Father Heart of God Ministries',
+		title: 'Ministries Intentional about our Father’s Heart',
 		blurb:
-			'A curated, honest list of ministries and teachers on the Father’s heart that we know and recommend — from the Woods and George LaDu to Fatherheart Ministries.',
+			'A curated, honest list of ministries and teachers intentional about our Father’s heart — from the Woods and George LaDu to Fatherheart Ministries.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c42c2fd1d784331411250317010d54a0cfac62cc-5959x3724.jpg',
 	},
 ];

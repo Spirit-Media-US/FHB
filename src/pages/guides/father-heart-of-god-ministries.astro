@@ -11,9 +11,10 @@ import ReviewLink from '../../components/ReviewLink.astro';
 import Layout from '../../layouts/Layout.astro';
 
 const PAGE_URL = 'https://fathersheartbible.com/guides/father-heart-of-god-ministries';
-const TITLE = "Father Heart of God Ministries — Voices We Recommend | Father's Heart Bible™";
+const TITLE =
+	"Ministries Intentional about our Father’s Heart — Voices We Recommend | Father's Heart Bible™";
 const DESCRIPTION =
-	'A curated, honest list of ministries and teachers on the Father heart of God — Kerry & Chiqui Wood, George LaDu, Sandra Steen, Barbara Kohler, Fatherheart Ministries, and more.';
+	'A curated, honest list of ministries and teachers intentional about our Father’s heart — Kerry & Chiqui Wood, George LaDu, Sandra Steen, Barbara Kohler, Fatherheart Ministries, and more.';
 const PUBLISHED = '2026-07-15';
 const MODIFIED = '2026-07-15';
 
@@ -199,7 +200,7 @@ const BOOK_OF: Record<string, string> = {
 
 const FAQS = [
 	{
-		question: 'Which ministries teach the Father heart of God?',
+		question: 'Which ministries teach on our Father’s heart?',
 		answer:
 			"Trusted father-heart ministries and teachers include Dr. Kerry and Chiqui Wood (Table of Friends and the Abba Series), George and Randi LaDu (Kingdom Living), Dr. Sandra Steen (First Love Reset), Barbara Kohler (The Kohler Group), Fatherheart Ministries (founded by Jack Winter and James Jordan), Shiloh Place Ministries (Jack Frost), Father's Love Letter (Barry Adams), Trevor and Linda Galpin, and Leif Hetland's Global Mission Awareness. Each teaches, from a different angle, the same revelation: God is a loving Father who welcomes His children home.",
 	},
@@ -223,7 +224,7 @@ const FAQS = [
 const articleSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'Article',
-	headline: 'Father Heart of God Ministries — Voices We Recommend',
+	headline: 'Ministries Intentional about our Father’s Heart — Voices We Recommend',
 	description: DESCRIPTION,
 	image: OG_IMG,
 	author: KEVIN_WHITE_AUTHOR,
@@ -240,12 +241,12 @@ const articleSchema = {
 	inLanguage: 'en-US',
 	articleSection: 'Bible Reading Guides',
 	keywords:
-		'father heart of God ministries, father heart of God teachers, sonship ministries, father heart of God teaching',
+		'father’s heart ministries, father’s heart teachers, sonship ministries, father heart teaching',
 };
 const listSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'ItemList',
-	name: 'Father Heart of God Ministries We Recommend',
+	name: 'Ministries Intentional about our Father’s Heart',
 	itemListElement: ORDERED_MIN.map((m, i) => ({
 		'@type': 'ListItem',
 		position: i + 1,
@@ -264,7 +265,12 @@ const breadcrumbSchema = {
 			name: 'Guides',
 			item: 'https://fathersheartbible.com/guides/',
 		},
-		{ '@type': 'ListItem', position: 3, name: 'Father Heart of God Ministries', item: PAGE_URL },
+		{
+			'@type': 'ListItem',
+			position: 3,
+			name: 'Ministries Intentional about our Father’s Heart',
+			item: PAGE_URL,
+		},
 	],
 };
 const faqSchema = {
@@ -288,7 +294,7 @@ const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema];
 	articleAuthor="Kevin White"
 	articlePublishedTime={PUBLISHED}
 	articleSection="Bible Reading Guides"
-	articleTags={['father heart of God', 'ministries', 'sonship']}
+	articleTags={['father’s heart', 'ministries', 'sonship']}
 	preloadImageMobile={HERO_640}
 	preloadImageDesktop={HERO_1400}
 >
@@ -303,10 +309,10 @@ const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema];
 				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
 					<a href="/guides/" class="hover:underline">Guides</a><span class="px-1.5" aria-hidden="true">/</span>
-					<span style="color: var(--color-ink);">Father Heart of God Ministries</span>
+					<span style="color: var(--color-ink);">Ministries Intentional about our Father’s Heart</span>
 				</nav>
 				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Ministries We Recommend</p>
-				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Father Heart of God Ministries</h1>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Ministries Intentional about our Father’s Heart</h1>
 				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
 					<span>By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; leading the Father&rsquo;s Heart Bible&trade; translation</span>
 					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
@@ -381,7 +387,7 @@ const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema];
 
 				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
 					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-						Keep going: see the <a href="/guides/best-books-on-the-father-heart-of-god/" style="color: var(--color-brand);" class="hover:underline">best books on the Father heart of God</a>, browse the <a href="/guides/father-heart-of-god-resources/" style="color: var(--color-brand);" class="hover:underline">Father heart of God resource hub</a>, or find <a href="/verses/god-as-father/" style="color: var(--color-brand);" class="hover:underline">verses about God as Father</a>.
+						Keep going: see the <a href="/guides/best-books-on-the-father-heart-of-god/" style="color: var(--color-brand);" class="hover:underline">best books on receiving our Father’s heart</a>, browse the <a href="/guides/father-heart-of-god-resources/" style="color: var(--color-brand);" class="hover:underline">our Father’s heart resource hub</a>, or find <a href="/verses/god-as-father/" style="color: var(--color-brand);" class="hover:underline">verses about God as Father</a>.
 					</p>
 				</div>
 			</div>
