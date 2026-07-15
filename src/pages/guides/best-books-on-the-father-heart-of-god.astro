@@ -13,7 +13,7 @@ const TITLE = "Best Books on the Father Heart of God — An Honest List | Father
 const DESCRIPTION =
 	'The best books on the Father heart of God: Floyd McClung’s classic, Brennan Manning, Henri Nouwen, Jack Frost, James Jordan — and the one Bible translation devoted to the theme.';
 const PUBLISHED = '2026-07-13';
-const MODIFIED = '2026-07-13';
+const MODIFIED = '2026-07-15';
 
 const HERO_BASE =
 	'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg';
@@ -55,6 +55,7 @@ interface BookRow {
 	thumb: string; // cover image URL (Sanity/R2)
 	thumbAlt: string;
 	body: string; // HTML
+	known?: boolean; // "Personally Known" badge — an author Kevin & Shelly know personally
 }
 const BOOKS: BookRow[] = [
 	{
@@ -127,6 +128,33 @@ const BOOKS: BookRow[] = [
 			'https://cdn.sanity.io/images/rusi1hyi/production/319cfe8ca7df7feadb47602b9c9fed9c7dace2f5-338x522.jpg?w=200&fm=webp&q=75',
 		thumbAlt: 'Knowing God book cover',
 		body: `A modern theological classic rather than a father-heart book per se — but its famous chapter on adoption argues that being fathered by God is the highest privilege of the gospel, and many readers meet the doctrine of the Father's love there for the first time. The sturdiest choice on this list for the reader who wants theological depth under the warmth.`,
+	},
+	{
+		id: 'abba-foundation',
+		title: 'The Abba Foundation',
+		author: 'Chiqui Polo-Wood',
+		known: true,
+		thumb: 'https://m.media-amazon.com/images/I/81JEJqGlECL._SY522_.jpg',
+		thumbAlt: 'The Abba Foundation book cover',
+		body: `Subtitled <em>Knowing the Father through the Eyes of Jesus</em>, this is the opening book of the Wood family's Abba Series and the most on-theme of the three. Dr. Chiqui Polo-Wood — a pastor and academic dean who, with her husband Kerry, has spent decades discipling leaders toward the Father's heart — builds a framework for meeting God as the same Abba Jesus revealed Him to be. Warm, ordered, and pastoral, it is a strong first read for anyone who wants the Father's love with a teacher's clarity underneath it. Available on <a href="https://www.amazon.com/dp/B079Z8J4YN" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Amazon</a>.`,
+	},
+	{
+		id: 'abba-factor',
+		title: 'The Abba Factor',
+		author: 'Kerry Wood',
+		known: true,
+		thumb: 'https://m.media-amazon.com/images/I/81OKdKyVWvL._SY522_.jpg',
+		thumbAlt: 'The Abba Factor book cover',
+		body: `The second book in the Abba Series, <em>Knowing Yourself Through the Eyes of Jesus</em>, turns from who the Father is to who you are in His sight. Dr. Kerry Wood writes for the believer who grasps the Father's love as doctrine but hasn't yet let it settle their identity — the same ground our own <a href="#white" style="color: var(--color-brand);" class="hover:underline">Beloved Identity</a> walks, from a different teacher's hand. It pairs naturally with <a href="#abba-foundation" style="color: var(--color-brand);" class="hover:underline">The Abba Foundation</a>. Available on <a href="https://www.amazon.com/dp/B07B8RJDMG" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Amazon</a>.`,
+	},
+	{
+		id: 'steen',
+		title: 'First Love Reset',
+		author: 'Dr. Sandra Steen',
+		known: true,
+		thumb: 'https://m.media-amazon.com/images/I/71LIg9wj-xL._SY522_.jpg',
+		thumbAlt: 'First Love Reset book cover',
+		body: `<em>8 Strategies to Renew Your Heart, Refresh Your Spirit, and Reignite Your Passion for God</em> — Dr. Sandra Steen's book is less a study of the Father than an invitation back to Him when love has cooled to routine. Practical and pastoral, it's built for the reader who once burned bright and wants that first-love nearness restored. A fitting companion to the reflective titles above when the need is renewal rather than introduction. Available on <a href="https://www.amazon.com/dp/B0FS3YCG5S" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Amazon</a>.`,
 	},
 ];
 
@@ -224,6 +252,9 @@ const TOC = [
 	{ id: 'frost', label: 'Frost' },
 	{ id: 'jordan', label: 'Jordan' },
 	{ id: 'packer', label: 'Packer' },
+	{ id: 'abba-foundation', label: 'Chiqui Polo-Wood' },
+	{ id: 'abba-factor', label: 'Kerry Wood' },
+	{ id: 'steen', label: 'Sandra Steen' },
 	{ id: 'choosing', label: 'Which one first?' },
 	{ id: 'faq', label: 'FAQ' },
 ];
@@ -270,6 +301,10 @@ const TOC = [
 					<strong style="color: var(--color-ink);">The best books on the Father heart of God are Floyd McClung&rsquo;s classic <em>The Father Heart of God</em>, Brennan Manning&rsquo;s <em>Abba&rsquo;s Child</em>, Henri Nouwen&rsquo;s <em>The Return of the Prodigal Son</em>, Jack Frost&rsquo;s <em>Experiencing Father&rsquo;s Embrace</em>, and James Jordan&rsquo;s <em>Sonship</em> &mdash; and one entry that isn&rsquo;t a book about the Father at all, but the Bible translated to reveal Him: the Father&rsquo;s Heart Bible&trade;.</strong> A word of honesty up front: we publish that last one, so we have listed it first and told you so plainly. The rest of this list is here on merit &mdash; these are the books that have carried the revelation of the Father&rsquo;s love to millions of readers across every stream of the church, and we would commend them no matter who published our Bible.
 				</p>
 
+				<p class="text-base leading-relaxed mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Where you see a <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold align-middle" style="background-color: #fdf2f5; color: var(--color-brand); border: 1px solid #f9d6e0;"><span aria-hidden="true">&#10003;</span> Personally Known</span> mark, it means the author is someone we know personally. Every book here is one we genuinely commend; the badge simply notes a personal relationship &mdash; it is not a ranking.
+				</p>
+
 				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
 					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
 					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">Books about the Father&rsquo;s heart prepare you; Scripture itself introduces you. Read McClung or Manning for the testimony &mdash; and read the Bible in a translation that lets you hear the Father&rsquo;s voice directly.</p>
@@ -285,7 +320,10 @@ const TOC = [
 				{BOOKS.map((b, i) => (
 					<div id={b.id} class="scroll-mt-28">
 						<h2 class="text-2xl md:text-3xl font-light mt-12 mb-1" style="font-family: var(--font-serif); color: var(--color-ink);">{i + 1}. {b.title}</h2>
-						<p class="text-sm font-semibold mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">{b.author}</p>
+						<p class="text-sm font-semibold mb-4 flex items-center gap-2 flex-wrap" style="font-family: var(--font-sans); color: var(--color-brand);">
+							<span>{b.author}</span>
+							{b.known && (<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold" style="background-color: #fdf2f5; color: var(--color-brand); border: 1px solid #f9d6e0;"><span aria-hidden="true">&#10003;</span> Personally Known</span>)}
+						</p>
 						<div class="flex gap-5 items-start mb-4">
 							<img src={b.thumb} alt={b.thumbAlt} width="100" height="150" loading="lazy" decoding="async" class="w-24 shrink-0 rounded-md" style="box-shadow: 0 6px 16px rgba(0,0,0,0.18); height: auto;" />
 							<p class="text-lg leading-relaxed min-w-0" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.body}></p>
@@ -309,7 +347,7 @@ const TOC = [
 
 				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
 					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-						Keep going: browse the <a href="/guides/father-heart-of-god-resources/" style="color: var(--color-brand);" class="hover:underline">Father heart of God resource hub</a>, learn <a href="/the-fathers-heart-bible/translation-philosophy/" style="color: var(--color-brand);" class="hover:underline">how the Father&rsquo;s Heart Bible&trade; is translated</a>, or find <a href="/verses/god-as-father/" style="color: var(--color-brand);" class="hover:underline">verses about God as Father</a>. There&rsquo;s a Bible for your exact season in the <a href="/bible-for/" style="color: var(--color-brand);" class="hover:underline">A Father For series</a>.
+						Keep going: meet the <a href="/guides/father-heart-of-god-ministries/" style="color: var(--color-brand);" class="hover:underline">ministries and voices on the Father&rsquo;s heart</a> we recommend, browse the <a href="/guides/father-heart-of-god-resources/" style="color: var(--color-brand);" class="hover:underline">Father heart of God resource hub</a>, learn <a href="/the-fathers-heart-bible/translation-philosophy/" style="color: var(--color-brand);" class="hover:underline">how the Father&rsquo;s Heart Bible&trade; is translated</a>, or find <a href="/verses/god-as-father/" style="color: var(--color-brand);" class="hover:underline">verses about God as Father</a>. There&rsquo;s a Bible for your exact season in the <a href="/bible-for/" style="color: var(--color-brand);" class="hover:underline">A Father For series</a>.
 					</p>
 				</div>
 			</div>

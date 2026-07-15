@@ -66,4 +66,11 @@ export const GUIDES: GuideEntry[] = [
 			'Everything in one place — free Scripture with audio, verse collections, guides, books, a short film, and community.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
 	},
+	{
+		slug: 'father-heart-of-god-ministries',
+		title: 'Father Heart of God Ministries',
+		blurb:
+			'A curated, honest list of ministries and teachers on the Father’s heart that we know and recommend — from the Woods and George LaDu to Fatherheart Ministries.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c42c2fd1d784331411250317010d54a0cfac62cc-5959x3724.jpg',
+	},
 ];
