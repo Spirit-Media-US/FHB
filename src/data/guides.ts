@@ -53,21 +53,21 @@ export const GUIDES: GuideEntry[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/e1bf90d1eaeab499989a239a2f5bfd98494e3f78-5867x3911.jpg',
 	},
 	{
-		slug: 'best-books-on-the-father-heart-of-god',
+		slug: 'best-books-on-the-fathers-heart',
 		title: 'Best Books on Receiving our Father’s Heart',
 		blurb:
 			'An honest reading list — McClung, Manning, Nouwen, Frost, Jordan, the Woods, Sandra Steen, Beloved Identity, and the one Bible devoted to the theme.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
 	{
-		slug: 'father-heart-of-god-resources',
+		slug: 'resources-for-the-fathers-heart',
 		title: 'Resources for Receiving our Father’s Heart',
 		blurb:
 			'Everything in one place — free Scripture with audio, verse collections, guides, books, a short film, and community.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
 	},
 	{
-		slug: 'father-heart-of-god-ministries',
+		slug: 'ministries-for-the-fathers-heart',
 		title: 'Ministries Intentional about our Father’s Heart',
 		blurb:
 			'A curated, honest list of ministries and teachers intentional about our Father’s heart — from the Woods and George LaDu to Fatherheart Ministries.',
