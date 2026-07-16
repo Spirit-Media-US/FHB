@@ -9,9 +9,9 @@ import Layout from '../../layouts/Layout.astro';
 
 const PAGE_URL = 'https://fathersheartbible.com/guides/father-heart-of-god-resources';
 const TITLE =
-	"Father Heart of God Resources — Read, Listen, Learn & Belong | Father's Heart Bible™";
+	"Resources for Receiving our Father's Heart — Read, Listen, Learn & Belong | Father's Heart Bible™";
 const DESCRIPTION =
-	'Free father heart of God resources: read and listen to Scripture that reveals the Father, verse collections, beginner guides, a reading list, a short film, and community.';
+	'Free resources for receiving our Father’s heart: read and listen to Scripture that reveals the Father, verse collections, beginner guides, a reading list, a short film, and community.';
 const PUBLISHED = '2026-07-13';
 const MODIFIED = '2026-07-13';
 
@@ -75,7 +75,7 @@ const GROUPS: ResourceGroup[] = [
 			{
 				name: 'The prodigal’s homecoming (Luke 15)',
 				href: 'https://fathersheartbible.com/read/luke/15',
-				blurb: 'The Father heart of God in a single story — the best first chapter.',
+				blurb: 'Our Father’s heart in a single story — the best first chapter.',
 			},
 			{
 				name: 'Verses about God as Father',
@@ -125,7 +125,7 @@ const GROUPS: ResourceGroup[] = [
 			'The classics that have carried this revelation to millions of readers, honestly reviewed — McClung, Manning, Nouwen, Frost, Jordan, Packer.',
 		items: [
 			{
-				name: 'Best Books on the Father Heart of God',
+				name: 'Best Books on Receiving our Father’s Heart',
 				href: '/guides/best-books-on-the-father-heart-of-god/',
 				blurb: 'Our honest list, including the one we publish.',
 			},
@@ -177,19 +177,19 @@ const GROUPS: ResourceGroup[] = [
 
 const FAQS = [
 	{
-		question: 'What resources are available for studying the Father heart of God?',
+		question: 'What resources are available for receiving our Father’s heart?',
 		answer:
 			"Start with Scripture itself in the Father's Heart Bible™ — free to read and listen to at fathersheartbible.com/read — then add the verse collection on God as Father, the beginner guides (where to start, how to read, how to pray), the honest reading list of father-heart classics by McClung, Manning, Nouwen, Frost, Jordan, and Packer, the short film on why the translation exists, and the FH Family community for reading with others.",
 	},
 	{
-		question: 'Are these father heart of God resources free?',
+		question: 'Are these resources free?',
 		answer:
 			"Almost all of them. The Father's Heart Bible™ is completely free to read and listen to online — no app, no account, no cost — and the verse collections, guides, blog, film, and a downloadable book in the resource library are free as well. Print editions and the translation-campaign partnership are the only things that cost anything.",
 	},
 	{
 		question: 'Where should I start if this is all new to me?',
 		answer:
-			"Read one chapter: Luke 15, the story of the prodigal son — freely, with audio, at fathersheartbible.com/read/luke/15. It is the Father heart of God in a single story. Then take the 'Where to Start Reading the Bible' guide, and let the rest of these resources meet you as you go.",
+			"Read one chapter: Luke 15, the story of the prodigal son — freely, with audio, at fathersheartbible.com/read/luke/15. It is our Father’s heart in a single story. Then take the 'Where to Start Reading the Bible' guide, and let the rest of these resources meet you as you go.",
 	},
 	{
 		question: 'Is there a community around the Father’s Heart Bible?',
@@ -201,7 +201,7 @@ const FAQS = [
 const articleSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'Article',
-	headline: 'Father Heart of God Resources — Read, Listen, Learn & Belong',
+	headline: 'Resources for Receiving our Father’s Heart — Read, Listen, Learn & Belong',
 	description: DESCRIPTION,
 	image: OG_IMG,
 	author: KEVIN_WHITE_AUTHOR,
@@ -218,12 +218,12 @@ const articleSchema = {
 	inLanguage: 'en-US',
 	articleSection: 'Bible Reading Guides',
 	keywords:
-		'father heart of God resources, father heart of God study, father heart of God teaching, father heart of God bible',
+		'resources for the father’s heart, father’s heart study, father’s heart teaching, father’s heart bible',
 };
 const listSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'ItemList',
-	name: 'Father Heart of God Resources',
+	name: 'Resources for Receiving our Father’s Heart',
 	itemListElement: GROUPS.flatMap((g) => g.items).map((r, i) => ({
 		'@type': 'ListItem',
 		position: i + 1,
@@ -242,7 +242,12 @@ const breadcrumbSchema = {
 			name: 'Guides',
 			item: 'https://fathersheartbible.com/guides/',
 		},
-		{ '@type': 'ListItem', position: 3, name: 'Father Heart of God Resources', item: PAGE_URL },
+		{
+			'@type': 'ListItem',
+			position: 3,
+			name: 'Resources for Receiving our Father’s Heart',
+			item: PAGE_URL,
+		},
 	],
 };
 const faqSchema = {
@@ -275,7 +280,7 @@ const TOC = [
 	articleAuthor="Kevin White"
 	articlePublishedTime={PUBLISHED}
 	articleSection="Bible Reading Guides"
-	articleTags={['father heart of God', 'resources', 'bible study']}
+	articleTags={['father’s heart', 'resources', 'bible study']}
 	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
 	preloadImageDesktop={HERO_IMG}
 >
@@ -290,10 +295,10 @@ const TOC = [
 				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
 					<a href="/guides/" class="hover:underline">Guides</a><span class="px-1.5" aria-hidden="true">/</span>
-					<span style="color: var(--color-ink);">Father Heart of God Resources</span>
+					<span style="color: var(--color-ink);">Resources for Receiving our Father’s Heart</span>
 				</nav>
 				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Resource Hub</p>
-				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Father Heart of God Resources</h1>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Resources for Receiving our Father’s Heart</h1>
 				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
 					<span>By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; leading the Father&rsquo;s Heart Bible&trade; translation</span>
 					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
@@ -341,7 +346,7 @@ const TOC = [
 
 				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
 					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Start with one chapter</p>
-					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Luke 15 &mdash; the prodigal&rsquo;s homecoming &mdash; is the Father heart of God in a single story. Read and listen free, right now.</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Luke 15 &mdash; the prodigal&rsquo;s homecoming &mdash; is our Father’s heart in a single story. Read and listen free, right now.</p>
 					<a href="https://fathersheartbible.com/read/luke/15" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read Luke 15 Free<span aria-hidden="true">&rarr;</span></a>
 				</aside>
 
@@ -352,7 +357,7 @@ const TOC = [
 
 				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
 					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-						Keep going: see the <a href="/guides/best-books-on-the-father-heart-of-god/" style="color: var(--color-brand);" class="hover:underline">best books on the Father heart of God</a>, learn <a href="/the-fathers-heart-bible/translation-philosophy/" style="color: var(--color-brand);" class="hover:underline">how the Father&rsquo;s Heart Bible&trade; is translated</a>, or find the Bible for your season in the <a href="/bible-for/" style="color: var(--color-brand);" class="hover:underline">A Father For series</a>.
+						Keep going: see the <a href="/guides/best-books-on-the-father-heart-of-god/" style="color: var(--color-brand);" class="hover:underline">best books on receiving our Father’s heart</a>, learn <a href="/the-fathers-heart-bible/translation-philosophy/" style="color: var(--color-brand);" class="hover:underline">how the Father&rsquo;s Heart Bible&trade; is translated</a>, or find the Bible for your season in the <a href="/bible-for/" style="color: var(--color-brand);" class="hover:underline">A Father For series</a>.
 					</p>
 				</div>
 			</div>

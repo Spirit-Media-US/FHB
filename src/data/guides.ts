@@ -61,7 +61,7 @@ export const GUIDES: GuideEntry[] = [
 	},
 	{
 		slug: 'father-heart-of-god-resources',
-		title: 'Father Heart of God Resources',
+		title: 'Resources for Receiving our Father’s Heart',
 		blurb:
 			'Everything in one place — free Scripture with audio, verse collections, guides, books, a short film, and community.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
