@@ -1,0 +1,154 @@
+---
+import ShareBar from '../../components/ShareBar.astro';
+import WordsJoin from '../../components/WordsJoin.astro';
+import Layout from '../../layouts/Layout.astro';
+import { sanityClient } from '../../lib/sanity';
+
+// Messages from the Father — the evergreen hub. Standalone (not part of the
+// blog or any guide cluster); grows indefinitely as new words are published.
+const msgs = await sanityClient.fetch(
+	`*[_type == "fatherMessage" && defined(slug.current)] | order(publishDate desc) {
+		title, audience, excerpt, publishDate, "slug": slug.current
+	}`,
+);
+
+const formatDate = (dateString: string) =>
+	new Date(dateString).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'CollectionPage',
+		'@id': 'https://fathersheartbible.com/words/#collection',
+		name: 'Messages from the Father',
+		url: 'https://fathersheartbible.com/words/',
+		description:
+			'Prophetic words received in prayer, tested against Scripture, and written down — each one a message from the Father to a specific community of His sons and daughters.',
+		publisher: { '@id': 'https://fathersheartbible.com/#organization' },
+		hasPart: msgs.map((m: any) => ({
+			'@type': 'BlogPosting',
+			headline: m.title,
+			url: `https://fathersheartbible.com/words/${m.slug}`,
+			datePublished: m.publishDate,
+		})),
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{
+				'@type': 'ListItem',
+				position: 2,
+				name: 'Messages from the Father',
+				item: 'https://fathersheartbible.com/words/',
+			},
+		],
+	},
+];
+---
+
+<Layout
+	title="Messages from the Father | Prophetic Words from God's Heart"
+	description="Prophetic words received in prayer and tested against Scripture — each a message from the Father to a specific community of His sons and daughters. New words added as they come."
+	ogDescription="Our Father wants His children to hear His voice. Read the messages, and receive each new one by email."
+	jsonLd={jsonLd}
+>
+	<main id="main-content">
+		<!-- HEADER -->
+		<section class="px-6 pt-16 pb-10 lg:px-8 lg:pt-24" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl text-center">
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: #a04060; font-family: var(--font-sans);">
+					Father&rsquo;s Heart Bible&trade;
+				</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Messages from the Father
+				</h1>
+				<p class="mt-6 text-lg leading-relaxed max-w-2xl mx-auto" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Our Father wants His children to hear His voice. Each message here was received in
+					prayer, written down, and weighed against Scripture before it was shared &mdash; each
+					one addressed to a particular community of His beloved sons and daughters. Open your
+					heart, and let Him fill it.
+				</p>
+			</div>
+		</section>
+
+		<!-- MESSAGES -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				{msgs.length === 0 ? (
+					<p class="text-center text-lg" style="font-family: var(--font-sans); color: var(--color-muted);">
+						The first message is on its way.
+					</p>
+				) : (
+					<div class="space-y-6">
+						{msgs.map((m: any) => (
+							<a
+								href={`/words/${m.slug}/`}
+								class="block px-6 py-6 lg:px-8 rounded-2xl no-underline transition-shadow hover:shadow-md"
+								style="border: 1px solid var(--color-hairline); background-color: var(--color-surface-low);"
+							>
+								{m.audience && (
+									<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: #a04060; font-family: var(--font-sans);">
+										A word for {m.audience}
+									</p>
+								)}
+								<h2 class="text-2xl font-light leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">
+									{m.title}
+								</h2>
+								{m.excerpt && (
+									<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+										{m.excerpt}
+									</p>
+								)}
+								<p class="mt-3 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">
+									{formatDate(m.publishDate)}
+								</p>
+							</a>
+						))}
+					</div>
+				)}
+			</div>
+		</section>
+
+		<!-- HOW THESE WORDS COME (trust block) -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl font-bold mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">
+					How these messages come
+				</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Scripture promises that the Father speaks to His children: &ldquo;your sons and your
+					daughters shall prophesy&rdquo; (Joel 2:28). These messages are received in prayer by
+					Kevin White, written down, and tested against the written word before they are shared
+					&mdash; &ldquo;test everything; hold fast what is good&rdquo; (1 Thessalonians 5:21).
+				</p>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">
+					No message here adds to the Bible or stands above it. The written word is the measure of
+					every word &mdash; which is why each message is anchored in Scripture drawn from the
+					Father&rsquo;s Heart Bible&trade;, free to read online.
+				</p>
+				<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					And these messages are not only to be read. Hearing our Father&rsquo;s voice is the
+					inheritance of every beloved son and daughter &mdash; &ldquo;your sons and your
+					daughters will prophesy&rdquo; (Joel 2:28). So every message ends the same way:
+					receive the Father&rsquo;s heart, hear His voice for yourself, and share it with
+					others. The &ldquo;now speak&rdquo; is for you.
+				</p>
+			</div>
+		</section>
+
+		<!-- JOIN -->
+		<section class="px-6 lg:px-8" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<WordsJoin />
+			</div>
+		</section>
+
+		<ShareBar title="Messages from the Father" url="https://fathersheartbible.com/words/" />
+	</main>
+</Layout>

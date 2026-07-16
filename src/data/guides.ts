@@ -52,4 +52,25 @@ export const GUIDES: GuideEntry[] = [
 			'The good news in plain terms — God is a Father who, through His Son, brings His lost children home.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/e1bf90d1eaeab499989a239a2f5bfd98494e3f78-5867x3911.jpg',
 	},
+	{
+		slug: 'best-books-on-the-fathers-heart',
+		title: 'Best Books on Receiving our Father’s Heart',
+		blurb:
+			'An honest reading list — McClung, Manning, Nouwen, Frost, Jordan, the Woods, Sandra Steen, Beloved Identity, and the one Bible devoted to the theme.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'resources-for-the-fathers-heart',
+		title: 'Resources for Receiving our Father’s Heart',
+		blurb:
+			'Everything in one place — free Scripture with audio, verse collections, guides, books, a short film, and community.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
+	},
+	{
+		slug: 'ministries-for-the-fathers-heart',
+		title: 'Ministries Intentional about our Father’s Heart',
+		blurb:
+			'A curated, honest list of ministries and teachers intentional about our Father’s heart — from the Woods and George LaDu to Fatherheart Ministries.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c42c2fd1d784331411250317010d54a0cfac62cc-5959x3724.jpg',
+	},
 ];

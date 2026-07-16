@@ -1,0 +1,25 @@
+---
+import WordsArticle from '../../../components/WordsArticle.astro';
+import { previewClient } from '../../../lib/sanity';
+
+// Dev-only draft preview — same mechanism as /blog/preview: pages are emitted
+// only when PUBLIC_PREVIEW_DRAFTS=1 (deploy-preview sets it on dev; prod builds
+// leave it unset so no preview pages ship).
+export async function getStaticPaths() {
+	if (import.meta.env.PUBLIC_PREVIEW_DRAFTS !== '1') return [];
+	const msgs = await previewClient.fetch(
+		`*[_type == "fatherMessage" && defined(slug.current)] { "slug": slug.current }`,
+	);
+	return msgs.map((m: any) => ({ params: { slug: m.slug } }));
+}
+
+const { slug } = Astro.params;
+const msg = await previewClient.fetch(`*[_type == "fatherMessage" && slug.current == $slug][0]`, {
+	slug,
+});
+if (!msg) {
+	return Astro.redirect('/words/');
+}
+---
+
+<WordsArticle msg={msg} noindex={true} />

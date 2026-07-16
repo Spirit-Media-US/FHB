@@ -1,0 +1,89 @@
+---
+// "Receive each message" — email (+ optional mobile) capture for the
+// Messages from the Father series. Posts to /words-join (CF Pages Function →
+// GHL upsert on the SMP location, tagged messages-from-the-father).
+// Growth engine for the series: every post and the hub carry this form.
+interface Props {
+	compact?: boolean;
+}
+const { compact = false } = Astro.props;
+---
+
+<aside
+	class:list={['words-join my-12 px-6 py-8 rounded-2xl text-center', compact ? '' : 'lg:px-10']}
+	style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"
+>
+	<p class="text-xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">
+		Receive each message as it comes
+	</p>
+	<p class="mt-2 max-w-xl mx-auto text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+		Delivered by email &mdash; and by text if you leave a mobile number. Unsubscribe anytime.
+	</p>
+	<form class="words-join-form mt-5 mx-auto max-w-md flex flex-col gap-3" novalidate>
+		<input
+			type="email"
+			name="email"
+			required
+			autocomplete="email"
+			placeholder="Your email"
+			class="w-full rounded-full px-5 py-3 text-sm"
+			style="border: 1px solid #f9d6e0; background-color: var(--color-surface); color: var(--color-ink); font-family: var(--font-sans);"
+		/>
+		<input
+			type="tel"
+			name="phone"
+			autocomplete="tel"
+			placeholder="Mobile number (optional, for text delivery)"
+			class="w-full rounded-full px-5 py-3 text-sm"
+			style="border: 1px solid #f9d6e0; background-color: var(--color-surface); color: var(--color-ink); font-family: var(--font-sans);"
+		/>
+		<!-- honeypot -->
+		<input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;width:0;opacity:0;" />
+		<button
+			type="submit"
+			class="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full text-sm font-semibold transition-opacity hover:opacity-90"
+			style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans); border: none; cursor: pointer;"
+		>
+			Send me each message
+			<span aria-hidden="true">&rarr;</span>
+		</button>
+		<p class="words-join-status text-sm min-h-5" style="font-family: var(--font-sans); color: var(--color-muted);" aria-live="polite"></p>
+	</form>
+</aside>
+
+<script>
+	for (const form of document.querySelectorAll<HTMLFormElement>('.words-join-form')) {
+		form.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const status = form.querySelector<HTMLElement>('.words-join-status');
+			const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+			const data = Object.fromEntries(new FormData(form).entries());
+			const email = String(data.email || '').trim();
+			if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+				if (status) status.textContent = 'Please enter a valid email address.';
+				return;
+			}
+			if (button) button.disabled = true;
+			if (status) status.textContent = 'One moment…';
+			try {
+				const res = await fetch('/words-join', {
+					method: 'POST',
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify({
+						email,
+						phone: String(data.phone || '').trim(),
+						website: String(data.website || ''),
+						page: location.pathname,
+					}),
+				});
+				if (!res.ok) throw new Error(String(res.status));
+				form.reset();
+				if (status) status.textContent = 'You’re in. The next message will come to your inbox.';
+			} catch {
+				if (status)
+					status.textContent = 'Something went wrong — please try again in a moment.';
+				if (button) button.disabled = false;
+			}
+		});
+	}
+</script>

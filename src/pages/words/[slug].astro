@@ -1,0 +1,21 @@
+---
+import WordsArticle from '../../components/WordsArticle.astro';
+import { sanityClient } from '../../lib/sanity';
+
+export async function getStaticPaths() {
+	const msgs = await sanityClient.fetch(
+		`*[_type == "fatherMessage" && defined(slug.current)] { "slug": slug.current }`,
+	);
+	return msgs.map((m: any) => ({ params: { slug: m.slug } }));
+}
+
+const { slug } = Astro.params;
+const msg = await sanityClient.fetch(`*[_type == "fatherMessage" && slug.current == $slug][0]`, {
+	slug,
+});
+if (!msg) {
+	return Astro.redirect('/words/');
+}
+---
+
+<WordsArticle msg={msg} />

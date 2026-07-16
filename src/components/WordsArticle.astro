@@ -1,0 +1,390 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { urlFor } from '../lib/sanity';
+// Shared renderer for a Messages from the Father post — used by both
+// /words/[slug] (published) and /words/preview/[slug] (drafts) so the two
+// can never drift. The word itself renders whole, in Father-voice styling,
+// with zero scaffolding; supporting FHB scriptures, the optional prophecy-
+// training section, the series join form, and the read/print CTA follow it.
+import ShareBar from './ShareBar.astro';
+import WordsJoin from './WordsJoin.astro';
+
+interface Props {
+	msg: any;
+	noindex?: boolean;
+}
+const { msg, noindex = false } = Astro.props;
+
+const esc = (s: string) =>
+	s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+// Minimal portable-text renderer (blocks + strong/em/link marks). The word's
+// paragraphs get Father-voice styling; the training section gets standard prose
+// with h2/h3 support.
+function renderBlocks(blocks: any[], voice: 'word' | 'prose'): string {
+	if (!Array.isArray(blocks)) return '';
+	let html = '';
+	let listType: string | null = null;
+	const closeList = () => {
+		if (listType) {
+			html += listType === 'number' ? '</ol>' : '</ul>';
+			listType = null;
+		}
+	};
+	for (const block of blocks) {
+		if (!block || block._type !== 'block') continue;
+		const children = Array.isArray(block.children) ? block.children : [];
+		const markDefs = Array.isArray(block.markDefs) ? block.markDefs : [];
+		const linkByKey: Record<string, string> = {};
+		for (const md of markDefs) {
+			if (md && md._type === 'link' && md._key && md.href) linkByKey[md._key] = md.href;
+		}
+		const inner = children
+			.map((child: any) => {
+				if (!child) return '';
+				let text = esc(child.text || '');
+				const marks = Array.isArray(child.marks) ? child.marks : [];
+				if (marks.includes('strong')) text = `<strong>${text}</strong>`;
+				if (marks.includes('em')) text = `<em>${text}</em>`;
+				const linkKey = marks.find((m: any) => typeof m === 'string' && linkByKey[m]);
+				if (linkKey) {
+					const href = linkByKey[linkKey];
+					const isExternal =
+						/^https?:\/\//i.test(href) && !href.startsWith('https://fathersheartbible.com');
+					const targetAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+					text = `<a href="${href}" style="color: var(--color-brand);" class="hover:underline"${targetAttrs}>${text}</a>`;
+				}
+				return text;
+			})
+			.join('');
+		// Indented lists (matches the blog's list rendering).
+		const listItem = block.listItem;
+		if (listItem === 'bullet' || listItem === 'number') {
+			if (listType && listType !== listItem) closeList();
+			if (!listType) {
+				listType = listItem;
+				html +=
+					listItem === 'number'
+						? '<ol class="list-decimal pl-7 my-6 space-y-3 text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">'
+						: '<ul class="list-disc pl-7 my-6 space-y-3 text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">';
+			}
+			html += `<li>${inner}</li>`;
+			continue;
+		}
+		closeList();
+		const style = block.style || 'normal';
+		if (voice === 'word') {
+			html += `<p class="text-xl leading-loose mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">${inner}</p>`;
+		} else if (style === 'h2') {
+			html += `<h2 class="text-2xl font-bold mt-12 mb-4 scroll-mt-24" style="font-family: var(--font-serif); color: var(--color-ink);">${inner}</h2>`;
+		} else if (style === 'h3') {
+			html += `<h3 class="text-xl font-bold mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">${inner}</h3>`;
+		} else {
+			html += `<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">${inner}</p>`;
+		}
+	}
+	closeList();
+	return html;
+}
+
+const wordHtml = renderBlocks(msg.body || [], 'word');
+const trainingHtml = renderBlocks(msg.training || [], 'prose');
+const scriptures = Array.isArray(msg.supportingScriptures) ? msg.supportingScriptures : [];
+
+const formatDate = (dateString: string) =>
+	new Date(dateString).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+const publishDate = msg.publishDate ? formatDate(msg.publishDate) : '';
+
+const heroImage = msg.heroImage
+	? urlFor(msg.heroImage).width(1200).quality(72).format('webp').url()
+	: '';
+const heroImageMobile = msg.heroImage
+	? urlFor(msg.heroImage).width(640).quality(70).format('webp').url()
+	: '';
+
+const receivedBy = msg.receivedBy || 'Kevin White';
+const postUrl = `https://fathersheartbible.com/words/${msg.slug.current}`;
+
+// Same unified author entity as the blog (E-E-A-T: visible human steward).
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: 'Founder & CEO, Spirit Media Publishing',
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://thekevinwhiteshow.podbean.com/',
+		'https://www.amazon.com/stores/author/B08LZYTR2B',
+	],
+};
+
+const FHB_PUBLISHER = {
+	'@type': 'Organization',
+	'@id': 'https://fathersheartbible.com/#organization',
+	name: "Father's Heart Bible",
+	url: 'https://fathersheartbible.com',
+	logo: { '@type': 'ImageObject', url: 'https://fathersheartbible.com/fhb-logo.png' },
+	parentOrganization: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+};
+
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BlogPosting',
+		headline: msg.title,
+		description: msg.excerpt || msg.seoDescription || msg.title,
+		...(heroImage ? { image: heroImage } : {}),
+		author: KEVIN_WHITE_AUTHOR,
+		publisher: FHB_PUBLISHER,
+		url: postUrl,
+		mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
+		datePublished: msg.publishDate,
+		inLanguage: 'en-US',
+		genre: 'Devotional',
+		speakable: { '@type': 'SpeakableSpecification', cssSelector: ['.post-title', '.words-body'] },
+		isPartOf: {
+			'@type': 'CollectionPage',
+			'@id': 'https://fathersheartbible.com/words/#collection',
+			name: 'Messages from the Father',
+			url: 'https://fathersheartbible.com/words/',
+		},
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{
+				'@type': 'ListItem',
+				position: 2,
+				name: 'Messages from the Father',
+				item: 'https://fathersheartbible.com/words/',
+			},
+			{ '@type': 'ListItem', position: 3, name: msg.title, item: postUrl },
+		],
+	},
+];
+---
+
+<Layout
+	title={msg.seoTitle || `${msg.title} | Father's Heart Bible™`}
+	description={msg.seoDescription || msg.excerpt || 'A message from the Father, received in prayer and tested against Scripture.'}
+	ogDescription={msg.ogDescription || msg.excerpt}
+	image={heroImage || undefined}
+	imageAlt={msg.heroImage?.alt}
+	noindex={noindex}
+	jsonLd={jsonLd}
+	darkHero={!!heroImage}
+	preloadImageMobile={heroImageMobile || undefined}
+	preloadImageDesktop={heroImage || undefined}
+	pageType="article"
+	articleAuthor={receivedBy}
+	articlePublishedTime={msg.publishDate}
+	articleSection="Messages from the Father"
+>
+	<main id="main-content">
+		{heroImage && (
+			<div class="relative w-full overflow-hidden h-72 lg:h-[520px]">
+				<img
+					src={heroImage}
+					srcset={`${heroImageMobile} 640w, ${heroImage} 1200w`}
+					sizes="(max-width: 1023px) 640px, 1200px"
+					alt={msg.heroImage?.alt || msg.title}
+					class="absolute inset-0 w-full h-full object-cover"
+					style="object-position: center center;"
+					fetchpriority="high"
+					decoding="async"
+				/>
+				<div
+					class="absolute inset-x-0 top-0 z-10"
+					style="height: 220px; background: linear-gradient(to bottom, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.32) 45%, rgba(0,0,0,0));"
+				></div>
+			</div>
+		)}
+
+		<!-- HEADER -->
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<a
+					href="/words/"
+					class="inline-flex items-center gap-1.5 text-sm font-semibold hover:opacity-80 transition-opacity mb-5 no-underline"
+					style="color: var(--color-brand);"
+				>
+					&larr; Messages from the Father
+				</a>
+				{msg.audience && (
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: #a04060; font-family: var(--font-sans);">
+						A word for {msg.audience}
+					</p>
+				)}
+				<h1 class="post-title text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+					{msg.title}
+				</h1>
+				<div class="mt-5 pb-8 text-sm border-b" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<p class="m-0">
+						By <span class="font-semibold" style="color: var(--color-ink);">{receivedBy}</span>,
+						founder of Spirit Media Publishing, the publisher of Father&rsquo;s Heart
+						Bible&trade;.{publishDate && <> Updated {publishDate}.</>}
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- WHAT THIS IS -->
+		<section class="px-6 pt-8 lg:px-8" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-base leading-relaxed italic px-6 py-4 rounded-2xl" style="font-family: var(--font-sans); color: var(--color-muted); background-color: var(--color-surface-low);">
+					This is a Message from the Father — a prophetic word received in prayer, written
+					down, and tested against Scripture before being shared (1 Thessalonians 5:21).
+					{msg.audience && <>This one is for {msg.audience.toLowerCase()}.</>}
+					<a href="/words/" class="no-underline hover:underline font-semibold not-italic" style="color: var(--color-brand);"> About these messages &rarr;</a>
+				</p>
+			</div>
+		</section>
+
+		<!-- THE WORD -->
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<article class="words-body mx-auto max-w-3xl">
+				<div set:html={wordHtml} />
+			</article>
+		</section>
+
+		<!-- SUPPORTING SCRIPTURES -->
+		{scriptures.length > 0 && (
+			<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-3xl">
+					<h2 class="text-2xl font-bold mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">
+						Anchored in Scripture
+					</h2>
+					<p class="text-base mb-10" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Every message is measured against the written word. These passages anchor this one
+						&mdash; from the Father&rsquo;s Heart Bible&trade;, free to read online.
+					</p>
+					<div class="flex flex-col gap-4">
+						{scriptures.map((s: any) => (
+							<figure class="m-0 px-6 py-6 lg:px-8 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+								<p class="text-lg font-semibold mb-3" style="color: #a04060; font-family: var(--font-serif);">
+									{s.reference}
+								</p>
+								<blockquote class="m-0 text-xl leading-relaxed font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
+									{s.text}
+								</blockquote>
+								<figcaption class="mt-4 text-sm" style="font-family: var(--font-sans);">
+									<a href={s.readUrl} class="font-semibold no-underline hover:underline" style="color: var(--color-brand);">
+										Read the whole chapter &rarr;
+									</a>
+								</figcaption>
+							</figure>
+						))}
+					</div>
+				</div>
+			</section>
+		)}
+
+		<!-- TRAINING -->
+		{trainingHtml && (
+			<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-3xl">
+					{msg.trainingTitle && (
+						<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: #a04060; font-family: var(--font-sans);">
+							Growing in the prophetic
+						</p>
+					)}
+					<div set:html={trainingHtml} />
+				</div>
+			</section>
+		)}
+
+		<!-- RECEIVE. HEAR. NOW SPEAK. — the standing close of every message -->
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl font-bold mb-8" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Receive. Hear. Now speak.
+				</h2>
+				<h3 class="text-lg font-semibold mb-3" style="font-family: var(--font-serif); color: #a04060;">
+					Receive
+				</h3>
+				<p class="text-lg leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Open your heart to God as your Heavenly Father. Receive His heart into your heart as
+					He daily showers you in His love, joy, and delight. Sit in His heart day by day until
+					you know beyond all doubts He is your holy Father and is absolutely well pleased with
+					you. Receive His identity as Father. Receive your identity as beloved son or daughter.
+				</p>
+				<h3 class="text-lg font-semibold mb-3" style="font-family: var(--font-serif); color: #a04060;">
+					Hear
+				</h3>
+				<p class="text-lg leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Seek His face. See His eyes of delight, His smile, His ears leaned toward you with
+					favor. Hear His voice. Let Him speak to you conversationally, in first person, as any
+					loving Father would with His beloved child. Write down what He says. Commit to believe
+					it and receive it. Do it again the next day, and the next. Soak up His love for you.
+				</p>
+				<h3 class="text-lg font-semibold mb-3" style="font-family: var(--font-serif); color: #a04060;">
+					Now speak
+				</h3>
+				<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Let Him reveal His passion to pour out His Spirit on all His beloved sons and daughters
+					worldwide. When He is ready, let Him say: <em>now speak</em>. Let Him reveal His heart
+					for specific people or groups of people. Share it &mdash; guiding them to receive the
+					Father&rsquo;s heart, hear His voice, and share it with others too.
+				</p>
+			</div>
+		</section>
+
+		<!-- JOIN + FHB CTA -->
+		<section class="px-6 lg:px-8" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<WordsJoin />
+				<aside class="mb-12 rounded-2xl overflow-hidden grid md:grid-cols-2 items-stretch" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<img
+						src="https://assets.spiritmediapublishing.com/FHB/print/print-band-white.webp"
+						alt="A reader holds the white print edition of the Father's Heart Bible, its cover reading “Father's Heart Bible — An Intimate Translation.”"
+						class="w-full h-56 md:h-full object-cover"
+						loading="lazy"
+						decoding="async"
+					/>
+					<div class="px-6 py-10 lg:px-10 lg:py-12 text-center md:text-left flex flex-col justify-center">
+						<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: #a04060; font-family: var(--font-sans);">
+							Father&rsquo;s Heart Bible&trade;
+						</p>
+						<p class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+							Meet the Father on every page of his word
+						</p>
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+							The complete Father&rsquo;s Heart Bible &mdash; free to read and listen online,
+							and now available in three print editions.
+						</p>
+						<div class="mt-7 flex flex-wrap items-center justify-center md:justify-start gap-3" style="font-family: var(--font-sans);">
+							<a href="/read" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A;">
+								Read free online
+							</a>
+							<a href="/print/" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="border: 1px solid #a04060; color: #a04060;">
+								Order in print &rarr;
+							</a>
+						</div>
+					</div>
+				</aside>
+			</div>
+		</section>
+
+		<ShareBar title={msg.title} url={postUrl} />
+	</main>
+</Layout>
