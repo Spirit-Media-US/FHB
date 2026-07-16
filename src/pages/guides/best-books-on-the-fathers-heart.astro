@@ -15,7 +15,7 @@ const TITLE =
 const DESCRIPTION =
 	'The best books on the father heart of God — the revelation of God as our loving Father: Floyd McClung’s classic, Brennan Manning, Henri Nouwen, Jack Frost, James Jordan — and the one Bible translation devoted to the theme.';
 const PUBLISHED = '2026-07-13';
-const MODIFIED = '2026-07-15';
+const MODIFIED = '2026-07-16';
 
 // Hero uses OUR FHB mock-up (T001) per the mock-ups-only hero rule, hosted on R2.
 const HERO_1400 = 'https://assets.spiritmediapublishing.com/FHB/heroes/best-books-hero-1400.webp';
@@ -47,6 +47,12 @@ const KEVIN_WHITE_AUTHOR = {
 		'https://www.linkedin.com/in/kevinwhiteus/',
 		'https://www.youtube.com/@KevinWhiteus',
 		'https://spiritmediapublishing.com',
+	],
+	knowsAbout: [
+		'the Father heart of God',
+		'the fatherhood of God',
+		'Bible translation',
+		'Christian discipleship',
 	],
 };
 
@@ -178,6 +184,49 @@ const ORDERED_BOOKS = [
 	),
 ];
 
+// Product URLs for Book-schema sameAs (entity linking, keyword-independent).
+const BUY: Record<string, string> = {
+	fhb: 'https://fathersheartbible.com/read',
+	white: 'https://www.amazon.com/dp/B0GQ3L2LQT',
+	jordan: 'https://www.amazon.com/dp/0994101619',
+	'abba-foundation': 'https://www.amazon.com/dp/B079Z8J4YN',
+	'abba-factor': 'https://www.amazon.com/dp/B07B8RJDMG',
+	steen: 'https://www.amazon.com/dp/B0FS3YCG5S',
+	fll: 'https://www.amazon.com/dp/0875099998',
+};
+// "At a glance" extraction table — engines cite tables verbatim.
+const COMPARE: Record<string, { bestFor: string; startIf: string }> = {
+	fhb: {
+		bestFor: 'Everyone — the source itself',
+		startIf: 'you want to hear the Father directly in Scripture',
+	},
+	white: {
+		bestFor: 'Performers & provers',
+		startIf: 'you wonder what your Heavenly Father thinks of you',
+	},
+	mcclung: { bestFor: 'Newcomers', startIf: 'the Father’s love is a brand-new idea' },
+	manning: { bestFor: 'The weary and ashamed', startIf: 'you’re worn out from performing for God' },
+	nouwen: { bestFor: 'Contemplatives', startIf: 'you love art and slow reflection' },
+	frost: { bestFor: 'Strivers', startIf: 'you know all about earning, little about resting' },
+	jordan: {
+		bestFor: 'Maturing believers',
+		startIf: 'the love has landed and you want to live as a son or daughter',
+	},
+	'abba-foundation': {
+		bestFor: 'Learners',
+		startIf: 'you want the Father’s love with a teacher’s clarity',
+	},
+	'abba-factor': {
+		bestFor: 'Identity-seekers',
+		startIf: 'you grasp the love but it hasn’t settled who you are',
+	},
+	steen: { bestFor: 'The cooled-off', startIf: 'your love for God has faded to routine' },
+	fll: {
+		bestFor: 'Those unsure of grace',
+		startIf: 'you struggle to believe He feels that way about you',
+	},
+};
+
 const FAQS = [
 	{
 		question: 'What is the best book on the father heart of God?',
@@ -230,8 +279,16 @@ const listSchema = {
 	itemListElement: ORDERED_BOOKS.map((b, i) => ({
 		'@type': 'ListItem',
 		position: i + 1,
-		name: `${b.title} — ${b.author.replace(/ — (the one we publish|also from our house)$/, '')}`,
-		url: `${PAGE_URL}#${b.id}`,
+		item: {
+			'@type': 'Book',
+			name: b.title,
+			author:
+				b.id === 'fhb'
+					? { '@type': 'Organization', name: 'Spirit Media Publishing' }
+					: { '@type': 'Person', name: b.author.replace(/ —.*$/, '').trim() },
+			url: `${PAGE_URL}#${b.id}`,
+			...(BUY[b.id] ? { sameAs: BUY[b.id] } : {}),
+		},
 	})),
 };
 const breadcrumbSchema = {
@@ -265,6 +322,7 @@ const faqSchema = {
 const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema];
 const TOC = [
 	{ id: 'fhb', label: 'The Father’s Heart Bible™' },
+	{ id: 'at-a-glance', label: 'At a glance' },
 	{ id: 'abba-factor', label: 'The Abba Factor' },
 	{ id: 'abba-foundation', label: 'The Abba Foundation' },
 	{ id: 'manning', label: 'Abba’s Child' },
@@ -336,6 +394,29 @@ const TOC = [
 						{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}
 					</ul>
 				</nav>
+
+				<h2 id="at-a-glance" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">At a glance: which one to read</h2>
+				<div class="my-4 overflow-x-auto">
+					<table class="w-full text-left" style="border-collapse: collapse; font-family: var(--font-sans);">
+						<caption class="sr-only">Which book on the Father heart of God to read, by need</caption>
+						<thead>
+							<tr style="border-bottom: 2px solid var(--color-hairline);">
+								<th scope="col" class="py-2 pr-4 text-sm font-semibold align-bottom" style="color: var(--color-ink);">Book</th>
+								<th scope="col" class="py-2 pr-4 text-sm font-semibold align-bottom" style="color: var(--color-ink);">Best for</th>
+								<th scope="col" class="py-2 text-sm font-semibold align-bottom" style="color: var(--color-ink);">Start here if&hellip;</th>
+							</tr>
+						</thead>
+						<tbody>
+							{ORDERED_BOOKS.map((b) => (
+								<tr style="border-bottom: 1px solid var(--color-hairline);">
+									<td class="py-2 pr-4 text-sm align-top"><a href={`#${b.id}`} class="hover:underline" style="color: var(--color-brand);">{b.title}</a></td>
+									<td class="py-2 pr-4 text-sm align-top" style="color: var(--color-muted);">{COMPARE[b.id]?.bestFor}</td>
+									<td class="py-2 text-sm align-top" style="color: var(--color-muted);">{COMPARE[b.id]?.startIf}</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
 
 				{ORDERED_BOOKS.map((b, i) => (
 					<div id={b.id} class="scroll-mt-28">

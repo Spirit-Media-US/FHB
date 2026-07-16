@@ -16,7 +16,7 @@ const TITLE =
 const DESCRIPTION =
 	'A curated, honest list of father heart of God ministries and teachers — Kerry & Chiqui Wood, George LaDu, Sandra Steen, Barbara Kohler, Fatherheart Ministries, and more.';
 const PUBLISHED = '2026-07-15';
-const MODIFIED = '2026-07-15';
+const MODIFIED = '2026-07-16';
 
 // Hero uses OUR FHB mock-up (M001) per the mock-ups-only hero rule, hosted on R2.
 const HERO_1400 = 'https://assets.spiritmediapublishing.com/FHB/heroes/ministries-hero-1400.webp';
@@ -48,6 +48,12 @@ const KEVIN_WHITE_AUTHOR = {
 		'https://www.linkedin.com/in/kevinwhiteus/',
 		'https://www.youtube.com/@KevinWhiteus',
 		'https://spiritmediapublishing.com',
+	],
+	knowsAbout: [
+		'the Father heart of God',
+		'the fatherhood of God',
+		'Bible translation',
+		'Christian discipleship',
 	],
 };
 
@@ -197,6 +203,18 @@ const BOOK_OF: Record<string, string> = {
 	shiloh: 'frost',
 	fll: 'fll',
 };
+// "At a glance" extraction table (focus + format) — engines cite tables verbatim.
+const COMPARE: Record<string, { focus: string; format: string }> = {
+	wood: { focus: 'Sonship & the Abba life', format: 'Books + local church' },
+	ladu: { focus: 'Identity in the Father', format: 'Online courses + coaching' },
+	steen: { focus: 'Renewing first love for God', format: 'Book + movement' },
+	kohler: { focus: 'Healing father wounds', format: 'Christian counseling & intensives' },
+	fatherheart: { focus: 'The Father’s love & sonship', format: 'Schools + books' },
+	shiloh: { focus: 'From performance to rest', format: 'Schools + conferences' },
+	fll: { focus: 'The Father’s love, personally', format: 'Free letter + book' },
+	galpin: { focus: 'Encountering God as Father', format: 'Retreats + book' },
+	hetland: { focus: 'The Father’s love in missions', format: 'Books + missions' },
+};
 
 const FAQS = [
 	{
@@ -250,9 +268,53 @@ const listSchema = {
 	itemListElement: ORDERED_MIN.map((m, i) => ({
 		'@type': 'ListItem',
 		position: i + 1,
-		name: m.name,
-		url: `${PAGE_URL}#${m.id}`,
+		item: {
+			'@type': 'Organization',
+			name: m.name,
+			url: m.links[0]?.href,
+			sameAs: m.links.map((l) => l.href),
+		},
 	})),
+};
+// Course entities for George & Randi LaDu's Kingdom Living academy.
+const courseSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'ItemList',
+	name: 'Kingdom Living courses — George & Randi LaDu',
+	itemListElement: [
+		{
+			'@type': 'ListItem',
+			position: 1,
+			item: {
+				'@type': 'Course',
+				name: 'The Beloved',
+				description:
+					'A course to experience your Heavenly Father’s love and live as His beloved child.',
+				provider: {
+					'@type': 'Organization',
+					name: 'Kingdom Living',
+					url: 'https://www.kingdomliving.global',
+				},
+				url: 'https://www.kingdomliving.global/course/beloved',
+			},
+		},
+		{
+			'@type': 'ListItem',
+			position: 2,
+			item: {
+				'@type': 'Course',
+				name: 'The Identity Project',
+				description:
+					'A self-paced journey into your God-given identity, with group and one-to-one coaching.',
+				provider: {
+					'@type': 'Organization',
+					name: 'Kingdom Living',
+					url: 'https://www.kingdomliving.global',
+				},
+				url: 'https://www.kingdomliving.global/course/identity-intro-call',
+			},
+		},
+	],
 };
 const breadcrumbSchema = {
 	'@context': 'https://schema.org',
@@ -282,7 +344,7 @@ const faqSchema = {
 		acceptedAnswer: { '@type': 'Answer', text: f.answer },
 	})),
 };
-const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema];
+const jsonLd = [articleSchema, listSchema, courseSchema, breadcrumbSchema, faqSchema];
 ---
 <Layout
 	title={TITLE}
@@ -334,6 +396,28 @@ const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema];
 					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
 					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">Good teachers point past themselves. Every voice on this page leads to the same place &mdash; the Father&rsquo;s heart revealed in Scripture. Let them guide you there, then read it for yourself.</p>
 				</aside>
+
+				<div class="my-4 overflow-x-auto">
+					<table class="w-full text-left" style="border-collapse: collapse; font-family: var(--font-sans);">
+						<caption class="sr-only">Father heart of God ministries at a glance — focus and format</caption>
+						<thead>
+							<tr style="border-bottom: 2px solid var(--color-hairline);">
+								<th scope="col" class="py-2 pr-4 text-sm font-semibold align-bottom" style="color: var(--color-ink);">Ministry</th>
+								<th scope="col" class="py-2 pr-4 text-sm font-semibold align-bottom" style="color: var(--color-ink);">Focus</th>
+								<th scope="col" class="py-2 text-sm font-semibold align-bottom" style="color: var(--color-ink);">Format</th>
+							</tr>
+						</thead>
+						<tbody>
+							{ORDERED_MIN.map((m) => (
+								<tr style="border-bottom: 1px solid var(--color-hairline);">
+									<td class="py-2 pr-4 text-sm align-top"><a href={`#${m.id}`} class="hover:underline" style="color: var(--color-brand);">{m.name}</a></td>
+									<td class="py-2 pr-4 text-sm align-top" style="color: var(--color-muted);">{COMPARE[m.id]?.focus}</td>
+									<td class="py-2 text-sm align-top" style="color: var(--color-muted);">{COMPARE[m.id]?.format}</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
 
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
 					{ORDERED_MIN.map((m) => (
