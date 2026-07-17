@@ -3,7 +3,7 @@ import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Three editions on Amazon, each in paperback (asin) and hardback (hbAsin).
+// COMPACT editions on Amazon, each in paperback (asin) and hardback (hbAsin).
 const editions = [
 	{
 		color: 'Plum',
@@ -28,13 +28,48 @@ const editions = [
 	},
 ];
 
+// LARGE PRINT editions. Paperbacks are live on Amazon; hardback listings are
+// coming soon (hbAsin null) but ARE orderable in bulk (POD, we fulfill). Same
+// retail as Compact ($39.99 PB / $44.99 HB), so LP shares the bulk ladder.
+// Reuses the Compact cover art (same design, larger trim) until LP product
+// shots are shot.
+const lpEditions = [
+	{
+		color: 'Plum',
+		slug: 'lp_plum',
+		asin: 'B0H8XC43KR',
+		hbAsin: null,
+		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-plum.webp',
+	},
+	{
+		color: 'Charcoal',
+		slug: 'lp_charcoal',
+		asin: 'B0H8XQ2LGL',
+		hbAsin: null,
+		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-charcoal.webp',
+	},
+	{
+		color: 'White',
+		slug: 'lp_white',
+		asin: 'B0H8XPWH6T',
+		hbAsin: null,
+		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-white.webp',
+	},
+];
+
+// Digital editions. eBook is live on Amazon ($9.99) AND sold direct here
+// ($7.49, our own fulfillment). Audiobook is coming soon (Authors Direct).
+const ebookAsin = 'B0H8R2YP66';
+const EBOOK_AMAZON = '$9.99';
+const EBOOK_DIRECT = '$7.49';
+
 // Volume ladder — the COMBINED total across all editions and bindings sets
 // the tier. ONE consistent discount % applies to both bindings, each off its
 // own retail (unit = paperback off $39.99, unitHb = hardback off $44.99).
 // MUST match functions/print-checkout.ts TIERS.
 const tiers = [
-	{ qty: 25, pct: 10, unit: 35.99, unitHb: 40.49 },
-	{ qty: 50, pct: 15, unit: 33.99, unitHb: 38.24 },
+	{ qty: 25, pct: 15, unit: 33.99, unitHb: 38.24 },
+	{ qty: 50, pct: 20, unit: 31.99, unitHb: 35.99 },
 	{ qty: 100, pct: 25, unit: 29.99, unitHb: 33.74 },
 	{ qty: 250, pct: 30, unit: 27.99, unitHb: 31.49 },
 	{ qty: 500, pct: 35, unit: 25.99, unitHb: 29.24 },
@@ -122,6 +157,34 @@ function markFather(text: string, phrases: string[]): string {
 				))}
 			</div>
 			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin-top: 2rem;">Both bindings ship from Amazon.</p>
+
+			<!-- Large Print -->
+			<div class="text-center mt-14 mb-8">
+				<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Also in Large Print</p>
+				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 600; margin: 0;">Large Print — easy-on-the-eyes 14pt type</h3>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-10 max-w-4xl mx-auto">
+				{lpEditions.map((e) => (
+					<div class="flex flex-col items-center text-center rounded-2xl p-6" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+						<img src={e.img} alt={`Father's Heart Bible Large Print — ${e.color} edition`} width="700" height="1170" loading="lazy" decoding="async" class="block" style="width: 180px; height: auto; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.18));" />
+						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 1.25rem 0 1rem;">{e.color} Edition</h3>
+						<div class="flex flex-col gap-2 w-full" style="max-width: 13rem;">
+							<a
+								href={`https://www.amazon.com/dp/${e.asin}`}
+								target="_blank"
+								rel="noopener"
+								class="inline-flex items-center justify-center rounded-full font-semibold"
+								style="font-family: var(--font-sans); background: #ffe9f0; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.7rem 1.4rem; text-decoration: none; font-size: 0.9rem;"
+							>Paperback · {RETAIL} →</a>
+							<span
+								class="inline-flex items-center justify-center rounded-full font-semibold"
+								style="font-family: var(--font-sans); background: #f3f3f3; color: var(--color-muted); border: 1.5px solid var(--color-hairline); padding: 0.7rem 1.4rem; font-size: 0.9rem; cursor: default;"
+							>Hardback · coming soon</span>
+						</div>
+					</div>
+				))}
+			</div>
+			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin-top: 2rem;">Large Print paperbacks ship from Amazon. Hardbacks are coming soon — and available now in bulk below.</p>
 		</Section>
 
 		<!-- ═══════════════ SCRIPTURE CARDS ═══════════════ -->
@@ -165,27 +228,23 @@ function markFather(text: string, phrases: string[]): string {
 
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Choose how many of each edition</p>
 					<div style="display: flex; flex-direction: column; gap: 0.65rem;">
-						{editions.map((e) => (
+						<p style="font-family: var(--font-sans); font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-brand); margin: 0.2rem 0 -0.1rem;">Compact</p>
+						{[...editions.map((e) => ({ ...e, bind: 'pb' })), ...editions.map((e) => ({ ...e, bind: 'hb' })),
+						  { sub: 'Large Print' },
+						  ...lpEditions.map((e) => ({ ...e, bind: 'pb' })), ...lpEditions.map((e) => ({ ...e, bind: 'hb' }))].map((e) => (
+							e.sub ? (
+								<p style="font-family: var(--font-sans); font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-brand); margin: 0.6rem 0 -0.1rem;">{e.sub}</p>
+							) : (
 							<div class="flex items-center gap-3">
 								<img src={e.img} alt="" width="700" height="1170" loading="lazy" decoding="async" style="width: 68px; height: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.18));" />
-								<span style="flex: 1; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">English Paperback ({e.color} Edition)</span>
+								<span style="flex: 1; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">{e.slug.startsWith('lp_') ? 'Large Print' : 'English'} {e.bind === 'hb' ? 'Hardback' : 'Paperback'} ({e.color} Edition)</span>
 								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
-									<button type="button" class="qty-step" data-color={e.slug} data-dir="-1" aria-label={`Fewer ${e.color} paperback`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
-									<input type="number" class="qty-in" data-color={e.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.color} paperback quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
-									<button type="button" class="qty-step" data-color={e.slug} data-dir="1" aria-label={`More ${e.color} paperback`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
+									<button type="button" class="qty-step" data-color={e.bind === 'hb' ? `${e.slug}_hb` : e.slug} data-dir="-1" aria-label={`Fewer ${e.color} ${e.bind}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
+									<input type="number" class="qty-in" data-color={e.bind === 'hb' ? `${e.slug}_hb` : e.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.color} ${e.bind} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
+									<button type="button" class="qty-step" data-color={e.bind === 'hb' ? `${e.slug}_hb` : e.slug} data-dir="1" aria-label={`More ${e.color} ${e.bind}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
 								</div>
 							</div>
-						))}
-						{editions.map((e) => (
-							<div class="flex items-center gap-3">
-								<img src={e.img} alt="" width="700" height="1170" loading="lazy" decoding="async" style="width: 68px; height: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.18));" />
-								<span style="flex: 1; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">English Hardback ({e.color} Edition)</span>
-								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
-									<button type="button" class="qty-step" data-color={`${e.slug}_hb`} data-dir="-1" aria-label={`Fewer ${e.color} hardback`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
-									<input type="number" class="qty-in" data-color={`${e.slug}_hb`} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.color} hardback quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
-									<button type="button" class="qty-step" data-color={`${e.slug}_hb`} data-dir="1" aria-label={`More ${e.color} hardback`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
-								</div>
-							</div>
+							)
 						))}
 					</div>
 
@@ -201,6 +260,34 @@ function markFather(text: string, phrases: string[]): string {
 				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.8rem; margin-top: 1rem;">Fulfilled direct by Spirit Media Publishing · 25-copy minimum · free shipping · sales tax calculated at checkout · mix editions and bindings freely. Need more than 1,000? <a href="mailto:hello@spiritmediapublishing.com?subject=FHB%20bulk%20order%20(1000%2B)" style="color: var(--color-brand); text-decoration: underline;">Contact us</a>.</p>
 			</div>
 		</Section>
+
+			<!-- ═══════════════ DIGITAL EDITIONS ═══════════════ -->
+			<Section variant="light">
+				<div class="text-center mb-10">
+					<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Digital Editions</p>
+					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Read it. Hear it.</h2>
+				</div>
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-3xl mx-auto">
+					<div class="flex flex-col text-center rounded-2xl p-7" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.4rem;">eBook</h3>
+						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.5; margin: 0 0 1.25rem; flex: 1;">Read on any device — Kindle, phone, or tablet. The complete translation, reflowable with pop-up footnotes.</p>
+						<div class="flex flex-col gap-2 w-full mx-auto" style="max-width: 15rem;">
+							<button type="button" data-ebook-buy class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-brand); color: #fff; border: 0; padding: 0.75rem 1.4rem; cursor: pointer; font-size: 0.92rem;">Buy Direct · {EBOOK_DIRECT} →</button>
+							<a href={`https://www.amazon.com/dp/${ebookAsin}`} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #fff; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Kindle on Amazon · {EBOOK_AMAZON} →</a>
+						</div>
+						<p data-ebook-msg style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.7rem 0 0; display: none;"></p>
+						<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">Direct = instant EPUB download, DRM-free — read it anywhere.</p>
+					</div>
+					<div class="flex flex-col text-center rounded-2xl p-7" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.4rem;">Audiobook</h3>
+						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.5; margin: 0 0 1.25rem; flex: 1;">The whole Bible, narrated — all 66 books, chapter by chapter, offline in your favorite audiobook app.</p>
+						<div class="flex flex-col gap-2 w-full mx-auto" style="max-width: 15rem;">
+							<span class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #f3f3f3; color: var(--color-muted); border: 1.5px solid var(--color-hairline); padding: 0.75rem 1.4rem; font-size: 0.92rem; cursor: default;">Coming soon</span>
+						</div>
+						<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">Coming to Spotify, Apple, Google Play — and here, direct.</p>
+					</div>
+				</div>
+			</Section>
 
 		<!-- ═══════════════ PEOPLE BAND (variety of readers with FHB) ═══════════════ -->
 		<div class="grid grid-cols-1 sm:grid-cols-3">
@@ -225,14 +312,17 @@ function markFather(text: string, phrases: string[]): string {
 			{ min: 500, pct: 35, unit: 25.99, unitHb: 29.24 },
 			{ min: 250, pct: 30, unit: 27.99, unitHb: 31.49 },
 			{ min: 100, pct: 25, unit: 29.99, unitHb: 33.74 },
-			{ min: 50, pct: 15, unit: 33.99, unitHb: 38.24 },
-			{ min: 25, pct: 10, unit: 35.99, unitHb: 40.49 },
+			{ min: 50, pct: 20, unit: 31.99, unitHb: 35.99 },
+			{ min: 25, pct: 15, unit: 33.99, unitHb: 38.24 },
 		];
 		const tierFor = (t) => TIERS.find((x) => t >= x.min) || null;
 		const fmt = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-		const counts = { plum: 0, charcoal: 0, white: 0, plum_hb: 0, charcoal_hb: 0, white_hb: 0 };
-		const PB_KEYS = ['plum', 'charcoal', 'white'];
-		const HB_KEYS = ['plum_hb', 'charcoal_hb', 'white_hb'];
+		const counts = {
+			plum: 0, charcoal: 0, white: 0, plum_hb: 0, charcoal_hb: 0, white_hb: 0,
+			lp_plum: 0, lp_charcoal: 0, lp_white: 0, lp_plum_hb: 0, lp_charcoal_hb: 0, lp_white_hb: 0,
+		};
+		const PB_KEYS = ['plum', 'charcoal', 'white', 'lp_plum', 'lp_charcoal', 'lp_white'];
+		const HB_KEYS = ['plum_hb', 'charcoal_hb', 'white_hb', 'lp_plum_hb', 'lp_charcoal_hb', 'lp_white_hb'];
 		const out = root.querySelector('[data-total-out]');
 		const countEl = root.querySelector('[data-count]');
 		const saveEl = root.querySelector('[data-save]');
@@ -294,6 +384,28 @@ function markFather(text: string, phrases: string[]): string {
 				const d = await r.json();
 				if (d.url) { window.location.href = d.url; return; }
 				if (msg) { msg.style.display = 'block'; msg.textContent = d.disabled ? 'Bulk checkout is opening soon — check back shortly.' : (d.error === 'below_minimum' ? 'A 25-copy minimum is required for bulk pricing.' : 'Sorry, something went wrong starting checkout. Please try again.'); }
+			} catch {
+				if (msg) { msg.style.display = 'block'; msg.textContent = 'Network error — please try again.'; }
+			}
+			btn.disabled = false; btn.textContent = label;
+		});
+	})();
+</script>
+
+
+<script is:inline>
+	(() => {
+		const btn = document.querySelector('[data-ebook-buy]');
+		if (!btn) return;
+		const msg = document.querySelector('[data-ebook-msg]');
+		btn.addEventListener('click', async () => {
+			const label = btn.textContent;
+			btn.disabled = true; btn.textContent = 'Starting checkout…';
+			try {
+				const r = await fetch('/ebook-checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
+				const d = await r.json();
+				if (d.url) { window.location.href = d.url; return; }
+				if (msg) { msg.style.display = 'block'; msg.textContent = d.disabled ? 'Direct download is opening soon — grab it on Amazon meanwhile.' : 'Sorry, something went wrong. Please try again.'; }
 			} catch {
 				if (msg) { msg.style.display = 'block'; msg.textContent = 'Network error — please try again.'; }
 			}

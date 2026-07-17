@@ -34,9 +34,9 @@ const TIERS: { min: number; pct: number; pb: number; hb: number }[] = [
 	{ min: 1000, pct: 40, pb: 2399, hb: 2699 },
 	{ min: 500, pct: 35, pb: 2599, hb: 2924 },
 	{ min: 250, pct: 30, pb: 2799, hb: 3149 },
-	{ min: 100, pct: 25, pb: 2999, hb: 3374 }, // deliberate 10-pt cliff at 100
-	{ min: 50, pct: 15, pb: 3399, hb: 3824 },
-	{ min: 25, pct: 10, pb: 3599, hb: 4049 },
+	{ min: 100, pct: 25, pb: 2999, hb: 3374 },
+	{ min: 50, pct: 20, pb: 3199, hb: 3599 },
+	{ min: 25, pct: 15, pb: 3399, hb: 3824 },
 ];
 const tierFor = (total: number) => TIERS.find((t) => total >= t.min) ?? null;
 
@@ -53,7 +53,14 @@ const COVER: Record<Color, string> = {
 const BINDING_LABEL: Record<Binding, string> = { pb: 'Paperback', hb: 'Hardback' };
 
 // Request-payload key for a color+binding ("plum", "plum_hb", …).
-const keyFor = (c: Color, b: Binding): string => (b === 'pb' ? c : `${c}_hb`);
+// Product lines: Compact + Large Print. LP prices identically to Compact (same
+// retail), so it just adds SKUs — LP paperback/hardback both bulk-orderable now.
+const LINES = ['compact', 'lp'] as const;
+type Line = (typeof LINES)[number];
+const keyFor = (c: Color, b: Binding, line: Line = 'compact'): string => {
+	const base = b === 'pb' ? c : `${c}_hb`;
+	return line === 'lp' ? `lp_${base}` : base;
+};
 
 function titleCase(s: string): string {
 	return s.charAt(0).toUpperCase() + s.slice(1);
@@ -81,14 +88,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		return json({ error: 'bad_request' }, 400);
 	}
 
-	// Normalize per-edition+binding counts (mix-and-match).
+	// Normalize per-line+edition+binding counts (mix-and-match; Compact + Large Print).
 	const counts: Record<string, number> = {};
-	for (const b of BINDINGS) {
-		for (const c of COLORS) {
-			const k = keyFor(c, b);
-			const n = Math.floor(Number(payload.counts?.[k] ?? 0));
-			if (!Number.isFinite(n) || n < 0) return json({ error: 'invalid_selection' }, 400);
-			counts[k] = n;
+	for (const line of LINES) {
+		for (const b of BINDINGS) {
+			for (const c of COLORS) {
+				const k = keyFor(c, b, line);
+				const n = Math.floor(Number(payload.counts?.[k] ?? 0));
+				if (!Number.isFinite(n) || n < 0) return json({ error: 'invalid_selection' }, 400);
+				counts[k] = n;
+			}
 		}
 	}
 	const total = Object.values(counts).reduce((s, n) => s + n, 0);
@@ -121,25 +130,27 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 			.map(([k, n]) => `${k}:${n}`)
 			.join(','),
 	};
-	// One line item per edition+binding ordered, each at its binding's
-	// volume-tier unit price.
+	// One line item per line+edition+binding ordered, each at its binding's
+	// volume-tier unit price (LP prices identically to Compact).
 	let li = 0;
-	for (const b of BINDINGS) {
-		for (const c of COLORS) {
-			const qty = counts[keyFor(c, b)];
-			if (qty <= 0) continue;
-			const p = `line_items[${li}]`;
-			form[`${p}[quantity]`] = qty;
-			form[`${p}[price_data][currency]`] = 'usd';
-			form[`${p}[price_data][unit_amount]`] = tier[b];
-			form[`${p}[price_data][tax_behavior]`] = 'exclusive';
-			form[`${p}[price_data][product_data][name]`] =
-				`Father's Heart Bible — ${titleCase(c)} ${BINDING_LABEL[b]}`;
-			form[`${p}[price_data][product_data][description]`] =
-				`Bulk (${total} copies, ${tier.pct}% off) · Free shipping`;
-			form[`${p}[price_data][product_data][images][0]`] = COVER[c];
-			form[`${p}[price_data][product_data][tax_code]`] = TAX_CODE;
-			li++;
+	for (const line of LINES) {
+		for (const b of BINDINGS) {
+			for (const c of COLORS) {
+				const qty = counts[keyFor(c, b, line)];
+				if (qty <= 0) continue;
+				const p = `line_items[${li}]`;
+				form[`${p}[quantity]`] = qty;
+				form[`${p}[price_data][currency]`] = 'usd';
+				form[`${p}[price_data][unit_amount]`] = tier[b];
+				form[`${p}[price_data][tax_behavior]`] = 'exclusive';
+				form[`${p}[price_data][product_data][name]`] =
+					`Father's Heart Bible${line === 'lp' ? ' Large Print' : ''} — ${titleCase(c)} ${BINDING_LABEL[b]}`;
+				form[`${p}[price_data][product_data][description]`] =
+					`Bulk (${total} copies, ${tier.pct}% off) · Free shipping`;
+				form[`${p}[price_data][product_data][images][0]`] = COVER[c];
+				form[`${p}[price_data][product_data][tax_code]`] = TAX_CODE;
+				li++;
+			}
 		}
 	}
 	const formStr = encodeForm(form);
