@@ -6,6 +6,7 @@
 // Shelly know personally. NOTE (pre-prod): book cover thumbs currently hotlink
 // Amazon's media CDN as review placeholders — move to R2/Sanity before main.
 import AuthorBio from '../../components/AuthorBio.astro';
+import BlogAudioPlayer from '../../components/BlogAudioPlayer.astro';
 import BlogPrintCTA from '../../components/BlogPrintCTA.astro';
 import ReviewLink from '../../components/ReviewLink.astro';
 import Layout from '../../layouts/Layout.astro';
@@ -23,6 +24,9 @@ const HERO_1400 = 'https://assets.spiritmediapublishing.com/FHB/heroes/ministrie
 const HERO_640 = 'https://assets.spiritmediapublishing.com/FHB/heroes/ministries-hero-640.webp';
 const HERO_ALT = 'Three generations reading the Father’s Heart Bible together by the fire';
 const OG_IMG = 'https://assets.spiritmediapublishing.com/FHB/heroes/ministries-hero-og.jpg';
+// "Listen to this guide" narration — rotation voice 10 (Algieba); Charon is Scripture-only.
+const AUDIO_SRC =
+	'https://media.spiritmediapublishing.com/audio/guide/en/ministries-for-the-fathers-heart.mp3';
 
 const formatDate = (iso: string) =>
 	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
@@ -361,6 +365,7 @@ const jsonLd = [articleSchema, listSchema, courseSchema, breadcrumbSchema, faqSc
 	preloadImageDesktop={HERO_1400}
 >
 	<main id="main-content">
+		<BlogAudioPlayer src={AUDIO_SRC} />
 		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
 			<img src={HERO_1400} srcset={`${HERO_640} 640w, ${HERO_1400} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
 			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>

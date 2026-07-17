@@ -4,6 +4,7 @@
 // trials, 15 citations). Curates only real, live FHB surfaces — the reader,
 // verses, guides, books list, film, community, print — one link each.
 import AuthorBio from '../../components/AuthorBio.astro';
+import BlogAudioPlayer from '../../components/BlogAudioPlayer.astro';
 import ReviewLink from '../../components/ReviewLink.astro';
 import Layout from '../../layouts/Layout.astro';
 
@@ -21,6 +22,9 @@ const HERO_ALT = 'An open Bible with morning light across its pages';
 const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
 const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
 const FILM_ID = 'Ld4_H5XxrLk';
+// "Listen to this guide" narration — rotation voice 13 (Sadachbia); Charon is Scripture-only.
+const AUDIO_SRC =
+	'https://media.spiritmediapublishing.com/audio/guide/en/resources-for-the-fathers-heart.mp3';
 
 const formatDate = (iso: string) =>
 	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
@@ -297,6 +301,7 @@ const TOC = [
 	preloadImageDesktop={HERO_IMG}
 >
 	<main id="main-content">
+		<BlogAudioPlayer src={AUDIO_SRC} />
 		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
 			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
 			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
