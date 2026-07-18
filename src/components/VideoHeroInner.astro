@@ -71,21 +71,16 @@ const heroSrcMain = hasW ? imageSrc.replace(/([?&])w=\d+/, '$1w=1280') : imageSr
 			style="opacity: 1;"
 		/>
 	)}
-	<!-- Dark overlay: darker at top (so the transparent header's nav/CTA stay
-	     legible) and at bottom (behind the heading), lighter through the middle
-	     so the imagery still reads. -->
-	<div
-		class="absolute inset-0 z-[1]"
-		style="background: linear-gradient(to bottom, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.18) 32%, rgba(0,0,0,0.30) 65%, rgba(0,0,0,0.62) 100%);"
-		aria-hidden="true"
-	></div>
+	<!-- No image overlay (Kevin 2026-07-18): heroes show at true brightness.
+	     The white heading keeps a soft text-shadow below for legibility over
+	     bright imagery — the image itself is untouched. -->
 	{href && (
 		<a href={href} aria-label="See the Father's Heart Bible print editions" class="absolute inset-0 z-[2]"></a>
 	)}
 	<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-10 md:pb-16 lg:pb-24">
 		<h1
 			class="text-4xl md:text-6xl font-medium leading-snug tracking-tight"
-			style={`font-family: var(--font-headline); color: #FFFFFF; margin-bottom: ${headingLift};`} data-hero-entrance
+			style={`font-family: var(--font-headline); color: #FFFFFF; margin-bottom: ${headingLift}; text-shadow: 0 2px 18px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.45);`} data-hero-entrance
 		>
 			{heading}
 		</h1>
