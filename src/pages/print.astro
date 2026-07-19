@@ -28,8 +28,7 @@ const editions = [
 	},
 ];
 
-// LARGE PRINT editions. Paperbacks are live on Amazon; hardback listings are
-// coming soon (hbAsin null) but ARE orderable in bulk (POD, we fulfill). Same
+// LARGE PRINT editions. Paperbacks and hardbacks are both live on Amazon. Same
 // retail as Compact ($39.99 PB / $44.99 HB), so LP shares the bulk ladder.
 // Reuses the Compact cover art (same design, larger trim) until LP product
 // shots are shot.
@@ -38,21 +37,21 @@ const lpEditions = [
 		color: 'Plum',
 		slug: 'lp_plum',
 		asin: 'B0H8XC43KR',
-		hbAsin: null,
+		hbAsin: 'B0H8XYPMQS',
 		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-plum.webp',
 	},
 	{
 		color: 'Charcoal',
 		slug: 'lp_charcoal',
 		asin: 'B0H8XQ2LGL',
-		hbAsin: null,
+		hbAsin: 'B0H8XM9VDC',
 		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-charcoal.webp',
 	},
 	{
 		color: 'White',
 		slug: 'lp_white',
 		asin: 'B0H8XPWH6T',
-		hbAsin: null,
+		hbAsin: 'B0H8XDZQ1Z',
 		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-white.webp',
 	},
 ];
@@ -178,15 +177,18 @@ function markFather(text: string, phrases: string[]): string {
 								class="inline-flex items-center justify-center rounded-full font-semibold"
 								style="font-family: var(--font-sans); background: #ffe9f0; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.7rem 1.4rem; text-decoration: none; font-size: 0.9rem;"
 							>Paperback · {RETAIL} →</a>
-							<span
+							<a
+								href={`https://www.amazon.com/dp/${e.hbAsin}`}
+								target="_blank"
+								rel="noopener"
 								class="inline-flex items-center justify-center rounded-full font-semibold"
-								style="font-family: var(--font-sans); background: #f3f3f3; color: var(--color-muted); border: 1.5px solid var(--color-hairline); padding: 0.7rem 1.4rem; font-size: 0.9rem; cursor: default;"
-							>Hardback · coming soon</span>
+								style="font-family: var(--font-sans); background: #fff; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.7rem 1.4rem; text-decoration: none; font-size: 0.9rem;"
+							>Hardback · {RETAIL_HB} →</a>
 						</div>
 					</div>
 				))}
 			</div>
-			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin-top: 2rem;">Large Print paperbacks ship from Amazon. Hardbacks are coming soon — and available now in bulk below.</p>
+			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin-top: 2rem;">Large Print paperbacks and hardbacks ship from Amazon — and are available in bulk below.</p>
 		</Section>
 
 		<!-- ═══════════════ SCRIPTURE CARDS (Hear the Father — own soft-brown section) ═══════════════ -->
@@ -217,13 +219,13 @@ function markFather(text: string, phrases: string[]): string {
 
 				<div class="rounded-2xl p-6 md:p-8" style="background: #fff; border: 1px solid var(--color-hairline);" data-bulk>
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Volume discounts — the more you order, the more you save</p>
-					<div class="grid grid-cols-3 gap-2 mb-6">
+					<div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
 						{tiers.map((t) => (
 							<div class="tier-card rounded-xl text-center" data-tier-min={t.qty} style="padding: 0.7rem 0.4rem; border: 1.5px solid #ffd0e0; background: #ffe9f0;">
 								<span style="display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.02em; color: #a0004c;">Save {t.pct}%</span>
 								<span style="display: block; font-size: 1.15rem; font-weight: 700; color: var(--color-ink); margin-top: 0.1rem; line-height: 1.1;">{t.qty.toLocaleString()}+</span>
-								<span style="display: block; font-size: 0.74rem; color: var(--color-muted); margin-top: 0.15rem; white-space: nowrap;">PB ${t.unit.toFixed(2)}</span>
-								<span style="display: block; font-size: 0.74rem; color: var(--color-muted); white-space: nowrap;">HB ${t.unitHb.toFixed(2)}</span>
+								<span style="display: block; font-size: 0.7rem; color: var(--color-muted); margin-top: 0.2rem; white-space: nowrap;">PB <s style="opacity: 0.6;">{RETAIL}</s> <span style="color: var(--color-ink); font-weight: 700;">${t.unit.toFixed(2)}</span></span>
+								<span style="display: block; font-size: 0.7rem; color: var(--color-muted); white-space: nowrap;">HB <s style="opacity: 0.6;">{RETAIL_HB}</s> <span style="color: var(--color-ink); font-weight: 700;">${t.unitHb.toFixed(2)}</span></span>
 							</div>
 						))}
 					</div>
