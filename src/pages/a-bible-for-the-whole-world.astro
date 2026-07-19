@@ -1,7 +1,7 @@
 ---
+import BiblesCounter from '../components/donations/BiblesCounter.astro';
 import DonationForm from '../components/donations/DonationForm.astro';
 import DonorFeed from '../components/donations/DonorFeed.astro';
-import ProgressBar from '../components/donations/ProgressBar.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
@@ -15,7 +15,7 @@ const seoTitle =
 	pageData?.seoTitle || "Sharing Our Father — Partner With the Father's Heart Bible™";
 const seoDescription =
 	pageData?.seoDescription ||
-	"Help take the Father's Heart Bible™ to every nation — 25 languages reaching ~75% of humanity in 24 months. Founding partners receive a free ComfortLeather™ edition.";
+	"Help take the Father's Heart Bible™ to every nation — 25 languages reaching ~75% of humanity in 24 months. Donors of $100+ receive a free ComfortLeather™ edition.";
 const heroHeading = 'Sharing Our Father';
 
 // Featured blog card ("The Father's Vision") shown under the give-by-check box.
@@ -160,24 +160,30 @@ const partnershipFaq = [
 
 		<!-- ═══════════════ HERO ═══════════════ -->
 		<VideoHeroInner
-			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/partner-hero.webp"
+			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/abw-hero.webp"
+			imagePosition="center"
 			href="/print"
 			heading=""
 		/>
 
 		<!-- ═══════════════ PAGE 1 — title, invitation, timeline, you're invited ═══════════════ -->
 		<Section variant="light">
+			<div class="text-center mb-8" data-reveal>
+				<p class="text-sm md:text-base mb-3" style="font-family: var(--font-sans); color: var(--color-muted);">A portion of every copy sold helps fund</p>
+				<img
+					src="https://assets.spiritmediapublishing.com/FHB/print/abw-title-banner.webp"
+					alt="A Bible for the Whole World — the Father's Heart Bible in three editions"
+					width="1920"
+					height="985"
+					loading="lazy"
+					decoding="async"
+					class="mx-auto rounded-2xl"
+					style="max-width: 42rem; width: 100%; height: auto;"
+				/>
+			</div>
 			<h1 class="text-center font-light leading-[0.95] mb-8 text-6xl md:text-8xl" style="font-family: var(--font-serif); color: var(--color-ink);" data-reveal>
 				Sharing <span style="color: var(--color-brand);">Our</span> Father
 			</h1>
-			<div class="max-w-3xl mx-auto text-center mb-12" data-reveal>
-				<p class="text-base md:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-					A fresh translation from the original Hebrew, Aramaic, and Greek that lets you hear God as He truly is: your Father.
-				</p>
-				<p class="text-lg md:text-xl font-semibold mt-3" style="font-family: var(--font-sans); color: var(--color-ink);">
-					Come home to your Father, here and now. His heart is for you.
-				</p>
-			</div>
 
 			<div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-8 lg:gap-12 items-start">
 				<!-- Production Timeline -->
@@ -234,17 +240,17 @@ const partnershipFaq = [
 					Make a Gift
 				</p>
 				<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
-					Partner with us to take the Father's Heart Bible™ to the nations.
+					Invest in A Bible for the Whole World
 				</h2>
 				<p class="mt-4 leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-					Every gift helps publish and translate the Father's Heart Bible™. <strong style="color: var(--color-ink);">Every founding partner receives a free ComfortLeather™ edition</strong> — give monthly or once; every gift matters.
+					Every gift helps publish and translate the Father's Heart Bible™. <strong style="color: var(--color-ink);">Every donor $100+ receives a free ComfortLeather™ edition</strong> — give monthly or once; every gift matters.
 				</p>
 			</div>
 
 			<div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-start">
 				<!-- Left: progress + donor feed -->
 				<div class="lg:col-span-2 space-y-8" data-reveal>
-					<ProgressBar campaign="fhb" />
+					<BiblesCounter target={1084} label="Bibles funded" />
 					<DonorFeed campaign="fhb" />
 				</div>
 				<!-- Right: donation form + give-by-check -->
@@ -403,7 +409,7 @@ const partnershipFaq = [
 						<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="font-family: var(--font-sans); color: var(--color-gold);">Your Partnership Matters</p>
 						<h2 class="text-2xl md:text-3xl font-light leading-tight mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">The ComfortLeather™ Edition</h2>
 						<p class="leading-relaxed" style="font-family: var(--font-sans); color: #3F3338;">
-							A premium print Bible, bound in supple leather and crafted to be held, gifted, and treasured for a lifetime. <strong style="color: var(--color-ink);">Every founding partner receives one free</strong> — the very Bible you're helping send to the nations, placed in your own hands.
+							A premium print Bible, bound in supple leather and crafted to be held, gifted, and treasured for a lifetime. <strong style="color: var(--color-ink);">Every donor $100+ receives one free</strong> — the very Bible you're helping send to the nations, placed in your own hands.
 						</p>
 					</div>
 				</div>
@@ -450,13 +456,20 @@ const partnershipFaq = [
 
 				<!-- CTA -->
 				<div class="text-center" data-reveal>
-					<a href="#donate" class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border-radius: 8px;" onmouseover="this.style.opacity='0.92'" onmouseout="this.style.opacity='1'">Become a Founding Partner →</a>
+					<a href="#donate" class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border-radius: 8px;" onmouseover="this.style.opacity='0.92'" onmouseout="this.style.opacity='1'">Invest in A Bible for the Whole World →</a>
 					<p class="text-base mt-6 leading-relaxed max-w-2xl mx-auto" style="font-family: var(--font-body); color: var(--color-muted);">
 						A ministry of Spirit Media Charities, a registered 501(c)(3). Gifts are tax-deductible as allowed by law. By check: Spirit Media Charities · 205 S Academy St #3251 · Cary, NC 27519 — write &ldquo;FHB&rdquo; in the memo.
 					</p>
 				</div>
 			</div>
 		</Section>
+
+		<!-- ═══════════════ PEOPLE BAND (readers with each edition) ═══════════════ -->
+		<div class="grid grid-cols-1 sm:grid-cols-3">
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-band-plum.webp" alt="A mother and daughter reading the Plum edition of the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-band-charcoal.webp" alt="A father and son reading the Charcoal edition of the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-band-white.webp" alt="Three generations reading the White edition of the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+		</div>
 
 	</main>
 </Layout>
