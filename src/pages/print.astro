@@ -91,11 +91,11 @@ const LINK = 'color: var(--color-brand); text-decoration: underline;';
 const printFaq = [
 	{
 		q: 'Is there a cheaper version?',
-		a: `Not yet. Right now the Father’s Heart Bible™ is printed on demand on premium white paper — and with paper costs up about 25% over the last two years and the 800–1,100 pages it takes to print a full Bible, the cost per copy runs high. More affordable offset-printed editions are on the way. In the meantime, you can read or listen to the whole Bible free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
+		a: `Not yet. Right now the Father’s Heart Bible™ is printed on demand on premium white paper (as required by the industry) — and with paper costs up about 25% over the last two years and the 800–1,100 pages it takes to print a full Bible, the cost per copy runs high. More affordable offset-printed editions will be added in the future. In the meantime, you can read or listen to the whole Bible free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
 	},
 	{
 		q: 'Why is the Father’s Heart Bible™ so thick?',
-		a: `For now it’s printed on demand on a premium, heavier white paper, and a complete Bible runs 800–1,100 pages — so the print-on-demand edition is thick. Slimmer, thinline editions on lighter paper are coming with offset printing. Until then, you can read or listen to the whole Bible free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
+		a: `For now it’s printed on demand on a premium, heavier white paper (as required by the industry), and a complete Bible runs 800–1,100 pages — so the print-on-demand edition is thick. Slimmer, thinline editions on lighter paper from offset printing will be added in the future. Until then, you can read or listen to the whole Bible free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
 	},
 	{
 		q: 'Will the Father’s Heart Bible™ be published in other languages?',
@@ -169,6 +169,11 @@ function markFather(text: string, phrases: string[]): string {
 			heading="Now in Print"
 			subheading="Order a copy for yourself, or in bulk to share."
 		/>
+
+		<!-- Campaign note (directly under the hero subheading) -->
+		<section style="background-color: var(--color-canvas);" class="px-4 md:px-6 pt-2 pb-8 md:pb-12">
+			<p class="max-w-2xl mx-auto text-center" style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.55;">A portion of every copy sold helps fund our Bible for the Whole World campaign. <a href={CAMPAIGN_URL} style="color: var(--color-brand); text-decoration: underline; font-weight: 600;">Learn More</a></p>
+		</section>
 
 		<!-- ═══════════════ THREE EDITIONS ═══════════════ -->
 		<Section variant="light">
