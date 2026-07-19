@@ -141,6 +141,45 @@ const faqSchema = {
 	})),
 };
 
+// Book + Offer structured data — the /print page is the commerce surface, so the
+// purchasable price range lives here (ebook direct $7.49 → hardback $44.99).
+const bookSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Book',
+	name: "Father's Heart Bible: An Intimate Translation",
+	url: 'https://fathersheartbible.com/print/',
+	inLanguage: 'en-US',
+	author: { '@type': 'Person', name: 'Kevin White', url: 'https://kevinwhite.us' },
+	publisher: {
+		'@type': 'Organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	image: 'https://assets.spiritmediapublishing.com/FHB/share/fhb-og-print-group.jpg',
+	offers: {
+		'@type': 'AggregateOffer',
+		priceCurrency: 'USD',
+		lowPrice: '7.49',
+		highPrice: '44.99',
+		offerCount: 4,
+		availability: 'https://schema.org/InStock',
+		url: 'https://fathersheartbible.com/print/',
+	},
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'Now in Print',
+			item: 'https://fathersheartbible.com/print/',
+		},
+	],
+};
+
 // FHB scripture cards — the Father's voice from first page to last (text pulled
 // from the reader content).
 const verses = [
@@ -175,11 +214,11 @@ function markFather(text: string, phrases: string[]): string {
 
 <Layout
 	title="Now in Print — Father's Heart Bible™: An Intimate Translation"
-	description="The Father's Heart Bible™: An Intimate Translation is now in print — a fresh Bible translation that reveals God as your Father. Buy a copy, or order in bulk for your church. Come home to your Father."
+	description="The Father's Heart Bible™ is now in print — a fresh translation that reveals God as your Father. Buy a single copy, or order in bulk for your church."
 	image="https://assets.spiritmediapublishing.com/FHB/share/fhb-og-print-group.jpg"
 	imageAlt="Eight friends holding the Father's Heart Bible™ print edition in three colors and two bindings"
 	darkHero={true}
-	jsonLd={faqSchema}
+	jsonLd={[bookSchema, breadcrumbSchema, faqSchema]}
 >
 	<main>
 		<!-- ═══════════════ HERO ═══════════════ (shared component — same size as other pages) -->
