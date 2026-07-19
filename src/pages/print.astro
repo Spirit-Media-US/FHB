@@ -84,6 +84,42 @@ const SAMPLE_REGULAR =
 const SAMPLE_LP =
 	'https://assets.spiritmediapublishing.com/FHB/print-samples/FHB-Genesis-sample-largeprint-14pt.pdf';
 
+// Print FAQ — rendered as a no-JS <details> accordion + FAQPage JSON-LD (AEO).
+const READ_URL = '/read';
+const CAMPAIGN_URL = '/a-bible-for-the-whole-world';
+const LINK = 'color: var(--color-brand); text-decoration: underline;';
+const printFaq = [
+	{
+		q: 'Is there a cheaper version?',
+		a: `Not yet. Right now the Father’s Heart Bible™ is printed on demand on premium white paper — and with paper costs up about 25% over the last two years and the 800–1,100 pages it takes to print a full Bible, the cost per copy runs high. More affordable offset-printed editions are on the way. In the meantime, you can read or listen to the whole Bible free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
+	},
+	{
+		q: 'Why is the Father’s Heart Bible™ so thick?',
+		a: `For now it’s printed on demand on a premium, heavier white paper, and a complete Bible runs 800–1,100 pages — so the print-on-demand edition is thick. Slimmer, thinline editions on lighter paper are coming with offset printing. Until then, you can read or listen to the whole Bible free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
+	},
+	{
+		q: 'Will the Father’s Heart Bible™ be published in other languages?',
+		a: `Yes! The English edition is available now — everywhere books are sold worldwide — and free to read or listen to at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>. We sense our Father pressing us on to translate the Father’s Heart Bible™ into the world’s 25 most-spoken languages, reaching roughly 75% of humanity — and we won’t stop there. Our Bible for the Whole World campaign will continue until every one of the 8+ billion souls on earth can hold a Father’s Heart Bible in their hands.`,
+		link: { href: '/partner', label: 'Full details →' },
+	},
+	{
+		q: 'Why are you charging for the Father’s Heart Bible™?',
+		a: `The Father’s Heart Bible™ is actually free to read or listen to at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>, and in time it will be free on every major digital Bible platform. Print editions are priced only to cover the real costs of printing and distribution — and a portion of every copy sold helps fund our Bible for the Whole World campaign.`,
+		link: { href: CAMPAIGN_URL, label: 'Learn more →' },
+	},
+];
+// Plain-text answers for FAQPage JSON-LD.
+const stripHtml = (s: string) => s.replace(/<[^>]+>/g, '');
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: printFaq.map((f) => ({
+		'@type': 'Question',
+		name: f.q,
+		acceptedAnswer: { '@type': 'Answer', text: stripHtml(f.a) },
+	})),
+};
+
 // FHB scripture cards — the Father's voice from first page to last (text pulled
 // from the reader content).
 const verses = [
@@ -122,6 +158,7 @@ function markFather(text: string, phrases: string[]): string {
 	image="https://assets.spiritmediapublishing.com/FHB/share/fhb-og-print-group.jpg"
 	imageAlt="Eight friends holding the Father's Heart Bible™ print edition in three colors and two bindings"
 	darkHero={true}
+	jsonLd={faqSchema}
 >
 	<main>
 		<!-- ═══════════════ HERO ═══════════════ (shared component — same size as other pages) -->
@@ -314,6 +351,32 @@ function markFather(text: string, phrases: string[]): string {
 				</div>
 			</Section>
 
+			<!-- ═══════════════ FAQ ═══════════════ -->
+			<Section variant="soft">
+				<div class="max-w-3xl mx-auto">
+					<div class="text-center mb-8">
+						<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Frequently Asked Questions</p>
+						<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Good questions, honest answers</h2>
+					</div>
+					<div class="space-y-3">
+						{printFaq.map(({ q, a, link }) => (
+							<details class="faq-item rounded-2xl" style="background-color: #fff; border: 1px solid var(--color-hairline);">
+								<summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">
+									<span>{q}</span>
+									<svg class="faq-chev shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+								</summary>
+								<div class="px-5 pb-5 -mt-1">
+									<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.6;" set:html={a}></p>
+									{link && (
+										<a href={link.href} class="inline-flex items-center mt-3 font-semibold no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.9rem;">{link.label}</a>
+									)}
+								</div>
+							</details>
+						))}
+					</div>
+				</div>
+			</Section>
+
 		<!-- ═══════════════ PEOPLE BAND (variety of readers with FHB) ═══════════════ -->
 		<div class="grid grid-cols-1 sm:grid-cols-3">
 			<img src="https://assets.spiritmediapublishing.com/FHB/print/print-band-white.webp" alt="A man reading the White edition of the Father's Heart Bible in a cafe" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
@@ -322,6 +385,23 @@ function markFather(text: string, phrases: string[]): string {
 		</div>
 	</main>
 </Layout>
+
+<style>
+	/* FAQ accordion — native <details>, no JS. */
+	.faq-item > summary {
+		cursor: pointer;
+		list-style: none;
+	}
+	.faq-item > summary::-webkit-details-marker {
+		display: none;
+	}
+	.faq-chev {
+		transition: transform 0.2s ease;
+	}
+	.faq-item[open] > summary .faq-chev {
+		transform: rotate(180deg);
+	}
+</style>
 
 <script is:inline>
 	(() => {
