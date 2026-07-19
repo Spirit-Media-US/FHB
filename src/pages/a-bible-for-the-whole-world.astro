@@ -286,35 +286,6 @@ const partnershipFaq = [
 				<!-- Right: donation form + give-by-check -->
 				<div id="donate" class="lg:col-span-3 scroll-mt-24" data-reveal>
 					<DonationForm />
-					<div class="mt-5 rounded-2xl p-5" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
-						<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">
-							Prefer to give by check?
-						</p>
-						<p class="text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">
-							Make your check payable to <strong style="color: var(--color-ink);">Spirit Media Charities</strong> and mail to:
-						</p>
-						<address class="not-italic text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">
-							Spirit Media Charities · 205 S Academy St #3251 · Cary, NC 27519
-						</address>
-						<p class="text-xs leading-snug" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.8;">
-							Write <strong style="color: var(--color-ink);">&ldquo;FHB&rdquo;</strong> in the memo so your gift supports the Father&rsquo;s Heart Bible&trade;. All gifts are tax-deductible as allowed by the IRS.
-						</p>
-					</div>
-
-					<!-- Major-gift path: sponsor an entire language -->
-					<div class="mt-5 rounded-2xl p-5 text-center" style="background-color: #FFE1E8; border: 1px solid #f9d6e0;">
-						<p class="text-sm font-semibold mb-1" style="font-family: var(--font-sans); color: var(--color-ink);">Called to give more?</p>
-						<p class="text-sm leading-snug mb-3" style="font-family: var(--font-sans); color: var(--color-muted);">Sponsor an entire language translation &mdash; and put the Father&rsquo;s Heart Bible into millions of hands in a language they&rsquo;ve never had it in.</p>
-						<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" class="inline-flex items-center text-sm font-semibold no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand);" aria-label="Email us about sponsoring a language" onclick="event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent('Sponsor a Language')">Sponsor a language &rarr;</a>
-					</div>
-
-					<!-- Major-gift path: pledge a matching-gift challenge -->
-					<div class="mt-5 rounded-2xl p-5 text-center" style="background-color: var(--color-canvas); border: 1px dashed var(--color-brand);">
-						<p class="text-xs font-semibold tracking-widest uppercase mb-1" style="font-family: var(--font-sans); color: var(--color-brand);">Challenge Us!</p>
-						<p class="text-sm leading-snug mb-3" style="font-family: var(--font-sans); color: var(--color-muted);">Pledge a matching-gift challenge and help us rally the community to unite and launch languages together. Matching-gift challenges foster generosity.</p>
-						<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" class="inline-flex items-center text-sm font-semibold no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand);" aria-label="Email Kevin about a matching gift challenge" onclick="event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent('Matching Gift Challenge')">Pledge a matching challenge &rarr;</a>
-					</div>
-
 					<!-- The Father's Vision blog card (restored) -->
 					{visionPost && (
 						<a href={visionPost.slug} class="group mt-5 block rounded-2xl border overflow-hidden transition-shadow hover:shadow-md" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
@@ -336,6 +307,38 @@ const partnershipFaq = [
 							</div>
 						</a>
 					)}
+				</div>
+			</div>
+
+			<!-- Three ways to go further — under Recent Supporters + The Father's Vision -->
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10" data-reveal>
+				<!-- Give by check -->
+				<div class="rounded-2xl overflow-hidden flex flex-col" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline);">
+					<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-card-check.webp" alt="A family reading the Father's Heart Bible together" width="720" height="420" loading="lazy" decoding="async" class="w-full h-36 object-cover block" />
+					<div class="p-5 flex-1">
+						<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">Prefer to give by check?</p>
+						<p class="text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">Make your check payable to <strong style="color: var(--color-ink);">Spirit Media Charities</strong> and mail to:</p>
+						<address class="not-italic text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">Spirit Media Charities &middot; 205 S Academy St #3251 &middot; Cary, NC 27519</address>
+						<p class="text-xs leading-snug" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.8;">Write <strong style="color: var(--color-ink);">&ldquo;FHB&rdquo;</strong> in the memo so your gift supports the Father&rsquo;s Heart Bible&trade;. All gifts are tax-deductible as allowed by the IRS.</p>
+					</div>
+				</div>
+				<!-- Sponsor a language -->
+				<div class="rounded-2xl overflow-hidden flex flex-col text-center" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline);">
+					<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-card-sponsor.webp" alt="A family reading the Father's Heart Bible in a park" width="720" height="420" loading="lazy" decoding="async" class="w-full h-36 object-cover block" />
+					<div class="p-5 flex-1 flex flex-col">
+						<p class="text-sm font-semibold mb-1" style="font-family: var(--font-sans); color: var(--color-ink);">Called to give more?</p>
+						<p class="text-sm leading-snug mb-3 flex-1" style="font-family: var(--font-sans); color: var(--color-muted);">Sponsor an entire language translation &mdash; and put the Father&rsquo;s Heart Bible into millions of hands in a language they&rsquo;ve never had it in.</p>
+						<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" class="inline-flex items-center justify-center text-sm font-semibold no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand);" aria-label="Email us about sponsoring a language" onclick="event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent('Sponsor a Language')">Sponsor a language &rarr;</a>
+					</div>
+				</div>
+				<!-- Pledge a matching challenge -->
+				<div class="rounded-2xl overflow-hidden flex flex-col text-center" style="background-color: var(--color-surface); border: 1px dashed var(--color-brand);">
+					<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-card-challenge.webp" alt="A family reading the Father's Heart Bible in three editions" width="720" height="420" loading="lazy" decoding="async" class="w-full h-36 object-cover block" />
+					<div class="p-5 flex-1 flex flex-col">
+						<p class="text-xs font-semibold tracking-widest uppercase mb-1" style="font-family: var(--font-sans); color: var(--color-brand);">Challenge Us!</p>
+						<p class="text-sm leading-snug mb-3 flex-1" style="font-family: var(--font-sans); color: var(--color-muted);">Pledge a matching-gift challenge and help us rally the community to unite and launch languages together. Matching-gift challenges foster generosity.</p>
+						<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" class="inline-flex items-center justify-center text-sm font-semibold no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand);" aria-label="Email Kevin about a matching gift challenge" onclick="event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent('Matching Gift Challenge')">Pledge a matching challenge &rarr;</a>
+					</div>
 				</div>
 			</div>
 
