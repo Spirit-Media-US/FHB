@@ -5,6 +5,7 @@ interface Props {
 	imagePosition?: string;
 	headingLift?: string;
 	href?: string;
+	linkLabel?: string;
 	heading: string;
 	subheading?: string;
 	primaryCtaLabel?: string;
@@ -19,6 +20,7 @@ const {
 	imagePosition = 'center',
 	headingLift = '0',
 	href,
+	linkLabel = "See the Father's Heart Bible print editions",
 	heading,
 	subheading,
 	primaryCtaLabel,
@@ -75,7 +77,7 @@ const heroSrcMain = hasW ? imageSrc.replace(/([?&])w=\d+/, '$1w=1280') : imageSr
 	     The white heading keeps a soft text-shadow below for legibility over
 	     bright imagery — the image itself is untouched. -->
 	{href && (
-		<a href={href} aria-label="See the Father's Heart Bible print editions" class="absolute inset-0 z-[2]"></a>
+		<a href={href} aria-label={linkLabel} class="absolute inset-0 z-[2]"></a>
 	)}
 	<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-10 md:pb-16 lg:pb-24">
 		<h1
