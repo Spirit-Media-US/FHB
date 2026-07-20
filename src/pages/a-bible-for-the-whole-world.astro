@@ -186,19 +186,54 @@ const partnershipFaq = [
 		<Section variant="light">
 			<div class="text-center mb-10" data-reveal>
 				<p class="text-sm md:text-base mb-3" style="font-family: var(--font-sans); color: var(--color-muted);">A portion of every <a href="/print" style="color: var(--color-brand); text-decoration: underline;">Father&rsquo;s Heart Bible sold</a> helps fund</p>
-				<!-- Funding-connection visual; the incoming testimony video replaces this image. -->
-				<figure style="margin: 0;">
-					<img
-						src="https://assets.spiritmediapublishing.com/FHB/print/abw-title-banner.webp"
-						alt="A Bible for the Whole World"
-						width="1920"
-						height="985"
-						loading="lazy"
-						decoding="async"
-						class="mx-auto rounded-2xl"
-						style="max-width: 42rem; width: 100%; height: auto;"
-					/>
+				<!-- Testimony video — small, borderless (transparent) lazy YouTube facade; replaces the funding-connection banner image. -->
+				<figure style="margin: 1.5rem 0 0;">
+					<button
+						type="button"
+						id="abw-video-facade"
+						class="group relative block mx-auto w-full overflow-hidden rounded-2xl cursor-pointer"
+						style="aspect-ratio: 16/9; max-width: 26rem; background: transparent; border: 0; padding: 0;"
+						aria-label="Play the A Bible for the Whole World video"
+						data-video-id="XjG6QU_TkPA"
+					>
+						<img
+							src="https://i.ytimg.com/vi/XjG6QU_TkPA/hqdefault.jpg"
+							alt="A Bible for the Whole World"
+							width="480"
+							height="360"
+							loading="lazy"
+							decoding="async"
+							class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+						/>
+						<span aria-hidden="true" class="absolute inset-0" style="background: rgba(36,27,23,0.12);"></span>
+						<span
+							aria-hidden="true"
+							class="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110"
+							style="width: 3.5rem; height: 3.5rem; transform: translate(-50%,-50%); background: rgba(255,255,255,0.92); border: 2px solid #FFFFFF; box-shadow: 0 4px 18px rgba(0,0,0,0.4);"
+						>
+							<svg width="22" height="22" viewBox="0 0 24 24" fill="var(--color-brand)" style="margin-left: 3px;"><path d="M8 5v14l11-7z"/></svg>
+						</span>
+					</button>
 				</figure>
+				<script is:inline>
+					// Lazy YouTube facade — swap the poster for an autoplaying,
+					// transparent-background iframe only on click. Keeps third-party
+					// JS off the initial load.
+					(() => {
+						const btn = document.getElementById('abw-video-facade');
+						if (!btn) return;
+						btn.addEventListener('click', () => {
+							const id = btn.dataset.videoId;
+							const iframe = document.createElement('iframe');
+							iframe.style.cssText = 'display:block;width:100%;max-width:26rem;margin:1.5rem auto 0;aspect-ratio:16/9;height:auto;border:0;border-radius:1rem;background:transparent;';
+							iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+							iframe.allowFullscreen = true;
+							iframe.title = 'A Bible for the Whole World';
+							iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&wmode=transparent`;
+							btn.parentElement.replaceWith(iframe);
+						}, { once: true });
+					})();
+				</script>
 			</div>
 
 			<div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-8 lg:gap-12 items-start">
