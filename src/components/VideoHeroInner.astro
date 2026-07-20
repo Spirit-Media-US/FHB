@@ -4,6 +4,8 @@ interface Props {
 	imageSrc?: string;
 	imagePosition?: string;
 	headingLift?: string;
+	headingClass?: string;
+	contentPad?: string;
 	href?: string;
 	linkLabel?: string;
 	heading: string;
@@ -19,6 +21,8 @@ const {
 	imageSrc,
 	imagePosition = 'center',
 	headingLift = '0',
+	headingClass = 'text-4xl md:text-6xl',
+	contentPad = 'pb-10 md:pb-16 lg:pb-24',
 	href,
 	linkLabel = "See the Father's Heart Bible print editions",
 	heading,
@@ -79,9 +83,9 @@ const heroSrcMain = hasW ? imageSrc.replace(/([?&])w=\d+/, '$1w=1280') : imageSr
 	{href && (
 		<a href={href} aria-label={linkLabel} class="absolute inset-0 z-[2]"></a>
 	)}
-	<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pb-10 md:pb-16 lg:pb-24">
+	<div class={`relative z-10 text-center px-6 max-w-3xl mx-auto ${contentPad}`}>
 		<h1
-			class="text-4xl md:text-6xl font-medium leading-snug tracking-tight"
+			class={`${headingClass} font-medium leading-snug tracking-tight`}
 			style={`font-family: var(--font-headline); color: #FFFFFF; margin-bottom: ${headingLift}; text-shadow: 0 2px 18px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.45);`} data-hero-entrance
 		>
 			{heading}
