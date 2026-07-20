@@ -1,7 +1,7 @@
 ---
+import BiblesCounter from '../components/donations/BiblesCounter.astro';
 import DonationForm from '../components/donations/DonationForm.astro';
 import DonorFeed from '../components/donations/DonorFeed.astro';
-import ProgressBar from '../components/donations/ProgressBar.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
@@ -15,7 +15,7 @@ const seoTitle =
 	pageData?.seoTitle || "Sharing Our Father — Partner With the Father's Heart Bible™";
 const seoDescription =
 	pageData?.seoDescription ||
-	"Help take the Father's Heart Bible™ to every nation — 25 languages reaching ~75% of humanity in 24 months. Founding partners receive a free ComfortLeather™ edition.";
+	"Help take the Father's Heart Bible™ to every nation — 25 languages reaching ~75% of humanity in 24 months. Donors of $100+ receive a free ComfortLeather™ edition.";
 const heroHeading = 'Sharing Our Father';
 
 // Featured blog card ("The Father's Vision") shown under the give-by-check box.
@@ -130,6 +130,19 @@ const partnershipFaq = [
 		q: 'Can I designate my gift — for example, pledging to sponsor a specific language?',
 		a: 'While donations to charity are ultimately unrestricted in order to remain tax-deductible, Spirit Media Charities is committed to partnering with each donor to honor the intent of their gift. To discuss sponsoring a language or another designated gift, reach out and we’ll work with you directly.',
 	},
+	{
+		q: 'How is the Father’s Heart Bible™ different from other translations?',
+		a: 'Father’s Heart Bible™: An Intimate Translation is a fresh translation from the original Hebrew, Aramaic, and Greek that lets you hear God as He truly is — not a distant deity, but your Father. That is the Bible your gift helps carry to the nations.',
+		link: {
+			href: '/the-fathers-heart-bible/translation-philosophy/',
+			label: 'Our translation approach →',
+		},
+	},
+	{
+		q: 'The Bible is free to read online — so why give?',
+		a: 'The Father’s Heart Bible™ is free to read or listen to online, and in time it will be free on every major digital Bible platform. But printing, publishing, and translating into new languages carry real costs — and that is what your gift makes possible, putting a physical Father’s Heart Bible into hands that have never held one.',
+		link: { href: '/read', label: 'Read or listen free →' },
+	},
 ];
 ---
 
@@ -143,10 +156,10 @@ const partnershipFaq = [
 	jsonLd={{
 		"@context": "https://schema.org",
 		"@graph": [
-			{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/partner" },
+			{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/a-bible-for-the-whole-world" },
 			{ "@type": "BreadcrumbList", "itemListElement": [
 				{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
-				{ "@type": "ListItem", "position": 2, "name": "Sharing Our Father", "item": "https://fathersheartbible.com/partner" }
+				{ "@type": "ListItem", "position": 2, "name": "Sharing Our Father", "item": "https://fathersheartbible.com/a-bible-for-the-whole-world" }
 			]},
 			{ "@type": "FAQPage", "mainEntity": partnershipFaq.map((f) => ({
 				"@type": "Question",
@@ -160,23 +173,32 @@ const partnershipFaq = [
 
 		<!-- ═══════════════ HERO ═══════════════ -->
 		<VideoHeroInner
-			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/partner-hero.webp"
-			href="/print"
-			heading=""
+			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/abw-hero.webp"
+			imagePosition="center 40%"
+			href="#donate"
+			linkLabel="Give to A Bible for the Whole World"
+			heading="A Bible for the Whole World"
+			headingClass="text-xl sm:text-3xl md:text-5xl whitespace-nowrap"
+			contentPad="pb-6 md:pb-10"
 		/>
 
 		<!-- ═══════════════ PAGE 1 — title, invitation, timeline, you're invited ═══════════════ -->
 		<Section variant="light">
-			<h1 class="text-center font-light leading-[0.95] mb-8 text-6xl md:text-8xl" style="font-family: var(--font-serif); color: var(--color-ink);" data-reveal>
-				Sharing <span style="color: var(--color-brand);">Our</span> Father
-			</h1>
-			<div class="max-w-3xl mx-auto text-center mb-12" data-reveal>
-				<p class="text-base md:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-					A fresh translation from the original Hebrew, Aramaic, and Greek that lets you hear God as He truly is: your Father.
-				</p>
-				<p class="text-lg md:text-xl font-semibold mt-3" style="font-family: var(--font-sans); color: var(--color-ink);">
-					Come home to your Father, here and now. His heart is for you.
-				</p>
+			<div class="text-center mb-10" data-reveal>
+				<p class="text-sm md:text-base mb-3" style="font-family: var(--font-sans); color: var(--color-muted);">A portion of every <a href="/print" style="color: var(--color-brand); text-decoration: underline;">Father&rsquo;s Heart Bible sold</a> helps fund</p>
+				<!-- Funding-connection visual; the incoming testimony video replaces this image. -->
+				<figure style="margin: 0;">
+					<img
+						src="https://assets.spiritmediapublishing.com/FHB/print/abw-title-banner.webp"
+						alt="A Bible for the Whole World"
+						width="1920"
+						height="985"
+						loading="lazy"
+						decoding="async"
+						class="mx-auto rounded-2xl"
+						style="max-width: 42rem; width: 100%; height: auto;"
+					/>
+				</figure>
 			</div>
 
 			<div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-8 lg:gap-12 items-start">
@@ -229,42 +251,55 @@ const partnershipFaq = [
 
 		<!-- ═══════════════ MAKE A GIFT ═══════════════ -->
 		<Section variant="soft">
+			<!-- Urgency: launch-campaign deadline (Aug 30, 2026) with live countdown -->
+			<div class="max-w-2xl mx-auto mb-8 rounded-2xl px-6 py-5 text-center" data-reveal style="background-color: #FFE1E8; border: 1px solid #f4b8c8;">
+				<p class="text-xs font-semibold tracking-widest uppercase mb-1" style="font-family: var(--font-sans); color: var(--color-brand);">Launch Campaign</p>
+				<p class="text-lg md:text-xl font-semibold" style="font-family: var(--font-serif); color: var(--color-ink);" data-give-deadline>
+					<span data-give-countdown>Only days left</span> to give before <strong style="color: var(--color-brand);">August 30</strong>
+				</p>
+				<p class="mt-1 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">Every gift now fuels the first wave of Father&rsquo;s Heart Bibles to the nations.</p>
+				<a href="#donate" class="inline-flex items-center mt-3 px-6 py-2.5 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;">Give now &rarr;</a>
+			</div>
+			<script is:inline>
+				(() => {
+					function setCountdown() {
+						const el = document.querySelector('[data-give-countdown]');
+						if (!el) return;
+						const deadline = new Date('2026-08-30T23:59:59-04:00').getTime();
+						const days = Math.ceil((deadline - Date.now()) / 86400000);
+						if (days > 1) el.textContent = `Only ${days} days left`;
+						else if (days === 1) el.textContent = 'Only 1 day left';
+						else if (days === 0) el.textContent = 'Today is the last day';
+						else {
+							const line = document.querySelector('[data-give-deadline]');
+							if (line) line.textContent = 'Give today and help send the Father’s Heart Bible to the nations';
+						}
+					}
+					setCountdown();
+					document.addEventListener('astro:page-load', setCountdown);
+				})();
+			</script>
 			<div class="max-w-2xl mx-auto text-center mb-10" data-reveal>
 				<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
 					Make a Gift
 				</p>
 				<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
-					Partner with us to take the Father's Heart Bible™ to the nations.
+					Invest in A Bible for the Whole World
 				</h2>
 				<p class="mt-4 leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-					Every gift helps publish and translate the Father's Heart Bible™. <strong style="color: var(--color-ink);">Every founding partner receives a free ComfortLeather™ edition</strong> — give monthly or once; every gift matters.
+					Every gift helps publish and translate the Father's Heart Bible™. <strong style="color: var(--color-ink);">Every donor $100+ receives a free ComfortLeather™ edition</strong> — give monthly or once; every gift matters.
 				</p>
 			</div>
 
 			<div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-start">
 				<!-- Left: progress + donor feed -->
 				<div class="lg:col-span-2 space-y-8" data-reveal>
-					<ProgressBar campaign="fhb" />
+					<BiblesCounter target={1084} label="Bibles sponsored" />
 					<DonorFeed campaign="fhb" />
 				</div>
 				<!-- Right: donation form + give-by-check -->
 				<div id="donate" class="lg:col-span-3 scroll-mt-24" data-reveal>
 					<DonationForm />
-					<div class="mt-5 rounded-2xl p-5" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
-						<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">
-							Prefer to give by check?
-						</p>
-						<p class="text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">
-							Make your check payable to <strong style="color: var(--color-ink);">Spirit Media Charities</strong> and mail to:
-						</p>
-						<address class="not-italic text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">
-							Spirit Media Charities · 205 S Academy St #3251 · Cary, NC 27519
-						</address>
-						<p class="text-xs leading-snug" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.8;">
-							Write <strong style="color: var(--color-ink);">&ldquo;FHB&rdquo;</strong> in the memo so your gift supports the Father&rsquo;s Heart Bible&trade;. All gifts are tax-deductible as allowed by the IRS.
-						</p>
-					</div>
-
 					<!-- The Father's Vision blog card (restored) -->
 					{visionPost && (
 						<a href={visionPost.slug} class="group mt-5 block rounded-2xl border overflow-hidden transition-shadow hover:shadow-md" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
@@ -286,6 +321,38 @@ const partnershipFaq = [
 							</div>
 						</a>
 					)}
+				</div>
+			</div>
+
+			<!-- Three ways to go further — under Recent Supporters + The Father's Vision -->
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10" data-reveal>
+				<!-- Give by check -->
+				<div class="rounded-2xl overflow-hidden flex flex-col" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline);">
+					<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-card-check.webp" alt="A family reading the Father's Heart Bible together" width="720" height="420" loading="lazy" decoding="async" class="w-full h-36 object-cover block" />
+					<div class="p-5 flex-1">
+						<p class="text-lg font-semibold mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">Prefer to give by check?</p>
+						<p class="text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">Make your check payable to <strong style="color: var(--color-ink);">Spirit Media Charities</strong> and mail to:</p>
+						<address class="not-italic text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">Spirit Media Charities &middot; 205 S Academy St #3251 &middot; Cary, NC 27519</address>
+						<p class="text-xs leading-snug" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.8;">Write <strong style="color: var(--color-ink);">&ldquo;FHB&rdquo;</strong> in the memo so your gift supports the Father&rsquo;s Heart Bible&trade;. All gifts are tax-deductible as allowed by the IRS.</p>
+					</div>
+				</div>
+				<!-- Sponsor a language -->
+				<div class="rounded-2xl overflow-hidden flex flex-col text-center" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline);">
+					<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-card-sponsor.webp" alt="A family reading the Father's Heart Bible in a park" width="720" height="420" loading="lazy" decoding="async" class="w-full h-36 object-cover block" />
+					<div class="p-5 flex-1 flex flex-col">
+						<p class="text-lg font-semibold mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">Called to give more?</p>
+						<p class="text-sm leading-snug mb-3 flex-1" style="font-family: var(--font-sans); color: var(--color-muted);">Sponsor an entire language translation &mdash; and put the Father&rsquo;s Heart Bible into millions of hands in a language they&rsquo;ve never had it in.</p>
+						<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" class="inline-flex items-center justify-center text-sm font-semibold no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand);" aria-label="Email us about sponsoring a language" onclick="event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent('Sponsor a Language')">Sponsor a language &rarr;</a>
+					</div>
+				</div>
+				<!-- Pledge a matching challenge -->
+				<div class="rounded-2xl overflow-hidden flex flex-col text-center" style="background-color: var(--color-surface); border: 1px dashed var(--color-brand);">
+					<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-card-challenge.webp" alt="A family reading the Father's Heart Bible in three editions" width="720" height="420" loading="lazy" decoding="async" class="w-full h-36 object-cover block" />
+					<div class="p-5 flex-1 flex flex-col">
+						<p class="text-lg font-semibold mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">Challenge Us!</p>
+						<p class="text-sm leading-snug mb-3 flex-1" style="font-family: var(--font-sans); color: var(--color-muted);">Pledge a matching-gift challenge and help us rally the community to unite and launch languages together. Matching-gift challenges foster generosity.</p>
+						<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" class="inline-flex items-center justify-center text-sm font-semibold no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand);" aria-label="Email Kevin about a matching gift challenge" onclick="event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent('Matching Gift Challenge')">Pledge a matching challenge &rarr;</a>
+					</div>
 				</div>
 			</div>
 
@@ -337,11 +404,13 @@ const partnershipFaq = [
 						width="1600" height="1262" loading="lazy" decoding="async"
 						class="block w-full"
 					/>
+					<!-- "Sharing Our Father" title over the top of the map (~1in down) -->
+					<p class="absolute left-1/2 -translate-x-1/2 text-center font-light text-4xl md:text-6xl" style="top: 6%; font-family: var(--font-serif); color: var(--color-ink); text-shadow: 0 1px 12px rgba(255,255,255,0.9), 0 1px 3px rgba(255,255,255,0.9);">Sharing <span style="color: var(--color-brand);">Our</span> Father</p>
 					<!-- key, across the top of Antarctica (matches the brochure) -->
-					<div class="absolute left-1/2 -translate-x-1/2 flex gap-6 px-6 py-3 rounded-xl whitespace-nowrap"
-						style="bottom: 13%; background: rgba(255,255,255,0.94); border: 1px solid #e6e0e2; box-shadow: 0 2px 10px rgba(0,0,0,0.10); font-family: var(--font-sans); font-size: 15px; font-weight: 600; color: var(--color-ink);">
-						<span class="flex items-center gap-2"><span class="inline-block w-4 h-4 rounded-sm" style="background:#ffbed0; border:1px solid #ef96ac;"></span>Reached by the 25 languages — ~6.5B people</span>
-						<span class="flex items-center gap-2"><span class="inline-block w-4 h-4 rounded-sm" style="background:#e7e7e3; border:1px solid #d2d2cd;"></span>Not yet reached</span>
+					<div class="absolute left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-x-6 gap-y-1 px-4 md:px-6 py-2.5 rounded-xl text-[13px] md:text-[15px]"
+						style="bottom: 13%; max-width: 92vw; background: rgba(255,255,255,0.94); border: 1px solid #e6e0e2; box-shadow: 0 2px 10px rgba(0,0,0,0.10); font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">
+						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#ffbed0; border:1px solid #ef96ac;"></span>Reached by the 25 languages — ~6.5B people</span>
+						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#e7e7e3; border:1px solid #d2d2cd;"></span>Not yet reached</span>
 					</div>
 				</div>
 
@@ -403,7 +472,7 @@ const partnershipFaq = [
 						<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="font-family: var(--font-sans); color: var(--color-gold);">Your Partnership Matters</p>
 						<h2 class="text-2xl md:text-3xl font-light leading-tight mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">The ComfortLeather™ Edition</h2>
 						<p class="leading-relaxed" style="font-family: var(--font-sans); color: #3F3338;">
-							A premium print Bible, bound in supple leather and crafted to be held, gifted, and treasured for a lifetime. <strong style="color: var(--color-ink);">Every founding partner receives one free</strong> — the very Bible you're helping send to the nations, placed in your own hands.
+							A premium print Bible, bound in supple leather and crafted to be held, gifted, and treasured for a lifetime. <strong style="color: var(--color-ink);">Every donor $100+ receives one free</strong> — the very Bible you're helping send to the nations, placed in your own hands.
 						</p>
 					</div>
 				</div>
@@ -450,7 +519,7 @@ const partnershipFaq = [
 
 				<!-- CTA -->
 				<div class="text-center" data-reveal>
-					<a href="#donate" class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border-radius: 8px;" onmouseover="this.style.opacity='0.92'" onmouseout="this.style.opacity='1'">Become a Founding Partner →</a>
+					<a href="#donate" class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border-radius: 8px;" onmouseover="this.style.opacity='0.92'" onmouseout="this.style.opacity='1'">Invest in A Bible for the Whole World →</a>
 					<p class="text-base mt-6 leading-relaxed max-w-2xl mx-auto" style="font-family: var(--font-body); color: var(--color-muted);">
 						A ministry of Spirit Media Charities, a registered 501(c)(3). Gifts are tax-deductible as allowed by law. By check: Spirit Media Charities · 205 S Academy St #3251 · Cary, NC 27519 — write &ldquo;FHB&rdquo; in the memo.
 					</p>
@@ -458,6 +527,15 @@ const partnershipFaq = [
 			</div>
 		</Section>
 
+		<!-- ═══════════════ PEOPLE BAND (readers with each edition) ═══════════════ -->
+		<div class="grid grid-cols-1 sm:grid-cols-3">
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-band-plum.webp" alt="A mother and daughter reading the Plum edition of the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-band-charcoal.webp" alt="A father and son reading the Charcoal edition of the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-band-white.webp" alt="Three generations reading the White edition of the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+		</div>
+
+		<!-- Sticky mobile Give button — keeps the ask one tap away on phones -->
+		<a href="#donate" aria-label="Give to A Bible for the Whole World" class="sm:hidden" style="position: fixed; right: 1rem; bottom: 1rem; z-index: 50; background-color: var(--color-brand); color: #fff; font-family: var(--font-sans); font-weight: 700; font-size: 0.95rem; padding: 0.85rem 1.6rem; border-radius: 999px; box-shadow: 0 6px 20px rgba(0,0,0,0.28); text-decoration: none;">Give &rarr;</a>
 	</main>
 </Layout>
 

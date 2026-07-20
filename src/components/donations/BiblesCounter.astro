@@ -1,0 +1,48 @@
+---
+// Animated Bibles counter — counts up from 0 to `target` when scrolled into
+// view. Static marketing number (not live donation data).
+interface Props {
+	target?: number;
+	label?: string;
+}
+const { target = 1084, label = 'Bibles funded' } = Astro.props;
+---
+
+<div
+	class="bibles-counter"
+	style="background-color: var(--color-surface); border: 1px solid var(--color-outline-variant); border-radius: 16px; padding: 32px 28px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04);"
+>
+	<p class="font-light" style="font-family: var(--font-serif); color: var(--color-brand); font-size: 3.75rem; line-height: 1; margin: 0;">
+		<span data-bibles-count data-target={target}>0</span>
+	</p>
+	<p class="mt-2 text-sm font-semibold tracking-widest uppercase" style="font-family: var(--font-sans); color: var(--color-muted); margin-top: 0.6rem;">{label}</p>
+</div>
+
+<script>
+	function runCounter() {
+		const el = document.querySelector('[data-bibles-count]') as HTMLElement | null;
+		if (!el || el.dataset.done) return;
+		const target = parseInt(el.dataset.target || '0', 10);
+		const io = new IntersectionObserver((entries) => {
+			entries.forEach((entry) => {
+				if (!entry.isIntersecting || el.dataset.done) return;
+				el.dataset.done = '1';
+				io.disconnect();
+				const dur = 1600;
+				let start: number | null = null;
+				function step(now: number) {
+					if (start === null) start = now;
+					const t = Math.min(1, (now - start) / dur);
+					const eased = 1 - Math.pow(1 - t, 3);
+					el!.textContent = Math.floor(eased * target).toLocaleString('en-US');
+					if (t < 1) requestAnimationFrame(step);
+					else el!.textContent = target.toLocaleString('en-US');
+				}
+				requestAnimationFrame(step);
+			});
+		}, { threshold: 0.4 });
+		io.observe(el);
+	}
+	document.addEventListener('astro:page-load', runCounter);
+	if (document.readyState !== 'loading') runCounter();
+</script>

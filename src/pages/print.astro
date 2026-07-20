@@ -28,8 +28,7 @@ const editions = [
 	},
 ];
 
-// LARGE PRINT editions. Paperbacks are live on Amazon; hardback listings are
-// coming soon (hbAsin null) but ARE orderable in bulk (POD, we fulfill). Same
+// LARGE PRINT editions. Paperbacks and hardbacks are both live on Amazon. Same
 // retail as Compact ($39.99 PB / $44.99 HB), so LP shares the bulk ladder.
 // Reuses the Compact cover art (same design, larger trim) until LP product
 // shots are shot.
@@ -38,29 +37,32 @@ const lpEditions = [
 		color: 'Plum',
 		slug: 'lp_plum',
 		asin: 'B0H8XC43KR',
-		hbAsin: null,
+		hbAsin: 'B0H8XYPMQS',
 		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-plum.webp',
 	},
 	{
 		color: 'Charcoal',
 		slug: 'lp_charcoal',
 		asin: 'B0H8XQ2LGL',
-		hbAsin: null,
+		hbAsin: 'B0H8XM9VDC',
 		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-charcoal.webp',
 	},
 	{
 		color: 'White',
 		slug: 'lp_white',
 		asin: 'B0H8XPWH6T',
-		hbAsin: null,
+		hbAsin: 'B0H8XDZQ1Z',
 		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-white.webp',
 	},
 ];
 
-// Digital editions. eBook is live on Amazon ($9.99) AND sold direct here
-// ($7.49, our own fulfillment). Audiobook is coming soon (Authors Direct).
+// Digital editions. eBook is live on Amazon (Kindle) + Barnes & Noble (Nook) at
+// $9.99, AND sold direct here ($7.49, our own fulfillment). Audiobook coming soon.
 const ebookAsin = 'B0H8R2YP66';
 const EBOOK_AMAZON = '$9.99';
+const EBOOK_NOOK = '$9.99';
+const EBOOK_NOOK_URL =
+	'https://www.barnesandnoble.com/w/fathers-heart-bible-spirit-media-publishing/1150585116?ean=2940196931611';
 const EBOOK_DIRECT = '$7.49';
 
 // Volume ladder — the COMBINED total across all editions and bindings sets
@@ -78,6 +80,105 @@ const tiers = [
 
 const RETAIL = '$39.99';
 const RETAIL_HB = '$44.99';
+
+// Interior sample excerpts (Genesis) — direct PDF, hosted on R2.
+const SAMPLE_REGULAR =
+	'https://assets.spiritmediapublishing.com/FHB/print-samples/FHB-Genesis-sample-regular-7.5pt.pdf';
+const SAMPLE_LP =
+	'https://assets.spiritmediapublishing.com/FHB/print-samples/FHB-Genesis-sample-largeprint-14pt.pdf';
+
+// Print FAQ — rendered as a no-JS <details> accordion + FAQPage JSON-LD (AEO).
+const READ_URL = '/read';
+const CAMPAIGN_URL = '/a-bible-for-the-whole-world/';
+const LINK = 'color: var(--color-brand); text-decoration: underline;';
+const TRANSLATION_URL = '/the-fathers-heart-bible/translation-philosophy/';
+const CONTACT = 'mailto:hello@spiritmediapublishing.com?subject=Father%27s%20Heart%20Bible%20print';
+const printFaq = [
+	{
+		q: 'Is there a cheaper version?',
+		a: `Not yet. Right now the Father’s Heart Bible™ is printed on demand on premium white paper (as required by the industry) — and with paper costs up about 25% over the last two years and the 800–1,100 pages it takes to print a full Bible, the cost per copy runs high. More affordable offset-printed editions will be added in the future. In the meantime, you can read or listen to the whole Bible free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
+	},
+	{
+		q: 'Why is the Father’s Heart Bible™ thicker than other bibles?',
+		a: `For now it’s printed on demand on a premium, heavier white paper (as required by the industry), and a complete Bible runs 800–1,100 pages — so the print-on-demand edition is thick. Slimmer, thinline editions on lighter paper from offset printing will be added in the future. Until then, you can read or listen to the whole Bible free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
+	},
+	{
+		q: 'Will the Father’s Heart Bible™ be published in other languages?',
+		a: `Yes! The English edition is available now — everywhere books are sold worldwide — and free to read or listen to at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>. We sense our Father pressing us on to translate the Father’s Heart Bible™ into the world’s 25 most-spoken languages, reaching roughly 75% of humanity — and we won’t stop there. Our Bible for the Whole World campaign will continue until every one of the 8+ billion souls on earth can hold a Father’s Heart Bible in their hands.`,
+		link: { href: CAMPAIGN_URL, label: 'Full details →' },
+	},
+	{
+		q: 'Why are you charging for the Father’s Heart Bible™?',
+		a: `The Father’s Heart Bible™ is actually free to read or listen to at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>, and in time it will be free on every major digital Bible platform. Print editions are priced only to cover the real costs of printing and distribution — and a portion of every copy sold helps fund our Bible for the Whole World campaign.`,
+		link: { href: CAMPAIGN_URL, label: 'Learn more →' },
+	},
+	{
+		q: 'What’s included in each edition?',
+		a: `The Regular Print editions are the complete Bible, plus Receive the Father notes per book where space allows. The Large Print editions are New Testament+ — Genesis, Psalms, Proverbs, and the complete New Testament in full, plus a Father-focused survey of every other Old Testament book. Every edition, in every color and binding, is the same translation.`,
+	},
+	{
+		q: 'How is the Father’s Heart Bible™ different from other translations?',
+		a: `Father’s Heart Bible™: An Intimate Translation is a fresh Bible translation from the original Hebrew, Aramaic, and Greek that lets you hear God as He truly is — not a distant deity, but your Father. Read about <a href="${TRANSLATION_URL}" style="${LINK}">our translation approach</a>, or start reading free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
+	},
+	{
+		q: 'How long does shipping take?',
+		a: `Single copies ship from Amazon on Amazon’s standard delivery timelines. Bulk orders through Spirit Media Publishing typically arrive in 3–4 weeks — <a href="${CONTACT}" style="${LINK}">reach out</a> if you need them sooner.`,
+	},
+	{
+		q: 'Can I return my order?',
+		a: `Copies bought on Amazon follow Amazon’s return policy. For bulk orders placed directly with us, <a href="${CONTACT}" style="${LINK}">reach out</a> and we’ll make it right.`,
+	},
+];
+// Plain-text answers for FAQPage JSON-LD.
+const stripHtml = (s: string) => s.replace(/<[^>]+>/g, '');
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: printFaq.map((f) => ({
+		'@type': 'Question',
+		name: f.q,
+		acceptedAnswer: { '@type': 'Answer', text: stripHtml(f.a) },
+	})),
+};
+
+// Book + Offer structured data — the /print page is the commerce surface, so the
+// purchasable price range lives here (ebook direct $7.49 → hardback $44.99).
+const bookSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Book',
+	name: "Father's Heart Bible: An Intimate Translation",
+	url: 'https://fathersheartbible.com/print/',
+	inLanguage: 'en-US',
+	author: { '@type': 'Person', name: 'Kevin White', url: 'https://kevinwhite.us' },
+	publisher: {
+		'@type': 'Organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	image: 'https://assets.spiritmediapublishing.com/FHB/share/fhb-og-print-group.jpg',
+	offers: {
+		'@type': 'AggregateOffer',
+		priceCurrency: 'USD',
+		lowPrice: '7.49',
+		highPrice: '44.99',
+		offerCount: 4,
+		availability: 'https://schema.org/InStock',
+		url: 'https://fathersheartbible.com/print/',
+	},
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'Now in Print',
+			item: 'https://fathersheartbible.com/print/',
+		},
+	],
+};
 
 // FHB scripture cards — the Father's voice from first page to last (text pulled
 // from the reader content).
@@ -113,25 +214,33 @@ function markFather(text: string, phrases: string[]): string {
 
 <Layout
 	title="Now in Print — Father's Heart Bible™: An Intimate Translation"
-	description="The Father's Heart Bible™: An Intimate Translation is now in print — a fresh Bible translation that reveals God as your Father. Buy a copy, or order in bulk for your church. Come home to your Father."
-	image="https://assets.spiritmediapublishing.com/FHB/share/fhb-og-print.jpg"
-	imageAlt="Friends reading the Father's Heart Bible™ print edition — now in three editions"
+	description="The Father's Heart Bible™ is now in print — a fresh translation that reveals God as your Father. Buy a single copy, or order in bulk for your church."
+	image="https://assets.spiritmediapublishing.com/FHB/share/fhb-og-print-group.jpg"
+	imageAlt="Eight friends holding the Father's Heart Bible™ print edition in three colors and two bindings"
 	darkHero={true}
+	jsonLd={[bookSchema, breadcrumbSchema, faqSchema]}
 >
 	<main>
 		<!-- ═══════════════ HERO ═══════════════ (shared component — same size as other pages) -->
 		<VideoHeroInner
 			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/print-hero-group.webp"
 			imagePosition="center top"
+			headingLift="0.5in"
 			heading="Now in Print"
 			subheading="Order a copy for yourself, or in bulk to share."
 		/>
 
+		<!-- Campaign note (directly under the hero subheading) -->
+		<section style="background-color: var(--color-canvas);" class="px-4 md:px-6 pt-2 pb-8 md:pb-12">
+			<p class="max-w-2xl mx-auto text-center" style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.55;">A portion of every copy sold helps fund our Bible for the Whole World campaign. <a href={CAMPAIGN_URL} style="color: var(--color-brand); text-decoration: underline; font-weight: 600;">Learn More</a></p>
+		</section>
+
 		<!-- ═══════════════ THREE EDITIONS ═══════════════ -->
 		<Section variant="light">
 			<div class="text-center mb-10">
-				<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Single Copies</p>
+				<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Single Copies from Amazon</p>
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Regular Print — Whole Bible: 3 colors, 2 bindings</h2>
+				<p style="margin-top: 0.75rem;"><a href={SAMPLE_REGULAR} target="_blank" rel="noopener" style="font-family: var(--font-sans); color: var(--color-brand); text-decoration: underline; font-weight: 600; font-size: 0.9rem;">See a Regular Print sample (PDF) →</a></p>
 			</div>
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-10 max-w-4xl mx-auto">
 				{editions.map((e) => (
@@ -157,13 +266,13 @@ function markFather(text: string, phrases: string[]): string {
 					</div>
 				))}
 			</div>
-			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin-top: 2rem;">Both bindings ship from Amazon.</p>
 
 			<!-- Large Print -->
 			<div class="text-center mt-14 mb-8">
-				<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Also in Large Print</p>
-				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 600; margin: 0;">Regular Print — New Testament+*: 3 colors, 2 bindings</h3>
-				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.55; margin: 0.75rem auto 0; max-width: 34rem;">Genesis, Psalms, Proverbs, and the complete New Testament in full, plus a Father-focused survey of every other Old Testament book.</p>
+				<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Also in Large Print from Amazon</p>
+				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Large Print — New Testament+*: 3 colors, 2 bindings</h3>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.55; margin: 0.75rem auto 0; max-width: 34rem;">*Genesis, Psalms, Proverbs, and the complete New Testament in full, plus a Father-focused survey of every other Old Testament book.</p>
+				<p style="margin-top: 0.75rem;"><a href={SAMPLE_LP} target="_blank" rel="noopener" style="font-family: var(--font-sans); color: var(--color-brand); text-decoration: underline; font-weight: 600; font-size: 0.9rem;">See a Large Print sample (PDF) →</a></p>
 			</div>
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-10 max-w-4xl mx-auto">
 				{lpEditions.map((e) => (
@@ -178,15 +287,31 @@ function markFather(text: string, phrases: string[]): string {
 								class="inline-flex items-center justify-center rounded-full font-semibold"
 								style="font-family: var(--font-sans); background: #ffe9f0; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.7rem 1.4rem; text-decoration: none; font-size: 0.9rem;"
 							>Paperback · {RETAIL} →</a>
-							<span
+							<a
+								href={`https://www.amazon.com/dp/${e.hbAsin}`}
+								target="_blank"
+								rel="noopener"
 								class="inline-flex items-center justify-center rounded-full font-semibold"
-								style="font-family: var(--font-sans); background: #f3f3f3; color: var(--color-muted); border: 1.5px solid var(--color-hairline); padding: 0.7rem 1.4rem; font-size: 0.9rem; cursor: default;"
-							>Hardback · coming soon</span>
+								style="font-family: var(--font-sans); background: #fff; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.7rem 1.4rem; text-decoration: none; font-size: 0.9rem;"
+							>Hardback · {RETAIL_HB} →</a>
 						</div>
 					</div>
 				))}
 			</div>
-			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin-top: 2rem;">Large Print paperbacks ship from Amazon. Hardbacks are coming soon — and available now in bulk below.</p>
+			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin-top: 2rem;">Large Print paperbacks and hardbacks ship from Amazon — and are available in bulk below.</p>
+
+			<!-- Available everywhere books are sold — retailer strip -->
+			<div class="text-center" style="margin-top: 2.5rem; padding-top: 1.75rem; border-top: 1px solid var(--color-hairline);">
+				<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin: 0 0 1.1rem;">Available everywhere books are sold</p>
+				<div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
+					<a href={"https://www.amazon.com/s?k=Father%27s+Heart+Bible&i=stripbooks&crid=3UMQWME49FJDP&sprefix=father%27s+heart+bible%2Cstripbooks%2C108&ref=nb_sb_noss_1"} target="_blank" rel="noopener" aria-label="Shop the Father's Heart Bible on Amazon" style="display: inline-flex;">
+						<img src="https://assets.spiritmediapublishing.com/FHB/print/logo-amazon.png" alt="Amazon" width="67" height="42" loading="lazy" decoding="async" style="height: 42px; width: auto;" />
+					</a>
+					<a href={"https://www.barnesandnoble.com/search?q=Father%27s%20Heart%20Bible&attributes.mfield_bnb__seoKeywords=Fathers-Heart-Bible%2FSpirit-Media-Publishing&filtersPreset=formatsEditions"} target="_blank" rel="noopener" aria-label="Shop the Father's Heart Bible at Barnes & Noble" style="display: inline-flex;">
+						<img src="https://assets.spiritmediapublishing.com/FHB/print/logo-barnes-noble.png" alt="Barnes & Noble Booksellers" width="120" height="30" loading="lazy" decoding="async" style="height: 30px; width: auto;" />
+					</a>
+				</div>
+			</div>
 		</Section>
 
 		<!-- ═══════════════ SCRIPTURE CARDS (Hear the Father — own soft-brown section) ═══════════════ -->
@@ -211,19 +336,19 @@ function markFather(text: string, phrases: string[]): string {
 				<div class="text-center mb-8">
 					<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Bulk Order Discounts</p>
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Order in Bulk and Save</h2>
-					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 32rem;">Bring the Father's heart to your whole business, congregation, or community. Mix and match editions and bindings — your combined total sets the discount.</p>
+					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 44rem;">Bring the Father's heart to your whole business, congregation, or community.<br />Mix and match editions and bindings — your combined total sets the discount.</p>
 					<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; margin: 0.75rem auto 0; max-width: 32rem;">Bulk orders are direct through Spirit Media Publishing — not Amazon.</p>
 				</div>
 
 				<div class="rounded-2xl p-6 md:p-8" style="background: #fff; border: 1px solid var(--color-hairline);" data-bulk>
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Volume discounts — the more you order, the more you save</p>
-					<div class="grid grid-cols-3 gap-2 mb-6">
+					<div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
 						{tiers.map((t) => (
 							<div class="tier-card rounded-xl text-center" data-tier-min={t.qty} style="padding: 0.7rem 0.4rem; border: 1.5px solid #ffd0e0; background: #ffe9f0;">
 								<span style="display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.02em; color: #a0004c;">Save {t.pct}%</span>
 								<span style="display: block; font-size: 1.15rem; font-weight: 700; color: var(--color-ink); margin-top: 0.1rem; line-height: 1.1;">{t.qty.toLocaleString()}+</span>
-								<span style="display: block; font-size: 0.74rem; color: var(--color-muted); margin-top: 0.15rem; white-space: nowrap;">PB ${t.unit.toFixed(2)}</span>
-								<span style="display: block; font-size: 0.74rem; color: var(--color-muted); white-space: nowrap;">HB ${t.unitHb.toFixed(2)}</span>
+								<span style="display: block; font-size: 0.7rem; color: var(--color-muted); margin-top: 0.2rem; white-space: nowrap;">PB <s style="opacity: 0.6;">{RETAIL}</s> <span style="color: var(--color-ink); font-weight: 700;">${t.unit.toFixed(2)}</span></span>
+								<span style="display: block; font-size: 0.7rem; color: var(--color-muted); white-space: nowrap;">HB <s style="opacity: 0.6;">{RETAIL_HB}</s> <span style="color: var(--color-ink); font-weight: 700;">${t.unitHb.toFixed(2)}</span></span>
 							</div>
 						))}
 					</div>
@@ -276,6 +401,7 @@ function markFather(text: string, phrases: string[]): string {
 						<div class="flex flex-col gap-2 w-full mx-auto" style="max-width: 15rem;">
 							<button type="button" data-ebook-buy class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-brand); color: #fff; border: 0; padding: 0.75rem 1.4rem; cursor: pointer; font-size: 0.92rem;">Buy Direct · {EBOOK_DIRECT} →</button>
 							<a href={`https://www.amazon.com/dp/${ebookAsin}`} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #fff; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Kindle on Amazon · {EBOOK_AMAZON} →</a>
+							<a href={EBOOK_NOOK_URL} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #fff; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Nook at B&N · {EBOOK_NOOK} →</a>
 						</div>
 						<p data-ebook-msg style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.7rem 0 0; display: none;"></p>
 						<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">Direct = instant EPUB download, DRM-free — read it anywhere.</p>
@@ -291,6 +417,32 @@ function markFather(text: string, phrases: string[]): string {
 				</div>
 			</Section>
 
+			<!-- ═══════════════ FAQ ═══════════════ -->
+			<Section variant="soft">
+				<div class="max-w-3xl mx-auto">
+					<div class="text-center mb-8">
+						<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Frequently Asked Questions</p>
+						<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Good questions, honest answers</h2>
+					</div>
+					<div class="space-y-3">
+						{printFaq.map(({ q, a, link }) => (
+							<details class="faq-item rounded-2xl" style="background-color: #fff; border: 1px solid var(--color-hairline);">
+								<summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">
+									<span>{q}</span>
+									<svg class="faq-chev shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+								</summary>
+								<div class="px-5 pb-5 -mt-1">
+									<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.6;" set:html={a}></p>
+									{link && (
+										<a href={link.href} class="inline-flex items-center mt-3 font-semibold no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.9rem;">{link.label}</a>
+									)}
+								</div>
+							</details>
+						))}
+					</div>
+				</div>
+			</Section>
+
 		<!-- ═══════════════ PEOPLE BAND (variety of readers with FHB) ═══════════════ -->
 		<div class="grid grid-cols-1 sm:grid-cols-3">
 			<img src="https://assets.spiritmediapublishing.com/FHB/print/print-band-white.webp" alt="A man reading the White edition of the Father's Heart Bible in a cafe" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
@@ -299,6 +451,23 @@ function markFather(text: string, phrases: string[]): string {
 		</div>
 	</main>
 </Layout>
+
+<style>
+	/* FAQ accordion — native <details>, no JS. */
+	.faq-item > summary {
+		cursor: pointer;
+		list-style: none;
+	}
+	.faq-item > summary::-webkit-details-marker {
+		display: none;
+	}
+	.faq-chev {
+		transition: transform 0.2s ease;
+	}
+	.faq-item[open] > summary .faq-chev {
+		transform: rotate(180deg);
+	}
+</style>
 
 <script is:inline>
 	(() => {
