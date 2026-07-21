@@ -163,8 +163,8 @@
 	   CSS — keep both surfaces in sync. */
 	--font-headline: "Epilogue", "Epilogue fallback", system-ui, sans-serif;
 	--font-body: "Manrope", "Manrope fallback", system-ui, sans-serif;
-	--font-serif: "Epilogue", "Epilogue fallback", system-ui, sans-serif;
-	--font-sans: "Manrope", "Manrope fallback", system-ui, sans-serif;
+	--font-serif: "Epilogue", "Epilogue fallback", "Noto Sans Telugu", system-ui, sans-serif;
+	--font-sans: "Manrope", "Manrope fallback", "Noto Sans Telugu", system-ui, sans-serif;
 }
 
 /* ── Base ── */
@@ -324,4 +324,28 @@ a.hover\:underline {
 	text-decoration: underline;
 	text-underline-offset: 0.15em;
 	text-decoration-thickness: from-font;
+}
+
+/* Telugu companion face (Kevin 2026-07-22) — self-hosted Noto Sans Telugu
+   (SIL OFL, R2). unicode-range gates the download to pages containing Telugu
+   glyphs; English pages never fetch it. Appended after the brand faces so
+   per-glyph fallback hands Telugu characters to it (Epilogue/Manrope carry
+   no Telugu glyphs). ~36KB/weight. */
+@font-face {
+	font-family: "Noto Sans Telugu";
+	font-style: normal;
+	font-weight: 400;
+	font-display: optional;
+	unicode-range: U+0C00-0C7F;
+	src: url("https://assets.spiritmediapublishing.com/fonts/noto-sans-telugu/noto-sans-telugu-400.woff2")
+		format("woff2");
+}
+@font-face {
+	font-family: "Noto Sans Telugu";
+	font-style: normal;
+	font-weight: 700;
+	font-display: optional;
+	unicode-range: U+0C00-0C7F;
+	src: url("https://assets.spiritmediapublishing.com/fonts/noto-sans-telugu/noto-sans-telugu-700.woff2")
+		format("woff2");
 }

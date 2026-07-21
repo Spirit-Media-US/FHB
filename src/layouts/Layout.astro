@@ -11,6 +11,10 @@ import { sanityClient } from '../lib/sanity';
 import '../styles/global.css';
 
 interface Props {
+	/** Page language for <html lang> (default en). Translated pages pass their code. */
+	lang?: string;
+	/** hreflang alternate links [{hreflang, href}] — emitted when present. */
+	alternates?: { hreflang: string; href: string }[];
 	title: string;
 	description?: string;
 	// Social/answer-engine share blurb. When set, og:description + twitter:description
@@ -57,6 +61,8 @@ const {
 	articlePublishedTime,
 	articleSection,
 	articleTags = [],
+	lang = 'en',
+	alternates = [],
 } = Astro.props;
 
 // Fetch siteName and ogImage from Sanity
@@ -134,7 +140,7 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -145,6 +151,9 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" />
 		<link rel="manifest" href="/site.webmanifest" />
 		<link rel="canonical" href={canonicalURL} />
+		{alternates.map((a) => (
+			<link rel="alternate" hreflang={a.hreflang} href={a.href} />
+		))}
 		{noindex && <meta name="robots" content="noindex, nofollow" />}
 
 		<!-- Bing Webmaster Tools site verification (AEO rubric row A3) -->
@@ -298,7 +307,15 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		{ogSized && <meta property="og:image:height" content="630" />}
 		{ogSized && <meta property="og:image:type" content="image/jpeg" />}
 		<meta property="og:site_name" content={siteName} />
-		<meta property="og:locale" content="en_US" />
+		<meta property="og:locale" content={lang === 'te' ? 'te_IN' : 'en_US'} />
+		{alternates
+			.filter((a) => a.hreflang !== 'x-default' && a.hreflang !== lang)
+			.map((a) => (
+				<meta
+					property="og:locale:alternate"
+					content={a.hreflang === 'te' ? 'te_IN' : 'en_US'}
+				/>
+			))}
 
 		{pageType === 'article' && articleAuthor && (
 			<meta property="article:author" content={articleAuthor} />
