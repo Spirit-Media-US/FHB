@@ -37,7 +37,7 @@ const langs = Object.entries(modules)
 							class="flex items-baseline justify-between rounded-lg px-4 py-3 no-underline transition-colors"
 							style="background-color: var(--color-surface-low); color: var(--color-ink);"
 						>
-							<span class="font-semibold">{l.language}</span>
+							<span class="font-semibold">{l.language} <span class="glossary-status" data-lang={l.code}></span></span>
 							<span style="color: var(--color-brand);">{l.endonym}</span>
 						</a>
 					</li>
@@ -46,3 +46,21 @@ const langs = Object.entries(modules)
 		</div>
 	</main>
 </Layout>
+
+<script>
+	// Live review status — ✓ approved / ✎ corrections — from KV via the same
+	// Pages Function that records submissions. No rebuild needed per review.
+	fetch('/api/glossary-review')
+		.then((r) => r.json())
+		.then((st) => {
+			for (const el of document.querySelectorAll('.glossary-status')) {
+				const s = st[el.dataset.lang];
+				if (!s) continue;
+				el.textContent = s.verdict === 'approved' ? '✓' : '✎';
+				el.title = `${s.verdict} by ${s.name} (${(s.at || '').slice(0, 10)})`;
+				el.style.color = s.verdict === 'approved' ? '#1a7f37' : '#b3261e';
+				el.style.fontWeight = '800';
+			}
+		})
+		.catch(() => {});
+</script>

@@ -80,5 +80,67 @@ export async function onRequestPost({ request, env }) {
 		}).catch(() => {});
 	}
 
+	// Live status for the /glossary-review/ index checkmarks.
+	try {
+		await env.GLOSSARY_KV.put(
+			`status:${lang}`,
+			JSON.stringify({ verdict, name, at: new Date().toISOString() }),
+		);
+	} catch {}
+
+	// Email Kevin a summary of every submission — sent from the SMP location
+	// (authenticated sending domain, lands in inbox; FHB location's isn't).
+	try {
+		const smpHeaders = {
+			Authorization: `Bearer ${env.GHL_TOKEN_SMP}`,
+			Version: '2021-07-28',
+			'Content-Type': 'application/json',
+		};
+		const kv = await fetch(`${GHL}/contacts/upsert`, {
+			method: 'POST',
+			headers: smpHeaders,
+			body: JSON.stringify({
+				locationId: 'oPP9m0hKJpU6cFB7yD9w',
+				email: 'kevin@spiritmediapublishing.com',
+				name: 'Kevin White',
+			}),
+		});
+		const kevinId = (await kv.json())?.contact?.id;
+		if (kevinId) {
+			await fetch(`${GHL}/conversations/messages`, {
+				method: 'POST',
+				headers: smpHeaders,
+				body: JSON.stringify({
+					type: 'Email',
+					contactId: kevinId,
+					subject: `Glossary ${verdict === 'approved' ? 'APPROVED ✓' : 'corrections ✎'} — ${language} (${lang})`,
+					html:
+						`<p><strong>${language}</strong> glossary review received.</p>` +
+						`<p>Verdict: <strong>${verdict.toUpperCase()}</strong><br>` +
+						`Reviewer: ${name} &lt;${email}&gt;<br>` +
+						`Page: <a href="https://fathersheartbible.com/glossary-review/${lang}/">glossary-review/${lang}</a></p>` +
+						(notes.trim()
+							? `<p><strong>Notes:</strong><br>${notes.replace(/</g, '&lt;').replace(/\n/g, '<br>')}</p>`
+							: '<p>No notes — approved as drafted.</p>'),
+				}),
+			});
+		}
+	} catch {}
+
 	return json({ ok: true });
+}
+
+// GET /api/glossary-review — live status map for the index page checkmarks.
+export async function onRequestGet({ env }) {
+	try {
+		const list = await env.GLOSSARY_KV.list({ prefix: 'status:' });
+		const out = {};
+		for (const k of list.keys) {
+			const v = await env.GLOSSARY_KV.get(k.name, 'json');
+			if (v) out[k.name.slice(7)] = v;
+		}
+		return json(out);
+	} catch {
+		return json({});
+	}
 }
