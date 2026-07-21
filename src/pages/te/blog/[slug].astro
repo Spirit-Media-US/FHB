@@ -1,0 +1,351 @@
+---
+// /te/blog/<slug> — Telugu edition of a blog post (in-house machine translation
+// PILOT, Kevin 2026-07-21; doctrine: projects/fhb-translation/MASTER-PLAN.md).
+//
+// The ENGLISH Sanity post stays the single source of structure (blocks, links,
+// hero, FAQs); a per-slug overlay at src/data/te-blog/<slug>.json carries the
+// Telugu strings (translated through the FHB Telugu glossary, so the filial
+// renderings survive — the reason we do NOT hand pages to Google Translate).
+// Adding another translated post = adding another overlay file; this route
+// picks it up automatically. Heading anchors are derived from the ENGLISH
+// heading text so in-post jump links keep working across languages.
+//
+// Pilot exclusions (deliberate): no audio player (no Telugu blog narration
+// yet), no RelatedPosts/guide-hub rails (their targets are English-only — a
+// selector/link must never promise untranslated content).
+
+import BlogCTA from '../../../components/BlogCTA.astro';
+import ChapterEmbed from '../../../components/ChapterEmbed.astro';
+import FeatureChapter from '../../../components/FeatureChapter.astro';
+import ShareBar from '../../../components/ShareBar.astro';
+import Layout from '../../../layouts/Layout.astro';
+import { sanityClient, urlFor } from '../../../lib/sanity';
+
+export async function getStaticPaths() {
+	const overlays = import.meta.glob('../../../data/te-blog/*.json');
+	return Object.keys(overlays).map((path) => ({
+		params: {
+			slug: path
+				.split('/')
+				.pop()!
+				.replace(/\.json$/, ''),
+		},
+	}));
+}
+
+const { slug } = Astro.params;
+const overlayModules = import.meta.glob('../../../data/te-blog/*.json', { eager: true });
+const te: any = (overlayModules[`../../../data/te-blog/${slug}.json`] as any)?.default;
+const post = await sanityClient.fetch(`*[_type == "blogPost" && slug.current == $slug][0]`, {
+	slug,
+});
+if (!post || !te) return Astro.redirect('/blog');
+
+// ── Telugu overlay onto the English structure ───────────────────────────────
+const spanText = (blockKey: string, spanKey: string, fallback: string): string =>
+	te.spans?.[`b:${blockKey}:${spanKey}`] ?? fallback;
+
+function slugifyHeading(s: string): string {
+	return s
+		.toLowerCase()
+		.replace(/[‘’“”]/g, '')
+		.replace(/[^\w\s-]/g, '')
+		.trim()
+		.replace(/\s+/g, '-');
+}
+
+// Compact portable-text renderer (marks, links, lists, headings, blockquote) —
+// same visual classes as the English post page; no audio sentence spans.
+function renderPortableText(blocks: any[]): string {
+	let html = '';
+	let listType: string | null = null;
+	const closeList = () => {
+		if (listType) {
+			html += listType === 'number' ? '</ol>' : '</ul>';
+			listType = null;
+		}
+	};
+	for (const block of blocks) {
+		if (!block || block._type !== 'block') continue;
+		const children = Array.isArray(block.children) ? block.children : [];
+		const enRawText = children.map((c: any) => c?.text || '').join('');
+		const markDefs = Array.isArray(block.markDefs) ? block.markDefs : [];
+		const linkByKey: Record<string, string> = {};
+		for (const md of markDefs) {
+			if (md && md._type === 'link' && md._key && md.href) linkByKey[md._key] = md.href;
+		}
+		const inner = children
+			.map((child: any) => {
+				if (!child) return '';
+				let text = spanText(block._key, child._key, child.text || '');
+				const marks = Array.isArray(child.marks) ? child.marks : [];
+				if (marks.includes('strong')) text = `<strong>${text}</strong>`;
+				if (marks.includes('em')) text = `<em>${text}</em>`;
+				const linkKey = marks.find((m: any) => typeof m === 'string' && linkByKey[m]);
+				if (linkKey) {
+					const href = linkByKey[linkKey];
+					const isExternal = /^https?:\/\//i.test(href);
+					const targetAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+					text = `<a href="${href}" style="color: var(--color-brand);" class="hover:underline"${targetAttrs}>${text}</a>`;
+				}
+				return text;
+			})
+			.join('');
+		const listItem = block.listItem;
+		if (listItem === 'bullet' || listItem === 'number') {
+			if (listType && listType !== listItem) closeList();
+			if (!listType) {
+				listType = listItem;
+				html +=
+					listItem === 'number'
+						? '<ol class="list-decimal pl-7 my-6 space-y-2 text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">'
+						: '<ul class="list-disc pl-7 my-6 space-y-2 text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">';
+			}
+			html += `<li>${inner}</li>`;
+			continue;
+		}
+		closeList();
+		const style = block.style || 'normal';
+		if (style === 'h2') {
+			// English-derived anchor id so the translated mini-TOC links still land.
+			const id = slugifyHeading(enRawText);
+			html += `<h2 id="${id}" class="text-2xl font-bold mt-12 mb-4 scroll-mt-24" style="font-family: var(--font-serif); color: var(--color-ink);">${inner}</h2>`;
+		} else if (style === 'h3') {
+			html += `<h3 class="text-xl font-bold mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">${inner}</h3>`;
+		} else if (style === 'blockquote') {
+			html += `<blockquote class="my-6 px-6 py-5 lg:px-8 rounded-2xl text-lg leading-relaxed" style="background-color: #fdf2f5; border: 1px solid #f9d6e0; font-family: var(--font-serif); color: var(--color-ink);">${inner}</blockquote>`;
+		} else {
+			html += `<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">${inner}</p>`;
+		}
+	}
+	closeList();
+	return html;
+}
+
+type BodySegment =
+	| { kind: 'html'; html: string }
+	| { kind: 'chapter'; book: string; chapter: number; slug?: string; verseLimit?: number };
+
+function segmentBody(blocks: any[]): BodySegment[] {
+	const segments: BodySegment[] = [];
+	let buf: any[] = [];
+	const flush = () => {
+		if (buf.length) {
+			segments.push({ kind: 'html', html: renderPortableText(buf) });
+			buf = [];
+		}
+	};
+	for (const b of blocks || []) {
+		if (b?._type === 'fhbChapter') {
+			flush();
+			segments.push({
+				kind: 'chapter',
+				book: b.book,
+				chapter: b.chapter,
+				slug: b.slug,
+				verseLimit: b.verseLimit,
+			});
+		} else if (b?._type === 'block') {
+			buf.push(b);
+		}
+	}
+	flush();
+	return segments;
+}
+
+const bodySegments = segmentBody(post.body || []);
+
+const title = te.title ?? post.title;
+const excerpt = te.excerpt ?? post.excerpt;
+const heroImage = post.heroImage
+	? urlFor(post.heroImage).width(1200).quality(72).format('webp').url()
+	: '/fhb-logo.png';
+const heroImageMobile = post.heroImage
+	? urlFor(post.heroImage).width(640).quality(70).format('webp').url()
+	: '/fhb-logo.png';
+const author = post.author || 'Kevin White';
+const publishDate = new Date(post.publishDate).toLocaleDateString('te-IN', {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+});
+
+const enUrl = `https://fathersheartbible.com/blog/${slug}`;
+const teUrl = `https://fathersheartbible.com/te/blog/${slug}`;
+
+const faqs = (post.faqs || []).map((f: any) => ({
+	question: te.spans?.[`fq:${f._key}`] ?? f.question,
+	answer: te.spans?.[`fa:${f._key}`] ?? f.answer,
+}));
+
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BlogPosting',
+		headline: title,
+		description: te.seoDescription ?? post.seoDescription,
+		image: heroImage,
+		author: {
+			'@type': 'Person',
+			'@id': 'https://kevinwhite.us/#person',
+			name: 'Kevin White',
+			url: 'https://kevinwhite.us',
+		},
+		publisher: { '@id': 'https://fathersheartbible.com/#organization' },
+		url: teUrl,
+		mainEntityOfPage: { '@type': 'WebPage', '@id': teUrl },
+		datePublished: post.publishDate,
+		dateModified: post.dateModified || post.publishDate,
+		inLanguage: 'te',
+		translationOfWork: { '@type': 'BlogPosting', '@id': enUrl },
+	},
+	faqs.length > 0
+		? {
+				'@context': 'https://schema.org',
+				'@type': 'FAQPage',
+				mainEntity: faqs.map((f: any) => ({
+					'@type': 'Question',
+					name: f.question,
+					acceptedAnswer: { '@type': 'Answer', text: f.answer },
+				})),
+			}
+		: null,
+].filter(Boolean);
+---
+
+<Layout
+	title={te.seoTitle ?? post.seoTitle ?? title}
+	description={te.seoDescription ?? post.seoDescription}
+	ogDescription={te.ogDescription ?? post.ogDescription}
+	image={heroImage}
+	imageAlt={te.heroAlt ?? post.heroImage?.alt}
+	jsonLd={jsonLd}
+	darkHero={true}
+	preloadImageMobile={heroImageMobile}
+	preloadImageDesktop={heroImage}
+	pageType="article"
+	articleAuthor={author}
+	articlePublishedTime={post.publishDate}
+	lang="te"
+	alternates={[
+		{ hreflang: 'en', href: enUrl },
+		{ hreflang: 'te', href: teUrl },
+		{ hreflang: 'x-default', href: enUrl },
+	]}
+>
+	<main id="main-content">
+		<div class="relative w-full overflow-hidden h-72 lg:h-[600px]">
+			<img
+				src={heroImage}
+				srcset={`${heroImageMobile} 640w, ${heroImage} 1200w`}
+				sizes="(max-width: 1023px) 640px, 1200px"
+				alt={te.heroAlt ?? post.heroImage?.alt ?? title}
+				class="absolute inset-0 w-full h-full object-cover"
+				style="object-position: center center;"
+				fetchpriority="high"
+				decoding="async"
+			/>
+			<div
+				class="absolute inset-x-0 top-0 z-10"
+				style="height: 220px; background: linear-gradient(to bottom, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.32) 45%, rgba(0,0,0,0));"
+			>
+			</div>
+		</div>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<a
+					href={`/blog/${slug}/`}
+					class="inline-flex items-center gap-1.5 text-sm font-semibold hover:opacity-80 transition-opacity mb-5 no-underline"
+					style="color: var(--color-brand);">ఈ వ్యాసం ఇంగ్లీషులో చదవండి → English</a
+				>
+				<h1
+					class="post-title text-4xl md:text-5xl font-light leading-tight"
+					style="font-family: var(--font-serif); color: var(--color-ink);"
+				>
+					{title}
+				</h1>
+				{
+					excerpt && (
+						<p
+							class="post-summary mt-3 text-lg leading-relaxed max-w-2xl"
+							style="font-family: var(--font-sans); color: var(--color-muted);"
+						>
+							{excerpt}
+						</p>
+					)
+				}
+				<div
+					class="flex items-center gap-3 mt-4 pb-8 text-sm border-b flex-wrap"
+					style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);"
+				>
+					<span
+						><span class="font-semibold" style="color: var(--color-ink);">{author}</span></span
+					>
+					<span>&middot;</span>
+					<span>{publishDate}</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl space-y-4">
+				{
+					bodySegments.map((seg) =>
+						seg.kind === 'chapter' ? (
+							seg.slug ? (
+								<FeatureChapter
+									book={seg.book}
+									slug={seg.slug}
+									chapter={seg.chapter}
+									verseLimit={seg.verseLimit}
+									playable={true}
+								/>
+							) : (
+								<ChapterEmbed book={seg.book} chapter={seg.chapter} />
+							)
+						) : (
+							<div set:html={seg.html} />
+						),
+					)
+				}
+				<BlogCTA />
+			</div>
+		</section>
+
+		{
+			faqs.length > 0 && (
+				<section class="px-6 pb-12 lg:px-8" style="background-color: var(--color-surface);">
+					<div class="mx-auto max-w-3xl">
+						<h2
+							class="text-2xl font-bold mb-6"
+							style="font-family: var(--font-serif); color: var(--color-ink);"
+						>
+							తరచుగా అడిగే ప్రశ్నలు
+						</h2>
+						<div class="space-y-6">
+							{faqs.map((f: any) => (
+								<div>
+									<h3
+										class="text-lg font-bold mb-2"
+										style="font-family: var(--font-serif); color: var(--color-ink);"
+									>
+										{f.question}
+									</h3>
+									<p
+										class="text-base leading-relaxed"
+										style="font-family: var(--font-sans); color: var(--color-muted);"
+									>
+										{f.answer}
+									</p>
+								</div>
+							))}
+						</div>
+					</div>
+				</section>
+			)
+		}
+
+		<ShareBar title={title} url={teUrl} />
+	</main>
+</Layout>

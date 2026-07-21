@@ -429,6 +429,19 @@ const faqSchema =
 		: null;
 
 const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
+
+// hreflang alternates — emitted only when a translated edition of THIS post
+// exists (overlay file under src/data/<lang>-blog/). Must stay bidirectional
+// with the translated page (te/blog/[slug].astro) for the pairing to count.
+const teOverlays = import.meta.glob('../../data/te-blog/*.json');
+const hasTe = Boolean(teOverlays[`../../data/te-blog/${post.slug.current}.json`]);
+const alternates = hasTe
+	? [
+			{ hreflang: 'en', href: postUrl },
+			{ hreflang: 'te', href: `https://fathersheartbible.com/te/blog/${post.slug.current}` },
+			{ hreflang: 'x-default', href: postUrl },
+		]
+	: [];
 ---
 
 <Layout
@@ -446,6 +459,7 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
   articlePublishedTime={post.publishDate}
   articleSection={tags[0]}
   articleTags={tags}
+  alternates={alternates}
 >
 
   <main id="main-content">
