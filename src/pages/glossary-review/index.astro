@@ -50,16 +50,17 @@ const langs = Object.entries(modules)
 <script>
 	// Live review status — ✓ approved / ✎ corrections — from KV via the same
 	// Pages Function that records submissions. No rebuild needed per review.
-	fetch('/api/glossary-review')
+	fetch('/glossary-review/status')
 		.then((r) => r.json())
 		.then((st) => {
 			for (const el of document.querySelectorAll('.glossary-status')) {
 				const s = st[el.dataset.lang];
 				if (!s) continue;
-				el.textContent = s.verdict === 'approved' ? '✓' : '✎';
-				el.title = `${s.verdict} by ${s.name} (${(s.at || '').slice(0, 10)})`;
-				el.style.color = s.verdict === 'approved' ? '#1a7f37' : '#b3261e';
-				el.style.fontWeight = '800';
+				const parts = [];
+				if (s.approved) parts.push(`<span style="color:#1a7f37;font-weight:800">✓${s.approved > 1 ? s.approved : ''}</span>`);
+				if (s.corrections) parts.push(`<span style="color:#b3261e;font-weight:800">✎${s.corrections > 1 ? s.corrections : ''}</span>`);
+				el.innerHTML = parts.join(' ');
+				el.title = `reviewers: ${(s.reviewers || []).join(', ')}`;
 			}
 		})
 		.catch(() => {});

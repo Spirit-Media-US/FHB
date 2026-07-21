@@ -137,7 +137,7 @@ const entries = (g.glossary || []).map((e: any, i: number) => ({
 					status.textContent = 'Submitting…';
 					status.style.color = 'var(--color-muted)';
 					try {
-						const r = await fetch('/api/glossary-review', {
+						const r = await fetch('/glossary-review/submit', {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
 							body: JSON.stringify(data),
