@@ -307,7 +307,15 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		{ogSized && <meta property="og:image:height" content="630" />}
 		{ogSized && <meta property="og:image:type" content="image/jpeg" />}
 		<meta property="og:site_name" content={siteName} />
-		<meta property="og:locale" content="en_US" />
+		<meta property="og:locale" content={lang === 'te' ? 'te_IN' : 'en_US'} />
+		{alternates
+			.filter((a) => a.hreflang !== 'x-default' && a.hreflang !== lang)
+			.map((a) => (
+				<meta
+					property="og:locale:alternate"
+					content={a.hreflang === 'te' ? 'te_IN' : 'en_US'}
+				/>
+			))}
 
 		{pageType === 'article' && articleAuthor && (
 			<meta property="article:author" content={articleAuthor} />
