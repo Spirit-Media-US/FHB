@@ -1,0 +1,48 @@
+---
+// /glossary-review/ — index of per-language FHB glossary review pages
+// (MASTER-PLAN launch strategy). noindex — internal review surface.
+import Layout from '../../layouts/Layout.astro';
+
+const modules = import.meta.glob('../../data/glossary-review/*.json', { eager: true });
+const langs = Object.entries(modules)
+	.map(([path, m]: [string, any]) => ({
+		code: path
+			.split('/')
+			.pop()!
+			.replace(/\.json$/, ''),
+		...((m as any).default ?? {}),
+	}))
+	.sort((a: any, b: any) => (a.language || '').localeCompare(b.language || ''));
+---
+
+<Layout
+	title="FHB Key-Term Glossary Review — All Languages"
+	description="Native-reviewer approval pages for the Father's Heart Bible key-term glossaries."
+	noindex={true}
+>
+	<main id="main-content" class="px-6 py-12 lg:px-8" style="background-color: var(--color-surface);">
+		<div class="mx-auto max-w-3xl">
+			<h1 class="text-3xl font-bold mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">
+				FHB Key-Term Glossaries — Review
+			</h1>
+			<p class="text-sm mb-8" style="color: var(--color-muted);">
+				One page per language. Each is a DRAFT awaiting native approval; the filial renderings
+				("our Father") are the heart of the review. {langs.length} language{langs.length === 1 ? '' : 's'} drafted.
+			</p>
+			<ul class="grid gap-2 sm:grid-cols-2">
+				{langs.map((l: any) => (
+					<li>
+						<a
+							href={`/glossary-review/${l.code}/`}
+							class="flex items-baseline justify-between rounded-lg px-4 py-3 no-underline transition-colors"
+							style="background-color: var(--color-surface-low); color: var(--color-ink);"
+						>
+							<span class="font-semibold">{l.language}</span>
+							<span style="color: var(--color-brand);">{l.endonym}</span>
+						</a>
+					</li>
+				))}
+			</ul>
+		</div>
+	</main>
+</Layout>
