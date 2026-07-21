@@ -5,6 +5,21 @@ import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
 
+// Language list for the reviewer-invitation band — same source as
+// /glossary-review/ so the two can never drift.
+const glossaryModules = import.meta.glob('../data/glossary-review/*.json', { eager: true });
+const reviewLangs = Object.entries(glossaryModules)
+	.map(([path, m]: [string, any]) => ({
+		code:
+			path
+				.split('/')
+				.pop()
+				?.replace(/\.json$/, '') ?? '',
+		language: (m as any).default?.language ?? '',
+		endonym: (m as any).default?.endonym ?? '',
+	}))
+	.sort((a, b) => a.language.localeCompare(b.language));
+
 // Fetch page content + media from Sanity (all values have hardcoded fallbacks)
 const [pageData, media, biblePageData] = await Promise.all([
 	sanityClient.fetch(`*[_type =="page" && slug =="home"][0] {
@@ -518,12 +533,25 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				<h2 class="text-3xl md:text-4xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">
 					Are you proficient in any of these languages?
 				</h2>
-				<p class="text-lg leading-relaxed mb-2 max-w-2xl mx-auto" style="font-family: var(--font-sans); color: var(--color-muted);">
-					The Father's Heart Bible™ is being prepared in the world's major languages —
-					Spanish, Hindi, Mandarin, Arabic, Swahili, and twenty more. Before each translation
-					begins, its key terms need a native speaker's eye: does "our Father" sound like a
-					beloved child speaking to their own father?
+				<p class="text-lg leading-relaxed mb-6 max-w-2xl mx-auto" style="font-family: var(--font-sans); color: var(--color-muted);">
+					The Father's Heart Bible™ is being prepared in the world's major languages.
+					Before each translation begins, its key terms need a native speaker's eye:
+					does "our Father" sound like a beloved child speaking to their own father?
 				</p>
+				<ul class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-2 max-w-3xl mx-auto mb-8 list-none p-0 text-left">
+					{reviewLangs.map((l) => (
+						<li>
+							<a
+								href={`/glossary-review/${l.code}/`}
+								class="block rounded-lg px-3 py-2 no-underline transition-colors hover:bg-white"
+								style="font-family: var(--font-sans);"
+							>
+								<span class="block text-sm font-bold" style="color: var(--color-ink);">{l.language}</span>
+								<span class="block text-sm" style="color: var(--color-brand);">{l.endonym}</span>
+							</a>
+						</li>
+					))}
+				</ul>
 				<p class="text-lg leading-relaxed mb-8 max-w-2xl mx-auto" style="font-family: var(--font-sans); color: var(--color-muted);">
 					Take a peek and approve — or make recommendations. Easy, but profound: you'll be
 					helping share our Father with the nations.
