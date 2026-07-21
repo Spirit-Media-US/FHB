@@ -1,0 +1,162 @@
+---
+// /glossary-review/<lang> — native-reviewer approval page for one language's
+// FHB key-term glossary (MASTER-PLAN launch strategy, Kevin 2026-07-22).
+// A WEBPAGE rather than a PDF so reviewers can also run their browser's
+// translate feature over it as a second witness. noindex — internal surface.
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+	const files = import.meta.glob('../../data/glossary-review/*.json');
+	return Object.keys(files).map((path) => ({
+		params: {
+			lang: path
+				.split('/')
+				.pop()!
+				.replace(/\.json$/, ''),
+		},
+	}));
+}
+
+const { lang } = Astro.params;
+const modules = import.meta.glob('../../data/glossary-review/*.json', { eager: true });
+const g: any = (modules[`../../data/glossary-review/${lang}.json`] as any)?.default;
+if (!g) return Astro.redirect('/glossary-review/');
+
+const entries = (g.glossary || []).map((e: any, i: number) => ({
+	n: i + 1,
+	en: e.en,
+	t: e.t ?? e[lang] ?? e.te ?? '',
+	gloss: e.gloss ?? '',
+	note: e.note ?? '',
+}));
+---
+
+<Layout
+	title={`FHB Glossary Review — ${g.language} (${g.endonym})`}
+	description={`Key-term glossary review for the Father's Heart Bible in ${g.language}.`}
+	noindex={true}
+>
+	<main id="main-content" class="px-6 py-12 lg:px-8" style="background-color: var(--color-surface);">
+		<div class="mx-auto max-w-4xl">
+			<a href="/glossary-review/" class="text-sm font-semibold no-underline" style="color: var(--color-brand);">&larr; All languages</a>
+			<h1 class="text-3xl font-bold mt-4 mb-1" style="font-family: var(--font-serif); color: var(--color-ink);">
+				{g.language} · {g.endonym}
+			</h1>
+			<p class="text-sm mb-6" style="color: var(--color-muted);">
+				Father's Heart Bible™ key-term glossary — DRAFT for native review · Script: {g.script}
+			</p>
+
+			<div class="rounded-xl px-5 py-4 mb-8 text-sm leading-relaxed" style="background-color: #fdf2f5; border: 1px solid #f9d6e0; color: var(--color-ink);">
+				<p class="font-bold mb-1">For the reviewer</p>
+				<p>
+					These are the proposed renderings of FHB's key terms. The heart of the review: wherever
+					English says <strong>our Father</strong>, the rendering must feel like a beloved child
+					addressing their own father — warm, reverent, natural to your language's Bible — and
+					never the distant generic word for "God." Mark anything that reads wrong, stiff, or
+					irreverent. Tip: your browser's translate feature can back-translate this page as a
+					second witness. Approvals or corrections go to Kevin White.
+				</p>
+			</div>
+
+			<div class="grid gap-4 md:grid-cols-3 text-sm mb-8">
+				<div class="rounded-lg p-4" style="background-color: var(--color-surface-low);">
+					<p class="font-bold mb-1" style="color: var(--color-ink);">Register</p>
+					<p style="color: var(--color-muted);">{g.register}</p>
+				</div>
+				<div class="rounded-lg p-4" style="background-color: var(--color-surface-low);">
+					<p class="font-bold mb-1" style="color: var(--color-ink);">Quotation marks</p>
+					<p style="color: var(--color-muted);">{g.quote_convention}</p>
+				</div>
+				<div class="rounded-lg p-4" style="background-color: var(--color-surface-low);">
+					<p class="font-bold mb-1" style="color: var(--color-ink);">Poetry lines</p>
+					<p style="color: var(--color-muted);">{g.poetry_convention}</p>
+				</div>
+			</div>
+
+			<div class="overflow-x-auto">
+				<table class="w-full border-collapse text-sm">
+					<thead>
+						<tr>
+							{['#', 'English term', 'Proposed rendering', 'Literal back-translation', 'Why'].map((h) => (
+								<th class="px-3 py-2 text-left align-bottom" style="border-bottom: 2px solid var(--color-hairline); color: var(--color-ink);">{h}</th>
+							))}
+						</tr>
+					</thead>
+					<tbody>
+						{entries.map((e: any) => (
+							<tr>
+								<td class="px-3 py-2 align-top" style="border-bottom: 1px solid var(--color-hairline); color: var(--color-muted);">{e.n}</td>
+								<td class="px-3 py-2 align-top font-semibold" style="border-bottom: 1px solid var(--color-hairline); color: var(--color-ink);">{e.en}</td>
+								<td class="px-3 py-2 align-top text-base" style="border-bottom: 1px solid var(--color-hairline); color: var(--color-brand); font-weight: 600;">{e.t}</td>
+								<td class="px-3 py-2 align-top" style="border-bottom: 1px solid var(--color-hairline); color: var(--color-ink);"><em>{e.gloss}</em></td>
+								<td class="px-3 py-2 align-top" style="border-bottom: 1px solid var(--color-hairline); color: var(--color-muted);">{e.note}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+
+			{g.filial_stems && (
+				<p class="mt-6 text-xs" style="color: var(--color-muted);">
+					Machine conformance stems (every filial rendering must contain one): {g.filial_stems.join(' · ')}
+				</p>
+			)}
+			<div class="mt-10 pt-8" style="border-top: 1px solid var(--color-hairline);" id="review-form-wrap">
+				<h2 class="text-xl font-bold mb-1" style="font-family: var(--font-serif); color: var(--color-ink);">Submit your review</h2>
+				<p class="text-sm mb-5" style="color: var(--color-muted);">Your review goes directly to Kevin White. Corrections can be written in {g.language} or English.</p>
+				<form id="glossary-review-form" class="space-y-4 max-w-xl">
+					<input type="hidden" name="lang" value={lang} />
+					<input type="hidden" name="language" value={g.language} />
+					<div class="grid gap-4 sm:grid-cols-2">
+						<label class="block text-sm font-semibold" style="color: var(--color-ink);">Your name
+							<input required name="name" type="text" class="mt-1 w-full rounded-lg border px-3 py-2 font-normal" style="border-color: var(--color-hairline); background: var(--color-surface-low); color: var(--color-ink);" />
+						</label>
+						<label class="block text-sm font-semibold" style="color: var(--color-ink);">Email
+							<input required name="email" type="email" class="mt-1 w-full rounded-lg border px-3 py-2 font-normal" style="border-color: var(--color-hairline); background: var(--color-surface-low); color: var(--color-ink);" />
+						</label>
+					</div>
+					<fieldset class="text-sm" style="color: var(--color-ink);">
+						<label class="mr-6"><input type="radio" name="verdict" value="approved" required /> I approve this glossary</label>
+						<label><input type="radio" name="verdict" value="corrections" required /> Corrections needed</label>
+					</fieldset>
+					<label class="block text-sm font-semibold" style="color: var(--color-ink);">Corrections / notes <span class="font-normal" style="color: var(--color-muted);">(term numbers help, e.g. “#3 should be …”)</span>
+						<textarea name="notes" rows="5" class="mt-1 w-full rounded-lg border px-3 py-2 font-normal" style="border-color: var(--color-hairline); background: var(--color-surface-low); color: var(--color-ink);"></textarea>
+					</label>
+					<button type="submit" class="rounded-full px-6 py-2.5 font-bold text-white" style="background-color: var(--color-brand);">Submit review</button>
+					<p id="review-status" class="text-sm font-semibold" hidden></p>
+				</form>
+			</div>
+
+			<script>
+				const form = document.getElementById('glossary-review-form');
+				const status = document.getElementById('review-status');
+				form?.addEventListener('submit', async (e) => {
+					e.preventDefault();
+					const data = Object.fromEntries(new FormData(form));
+					status.hidden = false;
+					status.textContent = 'Submitting…';
+					status.style.color = 'var(--color-muted)';
+					try {
+						const r = await fetch('/glossary-review/submit', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(data),
+						});
+						const out = await r.json();
+						if (out.ok) {
+							status.textContent = '✓ Thank you — your review has been recorded.';
+							status.style.color = 'var(--color-brand)';
+							form.querySelector('button').disabled = true;
+						} else {
+							status.textContent = out.error || 'Something went wrong — please try again.';
+							status.style.color = '#b3261e';
+						}
+					} catch {
+						status.textContent = 'Network error — please try again.';
+						status.style.color = '#b3261e';
+					}
+				});
+			</script>
+		</div>
+	</main>
+</Layout>
