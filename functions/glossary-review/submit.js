@@ -168,7 +168,10 @@ export async function onRequestPost({ request, env }) {
 	let kevinNotified = false;
 	if (env.INTERNAL_NOTIFY_SECRET) {
 		try {
-			const res = await fetch('https://join.fathersheartbible.com/api/internal/notify', {
+			// Apex URL — the router Worker owns /api/* and forwards to the
+			// community app (join.* 301s this path to the apex, and a redirected
+			// POST is unreliable).
+			const res = await fetch('https://fathersheartbible.com/api/internal/notify', {
 				method: 'POST',
 				headers: {
 					Authorization: `Bearer ${env.INTERNAL_NOTIFY_SECRET}`,
