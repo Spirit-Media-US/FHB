@@ -151,22 +151,44 @@ export async function onRequestPost({ request, env }) {
 		);
 	} catch {}
 
-	// Trigger: summary email to Kevin (every submission).
-	const kevinId = await smpContact(env, 'kevin@spiritmediapublishing.com', 'Kevin White').catch(
-		() => null,
-	);
-	await sendEmail(
-		env,
-		kevinId,
-		`Glossary ${r.verdict === 'approved' ? 'APPROVED ✓' : 'corrections ✎'} — ${r.language} (${r.lang})`,
+	// Trigger: summary email to Kevin (every submission) — via the community
+	// app's Gmail sender (/api/internal/notify), because GHL/Mailgun sends to
+	// our own inboxes get spam-foldered (the 2026-07-22 Tamil approval sat in
+	// spam). GHL delivery stays as the fallback so a notify outage can't
+	// silently drop the alert.
+	const kevinSubject = `Glossary ${r.verdict === 'approved' ? 'APPROVED ✓' : 'corrections ✎'} — ${r.language} (${r.lang})`;
+	const kevinHtml =
 		`<p><strong>${esc(r.language)}</strong> glossary review received.</p>` +
-			`<p>Verdict: <strong>${r.verdict.toUpperCase()}</strong><br>` +
-			`Reviewer: ${esc(r.name)} &lt;${esc(r.email)}&gt;<br>` +
-			`Page: <a href="https://fathersheartbible.com/glossary-review/${r.lang}/">glossary-review/${r.lang}</a></p>` +
-			(r.notes.trim()
-				? `<p><strong>Notes:</strong><br>${esc(r.notes)}</p>`
-				: '<p>No notes — approved as drafted.</p>'),
-	);
+		`<p>Verdict: <strong>${r.verdict.toUpperCase()}</strong><br>` +
+		`Reviewer: ${esc(r.name)} &lt;${esc(r.email)}&gt;<br>` +
+		`Page: <a href="https://fathersheartbible.com/glossary-review/${r.lang}/">glossary-review/${r.lang}</a></p>` +
+		(r.notes.trim()
+			? `<p><strong>Notes:</strong><br>${esc(r.notes)}</p>`
+			: '<p>No notes — approved as drafted.</p>');
+	let kevinNotified = false;
+	if (env.INTERNAL_NOTIFY_SECRET) {
+		try {
+			const res = await fetch('https://join.fathersheartbible.com/api/internal/notify', {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${env.INTERNAL_NOTIFY_SECRET}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					to: 'kevin@spiritmediapublishing.com',
+					subject: kevinSubject,
+					html: kevinHtml,
+				}),
+			});
+			kevinNotified = res.ok;
+		} catch {}
+	}
+	if (!kevinNotified) {
+		const kevinId = await smpContact(env, 'kevin@spiritmediapublishing.com', 'Kevin White').catch(
+			() => null,
+		);
+		await sendEmail(env, kevinId, kevinSubject, kevinHtml);
+	}
 
 	// Trigger 2: thank-you to the reviewer (silent-DND footer, SMP policy).
 	const reviewerId = await smpContact(env, r.email, r.name).catch(() => null);
