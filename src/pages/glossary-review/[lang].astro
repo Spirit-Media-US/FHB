@@ -144,9 +144,17 @@ const entries = (g.glossary || []).map((e: any, i: number) => ({
 						});
 						const out = await r.json();
 						if (out.ok) {
-							status.textContent = '✓ Thank you — your review has been recorded.';
+							status.textContent = '✓ Thank you — your review has been recorded. You may submit again any time (e.g. after updates).';
 							status.style.color = 'var(--color-brand)';
-							form.querySelector('button').disabled = true;
+							// Brief disable only (double-click guard) — multiple reviews per
+							// language are WELCOME until approval (Kevin 2026-07-22; Manish
+							// hit the old permanent disable trying to resubmit).
+							const btn = form.querySelector('button');
+							btn.disabled = true;
+							setTimeout(() => {
+								btn.disabled = false;
+								btn.textContent = 'Submit another review';
+							}, 2500);
 						} else {
 							status.textContent = out.error || 'Something went wrong — please try again.';
 							status.style.color = '#b3261e';
