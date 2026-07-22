@@ -96,6 +96,26 @@ const entries = (g.glossary || []).map((e: any, i: number) => ({
 				</table>
 			</div>
 
+			{g.doctrine_blocklist?.length > 0 && (
+				<div class="mt-8 rounded-xl p-5" style="background: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<h2 class="text-lg font-bold mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">Terms we deliberately avoid</h2>
+					<p class="text-sm mb-3" style="color: var(--color-muted);">
+						These common words carry another religion's meaning, so Scripture in {g.language} has
+						always chosen different vocabulary — and so do we. Please don't recommend them; the
+						established Bible alternative is listed beside each.
+					</p>
+					<ul class="text-sm space-y-1">
+						{g.doctrine_blocklist.map((b: any) => (
+							<li style="color: var(--color-ink);">
+								<span class="font-semibold" style="color: #b3261e;">{b.term}</span>
+								<span style="color: var(--color-muted);"> ({b.meaning})</span>
+								{' → '}
+								<span class="font-semibold" style="color: var(--color-brand);">{b.use_instead}</span>
+							</li>
+						))}
+					</ul>
+				</div>
+			)}
 			{g.filial_stems && (
 				<p class="mt-6 text-xs" style="color: var(--color-muted);">
 					Machine conformance stems (every filial rendering must contain one): {g.filial_stems.join(' · ')}
