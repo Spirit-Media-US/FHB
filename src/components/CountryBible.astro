@@ -36,7 +36,17 @@ export interface CountryWhyBlock {
 export interface CountryLanguage {
 	language: string;
 	speakers: string; // e.g. "97 million"
-	status: 'Available' | 'On the roadmap' | 'Translation needed';
+	// Four states, in descending order of readiness:
+	//   'Available'             — the whole Bible (all 66 books) can be read now.
+	//   'First books available' — some books are published and readable NOW; the
+	//                             rest are still coming. Use `note` to say exactly
+	//                             which books, so the page never overstates.
+	//   'On the roadmap'        — planned, nothing readable yet.
+	//   'Translation needed'    — not yet begun.
+	status: 'Available' | 'First books available' | 'On the roadmap' | 'Translation needed';
+	// Short, factual detail shown under the language name (e.g. which books are
+	// live). Required in practice for 'First books available'.
+	note?: string;
 }
 export interface CountryKnownFor {
 	label: string;
@@ -111,15 +121,6 @@ export interface Props {
 	languages?: CountryLanguage[];
 	// Side-by-side FHB-English | target-language Scripture previews (Gen 1 / John 3 etc.)
 	translationPreviews?: any[];
-	// Optional: override the featured $50,000 sponsor cards with explicit items
-	// (e.g. English print + ComfortLeather™ on the USA page, where the language
-	// is already free to READ online but PUBLISHING it still needs sponsorship).
-	// When set, all roadmap/needed languages drop to "Also available" below.
-	// `reach` (optional) drives the cost-per-reader math when `speakers` isn't a
-	// number (e.g. ComfortLeather™ "premium keepsake" still reaches 1.5B readers).
-	sponsorFeatured?: { label: string; speakers: string; note?: string; reach?: string }[];
-	sponsorIntroHtml?: string;
-	sponsorVisionHtml?: string;
 	verses: CountryVerse[];
 	keepReadingHtml: string;
 	faqs: CountryFaq[];
@@ -187,9 +188,6 @@ const {
 	opportunityIntroHtml,
 	languages = [],
 	translationPreviews = [],
-	sponsorFeatured,
-	sponsorIntroHtml,
-	sponsorVisionHtml,
 	verses,
 	keepReadingHtml,
 	faqs,
@@ -205,59 +203,12 @@ const _previews =
 
 const PAGE_URL = `https://fathersheartbible.com/bible-in/${slug}/`;
 
-// --- Sponsor-a-translation maths (bottom section) ---
-// Each language unlocks for a one-time $50,000 (translation + print + digital +
-// audio). Cost-per-reader = $50,000 / speakers, parsed from each language's
-// `speakers` string ("550 million", "1.7 million"). Available editions skipped.
-const TRANSLATION_COST = 50000;
-function parseReaders(s: string): number | null {
-	const m = (s || '').match(/([\d.]+)\s*(billion|million)/i);
-	if (m) return parseFloat(m[1]) * (m[2].toLowerCase() === 'billion' ? 1e9 : 1e6);
-	const digits = (s || '').replace(/[^\d]/g, '');
-	return digits ? parseInt(digits, 10) : null;
-}
-function perReaderLabel(readers: number): string {
-	const cents = (TRANSLATION_COST / readers) * 100;
-	if (cents < 0.01) return 'less than 0.01¢ per reader';
-	if (cents < 1) return `${cents.toFixed(2)}¢ per reader`;
-	if (cents < 10) return `${cents.toFixed(1)}¢ per reader`;
-	if (cents < 100) return `${Math.round(cents)}¢ per reader`;
-	return `$${(cents / 100).toFixed(2)} per reader`;
-}
-const sponsorLangs = languages
-	.filter((l) => l.status !== 'Available')
-	.map((l) => ({ ...l, readers: parseReaders(l.speakers) }))
-	.filter((l): l is typeof l & { readers: number } => l.readers != null);
-const primaryRoadmapLang =
-	languages.find((l) => l.status === 'On the roadmap')?.language || country;
-// Feature the top/roadmap language(s); smaller "needed" languages are Phase 2.
-const featuredSponsor = sponsorLangs.filter((l) => l.status === 'On the roadmap');
-const featured = featuredSponsor.length ? featuredSponsor : sponsorLangs;
-const phase2 = featuredSponsor.length
-	? sponsorLangs.filter((l) => l.status === 'Translation needed')
-	: [];
-// Explicit featured cards override (USA: English print + ComfortLeather™).
-const hasCustomFeatured = !!(sponsorFeatured && sponsorFeatured.length);
-const featuredCards = hasCustomFeatured
-	? sponsorFeatured.map((s) => ({
-			language: s.label,
-			speakers: s.speakers,
-			note: s.note,
-			readers: parseReaders(s.reach || s.speakers),
-		}))
-	: featured.map((l) => ({
-			language: l.language,
-			speakers: l.speakers,
-			note: undefined,
-			readers: l.readers,
-		}));
-// When featured cards are custom, every actual language drops to "Also available".
-const alsoAvailable = hasCustomFeatured ? sponsorLangs : phase2;
-const SPONSOR_VIDEO_ID = 'eD06eSXd2uU';
-// Spam-safe mailto (matches /partner UnlockMap): address assembled on click so
-// kevin@… never appears in the served HTML.
-const pledgeOnclick =
-	"event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent(this.dataset.subj)";
+// NOTE (2026-08-04, Kevin): this page set no longer asks for money for
+// translation work. The former "Sponsor a translation" section — the one-time
+// $50,000 figure, the cost-per-reader maths, the per-language pledge mailtos and
+// the partner-video CTA — was removed outright, not softened. Do not reintroduce
+// a sponsorship ask, a dollar figure, or a donate link here. The honest CTA on
+// these pages is to READ the editions that are already published and free.
 const HERO_BRI = heroBrightness != null ? `&bri=${heroBrightness}` : '';
 const HERO_IMG = `${heroBase}?w=1400&h=560&fit=crop&crop=${heroCrop}${HERO_BRI}&fm=webp&q=72`;
 const OG_IMG = `${heroBase}?w=1200&h=630&fit=crop&crop=${heroCrop}&fm=jpg&q=80`;
@@ -544,21 +495,26 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 							const tone =
 								l.status === 'Available'
 									? '#138808'
-									: l.status === 'On the roadmap'
-										? '#C77B0E'
-										: 'var(--color-muted)';
+									: l.status === 'First books available'
+										? '#1A7F5A'
+										: l.status === 'On the roadmap'
+											? '#C77B0E'
+											: 'var(--color-muted)';
 							return (
 								<li class="flex items-center justify-between gap-4 py-3.5" style="border-color: var(--color-hairline);">
 									<div>
 										<span class="text-lg font-medium" style="font-family: var(--font-serif); color: var(--color-ink);">{l.language}</span>
 										<span class="ml-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">{l.speakers} speakers</span>
+										{l.note && (
+											<span class="block mt-0.5 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">{l.note}</span>
+										)}
 									</div>
 									<span class="shrink-0 text-xs font-semibold uppercase tracking-wide rounded-full px-3 py-1" style={`color: ${tone}; border: 1px solid ${tone};`}>{l.status}</span>
 								</li>
 							);
 						})}
 					</ul>
-					<p class="mt-6 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Every language is a door. If you feel called to help open one, you can <a href="/a-bible-for-the-whole-world/" style="color: var(--color-brand);" class="hover:underline">sponsor a translation</a> &mdash; or simply <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">start reading the editions available today</a>.</p>
+					<p class="mt-6 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Every language is a door. You can <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">start reading the editions available today</a>, free, with verse-by-verse audio.</p>
 					{_previews.length > 0 && <TranslationPreview previews={_previews} />}
 				</div>
 			</section>
@@ -703,88 +659,8 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible&trade; free</h2>
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaBottomBodyHtml}></p>
 				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Start reading<span aria-hidden="true">&rarr;</span></a>
-				<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">Believe in the mission? <a href="/a-bible-for-the-whole-world/" style="color: var(--color-brand);" class="hover:underline">Help take it to the nations &rarr;</a></p>
 			</div>
 		</section>
-
-		<!-- Sponsor a translation (bottom invitation, under the read-free CTA) -->
-		{(sponsorLangs.length > 0 || hasCustomFeatured) && (
-			<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${tintWarm};`}>
-				<div class="mx-auto max-w-5xl">
-					<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
-						<div class="order-2 lg:order-1">
-							<p class="text-xs font-semibold uppercase tracking-widest mb-3" style={`color: ${colorPrimary}; font-family: var(--font-sans);`}>Sponsor a translation</p>
-							<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Open the door for {country}&rsquo;s languages</h2>
-							{sponsorIntroHtml ? (
-								<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={sponsorIntroHtml}></p>
-							) : (
-								<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">A one-time <strong style="color: var(--color-ink);">$50,000</strong> opens the door for an entire language &mdash; full translation, print, digital, and audio.</p>
-							)}
-							<div class="mt-6 space-y-4">
-								{featuredCards.map((l) => (
-									<div class="rounded-2xl p-5" style="background-color: var(--color-surface-lowest); border: 1px solid rgba(0,0,0,0.06);">
-										<div class="flex items-baseline justify-between gap-3">
-											<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{l.language}</h3>
-											<span class="shrink-0 text-sm font-semibold" style={`color: ${colorPrimary}; font-family: var(--font-sans);`}>{l.speakers}</span>
-										</div>
-										<p class="mt-3 flex items-baseline gap-2">
-											<span class="text-2xl font-medium" style="font-family: var(--font-serif); color: var(--color-ink);">$50,000</span>
-											<span class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">one-time &middot; {l.readers ? perReaderLabel(l.readers) : (l.note || 'full publication')}</span>
-										</p>
-									</div>
-								))}
-							</div>
-						</div>
-						<div class="order-1 lg:order-2">
-							<iframe class="lg:hidden block w-full overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);" src={`https://www.youtube-nocookie.com/embed/${SPONSOR_VIDEO_ID}?rel=0&playsinline=1`} title="Partner with the Father's Heart Bible" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-							<button type="button" id="sponsor-video-facade" class="group relative hidden lg:block w-full overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);" aria-label="Play the Father's Heart Bible partner video" data-video-id={SPONSOR_VIDEO_ID}>
-								<img src={`https://i.ytimg.com/vi/${SPONSOR_VIDEO_ID}/hqdefault.jpg`} alt="Partner with us to take the Father's Heart Bible to the nations" width="480" height="360" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
-								<span aria-hidden="true" class="absolute inset-0" style="background: rgba(36,27,23,0.12);"></span>
-								<span aria-hidden="true" class="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110" style="width: 4.5rem; height: 4.5rem; transform: translate(-50%,-50%); background: rgba(255,255,255,0.92); border: 2px solid #FFFFFF; box-shadow: 0 4px 18px rgba(0,0,0,0.4);">
-									<svg width="26" height="26" viewBox="0 0 24 24" fill="var(--color-brand)" style="margin-left: 3px;"><path d="M8 5v14l11-7z"></path></svg>
-								</span>
-							</button>
-							<p class="mt-4 text-center text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/a-bible-for-the-whole-world/" style="color: var(--color-brand);" class="hover:underline font-semibold">Partner with us &rarr;</a></p>
-						</div>
-					</div>
-					{alsoAvailable.length > 0 && (
-						<div class="mt-8">
-							<p class="text-xs font-semibold uppercase tracking-widest mb-2" style={`font-family: var(--font-sans); color: ${colorPrimary};`}>Also available for sponsorship</p>
-							<ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2.5">
-								{alsoAvailable.map((l) => (
-									<li class="text-sm leading-snug" style="font-family: var(--font-sans);">
-										<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" data-subj={`Sponsor ${l.language} — Father's Heart Bible`} onclick={pledgeOnclick} class="font-semibold hover:underline" style="color: var(--color-brand);">{l.language} &rarr;</a>
-										<span class="block" style="color: var(--color-muted);">$50,000 &middot; {l.speakers} &middot; {perReaderLabel(l.readers)}</span>
-									</li>
-								))}
-							</ul>
-						</div>
-					)}
-					{sponsorVisionHtml ? (
-						<p class="mt-7 text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);" set:html={sponsorVisionHtml}></p>
-					) : (
-						<p class="mt-7 text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">There is no greater purpose, destiny, or legacy than to reveal the Father&rsquo;s heart to the {primaryRoadmapLang}-speaking peoples of the world.</p>
-					)}
-					<a href="/a-bible-for-the-whole-world/" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Sponsor a language<span aria-hidden="true">&rarr;</span></a>
-				</div>
-						</section>
-		)}
-		<script is:inline>
-			(() => {
-				const btn = document.getElementById('sponsor-video-facade');
-				if (!btn) return;
-				btn.addEventListener('click', () => {
-					const id = btn.dataset.videoId;
-					const iframe = document.createElement('iframe');
-					iframe.style.cssText = 'display:block;width:100%;aspect-ratio:16/9;height:auto;border:0;border-radius:0.75rem;';
-					iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-					iframe.allowFullscreen = true;
-					iframe.title = "Partner with the Father's Heart Bible";
-					iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
-					btn.replaceWith(iframe);
-				});
-			})();
-		</script>
 
 		<!-- Footnote (above the shared global footer): country-hub discoverability + cross-links -->
 		<section class="px-6 py-6 lg:px-8" style="background-color: var(--color-surface); border-top: 1px solid var(--color-hairline);">
