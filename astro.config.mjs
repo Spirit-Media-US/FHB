@@ -1,34 +1,25 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 
 const SITE = 'https://fathersheartbible.com';
 
-// The Bible reader pages are served by the community app (under the apex via
-// fhb-apex-router) and are server-rendered there, so they appear in NO
-// auto-generated sitemap. Enumerate every chapter from the synced manifest so
-// the unified apex sitemap lists all /read pages in the canonical trailing-slash
-// form Google already indexed. Without this, deleting the old static reader
-// would drop ~900 reader URLs from the sitemap.
-const readPages = [`${SITE}/read/`];
-try {
-	const manifest = JSON.parse(
-		fs.readFileSync(path.resolve(process.cwd(), 'src/content/bible/_manifest.json'), 'utf8'),
-	);
-	for (const slug of Object.keys(manifest.books || {})) {
-		const entry = manifest.books[slug];
-		const chapters = [
-			...new Set([...(entry.lockedChapters || []), ...(entry.readingEditionChapters || [])]),
-		].sort((a, b) => a - b);
-		// NOTE: the /read/<book>/ landing page 302-redirects to chapter 1, so we do
-		// NOT list it (avoids GSC "Page with redirect") — only the canonical chapters.
-		for (const n of chapters) readPages.push(`${SITE}/read/${slug}/${n}/`);
-	}
-} catch {
-	// manifest missing — sitemap still builds (without the /read pages)
-}
+// READER URLs ARE NOT LISTED HERE. Every /read page — English AND every other
+// live language — is enumerated by scripts/gen-sitemap-read.mjs into
+// public/sitemap-read.xml, which is advertised as a second `Sitemap:` line in
+// public/robots.txt and submitted to GSC + Bing separately.
+//
+// Why it moved out of this config (2026-08-04): the reader is multilingual, and
+// a sitemap that lists translations must carry xhtml:link hreflang alternates.
+// @astrojs/sitemap cannot emit xhtml:link at all, and its `i18n` option cannot
+// express our URL shape (English is the default and has NO language segment:
+// /read/<book>/<ch>/, while others are /read/<lang>/<book>/<ch>/). So the reader
+// gets its own generated sitemap and this config owns only the marketing pages.
+// Keep it that way — reader URLs must have exactly ONE owner, or Google sees the
+// same chapter advertised twice with conflicting annotations.
+//
+// (Still true, and honoured by the generator: /read/<book>/ 302-redirects to
+// chapter 1, so only canonical chapters are listed — never the book landing.)
 
 export default defineConfig({
 	site: process.env.PUBLIC_SITE_URL || 'https://fathersheartbible.com',
@@ -45,8 +36,8 @@ export default defineConfig({
 			// Flat community pages serve + self-canonicalize WITHOUT a trailing
 			// slash (their /foo/ form 404s) — list the no-slash 200 URL. /events/
 			// is a directory page (serves 200 with slash). /login is intentionally
-			// excluded (never advertise the login page). /read/* added from the
-			// manifest above.
+			// excluded (never advertise the login page). /read/* is NOT here — it
+			// lives in public/sitemap-read.xml (see the note at the top of this file).
 			customPages: [
 				// /about (community-served) is noindex — do NOT advertise it in the
 				// sitemap (avoids GSC "Submitted URL marked noindex"). Re-add only when
@@ -57,7 +48,6 @@ export default defineConfig({
 				`${SITE}/map`,
 				`${SITE}/shareables`,
 				`${SITE}/events/`,
-				...readPages,
 			],
 			// Exclude /privacy + /terms (low-value), and /blog/preview/* — the latter
 			// are noindex draft-preview duplicates of the real posts; advertising them
