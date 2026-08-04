@@ -426,36 +426,30 @@ const relatedGroups: Group[] = _sibSlugs
 	preloadImageDesktop={HERO_IMG}
 >
 	<main id="main-content">
-		<!-- Hero -->
-		<section class="relative w-full overflow-hidden">
+		<!-- FEATURE IMAGE — full-bleed hero, starts at top behind the transparent nav.
+		     NO TEXT OVER THE HERO (Kevin 2026-08-04): every page on the site uses this
+		     shape — image alone, then the title block below it on --color-surface-low.
+		     This series used to overlay eyebrow/h1/subhead on the image, which is both
+		     off-standard and what put the h1 on top of the logo on Android (James).
+		     Matches /guides/how-to-read-the-bible/. -->
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
 			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={heroAlt} class="absolute inset-0 w-full h-full object-cover" style={`object-position: ${heroObjectPosition};`} fetchpriority="high" decoding="async" />
-			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.34) 45%, rgba(0,0,0,0.42) 100%);" aria-hidden="true"></div>
-			{/* Text sits in NORMAL FLOW (not absolute bottom-0) so the hero grows when
-			    the subhead is long. It used to be absolutely bottom-anchored inside a
-			    fixed 560px hero, so a long subhead grew UPWARDS and ran under the
-			    transparent fixed 72px header — the h1 rendered on top of the logo on
-			    Android (James, 2026-08-04; worst on /marriage and /graduates, which
-			    have the longest subheads). pt-24 keeps it clear of the header at every
-			    length; justify-end preserves the original bottom-aligned look. */}
-			<div class="relative z-20 flex min-h-[560px] lg:min-h-[calc(46vh_+_2in)] flex-col justify-end px-6 pb-10 pt-24 lg:px-8 lg:pb-14 lg:pt-28">
-				<div class="mx-auto max-w-4xl">
-					<p class="text-sm font-semibold uppercase tracking-widest mb-2" style="color: var(--color-gold); font-family: var(--font-sans);">{heroEyebrow}</p>
-					<h1 class="text-4xl md:text-5xl lg:text-6xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{h1}</h1>
-					<p class="mt-4 max-w-2xl text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.92);">{heroSubhead}</p>
-				</div>
-			</div>
+			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
 			<div class="absolute inset-x-0 bottom-0 z-30 h-1.5" style="background: linear-gradient(to right, var(--color-gold) 0%, var(--color-brand) 100%);" aria-hidden="true"></div>
 		</section>
 
-		<!-- Breadcrumb + direct answer -->
-		<section class="px-6 pt-9 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+		<!-- Title block + direct answer -->
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">
-				<nav aria-label="Breadcrumb" class="mb-6 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
 					<a href="/bible-for/" class="hover:underline">A Father For</a><span class="px-1.5" aria-hidden="true">/</span>
 					<span style="color: var(--color-ink);">{group}</span>
 				</nav>
-				<p id="direct-answer" class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={directAnswerHtml}></p>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">{heroEyebrow}</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{h1}</h1>
+				<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{heroSubhead}</p>
+				<p id="direct-answer" class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={directAnswerHtml}></p>
 				<p class="mt-3 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; leading the Father&rsquo;s Heart Bible&trade; translation{lastUpdated && <span> &middot; Last updated {lastUpdated}</span>}</p>
 				<div class="mt-6 rounded-xl px-5 py-4" style={`background-color: ${TINT_PINK}; border-left: 4px solid var(--color-gold);`}>
 					<p id="key-takeaway" class="text-base font-semibold leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);"><span class="font-bold uppercase text-sm tracking-widest mr-2" style="color: var(--color-brand);">Key takeaway</span>{keyTakeaway}</p>
