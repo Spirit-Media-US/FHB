@@ -1,0 +1,154 @@
+---
+import ReviewLink from '../../components/ReviewLink.astro';
+import { WORD_MEANINGS } from '../../data/wordMeanings';
+// /meaning — "Bible Word Meanings" hub (item 7). English cannot out-rank
+// BibleGateway and BibleHub on chapter-and-verse queries, so this section competes
+// where FHB's own rendering IS the answer: what a word means, how translations
+// differ, and why this Bible says "our Father". Add a row to src/data/wordMeanings.ts
+// when a new /meaning/<word> page ships.
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/meaning/';
+const TITLE = "Bible Word Meanings — What Words Mean | Father's Heart Bible™";
+const DESCRIPTION =
+	"What Bible words actually mean — begotten, hallowed, Abba — with the original language, the verses, and how the Father's Heart Bible™ renders each one.";
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg';
+const HERO_ALT = 'An open Bible with a reader taking notes';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=560&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const collectionSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'CollectionPage',
+	name: 'Bible Word Meanings',
+	description: DESCRIPTION,
+	url: PAGE_URL,
+	inLanguage: 'en-US',
+	isPartOf: {
+		'@type': 'WebSite',
+		name: "Father's Heart Bible",
+		url: 'https://fathersheartbible.com/',
+	},
+	mainEntity: {
+		'@type': 'ItemList',
+		itemListElement: WORD_MEANINGS.map((w, i) => ({
+			'@type': 'ListItem',
+			position: i + 1,
+			name: w.title,
+			url: `https://fathersheartbible.com/meaning/${w.slug}`,
+		})),
+	},
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{ '@type': 'ListItem', position: 2, name: 'Bible Word Meanings', item: PAGE_URL },
+	],
+};
+const FAQS = [
+	{
+		q: 'Why do Bible words need explaining at all?',
+		a: 'Because English has moved. Words like <em>begotten</em>, <em>hallowed</em>, and <em>iniquity</em> were ordinary speech when the King James Version was made, and have since narrowed or fallen out of use — so a reader today meets them only in Scripture and has to stop. Each page here gives the plain meaning, the original Hebrew, Greek, or Aramaic behind it, and the verses where it appears.',
+	},
+	{
+		q: 'How does the Father’s Heart Bible decide how to translate a word?',
+		a: 'By asking which English wording carries the original best for a reader today — and, where the text reveals God in His fatherly relationship to His people, letting that be visible rather than flattening it to a generic word. Distinctive renderings carry footnotes in the text, so any reader can see what was decided and why. See <a href="/meaning/our-father/" style="color: var(--color-brand);" class="hover:underline">why this Bible says “our Father” instead of “God”</a>.',
+	},
+	{
+		q: 'Does the Father’s Heart Bible change what the Bible says?',
+		a: 'No. Every distinctive rendering stands where the passage already carries that sense, and can be checked in context. All translation involves choosing which English words carry the original — older Bibles render the divine name as “the LORD” in small capitals, itself a substitution most readers never notice. What FHB does differently is footnote its choices so they are traceable.',
+	},
+	{
+		q: 'Where can I read these verses in full?',
+		a: 'Every verse quoted on these pages links into the full chapter in the Father’s Heart Bible, free at <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">fathersheartbible.com/read</a> — all 66 books, with verse-by-verse audio in English.',
+	},
+];
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.q,
+		acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/<[^>]+>/g, '') },
+	})),
+};
+const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
+			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
+		</section>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Bible Word Meanings</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Word Meanings</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Bible Word Meanings</h1>
+				<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					What does that word actually mean? Each page below takes one question and answers it plainly &mdash; the everyday sense, the Hebrew, Greek, or Aramaic behind it, the verses where it appears, and how the <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible</a> renders it, quoted word for word and linked into the chapter so you can read and listen free.
+				</p>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-4xl">
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+					{WORD_MEANINGS.map((w) => (
+						<a href={`/meaning/${w.slug}/`} class="block rounded-2xl overflow-hidden no-underline transition-all hover:opacity-95" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+							<img src={`${w.img}?w=800&h=460&fit=crop&crop=entropy&fm=webp&q=70`} alt={w.title} width="800" height="460" class="w-full h-44 object-cover" loading="lazy" decoding="async" />
+							<div class="p-5">
+								<h2 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{w.title}</h2>
+								<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{w.blurb}</p>
+								<span class="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">Read the answer <span aria-hidden="true">&rarr;</span></span>
+							</div>
+						</a>
+					))}
+				</div>
+				<p class="mt-8 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Looking for Scripture on a theme instead of a single word? Browse <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> &mdash; love, strength, faith, anxiety, healing, and God as Father.</p>
+			</div>
+		</section>
+
+		<section id="hub-faq" class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface); scroll-margin-top: 1.5rem;">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-gold); font-family: var(--font-sans);">Questions &amp; answers</p>
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">About these pages</h2>
+				<dl class="mt-8 space-y-7">
+					{FAQS.map((f) => (
+						<div>
+							<dt class="text-lg font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{f.q}</dt>
+							<dd class="mt-2 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={f.a}></dd>
+						</div>
+					))}
+				</dl>
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Don&rsquo;t stop at one word &mdash; read the whole story, free online with audio, in a fresh translation that reveals God as a loving Father.</p>
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<ReviewLink class="mb-12" />
+	</main>
+</Layout>
