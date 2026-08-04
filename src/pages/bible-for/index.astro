@@ -109,16 +109,11 @@ const sectionCards = (slugs: string[]) => slugs.map((s) => bySlug.get(s)).filter
 	preloadImageDesktop={HERO_IMG}
 >
 	<main id="main-content">
-		<section class="relative w-full overflow-hidden min-h-[560px] lg:min-h-[calc(46vh_+_2in)]">
+		{/* NO TEXT OVER THE HERO (Kevin 2026-08-04) — image only, title block below,
+		    matching /guides/* and the per-group pages. */}
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
 			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
-			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.4) 100%);" aria-hidden="true"></div>
-			<div class="absolute inset-x-0 bottom-0 z-20 px-6 pb-10 lg:px-8 lg:pb-14">
-				<div class="mx-auto max-w-4xl">
-					<p class="text-sm font-semibold uppercase tracking-widest mb-2" style="color: var(--color-gold); font-family: var(--font-sans);">A Father For</p>
-					<h1 class="text-4xl md:text-5xl lg:text-6xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">A Father for you</h1>
-					<p class="mt-4 max-w-2xl text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.92);">Whoever you are and whatever you carry, there is a word from the Father for you.</p>
-				</div>
-			</div>
+			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
 			<div class="absolute inset-x-0 bottom-0 z-30 h-1.5" style="background: linear-gradient(to right, var(--color-gold) 0%, var(--color-brand) 100%);" aria-hidden="true"></div>
 		</section>
 
@@ -128,6 +123,9 @@ const sectionCards = (slugs: string[]) => slugs.map((s) => bySlug.get(s)).filter
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
 					<span style="color: var(--color-ink);">A Father For</span>
 				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">A Father For</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">A Father for you</h1>
+				<p class="mt-5 mb-6 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Whoever you are and whatever you carry, there is a word from the Father for you.</p>
 				<div id="hub-overview">
 					<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);">
 						<strong>Whoever you are, there is a word from the Father for you.</strong> The <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> gathers free Bible verses and encouragement for every person and season &mdash; for <a href="#family" style="color: var(--color-brand);" class="hover:underline">parents</a>, <a href="#young" style="color: var(--color-brand);" class="hover:underline">children and students</a>, <a href="#caregivers" style="color: var(--color-brand);" class="hover:underline">teachers, nurses and doctors</a>, <a href="#serve" style="color: var(--color-brand);" class="hover:underline">first responders and the military</a>, <a href="#hardest" style="color: var(--color-brand);" class="hover:underline">those in the hardest seasons</a>, and <a href="#every-faith" style="color: var(--color-brand);" class="hover:underline">people of every faith and background</a>.
