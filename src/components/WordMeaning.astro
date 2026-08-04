@@ -1,0 +1,296 @@
+---
+import Layout from '../layouts/Layout.astro';
+// Reusable word-meaning / rendering-explainer page (/meaning/<word>). Item 7 of the
+// FHB SEO/AEO/GEO plan: English cannot win chapter-and-verse queries against
+// BibleGateway and BibleHub, so we compete where FHB's own rendering IS the answer —
+// what a word means, how translations differ, and why this Bible says "our Father".
+//
+// LOCKED CONVENTIONS (match /verses/<topic>, do not drift):
+//   - ONE question per page, stated verbatim in title, H1 and the first 150 words.
+//   - Direct-answer paragraph a reader or an AI can stop at, then a one-sentence
+//     key takeaway.
+//   - 3-6 self-contained H2 sections; the FAQ questions are ALSO visible H2/H3s.
+//   - Article + BreadcrumbList + FAQPage (+ ItemList when renderings exist) JSON-LD.
+//   - Every Scripture link goes to OUR reader at /read/<book>/<chapter>. Outbound
+//     authority links are allowed as citations, NEVER as where to read the verse.
+//   - `renderings` text must be VERBATIM from src/content/bible — never paraphrased,
+//     never invented. Verify with scratchpad/canon.py before adding a row.
+//   - No request for money anywhere. Audio may be claimed for ENGLISH only.
+//   - Never say "Locked" or "Reading Edition" — the canon lock is internal.
+import AuthorBio from './AuthorBio.astro';
+import ReviewLink from './ReviewLink.astro';
+
+interface Rendering {
+	ref: string; // 'John 3:16'
+	slug: string; // 'john'
+	ch: number; // 3
+	fhb: string; // VERBATIM Father's Heart Bible text
+	traditional?: string; // the familiar older rendering, for contrast
+}
+interface Section {
+	id: string;
+	heading: string;
+	bodyHtml: string;
+}
+interface Faq {
+	question: string;
+	answer: string;
+}
+interface Props {
+	slug: string; // 'begotten' -> /meaning/begotten
+	eyebrow?: string; // section label
+	title: string; // <=60 chars where possible, generic phrase first
+	description: string; // 150-160 chars
+	h1: string; // the question, verbatim
+	heroBase: string;
+	heroAlt: string;
+	heroPosition?: string;
+	published: string; // ISO
+	modified?: string;
+	directAnswerHtml: string;
+	keyTakeaway: string;
+	sections: Section[];
+	renderings?: Rendering[];
+	renderingsHeading?: string;
+	renderingsIntro?: string;
+	faqs: Faq[];
+	relatedHtml: string;
+	ctaMidHeading: string;
+	ctaMidBodyHtml: string;
+	ctaBottomBodyHtml: string;
+	tags?: string[];
+}
+
+const {
+	slug,
+	eyebrow = 'Bible Word Meanings',
+	title,
+	description,
+	h1,
+	heroBase,
+	heroAlt,
+	heroPosition = 'center',
+	published,
+	modified,
+	directAnswerHtml,
+	keyTakeaway,
+	sections,
+	renderings = [],
+	renderingsHeading = 'How the Father’s Heart Bible renders it',
+	renderingsIntro,
+	faqs,
+	relatedHtml,
+	ctaMidHeading,
+	ctaMidBodyHtml,
+	ctaBottomBodyHtml,
+	tags = [],
+} = Astro.props as Props;
+
+const PAGE_URL = `https://fathersheartbible.com/meaning/${slug}`;
+const HERO_IMG = `${heroBase}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${heroBase}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+const mod = modified || published;
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+const reader = (s: string, ch: number) => `https://fathersheartbible.com/read/${s}/${ch}`;
+const refLabel = (ref: string) => ref.split('–')[0].split(':')[0];
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: 'Founder & CEO, Spirit Media Publishing',
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: h1,
+	description,
+	image: OG_IMG,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: published,
+	dateModified: mod,
+	inLanguage: 'en-US',
+	articleSection: 'Bible Word Meanings',
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'Bible Word Meanings',
+			item: 'https://fathersheartbible.com/meaning/',
+		},
+		{ '@type': 'ListItem', position: 3, name: h1, item: PAGE_URL },
+	],
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: faqs.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd: object[] = [articleSchema, breadcrumbSchema, faqSchema];
+if (renderings.length) {
+	jsonLd.push({
+		'@context': 'https://schema.org',
+		'@type': 'ItemList',
+		name: renderingsHeading,
+		itemListElement: renderings.map((r, i) => ({
+			'@type': 'ListItem',
+			position: i + 1,
+			name: r.ref,
+			url: reader(r.slug, r.ch),
+		})),
+	});
+}
+
+const TOC = [
+	...sections.map((s) => ({ id: s.id, label: s.heading })),
+	...(renderings.length ? [{ id: 'renderings', label: renderingsHeading }] : []),
+	{ id: 'faq', label: 'FAQ' },
+];
+---
+
+<Layout
+	title={title}
+	description={description}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={published}
+	articleSection="Bible Word Meanings"
+	articleTags={tags}
+	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
+			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={heroAlt} class="absolute inset-0 w-full h-full object-cover" style={`object-position: ${heroPosition};`} fetchpriority="high" decoding="async" width="1400" height="620" />
+			<div class="absolute inset-x-0 top-0 z-10" style="height: 160px; background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0));"></div>
+		</section>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/meaning/" class="hover:underline">Word Meanings</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">{h1}</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">{eyebrow}</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{h1}</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; leading the Father&rsquo;s Heart Bible&trade; translation</span>
+					<span aria-hidden="true">&middot;</span><span>Published {formatDate(published)}</span>
+					{mod !== published && (<><span aria-hidden="true">&middot;</span><span>Updated {formatDate(mod)}</span></>)}
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={directAnswerHtml} />
+
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">{keyTakeaway}</p>
+				</aside>
+
+				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>
+					<ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
+						{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}
+					</ul>
+				</nav>
+
+				{sections.map((s) => (
+					<>
+						<h2 id={s.id} class="text-2xl md:text-3xl font-light mt-12 mb-3 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">{s.heading}</h2>
+						<div class="text-lg leading-relaxed space-y-4" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={s.bodyHtml} />
+					</>
+				))}
+
+				{renderings.length > 0 && (
+					<>
+						<h2 id="renderings" class="text-2xl md:text-3xl font-light mt-12 mb-3 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">{renderingsHeading}</h2>
+						{renderingsIntro && (
+							<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={renderingsIntro} />
+						)}
+						<div class="space-y-4">
+							{renderings.map((r) => (
+								<div class="px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+									<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: #a04060; font-family: var(--font-sans);">{r.ref}</p>
+									<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">{r.fhb}</p>
+									{r.traditional && (
+										<p class="mt-3 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);"><span class="font-semibold">Familiar older wording:</span> {r.traditional}</p>
+									)}
+									<a href={reader(r.slug, r.ch)} class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold hover:underline" style="color: #a04060; font-family: var(--font-sans);">Read &amp; listen to {refLabel(r.ref)} <span aria-hidden="true">&rarr;</span></a>
+								</div>
+							))}
+						</div>
+					</>
+				)}
+
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">{ctaMidHeading}</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaMidBodyHtml} />
+					<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a>
+				</aside>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="space-y-6">
+					{faqs.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={relatedHtml} />
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaBottomBodyHtml} />
+				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<ReviewLink class="mb-10" />
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>

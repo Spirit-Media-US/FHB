@@ -1,0 +1,125 @@
+---
+// /meaning/our-father — FLAGSHIP of item 7.
+// ONE question: Why does the Father's Heart Bible say "our Father" instead of "God"?
+//
+// Demand note (Ahrefs + GSC, Aug 2026): this page has almost NO direct search volume
+// ("is god a father" 30/mo, "what is the father heart of god" 0). It is built anyway
+// because (a) Search Console already shows us at positions 2-3 for "the heart of the
+// father", "father heart of god" and "the heart of the father bible verse" with no
+// page to land them on, and (b) it is the page an answer engine needs in order to
+// explain FHB at all — every other /meaning/ page leans on it. Judged high-value for
+// citation and trust, speculative for clicks.
+//
+// All FHB quotations are VERBATIM from src/content/bible (verified with canon.py).
+import WordMeaning from '../../components/WordMeaning.astro';
+
+const sections = [
+	{
+		id: 'what-fhb-does',
+		heading: 'What the Father’s Heart Bible actually does',
+		bodyHtml: `<p>The Father&rsquo;s Heart Bible renders God&rsquo;s name and titles as <strong>&ldquo;our Father&rdquo;</strong> in the places where the original text is already speaking of God in His fatherly, covenant relationship to His people. It is a translation decision about <em>which true thing to say</em>, not an addition to Scripture.</p><p>The clearest example is the best-known verse in the Bible. Where most English Bibles open John 3:16 with &ldquo;For God so loved the world,&rdquo; the Father&rsquo;s Heart Bible reads: &ldquo;For our Father so loved the world that he gave his only Son.&rdquo; Nothing has been inserted. The One who loved the world and gave His Son is the Father &mdash; the verse says so in its second half. FHB simply names Him at the start of the sentence the way the sentence itself ends.</p><p>Every distinctive choice of this kind carries a footnote in the text, so a reader can always see what was decided and why.</p>`,
+	},
+	{
+		id: 'why-not-just-god',
+		heading: 'Why not simply say “God”?',
+		bodyHtml: `<p>Because &ldquo;God&rdquo; is a category, and &ldquo;Father&rdquo; is a relationship. Both are true, and the Father&rsquo;s Heart Bible uses both. The word <em>God</em> is right and necessary wherever Scripture speaks of God as God &mdash; His deity, His power, His otherness. FHB has not removed it.</p><p>But English readers have inherited a habit of hearing &ldquo;God&rdquo; as a title of distance: a ruler, a judge, a force. When the text is describing a Father who binds Himself to His children, translating that with the most generic available word quietly costs the reader the very thing the passage was revealing. Jesus did not teach His followers to pray &ldquo;Almighty God in heaven.&rdquo; He taught them to begin, <em>&ldquo;Our Father in heaven&rdquo;</em> (Matthew 6:9) &mdash; and that word choice was the scandal of it.</p><p>So the rule is narrow: where the text reveals the Father, say Father. Where it speaks of God as God, say God.</p>`,
+	},
+	{
+		id: 'is-this-adding',
+		heading: 'Is this adding to Scripture?',
+		bodyHtml: `<p>No &mdash; and the test is simple: every &ldquo;our Father&rdquo; in the Father&rsquo;s Heart Bible stands where the passage is already about the Father, and can be checked against the surrounding verse.</p><p>Translation always requires choices. Hebrew and Greek do not map one-to-one onto English, so every English Bible you have ever read is the result of thousands of decisions about which English word carries the original best. Older translations rendered the divine name as <em>the LORD</em> in small capitals &mdash; itself a substitution, and one most readers never notice. The question is never whether a translation makes choices, but whether it makes them openly and traceably.</p><p>FHB footnotes its distinctive renderings for exactly that reason. The claim is not that other translations are wrong. It is that one true thing in the text &mdash; God&rsquo;s fatherhood &mdash; has been consistently under-translated, and that recovering it changes what a reader hears.</p>`,
+	},
+	{
+		id: 'father-throughout',
+		heading: 'The Father was never only a New Testament idea',
+		bodyHtml: `<p>A common assumption is that God is a distant sovereign in the Old Testament and becomes a Father in the New. Scripture does not read that way. Long before Matthew, He names Himself in fatherly terms: &ldquo;A father to the fatherless and defender of widows is our Father in his holy dwelling&rdquo; (Psalm 68:5), and &ldquo;But now, you are our Father; we are the clay, and you are our potter&rdquo; (Isaiah 64:8).</p><p>What the New Testament adds is not the fact of the Father but access to Him. Jesus calls Him <em>Abba</em> in Gethsemane (Mark 14:36), and Paul says the same cry is placed on our lips: &ldquo;You did not receive a spirit of slavery, to fall back into fear, but received the Spirit of adoption, by whom we cry, &lsquo;Abba! Father!&rsquo;&rdquo; (Romans 8:15).</p><p>Reading the whole canon with that thread visible is what the Father&rsquo;s Heart Bible is for.</p>`,
+	},
+];
+
+const renderings = [
+	{
+		ref: 'John 3:16',
+		slug: 'john',
+		ch: 3,
+		fhb: 'For our Father so loved the world that he gave his only Son, that whoever believes in him will not perish but have eternal life.',
+		traditional: '“For God so loved the world, that he gave his only begotten Son…”',
+	},
+	{
+		ref: 'Matthew 6:9',
+		slug: 'matthew',
+		ch: 6,
+		fhb: 'This, then, is how you should pray: “Our Father in heaven, hallowed be your name,',
+	},
+	{
+		ref: 'Psalms 68:5',
+		slug: 'psalms',
+		ch: 68,
+		fhb: 'A father to the fatherless and defender of widows is our Father in his holy dwelling.',
+		traditional:
+			'“A father of the fatherless, and a judge of the widows, is God in his holy habitation.”',
+	},
+	{
+		ref: 'Isaiah 64:8',
+		slug: 'isaiah',
+		ch: 64,
+		fhb: 'But now, you are our Father; we are the clay, and you are our potter; we are all the work of your hand.',
+	},
+	{
+		ref: 'Romans 8:15',
+		slug: 'romans',
+		ch: 8,
+		fhb: 'You did not receive a spirit of slavery, to fall back into fear, but received the Spirit of adoption, by whom we cry, “Abba! Father!”',
+	},
+];
+
+const faqs = [
+	{
+		question: 'Why does the Father’s Heart Bible say “our Father” instead of “God”?',
+		answer:
+			'Because in those places the text is already speaking of God in His fatherly relationship to His people, and “Father” carries that where the generic word “God” loses it. John 3:16 reads, “For our Father so loved the world that he gave his only Son” — the One who gave the Son is the Father, as the second half of the verse says. The word “God” is still used throughout wherever Scripture speaks of God as God. Every distinctive rendering is footnoted.',
+	},
+	{
+		question: 'Has the word “God” been removed from the Father’s Heart Bible?',
+		answer:
+			'No. “God” appears throughout the Father’s Heart Bible wherever the text speaks of God as God — His deity, power, and holiness. The change is narrower than people expect: where a passage reveals God specifically as Father to His people, it is rendered “our Father” rather than flattened to the most general available word.',
+	},
+	{
+		question: 'Is changing “God” to “our Father” adding to Scripture?',
+		answer:
+			'No. Every instance stands where the passage is already about the Father and can be checked in context. All translation involves choosing which English words carry the original best — older Bibles render the divine name as “the LORD” in small capitals, which is itself a substitution most readers never notice. FHB footnotes its distinctive choices so any reader can trace them.',
+	},
+	{
+		question: 'Was God called Father in the Old Testament?',
+		answer:
+			'Yes. Psalm 68:5 calls Him “a father to the fatherless and defender of widows,” and Isaiah 64:8 says “you are our Father; we are the clay, and you are our potter.” The New Testament does not invent the Father; it opens access to Him, so that the cry Jesus used in Gethsemane — “Abba, Father” (Mark 14:36) — becomes ours (Romans 8:15).',
+	},
+	{
+		question: 'What does “Father’s Heart Bible” mean?',
+		answer:
+			'It is an English translation of the whole Bible built to let God’s fatherhood be visible wherever the original text reveals it, instead of leaving it implied. All 66 books can be read free online, with verse-by-verse audio in English, and distinctive renderings carry footnotes explaining the choice.',
+	},
+];
+---
+
+<WordMeaning
+	slug="our-father"
+	eyebrow="How This Translation Reads"
+	title="Why This Bible Says “Our Father” Instead of “God”"
+	description="Why the Father’s Heart Bible renders God’s name as “our Father” where Scripture reveals His fatherhood — what changed, what did not, and how every choice is footnoted."
+	h1="Why does the Father’s Heart Bible say “our Father” instead of “God”?"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg"
+	heroAlt="A father and child together outdoors"
+	published="2026-08-04"
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">The Father&rsquo;s Heart Bible says &ldquo;our Father&rdquo; instead of &ldquo;God&rdquo; in the places where the original text is already speaking of God in His fatherly relationship to His people &mdash; so John 3:16 reads, &ldquo;For our Father so loved the world that he gave his only Son.&rdquo;</strong> Nothing is added: the One who loved the world and gave His Son <em>is</em> the Father, as the rest of the verse says. The word &ldquo;God&rdquo; has not been removed &mdash; it is used throughout wherever Scripture speaks of God as God. What changes is that His fatherhood is allowed to be visible in English where the Hebrew and Greek already carried it, and every distinctive choice is footnoted so you can trace it. You can <a href=\"https://fathersheartbible.com/read/john/3\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read John 3 free</a> and judge it yourself.`}
+	keyTakeaway="Where the text reveals the Father, this Bible says “Father”; where it speaks of God as God, it says “God” — and footnotes every distinctive choice."
+	sections={sections}
+	renderings={renderings}
+	renderingsHeading="Five places you can see it"
+	renderingsIntro="Each quotation below is the Father’s Heart Bible’s own wording, with the familiar older rendering shown where the contrast is sharpest. Every reference links into the full chapter so you can read it in context."
+	faqs={faqs}
+	relatedHtml={`Keep going: see what <a href=\"/meaning/abba-father/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">&ldquo;Abba, Father&rdquo; means</a>, why this Bible does not use <a href=\"/meaning/begotten/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">&ldquo;only begotten&rdquo;</a>, or what <a href=\"/meaning/hallowed-be-thy-name/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">&ldquo;hallowed be thy name&rdquo; means</a>. Read <a href=\"https://fathersheartbible.com/read/john/3\" style=\"color: var(--color-brand);\" class=\"hover:underline\">John 3</a> or the <a href=\"https://fathersheartbible.com/read\" style=\"color: var(--color-brand);\" class=\"hover:underline\">whole Bible free with audio</a>, learn <a href=\"/the-fathers-heart-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">why this translation exists</a>, or browse <a href=\"/verses/god-as-father/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Bible verses about God as Father</a>. On the history of rendering the divine name as &ldquo;the LORD,&rdquo; see the <a href=\"https://www.britannica.com/topic/Yahweh\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Encyclopaedia Britannica entry on Yahweh</a>.`}
+	ctaMidHeading="Read it and see for yourself"
+	ctaMidBodyHtml="The whole Bible is free online with verse-by-verse audio in English &mdash; and every distinctive rendering carries a footnote, so you can always see what was decided and why."
+	ctaBottomBodyHtml="From Genesis to Revelation, free online with audio &mdash; a fresh English translation that lets your Father&rsquo;s voice be heard on every page."
+	tags={["why this bible says our father", "our Father", "god as father", "bible translation", "father's heart bible"]}
+/>

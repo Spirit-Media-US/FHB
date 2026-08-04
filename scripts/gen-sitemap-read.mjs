@@ -96,6 +96,72 @@ for (const lang of LIVE_LANGS) {
 const chapterUrl = (lang, slug, n) =>
   lang === 'en' ? `${SITE}/read/${slug}/${n}/` : `${SITE}/read/${lang}/${slug}/${n}/`;
 
+// ── LIVE GUARD: never advertise a chapter production does not serve ──────────
+// The chapter data above is the translation pipeline's BUILD-TIME output, which
+// runs AHEAD of the community app that actually serves /read. On 2026-08-04 the
+// translation seat added Hindi and Tamil Psalms; the community app had shipped
+// hi/psalms but not ta/psalms, so a raw generation listed /read/ta/psalms/1/ —
+// which 404s. Listing 404s is the one thing this sitemap must never do.
+//
+// So for every NON-English (lang, book) pair we probe ONE chapter in production.
+// A book's chapters deploy together, so one probe settles the whole book — ~80
+// requests, a few seconds. English is the canon and is never probed.
+//
+// Fail-open on a network/probe error (keep the book, warn loudly): a transient
+// outage must not silently delete thousands of good URLs from the sitemap.
+// Set SITEMAP_SKIP_LIVE_CHECK=1 to bypass entirely (offline builds).
+const SKIP = process.env.SITEMAP_SKIP_LIVE_CHECK === '1';
+async function pruneToLive() {
+  if (SKIP) {
+    console.warn('gen-sitemap-read: SITEMAP_SKIP_LIVE_CHECK=1 — live guard DISABLED');
+    return;
+  }
+  const jobs = [];
+  for (const [lang, books] of byLang) {
+    if (lang === 'en') continue;
+    for (const [slug, chapters] of books) {
+      const probe = [...chapters].sort((a, b) => a - b)[0];
+      jobs.push({ lang, slug, probe });
+    }
+  }
+  let dropped = 0;
+  let errors = 0;
+  // Modest concurrency — this hits our own production edge.
+  const QUEUE = [...jobs];
+  const worker = async () => {
+    while (QUEUE.length) {
+      const j = QUEUE.shift();
+      const url = chapterUrl(j.lang, j.slug, j.probe);
+      try {
+        const ac = new AbortController();
+        const t = setTimeout(() => ac.abort(), 15000);
+        const r = await fetch(url, { method: 'GET', signal: ac.signal });
+        clearTimeout(t);
+        if (r.status === 404) {
+          byLang.get(j.lang).delete(j.slug);
+          dropped++;
+          console.warn(
+            `gen-sitemap-read: DROPPED ${j.lang}/${j.slug} — ${url} is 404 in production ` +
+              `(translated but not deployed to the reader yet)`,
+          );
+        } else if (!r.ok) {
+          errors++;
+          console.warn(`gen-sitemap-read: probe ${url} returned ${r.status} — keeping book`);
+        }
+      } catch (e) {
+        errors++;
+        console.warn(`gen-sitemap-read: probe failed for ${url} (${e.message}) — keeping book`);
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: 6 }, worker));
+  console.log(
+    `gen-sitemap-read: live guard checked ${jobs.length} non-English books — ` +
+      `${dropped} dropped, ${errors} inconclusive`,
+  );
+}
+await pruneToLive();
+
 // Group by <book>/<chapter> so every language sharing a chapter gets a mutually
 // consistent set of xhtml:link alternates (Google requires the annotations be
 // reciprocal). x-default -> English when English has the chapter.
