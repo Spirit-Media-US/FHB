@@ -342,11 +342,48 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 			<script type="application/ld+json" set:html={JSON.stringify(schema)} />
 		))}
 
-		<!-- Analytics: Cloudflare Web Analytics only (cookieless, zone-injected).
+		<!-- Analytics: Cloudflare Web Analytics only (cookieless).
 		     GA4 was removed 2026-06-10 — it set non-essential _ga cookies that
 		     would have required a consent banner for EU/UK visitors. Cookieless
 		     CF analytics needs no consent, so the site sets zero non-essential
-		     cookies and needs no cookie banner. (Kevin, load-scaling review.) -->
+		     cookies and needs no cookie banner. (Kevin, load-scaling review.)
+
+		     FIXED 2026-08-04: this comment used to say "zone-injected" and there
+		     was NO tag here. Cloudflare Web Analytics was enabled on the zone with
+		     auto_install since 2026-03-03, but the edge HTML rewrite that performs
+		     auto-injection does not apply to Worker/Pages-rendered responses — so
+		     the beacon never shipped on a single page. Combined with GA4's removal
+		     in June, the site recorded ZERO pageviews for months while analytics
+		     appeared configured. We could not answer whether anyone read a page.
+		     The tag is now explicit so it cannot be silently dropped, and the CSP
+		     in public/_headers already whitelists both hosts.
+
+		     PRODUCTION HOSTNAME ONLY. Off the apex — *.pages.dev previews, and
+		     the 127.0.0.1 server the 100-club verifier runs against — the RUM
+		     POST returns no Access-Control-Allow-Origin, which is a real console
+		     error. It broke two reader-smoke console contracts on the community
+		     side the first time this shipped. Suppressing it was the wrong fix:
+		     the contracts lose their teeth, and one variant of that message has
+		     no URL at all, so an allowlist would mask genuine failures too.
+		     Gating is also right on its own terms — preview and local traffic is
+		     us, and counting ourselves pollutes the numbers this exists to
+		     produce. Identical block in the community app, so there is one
+		     behaviour to reason about. -->
+		<script is:inline>
+			if (
+				location.hostname === 'fathersheartbible.com' ||
+				location.hostname === 'www.fathersheartbible.com'
+			) {
+				const s = document.createElement('script');
+				s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+				s.defer = true;
+				s.setAttribute(
+					'data-cf-beacon',
+					'{"token": "517ba484d6a84ed984249b146e854317"}',
+				);
+				document.head.appendChild(s);
+			}
+		</script>
 	</head>
 	<body class="min-h-screen flex flex-col" data-dark-hero={darkHero ? 'true' : 'false'}>
 		<Header

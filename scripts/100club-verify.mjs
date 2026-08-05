@@ -71,6 +71,12 @@ for (const [w, h, label] of [
   const ctx = await browser.newContext({ viewport: { width: w, height: h } });
   const page = await ctx.newPage();
 
+  // (A route stub for the Cloudflare beacon lived here for one day. It is gone
+  // because the beacon now only injects on the production hostname, so it never
+  // loads against 127.0.0.1 and there is no error left to stub. Masking machinery
+  // should not outlive the problem it masked — a stub that quietly swallows a whole
+  // domain is exactly the kind of thing that hides a real failure a year later.)
+
   const consoleErrors = [];
   page.on('console', (msg) => {
     if (msg.type() === 'error') consoleErrors.push(msg.text());
@@ -188,8 +194,9 @@ for (const [w, h, label] of [
   }
 
   // ---- Console errors ----
+  // Zero tolerance, no allowlist. The beacon that briefly needed one is now gated to
+  // the production hostname, so nothing here is expected to be noisy.
   for (const e of consoleErrors) {
-    // CF Insights beacon CSP block is fixed; any error here is a regression
     fails.push(`[${label}] CONSOLE ERROR: ${e.slice(0, 200)}`);
   }
 
