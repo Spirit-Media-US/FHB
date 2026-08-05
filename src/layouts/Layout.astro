@@ -342,11 +342,27 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 			<script type="application/ld+json" set:html={JSON.stringify(schema)} />
 		))}
 
-		<!-- Analytics: Cloudflare Web Analytics only (cookieless, zone-injected).
+		<!-- Analytics: Cloudflare Web Analytics only (cookieless).
 		     GA4 was removed 2026-06-10 — it set non-essential _ga cookies that
 		     would have required a consent banner for EU/UK visitors. Cookieless
 		     CF analytics needs no consent, so the site sets zero non-essential
-		     cookies and needs no cookie banner. (Kevin, load-scaling review.) -->
+		     cookies and needs no cookie banner. (Kevin, load-scaling review.)
+
+		     FIXED 2026-08-04: this comment used to say "zone-injected" and there
+		     was NO tag here. Cloudflare Web Analytics was enabled on the zone with
+		     auto_install since 2026-03-03, but the edge HTML rewrite that performs
+		     auto-injection does not apply to Worker/Pages-rendered responses — so
+		     the beacon never shipped on a single page. Combined with GA4's removal
+		     in June, the site recorded ZERO pageviews for months while analytics
+		     appeared configured. We could not answer whether anyone read a page.
+		     The tag is now explicit so it cannot be silently dropped. type="module"
+		     defers it, so it does not contend with the perf gate, and the CSP in
+		     public/_headers already whitelists both hosts. -->
+		<script
+			type="module"
+			src="https://static.cloudflareinsights.com/beacon.min.js"
+			data-cf-beacon='{"token": "517ba484d6a84ed984249b146e854317"}'
+		/>
 	</head>
 	<body class="min-h-screen flex flex-col" data-dark-hero={darkHero ? 'true' : 'false'}>
 		<Header
