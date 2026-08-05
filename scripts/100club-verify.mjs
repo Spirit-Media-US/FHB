@@ -71,28 +71,11 @@ for (const [w, h, label] of [
   const ctx = await browser.newContext({ viewport: { width: w, height: h } });
   const page = await ctx.newPage();
 
-  // The Cloudflare Web Analytics beacon cannot succeed here: this verifier serves the
-  // PRODUCTION build from 127.0.0.1, and Cloudflare rejects the RUM preflight because
-  // the Origin is not the registered site host. That is an artifact of local
-  // verification, not a defect — on the real domain it works. Block the request so it
-  // never fails noisily, which keeps the console-error gate below STRICT rather than
-  // teaching it to ignore "Failed to load resource" (a message that carries no URL and
-  // would have masked genuine failures). Added 2026-08-04 with the beacon itself.
-  // Fulfil rather than abort: aborting emits the same "Failed to load resource"
-  // console error we are trying to avoid. A 204 with permissive CORS headers makes
-  // both the beacon fetch and its preflight succeed silently.
-  await page.route(/cloudflareinsights\.com/, (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'text/javascript',
-      headers: {
-        'access-control-allow-origin': '*',
-        'access-control-allow-methods': 'GET,POST,OPTIONS',
-        'access-control-allow-headers': '*',
-      },
-      body: '/* stub */',
-    }),
-  );
+  // (A route stub for the Cloudflare beacon lived here for one day. It is gone
+  // because the beacon now only injects on the production hostname, so it never
+  // loads against 127.0.0.1 and there is no error left to stub. Masking machinery
+  // should not outlive the problem it masked — a stub that quietly swallows a whole
+  // domain is exactly the kind of thing that hides a real failure a year later.)
 
   const consoleErrors = [];
   page.on('console', (msg) => {
@@ -211,13 +194,8 @@ for (const [w, h, label] of [
   }
 
   // ---- Console errors ----
-  // The Cloudflare Web Analytics beacon POSTs to cloudflareinsights.com/cdn-cgi/rum.
-  // This verifier serves the PRODUCTION build from 127.0.0.1, and Cloudflare rejects
-  // that preflight because the Origin is not the registered site host — so the CORS
-  // failure is an artifact of local verification, not a defect. On the real domain the
-  // beacon succeeds. Narrowly allowed (2026-08-04) so the analytics tag can ship;
-  // deliberately matched on the RUM endpoint only, so a genuine CSP block, a wrong
-  // token, or any other console error still fails the gate.
+  // Zero tolerance, no allowlist. The beacon that briefly needed one is now gated to
+  // the production hostname, so nothing here is expected to be noisy.
   for (const e of consoleErrors) {
     fails.push(`[${label}] CONSOLE ERROR: ${e.slice(0, 200)}`);
   }
