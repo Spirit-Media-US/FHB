@@ -143,7 +143,12 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				"name": "Father's Heart Bible",
 				"url": "https://fathersheartbible.com",
 				"logo": "https://fathersheartbible.com/fhb-logo.png",
-				"publisher": { "@type": "Organization", "name": "Spirit Media Inc.", "url": "https://spiritmediapublishing.com" },
+				// Publisher/imprint is Spirit Media Publishing; Spirit Media Inc. is its PARENT
+				// (Metadata & Messaging Guidelines, Publication facts). Reference the canonical
+				// @id that Layout.astro already emits on this page — the previous inline copy
+				// named the parent and carried no @id, creating a second, unlinked publisher
+				// entity on the same page that engines could not merge.
+				"publisher": { "@id": "https://spiritmediapublishing.com/#organization" },
 				"description": "A new Bible translation revealing God as Father where Scripture reveals Him — published in English and being prepared in 24 world languages, from Spanish and Hindi to Swahili and Mandarin.",
 				"knowsLanguage": ["en", ...reviewLangs.map((l) => l.code)]
 			},

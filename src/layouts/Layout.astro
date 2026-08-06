@@ -293,8 +293,11 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		{!noindex && <meta name="robots" content="index, follow" />}
-		<meta name="author" content="Spirit Media Inc." />
-		<meta name="publisher" content="Spirit Media Inc." />
+		{/* Publisher/imprint AND by-line are both "Spirit Media Publishing" per the Metadata &
+		    Messaging Guidelines — Spirit Media Inc. is the parent company, never the publisher
+		    of record, and no individual is credited as author/translator. */}
+		<meta name="author" content="Spirit Media Publishing" />
+		<meta name="publisher" content="Spirit Media Publishing" />
 
 		<!-- Open Graph -->
 		<meta property="og:type" content={pageType} />
