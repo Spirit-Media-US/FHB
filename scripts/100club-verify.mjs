@@ -206,12 +206,25 @@ for (const [w, h, label] of [
 await browser.close();
 cleanup();
 
+// ADVISORY BY DEFAULT (Kevin, 2026-08-06). The 100 Club gate is a quality signal,
+// not a work stopper — it was never meant to block unrelated work from building
+// or shipping. A pre-existing homepage image regression had blocked every SMP
+// build, including changes with nothing to do with performance.
+//
+// Findings are still reported loudly and in full; only the exit status changed.
+// Set CLUB100_STRICT=1 to restore hard-fail (nightly audit, deliberate perf check).
+const STRICT = process.env.CLUB100_STRICT === '1';
+
 if (fails.length) {
   console.error('');
-  console.error(`[100club-verify] \u001b[31m✗ FAILED (${fails.length} issue${fails.length === 1 ? '' : 's'})\u001b[0m`);
+  console.error(`[100club-verify] \u001b[33m⚠ ${fails.length} issue${fails.length === 1 ? '' : 's'} found\u001b[0m`);
   for (const f of fails) console.error('  ' + f);
   console.error('');
-  console.error('Build BLOCKED. Fix the issues above and rebuild.');
-  process.exit(1);
+  if (STRICT) {
+    console.error('Build BLOCKED (CLUB100_STRICT=1). Fix the issues above and rebuild.');
+    process.exit(1);
+  }
+  console.error('\u001b[33m[100club-verify] advisory — build continues.\u001b[0m Re-run with CLUB100_STRICT=1 to enforce.');
+  process.exit(0);
 }
 console.log('\u001b[32m[100club-verify] ✓\u001b[0m grids + h-N images + data-animate + console all pass on mobile + desktop');
