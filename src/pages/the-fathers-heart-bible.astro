@@ -185,10 +185,21 @@ const formatDate = (dateString: string) => {
 			"@context": "https://schema.org",
 			"@type": "Book",
 			"@id": "https://fathersheartbible.com/#book",
-			"name": "Father's Heart Bible",
-			"alternateName": "FHB",
-			"description": "An interpretive English Bible translation that reveals God as Father wherever Scripture reveals Him — rendering YHWH and Elohim through Trinitarian Persons where the original text points to them.",
-			"inLanguage": "en-US",
+			// Names, edition and description follow the Metadata & Messaging Guidelines
+			// verbatim: brand always carries the ™ and never a leading "The"; the full
+			// listed title is the alternateName; the description is the approved short
+			// blurb. inLanguage is "en" per the brief's Publication facts — the reader's
+			// node in community/src/lib/reader-seo.ts MUST stay identical to this, since
+			// two values for one @id is precisely the conflict this pass removed.
+			"name": "Father's Heart Bible™",
+			"alternateName": [
+				"Father's Heart Bible",
+				"Father's Heart Bible: An Intimate Translation",
+				"FHB"
+			],
+			"bookEdition": "An Intimate Translation",
+			"description": "A fresh Bible translation from the original Hebrew, Aramaic, and Greek that reveals God as your Father. Come home to your Father. His heart is for you.",
+			"inLanguage": "en",
 			"url": "https://fathersheartbible.com",
 			"sameAs": [
 				"https://www.instagram.com/fathersheartbible/",
