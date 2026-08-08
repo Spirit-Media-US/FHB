@@ -33,13 +33,16 @@
 //   this list, or its chapters stay unlisted. Verified against the registry
 //   2026-08-04: live = en, te, es, hi, ta;  pt + mr are live:false and 404 in
 //   production (probed) — listing them would violate the never-list-a-404 rule.
+//   2026-08-08: mr added — full canon complete, Gate A2 PASS, flipped live:true in
+//   the community registry. mr 404s in production until BOTH apps deploy to main,
+//   so these two changes must ship together (the live guard below enforces it).
 
 import fs from 'node:fs';
 import path from 'node:path';
 
 const SITE = 'https://fathersheartbible.com';
 const TRANSLATION_OUT = '/home/deploy/bin/tools-api/pipelines/translation/output';
-const LIVE_LANGS = ['en', 'te', 'es', 'hi', 'ta'];
+const LIVE_LANGS = ['en', 'te', 'es', 'hi', 'ta', 'mr'];
 const OUT = path.resolve(process.cwd(), 'public/sitemap-read.xml');
 
 const slugify = (book) => book.toLowerCase().replace(/\s+/g, '-');
