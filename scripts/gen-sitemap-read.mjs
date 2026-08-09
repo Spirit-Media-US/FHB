@@ -42,7 +42,7 @@ import path from 'node:path';
 
 const SITE = 'https://fathersheartbible.com';
 const TRANSLATION_OUT = '/home/deploy/bin/tools-api/pipelines/translation/output';
-const LIVE_LANGS = ['en', 'te', 'es', 'hi', 'ta', 'mr'];
+const LIVE_LANGS = ['en', 'te', 'es', 'hi', 'ta', 'mr', 'pt'];
 const OUT = path.resolve(process.cwd(), 'public/sitemap-read.xml');
 
 const slugify = (book) => book.toLowerCase().replace(/\s+/g, '-');
