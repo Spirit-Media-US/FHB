@@ -42,7 +42,34 @@ import path from 'node:path';
 
 const SITE = 'https://fathersheartbible.com';
 const TRANSLATION_OUT = '/home/deploy/bin/tools-api/pipelines/translation/output';
-const LIVE_LANGS = ['en', 'te', 'es', 'hi', 'ta', 'mr', 'pt', 'ru', 'fr', 'id'];
+// Which languages RENDER is decided by `live: true` in community's registry.
+// This USED to be a hand-copied list, and the coupling bit repeatedly: flip a
+// language live in community, forget this line, and its chapters silently never
+// enter the sitemap or hreflang. Read the registry instead — both repos sit on
+// the same box and the chrome sync already reads across, so this is the same
+// build-time-truth pattern, not a new dependency.
+//
+// The literal fallback is the last-known-good list, used only if the registry
+// cannot be read (a detached build elsewhere). It can go stale; the parse cannot.
+const LIVE_LANGS = (() => {
+	const FALLBACK = ['en', 'te', 'es', 'hi', 'ta', 'mr', 'pt', 'ru', 'fr', 'id'];
+	try {
+		const src = fs.readFileSync(
+			'/srv/sites/community/src/lib/languages.ts',
+			'utf8',
+		);
+		const live = [];
+		for (const m of src.matchAll(/code:\s*"([a-z-]+)"[\s\S]{0,120}?live:\s*(true|false)/g)) {
+			if (m[2] === 'true' && !live.includes(m[1])) live.push(m[1]);
+		}
+		if (live.length === 0) throw new Error('registry parsed to zero live languages');
+		console.log(`[gen-sitemap-read] live languages from registry: ${live.join(', ')}`);
+		return live;
+	} catch (err) {
+		console.warn(`[gen-sitemap-read] registry unreadable (${err.message}); using fallback list`);
+		return FALLBACK;
+	}
+})();
 const OUT = path.resolve(process.cwd(), 'public/sitemap-read.xml');
 
 const slugify = (book) => book.toLowerCase().replace(/\s+/g, '-');
