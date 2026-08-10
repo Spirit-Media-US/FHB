@@ -51,6 +51,13 @@ const TRANSLATION_OUT = '/home/deploy/bin/tools-api/pipelines/translation/output
 //
 // The literal fallback is the last-known-good list, used only if the registry
 // cannot be read (a detached build elsewhere). It can go stale; the parse cannot.
+//
+// ⚠ CONSEQUENCE OF DERIVING THIS: flipping a language live in community no
+// longer changes any FILE here, so nothing triggers an FHB rebuild and the
+// sitemap silently keeps the old language set. Deploying community after a
+// live-flip must be followed by an FHB deploy (an empty commit is enough).
+// Both apps have always had to ship together for a language launch; this is
+// the same rule, with the reason moved.
 const LIVE_LANGS = (() => {
 	const FALLBACK = ['en', 'te', 'es', 'hi', 'ta', 'mr', 'pt', 'ru', 'fr', 'id'];
 	try {
