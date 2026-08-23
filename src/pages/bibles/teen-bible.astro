@@ -436,7 +436,6 @@ const faqSchema = {
 				</div>
 			</div>
 		</Section>
-
 		<Section variant="warm">
 			<div class="max-w-3xl mx-auto">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">He spoke to a teenager before He spoke to the priest</h2>
@@ -447,23 +446,15 @@ const faqSchema = {
 				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.65; margin: 1.5rem 0 0;">Samuel was young enough that he didn’t recognise the voice at first. It called his name three times in the night before anyone told him who was speaking. Your Father spoke to a kid before He spoke to the priest — He knows your name, and He isn’t waiting for you to grow up first.</p>
 			</div>
 		</Section>
-
-		<!-- The full listing — the same copy the Ingram/Amazon record carries, not a summary
-		     of it. Kevin 2026-08-23: "you have a full page to describe this bible, but you are
-		     only given 10% of what we gave Ingram." -->
+		<!-- In brief, and the searches this edition is for -->
 		<Section variant="light">
 			<div class="max-w-3xl mx-auto">
-				{listing.sections.map((sec) => (
-					<div class="mb-8">
-						<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.8rem;">{sec.h}</h2>
-						{sec.body.map((para) => (
-							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colorWords(para)}></p>
-						))}
-					</div>
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">In brief</h2>
+				{listing.short350.map((para) => (
+					<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colorWords(para)}></p>
 				))}
 			</div>
 		</Section>
-
 		<!-- What's inside + product details, laid out as a retail listing rather than a list -->
 		<Section variant="soft">
 			<div class="max-w-4xl mx-auto">
@@ -505,9 +496,23 @@ const faqSchema = {
 				</div>
 			</div>
 		</Section>
-
-		<!-- About the translation, and who made it -->
+		<!-- The full listing — the same copy the Ingram/Amazon record carries, not a summary
+		     of it. Kevin 2026-08-23: "you have a full page to describe this bible, but you are
+		     only given 10% of what we gave Ingram." -->
 		<Section variant="light">
+			<div class="max-w-3xl mx-auto">
+				{listing.sections.map((sec) => (
+					<div class="mb-8">
+						<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.8rem;">{sec.h}</h2>
+						{sec.body.map((para) => (
+							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colorWords(para)}></p>
+						))}
+					</div>
+				))}
+			</div>
+		</Section>
+		<!-- About the translation, and who made it -->
+		<Section variant="warm">
 			<div class="max-w-3xl mx-auto">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">About this translation</h2>
 				{listing.about.map((para) => (
@@ -533,23 +538,6 @@ const faqSchema = {
 				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.98rem; line-height: 1.65; margin: 0;">{listing.publisher}</p>
 			</div>
 		</Section>
-
-		<!-- In brief, and the searches this edition is for -->
-		<Section variant="warm">
-			<div class="max-w-3xl mx-auto">
-				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">In brief</h2>
-				{listing.short350.map((para) => (
-					<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colorWords(para)}></p>
-				))}
-				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.7rem;">Also known as</h3>
-				<div class="flex flex-wrap gap-2">
-					{listing.keywords.map((k) => (
-						<span style="font-family: var(--font-sans); font-size: 0.82rem; color: #3f3f46; background: #fff; border: 1px solid var(--color-hairline); border-radius: 999px; padding: 0.3rem 0.75rem;">{k}</span>
-					))}
-				</div>
-			</div>
-		</Section>
-
 		<!-- The front matter, on the page. Kevin 2026-08-23. -->
 		<Section variant="light">
 			<div class="max-w-3xl mx-auto">
@@ -589,9 +577,14 @@ const faqSchema = {
 						))}
 					</div>
 				))}
+				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.1rem; font-weight: 600; margin: 2.6rem 0 0.7rem;">Also known as</h3>
+				<div class="flex flex-wrap gap-2">
+					{listing.keywords.map((k) => (
+						<span style="font-family: var(--font-sans); font-size: 0.82rem; color: #3f3f46; background: #fff; border: 1px solid var(--color-hairline); border-radius: 999px; padding: 0.3rem 0.75rem;">{k}</span>
+					))}
+				</div>
 			</div>
 		</Section>
-
 		<Section variant="soft">
 			<div class="max-w-3xl mx-auto">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1.2rem;">Questions</h2>
