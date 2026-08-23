@@ -255,6 +255,57 @@ const pillars = [
 	},
 ];
 
+const hearing = {
+	title: 'Hearing your Father\u2019s voice',
+	line: 'You do not have to earn His voice, decode it, or qualify for it. You have to receive Him.',
+	groups: [
+		{
+			h: 'Our Father speaks',
+			p: 'That is not a reward for the mature; it is what kind of Father He is. He has never been silent, and He did not stop when the last page of Scripture was written. He speaks because He is a Father, and a Father talks to His children.',
+			verses: [
+				[
+					'Hebrews 1:1',
+					'Long ago, in many times and many ways, our Heavenly Father spoke to our ancestors through the prophets.',
+				],
+				[
+					'Jeremiah 33:3',
+					'Call to me, and I\u2019ll answer, and tell you great, hidden things you don\u2019t know.',
+				],
+			],
+		},
+		{
+			h: 'We hear His voice',
+			p: 'When you doubt your own ability to hear, trust His ability to speak. He is not a poor communicator, and He is not hiding from His own child. Notice that the sheep are never described as skilled listeners \u2014 only as His.',
+			verses: [
+				['John 10:27', 'My sheep listen to my voice; I know them, and they follow me.'],
+				[
+					'Isaiah 30:21',
+					'Your ears will hear a word behind you: \u201cThis is the way; walk in it,\u201d when you turn right or left.',
+				],
+				[
+					'John 16:13',
+					'But when he, the Spirit of truth, comes, he will guide you into all truth.',
+				],
+				[
+					'1 Samuel 3:10',
+					'Then our Father came, stood there, and called as before: \u201cSamuel! Samuel!\u201d Samuel said, \u201cSpeak, for your servant is listening.\u201d',
+				],
+			],
+		},
+		{
+			h: 'The foundation is intimacy',
+			p: 'We usually come wanting guidance for one decision, and He answers with something larger: the greatest gift I will ever give you is me. Seek the Father before you seek the answer, and you will find you have been hearing Him all along.',
+			verses: [
+				['Psalm 46:10', '\u201cBe still, and know that I am the Father.\u201d'],
+				[
+					'Matthew 11:28',
+					'Come to me, all you who are weary and burdened, and I will give you rest.',
+				],
+			],
+		},
+	],
+};
+
 const preface = [
 	{
 		h: 'The destination was always the Father',
@@ -414,11 +465,16 @@ const faqSchema = {
 	<main>
 		<Section variant="light">
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center max-w-5xl mx-auto">
-				<!-- Hover swaps to the back cover, the way a listing lets you turn the book over. -->
+				<!-- Front and back toggle, the way a retail listing does it (Kevin 2026-08-23).
+				     Hover was wrong for this: it is undiscoverable, and it does not exist at all
+				     on a phone, where most of this traffic lands. -->
 				<div class="flex flex-col items-center">
-					<div class="dvc-flip" style="position: relative; max-width: 340px; width: 100%;">
-						<img src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} alt={`${ed.name} front cover — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto dvc-front" />
-						<img src={`${ASSETS}/dvc-${ed.slug}-back-1200.webp`} alt={`${ed.name} back cover`} width="1200" height="1528" loading="lazy" decoding="async" class="block w-full h-auto dvc-back" />
+					<div style="max-width: 340px; width: 100%;">
+						<img id="cover-main" src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} alt={`${ed.name} front cover — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
+						<div class="cover-tabs" role="group" aria-label="Cover views">
+							<button type="button" class="cover-tab is-on" data-view="front" data-src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} data-alt={`${ed.name} front cover — Father's Heart Bible in Divine Voice Color`} aria-pressed="true">Front</button>
+							<button type="button" class="cover-tab" data-view="back" data-src={`${ASSETS}/dvc-${ed.slug}-back-1200.webp`} data-alt={`${ed.name} back cover`} aria-pressed="false">Back</button>
+						</div>
 					</div>
 					<LookInside slug={ed.slug} title={ed.name} />
 				</div>
@@ -434,7 +490,6 @@ const faqSchema = {
 					<p style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">${ed.price.toFixed(2)}</p>
 					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">Free shipping — a $15 value.</p>
 					<a href="/print" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Order direct from SMP →</a>
-					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.8rem; margin: 1rem 0 0;">Hover the cover to see the back.</p>
 				</div>
 			</div>
 		</Section>
@@ -487,6 +542,26 @@ const faqSchema = {
 						</dl>
 					</div>
 				))}
+				<div style="margin: 2.6rem 0 0;">
+					<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 0 0 0.15rem;">{hearing.title}</h3>
+					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.97rem; font-style: italic; margin: 0 0 1.2rem;">{hearing.line}</p>
+					{hearing.groups.map((g) => (
+						<div style="margin: 0 0 1.6rem;">
+							<h4 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; font-weight: 700; margin: 0 0 0.35rem;">{g.h}</h4>
+							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 0.99rem; line-height: 1.65; margin: 0 0 0.6rem;">{g.p}</p>
+							<dl style="margin: 0;">
+								{g.verses.map(([ref, text]) => (
+								<div style="display: flex; gap: 0.75rem; align-items: baseline; padding: 0.4rem 0; border-top: 1px solid var(--color-hairline);">
+									<dt style="font-family: var(--font-sans); font-size: 0.8rem; font-weight: 700; color: #3f3f46; white-space: nowrap; min-width: 7.5rem;">{ref}</dt>
+									<dd style="font-family: var(--font-body); font-size: 0.97rem; line-height: 1.6; color: var(--color-ink); margin: 0;">{text}</dd>
+								</div>
+								))}
+							</dl>
+						</div>
+					))}
+				</div>
+						</dl>
+					</div>
 
 			</div>
 		</Section>
@@ -617,13 +692,40 @@ const faqSchema = {
 	</main>
 </Layout>
 
+<script>
+	// Front/back toggle. Both files are rendered onto an identical footprint, so swapping
+	// the src cannot shift the layout — no crossfade needed, and none wanted.
+	const main = document.getElementById('cover-main') as HTMLImageElement | null;
+	const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.cover-tab'));
+	if (main && tabs.length) {
+		const show = (tab: HTMLButtonElement) => {
+			main.src = tab.dataset.src!;
+			main.alt = tab.dataset.alt!;
+			tabs.forEach((t) => {
+				const on = t === tab;
+				t.classList.toggle('is-on', on);
+				t.setAttribute('aria-pressed', String(on));
+			});
+		};
+		tabs.forEach((t) => t.addEventListener('click', () => show(t)));
+		// Warm the back cover so the first toggle is instant.
+		const back = tabs.find((t) => t.dataset.view === 'back');
+		if (back) new Image().src = back.dataset.src!;
+	}
+</script>
+
 <style>
-	/* The back cover carried its opacity inline, which beats any stylesheet hover rule —
-	   so the flip never fired. Declarations belong here, where :hover can win. */
-	.dvc-back { position: absolute; inset: 0; opacity: 0; transition: opacity 0.25s ease; }
-	.dvc-front { transition: opacity 0.25s ease; }
-	.dvc-flip:hover .dvc-back { opacity: 1; }
-	.dvc-flip:hover .dvc-front { opacity: 0; }
+	.cover-tabs { display: flex; gap: 0.4rem; justify-content: center; margin: 0.9rem 0 0; }
+	.cover-tab {
+		font-family: var(--font-sans); font-size: 0.78rem; font-weight: 700;
+		letter-spacing: 0.04em; text-transform: uppercase; color: #71717a;
+		background: transparent; border: 1px solid var(--color-hairline);
+		border-radius: 999px; padding: 0.32rem 0.9rem; cursor: pointer;
+		transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+	}
+	.cover-tab:hover { color: #3f3f46; border-color: #a1a1aa; }
+	.cover-tab.is-on { color: var(--color-ink); border-color: #3f3f46; background: var(--color-surface-low); }
+	.cover-tab:focus-visible { outline: 2px solid #3f3f46; outline-offset: 2px; }
 	.faq-item > summary { cursor: pointer; list-style: none; }
 	.faq-item > summary::-webkit-details-marker { display: none; }
 </style>
