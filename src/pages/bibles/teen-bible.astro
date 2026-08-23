@@ -56,11 +56,11 @@ const verse = {
 };
 
 const VOICE = { father: '#3563ae', son: '#f04933', spirit: '#91278f' };
-function mark(text: string, spans: string[], colour: string): string {
+function mark(text: string, spans: string[], color: string): string {
 	let out = text;
 	for (const s of spans)
 		if (s && out.includes(s))
-			out = out.replace(s, `<span style="color:${colour};font-weight:600;">${s}</span>`);
+			out = out.replace(s, `<span style="color:${color};font-weight:600;">${s}</span>`);
 	return out;
 }
 
@@ -162,9 +162,9 @@ const listing = {
 	bio: "Kevin White himself is a beloved son, husband, and father. He is an international best selling author, speaker, and marketplace pastor with decades of experience planting churches, leading nonprofits, starting companies, and developing leaders around the world. Kevin and Shelly, his high school sweetheart and partner in marriage and mission for nearly forty years, co-founded Spirit Media Publishing and are devoted to empowering beloved sons and daughters in revealing our Father's heart to the nations. Kevin and Shelly live in North Carolina with their family.",
 };
 
-// Colour the COLOUR WORDS, not the sentence around them (Kevin 2026-08-23). The claim is
-// "our Father's words in BLUE" — so BLUE is what should be blue. Colouring the whole line
-// makes it decoration; colouring the one word makes it a demonstration. Applied to every
+// color the COLOUR WORDS, not the sentence around them (Kevin 2026-08-23). The claim is
+// "our Father's words in BLUE" — so BLUE is what should be blue. coloring the whole line
+// makes it decoration; coloring the one word makes it a demonstration. Applied to every
 // paragraph, so it works for the standalone lines and for the sentence that runs them
 // together mid-prose.
 const COLOUR_WORD: Record<string, string> = {
@@ -172,12 +172,175 @@ const COLOUR_WORD: Record<string, string> = {
 	RED: VOICE.son,
 	PURPLE: VOICE.spirit,
 };
-function colourWords(text: string): string {
+function colorWords(text: string): string {
 	return text.replace(
 		/\b(BLUE|RED|PURPLE)\b/g,
 		(w) => `<span style="color:${COLOUR_WORD[w]};font-weight:700;">${w}</span>`,
 	);
 }
+
+// Everything below is lifted from the front matter of this edition's own interior — the
+// preface, the three pillar pages, and the hearing-His-voice pages that a reader gets in
+// the printed book. It is the most substantial, most specific writing we own about this
+// Bible, and until now it existed only inside a PDF where no search engine could read it.
+// Kevin 2026-08-23: put it on the page even if it sits at the bottom.
+const pillars = [
+	{
+		title: 'Intimacy for Teens',
+		line: 'Before He asks anything of you, He asks for you.',
+		verses: [
+			['James 4:8', 'Come close to our Father, and he will come close to you.'],
+			['Psalm 27:8', 'My heart says of you, “Seek his face.” Your face, my Father, do I seek.'],
+			[
+				'Jeremiah 31:3',
+				'I have loved you with everlasting love; so I have drawn you to myself with faithful love.',
+			],
+			['Psalm 34:18', 'Our Father is near to the brokenhearted; he saves those crushed in spirit.'],
+			['John 15:9', 'As the Father has loved me, so I have loved you. Remain in my love.'],
+		],
+	},
+	{
+		title: 'Identity for Teens',
+		line: 'He named you His before you had done anything for Him.',
+		verses: [
+			[
+				'John 1:12',
+				'But to all who received him, believing in his name, he gave the right to become children of our Father.',
+			],
+			[
+				'Romans 8:15',
+				'You did not receive a spirit of slavery, to fall back into fear, but received the Spirit of restoration, by whom we cry, “Abba! Father!”',
+			],
+			[
+				'1 John 3:1',
+				'See what kind of love our Father has given us, that we should be called children of our Father! And we are.',
+			],
+			[
+				'Ephesians 1:5',
+				'He predestined us to be his own sons through Jesus Christ, according to the good pleasure of his will.',
+			],
+			[
+				'Isaiah 43:1',
+				'Do not be afraid, for I have redeemed you; I have called you by name, you are mine.',
+			],
+			[
+				'John 15:15',
+				'I no longer call you servants. I call you friends, since I’ve made known to you everything I heard from my Father.',
+			],
+		],
+	},
+	{
+		title: 'Inheritance for Teens',
+		line: 'Sons and daughters are not paid. Sons and daughters inherit.',
+		verses: [
+			['Romans 8:17', 'If children, then heirs — heirs of our Father, co-heirs with Christ.'],
+			[
+				'Galatians 4:7',
+				'So you’re no longer a slave but a son; and if a son, then an heir through our Father.',
+			],
+			[
+				'Ephesians 1:11',
+				'In him we also were made heirs, destined beforehand by our Father’s purpose.',
+			],
+			[
+				'Luke 12:32',
+				'Do not be afraid, little flock, for your Father has been pleased to give you the kingdom.',
+			],
+			[
+				'Colossians 1:12',
+				'giving thanks to our Father, who qualified you to share the saints’ inheritance in the light.',
+			],
+		],
+	},
+];
+
+const preface = [
+	{
+		h: 'The destination was always the Father',
+		p: [
+			'Jesus said, “I am the way, and the truth, and the life. No one comes to the Father except through me” (John 14:6). For generations the church heard the way to heaven. He said the way to the Father. The destination was never merely forgiveness, and never merely heaven. It was the Father Himself.',
+			'From the first page to the last, Scripture tells one story: a perfect and loving Father pursuing and restoring His beloved sons and daughters through the blood of His Son and by the Holy Spirit. Father’s Heart Bible™ exists for one reason: so you can hear that story in Father’s own voice, and come home.',
+		],
+	},
+	{
+		h: 'Father is His name',
+		p: [
+			'We believe in One God in Three Persons: Father, Son, and Holy Spirit. At the center of the Trinity is a Father. Not a role God plays. “God” is not a name. It is what He is. Father is who He is.',
+			'He is not one of many gods. He is not an idol. He is Father, and Father is His name — the name Jesus came to reveal. “I revealed your name to those you gave me from the world” (John 17:6). In Revelation 7:9–12 a multitude too numerous to count, from every nation, tribe, and language, shouts one thing: “Salvation belongs to our Father, seated on the throne, and to the Lamb!” The focus of Heaven is the Father.',
+		],
+	},
+	{
+		h: 'Who never calls Him Father',
+		p: [
+			'Notice who, in Scripture, relates to God only as a distant deity and never as Father. The serpent in Eden, who recast a generous Father as a withholding rival: “Did God really say…?” (Genesis 3:1). The accuser and the arguing friends in Job, who debated a remote and transactional judge, until Job himself moved from hearing about God to seeing Him. Pharaoh, who sneered, “Who is God, that I should obey his voice?” (Exodus 5:2). The nations who served gods of wood and stone. Even the tempter in the wilderness aimed his attack straight at the bond of sonship: “If you’re the Son of God…” (Matthew 4:3).',
+			'The enemy’s strategy has never changed since the garden: to make the Father seem distant, demanding, and disappointed. For too long, “God” and “the LORD” left that caricature unchallenged. Father’s Heart Bible™ lets the Hebrew and Greek speak the distinction they always made, between a deity to be appeased and a Father to be received.',
+		],
+	},
+	{
+		h: 'Hear His voice',
+		p: [
+			'For a hundred and twenty-five years, red letters have shown readers the words of the Son. Our Father speaks more than three times as often, and until now every one of those words has been printed exactly like the genealogies around them. In this Bible you can see who is speaking. Our Father’s words in BLUE. The Son’s in RED. The Spirit’s in PURPLE.',
+			'The color is a mark of ownership, not of quotation: our Father’s words stay His on any lips that carry them faithfully, and words He never spoke are never colored. Narration stays black.',
+		],
+	},
+	{
+		h: 'The Trinity, rightly seen',
+		p: [
+			'This recovery does not diminish the Trinity; it clarifies it. The one God exists eternally as Father, Son, and Holy Spirit, three persons in one essence, and Father’s Heart Bible™ honors each. The Father initiates, sends, and gives. The Son reveals, redeems, and reconciles us to the Father. The Spirit applies, confirms, and pours Father’s love into our hearts.',
+			'Three realities shape how we translate, beginning at the very first verse. The incarnation: the Son revealed the Father perfectly — “Whoever has seen me has seen the Father” (John 14:9). Pentecost: the Spirit of sonship was poured out, crying from within His children, “Abba, Father” (Romans 8:15; Galatians 4:6). And the sealed canon: with the last book written, the whole story finally came into view — one Father, one redemption, one family.',
+		],
+	},
+	{
+		h: 'What it is not',
+		p: [
+			'Not a paraphrase, and not an adaptation of any existing English Bible. Not a study Bible or commentary — the notes serve the reader, not the scholar. Not the work of a committee: every rendering and every interpretive decision is our own, and our own responsibility. Not abridged. It reads 135,000 words shorter than the King James because contemporary English says the same thing in fewer words. Every verse. Every book.',
+		],
+	},
+	{
+		h: 'How it renders the divine names',
+		p: [
+			'Where a word for God stands in a clearly relational or covenantal setting, it is rendered “our Father.” Elsewhere the customary rendering is kept, and Adonai and Kurios are always rendered “Lord.” At Genesis 1:1, “God” (Elohim) is rendered “our Heavenly Father.”',
+			'This edition carries 1,354 notes across 777 chapters: 1,075 explain a word, name, custom, or background; 248 mark where the text reveals the Father; and 31 record a difference among the manuscripts. Where the original carries no divine name, the note says so.',
+		],
+	},
+	{
+		h: 'Hearing your Father’s voice',
+		p: [
+			'You do not have to earn His voice, decode it, or qualify for it. You have to receive Him. Our Father speaks — that is not a reward for the mature; it is what kind of Father He is. He has never been silent, and He did not stop when the last page of Scripture was written. He speaks because He is a Father, and a Father talks to His children.',
+			'And you hear Him. When you doubt your own ability to hear, trust His ability to speak. Notice that the sheep are never described as skilled listeners — only as His. “My sheep listen to my voice; I know them, and they follow me” (John 10:27). He rarely shouts over the noise. He speaks close, the way a father speaks to a child in his own house — and the quiet of it is not distance, it is nearness.',
+		],
+	},
+];
+
+// The front matter every copy carries, before Genesis 1:1.
+const frontMatterParts = [
+	[
+		'Presentation page',
+		'A place for a name, a giver, and a date — “I will be his Father, and he will be my son.” Revelation 21:7.',
+	],
+	[
+		'Abba Father',
+		'The opening word to the reader: God is our Father — not a distant deity, not a disappointed one.',
+	],
+	[
+		'A letter from the publishers',
+		'Kevin and Shelly White on the question behind the translation: “Where is my voice? I want my voice heard.”',
+	],
+	[
+		'Receiving Your Father',
+		'A prayer to pray — the eighteen-inch journey from the head to the heart.',
+	],
+	[
+		'The three pillars',
+		'Intimacy, Identity, and Inheritance for Teens, each with its own passages.',
+	],
+	['Preface', 'Eight pages on why this translation exists and how it was made.'],
+	[
+		'Hearing Your Father’s Voice',
+		'Our Father speaks · We hear His voice · The foundation is intimacy.',
+	],
+	['Contents', 'All sixty-six books, Genesis through Revelation, with page numbers.'],
+];
 
 const faq = [
 	{
@@ -294,7 +457,7 @@ const faqSchema = {
 					<div class="mb-8">
 						<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.8rem;">{sec.h}</h2>
 						{sec.body.map((para) => (
-							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colourWords(para)}></p>
+							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colorWords(para)}></p>
 						))}
 					</div>
 				))}
@@ -324,7 +487,7 @@ const faqSchema = {
 						['Print length', `${ed.pages} pages`],
 						['Binding', 'Hardcover, case laminate with dust jacket'],
 						['Dimensions', '6 x 9 in'],
-						['Interior', 'Full colour throughout'],
+						['Interior', 'Full color throughout'],
 						['ISBN-13', ed.isbn],
 						['BISAC codes', null],
 					].map(([k, v], n) => (
@@ -376,7 +539,7 @@ const faqSchema = {
 			<div class="max-w-3xl mx-auto">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">In brief</h2>
 				{listing.short350.map((para) => (
-					<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colourWords(para)}></p>
+					<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colorWords(para)}></p>
 				))}
 				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.7rem;">Also known as</h3>
 				<div class="flex flex-wrap gap-2">
@@ -384,6 +547,48 @@ const faqSchema = {
 						<span style="font-family: var(--font-sans); font-size: 0.82rem; color: #3f3f46; background: #fff; border: 1px solid var(--color-hairline); border-radius: 999px; padding: 0.3rem 0.75rem;">{k}</span>
 					))}
 				</div>
+			</div>
+		</Section>
+
+		<!-- The front matter, on the page. Kevin 2026-08-23. -->
+		<Section variant="light">
+			<div class="max-w-3xl mx-auto">
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 0.4rem;">From the front matter</h2>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.98rem; line-height: 1.65; margin: 0 0 2rem;">Every copy opens with these pages, before Genesis 1:1.</p>
+
+				<div class="grid gap-x-8 gap-y-4" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 0 0 2.6rem;">
+					{frontMatterParts.map(([name, what]) => (
+						<div>
+							<h3 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.86rem; font-weight: 700; letter-spacing: 0.02em; margin: 0 0 0.2rem;">{name}</h3>
+							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.92rem; line-height: 1.55; margin: 0;">{what}</p>
+						</div>
+					))}
+				</div>
+
+				{pillars.map((pil) => (
+					<div style="margin: 0 0 2.2rem;">
+						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 0 0 0.15rem;">{pil.title}</h3>
+						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.97rem; font-style: italic; margin: 0 0 0.9rem;">{pil.line}</p>
+						<dl style="margin: 0;">
+							{pil.verses.map(([ref, text]) => (
+								<div style="display: flex; gap: 0.75rem; align-items: baseline; padding: 0.4rem 0; border-top: 1px solid var(--color-hairline);">
+									<dt style="font-family: var(--font-sans); font-size: 0.8rem; font-weight: 700; color: #3f3f46; white-space: nowrap; min-width: 7.5rem;">{ref}</dt>
+									<dd style="font-family: var(--font-body); font-size: 0.97rem; line-height: 1.6; color: var(--color-ink); margin: 0;">{text}</dd>
+								</div>
+							))}
+						</dl>
+					</div>
+				))}
+
+				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 2.6rem 0 1.2rem;">From the preface</h3>
+				{preface.map((sec) => (
+					<div style="margin: 0 0 1.7rem;">
+						<h4 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; font-weight: 700; margin: 0 0 0.5rem;">{sec.h}</h4>
+						{sec.p.map((para) => (
+							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1rem; line-height: 1.7; margin: 0 0 0.7rem;" set:html={colorWords(para)}></p>
+						))}
+					</div>
+				))}
 			</div>
 		</Section>
 

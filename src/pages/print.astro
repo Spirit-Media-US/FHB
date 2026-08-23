@@ -11,9 +11,9 @@ import Layout from '../layouts/Layout.astro';
 // over each card"). Copy is lifted from the metadata sheets so the site and the trade
 // listings cannot drift apart.
 // The spec, stated once for all sixteen. Concrete facts rather than "premium" — every
-// Bible on the shelf claims premium; 6x9 hardback with a dust jacket, full colour and
+// Bible on the shelf claims premium; 6x9 hardback with a dust jacket, full color and
 // 876 pages is checkable and does more selling (Kevin asked 2026-08-23).
-const DVC_TAIL = '6×9 Hardback with Dust Jacket · 876 Pages · Full Colour Throughout';
+const DVC_TAIL = '6×9 Hardback with Dust Jacket · 876 Pages · Full Color Throughout';
 const DVC_TAIL2 =
 	'Red Letter \u00b7 Blue Letter \u00b7 Purple Letter \u00b7 Three-Color Divine Voice \u00b7 Complete Bible';
 const dvcEditions = [
@@ -150,7 +150,7 @@ const SAMPLE_LP =
 // Print FAQ — rendered as a no-JS <details> accordion + FAQPage JSON-LD (AEO).
 const READ_URL = '/read';
 const CAMPAIGN_URL = '/a-bible-for-the-whole-world/';
-// Neutral: the only colour between the header and the footer is the three voices and
+// Neutral: the only color between the header and the footer is the three voices and
 // the cover art (Kevin 2026-08-23).
 const LINK = 'color: #3f3f46; text-decoration: underline;';
 const TRANSLATION_URL = '/the-fathers-heart-bible/translation-philosophy/';
@@ -260,8 +260,8 @@ const breadcrumbSchema = {
 // the printed book and /read use \u2014 fatherWords / sonWords / spiritWords. Nothing is
 // retyped here, so a verse on this page cannot disagree with the Bible it advertises.
 const VOICE = { father: '#3563ae', son: '#f04933', spirit: '#91278f' };
-// One column per voice, each headed by the same coloured block used at the top of the
-// page \u2014 the demo repeated where the proof is. Two passages each, in that voice's colour,
+// One column per voice, each headed by the same colored block used at the top of the
+// page \u2014 the demo repeated where the proof is. Two passages each, in that voice's color,
 // straight from the canon's own spans.
 const dvcVerses = [
 	{
@@ -337,7 +337,7 @@ const dvcVerses = [
 	},
 ];
 
-// Wrap each voice's spans in its own colour. Longest-first so a span that contains
+// Wrap each voice's spans in its own color. Longest-first so a span that contains
 // another cannot be half-replaced.
 function markVoices(v: {
 	text: string;
@@ -381,8 +381,8 @@ function markVoices(v: {
 			<div class="text-center mb-3">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2.1rem; font-weight: 600; margin: 0;">Father’s Heart Bible™ + Divine Voice™ Color Bibles</h2>
 			</div>
-			<!-- THE COLOUR DEMO. Kevin 2026-08-23: "if we were selling color tvs this is our color
-			     tv demo." So the three voices are set large and are the ONLY saturated colour on the
+			<!-- THE COLOR DEMO. Kevin 2026-08-23: "if we were selling color tvs this is our color
+			     tv demo." So the three voices are set large and are the ONLY saturated color on the
 			     page — every button, tier and label below is neutral grey so nothing competes with
 			     them or with the covers. -->
 			<div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-5" aria-label="Father, Son and Spirit in Divine Voice Color">
