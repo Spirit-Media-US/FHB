@@ -162,6 +162,17 @@ const listing = {
 	bio: "Kevin White himself is a beloved son, husband, and father. He is an international best selling author, speaker, and marketplace pastor with decades of experience planting churches, leading nonprofits, starting companies, and developing leaders around the world. Kevin and Shelly, his high school sweetheart and partner in marriage and mission for nearly forty years, co-founded Spirit Media Publishing and are devoted to empowering beloved sons and daughters in revealing our Father's heart to the nations. Kevin and Shelly live in North Carolina with their family.",
 };
 
+// The three colour lines in the long description are the product claim; rendering them in
+// black states the claim while contradicting it. Colour them in their own voice.
+const VOICE_LINE: Record<string, string> = {
+	'Our Father’s words in BLUE': VOICE.father,
+	"Our Father's words in BLUE": VOICE.father,
+	'The Son’s words in RED': VOICE.son,
+	"The Son's words in RED": VOICE.son,
+	'The Spirit’s words in PURPLE': VOICE.spirit,
+	"The Spirit's words in PURPLE": VOICE.spirit,
+};
+
 const faq = [
 	{
 		q: 'What makes the Teen Bible different from the other editions?',
@@ -277,7 +288,11 @@ const faqSchema = {
 					<div class="mb-8">
 						<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.8rem;">{sec.h}</h2>
 						{sec.body.map((para) => (
-							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;">{para}</p>
+							VOICE_LINE[para] ? (
+								<p style={`font-family: var(--font-sans); color: ${VOICE_LINE[para]}; font-size: 1.15rem; font-weight: 700; line-height: 1.6; margin: 0 0 0.35rem;`}>{para}</p>
+							) : (
+								<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;">{para}</p>
+							)
 						))}
 					</div>
 				))}
@@ -309,11 +324,17 @@ const faqSchema = {
 						['Dimensions', '6 x 9 in'],
 						['Interior', 'Full colour throughout'],
 						['ISBN-13', ed.isbn],
-						['Subject codes', listing.bisac.join(' · ')],
+						['Subject codes', null],
 					].map(([k, v], n) => (
 						<div class="flex flex-wrap gap-2 px-5 py-3" style={`font-family: var(--font-sans); font-size: 0.9rem; ${n % 2 ? 'background: #fafafa;' : ''}`}>
 							<span style="color: #71717a; min-width: 10rem;">{k}</span>
-							<span style="color: var(--color-ink); font-weight: 600; flex: 1;">{v}</span>
+							{v === null ? (
+								<span style="color: var(--color-ink); font-weight: 600; flex: 1;">
+									{listing.bisac.map((b) => (<span style="display: block;">{b}</span>))}
+								</span>
+							) : (
+								<span style="color: var(--color-ink); font-weight: 600; flex: 1;">{v}</span>
+							)}
 						</div>
 					))}
 				</div>
