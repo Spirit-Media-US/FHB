@@ -66,7 +66,6 @@ const ph = pages[0]?.h ?? 1400;
 				</svg>
 				<span>Look inside</span>
 			</button>
-			<p class="li-note">{total} sample pages from the printed edition.</p>
 
 			{/* The manifest, read by the flip renderer. No markup per page in flip
 			    mode: images are requested only for the spread you are on and the
@@ -155,8 +154,9 @@ const ph = pages[0]?.h ?? 1400;
 	/* Neutral chrome throughout — greys and the site's ink/hairline tokens only.
 	   The page images are the one colorful thing in this viewer, by instruction. */
 	.lookinside {
-		margin: 1rem 0 0;
-		display: flex; flex-direction: column; align-items: center;
+		/* Sits inline with the cover's Front/Back buttons, so it is a row member,
+		   not a block with its own margin. */
+		display: inline-flex; align-items: center;
 		position: relative; z-index: 1;
 	}
 

@@ -176,7 +176,7 @@ const COLOUR_WORD: Record<string, string> = {
 function colorWords(text: string): string {
 	return text.replace(
 		/\b(BLUE|RED|PURPLE)\b/g,
-		(w) => `<span style="color:${COLOUR_WORD[w]};font-weight:700;">${w}</span>`,
+		(w) => `<span style="color:${COLOUR_WORD[w]};font-weight:800;">${w}</span>`,
 	);
 }
 
@@ -464,7 +464,7 @@ const faqSchema = {
 
 	<main>
 		<Section variant="light">
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center max-w-5xl mx-auto">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start max-w-5xl mx-auto">
 				<!-- Front and back toggle, the way a retail listing does it (Kevin 2026-08-23).
 				     Hover was wrong for this: it is undiscoverable, and it does not exist at all
 				     on a phone, where most of this traffic lands. -->
@@ -473,13 +473,14 @@ const faqSchema = {
 						<div class="cover-stage">
 							<img id="cover-main" src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} alt={`${ed.name} — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" />
 						</div>
-						<div class="cover-tabs" role="group" aria-label="Cover views">
-							<button type="button" class="cover-tab is-on" data-view="edition" data-src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} data-alt={`${ed.name} — Father's Heart Bible in Divine Voice Color`} aria-pressed="true">Edition</button>
-							<button type="button" class="cover-tab" data-view="front" data-src={`${ASSETS}/dvc-${ed.slug}-front-flat-1200.webp`} data-alt={`${ed.name} front cover — Father's Heart Bible in Divine Voice Color`} aria-pressed="false">Front</button>
-							<button type="button" class="cover-tab" data-view="back" data-src={`${ASSETS}/dvc-${ed.slug}-back-flat-1200.webp`} data-alt={`${ed.name} back cover`} aria-pressed="false">Back</button>
+						<div class="cover-controls">
+							<div class="cover-tabs" role="group" aria-label="Cover views">
+								<button type="button" class="cover-tab" data-view="front" data-src={`${ASSETS}/dvc-${ed.slug}-front-flat-1200.webp`} data-alt={`${ed.name} front cover — Father's Heart Bible in Divine Voice Color`} aria-pressed="false">Front</button>
+								<button type="button" class="cover-tab" data-view="back" data-src={`${ASSETS}/dvc-${ed.slug}-back-flat-1200.webp`} data-alt={`${ed.name} back cover`} aria-pressed="false">Back</button>
+							</div>
+							<LookInside slug={ed.slug} title={ed.name} />
 						</div>
 					</div>
-					<LookInside slug={ed.slug} title={ed.name} />
 				</div>
 				<div>
 					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Divine Voice Color</p>
@@ -525,7 +526,7 @@ const faqSchema = {
 				<div class="grid gap-x-8 gap-y-4" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 0 0 2.6rem;">
 					{frontMatterParts.map(([name, what]) => (
 						<div>
-							<h3 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.86rem; font-weight: 700; letter-spacing: 0.02em; margin: 0 0 0.2rem;">{name}</h3>
+							<h3 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.88rem; font-weight: 800; letter-spacing: 0.01em; margin: 0 0 0.2rem;">{name}</h3>
 							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.92rem; line-height: 1.55; margin: 0;">{what}</p>
 						</div>
 					))}
@@ -550,7 +551,7 @@ const faqSchema = {
 					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.97rem; font-style: italic; margin: 0 0 1.2rem;">{hearing.line}</p>
 					{hearing.groups.map((g) => (
 						<div style="margin: 0 0 1.6rem;">
-							<h4 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; font-weight: 700; margin: 0 0 0.35rem;">{g.h}</h4>
+							<h4 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.98rem; font-weight: 800; margin: 0 0 0.35rem;">{g.h}</h4>
 							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 0.99rem; line-height: 1.65; margin: 0 0 0.6rem;">{g.p}</p>
 							<dl style="margin: 0;">
 								{g.verses.map(([ref, text]) => (
@@ -658,7 +659,7 @@ const faqSchema = {
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1.4rem;">Why this translation exists</h2>
 				{preface.map((sec) => (
 					<div style="margin: 0 0 1.7rem;">
-						<h4 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; font-weight: 700; margin: 0 0 0.5rem;">{sec.h}</h4>
+						<h4 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.98rem; font-weight: 800; margin: 0 0 0.5rem;">{sec.h}</h4>
 						{sec.p.map((para) => (
 							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1rem; line-height: 1.7; margin: 0 0 0.7rem;" set:html={colorWords(para)}></p>
 						))}
@@ -722,15 +723,18 @@ const faqSchema = {
 		display: flex; align-items: center; justify-content: center;
 	}
 	.cover-stage img { max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; }
-	.cover-tabs { display: flex; gap: 0.4rem; justify-content: center; margin: 0.9rem 0 0; }
+	.cover-controls {
+		display: flex; flex-wrap: wrap; gap: 0.4rem;
+		align-items: center; justify-content: center; margin: 0.9rem 0 0;
+	}
+	.cover-tabs { display: flex; gap: 0.4rem; }
 	.cover-tab {
-		font-family: var(--font-sans); font-size: 0.78rem; font-weight: 700;
-		letter-spacing: 0.04em; text-transform: uppercase; color: #71717a;
-		background: transparent; border: 1px solid var(--color-hairline);
-		border-radius: 999px; padding: 0.32rem 0.9rem; cursor: pointer;
+		font-family: var(--font-sans); font-size: 0.9rem; font-weight: 600;
+		color: #3f3f46; background: #fff; border: 1px solid var(--color-hairline);
+		border-radius: 999px; padding: 0.55rem 1.1rem; cursor: pointer;
 		transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
 	}
-	.cover-tab:hover { color: #3f3f46; border-color: #a1a1aa; }
+	.cover-tab:hover { background: #f3f3f3; border-color: #a1a1aa; }
 	.cover-tab.is-on { color: var(--color-ink); border-color: #3f3f46; background: var(--color-surface-low); }
 	.cover-tab:focus-visible { outline: 2px solid #3f3f46; outline-offset: 2px; }
 	.faq-item > summary { cursor: pointer; list-style: none; }
