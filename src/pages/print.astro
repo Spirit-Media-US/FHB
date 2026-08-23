@@ -3,56 +3,111 @@ import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
 
-// COMPACT editions on Amazon, each in paperback (asin) and hardback (hbAsin).
-const editions = [
+// THE DIVINE VOICE COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
+// edition. Every subtitle in the trade metadata ends with the same tail ("Red Letter -
+// Blue Letter - Purple Letter - Three-Color Divine Voice - Complete Bible"), so the cards
+// carry only the part that is UNIQUE to each Bible and the shared tail is stated once,
+// under the page header (Kevin 2026-08-23: "Don't need to repeat same things over and
+// over each card"). Copy is lifted from the metadata sheets so the site and the trade
+// listings cannot drift apart.
+const DVC_TAIL =
+	'Red Letter \u00b7 Blue Letter \u00b7 Purple Letter \u00b7 Three-Color Divine Voice \u00b7 Complete Bible';
+const dvcEditions = [
 	{
-		color: 'Plum',
-		slug: 'plum',
-		asin: 'B0H6S2MCY9',
-		hbAsin: 'B0H86787P1',
-		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-plum.webp',
+		slug: 'chosen',
+		title: 'Chosen Bible',
+		sub: 'For the Fatherless, Foster Youth, Adoptive and Foster Families, Youth Aging Out of Care, and Anyone Raised Without a Father',
+		price: 99.99,
 	},
 	{
-		color: 'Charcoal',
-		slug: 'charcoal',
-		asin: 'B0H6S72QPD',
-		hbAsin: 'B0H86Z7Y9B',
-		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-charcoal.webp',
+		slug: 'couples',
+		title: "Couple's Bible",
+		sub: 'For Married Couples, Engaged Couples, Newlyweds, Dating Couples, Domestic Partners, and Anniversary Gifts',
+		price: 99.99,
 	},
 	{
-		color: 'White',
-		slug: 'white',
-		asin: 'B0H6S51GHR',
-		hbAsin: 'B0H86GKMBP',
-		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-white.webp',
-	},
-];
-
-// LARGE PRINT editions. Paperbacks and hardbacks are both live on Amazon. Same
-// retail as Compact ($39.99 PB / $44.99 HB), so LP shares the bulk ladder.
-// Reuses the Compact cover art (same design, larger trim) until LP product
-// shots are shot.
-const lpEditions = [
-	{
-		color: 'Plum',
-		slug: 'lp_plum',
-		asin: 'B0H8XC43KR',
-		hbAsin: 'B0H8XYPMQS',
-		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-plum.webp',
+		slug: 'dads',
+		title: "Dad's Bible",
+		sub: "For Dads, Fathers, New Dads, Stepdads, Granddads, and Father's Day Gifts",
+		price: 99.99,
 	},
 	{
-		color: 'Charcoal',
-		slug: 'lp_charcoal',
-		asin: 'B0H8XQ2LGL',
-		hbAsin: 'B0H8XM9VDC',
-		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-charcoal.webp',
+		slug: 'first-responders',
+		title: "First Responder's Bible",
+		sub: 'For Police Officers, Firefighters, EMTs, Paramedics, Dispatchers, Nurses, and Search and Rescue',
+		price: 99.99,
 	},
 	{
-		color: 'White',
-		slug: 'lp_white',
-		asin: 'B0H8XPWH6T',
-		hbAsin: 'B0H8XDZQ1Z',
-		img: 'https://assets.spiritmediapublishing.com/FHB/print/edition-white.webp',
+		slug: 'mens',
+		title: "Men's Bible",
+		sub: "He Hears His Father's Voice - For Men, Husbands, Fathers, and Young Men",
+		price: 99.99,
+	},
+	{
+		slug: 'moms',
+		title: "Mom's Bible",
+		sub: "For Moms, Mothers, New Moms, Stepmoms, Grandmothers, and Mother's Day Gifts",
+		price: 99.99,
+	},
+	{
+		slug: 'pastors',
+		title: "Pastor's Bible",
+		sub: 'For Pastors, Preachers, Ministers, Elders, Deacons, Chaplains, and Church Leaders',
+		price: 99.99,
+	},
+	{
+		slug: 'peace',
+		title: 'Peace Bible',
+		sub: 'For Overcoming Anxiety, Depression, PTSD, Panic, Stress, Trauma, and Worry',
+		price: 99.99,
+	},
+	{
+		slug: 'presidents',
+		title: "President's Bible",
+		sub: 'For Presidents, CEOs, Executives, Public Servants, Officers, and Leaders',
+		price: 99.99,
+	},
+	{
+		slug: 'recovery',
+		title: 'Recovery Bible',
+		sub: 'For Overcoming Addiction, Recovery, Sobriety, Freedom, 12 Step Programs, and Families',
+		price: 99.99,
+	},
+	{
+		slug: 'seekers',
+		title: "Seeker's Bible",
+		sub: 'For Seekers, Skeptics, and Anyone Exploring the Christian Faith for the First Time',
+		price: 99.99,
+	},
+	{
+		slug: 'seventeen',
+		title: 'Seventeen Bible',
+		sub: 'For Seventeen-Year-Olds, Teens and Young Adults, 17th Birthday, Confirmation, and Graduation Gifts',
+		price: 99.99,
+	},
+	{
+		slug: 'soldiers',
+		title: "Soldier's Bible",
+		sub: 'For all Soldiers, Army, Marine Corps, Navy, Air Force, Space Force, Coast Guard, and Veterans',
+		price: 99.99,
+	},
+	{
+		slug: 'teen',
+		title: 'Teen Bible',
+		sub: 'For Teens, Teenagers, Youth Group, Confirmation, and Graduation Gifts, Ages 13-19',
+		price: 99.99,
+	},
+	{
+		slug: 'worship-leaders',
+		title: "Worship Leader's Bible",
+		sub: 'For Worship Leaders, Praise Teams, Worship Pastors, Musicians, Singers, and Choir Directors',
+		price: 99.99,
+	},
+	{
+		slug: 'journaling',
+		title: 'She Hears Her Father\u2019s Voice',
+		sub: 'For Women \u00b7 Wide Margin \u00b7 Note-Taking \u00b7 8x10 Journaling Edition',
+		price: 124.99,
 	},
 ];
 
@@ -65,21 +120,22 @@ const EBOOK_NOOK_URL =
 	'https://www.barnesandnoble.com/w/fathers-heart-bible-spirit-media-publishing/1150585116?ean=2940196931611';
 const EBOOK_DIRECT = '$7.49';
 
-// Volume ladder — the COMBINED total across all editions and bindings sets
-// the tier. ONE consistent discount % applies to both bindings, each off its
-// own retail (unit = paperback off $39.99, unitHb = hardback off $44.99).
-// MUST match functions/print-checkout.ts TIERS.
+// Volume ladder — the COMBINED total across all 16 editions sets the tier (mix and match).
+// 1–9 pays full price; the published ladder stops at 250 because anyone buying 500+
+// negotiates directly, and a published 40% tier would permanently anchor a $99.99 Bible at
+// $59.99 (Kevin 2026-08-23, after reviewing category benchmarks: Bible bulk discounting
+// runs 30–55%, but on $5–15 units, not a premium single-volume edition).
+// MUST match functions/dvc-checkout.ts TIERS.
 const tiers = [
-	{ qty: 25, pct: 15, unit: 33.99, unitHb: 38.24 },
-	{ qty: 50, pct: 20, unit: 31.99, unitHb: 35.99 },
-	{ qty: 100, pct: 25, unit: 29.99, unitHb: 33.74 },
-	{ qty: 250, pct: 30, unit: 27.99, unitHb: 31.49 },
-	{ qty: 500, pct: 35, unit: 25.99, unitHb: 29.24 },
-	{ qty: 1000, pct: 40, unit: 23.99, unitHb: 26.99 },
+	{ qty: 10, pct: 10, unit: 89.99, unit8: 112.49 },
+	{ qty: 25, pct: 15, unit: 84.99, unit8: 106.24 },
+	{ qty: 50, pct: 20, unit: 79.99, unit8: 99.99 },
+	{ qty: 100, pct: 25, unit: 74.99, unit8: 93.74 },
+	{ qty: 250, pct: 30, unit: 69.99, unit8: 87.49 },
 ];
 
-const RETAIL = '$39.99';
-const RETAIL_HB = '$44.99';
+const RETAIL = '$99.99';
+const RETAIL_8 = '$124.99';
 
 // Interior sample excerpts (Genesis) — direct PDF, hosted on R2.
 const SAMPLE_REGULAR =
@@ -114,19 +170,31 @@ const printFaq = [
 	},
 	{
 		q: 'What’s included in each edition?',
-		a: `The Regular Print editions are the complete Bible, plus Receive the Father notes per book where space allows. The Large Print editions are New Testament+ — Genesis, Psalms, Proverbs, and the complete New Testament in full, plus a Father-focused survey of every other Old Testament book. Every edition, in every color and binding, is the same translation.`,
+		a: `Every edition is the complete Bible — all 66 books, 1,189 chapters, 31,085 verses — in Divine Voice Color, with an introduction to each book, a Father's note closing each one, 1,354 study notes and a presentation page. All sixteen editions carry the identical translation and the identical 876 pages. What changes is the cover, one opening page written for that audience, and three section headings. Choose the one that speaks to the person you're buying for.`,
 	},
 	{
 		q: 'How is the Father’s Heart Bible™ different from other translations?',
 		a: `Father’s Heart Bible™: An Intimate Translation is a fresh Bible translation from the original Hebrew, Aramaic, and Greek that lets you hear God as He truly is — not a distant deity, but your Father. Read about <a href="${TRANSLATION_URL}" style="${LINK}">our translation approach</a>, or start reading free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
 	},
 	{
+		q: 'What is Divine Voice Color?',
+		a: `For a hundred and twenty-five years red letters have shown the Son speaking. Our Father speaks more than three times as often — 125,457 words across 5,623 verses — and until now those words were printed in the same black ink as the genealogies. In Divine Voice Color you see who is speaking: our Father's words in blue, the Son's in red, the Spirit's in purple. More than one word in four of the Bible is a divine person speaking. The color is a mark of ownership, not of quotation — His words stay His on any lips that carry them faithfully, and words He never spoke are never colored.`,
+	},
+	{
+		q: 'Are the sixteen editions different Bibles?',
+		a: `No. Every one is the identical translation and the identical 876 pages, cover to cover. What differs is the cover, one opening page written for that audience, and three section headings. A Teen Bible and a Pastor's Bible read exactly the same — they are simply handed to different people.`,
+	},
+	{
+		q: 'Is the color throughout the whole Bible?',
+		a: `Yes — Genesis to Revelation, every divine voice, in full color on every page. Not a red-letter New Testament with a black Old Testament, and not a study section at the back. You can see it for yourself free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
+	},
+	{
 		q: 'How long does shipping take?',
-		a: `Single copies ship from Amazon on Amazon’s standard delivery timelines. Bulk orders through Spirit Media Publishing typically arrive in 3–4 weeks — <a href="${CONTACT}" style="${LINK}">reach out</a> if you need them sooner.`,
+		a: `Order direct from us today and shipping is free — most orders arrive in 7–10 days, and larger bulk orders in 3–4 weeks. The Divine Voice Color editions arrive on Amazon shortly; until then, direct is the way to get one. <a href="${CONTACT}" style="${LINK}">Reach out</a> if you need them by a particular date.`,
 	},
 	{
 		q: 'Can I return my order?',
-		a: `Copies bought on Amazon follow Amazon’s return policy. For bulk orders placed directly with us, <a href="${CONTACT}" style="${LINK}">reach out</a> and we’ll make it right.`,
+		a: `Yes. For orders placed directly with us, <a href="${CONTACT}" style="${LINK}">reach out</a> and we'll make it right. Copies bought on Amazon follow Amazon's return policy.`,
 	},
 ];
 // Plain-text answers for FAQPage JSON-LD.
@@ -182,31 +250,77 @@ const breadcrumbSchema = {
 
 // FHB scripture cards — the Father's voice from first page to last (text pulled
 // from the reader content).
-const verses = [
+// DIVINE VOICE COLOR verses, straight from the locked canon with the same voice spans
+// the printed book and /read use \u2014 fatherWords / sonWords / spiritWords. Nothing is
+// retyped here, so a verse on this page cannot disagree with the Bible it advertises.
+const VOICE = { father: '#3563ae', son: '#f04933', spirit: '#91278f' };
+const dvcVerses = [
 	{
 		ref: 'Genesis 1:1',
 		text: 'In the beginning, our Heavenly Father created the heavens and the earth.',
-		hl: ['our Heavenly Father'],
+		father: [],
+		son: [],
+		spirit: [],
+	},
+	{
+		ref: 'Genesis 1:3',
+		text: 'Then our Father said, "Let there be light," and there was light.',
+		father: ['"Let there be light,"'],
+		son: [],
+		spirit: [],
+	},
+	{
+		ref: 'Jeremiah 29:11',
+		text: 'For I know the plans I have for you, declares your Father — plans for peace, not disaster, to give you a future and hope.',
+		father: [
+			'For I know the plans I have for you,',
+			'plans for peace, not disaster, to give you a future and hope.',
+		],
+		son: [],
+		spirit: [],
 	},
 	{
 		ref: 'John 3:16',
-		text: 'For our Father so loved the world, that he gave his one and only Son, that whoever believes in him should not perish but have eternal life.',
-		hl: ['our Father'],
+		text: 'For our Father so loved the world that he gave his one and only Son, that whoever believes in him will not perish but have eternal life.',
+		father: [],
+		son: [
+			'For our Father so loved the world that he gave his one and only Son, that whoever believes in him will not perish but have eternal life.',
+		],
+		spirit: [],
 	},
 	{
-		ref: '2 Corinthians 6:18',
-		text: 'I will be a Father to you and you will be sons and daughters to me, says our Father, the Almighty.',
-		hl: ['a Father', 'sons and daughters', 'our Father'],
+		ref: 'Matthew 11:28',
+		text: 'Come to me, all you who are weary and burdened, and I will give you rest.',
+		father: [],
+		son: ['Come to me, all you who are weary and burdened, and I will give you rest.'],
+		spirit: [],
+	},
+	{
+		ref: 'Acts 10:15',
+		text: 'The voice came to him again, a second time: "What I have made clean, don\'t call common."',
+		father: [],
+		son: [],
+		spirit: ['"What I have made clean, don\'t call common."'],
 	},
 ];
-// Wrap the Father-identity phrases in a light-pink highlighter mark.
-function markFather(text: string, phrases: string[]): string {
-	let out = text;
-	for (const p of phrases) {
-		out = out.replace(
-			p,
-			`<mark style="background:#ffd6e4;color:inherit;padding:0.02em 0.2em;border-radius:3px;">${p}</mark>`,
-		);
+
+// Wrap each voice's spans in its own colour. Longest-first so a span that contains
+// another cannot be half-replaced.
+function markVoices(v: {
+	text: string;
+	father: string[];
+	son: string[];
+	spirit: string[];
+}): string {
+	let out = v.text;
+	const spans: { s: string; c: string }[] = [
+		...v.father.map((s) => ({ s, c: VOICE.father })),
+		...v.son.map((s) => ({ s, c: VOICE.son })),
+		...v.spirit.map((s) => ({ s, c: VOICE.spirit })),
+	].sort((a, b) => b.s.length - a.s.length);
+	for (const { s, c } of spans) {
+		if (!s || !out.includes(s)) continue;
+		out = out.replace(s, `<span style="color:${c};font-weight:600;">${s}</span>`);
 	}
 	return out;
 }
@@ -235,95 +349,62 @@ function markFather(text: string, phrases: string[]): string {
 			<p class="max-w-2xl mx-auto text-center" style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.55;">A portion of every copy sold helps fund our Bible for the Whole World campaign. <a href={CAMPAIGN_URL} style="color: var(--color-brand); text-decoration: underline; font-weight: 600;">Learn More</a></p>
 		</section>
 
-		<!-- ═══════════════ THREE EDITIONS ═══════════════ -->
+		<!-- ═══════════════ THE DVC LINE — 16 EDITIONS ═══════════════ -->
 		<Section variant="light">
-			<div class="text-center mb-10">
-				<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Single Copies from Amazon</p>
-				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Regular Print — Whole Bible: 3 colors, 2 bindings</h2>
-				<p style="margin-top: 0.75rem;"><a href={SAMPLE_REGULAR} target="_blank" rel="noopener" style="font-family: var(--font-sans); color: var(--color-brand); text-decoration: underline; font-weight: 600; font-size: 0.9rem;">See a Regular Print sample (PDF) →</a></p>
+			<div class="text-center mb-3">
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2.1rem; font-weight: 600; margin: 0;">FHB + DVC Bibles</h2>
 			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-10 max-w-4xl mx-auto">
-				{editions.map((e) => (
-					<div class="flex flex-col items-center text-center rounded-2xl p-6" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
-						<img src={e.img} alt={`Father's Heart Bible — ${e.color} edition`} width="700" height="1170" loading="lazy" decoding="async" class="block" style="width: 180px; height: auto; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.18));" />
-						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 1.25rem 0 1rem;">{e.color} Edition</h3>
-						<div class="flex flex-col gap-2 w-full" style="max-width: 13rem;">
-							<a
-								href={`https://www.amazon.com/dp/${e.asin}`}
-								target="_blank"
-								rel="noopener"
+			<!-- The three voices, framed exactly as they are on every cover. -->
+			<div class="flex items-center justify-center gap-2 sm:gap-3 mb-4" aria-label="Father, Son and Spirit in Divine Voice Color">
+				<span style={`font-family: var(--font-sans); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.07em; color: ${VOICE.father}; background: #fff; border: 1.5px solid var(--color-hairline); padding: 0.35rem 0.8rem; border-radius: 4px;`}>FATHER</span>
+				<span style={`font-family: var(--font-sans); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.07em; color: ${VOICE.son}; background: #fff; border: 1.5px solid var(--color-hairline); padding: 0.35rem 0.8rem; border-radius: 4px;`}>SON</span>
+				<span style={`font-family: var(--font-sans); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.07em; color: ${VOICE.spirit}; background: #fff; border: 1.5px solid var(--color-hairline); padding: 0.35rem 0.8rem; border-radius: 4px;`}>SPIRIT</span>
+			</div>
+			<p class="text-center mb-10" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em;">{DVC_TAIL}</p>
+
+			<div class="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7 max-w-6xl mx-auto">
+				{dvcEditions.map((e) => (
+					<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+						<img
+							src={`https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-600.webp`}
+							srcset={`https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-600.webp 600w, https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-1200.webp 1200w`}
+							sizes="(min-width: 1024px) 260px, 44vw"
+							alt={`Father's Heart Bible — ${e.title}, Divine Voice Color`}
+							width="600" height="764" loading="lazy" decoding="async"
+							class="block w-full h-auto" style="max-width: 200px;"
+						/>
+						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{e.title}</h3>
+						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">{e.sub}</p>
+						<div class="flex flex-col gap-2 w-full mt-auto">
+							<span
+								aria-disabled="true"
 								class="inline-flex items-center justify-center rounded-full font-semibold"
-								style="font-family: var(--font-sans); background: #ffe9f0; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.7rem 1.4rem; text-decoration: none; font-size: 0.9rem;"
-							>Paperback · {RETAIL} →</a>
-							<a
-								href={`https://www.amazon.com/dp/${e.hbAsin}`}
-								target="_blank"
-								rel="noopener"
+								style="font-family: var(--font-sans); background: #f2efec; color: #9a938c; border: 1.5px solid var(--color-hairline); padding: 0.55rem 1rem; font-size: 0.8rem; cursor: default;"
+							>Amazon — coming soon</span>
+							<button
+								type="button"
+								data-add={e.slug}
 								class="inline-flex items-center justify-center rounded-full font-semibold"
-								style="font-family: var(--font-sans); background: #fff; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.7rem 1.4rem; text-decoration: none; font-size: 0.9rem;"
-							>Hardback · {RETAIL_HB} →</a>
+								style="font-family: var(--font-sans); background: #ffe9f0; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.55rem 1rem; font-size: 0.8rem; cursor: pointer;"
+							>Direct from SMP · ${e.price.toFixed(2)}</button>
 						</div>
 					</div>
 				))}
 			</div>
-
-			<!-- Large Print -->
-			<div class="text-center mt-14 mb-8">
-				<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Also in Large Print from Amazon</p>
-				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Large Print — New Testament+*: 3 colors, 2 bindings</h3>
-				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.55; margin: 0.75rem auto 0; max-width: 34rem;">*Genesis, Psalms, Proverbs, and the complete New Testament in full, plus a Father-focused survey of every other Old Testament book.</p>
-				<p style="margin-top: 0.75rem;"><a href={SAMPLE_LP} target="_blank" rel="noopener" style="font-family: var(--font-sans); color: var(--color-brand); text-decoration: underline; font-weight: 600; font-size: 0.9rem;">See a Large Print sample (PDF) →</a></p>
-			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-10 max-w-4xl mx-auto">
-				{lpEditions.map((e) => (
-					<div class="flex flex-col items-center text-center rounded-2xl p-6" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
-						<img src={e.img} alt={`Father's Heart Bible Large Print — ${e.color} edition`} width="700" height="1170" loading="lazy" decoding="async" class="block" style="width: 180px; height: auto; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.18));" />
-						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 1.25rem 0 1rem;">{e.color} Edition</h3>
-						<div class="flex flex-col gap-2 w-full" style="max-width: 13rem;">
-							<a
-								href={`https://www.amazon.com/dp/${e.asin}`}
-								target="_blank"
-								rel="noopener"
-								class="inline-flex items-center justify-center rounded-full font-semibold"
-								style="font-family: var(--font-sans); background: #ffe9f0; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.7rem 1.4rem; text-decoration: none; font-size: 0.9rem;"
-							>Paperback · {RETAIL} →</a>
-							<a
-								href={`https://www.amazon.com/dp/${e.hbAsin}`}
-								target="_blank"
-								rel="noopener"
-								class="inline-flex items-center justify-center rounded-full font-semibold"
-								style="font-family: var(--font-sans); background: #fff; color: var(--color-brand); border: 1.5px solid var(--color-brand); padding: 0.7rem 1.4rem; text-decoration: none; font-size: 0.9rem;"
-							>Hardback · {RETAIL_HB} →</a>
-						</div>
-					</div>
-				))}
-			</div>
-			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin-top: 2rem;">Large Print paperbacks and hardbacks ship from Amazon — and are available in bulk below.</p>
-
-			<!-- Available everywhere books are sold — retailer strip -->
-			<div class="text-center" style="margin-top: 2.5rem; padding-top: 1.75rem; border-top: 1px solid var(--color-hairline);">
-				<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin: 0 0 1.1rem;">Available everywhere books are sold</p>
-				<div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
-					<a href={"https://www.amazon.com/s?k=Father%27s+Heart+Bible&i=stripbooks&crid=3UMQWME49FJDP&sprefix=father%27s+heart+bible%2Cstripbooks%2C108&ref=nb_sb_noss_1"} target="_blank" rel="noopener" aria-label="Shop the Father's Heart Bible on Amazon" style="display: inline-flex;">
-						<img src="https://assets.spiritmediapublishing.com/FHB/print/logo-amazon.png" alt="Amazon" width="67" height="42" loading="lazy" decoding="async" style="height: 42px; width: auto;" />
-					</a>
-					<a href={"https://www.barnesandnoble.com/search?q=Father%27s%20Heart%20Bible&attributes.mfield_bnb__seoKeywords=Fathers-Heart-Bible%2FSpirit-Media-Publishing&filtersPreset=formatsEditions"} target="_blank" rel="noopener" aria-label="Shop the Father's Heart Bible at Barnes & Noble" style="display: inline-flex;">
-						<img src="https://assets.spiritmediapublishing.com/FHB/print/logo-barnes-noble.png" alt="Barnes & Noble Booksellers" width="120" height="30" loading="lazy" decoding="async" style="height: 30px; width: auto;" />
-					</a>
-				</div>
-			</div>
+			<p class="text-center mt-6" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600;">Free shipping — a $15 value.</p>
 		</Section>
 
-		<!-- ═══════════════ SCRIPTURE CARDS (Hear the Father — own soft-brown section) ═══════════════ -->
+		<!-- ═══════════════ HIS VOICE — DVC ON THE PAGE ═══════════════ -->
 		<Section variant="warm">
 			<div class="text-center mb-8">
 				<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Hear the Father</p>
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">His voice, from the first page to the last</h2>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.6; margin: 0.9rem auto 0; max-width: 42rem;">Exactly as these verses appear in print — our Father's words in blue, the Son's in red, the Spirit's in purple.</p>
 			</div>
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-				{verses.map((v) => (
+				{dvcVerses.map((v) => (
 					<div class="rounded-2xl p-7 flex flex-col" style="background: #fff; border: 1px solid var(--color-hairline);">
-						<p style="font-family: var(--font-serif); font-style: italic; font-size: 1.08rem; line-height: 1.65; color: var(--color-ink); margin: 0; flex: 1;" set:html={`“${markFather(v.text, v.hl)}”`}></p>
+						<p style="font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.7; color: var(--color-ink); margin: 0; flex: 1;" set:html={markVoices(v)}></p>
 						<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.03em; color: var(--color-brand); margin: 1.25rem 0 0;">{v.ref} · Father's Heart Bible™</p>
 					</div>
 				))}
@@ -336,42 +417,34 @@ function markFather(text: string, phrases: string[]): string {
 				<div class="text-center mb-8">
 					<p style="font-family: var(--font-sans); color: var(--color-brand); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Bulk Order Discounts</p>
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Order in Bulk and Save</h2>
-					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 44rem;">Bring the Father's heart to your whole business, congregation, or community.<br />Mix and match editions and bindings — your combined total sets the discount.</p>
-					<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; margin: 0.75rem auto 0; max-width: 32rem;">Bulk orders are direct through Spirit Media Publishing — not Amazon.</p>
+					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 44rem;">Bring the Father's heart to your whole business, congregation, or community.<br />Mix and match any of the sixteen editions — your combined total sets the discount.</p>
+					<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; margin: 0.75rem auto 0; max-width: 32rem;">Order direct from Spirit Media Publishing — any quantity, free shipping.</p>
 				</div>
 
 				<div class="rounded-2xl p-6 md:p-8" style="background: #fff; border: 1px solid var(--color-hairline);" data-bulk>
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Volume discounts — the more you order, the more you save</p>
-					<div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
+					<div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-6">
 						{tiers.map((t) => (
 							<div class="tier-card rounded-xl text-center" data-tier-min={t.qty} style="padding: 0.7rem 0.4rem; border: 1.5px solid #ffd0e0; background: #ffe9f0;">
 								<span style="display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.02em; color: #a0004c;">Save {t.pct}%</span>
-								<span style="display: block; font-size: 1.15rem; font-weight: 700; color: var(--color-ink); margin-top: 0.1rem; line-height: 1.1;">{t.qty.toLocaleString()}+</span>
-								<span style="display: block; font-size: 0.7rem; color: var(--color-muted); margin-top: 0.2rem; white-space: nowrap;">PB <s style="opacity: 0.6;">{RETAIL}</s> <span style="color: var(--color-ink); font-weight: 700;">${t.unit.toFixed(2)}</span></span>
-								<span style="display: block; font-size: 0.7rem; color: var(--color-muted); white-space: nowrap;">HB <s style="opacity: 0.6;">{RETAIL_HB}</s> <span style="color: var(--color-ink); font-weight: 700;">${t.unitHb.toFixed(2)}</span></span>
+								<span style="display: block; font-size: 1.15rem; font-weight: 700; color: var(--color-ink); margin-top: 0.1rem; line-height: 1.1;">{t.qty}+</span>
+								<span style="display: block; font-size: 0.7rem; color: var(--color-muted); margin-top: 0.2rem; white-space: nowrap;"><s style="opacity: 0.6;">{RETAIL}</s> <span style="color: var(--color-ink); font-weight: 700;">${t.unit.toFixed(2)}</span></span>
 							</div>
 						))}
 					</div>
 
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Choose how many of each edition</p>
-					<div style="display: flex; flex-direction: column; gap: 0.65rem;">
-						<p style="font-family: var(--font-sans); font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-brand); margin: 0.2rem 0 -0.1rem;">Compact</p>
-						{[...editions.map((e) => ({ ...e, bind: 'pb' })), ...editions.map((e) => ({ ...e, bind: 'hb' })),
-						  { sub: 'Large Print' },
-						  ...lpEditions.map((e) => ({ ...e, bind: 'pb' })), ...lpEditions.map((e) => ({ ...e, bind: 'hb' }))].map((e) => (
-							e.sub ? (
-								<p style="font-family: var(--font-sans); font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-brand); margin: 0.6rem 0 -0.1rem;">{e.sub}</p>
-							) : (
+					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
+						{dvcEditions.map((e) => (
 							<div class="flex items-center gap-3">
-								<img src={e.img} alt="" width="700" height="1170" loading="lazy" decoding="async" style="width: 68px; height: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.18));" />
-								<span style="flex: 1; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">{e.slug.startsWith('lp_') ? 'Large Print' : 'English'} {e.bind === 'hb' ? 'Hardback' : 'Paperback'} ({e.color} Edition)</span>
+								<img src={`https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-600.webp`} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 46px; height: auto;" />
+								<span style="flex: 1; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink); font-size: 0.92rem;">{e.title} <span style="color: var(--color-muted); font-weight: 400;">· ${e.price.toFixed(2)}</span></span>
 								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
-									<button type="button" class="qty-step" data-color={e.bind === 'hb' ? `${e.slug}_hb` : e.slug} data-dir="-1" aria-label={`Fewer ${e.color} ${e.bind}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
-									<input type="number" class="qty-in" data-color={e.bind === 'hb' ? `${e.slug}_hb` : e.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.color} ${e.bind} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
-									<button type="button" class="qty-step" data-color={e.bind === 'hb' ? `${e.slug}_hb` : e.slug} data-dir="1" aria-label={`More ${e.color} ${e.bind}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
+									<button type="button" class="qty-step" data-slug={e.slug} data-dir="-1" aria-label={`Fewer ${e.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
+									<input type="number" class="qty-in" data-slug={e.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.title} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
+									<button type="button" class="qty-step" data-slug={e.slug} data-dir="1" aria-label={`More ${e.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
 								</div>
 							</div>
-							)
 						))}
 					</div>
 
@@ -384,7 +457,7 @@ function markFather(text: string, phrases: string[]): string {
 					</div>
 					<p data-bulk-msg style="font-family: var(--font-sans); font-size: 0.85rem; color: var(--color-muted); margin: 0.75rem 0 0; display: none;"></p>
 				</div>
-				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.8rem; margin-top: 1rem;">Fulfilled direct by Spirit Media Publishing · 25-copy minimum · free shipping · sales tax calculated at checkout · mix editions and bindings freely. Need more than 1,000? <a href="mailto:hello@spiritmediapublishing.com?subject=FHB%20bulk%20order%20(1000%2B)" style="color: var(--color-brand); text-decoration: underline;">Contact us</a>.</p>
+				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.8rem; margin-top: 1rem;">Fulfilled direct by Spirit Media Publishing · order any quantity · free shipping · sales tax calculated at checkout · mix editions freely. Need 500 or more? <a href="mailto:hello@spiritmediapublishing.com?subject=FHB%20bulk%20order%20(500%2B)" style="color: var(--color-brand); text-decoration: underline;">Contact us</a>.</p>
 			</div>
 		</Section>
 
@@ -473,93 +546,90 @@ function markFather(text: string, phrases: string[]): string {
 	(() => {
 		const root = document.querySelector('[data-bulk]');
 		if (!root) return;
-		const MIN = 25;
-		// Combined total → tier. One consistent % for both bindings, each off its
-		// own retail (unit = paperback, unitHb = hardback). Mirrors print-checkout.ts.
-		const RETAIL_PB = 39.99;
-		const RETAIL_HB = 44.99;
+		// Prices and tiers are mirrored here for live totals only — functions/dvc-checkout.ts
+		// is authoritative, so a tampered browser cannot change what Stripe charges.
+		const PRICE = {
+			chosen: 99.99, couples: 99.99, dads: 99.99, 'first-responders': 99.99, mens: 99.99,
+			moms: 99.99, pastors: 99.99, peace: 99.99, presidents: 99.99, recovery: 99.99,
+			seekers: 99.99, seventeen: 99.99, soldiers: 99.99, teen: 99.99,
+			'worship-leaders': 99.99, journaling: 124.99,
+		};
 		const TIERS = [
-			{ min: 1000, pct: 40, unit: 23.99, unitHb: 26.99 },
-			{ min: 500, pct: 35, unit: 25.99, unitHb: 29.24 },
-			{ min: 250, pct: 30, unit: 27.99, unitHb: 31.49 },
-			{ min: 100, pct: 25, unit: 29.99, unitHb: 33.74 },
-			{ min: 50, pct: 20, unit: 31.99, unitHb: 35.99 },
-			{ min: 25, pct: 15, unit: 33.99, unitHb: 38.24 },
+			{ min: 250, pct: 30 }, { min: 100, pct: 25 }, { min: 50, pct: 20 },
+			{ min: 25, pct: 15 }, { min: 10, pct: 10 }, { min: 1, pct: 0 },
 		];
 		const tierFor = (t) => TIERS.find((x) => t >= x.min) || null;
 		const fmt = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-		const counts = {
-			plum: 0, charcoal: 0, white: 0, plum_hb: 0, charcoal_hb: 0, white_hb: 0,
-			lp_plum: 0, lp_charcoal: 0, lp_white: 0, lp_plum_hb: 0, lp_charcoal_hb: 0, lp_white_hb: 0,
-		};
-		const PB_KEYS = ['plum', 'charcoal', 'white', 'lp_plum', 'lp_charcoal', 'lp_white'];
-		const HB_KEYS = ['plum_hb', 'charcoal_hb', 'white_hb', 'lp_plum_hb', 'lp_charcoal_hb', 'lp_white_hb'];
+		const counts = {};
+		Object.keys(PRICE).forEach((k) => (counts[k] = 0));
+
 		const out = root.querySelector('[data-total-out]');
 		const countEl = root.querySelector('[data-count]');
 		const saveEl = root.querySelector('[data-save]');
 		const msg = root.querySelector('[data-bulk-msg]');
-		const btn = root.querySelector('[data-checkout]');
-		const cards = [...root.querySelectorAll('.tier-card')];
-		const highlight = (min) => cards.forEach((c) => {
-			const on = min !== null && Number(c.dataset.tierMin) === min;
-			c.style.borderColor = on ? 'var(--color-brand)' : '#ffd0e0';
-			c.style.background = on ? '#ffd0e0' : '#ffe9f0';
-		});
 
-		function recompute() {
-			const pbTotal = PB_KEYS.reduce((s, k) => s + counts[k], 0);
-			const hbTotal = HB_KEYS.reduce((s, k) => s + counts[k], 0);
-			const total = pbTotal + hbTotal;
+		function render() {
+			const total = Object.values(counts).reduce((a, b) => a + b, 0);
 			const tier = tierFor(total);
-			highlight(tier ? tier.min : null);
-			if (countEl) countEl.textContent = String(total);
-			if (tier) {
-				const saved = pbTotal * (RETAIL_PB - tier.unit) + hbTotal * (RETAIL_HB - tier.unitHb);
-				if (saveEl) saveEl.textContent = 'Save ' + tier.pct + '% (' + fmt(saved) + ')';
-				if (out) out.textContent = fmt(pbTotal * tier.unit + hbTotal * tier.unitHb);
-				if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
-				if (msg) msg.style.display = 'none';
-			} else {
-				if (saveEl) saveEl.textContent = '—';
-				if (out) out.textContent = '$0.00';
-				if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; }
-				if (msg) {
-					msg.style.display = 'block';
-					msg.textContent = total === 0
-						? 'Add copies above to begin (25-copy minimum for bulk pricing).'
-						: 'Add ' + (MIN - total) + ' more to reach the 25-copy minimum.';
-				}
-			}
+			const pct = tier ? tier.pct : 0;
+			let sum = 0;
+			for (const [k, n] of Object.entries(counts)) sum += n * PRICE[k] * (1 - pct / 100);
+			countEl.textContent = total;
+			saveEl.textContent = pct ? `save ${pct}%` : 'full price';
+			out.textContent = fmt(sum);
+			root.querySelectorAll('.tier-card').forEach((c) => {
+				const on = tier && Number(c.dataset.tierMin) === tier.min;
+				c.style.outline = on ? '2px solid var(--color-brand)' : 'none';
+				c.style.outlineOffset = '2px';
+			});
 		}
+		function bump(slug, d) {
+			counts[slug] = Math.max(0, (counts[slug] || 0) + d);
+			const input = root.querySelector(`.qty-in[data-slug="${slug}"]`);
+			if (input) input.value = counts[slug];
+			render();
+		}
+		root.querySelectorAll('.qty-step').forEach((b) =>
+			b.addEventListener('click', () => bump(b.dataset.slug, Number(b.dataset.dir))));
+		root.querySelectorAll('.qty-in').forEach((el) =>
+			el.addEventListener('input', () => {
+				counts[el.dataset.slug] = Math.max(0, Math.floor(Number(el.value) || 0));
+				render();
+			}));
 
-		const inputs = [...root.querySelectorAll('.qty-in')];
-		const inputFor = (c) => inputs.find((i) => i.dataset.color === c);
-		inputs.forEach((inp) => inp.addEventListener('input', () => {
-			let v = parseInt(inp.value, 10); if (!Number.isFinite(v) || v < 0) v = 0;
-			counts[inp.dataset.color] = v; recompute();
-		}));
-		root.querySelectorAll('.qty-step').forEach((b) => b.addEventListener('click', () => {
-			const c = b.dataset.color; const dir = Number(b.dataset.dir);
-			counts[c] = Math.max(0, counts[c] + dir);
-			const inp = inputFor(c); if (inp) inp.value = String(counts[c]);
-			recompute();
-		}));
-		recompute();
+		// "Direct from SMP" on a card adds one and scrolls to the order builder, so a single
+		// copy and a bulk order go through the same checkout (Kevin 2026-08-23).
+		document.querySelectorAll('[data-add]').forEach((b) =>
+			b.addEventListener('click', () => {
+				bump(b.dataset.add, 1);
+				root.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}));
 
-		btn?.addEventListener('click', async () => {
-			if (btn.disabled) return;
-			const label = btn.textContent;
-			btn.disabled = true; btn.textContent = 'Starting checkout…';
+		root.querySelector('[data-checkout]').addEventListener('click', async (ev) => {
+			const btn = ev.currentTarget;
+			const total = Object.values(counts).reduce((a, b) => a + b, 0);
+			msg.style.display = 'block';
+			if (total < 1) { msg.textContent = 'Choose at least one Bible to continue.'; return; }
+			msg.textContent = 'Opening secure checkout…';
+			btn.disabled = true;
 			try {
-				const r = await fetch('/print-checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ counts }) });
+				const r = await fetch('/dvc-checkout', {
+					method: 'POST',
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify({ counts }),
+				});
 				const d = await r.json();
 				if (d.url) { window.location.href = d.url; return; }
-				if (msg) { msg.style.display = 'block'; msg.textContent = d.disabled ? 'Bulk checkout is opening soon — check back shortly.' : (d.error === 'below_minimum' ? 'A 25-copy minimum is required for bulk pricing.' : 'Sorry, something went wrong starting checkout. Please try again.'); }
+				msg.textContent = d.disabled
+					? 'Direct ordering opens shortly — please check back.'
+					: 'Sorry, something went wrong. Please try again.';
 			} catch {
-				if (msg) { msg.style.display = 'block'; msg.textContent = 'Network error — please try again.'; }
+				msg.textContent = 'Sorry, something went wrong. Please try again.';
 			}
-			btn.disabled = false; btn.textContent = label;
+			btn.disabled = false;
 		});
+
+		render();
 	})();
 </script>
 
