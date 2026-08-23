@@ -1,4 +1,5 @@
 ---
+import LookInside from '../../components/LookInside.astro';
 import Section from '../../components/Section.astro';
 // /bibles/teen-bible — PRODUCT page for one Divine Voice Color edition.
 //
@@ -414,11 +415,12 @@ const faqSchema = {
 		<Section variant="light">
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center max-w-5xl mx-auto">
 				<!-- Hover swaps to the back cover, the way a listing lets you turn the book over. -->
-				<div class="flex justify-center">
+				<div class="flex flex-col items-center">
 					<div class="dvc-flip" style="position: relative; max-width: 340px; width: 100%;">
 						<img src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} alt={`${ed.name} front cover — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto dvc-front" />
 						<img src={`${ASSETS}/dvc-${ed.slug}-back-1200.webp`} alt={`${ed.name} back cover`} width="1200" height="1528" loading="lazy" decoding="async" class="block w-full h-auto dvc-back" style="position: absolute; inset: 0; opacity: 0; transition: opacity 0.25s ease;" />
 					</div>
+					<LookInside slug={ed.slug} title={ed.name} />
 				</div>
 				<div>
 					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Divine Voice Color</p>
@@ -449,10 +451,43 @@ const faqSchema = {
 		<!-- In brief, and the searches this edition is for -->
 		<Section variant="light">
 			<div class="max-w-3xl mx-auto">
-				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">In brief</h2>
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">What makes this a Bible for teenagers</h2>
 				{listing.short350.map((para) => (
 					<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colorWords(para)}></p>
 				))}
+			</div>
+		</Section>
+		<!-- What a teenager actually gets that no other edition has. "From the front matter"
+		     named a location in the book; this names the value. (Kevin 2026-08-23) -->
+		<Section variant="soft">
+			<div class="max-w-3xl mx-auto">
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 0.4rem;">Identity, intimacy, and inheritance for teens</h2>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.98rem; line-height: 1.65; margin: 0 0 2rem;">Every copy opens with these pages, written for a teenager, before Genesis 1:1.</p>
+
+				<div class="grid gap-x-8 gap-y-4" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 0 0 2.6rem;">
+					{frontMatterParts.map(([name, what]) => (
+						<div>
+							<h3 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.86rem; font-weight: 700; letter-spacing: 0.02em; margin: 0 0 0.2rem;">{name}</h3>
+							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.92rem; line-height: 1.55; margin: 0;">{what}</p>
+						</div>
+					))}
+				</div>
+
+				{pillars.map((pil) => (
+					<div style="margin: 0 0 2.2rem;">
+						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 0 0 0.15rem;">{pil.title}</h3>
+						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.97rem; font-style: italic; margin: 0 0 0.9rem;">{pil.line}</p>
+						<dl style="margin: 0;">
+							{pil.verses.map(([ref, text]) => (
+								<div style="display: flex; gap: 0.75rem; align-items: baseline; padding: 0.4rem 0; border-top: 1px solid var(--color-hairline);">
+									<dt style="font-family: var(--font-sans); font-size: 0.8rem; font-weight: 700; color: #3f3f46; white-space: nowrap; min-width: 7.5rem;">{ref}</dt>
+									<dd style="font-family: var(--font-body); font-size: 0.97rem; line-height: 1.6; color: var(--color-ink); margin: 0;">{text}</dd>
+								</div>
+							))}
+						</dl>
+					</div>
+				))}
+
 			</div>
 		</Section>
 		<!-- What's inside + product details, laid out as a retail listing rather than a list -->
@@ -538,37 +573,11 @@ const faqSchema = {
 				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.98rem; line-height: 1.65; margin: 0;">{listing.publisher}</p>
 			</div>
 		</Section>
-		<!-- The front matter, on the page. Kevin 2026-08-23. -->
+
+		<!-- The preface itself — the translation's own account of why it exists. -->
 		<Section variant="light">
 			<div class="max-w-3xl mx-auto">
-				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 0.4rem;">From the front matter</h2>
-				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.98rem; line-height: 1.65; margin: 0 0 2rem;">Every copy opens with these pages, before Genesis 1:1.</p>
-
-				<div class="grid gap-x-8 gap-y-4" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 0 0 2.6rem;">
-					{frontMatterParts.map(([name, what]) => (
-						<div>
-							<h3 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.86rem; font-weight: 700; letter-spacing: 0.02em; margin: 0 0 0.2rem;">{name}</h3>
-							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.92rem; line-height: 1.55; margin: 0;">{what}</p>
-						</div>
-					))}
-				</div>
-
-				{pillars.map((pil) => (
-					<div style="margin: 0 0 2.2rem;">
-						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 0 0 0.15rem;">{pil.title}</h3>
-						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.97rem; font-style: italic; margin: 0 0 0.9rem;">{pil.line}</p>
-						<dl style="margin: 0;">
-							{pil.verses.map(([ref, text]) => (
-								<div style="display: flex; gap: 0.75rem; align-items: baseline; padding: 0.4rem 0; border-top: 1px solid var(--color-hairline);">
-									<dt style="font-family: var(--font-sans); font-size: 0.8rem; font-weight: 700; color: #3f3f46; white-space: nowrap; min-width: 7.5rem;">{ref}</dt>
-									<dd style="font-family: var(--font-body); font-size: 0.97rem; line-height: 1.6; color: var(--color-ink); margin: 0;">{text}</dd>
-								</div>
-							))}
-						</dl>
-					</div>
-				))}
-
-				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 2.6rem 0 1.2rem;">From the preface</h3>
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1.4rem;">Why this translation exists</h2>
 				{preface.map((sec) => (
 					<div style="margin: 0 0 1.7rem;">
 						<h4 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; font-weight: 700; margin: 0 0 0.5rem;">{sec.h}</h4>
@@ -577,6 +586,8 @@ const faqSchema = {
 						))}
 					</div>
 				))}
+			</div>
+		</Section>
 				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.1rem; font-weight: 600; margin: 2.6rem 0 0.7rem;">Also known as</h3>
 				<div class="flex flex-wrap gap-2">
 					{listing.keywords.map((k) => (
