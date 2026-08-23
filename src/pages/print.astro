@@ -256,53 +256,80 @@ const breadcrumbSchema = {
 // the printed book and /read use \u2014 fatherWords / sonWords / spiritWords. Nothing is
 // retyped here, so a verse on this page cannot disagree with the Bible it advertises.
 const VOICE = { father: '#3563ae', son: '#f04933', spirit: '#91278f' };
+// One column per voice, each headed by the same coloured block used at the top of the
+// page \u2014 the demo repeated where the proof is. Two passages each, in that voice's colour,
+// straight from the canon's own spans.
 const dvcVerses = [
 	{
-		ref: 'Genesis 1:1',
-		text: 'In the beginning, our Heavenly Father created the heavens and the earth.',
-		father: [],
-		son: [],
-		spirit: [],
-	},
-	{
-		ref: 'Genesis 1:3',
-		text: 'Then our Father said, "Let there be light," and there was light.',
-		father: ['"Let there be light,"'],
-		son: [],
-		spirit: [],
-	},
-	{
-		ref: 'Jeremiah 29:11',
-		text: 'For I know the plans I have for you, declares your Father — plans for peace, not disaster, to give you a future and hope.',
-		father: [
-			'For I know the plans I have for you,',
-			'plans for peace, not disaster, to give you a future and hope.',
+		key: 'father',
+		label: 'FATHER',
+		verses: [
+			{
+				ref: 'Genesis 1:3',
+				href: '/read/genesis/1#v3',
+				text: 'Then our Father said, "Let there be light," and there was light.',
+				father: ['"Let there be light,"'],
+				son: [],
+				spirit: [],
+			},
+			{
+				ref: 'Jeremiah 29:11',
+				href: '/read/jeremiah/29#v11',
+				text: 'For I know the plans I have for you, declares your Father — plans for peace, not disaster, to give you a future and hope.',
+				father: [
+					'For I know the plans I have for you,',
+					'plans for peace, not disaster, to give you a future and hope.',
+				],
+				son: [],
+				spirit: [],
+			},
 		],
-		son: [],
-		spirit: [],
 	},
 	{
-		ref: 'John 3:16',
-		text: 'For our Father so loved the world that he gave his one and only Son, that whoever believes in him will not perish but have eternal life.',
-		father: [],
-		son: [
-			'For our Father so loved the world that he gave his one and only Son, that whoever believes in him will not perish but have eternal life.',
+		key: 'son',
+		label: 'SON',
+		verses: [
+			{
+				ref: 'Matthew 11:28',
+				href: '/read/matthew/11#v28',
+				text: 'Come to me, all you who are weary and burdened, and I will give you rest.',
+				father: [],
+				son: ['Come to me, all you who are weary and burdened, and I will give you rest.'],
+				spirit: [],
+			},
+			{
+				ref: 'John 14:6',
+				href: '/read/john/14#v6',
+				text: 'Jesus told him, "I am the way, and the truth, and the life. No one comes to the Father except through me."',
+				father: [],
+				son: [
+					'"I am the way, and the truth, and the life. No one comes to the Father except through me."',
+				],
+				spirit: [],
+			},
 		],
-		spirit: [],
 	},
 	{
-		ref: 'Matthew 11:28',
-		text: 'Come to me, all you who are weary and burdened, and I will give you rest.',
-		father: [],
-		son: ['Come to me, all you who are weary and burdened, and I will give you rest.'],
-		spirit: [],
-	},
-	{
-		ref: 'Acts 10:15',
-		text: 'The voice came to him again, a second time: "What I have made clean, don\'t call common."',
-		father: [],
-		son: [],
-		spirit: ['"What I have made clean, don\'t call common."'],
+		key: 'spirit',
+		label: 'SPIRIT',
+		verses: [
+			{
+				ref: 'Acts 8:29',
+				href: '/read/acts/8#v29',
+				text: 'And the Holy Spirit said to Philip, "Go over and catch up with that chariot."',
+				father: [],
+				son: [],
+				spirit: ['"Go over and catch up with that chariot."'],
+			},
+			{
+				ref: 'Acts 10:15',
+				href: '/read/acts/10#v15',
+				text: 'The voice came to him again, a second time: "What I have made clean, don\'t call common."',
+				father: [],
+				son: [],
+				spirit: ['"What I have made clean, don\'t call common."'],
+			},
+		],
 	},
 ];
 
@@ -390,7 +417,7 @@ function markVoices(v: {
 					</div>
 				))}
 			</div>
-			<p class="text-center mt-6" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600;">Free shipping — a $15 value.</p>
+			<p class="text-center mt-6" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600;">Direct from SMP includes free shipping — a $15 value.</p>
 		</Section>
 
 		<!-- ═══════════════ HIS VOICE — DVC ON THE PAGE ═══════════════ -->
@@ -398,16 +425,25 @@ function markVoices(v: {
 			<div class="text-center mb-8">
 				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Hear the Father</p>
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">His voice, from the first page to the last</h2>
-				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.6; margin: 0.9rem auto 0; max-width: 42rem;">Exactly as these verses appear in print — our Father's words in blue, the Son's in red, the Spirit's in purple.</p>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.6; margin: 0.9rem auto 0; max-width: 42rem;">Exactly as these passages appear in print.</p>
 			</div>
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-				{dvcVerses.map((v) => (
-					<div class="rounded-2xl p-7 flex flex-col" style="background: #fff; border: 1px solid var(--color-hairline);">
-						<p style="font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.7; color: var(--color-ink); margin: 0; flex: 1;" set:html={markVoices(v)}></p>
-						<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.03em; color: #71717a; margin: 1.25rem 0 0;">{v.ref} · Father's Heart Bible™</p>
+				{dvcVerses.map((g) => (
+					<div class="flex flex-col gap-4">
+						<!-- the same block as the top of the page, over the column it proves -->
+						<div class="text-center">
+							<span style={`display: inline-block; font-family: var(--font-sans); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.06em; color: ${VOICE[g.key]}; background: #fff; border: 2px solid ${VOICE[g.key]}; padding: 0.5rem 1.15rem; border-radius: 6px; line-height: 1;`}>{g.label}</span>
+						</div>
+						{g.verses.map((v) => (
+							<div class="rounded-2xl p-6 flex flex-col" style="background: #fff; border: 1px solid var(--color-hairline);">
+								<p style="font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.7; color: var(--color-ink); margin: 0; flex: 1;" set:html={markVoices(v)}></p>
+								<a href={v.href} style="font-family: var(--font-sans); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.03em; color: #71717a; margin: 1rem 0 0; text-decoration: underline;">{v.ref} (FHB)</a>
+							</div>
+						))}
 					</div>
 				))}
 			</div>
+			<p class="text-center mt-8" style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.9rem;">Every verse from the Father’s Heart Bible™ — read the whole Bible free at <a href={READ_URL} style="color: #3f3f46; text-decoration: underline;">fathersheartbible.com/read</a>.</p>
 		</Section>
 
 		<!-- ═══════════════ BULK ORDERS ═══════════════ -->
@@ -436,8 +472,8 @@ function markVoices(v: {
 					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
 						{dvcEditions.map((e) => (
 							<div class="flex items-center gap-3">
-								<img src={`https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-600.webp`} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 74px; height: auto;" />
-								<span style="flex: 1; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink); font-size: 0.92rem;">{e.title} <span style="color: var(--color-muted); font-weight: 400;">· ${e.price.toFixed(2)}</span></span>
+								<img src={`https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-600.webp`} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
+								<span style="flex: 1; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink); font-size: 0.95rem;">{e.title}</span>
 								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
 									<button type="button" class="qty-step" data-slug={e.slug} data-dir="-1" aria-label={`Fewer ${e.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
 									<input type="number" class="qty-in" data-slug={e.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.title} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
