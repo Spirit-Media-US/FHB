@@ -105,8 +105,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		counts[slug] = n;
 	}
 	const total = Object.values(counts).reduce((s, n) => s + n, 0);
-	if (total < 1) return json({ error: 'empty' }, 400);
-	const tier = tierFor(total)!;
+	const tier = tierFor(total);
+	// tierFor covers everything from 1 upward, so a null here means an empty order.
+	if (total < 1 || tier === null) return json({ error: 'empty' }, 400);
 
 	if (!env.STRIPE_FHB_SECRET_KEY) {
 		return json({ disabled: true, message: 'Checkout is not enabled yet.' });
