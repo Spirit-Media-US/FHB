@@ -470,9 +470,12 @@ const faqSchema = {
 				     on a phone, where most of this traffic lands. -->
 				<div class="flex flex-col items-center">
 					<div style="max-width: 340px; width: 100%;">
-						<img id="cover-main" src={`${ASSETS}/dvc-${ed.slug}-front-flat-1200.webp`} alt={`${ed.name} front cover — Father's Heart Bible in Divine Voice Color`} width="1200" height="1800" fetchpriority="high" decoding="async" class="block w-full h-auto" />
+						<div class="cover-stage">
+							<img id="cover-main" src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} alt={`${ed.name} — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" />
+						</div>
 						<div class="cover-tabs" role="group" aria-label="Cover views">
-							<button type="button" class="cover-tab is-on" data-view="front" data-src={`${ASSETS}/dvc-${ed.slug}-front-flat-1200.webp`} data-alt={`${ed.name} front cover — Father's Heart Bible in Divine Voice Color`} aria-pressed="true">Front</button>
+							<button type="button" class="cover-tab is-on" data-view="edition" data-src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} data-alt={`${ed.name} — Father's Heart Bible in Divine Voice Color`} aria-pressed="true">Edition</button>
+							<button type="button" class="cover-tab" data-view="front" data-src={`${ASSETS}/dvc-${ed.slug}-front-flat-1200.webp`} data-alt={`${ed.name} front cover — Father's Heart Bible in Divine Voice Color`} aria-pressed="false">Front</button>
 							<button type="button" class="cover-tab" data-view="back" data-src={`${ASSETS}/dvc-${ed.slug}-back-flat-1200.webp`} data-alt={`${ed.name} back cover`} aria-pressed="false">Back</button>
 						</div>
 					</div>
@@ -708,13 +711,17 @@ const faqSchema = {
 			});
 		};
 		tabs.forEach((t) => t.addEventListener('click', () => show(t)));
-		// Warm the back cover so the first toggle is instant.
-		const back = tabs.find((t) => t.dataset.view === 'back');
-		if (back) new Image().src = back.dataset.src!;
+		// Warm the other views so the first switch is instant.
+		tabs.slice(1).forEach((t) => { new Image().src = t.dataset.src!; });
 	}
 </script>
 
 <style>
+	.cover-stage {
+		aspect-ratio: 1200 / 1800;
+		display: flex; align-items: center; justify-content: center;
+	}
+	.cover-stage img { max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; }
 	.cover-tabs { display: flex; gap: 0.4rem; justify-content: center; margin: 0.9rem 0 0; }
 	.cover-tab {
 		font-family: var(--font-sans); font-size: 0.78rem; font-weight: 700;
