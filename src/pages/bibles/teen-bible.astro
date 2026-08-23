@@ -162,16 +162,22 @@ const listing = {
 	bio: "Kevin White himself is a beloved son, husband, and father. He is an international best selling author, speaker, and marketplace pastor with decades of experience planting churches, leading nonprofits, starting companies, and developing leaders around the world. Kevin and Shelly, his high school sweetheart and partner in marriage and mission for nearly forty years, co-founded Spirit Media Publishing and are devoted to empowering beloved sons and daughters in revealing our Father's heart to the nations. Kevin and Shelly live in North Carolina with their family.",
 };
 
-// The three colour lines in the long description are the product claim; rendering them in
-// black states the claim while contradicting it. Colour them in their own voice.
-const VOICE_LINE: Record<string, string> = {
-	'Our Father’s words in BLUE': VOICE.father,
-	"Our Father's words in BLUE": VOICE.father,
-	'The Son’s words in RED': VOICE.son,
-	"The Son's words in RED": VOICE.son,
-	'The Spirit’s words in PURPLE': VOICE.spirit,
-	"The Spirit's words in PURPLE": VOICE.spirit,
+// Colour the COLOUR WORDS, not the sentence around them (Kevin 2026-08-23). The claim is
+// "our Father's words in BLUE" — so BLUE is what should be blue. Colouring the whole line
+// makes it decoration; colouring the one word makes it a demonstration. Applied to every
+// paragraph, so it works for the standalone lines and for the sentence that runs them
+// together mid-prose.
+const COLOUR_WORD: Record<string, string> = {
+	BLUE: VOICE.father,
+	RED: VOICE.son,
+	PURPLE: VOICE.spirit,
 };
+function colourWords(text: string): string {
+	return text.replace(
+		/\b(BLUE|RED|PURPLE)\b/g,
+		(w) => `<span style="color:${COLOUR_WORD[w]};font-weight:700;">${w}</span>`,
+	);
+}
 
 const faq = [
 	{
@@ -288,11 +294,7 @@ const faqSchema = {
 					<div class="mb-8">
 						<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.8rem;">{sec.h}</h2>
 						{sec.body.map((para) => (
-							VOICE_LINE[para] ? (
-								<p style={`font-family: var(--font-sans); color: ${VOICE_LINE[para]}; font-size: 1.15rem; font-weight: 700; line-height: 1.6; margin: 0 0 0.35rem;`}>{para}</p>
-							) : (
-								<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;">{para}</p>
-							)
+							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colourWords(para)}></p>
 						))}
 					</div>
 				))}
@@ -374,7 +376,7 @@ const faqSchema = {
 			<div class="max-w-3xl mx-auto">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">In brief</h2>
 				{listing.short350.map((para) => (
-					<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;">{para}</p>
+					<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colourWords(para)}></p>
 				))}
 				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.7rem;">Also known as</h3>
 				<div class="flex flex-wrap gap-2">
