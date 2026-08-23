@@ -10,7 +10,11 @@ import Layout from '../layouts/Layout.astro';
 // under the page header (Kevin 2026-08-23: "Don't need to repeat same things over and
 // over each card"). Copy is lifted from the metadata sheets so the site and the trade
 // listings cannot drift apart.
-const DVC_TAIL =
+// The spec, stated once for all sixteen. Concrete facts rather than "premium" — every
+// Bible on the shelf claims premium; 6x9 hardback with a dust jacket, full colour and
+// 876 pages is checkable and does more selling (Kevin asked 2026-08-23).
+const DVC_TAIL = '6×9 Hardback with Dust Jacket · 876 Pages · Full Colour Throughout';
+const DVC_TAIL2 =
 	'Red Letter \u00b7 Blue Letter \u00b7 Purple Letter \u00b7 Three-Color Divine Voice \u00b7 Complete Bible';
 const dvcEditions = [
 	{
@@ -386,7 +390,8 @@ function markVoices(v: {
 				<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.06em; color: ${VOICE.son}; background: #fff; border: 2px solid ${VOICE.son}; padding: 0.5rem 1.15rem; border-radius: 6px; line-height: 1;`}>SON</span>
 				<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.06em; color: ${VOICE.spirit}; background: #fff; border: 2px solid ${VOICE.spirit}; padding: 0.5rem 1.15rem; border-radius: 6px; line-height: 1;`}>SPIRIT</span>
 			</div>
-			<p class="text-center mb-10" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em;">{DVC_TAIL}</p>
+			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">{DVC_TAIL}</p>
+			<p class="text-center mb-10" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em;">{DVC_TAIL2}</p>
 
 			<div class="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7 max-w-6xl mx-auto">
 				{dvcEditions.map((e) => (
