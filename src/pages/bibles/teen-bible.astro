@@ -473,13 +473,7 @@ const faqSchema = {
 						<div class="cover-stage">
 							<img id="cover-main" src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} alt={`${ed.name} — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" />
 						</div>
-						<div class="cover-controls">
-							<div class="cover-tabs" role="group" aria-label="Cover views">
-								<button type="button" class="cover-tab" data-view="front" data-src={`${ASSETS}/dvc-${ed.slug}-front-flat-1200.webp`} data-alt={`${ed.name} front cover — Father's Heart Bible in Divine Voice Color`} aria-pressed="false">Front</button>
-								<button type="button" class="cover-tab" data-view="back" data-src={`${ASSETS}/dvc-${ed.slug}-back-flat-1200.webp`} data-alt={`${ed.name} back cover`} aria-pressed="false">Back</button>
-							</div>
-							<LookInside slug={ed.slug} title={ed.name} />
-						</div>
+						<LookInside slug={ed.slug} title={ed.name} />
 					</div>
 				</div>
 				<div>
@@ -696,47 +690,13 @@ const faqSchema = {
 	</main>
 </Layout>
 
-<script>
-	// Front/back toggle. Both files are rendered onto an identical footprint, so swapping
-	// the src cannot shift the layout — no crossfade needed, and none wanted.
-	const main = document.getElementById('cover-main') as HTMLImageElement | null;
-	const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.cover-tab'));
-	if (main && tabs.length) {
-		const show = (tab: HTMLButtonElement) => {
-			main.src = tab.dataset.src!;
-			main.alt = tab.dataset.alt!;
-			tabs.forEach((t) => {
-				const on = t === tab;
-				t.classList.toggle('is-on', on);
-				t.setAttribute('aria-pressed', String(on));
-			});
-		};
-		tabs.forEach((t) => t.addEventListener('click', () => show(t)));
-		// Warm the other views so the first switch is instant.
-		tabs.slice(1).forEach((t) => { new Image().src = t.dataset.src!; });
-	}
-</script>
 
 <style>
 	.cover-stage {
 		aspect-ratio: 1200 / 1800;
-		display: flex; align-items: center; justify-content: center;
+		display: flex; align-items: flex-start; justify-content: center;
 	}
 	.cover-stage img { max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; }
-	.cover-controls {
-		display: flex; flex-wrap: wrap; gap: 0.4rem;
-		align-items: center; justify-content: center; margin: 0.9rem 0 0;
-	}
-	.cover-tabs { display: flex; gap: 0.4rem; }
-	.cover-tab {
-		font-family: var(--font-sans); font-size: 0.9rem; font-weight: 600;
-		color: #3f3f46; background: #fff; border: 1px solid var(--color-hairline);
-		border-radius: 999px; padding: 0.55rem 1.1rem; cursor: pointer;
-		transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
-	}
-	.cover-tab:hover { background: #f3f3f3; border-color: #a1a1aa; }
-	.cover-tab.is-on { color: var(--color-ink); border-color: #3f3f46; background: var(--color-surface-low); }
-	.cover-tab:focus-visible { outline: 2px solid #3f3f46; outline-offset: 2px; }
 	.faq-item > summary { cursor: pointer; list-style: none; }
 	.faq-item > summary::-webkit-details-marker { display: none; }
 </style>
