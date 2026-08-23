@@ -1,0 +1,225 @@
+---
+import Section from '../../components/Section.astro';
+// /bibles/teen-bible — PRODUCT page for one Divine Voice Color edition.
+//
+// Why this exists alongside /bible-for/teenagers: that page answers a PASTORAL search
+// ("bible verses for teenagers") and this one answers a PURCHASE search ("teen bible",
+// "confirmation gift bible"). They target different intent and link to each other rather
+// than competing for the same query.
+//
+// Every fact here — ISBN, price, page count, BISAC, keywords, descriptions — is lifted from
+// the edition's Drive metadata sheet, the same source the Ingram listing uses, so the site
+// and the trade record cannot drift apart. This is the template for the other fifteen.
+import Layout from '../../layouts/Layout.astro';
+
+const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
+const READ_URL = 'https://fathersheartbible.com/read';
+const SITE = 'https://fathersheartbible.com';
+
+const ed = {
+	slug: 'teen',
+	name: 'Teen Bible',
+	title: 'Father’s Heart Bible — Teen Bible',
+	audience: 'For Teens, Teenagers, Youth Group, Confirmation, and Graduation Gifts, Ages 13-19',
+	isbn: '979-8-89307-326-3',
+	price: 99.99,
+	pages: 876,
+	trim: '6 x 9 in',
+	binding: 'Hardcover, case laminate',
+	published: '2026-09-01',
+	bisac: [
+		'BIB018070 — BIBLES / Other English Translations / Youth & Teen',
+		'BIB018000 — BIBLES / Other English Translations / General',
+		'REL012070 — RELIGION / Christian Living / Personal Growth',
+	],
+	keywords: [
+		'bible for teens',
+		'teen bible',
+		'bible for teenage boys',
+		'bible for teenage girls',
+		'youth group bible',
+		'confirmation gift bible',
+		'graduation gift bible',
+		'color coded bible',
+		'three color bible',
+		'red letter blue letter purple letter',
+	],
+};
+
+// The verse that carries this edition's opening page — a teenager our Father spoke to
+// before He spoke to the priest.
+const verse = {
+	ref: '1 Samuel 3:10',
+	href: '/read/1-samuel/3#v10',
+	text: 'Then our Father came, stood there, and called as before: “Samuel! Samuel!” Samuel said, “Speak, for your servant is listening.”',
+	father: ['“Samuel! Samuel!”'],
+};
+
+const VOICE = { father: '#3563ae', son: '#f04933', spirit: '#91278f' };
+function mark(text: string, spans: string[], colour: string): string {
+	let out = text;
+	for (const s of spans)
+		if (s && out.includes(s))
+			out = out.replace(s, `<span style="color:${colour};font-weight:600;">${s}</span>`);
+	return out;
+}
+
+const faq = [
+	{
+		q: 'What makes the Teen Bible different from the other editions?',
+		a: 'Nothing in the text. Every Divine Voice Color edition is the identical translation and the identical 876 pages. The Teen Bible differs in its cover, one opening page written for teenagers, and three section headings. It is the whole Bible, not a selection or a devotional.',
+	},
+	{
+		q: 'What age is the Teen Bible for?',
+		a: 'Ages 13–19. It reads at the same level as every other edition — a fresh translation in clear contemporary English — so it carries a teenager through into adulthood rather than being outgrown.',
+	},
+	{
+		q: 'Is this a good confirmation or graduation gift?',
+		a: 'It is made for it. A complete hardcover Bible with a presentation page for their name, in a cover designed for a teenager rather than a children’s Bible or a generic pew edition.',
+	},
+	{
+		q: 'What is Divine Voice Color?',
+		a: 'For a hundred and twenty-five years red letters have shown the Son speaking. Our Father speaks more than three times as often — 125,457 words across 5,623 verses. In Divine Voice Color you see who is speaking: our Father’s words in blue, the Son’s in red, the Spirit’s in purple, Genesis to Revelation.',
+	},
+];
+
+const productSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Book',
+	'@id': `${SITE}/bibles/teen-bible#book`,
+	name: ed.title,
+	alternateName: ed.name,
+	bookFormat: 'https://schema.org/Hardcover',
+	numberOfPages: ed.pages,
+	isbn: ed.isbn,
+	inLanguage: 'en',
+	datePublished: ed.published,
+	description: `${ed.audience}. The complete Bible in Divine Voice Color — our Father's words in blue, the Son's in red, the Spirit's in purple.`,
+	image: `${ASSETS}/dvc-${ed.slug}-1200.webp`,
+	url: `${SITE}/bibles/teen-bible`,
+	publisher: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+	author: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+	translationOfWork: { '@type': 'Book', name: 'The Holy Bible' },
+	keywords: ed.keywords.join(', '),
+	offers: {
+		'@type': 'Offer',
+		price: ed.price.toFixed(2),
+		priceCurrency: 'USD',
+		availability: 'https://schema.org/InStock',
+		url: `${SITE}/print`,
+		seller: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+		shippingDetails: {
+			'@type': 'OfferShippingDetails',
+			shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'USD' },
+		},
+	},
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: faq.map((f) => ({
+		'@type': 'Question',
+		name: f.q,
+		acceptedAnswer: { '@type': 'Answer', text: f.a },
+	})),
+};
+---
+
+<Layout
+	title={`Teen Bible | ${ed.audience.split(' - ')[0]} | Father's Heart Bible™`}
+	description={`The Teen Bible — the complete Bible in Divine Voice Color, where you can see who is speaking. Our Father's words in blue, the Son's in red, the Spirit's in purple. Hardcover, 876 pages, free shipping.`}
+>
+	<script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
+	<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+	<main>
+		<Section variant="light">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center max-w-5xl mx-auto">
+				<!-- Hover swaps to the back cover, the way a listing lets you turn the book over. -->
+				<div class="flex justify-center">
+					<div class="dvc-flip" style="position: relative; max-width: 340px; width: 100%;">
+						<img src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} alt={`${ed.name} front cover — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto dvc-front" />
+						<img src={`${ASSETS}/dvc-${ed.slug}-back-1200.webp`} alt={`${ed.name} back cover`} width="1200" height="1528" loading="lazy" decoding="async" class="block w-full h-auto dvc-back" style="position: absolute; inset: 0; opacity: 0; transition: opacity 0.25s ease;" />
+					</div>
+				</div>
+				<div>
+					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Divine Voice Color</p>
+					<h1 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2.4rem; font-weight: 600; margin: 0 0 0.6rem;">{ed.name}</h1>
+					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.55; margin: 0 0 1.2rem;">{ed.audience}</p>
+					<div class="flex flex-wrap items-center gap-2 mb-5">
+						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.father}; background: #fff; border: 2px solid ${VOICE.father}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>FATHER</span>
+						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.son}; background: #fff; border: 2px solid ${VOICE.son}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>SON</span>
+						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.spirit}; background: #fff; border: 2px solid ${VOICE.spirit}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>SPIRIT</span>
+					</div>
+					<p style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">${ed.price.toFixed(2)}</p>
+					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">Free shipping — a $15 value.</p>
+					<a href="/print" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Order direct from SMP →</a>
+					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.8rem; margin: 1rem 0 0;">Hover the cover to see the back.</p>
+				</div>
+			</div>
+		</Section>
+
+		<Section variant="warm">
+			<div class="max-w-3xl mx-auto">
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">He spoke to a teenager before He spoke to the priest</h2>
+				<div class="rounded-2xl p-7" style="background: #fff; border: 1px solid var(--color-hairline);">
+					<p style="font-family: var(--font-serif); font-size: 1.1rem; line-height: 1.7; color: var(--color-ink); margin: 0;" set:html={mark(verse.text, verse.father, VOICE.father)}></p>
+					<a href={verse.href} style="display: inline-block; font-family: var(--font-sans); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.03em; color: #71717a; margin: 1rem 0 0; text-decoration: underline;">{verse.ref} (FHB)</a>
+				</div>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.65; margin: 1.5rem 0 0;">Samuel was young enough that he didn’t recognise the voice at first. It called his name three times in the night before anyone told him who was speaking. Your Father spoke to a kid before He spoke to the priest — He knows your name, and He isn’t waiting for you to grow up first.</p>
+			</div>
+		</Section>
+
+		<Section variant="light">
+			<div class="max-w-3xl mx-auto">
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1.2rem;">What’s inside</h2>
+				<ul style="font-family: var(--font-body); color: var(--color-ink); font-size: 1rem; line-height: 1.9; margin: 0 0 1.5rem; padding-left: 1.1rem;">
+					<li>The complete Bible — 66 books, 1,189 chapters, 31,085 verses. Not abridged.</li>
+					<li>Divine Voice Color throughout, Genesis to Revelation.</li>
+					<li>An introduction to each of the 66 books, and a Father’s note closing every book with a short prayer.</li>
+					<li>1,354 study notes, including 31 on manuscript differences.</li>
+					<li>A presentation page for their name.</li>
+					<li>A fresh translation from the original Hebrew, Aramaic and Greek — not adapted from any existing English Bible.</li>
+				</ul>
+				<dl class="grid grid-cols-2 sm:grid-cols-3 gap-4" style="font-family: var(--font-sans); font-size: 0.88rem;">
+					<div><dt style="color: #71717a;">ISBN</dt><dd style="color: var(--color-ink); font-weight: 600; margin: 0;">{ed.isbn}</dd></div>
+					<div><dt style="color: #71717a;">Pages</dt><dd style="color: var(--color-ink); font-weight: 600; margin: 0;">{ed.pages}</dd></div>
+					<div><dt style="color: #71717a;">Trim</dt><dd style="color: var(--color-ink); font-weight: 600; margin: 0;">{ed.trim}</dd></div>
+					<div><dt style="color: #71717a;">Binding</dt><dd style="color: var(--color-ink); font-weight: 600; margin: 0;">{ed.binding}</dd></div>
+					<div><dt style="color: #71717a;">Publisher</dt><dd style="color: var(--color-ink); font-weight: 600; margin: 0;">Spirit Media Publishing</dd></div>
+					<div><dt style="color: #71717a;">Published</dt><dd style="color: var(--color-ink); font-weight: 600; margin: 0;">September 2026</dd></div>
+				</dl>
+				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.8rem; line-height: 1.6; margin: 1.5rem 0 0;">{ed.bisac.join(' · ')}</p>
+			</div>
+		</Section>
+
+		<Section variant="soft">
+			<div class="max-w-3xl mx-auto">
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1.2rem;">Questions</h2>
+				<div class="space-y-3">
+					{faq.map((f) => (
+						<details class="faq-item rounded-2xl" style="background-color: #fff; border: 1px solid var(--color-hairline);">
+							<summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">
+								<span>{f.q}</span>
+							</summary>
+							<div class="px-5 pb-5 -mt-1">
+								<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.6;">{f.a}</p>
+							</div>
+						</details>
+					))}
+				</div>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; margin: 1.75rem 0 0;">
+					Looking for scripture rather than a copy to hold? Read <a href="/bible-for/teenagers" style="color: #3f3f46; text-decoration: underline;">Bible verses for teenagers</a>, or read the whole Bible free at <a href={READ_URL} style="color: #3f3f46; text-decoration: underline;">fathersheartbible.com/read</a>. See <a href="/print" style="color: #3f3f46; text-decoration: underline;">all sixteen Divine Voice Color editions</a>.
+				</p>
+			</div>
+		</Section>
+	</main>
+</Layout>
+
+<style>
+	.dvc-flip:hover .dvc-back { opacity: 1; }
+	.dvc-flip:hover .dvc-front { opacity: 0; }
+	.dvc-front { transition: opacity 0.25s ease; }
+	.faq-item > summary { cursor: pointer; list-style: none; }
+	.faq-item > summary::-webkit-details-marker { display: none; }
+</style>
