@@ -470,9 +470,7 @@ const faqSchema = {
 				     on a phone, where most of this traffic lands. -->
 				<div class="flex flex-col items-center">
 					<div style="max-width: 340px; width: 100%;">
-						<div class="cover-stage">
-							<img id="cover-main" src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} alt={`${ed.name} — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" />
-						</div>
+						<img id="cover-main" src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} alt={`${ed.name} — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
 						<LookInside slug={ed.slug} title={ed.name} />
 					</div>
 				</div>
@@ -692,11 +690,6 @@ const faqSchema = {
 
 
 <style>
-	.cover-stage {
-		aspect-ratio: 1200 / 1800;
-		display: flex; align-items: flex-start; justify-content: center;
-	}
-	.cover-stage img { max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; }
 	.faq-item > summary { cursor: pointer; list-style: none; }
 	.faq-item > summary::-webkit-details-marker { display: none; }
 </style>
