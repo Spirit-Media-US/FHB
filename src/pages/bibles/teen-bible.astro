@@ -398,7 +398,7 @@ const frontMatterParts = [
 const faq = [
 	{
 		q: 'What makes the Teen Bible different from the other editions?',
-		a: 'Nothing in the text. Every Divine Voice Color edition is the identical translation and the identical 876 pages. The Teen Bible differs in its cover, one opening page written for teenagers, and three section headings. It is the whole Bible, not a selection or a devotional.',
+		a: `It is the complete Father's Heart Bible™ in Divine Voice Color — every book, every page, nothing abridged — bound and written for a teenager. It opens with front matter addressed to them: a word about the Father who speaks, a prayer to pray, and passages on intimacy, identity and inheritance chosen for where they are. Through the whole Bible there is an introduction to each book, a Father's note and prayer closing each one, 1,354 study notes, and a presentation page carrying their name.`,
 	},
 	{
 		q: 'What age is the Teen Bible for?',
@@ -410,7 +410,7 @@ const faq = [
 	},
 	{
 		q: 'What is Divine Voice Color?',
-		a: 'For a hundred and twenty-five years red letters have shown the Son speaking. Our Father speaks more than three times as often — 125,457 words across 5,623 verses. In Divine Voice Color you see who is speaking: our Father’s words in blue, the Son’s in red, the Spirit’s in purple, Genesis to Revelation.',
+		a: `For a hundred and twenty-five years red letters have shown the Son speaking. Our Father speaks more than three times as often — 125,457 words across 5,623 verses — and until now those words were printed in the same black ink as the genealogies. In Divine Voice Color you see who is speaking: our Father's words in <strong style="color:${VOICE.father};">BLUE</strong>, the Son's in <strong style="color:${VOICE.son};">RED</strong>, the Spirit's in <strong style="color:${VOICE.spirit};">PURPLE</strong>. More than one word in four of the Bible is a divine person speaking. The color is a mark of ownership, not of quotation — His words stay His on any lips that carry them faithfully, and words He never spoke are never colored.`,
 	},
 ];
 
@@ -487,7 +487,7 @@ const faqSchema = {
 					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">Free shipping — a $15 value.</p>
 					<div class="flex flex-wrap items-center gap-3">
 						<a href="/print" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Buy Now</a>
-						<LookInside slug={ed.slug} title={ed.name} />
+						<LookInside slug={ed.slug} title={ed.name} size="lg" />
 					</div>
 				</div>
 			</div>
@@ -678,7 +678,7 @@ const faqSchema = {
 								<span>{f.q}</span>
 							</summary>
 							<div class="px-5 pb-5 -mt-1">
-								<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.6;">{f.a}</p>
+								<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.6;" set:html={f.a}></p>
 							</div>
 						</details>
 					))}

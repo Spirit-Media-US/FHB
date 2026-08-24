@@ -163,6 +163,7 @@ const builtPages = new Set(
 );
 const TRANSLATION_URL = '/the-fathers-heart-bible/translation-philosophy/';
 const CONTACT = 'mailto:hello@spiritmediapublishing.com?subject=Father%27s%20Heart%20Bible%20print';
+const VOICE = { father: '#3563ae', son: '#f04933', spirit: '#91278f' };
 const printFaq = [
 	{
 		q: 'Are the sixteen editions different Bibles?',
@@ -190,7 +191,7 @@ const printFaq = [
 	},
 	{
 		q: 'What is Divine Voice Color?',
-		a: `For a hundred and twenty-five years red letters have shown the Son speaking. Our Father speaks more than three times as often — 125,457 words across 5,623 verses — and until now those words were printed in the same black ink as the genealogies. In Divine Voice Color you see who is speaking: our Father's words in blue, the Son's in red, the Spirit's in purple. More than one word in four of the Bible is a divine person speaking. The color is a mark of ownership, not of quotation — His words stay His on any lips that carry them faithfully, and words He never spoke are never colored.`,
+		a: `For a hundred and twenty-five years red letters have shown the Son speaking. Our Father speaks more than three times as often — 125,457 words across 5,623 verses — and until now those words were printed in the same black ink as the genealogies. In Divine Voice Color you see who is speaking: our Father's words in <strong style="color:${VOICE.father};">BLUE</strong>, the Son's in <strong style="color:${VOICE.son};">RED</strong>, the Spirit's in <strong style="color:${VOICE.spirit};">PURPLE</strong>. More than one word in four of the Bible is a divine person speaking. The color is a mark of ownership, not of quotation — His words stay His on any lips that carry them faithfully, and words He never spoke are never colored.`,
 	},
 	{
 		q: 'What’s included in each edition?',
@@ -267,7 +268,6 @@ const breadcrumbSchema = {
 // DIVINE VOICE COLOR verses, straight from the locked canon with the same voice spans
 // the printed book and /read use \u2014 fatherWords / sonWords / spiritWords. Nothing is
 // retyped here, so a verse on this page cannot disagree with the Bible it advertises.
-const VOICE = { father: '#3563ae', son: '#f04933', spirit: '#91278f' };
 // One column per voice, each headed by the same colored block used at the top of the
 // page \u2014 the demo repeated where the proof is. Two passages each, in that voice's color,
 // straight from the canon's own spans.

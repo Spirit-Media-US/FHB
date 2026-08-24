@@ -30,9 +30,11 @@ interface Props {
 	title: string;
 	/** 'button' = pill (product page). 'link' = inline text link (the /print cards). */
 	variant?: 'button' | 'link';
+	/** 'lg' matches the page's primary CTA when the two sit side by side. */
+	size?: 'md' | 'lg';
 	label?: string;
 }
-const { slug, title, variant = 'button', label = 'Look inside' } = Astro.props;
+const { slug, title, variant = 'button', size = 'md', label = 'Look inside' } = Astro.props;
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print/lookinside';
 
@@ -61,7 +63,7 @@ const ph = pages[0]?.h ?? 1400;
 
 {
 	total > 0 && (
-		<div class={`lookinside li-${variant}`} data-lookinside data-total={total}>
+		<div class={`lookinside li-${variant} li-size-${size}`} data-lookinside data-total={total}>
 			<button type="button" class="li-trigger" data-li-open aria-haspopup="dialog">
 				{variant === 'button' && (
 					<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -161,6 +163,15 @@ const ph = pages[0]?.h ?? 1400;
 	.lookinside { position: relative; z-index: 1; }
 	.li-button { display: flex; justify-content: center; margin: 0.9rem 0 0; }
 	.li-link { display: inline; }
+	/* Beside the buy button these two must read as a pair, so the trigger takes the
+	   CTA's exact padding and type size. (Kevin 2026-08-24) */
+	.li-size-lg { margin: 0; }
+	/* The CTA has no border and this does, and with auto height a border adds to the
+	   outer box — so the padding gives back the 1px on each side and the two match. */
+	.li-size-lg .li-trigger {
+		padding: calc(0.8rem - 1px) calc(1.8rem - 1px);
+		font-size: 1rem; font-weight: 600;
+	}
 	/* On a card the trigger is one of two peer links, so it takes the card's link
 	   shape rather than a pill that would compete with the buttons around it. */
 	.li-link .li-trigger {
