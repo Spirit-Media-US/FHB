@@ -28,8 +28,11 @@ import data from '../data/lookinside.json';
 interface Props {
 	slug: string;
 	title: string;
+	/** 'button' = pill (product page). 'link' = inline text link (the /print cards). */
+	variant?: 'button' | 'link';
+	label?: string;
 }
-const { slug, title } = Astro.props;
+const { slug, title, variant = 'button', label = 'Look inside' } = Astro.props;
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print/lookinside';
 
@@ -58,13 +61,15 @@ const ph = pages[0]?.h ?? 1400;
 
 {
 	total > 0 && (
-		<div class="lookinside" data-lookinside data-total={total}>
+		<div class={`lookinside li-${variant}`} data-lookinside data-total={total}>
 			<button type="button" class="li-trigger" data-li-open aria-haspopup="dialog">
-				<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M12 6.5C10.5 5.2 8.6 4.5 6.5 4.5H3v14h3.5c2.1 0 4 .7 5.5 2 1.5-1.3 3.4-2 5.5-2H21v-14h-3.5c-2.1 0-4 .7-5.5 2Z" />
-					<path d="M12 6.5v14" />
-				</svg>
-				<span>Look inside</span>
+				{variant === 'button' && (
+					<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M12 6.5C10.5 5.2 8.6 4.5 6.5 4.5H3v14h3.5c2.1 0 4 .7 5.5 2 1.5-1.3 3.4-2 5.5-2H21v-14h-3.5c-2.1 0-4 .7-5.5 2Z" />
+						<path d="M12 6.5v14" />
+					</svg>
+				)}
+				<span>{label}</span>
 			</button>
 
 			{/* The manifest, read by the flip renderer. No markup per page in flip
@@ -153,12 +158,18 @@ const ph = pages[0]?.h ?? 1400;
 <style>
 	/* Neutral chrome throughout — greys and the site's ink/hairline tokens only.
 	   The page images are the one colorful thing in this viewer, by instruction. */
-	.lookinside {
-		/* Centred directly beneath the cover it belongs to. */
-		display: flex; justify-content: center;
-		margin: 0.9rem 0 0;
-		position: relative; z-index: 1;
+	.lookinside { position: relative; z-index: 1; }
+	.li-button { display: flex; justify-content: center; margin: 0.9rem 0 0; }
+	.li-link { display: inline; }
+	/* On a card the trigger is one of two peer links, so it takes the card's link
+	   shape rather than a pill that would compete with the buttons around it. */
+	.li-link .li-trigger {
+		display: inline; font-family: var(--font-sans); font-size: 0.82rem;
+		font-weight: 700; color: #3f3f46; background: none; border: 0;
+		border-radius: 0; padding: 0; text-decoration: underline;
+		text-underline-offset: 2px; cursor: pointer;
 	}
+	.li-link .li-trigger:hover { color: var(--color-ink); }
 
 	.li-trigger {
 		display: inline-flex; align-items: center; gap: 0.5rem;

@@ -1,4 +1,5 @@
 ---
+import LookInside from '../components/LookInside.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import Layout from '../layouts/Layout.astro';
@@ -98,7 +99,7 @@ const dvcEditions = [
 	{
 		slug: 'teen',
 		title: 'Teen Bible',
-		sub: 'For Teens, Teenagers, Youth Group, Confirmation, and Graduation Gifts, Ages 13-19',
+		sub: 'For Teens, Teenagers, Ages 13-19, Middle School, Junior High, High School, Junior College, Youth Group, Confirmation, and Graduation Gifts',
 		price: 99.99,
 	},
 	{
@@ -153,54 +154,61 @@ const CAMPAIGN_URL = '/a-bible-for-the-whole-world/';
 // Neutral: the only color between the header and the footer is the three voices and
 // the cover art (Kevin 2026-08-23).
 const LINK = 'color: #3f3f46; text-decoration: underline;';
+// Only link "Full details" where the product page exists — the other fifteen are still
+// to be built, and a card linking to a 404 is worse than a card without the link.
+const builtPages = new Set(
+	Object.keys(import.meta.glob('./bibles/*.astro')).map((f) =>
+		f.split('/').pop()!.replace('.astro', ''),
+	),
+);
 const TRANSLATION_URL = '/the-fathers-heart-bible/translation-philosophy/';
 const CONTACT = 'mailto:hello@spiritmediapublishing.com?subject=Father%27s%20Heart%20Bible%20print';
 const printFaq = [
-	{
-		q: 'Is there a cheaper version?',
-		a: `Not yet. Right now the Father’s Heart Bible™ is printed on demand on premium white paper (as required by the industry) — and with paper costs up about 25% over the last two years and the 800–1,100 pages it takes to print a full Bible, the cost per copy runs high. More affordable offset-printed editions will be added in the future. In the meantime, you can read or listen to the whole Bible free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
-	},
-	{
-		q: 'Why is the Father’s Heart Bible™ thicker than other bibles?',
-		a: `For now it’s printed on demand on a premium, heavier white paper (as required by the industry), and a complete Bible runs 800–1,100 pages — so the print-on-demand edition is thick. Slimmer, thinline editions on lighter paper from offset printing will be added in the future. Until then, you can read or listen to the whole Bible free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
-	},
-	{
-		q: 'Will the Father’s Heart Bible™ be published in other languages?',
-		a: `Yes! The English edition is available now — everywhere books are sold worldwide — and free to read or listen to at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>. We sense our Father pressing us on to translate the Father’s Heart Bible™ into the world’s 25 most-spoken languages, reaching roughly 75% of humanity — and we won’t stop there. Our Bible for the Whole World campaign will continue until every one of the 8+ billion souls on earth can hold a Father’s Heart Bible in their hands.`,
-		link: { href: CAMPAIGN_URL, label: 'Full details →' },
-	},
-	{
-		q: 'Why are you charging for the Father’s Heart Bible™?',
-		a: `The Father’s Heart Bible™ is actually free to read or listen to at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>, and in time it will be free on every major digital Bible platform. Print editions are priced only to cover the real costs of printing and distribution — and a portion of every copy sold helps fund our Bible for the Whole World campaign.`,
-		link: { href: CAMPAIGN_URL, label: 'Learn more →' },
-	},
-	{
-		q: 'What’s included in each edition?',
-		a: `Every edition is the complete Bible — all 66 books, 1,189 chapters, 31,085 verses — in Divine Voice Color, with an introduction to each book, a Father's note closing each one, 1,354 study notes and a presentation page. All sixteen editions carry the identical translation and the identical 876 pages. What changes is the cover, one opening page written for that audience, and three section headings. Choose the one that speaks to the person you're buying for.`,
-	},
-	{
-		q: 'How is the Father’s Heart Bible™ different from other translations?',
-		a: `Father’s Heart Bible™: An Intimate Translation is a fresh Bible translation from the original Hebrew, Aramaic, and Greek that lets you hear God as He truly is — not a distant deity, but your Father. Read about <a href="${TRANSLATION_URL}" style="${LINK}">our translation approach</a>, or start reading free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
-	},
-	{
-		q: 'What is Divine Voice Color?',
-		a: `For a hundred and twenty-five years red letters have shown the Son speaking. Our Father speaks more than three times as often — 125,457 words across 5,623 verses — and until now those words were printed in the same black ink as the genealogies. In Divine Voice Color you see who is speaking: our Father's words in blue, the Son's in red, the Spirit's in purple. More than one word in four of the Bible is a divine person speaking. The color is a mark of ownership, not of quotation — His words stay His on any lips that carry them faithfully, and words He never spoke are never colored.`,
-	},
 	{
 		q: 'Are the sixteen editions different Bibles?',
 		a: `No. Every one is the identical translation and the identical 876 pages, cover to cover. What differs is the cover, one opening page written for that audience, and three section headings. A Teen Bible and a Pastor's Bible read exactly the same — they are simply handed to different people.`,
 	},
 	{
-		q: 'Is the color throughout the whole Bible?',
-		a: `Yes — Genesis to Revelation, every divine voice, in full color on every page. Not a red-letter New Testament with a black Old Testament, and not a study section at the back. You can see it for yourself free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
+		q: 'Can I return my order?',
+		a: `Yes. For orders placed directly with us, <a href="${CONTACT}" style="${LINK}">reach out</a> and we'll make it right. Copies bought on Amazon follow Amazon's return policy.`,
+	},
+	{
+		q: 'How is the Father’s Heart Bible™ different from other translations?',
+		a: `It is a fresh translation from the original Hebrew, Aramaic, and Greek — not an adaptation of any existing English Bible — made so you can hear God as He truly is: not a distant deity, but your Father. Complete at 66 books, 1,189 chapters and 31,085 verses, governed by 170 written translation rules. And it is the first Bible in print to show you which words a divine person spoke, and which person spoke them. Read about <a href="${TRANSLATION_URL}" style="${LINK}">our translation approach</a>, or start reading free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
 	},
 	{
 		q: 'How long does shipping take?',
 		a: `Order direct from us today and shipping is free — most orders arrive in 7–10 days, and larger bulk orders in 3–4 weeks. The Divine Voice Color editions arrive on Amazon shortly; until then, direct is the way to get one. <a href="${CONTACT}" style="${LINK}">Reach out</a> if you need them by a particular date.`,
 	},
 	{
-		q: 'Can I return my order?',
-		a: `Yes. For orders placed directly with us, <a href="${CONTACT}" style="${LINK}">reach out</a> and we'll make it right. Copies bought on Amazon follow Amazon's return policy.`,
+		q: 'Is the color throughout the whole Bible?',
+		a: `Yes — Genesis to Revelation, every divine voice, in full color on every page. Not a red-letter New Testament with a black Old Testament, and not a study section at the back. You can see it for yourself free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
+	},
+	{
+		q: 'Is there a cheaper version?',
+		a: `The whole Bible is already free. Every word of the Father’s Heart Bible™ can be read online at no cost, by anyone, anywhere in the world, in twenty-five languages — with English and Telugu also free to listen to, and more languages being recorded. Nobody has to buy anything to receive our Father’s voice. As for print: the Father’s Heart Bible™ is currently printed on demand on premium white paper, as the industry requires — and with paper costs up about 25% over the last two years and 876 pages to a complete Bible, the cost per copy runs high. More affordable offset-printed editions will be added in the future. Read it all today at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
+	},
+	{
+		q: 'What is Divine Voice Color?',
+		a: `For a hundred and twenty-five years red letters have shown the Son speaking. Our Father speaks more than three times as often — 125,457 words across 5,623 verses — and until now those words were printed in the same black ink as the genealogies. In Divine Voice Color you see who is speaking: our Father's words in blue, the Son's in red, the Spirit's in purple. More than one word in four of the Bible is a divine person speaking. The color is a mark of ownership, not of quotation — His words stay His on any lips that carry them faithfully, and words He never spoke are never colored.`,
+	},
+	{
+		q: 'What’s included in each edition?',
+		a: `Every edition is the complete Bible — all 66 books, 1,189 chapters, 31,085 verses — in Divine Voice Color, with an introduction to each book, a Father's note closing each one, 1,354 study notes across 777 chapters, and a presentation page for the reader's name. All sixteen editions carry the identical translation and the identical 876 pages. What changes is the cover, one opening page written for that audience, and three section headings.`,
+	},
+	{
+		q: 'Which languages can I read it in?',
+		a: `Twenty-five, free, right now: English, Spanish, Portuguese, French, German, Russian, Turkish, Arabic, Persian, Urdu, Hindi, Bengali, Punjabi, Marathi, Tamil, Telugu, Indonesian, Filipino, Vietnamese, Japanese, Korean, Mandarin, Cantonese, Swahili and Nigerian Pidgin — reaching roughly three-quarters of humanity. English and Telugu can also be listened to, and more languages are being recorded. Print editions are English for now. Our Bible for the Whole World campaign continues until every one of the 8+ billion souls on earth can hold a Father's Heart Bible in their hands.`,
+		link: { href: CAMPAIGN_URL, label: 'Full details →' },
+	},
+	{
+		q: 'Why are you charging for the Father’s Heart Bible™?',
+		a: `We aren't, for the text itself — it is free to read at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a> and in time will be free on every major digital Bible platform. Print editions are priced only to cover the real costs of printing and distribution, and a portion of every copy sold helps fund our Bible for the Whole World campaign.`,
+		link: { href: CAMPAIGN_URL, label: 'Learn more →' },
+	},
+	{
+		q: 'Why is the Father’s Heart Bible™ thicker than other bibles?',
+		a: `Two reasons, and both are honest ones. A complete Bible in readable type runs 876 pages here, and print-on-demand uses a premium, heavier white paper — the thin, opaque bible paper you know from other editions comes from offset printing at volume, which we will move to in future. Slimmer thinline editions will follow.`,
 	},
 ];
 // Plain-text answers for FAQPage JSON-LD.
@@ -405,7 +413,14 @@ function markVoices(v: {
 							class="block w-full h-auto" style="max-width: 220px;"
 						/>
 						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{e.title}</h3>
-						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">{e.sub}</p>
+						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.5rem;">{e.sub}</p>
+						<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.9rem;">
+							{builtPages.has(`${e.slug}-bible`) && (
+								<a href={`/bibles/${e.slug}-bible`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
+							)}
+							{builtPages.has(`${e.slug}-bible`) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
+							<LookInside slug={e.slug} title={e.title} variant="link" label="Look inside" />
+						</div>
 						<div class="flex flex-col gap-2 w-full mt-auto">
 							<span
 								aria-disabled="true"
@@ -434,7 +449,10 @@ function markVoices(v: {
 			</div>
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
 				{dvcVerses.map((g) => (
-					<div class="flex flex-col gap-4">
+					<!-- auto for the voice block, then two equal rows: without this the cards
+					     size to their own text and the shorter SPIRIT passages left that column
+					     visibly short of FATHER and SON. (Kevin 2026-08-24) -->
+					<div class="gap-4" style="display: grid; grid-template-rows: auto 1fr 1fr;">
 						<!-- the same block as the top of the page, over the column it proves -->
 						<div class="text-center">
 							<span style={`display: inline-block; font-family: var(--font-sans); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.06em; color: ${VOICE[g.key]}; background: #fff; border: 2px solid ${VOICE[g.key]}; padding: 0.5rem 1.15rem; border-radius: 6px; line-height: 1;`}>{g.label}</span>
@@ -476,9 +494,9 @@ function markVoices(v: {
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Choose how many of each edition</p>
 					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
 						{dvcEditions.map((e) => (
-							<div class="flex items-center gap-3">
+							<div class="flex items-center gap-3" style="max-width: 30rem; width: 100%; margin: 0 auto;">
 								<img src={`https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-600.webp`} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-								<span style="flex: 1; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink); font-size: 0.95rem;">{e.title}</span>
+								<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink); font-size: 0.95rem;">{e.title}</span>
 								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
 									<button type="button" class="qty-step" data-slug={e.slug} data-dir="-1" aria-label={`Fewer ${e.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
 									<input type="number" class="qty-in" data-slug={e.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.title} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />

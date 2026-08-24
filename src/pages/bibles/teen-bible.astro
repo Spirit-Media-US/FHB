@@ -21,7 +21,8 @@ const ed = {
 	slug: 'teen',
 	name: 'Teen Bible',
 	title: 'Father’s Heart Bible — Teen Bible',
-	audience: 'For Teens, Teenagers, Youth Group, Confirmation, and Graduation Gifts, Ages 13-19',
+	audience:
+		'For Teens, Teenagers, Ages 13-19, Middle School, Junior High, High School, Junior College, Youth Group, Confirmation, and Graduation Gifts',
 	isbn: '979-8-89307-326-3',
 	price: 99.99,
 	pages: 876,
@@ -471,7 +472,6 @@ const faqSchema = {
 				<div class="flex flex-col items-center">
 					<div style="max-width: 340px; width: 100%;">
 						<img id="cover-main" src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} alt={`${ed.name} — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
-						<LookInside slug={ed.slug} title={ed.name} />
 					</div>
 				</div>
 				<div>
@@ -485,7 +485,10 @@ const faqSchema = {
 					</div>
 					<p style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">${ed.price.toFixed(2)}</p>
 					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">Free shipping — a $15 value.</p>
-					<a href="/print" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Order direct from SMP →</a>
+					<div class="flex flex-wrap items-center gap-3">
+						<a href="/print" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Buy Now</a>
+						<LookInside slug={ed.slug} title={ed.name} />
+					</div>
 				</div>
 			</div>
 		</Section>
