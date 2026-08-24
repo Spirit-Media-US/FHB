@@ -164,7 +164,7 @@ const editionData = import.meta.glob<{ default?: { slug?: string } }>('../data/e
 const builtPages = new Set(
 	Object.entries(editionData)
 		.filter(([f]) => !/\/(frontmatter|shared)\.json$/.test(f))
-		.map(([f, m]) => m?.default?.slug ?? f.split('/').pop()!.replace('.json', ''))
+		.map(([f, m]) => m?.default?.slug ?? f.split('/').pop()?.replace('.json', ''))
 		.filter(Boolean)
 		.map((slug) => `${slug}-bible`),
 );
