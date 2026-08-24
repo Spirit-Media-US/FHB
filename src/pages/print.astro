@@ -27,13 +27,13 @@ const dvcEditions = [
 	{
 		slug: 'couples',
 		title: "Couple's Bible",
-		sub: 'For Married Couples, Engaged Couples, Newlyweds, Dating Couples, Domestic Partners, and Anniversary Gifts',
+		sub: 'For Married Couples, Engaged Couples, Newlyweds, Dating Couples, Domestic Partners, Gift for Couples and Anniversary Gifts',
 		price: 99.99,
 	},
 	{
 		slug: 'dads',
 		title: "Dad's Bible",
-		sub: "For Dads, Fathers, New Dads, Stepdads, Granddads, and Father's Day Gifts",
+		sub: "For Dads, Fathers, New Dads, Stepdads, Granddads, Gift for Dads and Father's Day Gifts",
 		price: 99.99,
 	},
 	{
@@ -51,7 +51,7 @@ const dvcEditions = [
 	{
 		slug: 'moms',
 		title: "Mom's Bible",
-		sub: "For Moms, Mothers, New Moms, Stepmoms, Grandmothers, and Mother's Day Gifts",
+		sub: "For Moms, Mothers, New Moms, Stepmoms, Grandmothers, Gift for Moms and Mother's Day Gifts",
 		price: 99.99,
 	},
 	{
@@ -87,7 +87,7 @@ const dvcEditions = [
 	{
 		slug: 'seventeen',
 		title: 'Seventeen Bible',
-		sub: 'For Seventeen-Year-Olds, Teens and Young Adults, 17th Birthday, Confirmation, and Graduation Gifts',
+		sub: 'For Seventeen-Year-Olds, Teens and Young Adults, 17th Birthday, Gift for Teens, Confirmation and Graduation Gifts',
 		price: 99.99,
 	},
 	{
@@ -99,7 +99,7 @@ const dvcEditions = [
 	{
 		slug: 'teen',
 		title: 'Teen Bible',
-		sub: 'For Teens, Teenagers, Ages 13-19, Middle School, Junior High, High School, Junior College, Youth Group, Confirmation, and Graduation Gifts',
+		sub: 'For Teens, Teenagers, Ages 13-19, Middle School, Junior High, High School, Junior College, Youth Group, Gift for Teens, Confirmation and Graduation Gifts',
 		price: 99.99,
 	},
 	{
@@ -167,7 +167,7 @@ const VOICE = { father: '#3563ae', son: '#f04933', spirit: '#91278f' };
 const printFaq = [
 	{
 		q: 'Are the sixteen editions different Bibles?',
-		a: `No. Every one is the identical translation and the identical 876 pages, cover to cover. What differs is the cover, one opening page written for that audience, and three section headings. A Teen Bible and a Pastor's Bible read exactly the same — they are simply handed to different people.`,
+		a: `Every one is the complete Father's Heart Bible™ in Divine Voice Color — all 66 books, 1,189 chapters, 31,085 verses, nothing abridged, the same fresh translation from the original Hebrew, Aramaic and Greek. What changes is who it was made for: the cover, the opening pages written for that reader, and the passages chosen for where they are. Buy the Teen Bible for a teenager and the Soldier's Bible for a soldier — each one arrives looking and sounding like it was meant for them, and each one carries the whole Bible.`,
 	},
 	{
 		q: 'Can I return my order?',
@@ -195,7 +195,7 @@ const printFaq = [
 	},
 	{
 		q: 'What’s included in each edition?',
-		a: `Every edition is the complete Bible — all 66 books, 1,189 chapters, 31,085 verses — in Divine Voice Color, with an introduction to each book, a Father's note closing each one, 1,354 study notes across 777 chapters, and a presentation page for the reader's name. All sixteen editions carry the identical translation and the identical 876 pages. What changes is the cover, one opening page written for that audience, and three section headings.`,
+		a: `The complete Bible in Divine Voice Color, 876 pages, 6×9 hardcover with a dust jacket and full color throughout. A presentation page for the reader's name. Opening pages on intimacy, identity, inheritance and hearing His voice. An introduction to every one of the 66 books, and a Father's note closing each one with a short prayer. 1,354 study notes across 777 chapters — 1,075 explaining a word, name, custom or background, 248 marking where the text reveals the Father, and 31 recording a difference among the manuscripts.`,
 	},
 	{
 		q: 'Which languages can I read it in?',
@@ -413,15 +413,15 @@ function markVoices(v: {
 							class="block w-full h-auto" style="max-width: 220px;"
 						/>
 						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{e.title}</h3>
-						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.5rem;">{e.sub}</p>
-						<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.9rem;">
-							{builtPages.has(`${e.slug}-bible`) && (
-								<a href={`/bibles/${e.slug}-bible`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
-							)}
-							{builtPages.has(`${e.slug}-bible`) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
-							<LookInside slug={e.slug} title={e.title} variant="link" label="Look inside" />
-						</div>
+						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">{e.sub}</p>
 						<div class="flex flex-col gap-2 w-full mt-auto">
+							<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.2rem;">
+								{builtPages.has(`${e.slug}-bible`) && (
+									<a href={`/bibles/${e.slug}-bible`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
+								)}
+								{builtPages.has(`${e.slug}-bible`) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
+								<LookInside slug={e.slug} title={e.title} variant="link" label="Look inside" />
+							</div>
 							<span
 								aria-disabled="true"
 								class="inline-flex items-center justify-center rounded-full font-semibold"
