@@ -1,0 +1,713 @@
+---
+// LookInside.astro — an Amazon-style "Look inside" for one print edition.
+//
+// TWO reading modes, because a Bible is read two ways and Kevin approved one of
+// them before asking for the other:
+//
+//   FLIP (default)  — a two-page spread with a page-turn, the way you actually
+//                     hold a Bible open. Left page, right page, a gutter between
+//                     them, and a leaf that lifts and rotates about the gutter
+//                     with its underside showing and a shadow falling across the
+//                     page beneath.
+//   SCROLL          — the continuous ebook column, unchanged.
+//
+// The flip is hand-rolled CSS 3D rather than StPageFlip. See the commit message
+// for why; the short version is sizing control, lazy loading by construction,
+// an honest reduced-motion path, and no library bytes on a page under a 100/100
+// perf bar.
+//
+// Driven entirely by `slug`: it reads src/data/lookinside.json, so a product page
+// adopts the viewer with one tag and nothing else changes.
+//
+// PROTECTION: there is no PDF on the page, no link to one, and no download control.
+// Only the sample page images exist as assets at all — that is the real protection.
+// The contextmenu/dragstart/user-select suppression below is ordinary deterrence,
+// scoped to the viewer only. It cannot stop a screenshot, and is not meant to.
+import data from '../data/lookinside.json';
+
+interface Props {
+	slug: string;
+	title: string;
+	/** 'button' = pill (product page). 'link' = inline text link (the /print cards). */
+	variant?: 'button' | 'link';
+	/** 'lg' matches the page's primary CTA when the two sit side by side. */
+	size?: 'md' | 'lg';
+	label?: string;
+}
+const { slug, title, variant = 'button', size = 'md', label = 'Look inside' } = Astro.props;
+
+const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print/lookinside';
+
+type Page = { file: string; label: string; w: number; h: number };
+const entry = (data as Record<string, { count: number; pages: Page[] }>)[slug];
+const pages: Page[] = entry?.pages ?? [];
+const total = pages.length;
+
+const items = pages.map((p, i) => ({
+	src: `${ASSETS}/${slug}/${p.file}`,
+	label: p.label,
+	w: p.w,
+	h: p.h,
+	n: i + 1,
+}));
+
+// Page proportions drive every size in here; they come from the manifest, so a
+// box is always reserved at the right shape and nothing shifts as images land.
+const pw = pages[0]?.w ?? 928;
+const ph = pages[0]?.h ?? 1400;
+
+// Page sizing subtracts the viewer's own chrome (the dialog's margin plus its
+// bar) from the viewport, so a page — or a spread — lands whole without anyone
+// having to zoom. That value lives in CSS because it differs by breakpoint.
+---
+
+{
+	total > 0 && (
+		<div class={`lookinside li-${variant} li-size-${size}`} data-lookinside data-total={total}>
+			<button type="button" class="li-trigger" data-li-open aria-haspopup="dialog">
+				{variant === 'button' && (
+					<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M12 6.5C10.5 5.2 8.6 4.5 6.5 4.5H3v14h3.5c2.1 0 4 .7 5.5 2 1.5-1.3 3.4-2 5.5-2H21v-14h-3.5c-2.1 0-4 .7-5.5 2Z" />
+						<path d="M12 6.5v14" />
+					</svg>
+				)}
+				<span>{label}</span>
+			</button>
+
+			{/* The manifest, read by the flip renderer. No markup per page in flip
+			    mode: images are requested only for the spread you are on and the
+			    one next to it, which is what keeps opening cheap. */}
+			<script type="application/json" data-li-pages set:html={JSON.stringify(items)} />
+
+			{/* A dialog over the page, not a takeover: a dimmed backdrop with the
+			    page still visible around a contained panel. Backdrop click closes. */}
+			<div class="li-modal" data-li-modal hidden style={`--pw: ${pw}; --pw2: ${pw * 2}; --ph: ${ph};`}>
+			<div class="li-panel" data-li-panel role="dialog" aria-modal="true" aria-label={`Look inside — ${title}`}>
+				<div class="li-bar">
+					<div class="li-bar-text">
+						<span class="li-title">{title}</span>
+						<span class="li-readout" data-li-readout />
+					</div>
+
+					<div class="li-bar-tools">
+						<div class="li-modes" role="group" aria-label="Reading mode">
+							<button type="button" data-li-mode="flip" aria-pressed="true">Flip</button>
+							<button type="button" data-li-mode="scroll" aria-pressed="false">Scroll</button>
+						</div>
+						<label class="li-jump">
+							<span class="li-jump-label">Jump to</span>
+							<select data-li-jump aria-label="Jump to a page">
+								{items.map((p) => (
+									<option value={p.n}>{p.n}. {p.label}</option>
+								))}
+							</select>
+						</label>
+						<button type="button" class="li-close" data-li-close aria-label="Close the viewer">
+							<svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+						</button>
+					</div>
+				</div>
+
+				{/* FLIP — the book. Slots hold the spread you are on; a leaf is built
+				    on demand for each turn and thrown away when it lands. */}
+				<div class="li-stage" data-li-stage>
+					<div class="li-book" data-li-book>
+						<div class="li-slot li-slot-l" data-li-slot-l><img alt="" draggable="false" decoding="async" /></div>
+						<div class="li-slot li-slot-r" data-li-slot-r><img alt="" draggable="false" decoding="async" /></div>
+						<div class="li-gutter" aria-hidden="true" />
+						<div class="li-shield" aria-hidden="true" />
+					</div>
+					<button type="button" class="li-turn li-turn-prev" data-li-prev aria-label="Previous page">
+						<svg aria-hidden="true" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-8 7 8 7" /></svg>
+					</button>
+					<button type="button" class="li-turn li-turn-next" data-li-next aria-label="Next page">
+						<svg aria-hidden="true" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l8 7-8 7" /></svg>
+					</button>
+				</div>
+
+				{/* SCROLL — the continuous column, hidden while flipping so its
+				    lazy images are never requested in the other mode. */}
+				<div class="li-scroll" data-li-scroll tabindex="0" hidden>
+					{items.map((p) => (
+						<figure
+							class="li-page"
+							data-li-page={p.n}
+							style={`width: min(100%, calc((100dvh - var(--chrome)) * ${p.w} / ${p.h}));`}
+						>
+							{/* No src until scroll mode is first entered, so flip mode never
+							    requests a single image from this column. width/height still
+							    reserve the box, so nothing shifts when they do arrive. */}
+							<img
+								data-src={p.src}
+								alt={`${p.label} — sample page ${p.n} of ${total}`}
+								width={p.w}
+								height={p.h}
+								loading="lazy"
+								decoding="async"
+								draggable="false"
+							/>
+							<div class="li-shield" aria-hidden="true" />
+						</figure>
+					))}
+					<p class="li-end">End of the sample — {total} of {entry.count} pages shown.</p>
+				</div>
+			</div>
+			</div>
+		</div>
+	)
+}
+
+<style>
+	/* Neutral chrome throughout — greys and the site's ink/hairline tokens only.
+	   The page images are the one colorful thing in this viewer, by instruction. */
+	.lookinside { position: relative; z-index: 1; }
+	.li-button { display: flex; justify-content: center; margin: 0.9rem 0 0; }
+	.li-link { display: inline; }
+	/* Beside the buy button these two must read as a pair, so the trigger takes the
+	   CTA's exact padding and type size. (Kevin 2026-08-24) */
+	.li-size-lg { margin: 0; }
+	/* The CTA has no border and this does, and with auto height a border adds to the
+	   outer box — so the padding gives back the 1px on each side and the two match. */
+	.li-size-lg .li-trigger {
+		padding: calc(0.8rem - 1px) calc(1.8rem - 1px);
+		font-size: 1rem; font-weight: 600;
+	}
+	/* On a card the trigger is one of two peer links, so it takes the card's link
+	   shape rather than a pill that would compete with the buttons around it. */
+	.li-link .li-trigger {
+		display: inline; font-family: var(--font-sans); font-size: 0.82rem;
+		font-weight: 700; color: #3f3f46; background: none; border: 0;
+		border-radius: 0; padding: 0; text-decoration: underline;
+		text-underline-offset: 2px; cursor: pointer;
+	}
+	.li-link .li-trigger:hover { color: var(--color-ink); }
+
+	.li-trigger {
+		display: inline-flex; align-items: center; gap: 0.5rem;
+		font-family: var(--font-sans); font-size: 0.9rem; font-weight: 600;
+		color: #3f3f46; background: #fff;
+		border: 1px solid var(--color-hairline); border-radius: 999px;
+		padding: 0.55rem 1.1rem; cursor: pointer;
+		transition: background 0.18s ease, border-color 0.18s ease;
+	}
+	.li-trigger:hover { background: #f3f3f3; border-color: #a1a1aa; }
+	.li-trigger:focus-visible { outline: 2px solid #3f3f46; outline-offset: 2px; }
+
+	.li-note { font-family: var(--font-sans); color: #71717a; font-size: 0.78rem; margin: 0.5rem 0 0; }
+
+	/* The backdrop. The page stays visible behind it, dimmed, so the viewer
+	   reads as something opening ON this page rather than a page you navigated to. */
+	.li-modal {
+		position: fixed; inset: 0; z-index: 9999;
+		--chrome: 11rem;
+		display: flex; align-items: center; justify-content: center;
+		padding: 2.5rem 2rem;
+		background: rgba(10, 11, 11, 0.72);
+		-webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+		-webkit-user-select: none; user-select: none;
+		-webkit-touch-callout: none;
+	}
+	.li-modal[hidden] { display: none; }
+
+	/* The dialog itself: a contained panel with a visible boundary. */
+	.li-panel {
+		display: flex; flex-direction: column;
+		width: 100%; height: 100%;
+		max-width: 1180px;
+		background: #1a1c1c;
+		border: 1px solid #3f3f46; border-radius: 16px;
+		box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+		overflow: hidden;
+	}
+
+	.li-bar {
+		display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+		padding: 0.7rem 1rem; border-bottom: 1px solid #3f3f46; flex: none;
+	}
+	.li-bar-text { display: flex; flex-direction: column; min-width: 0; }
+	.li-title {
+		font-family: var(--font-sans); font-size: 0.72rem; font-weight: 700;
+		letter-spacing: 0.12em; text-transform: uppercase; color: #a1a1aa;
+		overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+	}
+	.li-readout {
+		font-family: var(--font-headline); font-size: 1rem; color: #f1f1f1;
+		overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+	}
+	.li-bar-tools { display: flex; align-items: center; gap: 0.6rem; flex: none; }
+
+	.li-modes { display: inline-flex; border: 1px solid #52525b; border-radius: 999px; overflow: hidden; }
+	.li-modes button {
+		font-family: var(--font-sans); font-size: 0.76rem; font-weight: 600;
+		color: #a1a1aa; background: transparent; border: 0;
+		padding: 0.45rem 0.85rem; cursor: pointer;
+	}
+	.li-modes button[aria-pressed='true'] { background: #3f3f46; color: #f1f1f1; }
+	.li-modes button:focus-visible { outline: 2px solid #f1f1f1; outline-offset: -2px; }
+
+	.li-jump { display: flex; align-items: center; gap: 0.4rem; }
+	.li-jump-label {
+		font-family: var(--font-sans); font-size: 0.72rem; font-weight: 700;
+		letter-spacing: 0.1em; text-transform: uppercase; color: #a1a1aa;
+	}
+	.li-jump select {
+		font-family: var(--font-sans); font-size: 0.82rem;
+		color: #f1f1f1; background: #2f3131;
+		border: 1px solid #52525b; border-radius: 6px;
+		padding: 0.45rem 0.5rem; max-width: 11rem; cursor: pointer;
+	}
+	.li-jump select:focus-visible { outline: 2px solid #f1f1f1; outline-offset: 2px; }
+
+	.li-close {
+		display: inline-flex; align-items: center; justify-content: center;
+		width: 44px; height: 44px; border-radius: 999px;
+		background: transparent; border: 1px solid #52525b; color: #f1f1f1; cursor: pointer;
+	}
+	.li-close:hover { background: #2f3131; }
+	.li-close:focus-visible { outline: 2px solid #f1f1f1; outline-offset: 2px; }
+
+	/* ── FLIP ─────────────────────────────────────────────────────────────── */
+	.li-stage {
+		position: relative; flex: 1 1 auto; min-height: 0;
+		display: flex; align-items: center; justify-content: center;
+		padding: 1rem;
+	}
+	.li-stage[hidden] { display: none; }
+	.li-stage:focus { outline: none; }
+
+	/* The open book. Sized from the viewport so a whole spread lands without
+	   zooming; the proportions come from the manifest. */
+	.li-book {
+		position: relative;
+		width: min(100%, calc((100dvh - var(--chrome)) * var(--pw2) / var(--ph)));
+		aspect-ratio: var(--pw2) / var(--ph);
+		perspective: 3200px;
+		background: #17181a;
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
+		/* A page never sticks out past the boards. Without this the perspective
+		   projection of the turning leaf runs past the book's top and bottom. */
+		overflow: hidden;
+	}
+
+	.li-slot { position: absolute; top: 0; height: 100%; width: 50%; overflow: hidden; background: #fff; }
+	.li-slot-l { left: 0; }
+	.li-slot-r { left: 50%; }
+	.li-slot img { display: block; width: 100%; height: 100%; -webkit-user-drag: none; pointer-events: none; }
+	.li-slot[data-empty='true'] { background: #17181a; }
+	.li-slot[data-empty='true'] img { visibility: hidden; }
+
+	/* The gutter: the shadowed valley where the two pages meet. */
+	.li-gutter {
+		position: absolute; top: 0; bottom: 0; left: 50%; width: 4.5%;
+		transform: translateX(-50%); pointer-events: none; z-index: 3;
+		background: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.24) 42%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.24) 58%, rgba(0,0,0,0) 100%);
+	}
+
+	/* The turning leaf, built per turn and removed when it lands. */
+	.li-leaf { position: absolute; top: 0; height: 100%; width: 50%; transform-style: preserve-3d; z-index: 6; will-change: transform; }
+	.li-leaf-fwd { left: 50%; transform-origin: left center; }
+	.li-leaf-bwd { left: 0; transform-origin: right center; }
+	.li-face {
+		position: absolute; inset: 0; overflow: hidden; background: #fff;
+		backface-visibility: hidden; -webkit-backface-visibility: hidden;
+	}
+	.li-face-back { transform: rotateY(180deg); }
+	.li-face img { display: block; width: 100%; height: 100%; -webkit-user-drag: none; pointer-events: none; }
+	/* Light raking across the leaf as it lifts — this is what reads as paper
+	   rather than a rectangle sliding. */
+	.li-gloss { position: absolute; inset: 0; pointer-events: none; opacity: 0; }
+	.li-face-front .li-gloss { background: linear-gradient(to left, rgba(0,0,0,0.34), rgba(0,0,0,0.02) 55%, rgba(255,255,255,0.06)); }
+	.li-face-back .li-gloss { background: linear-gradient(to right, rgba(0,0,0,0.4), rgba(0,0,0,0.04) 60%, rgba(255,255,255,0.05)); }
+	/* The shadow the leaf throws on the page underneath it. */
+	.li-drop { position: absolute; top: 0; height: 100%; width: 50%; z-index: 4; pointer-events: none; opacity: 0; }
+	.li-drop-fwd { left: 50%; background: linear-gradient(to right, rgba(0,0,0,0.45), rgba(0,0,0,0) 72%); }
+	.li-drop-bwd { left: 0; background: linear-gradient(to left, rgba(0,0,0,0.45), rgba(0,0,0,0) 72%); }
+
+	.li-shield { position: absolute; inset: 0; z-index: 7; }
+
+	.li-turn {
+		position: absolute; top: 50%; transform: translateY(-50%); z-index: 8;
+		display: inline-flex; align-items: center; justify-content: center;
+		width: 48px; height: 48px; border-radius: 999px;
+		background: rgba(47, 49, 49, 0.92); border: 1px solid #52525b;
+		color: #f1f1f1; cursor: pointer;
+	}
+	.li-turn-prev { left: 0.75rem; }
+	.li-turn-next { right: 0.75rem; }
+	.li-turn:hover:not(:disabled) { background: #3f3f46; }
+	.li-turn:disabled { opacity: 0.28; cursor: default; }
+	.li-turn:focus-visible { outline: 2px solid #f1f1f1; outline-offset: 2px; }
+
+	/* A phone cannot read a two-page spread, so below this it is one page at a
+	   time — still with the turn, just a whole leaf instead of half. */
+	@media (max-width: 767px) {
+		.li-book {
+			width: min(100%, calc((100dvh - var(--chrome)) * var(--pw) / var(--ph)));
+			aspect-ratio: var(--pw) / var(--ph);
+		}
+		.li-slot-l { display: none; }
+		.li-slot-r { left: 0; width: 100%; }
+		.li-gutter { display: none; }
+		.li-leaf { width: 100%; }
+		.li-leaf-fwd { left: 0; }
+		.li-drop { width: 100%; }
+		.li-drop-fwd, .li-drop-bwd { left: 0; }
+		.li-stage { padding: 0.5rem; }
+		.li-turn-prev { left: 0.35rem; }
+		.li-turn-next { right: 0.35rem; }
+		/* The bar's tools were taking 288 of 370px and squeezing the readout into
+		   an ellipsis; at this width they get only what they need. */
+		.li-bar { padding: 0.6rem 0.7rem; gap: 0.45rem; }
+		.li-bar-tools { gap: 0.4rem; }
+		.li-jump-label { display: none; }
+		.li-jump select { max-width: 4.5rem; padding: 0.4rem 0.3rem; font-size: 0.75rem; }
+		.li-modes button { padding: 0.4rem 0.5rem; font-size: 0.72rem; }
+		/* A phone gets a near-full-screen sheet — containment matters on desktop. */
+		.li-modal { padding: 0.5rem; --chrome: 5.5rem; }
+		.li-panel { border-radius: 12px; }
+		/* The edition name is already on the page behind; at this width the bar
+		   needs the room for the readout, which is the part that changes. */
+		.li-title { display: none; }
+		.li-readout { font-size: 0.9rem; }
+	}
+
+	/* ── SCROLL ───────────────────────────────────────────────────────────── */
+	.li-scroll {
+		flex: 1 1 auto; min-height: 0;
+		overflow-y: auto; overflow-x: hidden;
+		-webkit-overflow-scrolling: touch;
+		overscroll-behavior: contain;
+		scroll-behavior: smooth;
+		padding: 1rem 1rem 0;
+	}
+	.li-scroll[hidden] { display: none; }
+	.li-scroll:focus { outline: none; }
+	.li-scroll:focus-visible { outline: 2px solid #52525b; outline-offset: -2px; }
+	.li-page { margin: 0 auto 1rem; max-width: 100%; position: relative; background: #fff; box-shadow: 0 2px 18px rgba(0,0,0,0.45); }
+	.li-page img { display: block; width: 100%; height: auto; -webkit-user-drag: none; pointer-events: none; }
+	.li-end { font-family: var(--font-sans); font-size: 0.8rem; color: #a1a1aa; text-align: center; margin: 0; padding: 1rem 0 2rem; }
+	@media (max-width: 640px) {
+		.li-scroll { padding: 0.75rem 0.75rem 0; }
+		.li-page { margin-bottom: 0.75rem; }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.li-trigger { transition: none; }
+		.li-scroll { scroll-behavior: auto; }
+	}
+</style>
+
+<script>
+	document.querySelectorAll('[data-lookinside]').forEach((root) => {
+		if (root.hasAttribute('data-li-ready')) return;
+		root.setAttribute('data-li-ready', '');
+
+		let pages = [];
+		try { pages = JSON.parse(root.querySelector('[data-li-pages]')?.textContent || '[]'); } catch { return; }
+		if (!pages.length) return;
+
+		const modal = root.querySelector('[data-li-modal]');
+		const stage = root.querySelector('[data-li-stage]');
+		const book = root.querySelector('[data-li-book]');
+		const slotL = root.querySelector('[data-li-slot-l]');
+		const slotR = root.querySelector('[data-li-slot-r]');
+		const scroll = root.querySelector('[data-li-scroll]');
+		const readout = root.querySelector('[data-li-readout]');
+		const jump = root.querySelector('[data-li-jump]');
+		const prevBtn = root.querySelector('[data-li-prev]');
+		const nextBtn = root.querySelector('[data-li-next]');
+		const modeBtns = Array.from(root.querySelectorAll('[data-li-mode]'));
+		const figures = Array.from(root.querySelectorAll('[data-li-page]'));
+		if (!modal || !book) return;
+
+		const total = pages.length;
+		const TURN = 720;
+		let mode = 'flip';
+		let view = 0;
+		let turning = false;
+		let opener = null;
+		let portalled = false;
+
+		// Astro scopes this component's CSS with a data-astro-cid-* attribute, and
+		// elements built in JS do not get it — without this the leaf renders
+		// completely unstyled (no absolute positioning, no backface-visibility)
+		// while its WAAPI transform still runs, which looks like a turn but is not.
+		const SCOPE = Array.from(book.attributes).map((a) => a.name).find((n) => n.startsWith('data-astro-cid-'));
+		const scoped = (el) => { if (SCOPE) el.setAttribute(SCOPE, ''); return el; };
+
+		const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const single = () => window.matchMedia('(max-width: 767px)').matches;
+		let wasSingle = single();
+		stage.tabIndex = -1;
+
+		// A real book opens to a single first page, then spreads. Built this way an
+		// odd tail page stands alone the way the first one does, so fourteen pages
+		// never leave a broken half-spread at the end.
+		function buildViews() {
+			if (single()) return pages.map((_, i) => ({ l: null, r: i }));
+			const v = [{ l: null, r: 0 }];
+			for (let i = 1; i < total; i += 2) v.push({ l: i, r: i + 1 < total ? i + 1 : null });
+			return v;
+		}
+		let views = buildViews();
+
+		function viewOfPage(i) {
+			for (let v = 0; v < views.length; v++) if (views[v].l === i || views[v].r === i) return v;
+			return 0;
+		}
+
+		// Only the spread you are on and its neighbors are ever requested, so
+		// opening the book is not a fourteen-image download.
+		const preloaded = new Set();
+		function preload(v) {
+			const vw = views[v];
+			if (!vw) return;
+			[vw.l, vw.r].forEach((i) => {
+				if (i == null || preloaded.has(i)) return;
+				preloaded.add(i);
+				const im = new Image();
+				im.decoding = 'async';
+				im.src = pages[i].src;
+			});
+		}
+
+		function paintSlot(slot, i) {
+			const img = slot.querySelector('img');
+			if (i == null) { slot.setAttribute('data-empty', 'true'); img.alt = ''; return; }
+			slot.removeAttribute('data-empty');
+			if (img.getAttribute('src') !== pages[i].src) img.src = pages[i].src;
+			img.alt = `${pages[i].label} — sample page ${i + 1} of ${total}`;
+		}
+
+		// The bar is tight on a phone, and the jump menu already names the page,
+		// so the readout drops the label at that width rather than ellipsizing.
+		const narrow = () => window.matchMedia('(max-width: 640px)').matches;
+		function compactReadout(i) {
+			return narrow() ? `Page ${i + 1} of ${total}` : `Page ${i + 1} of ${total} — ${pages[i].label}`;
+		}
+
+		function flipReadout() {
+			const vw = views[view];
+			if (!vw) return '';
+			if (vw.l == null) return compactReadout(vw.r);
+			if (vw.r == null) return compactReadout(vw.l);
+			return `Pages ${vw.l + 1}–${vw.r + 1} of ${total}`;
+		}
+
+		function render() {
+			const vw = views[view];
+			paintSlot(slotL, vw.l);
+			paintSlot(slotR, vw.r);
+			readout.textContent = flipReadout();
+			prevBtn.disabled = view === 0;
+			nextBtn.disabled = view === views.length - 1;
+			const first = vw.l != null ? vw.l : vw.r;
+			if (jump.selectedIndex !== first) jump.selectedIndex = first;
+			preload(view); preload(view + 1); preload(view - 1);
+		}
+
+		// The turn. A leaf is built for it and thrown away when it lands, so there
+		// is never a stale leaf sitting in the DOM between turns.
+		function turn(dir) {
+			if (turning) return;
+			const target = view + dir;
+			if (target < 0 || target >= views.length) return;
+			// Reduced motion gets an instant page change, not a shortened animation.
+			if (reduced()) { view = target; render(); return; }
+
+			turning = true;
+			const from = views[view];
+			const to = views[target];
+			const fwd = dir > 0;
+			const sgl = single();
+			const frontIdx = fwd ? from.r : sgl ? from.r : from.l;
+			const backIdx = fwd ? (sgl ? to.r : to.l) : to.r;
+
+			// Reveal the destination underneath before the leaf lifts off it.
+			if (fwd) paintSlot(slotR, to.r); else paintSlot(slotL, sgl ? to.r : to.l);
+
+			const mkFace = (cls, idx) => {
+				const f = scoped(document.createElement('div'));
+				f.className = 'li-face ' + cls;
+				const im = scoped(document.createElement('img'));
+				im.draggable = false; im.alt = ''; im.decoding = 'async';
+				if (idx != null) im.src = pages[idx].src; else f.style.background = '#17181a';
+				const g = scoped(document.createElement('div'));
+				g.className = 'li-gloss';
+				f.append(im, g);
+				return f;
+			};
+			const leaf = scoped(document.createElement('div'));
+			leaf.className = 'li-leaf ' + (fwd ? 'li-leaf-fwd' : 'li-leaf-bwd');
+			leaf.setAttribute('aria-hidden', 'true');
+			const front = mkFace('li-face-front', frontIdx);
+			const back = mkFace('li-face-back', backIdx);
+			leaf.append(front, back);
+
+			const drop = scoped(document.createElement('div'));
+			drop.className = 'li-drop ' + (fwd ? 'li-drop-fwd' : 'li-drop-bwd');
+			drop.setAttribute('aria-hidden', 'true');
+			book.append(drop, leaf);
+
+			const opts = { duration: TURN, easing: 'cubic-bezier(.36,.08,.28,1)', fill: 'forwards' };
+			const anim = leaf.animate(
+				[{ transform: 'rotateY(0deg)' }, { transform: `rotateY(${fwd ? -180 : 180}deg)` }],
+				opts
+			);
+			front.querySelector('.li-gloss').animate([{ opacity: 0 }, { opacity: 0.85 }, { opacity: 0 }], { duration: TURN, easing: 'ease-in-out' });
+			back.querySelector('.li-gloss').animate([{ opacity: 0.9 }, { opacity: 0.45 }, { opacity: 0 }], { duration: TURN, easing: 'ease-out' });
+			drop.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], { duration: TURN, easing: 'ease-in-out' });
+
+			const land = () => {
+				leaf.remove(); drop.remove();
+				view = target; turning = false; render();
+			};
+			anim.finished.then(land).catch(land);
+		}
+
+		function goToView(v) {
+			v = Math.max(0, Math.min(views.length - 1, v));
+			if (v === view) return;
+			if (Math.abs(v - view) === 1) { turn(v - view); return; }
+			view = v; render();
+		}
+
+		// ── scroll mode readout ──────────────────────────────────────────────
+		const seen = new Map();
+		const io = new IntersectionObserver(
+			(entries) => {
+				if (mode !== 'scroll') return;
+				for (const e of entries) seen.set(e.target, e.intersectionRatio);
+				let best = null, bestRatio = 0;
+				for (const [el, ratio] of seen) if (ratio > bestRatio) { bestRatio = ratio; best = el; }
+				if (best && bestRatio > 0) {
+					const i = figures.indexOf(best);
+					readout.textContent = compactReadout(i);
+					if (jump.selectedIndex !== i) jump.selectedIndex = i;
+				}
+			},
+			{ root: scroll, threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] }
+		);
+
+		// The scroll column stays srcless until the reader actually asks for it.
+		let scrollHydrated = false;
+		function hydrateScroll() {
+			if (scrollHydrated) return;
+			scrollHydrated = true;
+			figures.forEach((f) => {
+				const im = f.querySelector('img');
+				if (im && im.dataset.src) im.src = im.dataset.src;
+			});
+		}
+
+		function setMode(m) {
+			mode = m;
+			modeBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.liMode === m)));
+			const flip = m === 'flip';
+			stage.hidden = !flip;
+			scroll.hidden = flip;
+			if (flip) {
+				io.disconnect(); seen.clear();
+				views = buildViews();
+				if (view >= views.length) view = views.length - 1;
+				render();
+				stage.focus({ preventScroll: true });
+			} else {
+				hydrateScroll();
+				const i = views[view]?.l ?? views[view]?.r ?? 0;
+				readout.textContent = compactReadout(i);
+				figures[i]?.scrollIntoView({ block: 'start', behavior: 'auto' });
+				scroll.focus({ preventScroll: true });
+				// Observe only once the jump has landed. Observing first makes the
+				// first callback describe where the column was, not where it went.
+				requestAnimationFrame(() => {
+					if (mode === 'scroll') figures.forEach((f) => io.observe(f));
+				});
+			}
+		}
+
+		// The book grows out of the cover it was opened from, with a slight
+		// rotation, so it reads as the book opening rather than a panel appearing.
+		function coverOpen() {
+			if (reduced()) return;
+			const cover = root.parentElement?.querySelector('img');
+			if (!cover) return;
+			const c = cover.getBoundingClientRect();
+			const b = book.getBoundingClientRect();
+			if (!b.width || !c.width) return;
+			const dx = c.left + c.width / 2 - (b.left + b.width / 2);
+			const dy = c.top + c.height / 2 - (b.top + b.height / 2);
+			book.animate(
+				[
+					{ transform: `translate(${dx}px, ${dy}px) scale(${c.width / b.width}, ${c.height / b.height}) rotateY(-26deg)`, opacity: 0.35 },
+					{ transform: 'none', opacity: 1 },
+				],
+				{ duration: 460, easing: 'cubic-bezier(.22,.61,.36,1)' }
+			);
+		}
+
+		function onResize() {
+			if (modal.hidden || single() === wasSingle) return;
+			const page = views[view]?.l ?? views[view]?.r ?? 0;
+			wasSingle = single();
+			views = buildViews();
+			view = viewOfPage(page);
+			if (mode === 'flip') render();
+		}
+
+		function onKey(e) {
+			if (modal.hidden) return;
+			if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+			if (e.target === jump) return;
+			if (mode === 'flip') {
+				if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); turn(1); }
+				else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); turn(-1); }
+				else if (e.key === 'Home') { e.preventDefault(); goToView(0); }
+				else if (e.key === 'End') { e.preventDefault(); goToView(views.length - 1); }
+			} else if (e.key === 'Home') { e.preventDefault(); figures[0]?.scrollIntoView({ block: 'start' }); }
+			else if (e.key === 'End') { e.preventDefault(); figures[total - 1]?.scrollIntoView({ block: 'start' }); }
+		}
+
+		function open() {
+			opener = document.activeElement;
+			if (!portalled) { document.body.appendChild(modal); portalled = true; }
+			modal.hidden = false;
+			document.body.style.overflow = 'hidden';
+			wasSingle = single();
+			views = buildViews();
+			view = 0;
+			setMode('flip');
+			coverOpen();
+			document.addEventListener('keydown', onKey, true);
+			window.addEventListener('resize', onResize);
+		}
+
+		function close() {
+			modal.hidden = true;
+			document.body.style.overflow = '';
+			io.disconnect(); seen.clear();
+			document.removeEventListener('keydown', onKey, true);
+			window.removeEventListener('resize', onResize);
+			if (opener && opener.focus) opener.focus();
+		}
+
+		// Clicking the dimmed backdrop closes, alongside Escape and the close button.
+		modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+
+		root.querySelector('[data-li-open]')?.addEventListener('click', open);
+		root.querySelector('[data-li-close]')?.addEventListener('click', close);
+		prevBtn.addEventListener('click', () => turn(-1));
+		nextBtn.addEventListener('click', () => turn(1));
+		modeBtns.forEach((b) => b.addEventListener('click', () => setMode(b.dataset.liMode)));
+		jump.addEventListener('change', () => {
+			const i = jump.selectedIndex;
+			if (mode === 'flip') goToView(viewOfPage(i));
+			else figures[i]?.scrollIntoView({ block: 'start' });
+		});
+
+		// Deterrence, scoped to the viewer. Anything the browser renders can be
+		// captured; this only removes the convenient paths.
+		modal.addEventListener('contextmenu', (e) => e.preventDefault());
+		modal.addEventListener('dragstart', (e) => e.preventDefault());
+	});
+</script>
