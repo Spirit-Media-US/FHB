@@ -1,0 +1,442 @@
+---
+import LookInside from '../../components/LookInside.astro';
+import Section from '../../components/Section.astro';
+import frontmatter from '../../data/editions/frontmatter.json';
+import shared from '../../data/editions/shared.json';
+// /bibles/<slug>-bible — the PRODUCT page for every Divine Voice Color edition.
+//
+// Why this exists alongside /bible-for/<audience>: those pages answer a PASTORAL search
+// ("bible verses for teenagers") and this one answers a PURCHASE search ("teen bible",
+// "confirmation gift bible"). They target different intent and link to each other rather
+// than competing for the same query.
+//
+// Every fact here — ISBN, price, page count, BISAC, keywords, descriptions — is lifted from
+// the edition's Drive metadata sheet, the same source the Ingram listing uses, so the site
+// and the trade record cannot drift apart.
+//
+// THE DATA BOUNDARY, which is the whole point of this file:
+//   src/data/editions/<slug>.json   — what is TRUE OF THIS EDITION ONLY (audience, hook,
+//                                     listing copy, FAQ, ISBN). See SCHEMA.md.
+//   src/data/editions/shared.json   — what is IDENTICAL IN ALL SIXTEEN (the preface, the
+//                                     hearing-His-voice pages, the bios, the translation
+//                                     description). Written once, never copied sixteen times.
+//   src/data/editions/frontmatter.json — extracted from the shipping interiors: the audience
+//                                     page and the three pillar pages. Read, never retyped.
+import Layout from '../../layouts/Layout.astro';
+
+const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
+const READ_URL = 'https://fathersheartbible.com/read';
+const SITE = 'https://fathersheartbible.com';
+
+// The journaling edition is `journaling` on /print and in the asset names, but its front
+// matter was extracted under the interior's own name, `divinevoice`. Alias, don't rename:
+// the asset paths and the /print cart keys are live.
+const FM_ALIAS: Record<string, string> = { journaling: 'divinevoice' };
+
+type Edition = {
+	slug: string;
+	name: string;
+	title: string;
+	sub: string;
+	isbn: string;
+	price: number;
+	pages?: number;
+	published: string;
+	datePublished?: string;
+	trim?: string;
+	binding?: string;
+	audienceNoun: string;
+	audienceSingular?: string;
+	hook: {
+		h2: string;
+		ref: string;
+		href: string;
+		text: string;
+		father?: string[];
+		son?: string[];
+		spirit?: string[];
+		note: string;
+	};
+	relatedGuide?: { href: string; label: string };
+	listing: {
+		short350: string[];
+		long: { h: string; body: string[] }[];
+		features: string[];
+		keywords: string[];
+		keywordsSchema?: string[];
+		bisac: [string, string][];
+	};
+	faq: { q: string; a: string }[];
+};
+
+export async function getStaticPaths() {
+	// One page per edition data file. A file that has not landed yet simply has no page —
+	// the route is driven by the data, so the fifteen arrive as their JSON does.
+	const files = import.meta.glob<{ default: Edition }>('../../data/editions/*.json', {
+		eager: true,
+	});
+	const editions = Object.entries(files)
+		.filter(([path]) => /\/[a-z0-9-]+\.json$/.test(path))
+		.map(([, mod]) => mod.default)
+		.filter((e) => e && typeof e.slug === 'string' && e.listing && e.hook);
+	return editions.map((ed) => ({ params: { slug: `${ed.slug}-bible` }, props: { ed } }));
+}
+
+const { ed } = Astro.props as { ed: Edition };
+
+const fm = (frontmatter as Record<string, { pages?: number; pillars?: Pillar[] }>)[
+	FM_ALIAS[ed.slug] ?? ed.slug
+];
+type Pillar = { title: string; line: string; verses: [string, string][] };
+const pillars: Pillar[] = fm?.pillars ?? [];
+const pages = ed.pages ?? fm?.pages ?? 876;
+const trim = ed.trim ?? '6 x 9 in';
+const binding = ed.binding ?? 'Hardcover, case laminate with dust jacket';
+
+// "Intimacy for Teens" -> "for Teens". The pillar titles are uniform across the interiors,
+// so the audience phrase the printed book uses is the one the page uses too — no second
+// place to keep it in sync.
+const pillarSuffix = pillars[0]?.title.replace(/^\S+\s+/, '') ?? '';
+
+const MONTHS = [
+	'January',
+	'February',
+	'March',
+	'April',
+	'May',
+	'June',
+	'July',
+	'August',
+	'September',
+	'October',
+	'November',
+	'December',
+];
+function isoDate(display: string): string {
+	const m = /^([A-Za-z]+)\s+(\d{4})$/.exec(display.trim());
+	if (!m) return display;
+	const i = MONTHS.indexOf(m[1]);
+	return i < 0 ? display : `${m[2]}-${String(i + 1).padStart(2, '0')}-01`;
+}
+const datePublished = ed.datePublished ?? isoDate(ed.published);
+
+// `title` is the long JSON-LD name ("Father's Heart Bible — Dad's Bible"); `name` is the h1.
+// Tolerate a data file that set them equal rather than emitting a Book whose name and
+// alternateName are the same string.
+const schemaName = ed.title === ed.name ? `Father’s Heart Bible — ${ed.name}` : ed.title;
+
+const VOICE = { father: '#3563ae', son: '#f04933', spirit: '#91278f' };
+function mark(text: string, spans: string[], color: string): string {
+	let out = text;
+	for (const s of spans)
+		if (s && out.includes(s))
+			out = out.replace(s, `<span style="color:${color};font-weight:600;">${s}</span>`);
+	return out;
+}
+let hookHtml = mark(ed.hook.text, ed.hook.father ?? [], VOICE.father);
+hookHtml = mark(hookHtml, ed.hook.son ?? [], VOICE.son);
+hookHtml = mark(hookHtml, ed.hook.spirit ?? [], VOICE.spirit);
+
+// color the COLOUR WORDS, not the sentence around them (Kevin 2026-08-23). The claim is
+// "our Father's words in BLUE" — so BLUE is what should be blue. coloring the whole line
+// makes it decoration; coloring the one word makes it a demonstration. Applied to every
+// paragraph, so it works for the standalone lines and for the sentence that runs them
+// together mid-prose.
+const COLOUR_WORD: Record<string, string> = {
+	BLUE: VOICE.father,
+	RED: VOICE.son,
+	PURPLE: VOICE.spirit,
+};
+function colorWords(text: string): string {
+	return text.replace(
+		/\b(BLUE|RED|PURPLE)\b/g,
+		(w) => `<span style="color:${COLOUR_WORD[w]};font-weight:800;">${w}</span>`,
+	);
+}
+
+// The front matter every copy carries, before Genesis 1:1. Shared for every edition except
+// the pillars line, which names this edition's own reader — and which the journaling
+// edition does not have at all, so it is spliced in rather than blanked out.
+const frontMatterParts: [string, string][] = [...(shared.frontMatterParts as [string, string][])];
+if (pillars.length) {
+	const p = shared.pillarsFrontMatter;
+	frontMatterParts.splice(p.index, 0, [p.name, p.what.replace('{suffix}', pillarSuffix)]);
+}
+
+const url = `${SITE}/bibles/${ed.slug}-bible`;
+const productSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Book',
+	'@id': `${url}#book`,
+	name: schemaName,
+	alternateName: ed.name,
+	bookFormat: 'https://schema.org/Hardcover',
+	numberOfPages: pages,
+	isbn: ed.isbn,
+	inLanguage: 'en',
+	datePublished,
+	description: `${ed.sub}. The complete Bible in Divine Voice Color — our Father's words in blue, the Son's in red, the Spirit's in purple.`,
+	image: `${ASSETS}/dvc-${ed.slug}-1200.webp`,
+	url,
+	publisher: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+	author: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+	translationOfWork: { '@type': 'Book', name: 'The Holy Bible' },
+	keywords: (ed.listing.keywordsSchema ?? ed.listing.keywords).join(', '),
+	offers: {
+		'@type': 'Offer',
+		price: ed.price.toFixed(2),
+		priceCurrency: 'USD',
+		availability: 'https://schema.org/InStock',
+		url: `${SITE}/print`,
+		seller: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+		shippingDetails: {
+			'@type': 'OfferShippingDetails',
+			shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'USD' },
+		},
+	},
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: ed.faq.map((f) => ({
+		'@type': 'Question',
+		name: f.q,
+		acceptedAnswer: { '@type': 'Answer', text: f.a },
+	})),
+};
+---
+
+<Layout
+	title={`${ed.name} | ${ed.sub.split(' - ')[0]} | Father's Heart Bible™`}
+	description={`The ${ed.name} — the complete Bible in Divine Voice Color, where you can see who is speaking. Our Father's words in blue, the Son's in red, the Spirit's in purple. Hardcover, ${pages} pages, free shipping.`}
+>
+	<script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
+	<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+	<main>
+		<Section variant="light">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start max-w-5xl mx-auto">
+				<!-- Front and back toggle, the way a retail listing does it (Kevin 2026-08-23).
+				     Hover was wrong for this: it is undiscoverable, and it does not exist at all
+				     on a phone, where most of this traffic lands. -->
+				<div class="flex flex-col items-center">
+					<div style="max-width: 340px; width: 100%;">
+						<img id="cover-main" src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} alt={`${ed.name} — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
+					</div>
+				</div>
+				<div>
+					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Divine Voice Color</p>
+					<h1 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2.4rem; font-weight: 600; margin: 0 0 0.6rem;">{ed.name}</h1>
+					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.55; margin: 0 0 1.2rem;">{ed.sub}</p>
+					<div class="flex flex-wrap items-center gap-2 mb-5">
+						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.father}; background: #fff; border: 2px solid ${VOICE.father}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>FATHER</span>
+						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.son}; background: #fff; border: 2px solid ${VOICE.son}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>SON</span>
+						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.spirit}; background: #fff; border: 2px solid ${VOICE.spirit}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>SPIRIT</span>
+					</div>
+					<p style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">${ed.price.toFixed(2)}</p>
+					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">Free shipping — a $15 value.</p>
+					<div class="flex flex-wrap items-center gap-3">
+						<a href="/print" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Buy Now</a>
+						<LookInside slug={ed.slug} title={ed.name} size="lg" />
+					</div>
+				</div>
+			</div>
+		</Section>
+		<Section variant="warm">
+			<div class="max-w-3xl mx-auto">
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">{ed.hook.h2}</h2>
+				<div class="rounded-2xl p-7" style="background: #fff; border: 1px solid var(--color-hairline);">
+					<p style="font-family: var(--font-serif); font-size: 1.1rem; line-height: 1.7; color: var(--color-ink); margin: 0;" set:html={hookHtml}></p>
+					<a href={ed.hook.href} style="display: inline-block; font-family: var(--font-sans); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.03em; color: #71717a; margin: 1rem 0 0; text-decoration: underline;">{ed.hook.ref} (FHB)</a>
+				</div>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.65; margin: 1.5rem 0 0;">{ed.hook.note}</p>
+			</div>
+		</Section>
+		<!-- In brief, and the searches this edition is for -->
+		<Section variant="light">
+			<div class="max-w-3xl mx-auto">
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">What makes this a Bible for {ed.audienceNoun}</h2>
+				{ed.listing.short350.map((para) => (
+					<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colorWords(para)}></p>
+				))}
+			</div>
+		</Section>
+		<!-- What this reader actually gets that no other edition has. "From the front matter"
+		     named a location in the book; this names the value. (Kevin 2026-08-23) -->
+		<Section variant="soft">
+			<div class="max-w-3xl mx-auto">
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 0.4rem;">{pillars.length ? `Identity, intimacy, and inheritance ${pillarSuffix.toLowerCase()}` : 'What every copy opens with'}</h2>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.98rem; line-height: 1.65; margin: 0 0 2rem;">Every copy opens with these pages, written for {ed.audienceSingular ?? ed.audienceNoun}, before Genesis 1:1.</p>
+
+				<div class="grid gap-x-8 gap-y-4" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 0 0 2.6rem;">
+					{frontMatterParts.map(([name, what]) => (
+						<div>
+							<h3 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.88rem; font-weight: 800; letter-spacing: 0.01em; margin: 0 0 0.2rem;">{name}</h3>
+							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.92rem; line-height: 1.55; margin: 0;">{what}</p>
+						</div>
+					))}
+				</div>
+
+				{pillars.map((pil) => (
+					<div style="margin: 0 0 2.2rem;">
+						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 0 0 0.15rem;">{pil.title}</h3>
+						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.97rem; font-style: italic; margin: 0 0 0.9rem;">{pil.line}</p>
+						<dl style="margin: 0;">
+							{pil.verses.map(([ref, text]) => (
+								<div style="display: flex; gap: 0.75rem; align-items: baseline; padding: 0.4rem 0; border-top: 1px solid var(--color-hairline);">
+									<dt style="font-family: var(--font-sans); font-size: 0.8rem; font-weight: 700; color: #3f3f46; white-space: nowrap; min-width: 7.5rem;">{ref}</dt>
+									<dd style="font-family: var(--font-body); font-size: 0.97rem; line-height: 1.6; color: var(--color-ink); margin: 0;">{text}</dd>
+								</div>
+							))}
+						</dl>
+					</div>
+				))}
+				<div style="margin: 2.6rem 0 0;">
+					<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 0 0 0.15rem;">{shared.hearing.title}</h3>
+					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.97rem; font-style: italic; margin: 0 0 1.2rem;">{shared.hearing.line}</p>
+					{shared.hearing.groups.map((g) => (
+						<div style="margin: 0 0 1.6rem;">
+							<h4 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.98rem; font-weight: 800; margin: 0 0 0.35rem;">{g.h}</h4>
+							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 0.99rem; line-height: 1.65; margin: 0 0 0.6rem;">{g.p}</p>
+							<dl style="margin: 0;">
+								{g.verses.map(([ref, text]) => (
+								<div style="display: flex; gap: 0.75rem; align-items: baseline; padding: 0.4rem 0; border-top: 1px solid var(--color-hairline);">
+									<dt style="font-family: var(--font-sans); font-size: 0.8rem; font-weight: 700; color: #3f3f46; white-space: nowrap; min-width: 7.5rem;">{ref}</dt>
+									<dd style="font-family: var(--font-body); font-size: 0.97rem; line-height: 1.6; color: var(--color-ink); margin: 0;">{text}</dd>
+								</div>
+								))}
+							</dl>
+						</div>
+					))}
+				</div>
+
+			</div>
+		</Section>
+		<!-- What's inside + product details, laid out as a retail listing rather than a list -->
+		<Section variant="soft">
+			<div class="max-w-4xl mx-auto">
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1.4rem;">What’s inside</h2>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-3 mb-10">
+					{ed.listing.features.map((f) => (
+						<div class="flex items-start gap-3">
+							<span aria-hidden="true" style="color: #3f3f46; font-weight: 700; line-height: 1.6;">·</span>
+							<span style="font-family: var(--font-body); color: var(--color-ink); font-size: 1rem; line-height: 1.6;">{f}</span>
+						</div>
+					))}
+				</div>
+
+				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 0 0 0.9rem;">Product details</h3>
+				<div class="rounded-2xl overflow-hidden" style="border: 1px solid var(--color-hairline); background: #fff;">
+					{[
+						['Publisher', 'Spirit Media Publishing'],
+						['Publication date', ed.published],
+						['Language', 'English'],
+						['Translation', 'Father’s Heart Bible™ — An Intimate Translation'],
+						['Print length', `${pages} pages`],
+						['Binding', binding],
+						['Dimensions', trim],
+						['Interior', 'Full color throughout'],
+						['ISBN-13', ed.isbn],
+						['BISAC codes', null],
+					].map(([k, v], n) => (
+						<div class="flex flex-wrap gap-2 px-5 py-3" style={`font-family: var(--font-sans); font-size: 0.9rem; ${n % 2 ? 'background: #fafafa;' : ''}`}>
+							<span style="color: #71717a; min-width: 10rem;">{k}</span>
+							{v === null ? (
+								<span style="color: var(--color-ink); font-weight: 600; flex: 1;">
+									{ed.listing.bisac.map(([code, label]) => (<span style="display: block;">{`${code}  ${label}`}</span>))}
+								</span>
+							) : (
+								<span style="color: var(--color-ink); font-weight: 600; flex: 1;">{v}</span>
+							)}
+						</div>
+					))}
+				</div>
+			</div>
+		</Section>
+		<!-- The full listing — the same copy the Ingram/Amazon record carries, not a summary
+		     of it. Kevin 2026-08-23: "you have a full page to describe this bible, but you are
+		     only given 10% of what we gave Ingram." -->
+		<Section variant="light">
+			<div class="max-w-3xl mx-auto">
+				{ed.listing.long.map((sec) => (
+					<div class="mb-8">
+						<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.8rem;">{sec.h}</h2>
+						{sec.body.map((para) => (
+							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colorWords(para)}></p>
+						))}
+					</div>
+				))}
+			</div>
+		</Section>
+		<!-- About the translation, and who made it -->
+		<Section variant="warm">
+			<div class="max-w-3xl mx-auto">
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">About this translation</h2>
+				{shared.about.map((para) => (
+					<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;">{para}</p>
+				))}
+
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 mb-8">
+					{shared.credits.map(([k, v]) => (
+						<div class="rounded-xl p-4" style="background: #fff; border: 1px solid var(--color-hairline);">
+							<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 0.3rem;">{k}</p>
+							<p style="font-family: var(--font-sans); color: var(--color-ink); font-weight: 600; margin: 0;">{v}</p>
+						</div>
+					))}
+				</div>
+
+				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.2rem; font-weight: 600; margin: 0 0 0.6rem;">Kevin White</h3>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.98rem; line-height: 1.65; margin: 0 0 1.6rem;">{shared.bio}</p>
+				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.2rem; font-weight: 600; margin: 0 0 0.6rem;">Spirit Media Publishing</h3>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.98rem; line-height: 1.65; margin: 0;">{shared.publisher}</p>
+			</div>
+		</Section>
+
+		<!-- The preface itself — the translation's own account of why it exists. -->
+		<Section variant="light">
+			<div class="max-w-3xl mx-auto">
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1.4rem;">Why this translation exists</h2>
+				{shared.preface.map((sec) => (
+					<div style="margin: 0 0 1.7rem;">
+						<h4 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.98rem; font-weight: 800; margin: 0 0 0.5rem;">{sec.h}</h4>
+						{sec.p.map((para) => (
+							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1rem; line-height: 1.7; margin: 0 0 0.7rem;" set:html={colorWords(para)}></p>
+						))}
+					</div>
+				))}
+				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.1rem; font-weight: 600; margin: 2.6rem 0 0.7rem;">Also known as</h3>
+				<div class="flex flex-wrap gap-2">
+					{ed.listing.keywords.map((k) => (
+						<span style="font-family: var(--font-sans); font-size: 0.82rem; color: #3f3f46; background: var(--color-surface-low); border: 1px solid var(--color-hairline); border-radius: 999px; padding: 0.3rem 0.75rem;">{k}</span>
+					))}
+				</div>
+			</div>
+		</Section>
+		<Section variant="soft">
+			<div class="max-w-3xl mx-auto">
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1.2rem;">Questions</h2>
+				<div class="space-y-3">
+					{ed.faq.map((f) => (
+						<details class="faq-item rounded-2xl" style="background-color: #fff; border: 1px solid var(--color-hairline);">
+							<summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">
+								<span>{f.q}</span>
+							</summary>
+							<div class="px-5 pb-5 -mt-1">
+								<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.6;" set:html={colorWords(f.a)}></p>
+							</div>
+						</details>
+					))}
+				</div>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; margin: 1.75rem 0 0;">
+					Looking for scripture rather than a copy to hold? {ed.relatedGuide && (<Fragment>Read <a href={ed.relatedGuide.href} style="color: #3f3f46; text-decoration: underline;">{ed.relatedGuide.label}</a>, or read</Fragment>)}{!ed.relatedGuide && 'Read'} the whole Bible free at <a href={READ_URL} style="color: #3f3f46; text-decoration: underline;">fathersheartbible.com/read</a>. See <a href="/print" style="color: #3f3f46; text-decoration: underline;">all sixteen Divine Voice Color editions</a>.
+				</p>
+			</div>
+		</Section>
+	</main>
+</Layout>
+
+
+<style>
+	.faq-item > summary { cursor: pointer; list-style: none; }
+	.faq-item > summary::-webkit-details-marker { display: none; }
+</style>

@@ -8,31 +8,52 @@ it, never retype it.
 
 ```jsonc
 {
-  "slug": "dads",
-  "name": "Dad's Bible",                 // as it appears on /print
-  "title": "Dad's Bible",                // <h1>
-  "sub": "…",                            // the /print subtitle, verbatim
+  "slug": "dads",                        // matches /print and the cover asset name
+  "name": "Dad's Bible",                 // the <h1>, and the name on /print
+  "title": "Father’s Heart Bible — Dad's Bible",  // the long name, JSON-LD only
+  "sub": "…",                            // the audience line under the h1; start from the
+                                         // /print subtitle, refine for the page
   "isbn": "979-8-89307-…",
   "price": 99.99,
-  "pages": 876,
-  "published": "September 2026",
-  "audienceNoun": "dads",                // used in prose: "written for dads"
+  "pages": 876,                          // 788 for the journaling edition
+  "published": "September 2026",         // display; ISO is derived
+  "trim": "6 x 9 in",                    // optional — 8 x 10 in for journaling
+  "binding": "Hardcover, case laminate with dust jacket",   // optional
+  "audienceNoun": "dads",                // "What makes this a Bible for dads"
+  "audienceSingular": "a dad",           // "written for a dad, before Genesis 1:1"
   "hook": {                              // the one passage that opens the page
-    "h2": "…", "ref": "…", "href": "/read/…#v…",
+    "h2": "…",                           // the section heading above the passage
+    "ref": "…", "href": "/read/…#v…",
     "text": "…",                         // FHB text, verbatim from canon
     "father": ["…"], "son": [], "spirit": [],   // spans to color, verbatim substrings
     "note": "…"                          // 2–3 sentences on why this passage, for this reader
   },
+  "relatedGuide": { "href": "/bible-for/dads", "label": "Bible verses for dads" },  // optional;
+                                         // omit if no /bible-for page exists yet
   "listing": {
     "short350": ["…"],                   // the 30-second answer, ~350 words
     "long": [{ "h": "…", "body": ["…"] }],       // 4 sections, the Ingram/Amazon long description
     "features": ["…"],                   // What's inside bullets
-    "keywords": ["…"],                   // 20–25, lowercase, real search terms
+    "keywords": ["…"],                   // 20–25, lowercase, real search terms — the chips
+    "keywordsSchema": ["…"],             // optional; the ~10 that go in JSON-LD keywords
     "bisac": [["BIB018070", "BIBLES / …"]]
   },
   "faq": [{ "q": "…", "a": "…" }]        // 4–6, specific to this edition, HTML allowed
 }
 ```
+
+## What is NOT in this file
+
+Do not write these into a per-edition file — the template supplies them for all sixteen from
+`shared.json`, and a copy here would be sixteen places to fix one typo:
+
+- the preface ("Why this translation exists"), all eight sections
+- the "Hearing your Father’s voice" passages
+- "About this translation", the credits table, and the Kevin White / Spirit Media bios
+- the front-matter list (Presentation page, Abba Father, …). The pillars row is generated
+  from `frontmatter.json`, so it names this edition's reader automatically.
+- the three pillar pages and their verses — those come from `frontmatter.json`, keyed by slug
+  (the journaling edition is keyed `divinevoice` there, and has no pillars at all)
 
 ## Rules
 

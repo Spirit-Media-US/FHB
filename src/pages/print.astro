@@ -154,12 +154,19 @@ const CAMPAIGN_URL = '/a-bible-for-the-whole-world/';
 // Neutral: the only color between the header and the footer is the three voices and
 // the cover art (Kevin 2026-08-23).
 const LINK = 'color: #3f3f46; text-decoration: underline;';
-// Only link "Full details" where the product page exists — the other fifteen are still
-// to be built, and a card linking to a 404 is worse than a card without the link.
+// Only link "Full details" where the product page exists. The pages come from a dynamic
+// route (src/pages/bibles/[slug].astro) driven by src/data/editions/<slug>.json, so the
+// presence of the DATA file — not of an .astro file — is what says a page will be built.
+// Tolerant by design: an edition whose data has not landed yet just loses the link.
+const editionData = import.meta.glob<{ default?: { slug?: string } }>('../data/editions/*.json', {
+	eager: true,
+});
 const builtPages = new Set(
-	Object.keys(import.meta.glob('./bibles/*.astro')).map((f) =>
-		f.split('/').pop()!.replace('.astro', ''),
-	),
+	Object.entries(editionData)
+		.filter(([f]) => !/\/(frontmatter|shared)\.json$/.test(f))
+		.map(([f, m]) => m?.default?.slug ?? f.split('/').pop()!.replace('.json', ''))
+		.filter(Boolean)
+		.map((slug) => `${slug}-bible`),
 );
 const TRANSLATION_URL = '/the-fathers-heart-bible/translation-philosophy/';
 const CONTACT = 'mailto:hello@spiritmediapublishing.com?subject=Father%27s%20Heart%20Bible%20print';
