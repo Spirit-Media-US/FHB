@@ -207,8 +207,10 @@ const faqSchema = {
 ---
 
 <Layout
-	title={`${ed.name} | ${ed.sub.split(' - ')[0]} | Father's Heart Bible™`}
-	description={`The ${ed.name} — the complete Bible in Divine Voice Color, where you can see who is speaking. Our Father's words in blue, the Son's in red, the Spirit's in purple. Hardcover, ${pages} pages, free shipping.`}
+	title={ed.seo?.title ?? `${ed.name} | Father's Heart Bible™`}
+	description={ed.seo?.description ?? `The ${ed.name} — the complete Bible in Divine Voice Color. Hardcover, ${pages} pages.`}
+	image={`${ASSETS}/dvc-${ed.slug}-1200.webp`}
+	imageAlt={`${ed.name} — Father's Heart Bible in Divine Voice Color`}
 >
 	<script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
 	<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
