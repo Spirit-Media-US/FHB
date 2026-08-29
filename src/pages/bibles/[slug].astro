@@ -45,6 +45,12 @@ type Edition = {
 	datePublished?: string;
 	trim?: string;
 	binding?: string;
+	/** Asset/data keys, when they differ from `slug` (which drives the URL).
+	 *  The General Audience lines are sold by colour, so their cover art and sample
+	 *  pages are filed under the LINE, not under the page's slug. */
+	coverImage?: string;
+	lookInsideKey?: string;
+	frontmatterKey?: string;
 	audienceNoun: string;
 	audienceSingular?: string;
 	hook: {
@@ -85,10 +91,11 @@ export async function getStaticPaths() {
 const { ed } = Astro.props as { ed: Edition };
 
 const fm = (frontmatter as Record<string, { pages?: number; pillars?: Pillar[] }>)[
-	FM_ALIAS[ed.slug] ?? ed.slug
+	ed.frontmatterKey ?? FM_ALIAS[ed.slug] ?? ed.slug
 ];
 type Pillar = { title: string; line: string; verses: [string, string][] };
 const pillars: Pillar[] = fm?.pillars ?? [];
+const coverUrl = `${ASSETS}/${ed.coverImage ?? `dvc-${ed.slug}`}-1200.webp`;
 const pages = ed.pages ?? fm?.pages ?? 876;
 const trim = ed.trim ?? '6 x 9 in';
 const binding = ed.binding ?? 'Hardcover, case laminate with dust jacket';
@@ -182,7 +189,7 @@ const productSchema = {
 	inLanguage: 'en',
 	datePublished,
 	description: `${ed.sub}. The complete Bible in Divine Voice Color — our Father's words in blue, the Son's in red, the Spirit's in purple.`,
-	image: `${ASSETS}/dvc-${ed.slug}-1200.webp`,
+	image: coverUrl,
 	url,
 	publisher: { '@type': 'Organization', name: 'Spirit Media Publishing' },
 	author: { '@type': 'Organization', name: 'Spirit Media Publishing' },
@@ -215,7 +222,7 @@ const faqSchema = {
 <Layout
 	title={ed.seo?.title ?? `${ed.name} | Father's Heart Bible™`}
 	description={ed.seo?.description ?? `The ${ed.name} — the complete Bible in Divine Voice Color. Hardcover, ${pages} pages.`}
-	image={`${ASSETS}/dvc-${ed.slug}-1200.webp`}
+	image={coverUrl}
 	imageAlt={`${ed.name} — Father's Heart Bible in Divine Voice Color`}
 >
 	<script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
@@ -229,7 +236,7 @@ const faqSchema = {
 				     on a phone, where most of this traffic lands. -->
 				<div class="flex flex-col items-center">
 					<div style="max-width: 340px; width: 100%;">
-						<img id="cover-main" src={`${ASSETS}/dvc-${ed.slug}-1200.webp`} alt={`${ed.name} — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
+						<img id="cover-main" src={coverUrl} alt={`${ed.name} — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
 					</div>
 				</div>
 				<div>
@@ -245,7 +252,7 @@ const faqSchema = {
 					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">Free shipping — a $15 value.</p>
 					<div class="flex flex-wrap items-center gap-3">
 						<a href="/print" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Buy Now</a>
-						<LookInside slug={ed.slug} title={ed.name} size="lg" />
+						<LookInside slug={ed.lookInsideKey ?? ed.slug} title={ed.name} size="lg" />
 					</div>
 				</div>
 			</div>
@@ -436,7 +443,7 @@ const faqSchema = {
 					))}
 				</div>
 				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; margin: 1.75rem 0 0;">
-					Looking for scripture rather than a copy to hold? {ed.relatedGuide && (<Fragment>Read <a href={ed.relatedGuide.href} style="color: #3f3f46; text-decoration: underline;">{ed.relatedGuide.label}</a>, or read</Fragment>)}{!ed.relatedGuide && 'Read'} the whole Bible free at <a href={READ_URL} style="color: #3f3f46; text-decoration: underline;">fathersheartbible.com/read</a>. See <a href="/print" style="color: #3f3f46; text-decoration: underline;">all sixteen Divine Voice Color editions</a>.
+					Looking for scripture rather than a copy to hold? {ed.relatedGuide && (<Fragment>Read <a href={ed.relatedGuide.href} style="color: #3f3f46; text-decoration: underline;">{ed.relatedGuide.label}</a>, or read</Fragment>)}{!ed.relatedGuide && 'Read'} the whole Bible free at <a href={READ_URL} style="color: #3f3f46; text-decoration: underline;">fathersheartbible.com/read</a>. See <a href="/print" style="color: #3f3f46; text-decoration: underline;">every Divine Voice Color edition</a>.
 				</p>
 			</div>
 		</Section>

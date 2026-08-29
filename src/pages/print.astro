@@ -607,6 +607,15 @@ function markVoices(v: {
 							    three colours share an interior, so they share the sample pages).
 							    "Full details" waits on the product pages for these two lines. */}
 							<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.9rem;">
+								{builtPages.has(`${l.line === 'largeprint' ? 'large-print' : 'fathers-heart'}-bible`) && (
+									<>
+										<a
+											href={`/bibles/${l.line === 'largeprint' ? 'large-print' : 'fathers-heart'}-bible`}
+											style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;"
+										>Full details</a>
+										<span aria-hidden="true" style="color: #a1a1aa;">·</span>
+									</>
+								)}
 								<LookInside
 									slug={l.line === 'largeprint' ? 'largeprint' : 'general'}
 									title={`Father’s Heart Bible — ${l.label}`}
