@@ -67,64 +67,64 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string }> =
 	// ladder as the targeted editions — the combined total across everything sets the tier.
 	// MUST match src/pages/print.astro `generalSkus` and the PRICE map in its inline script.
 	'general-regular-charcoal-pb': {
-		title: 'Father’s Heart Bible — Charcoal, Paperback',
+		title: 'Charcoal, Paperback',
 		retail: 7999,
-		img: `${ASSETS}/general-regular-charcoal-600.webp`,
+		img: `${ASSETS}/general-regular-charcoal-600.webp?v=2`,
 	},
 	'general-regular-charcoal-hb': {
-		title: 'Father’s Heart Bible — Charcoal, Hardback',
+		title: 'Charcoal, Hardback',
 		retail: 9999,
-		img: `${ASSETS}/general-regular-charcoal-600.webp`,
+		img: `${ASSETS}/general-regular-charcoal-600.webp?v=2`,
 	},
 	'general-regular-plum-pb': {
-		title: 'Father’s Heart Bible — Plum, Paperback',
+		title: 'Plum, Paperback',
 		retail: 7999,
-		img: `${ASSETS}/general-regular-plum-600.webp`,
+		img: `${ASSETS}/general-regular-plum-600.webp?v=2`,
 	},
 	'general-regular-plum-hb': {
-		title: 'Father’s Heart Bible — Plum, Hardback',
+		title: 'Plum, Hardback',
 		retail: 9999,
-		img: `${ASSETS}/general-regular-plum-600.webp`,
+		img: `${ASSETS}/general-regular-plum-600.webp?v=2`,
 	},
 	'general-regular-white-pb': {
-		title: 'Father’s Heart Bible — White, Paperback',
+		title: 'White, Paperback',
 		retail: 7999,
-		img: `${ASSETS}/general-regular-white-600.webp`,
+		img: `${ASSETS}/general-regular-white-600.webp?v=2`,
 	},
 	'general-regular-white-hb': {
-		title: 'Father’s Heart Bible — White, Hardback',
+		title: 'White, Hardback',
 		retail: 9999,
-		img: `${ASSETS}/general-regular-white-600.webp`,
+		img: `${ASSETS}/general-regular-white-600.webp?v=2`,
 	},
 	'general-largeprint-charcoal-pb': {
-		title: 'Father’s Heart Bible Large Print — Charcoal, Paperback',
+		title: 'Large Print — Charcoal, Paperback',
 		retail: 9999,
-		img: `${ASSETS}/general-largeprint-charcoal-600.webp`,
+		img: `${ASSETS}/general-largeprint-charcoal-600.webp?v=2`,
 	},
 	'general-largeprint-charcoal-hb': {
-		title: 'Father’s Heart Bible Large Print — Charcoal, Hardback',
+		title: 'Large Print — Charcoal, Hardback',
 		retail: 12499,
-		img: `${ASSETS}/general-largeprint-charcoal-600.webp`,
+		img: `${ASSETS}/general-largeprint-charcoal-600.webp?v=2`,
 	},
 	'general-largeprint-plum-pb': {
-		title: 'Father’s Heart Bible Large Print — Plum, Paperback',
+		title: 'Large Print — Plum, Paperback',
 		retail: 9999,
-		img: `${ASSETS}/general-largeprint-plum-600.webp`,
+		img: `${ASSETS}/general-largeprint-plum-600.webp?v=2`,
 	},
 	'general-largeprint-plum-hb': {
-		title: 'Father’s Heart Bible Large Print — Plum, Hardback',
+		title: 'Large Print — Plum, Hardback',
 		retail: 12499,
-		img: `${ASSETS}/general-largeprint-plum-600.webp`,
+		img: `${ASSETS}/general-largeprint-plum-600.webp?v=2`,
 	},
 	'general-largeprint-white-pb': {
-		title: 'Father’s Heart Bible Large Print — White, Paperback',
+		title: 'Large Print — White, Paperback',
 		retail: 9999,
-		img: `${ASSETS}/general-largeprint-white-600.webp`,
+		img: `${ASSETS}/general-largeprint-white-600.webp?v=2`,
 	},
 	'general-largeprint-white-hb': {
-		title: 'Father’s Heart Bible Large Print — White, Hardback',
+		title: 'Large Print — White, Hardback',
 		retail: 12499,
-		img: `${ASSETS}/general-largeprint-white-600.webp`,
+		img: `${ASSETS}/general-largeprint-white-600.webp?v=2`,
 	},
 };
 

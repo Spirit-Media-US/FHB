@@ -641,7 +641,7 @@ function markVoices(v: {
 						{dvcEditions.map((e) => (
 							<div class="flex items-center gap-3" style="max-width: 30rem; width: 100%; margin: 0 auto;">
 								<img src={`https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-600.webp`} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-								<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink); font-size: 0.95rem;">{e.title}</span>
+								<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink); font-size: 0.95rem;">{e.title}<span style="display: block; font-weight: 500; color: var(--color-muted); font-size: 0.8rem;">${e.price.toFixed(2)}</span></span>
 								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
 									<button type="button" class="qty-step" data-slug={e.slug} data-dir="-1" aria-label={`Fewer ${e.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
 									<input type="number" class="qty-in" data-slug={e.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.title} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
@@ -801,8 +801,16 @@ function markVoices(v: {
 			const total = Object.values(counts).reduce((a, b) => a + b, 0);
 			const tier = tierFor(total);
 			const pct = tier ? tier.pct : 0;
-			let sum = 0;
-			for (const [k, n] of Object.entries(counts)) sum += n * PRICE[k] * (1 - pct / 100);
+			// Round the discounted UNIT to whole cents, then multiply — the exact order
+			// functions/dvc-checkout.ts uses, because Stripe is charged a per-unit amount in
+			// cents. Multiplying first and rounding once at the end drifts from what the
+			// customer is actually charged: a 500-copy order of a $99.99 edition at 30% off
+			// showed $34,996.50 here while Stripe billed $34,995.00.
+			let cents = 0;
+			for (const [k, n] of Object.entries(counts)) {
+				cents += Math.round((PRICE[k] * 100 * (100 - pct)) / 100) * n;
+			}
+			const sum = cents / 100;
 			countEl.textContent = total;
 			saveEl.textContent = pct ? `save ${pct}%` : 'full price';
 			out.textContent = fmt(sum);
