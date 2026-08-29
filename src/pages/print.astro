@@ -18,102 +18,135 @@ import Layout from '../layouts/Layout.astro';
 const DVC_TAIL = '6×9 Hardback with Dust Jacket · 876 Pages · Full Color Throughout';
 const DVC_TAIL2 =
 	'Red Letter \u00b7 Blue Letter \u00b7 Purple Letter \u00b7 Three-Color Divine Voice \u00b7 Complete Bible';
+// ── The one-line spec every order row carries (Kevin 2026-08-29) ──
+// "Chosen Bible $99.99 6x9 Hardback" — title, price and format together, so a buyer
+// choosing between 28 rows can tell them apart without scrolling back to the section
+// heading. The facts that actually decide it: TRIM, BINDING, LARGE PRINT or not, and PAGE
+// COUNT (the only number that separates Regular from Large Print at a glance).
+//
+// Every value below is MEASURED, not assumed:
+//   page counts read off the built interiors in projects/fhb-print-bible/current/
+//     — targeted 876pp, journaling 788pp @ 8x10, large print 1,016pp
+//   binding read off the APPROVED cover for each ISBN. The general hardback is CASE
+//     LAMINATE (2026-08-24-general/APPROVALS.json approves COVER-Case for 979-8-89307-294-5),
+//     so it must NOT claim a dust jacket; jacket files exist but are not the approved
+//     binding. Large Print follows the same pattern. Only the 15 targeted editions carry
+//     "with Dust Jacket", which is the page's own approved header copy.
+const SPEC_TARGETED = '6×9 Hardback with Dust Jacket · 876 pages';
+const SPEC_JOURNALING = '8×10 Hardback · Wide Margin · 788 pages';
+
 const dvcEditions = [
 	{
 		slug: 'chosen',
 		title: 'Chosen Bible',
 		sub: 'For the Fatherless, Foster Youth, Adoptive and Foster Families, Youth Aging Out of Care, and Anyone Raised Without a Father',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'couples',
 		title: "Couple's Bible",
 		sub: 'For Married Couples, Engaged Couples, Newlyweds, Dating Couples, Domestic Partners, Gift for Couples and Anniversary Gifts',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'dads',
 		title: "Dad's Bible",
 		sub: "For Dads, Fathers, New Dads, Stepdads, Granddads, Gift for Dads and Father's Day Gifts",
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'first-responders',
 		title: "First Responder's Bible",
 		sub: 'For Police Officers, Firefighters, EMTs, Paramedics, Dispatchers, Nurses, and Search and Rescue',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'mens',
 		title: "Men's Bible",
 		sub: "He Hears His Father's Voice - For Men, Husbands, Fathers, and Young Men",
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'moms',
 		title: "Mom's Bible",
 		sub: "For Moms, Mothers, New Moms, Stepmoms, Grandmothers, Gift for Moms and Mother's Day Gifts",
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'pastors',
 		title: "Pastor's Bible",
 		sub: 'For Pastors, Preachers, Ministers, Elders, Deacons, Chaplains, and Church Leaders',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'peace',
 		title: 'Peace Bible',
 		sub: 'For Overcoming Anxiety, Depression, PTSD, Panic, Stress, Trauma, and Worry',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'presidents',
 		title: "President's Bible",
 		sub: 'For Presidents, CEOs, Executives, Public Servants, Officers, and Leaders',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'recovery',
 		title: 'Recovery Bible',
 		sub: 'For Overcoming Addiction, Recovery, Sobriety, Freedom, 12 Step Programs, and Families',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'seekers',
 		title: "Seeker's Bible",
 		sub: 'For Seekers, Skeptics, and Anyone Exploring the Christian Faith for the First Time',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'seventeen',
 		title: 'Seventeen Bible',
 		sub: 'For Seventeen-Year-Olds, Teens and Young Adults, 17th Birthday, Gift for Teens, Confirmation and Graduation Gifts',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'soldiers',
 		title: "Soldier's Bible",
 		sub: 'For all Soldiers, Army, Marine Corps, Navy, Air Force, Space Force, Coast Guard, and Veterans',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'teen',
 		title: 'Teen Bible',
 		sub: 'For Teens, Teenagers, Ages 13-19, Middle School, Junior High, High School, Junior College, Youth Group, Gift for Teens, Confirmation and Graduation Gifts',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'worship-leaders',
 		title: "Worship Leader's Bible",
 		sub: 'For Worship Leaders, Praise Teams, Worship Pastors, Musicians, Singers, and Choir Directors',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'journaling',
 		title: 'She Hears Her Father\u2019s Voice',
 		sub: 'For Women \u00b7 Wide Margin \u00b7 Note-Taking \u00b7 8x10 Journaling Edition',
 		price: 124.99,
+		spec: SPEC_JOURNALING,
 	},
 ];
 
@@ -205,6 +238,11 @@ const generalSkus = generalLines.flatMap((l) =>
 			lineLabel: l.label,
 			color: c.name,
 			binding: b === 'pb' ? 'Paperback' : 'Hardback',
+			// No dust jacket here: the approved cover for these ISBNs is case laminate.
+			spec:
+				l.line === 'largeprint'
+					? `6×9 Large Print ${b === 'pb' ? 'Paperback' : 'Hardback'} · 1,016 pages`
+					: `6×9 ${b === 'pb' ? 'Paperback' : 'Hardback'} · 876 pages`,
 			price: b === 'pb' ? l.pb : l.hb,
 			isbn: l.isbn[c.key as 'charcoal' | 'plum' | 'white'][b],
 			img: `https://assets.spiritmediapublishing.com/FHB/print/general-${l.line}-${c.key}-600.webp?v=${CARD_V}`,
@@ -641,7 +679,7 @@ function markVoices(v: {
 						{dvcEditions.map((e) => (
 							<div class="flex items-center gap-3" style="max-width: 30rem; width: 100%; margin: 0 auto;">
 								<img src={`https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-600.webp`} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-								<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink); font-size: 0.95rem;">{e.title}<span style="display: block; font-weight: 500; color: var(--color-muted); font-size: 0.8rem;">${e.price.toFixed(2)}</span></span>
+								<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.title}</span> <span style="white-space: nowrap; font-weight: 600;">${e.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{e.spec}</span></span>
 								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
 									<button type="button" class="qty-step" data-slug={e.slug} data-dir="-1" aria-label={`Fewer ${e.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
 									<input type="number" class="qty-in" data-slug={e.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.title} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
@@ -658,7 +696,7 @@ function markVoices(v: {
 								{generalSkus.filter((s) => s.line === l.line).map((s) => (
 									<div class="flex items-center gap-3" style="max-width: 30rem; width: 100%; margin: 0 auto;">
 										<img src={s.img} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-										<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink); font-size: 0.95rem;">{s.color} · {s.binding}<span style="display: block; font-weight: 500; color: var(--color-muted); font-size: 0.8rem;">${s.price.toFixed(2)}</span></span>
+										<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">Father’s Heart Bible — {s.color}</span> <span style="white-space: nowrap; font-weight: 600;">${s.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{s.spec}</span></span>
 										<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
 											<button type="button" class="qty-step" data-slug={s.key} data-dir="-1" aria-label={`Fewer ${l.label} ${s.color} ${s.binding}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
 											<input type="number" class="qty-in" data-slug={s.key} value="0" min="0" step="1" inputmode="numeric" aria-label={`${l.label} ${s.color} ${s.binding} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
