@@ -601,7 +601,19 @@ function markVoices(v: {
 								width="600" height="764" loading="lazy" decoding="async"
 								class="block w-full h-auto" style="max-width: 220px;"
 							/>
-							<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.6rem;">{c.name}</h3>
+							<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{c.name}</h3>
+							{/* Same affordances as the targeted cards, so the page reads as one thing.
+							    Look inside is driven off src/data/lookinside.json, keyed by LINE (the
+							    three colours share an interior, so they share the sample pages).
+							    "Full details" waits on the product pages for these two lines. */}
+							<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.9rem;">
+								<LookInside
+									slug={l.line === 'largeprint' ? 'largeprint' : 'general'}
+									title={`Father’s Heart Bible — ${l.label}`}
+									variant="link"
+									label="Look inside"
+								/>
+							</div>
 							<div class="flex flex-col gap-2 w-full mt-auto">
 								{(['pb', 'hb'] as const).map((b) => (
 									<button
