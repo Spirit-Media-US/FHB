@@ -95,7 +95,10 @@ const fm = (frontmatter as Record<string, { pages?: number; pillars?: Pillar[] }
 ];
 type Pillar = { title: string; line: string; verses: [string, string][] };
 const pillars: Pillar[] = fm?.pillars ?? [];
-const coverUrl = `${ASSETS}/${ed.coverImage ?? `dvc-${ed.slug}`}-1200.webp`;
+// ?v= because the General Audience covers were replaced in place at the same R2
+// keys after the first upload was rendered in the wrong style; without it the edge
+// keeps serving the withdrawn 3-D mock-up. Keep in step with CARD_V in print.astro.
+const coverUrl = `${ASSETS}/${ed.coverImage ?? `dvc-${ed.slug}`}-1200.webp${ed.coverImage ? '?v=2' : ''}`;
 const pages = ed.pages ?? fm?.pages ?? 876;
 const trim = ed.trim ?? '6 x 9 in';
 const binding = ed.binding ?? 'Hardcover, case laminate with dust jacket';
@@ -236,7 +239,7 @@ const faqSchema = {
 				     on a phone, where most of this traffic lands. -->
 				<div class="flex flex-col items-center">
 					<div style="max-width: 340px; width: 100%;">
-						<img id="cover-main" src={coverUrl} alt={`${ed.name} — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
+						<img id="cover-main" src={coverUrl} alt={ed.name.startsWith('Father') ? `${ed.name} in Divine Voice Color` : `${ed.name} — Father's Heart Bible in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
 					</div>
 				</div>
 				<div>
