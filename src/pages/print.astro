@@ -2,6 +2,7 @@
 import LookInside from '../components/LookInside.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
+import VoiceChips from '../components/VoiceChips.astro';
 import Layout from '../layouts/Layout.astro';
 
 // THE DIVINE VOICE COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
@@ -478,11 +479,7 @@ function markVoices(v: {
 			     tv demo." So the three voices are set large and are the ONLY saturated color on the
 			     page — every button, tier and label below is neutral grey so nothing competes with
 			     them or with the covers. -->
-			<div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-5" aria-label="Father, Son and Spirit in Divine Voice Color">
-				<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.06em; color: ${VOICE.father}; background: #fff; border: 2px solid ${VOICE.father}; padding: 0.5rem 1.15rem; border-radius: 6px; line-height: 1;`}>FATHER</span>
-				<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.06em; color: ${VOICE.son}; background: #fff; border: 2px solid ${VOICE.son}; padding: 0.5rem 1.15rem; border-radius: 6px; line-height: 1;`}>SON</span>
-				<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.06em; color: ${VOICE.spirit}; background: #fff; border: 2px solid ${VOICE.spirit}; padding: 0.5rem 1.15rem; border-radius: 6px; line-height: 1;`}>SPIRIT</span>
-			</div>
+			<VoiceChips />
 			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">{DVC_TAIL}</p>
 			<p class="text-center mb-10" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em;">{DVC_TAIL2}</p>
 
@@ -538,6 +535,7 @@ function markVoices(v: {
 					</p>
 					<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em; margin: 0.9rem 0 0;">{l.tail}</p>
 					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em; margin: 0.35rem 0 0;">{DVC_TAIL2}</p>
+					<VoiceChips class="mt-5 mb-0" />
 				</div>
 
 				{/* The page's previous hero, reused here rather than retired: it shows the generic
@@ -620,6 +618,7 @@ function markVoices(v: {
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Order in Bulk and Save</h2>
 					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 44rem;">Bring the Father's heart to your whole business, congregation, or community.<br />Mix and match any edition, color or binding — your combined total sets the discount.</p>
 					<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; margin: 0.75rem auto 0; max-width: 32rem;">Order direct from Spirit Media Publishing — any quantity, free shipping.</p>
+					<VoiceChips class="mt-5 mb-0" />
 				</div>
 
 				<div class="rounded-2xl p-6 md:p-8" style="background: #fff; border: 1px solid var(--color-hairline);" data-bulk>

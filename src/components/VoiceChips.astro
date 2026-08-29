@@ -1,0 +1,40 @@
+---
+// FATHER / SON / SPIRIT in the three divine-voice inks — the /print page's colour demo.
+//
+// Kevin 2026-08-23: "if we were selling color tvs this is our color tv demo." These chips
+// are the ONLY saturated colour on the page; every button, tier and label around them is
+// neutral grey so nothing competes with them. Kevin 2026-08-29 asked for the block to
+// repeat under Regular Print, under Large Print, and under the bulk-order line, so it lives
+// here rather than as four copies of the same markup that can drift apart.
+//
+// SCREEN palette, not print ink — the same values /read uses, so a visitor sees one red on
+// the product page and in the reader. The interiors keep 3563ae / f04933 / 91278f.
+interface Props {
+	/** Chip type size. The hero demo is the loud one; sections below can sit quieter. */
+	size?: string;
+	/** Tailwind margin-bottom utility, so callers control their own spacing. */
+	class?: string;
+}
+const { size = '1.5rem', class: cls = 'mb-5' } = Astro.props;
+const VOICE = { father: '#2563eb', son: '#c8102e', spirit: '#6a3fa0' };
+const voices = [
+	{ label: 'FATHER', color: VOICE.father },
+	{ label: 'SON', color: VOICE.son },
+	{ label: 'SPIRIT', color: VOICE.spirit },
+];
+---
+
+<div
+	class:list={['flex flex-wrap items-center justify-center gap-3 sm:gap-4', cls]}
+	aria-label="Father, Son and Spirit in Divine Voice Color"
+>
+	{
+		voices.map((v) => (
+			<span
+				style={`font-family: var(--font-sans); font-weight: 800; font-size: ${size}; letter-spacing: 0.06em; color: ${v.color}; background: #fff; border: 2px solid ${v.color}; padding: 0.5rem 1.15rem; border-radius: 6px; line-height: 1;`}
+			>
+				{v.label}
+			</span>
+		))
+	}
+</div>
