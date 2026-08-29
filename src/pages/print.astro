@@ -15,7 +15,7 @@ import Layout from '../layouts/Layout.astro';
 // The spec, stated once for all sixteen. Concrete facts rather than "premium" — every
 // Bible on the shelf claims premium; 6x9 hardback with a dust jacket, full color and
 // 876 pages is checkable and does more selling (Kevin asked 2026-08-23).
-const DVC_TAIL = '6×9 Hardback with Dust Jacket · 876 Pages · Full Color Throughout';
+const DVC_TAIL = 'Full Color Throughout · 6×9 Hardback with Dust Jacket';
 const DVC_TAIL2 =
 	'Red Letter \u00b7 Blue Letter \u00b7 Purple Letter \u00b7 Three-Color Divine Voice \u00b7 Complete Bible';
 // ── The one-line spec every order row carries (Kevin 2026-08-29) ──
@@ -32,8 +32,8 @@ const DVC_TAIL2 =
 //     so it must NOT claim a dust jacket; jacket files exist but are not the approved
 //     binding. Large Print follows the same pattern. Only the 15 targeted editions carry
 //     "with Dust Jacket", which is the page's own approved header copy.
-const SPEC_TARGETED = '6×9 Hardback with Dust Jacket · 876 pages';
-const SPEC_JOURNALING = '8×10 Hardback · Wide Margin · 788 pages';
+const SPEC_TARGETED = '6×9 Hardback with Dust Jacket';
+const SPEC_JOURNALING = '8×10 Hardback · Wide Margin';
 
 const dvcEditions = [
 	{
@@ -194,8 +194,8 @@ const RETAIL_8 = '$124.99';
 // the same R2 keys, so the Cloudflare edge holds the old image for those paths. Bump this
 // whenever a general card is re-rendered to the same filename.
 const CARD_V = '2';
-const GENERAL_TAIL = '6×9 · 876 Pages · Full Color Throughout · Paperback or Hardback';
-const LP_TAIL = '6×9 Large Print · 1,016 Pages · Full Color Throughout · Paperback or Hardback';
+const GENERAL_TAIL = 'Full Color Throughout · 6×9 Paperback or Hardback';
+const LP_TAIL = 'Large Print · Full Color Throughout · 6×9 Paperback or Hardback';
 const generalColors = [
 	{ key: 'charcoal', name: 'Charcoal' },
 	{ key: 'plum', name: 'Plum' },
@@ -241,8 +241,8 @@ const generalSkus = generalLines.flatMap((l) =>
 			// No dust jacket here: the approved cover for these ISBNs is case laminate.
 			spec:
 				l.line === 'largeprint'
-					? `6×9 Large Print ${b === 'pb' ? 'Paperback' : 'Hardback'} · 1,016 pages`
-					: `6×9 ${b === 'pb' ? 'Paperback' : 'Hardback'} · 876 pages`,
+					? `6×9 Large Print ${b === 'pb' ? 'Paperback' : 'Hardback'}`
+					: `6×9 ${b === 'pb' ? 'Paperback' : 'Hardback'}`,
 			price: b === 'pb' ? l.pb : l.hb,
 			isbn: l.isbn[c.key as 'charcoal' | 'plum' | 'white'][b],
 			img: `https://assets.spiritmediapublishing.com/FHB/print/general-${l.line}-${c.key}-600.webp?v=${CARD_V}`,
@@ -650,7 +650,7 @@ function markVoices(v: {
 
 		<!-- ═══════════════ BULK ORDERS ═══════════════ -->
 		<Section variant="soft">
-			<div class="max-w-3xl mx-auto">
+			<div class="max-w-5xl mx-auto">
 				<div class="text-center mb-8">
 					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Bulk Order Discounts</p>
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Order in Bulk and Save</h2>
@@ -677,7 +677,7 @@ function markVoices(v: {
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 0 0 0.5rem;">Targeted Editions</p>
 					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
 						{dvcEditions.map((e) => (
-							<div class="flex items-center gap-3" style="max-width: 30rem; width: 100%; margin: 0 auto;">
+							<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
 								<img src={`https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-600.webp`} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
 								<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.title}</span> <span style="white-space: nowrap; font-weight: 600;">${e.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{e.spec}</span></span>
 								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
@@ -694,7 +694,7 @@ function markVoices(v: {
 							<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.6rem 0 0.5rem;">General Audience — {l.label}</p>
 							<div style="display: flex; flex-direction: column; gap: 0.55rem;">
 								{generalSkus.filter((s) => s.line === l.line).map((s) => (
-									<div class="flex items-center gap-3" style="max-width: 30rem; width: 100%; margin: 0 auto;">
+									<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
 										<img src={s.img} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
 										<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">Father’s Heart Bible — {s.color}</span> <span style="white-space: nowrap; font-weight: 600;">${s.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{s.spec}</span></span>
 										<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
