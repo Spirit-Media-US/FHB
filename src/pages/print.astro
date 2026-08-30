@@ -683,18 +683,20 @@ function markVoices(v: {
 				</div>
 
 				<div class="rounded-2xl p-6 md:p-8" style="background: #fff; border: 1px solid var(--color-hairline);" data-bulk>
+					{/* PERCENTAGES ONLY — no example prices. They were fine when every edition was
+					    $99.99, but the page now sells at $79.99, $99.99 and $124.99, so "50+ →
+					    $79.99" reads as the price of whatever the customer is looking at. The
+					    percentage is true of every SKU without a caveat, and the live total below
+					    shows the real money as soon as quantities are picked. */}
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Volume discounts — the more you order, the more you save</p>
 					<div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-6">
 						{tiers.map((t) => (
 							<div class="tier-card rounded-xl text-center" data-tier-min={t.qty} style="padding: 0.7rem 0.4rem; border: 1.5px solid #d4d4d8; background: #f4f4f5;">
 								<span style="display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.02em; color: #3f3f46;">Save {t.pct}%</span>
 								<span style="display: block; font-size: 1.15rem; font-weight: 700; color: var(--color-ink); margin-top: 0.1rem; line-height: 1.1;">{t.qty}+</span>
-								<span style="display: block; font-size: 0.7rem; color: var(--color-muted); margin-top: 0.2rem; white-space: nowrap;"><s style="opacity: 0.6;">{RETAIL}</s> <span style="color: var(--color-ink); font-weight: 700;">${t.unit.toFixed(2)}</span></span>
 							</div>
 						))}
 					</div>
-
-					<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: -0.9rem 0 1.4rem;">The percentage applies to every edition; the prices shown are for a {RETAIL} edition.</p>
 
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Choose how many of each edition</p>
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 0 0 0.5rem;">Targeted Editions</p>
