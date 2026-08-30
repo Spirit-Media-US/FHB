@@ -2,6 +2,7 @@
 import LookInside from '../components/LookInside.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
+import VoiceChips from '../components/VoiceChips.astro';
 import Layout from '../layouts/Layout.astro';
 
 // THE DIVINE VOICE COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
@@ -12,107 +13,142 @@ import Layout from '../layouts/Layout.astro';
 // over each card"). Copy is lifted from the metadata sheets so the site and the trade
 // listings cannot drift apart.
 // The spec, stated once for all sixteen. Concrete facts rather than "premium" — every
-// Bible on the shelf claims premium; 6x9 hardback with a dust jacket, full color and
+// Bible on the shelf claims premium; 6x9 case-laminate hardback, full color and
 // 876 pages is checkable and does more selling (Kevin asked 2026-08-23).
-const DVC_TAIL = '6×9 Hardback with Dust Jacket · 876 Pages · Full Color Throughout';
+const DVC_TAIL = 'Full Color Throughout · 6×9 Hardback, Case Laminate';
 const DVC_TAIL2 =
 	'Red Letter \u00b7 Blue Letter \u00b7 Purple Letter \u00b7 Three-Color Divine Voice \u00b7 Complete Bible';
+// ── The one-line spec every order row carries (Kevin 2026-08-29) ──
+// "Chosen Bible $99.99 6x9 Hardback" — title, price and format together, so a buyer
+// choosing between 28 rows can tell them apart without scrolling back to the section
+// heading. The facts that actually decide it: TRIM, BINDING, LARGE PRINT or not, and PAGE
+// COUNT (the only number that separates Regular from Large Print at a glance).
+//
+// Every value below is MEASURED, not assumed:
+//   page counts read off the built interiors in projects/fhb-print-bible/current/
+//     — targeted 876pp, journaling 788pp @ 8x10, large print 1,016pp
+//   binding read off the APPROVED cover for each ISBN. The general hardback is CASE
+//     LAMINATE (2026-08-24-general/APPROVALS.json approves COVER-Case for 979-8-89307-294-5),
+//     so it must NOT claim a dust jacket; jacket files exist but are not the approved
+//     binding. NOTHING claims a dust jacket: every sheet says case laminate, the ISBNs sit
+//     in `hardcover_case_laminate`, the delivered cover is ...-CASE-876pp.pdf, and the
+//     journaling sheet states "No dust jacket: not offered at 8 x 10". Jacket PDFs exist
+//     but carry no ISBN and no delivery record — they are not what ships.
+const SPEC_TARGETED = '6×9 Hardback, Case Laminate';
+const SPEC_JOURNALING = '8×10 Hardback · Wide Margin';
+
 const dvcEditions = [
 	{
 		slug: 'chosen',
 		title: 'Chosen Bible',
 		sub: 'For the Fatherless, Foster Youth, Adoptive and Foster Families, Youth Aging Out of Care, and Anyone Raised Without a Father',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'couples',
 		title: "Couple's Bible",
 		sub: 'For Married Couples, Engaged Couples, Newlyweds, Dating Couples, Domestic Partners, Gift for Couples and Anniversary Gifts',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'dads',
 		title: "Dad's Bible",
 		sub: "For Dads, Fathers, New Dads, Stepdads, Granddads, Gift for Dads and Father's Day Gifts",
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'first-responders',
 		title: "First Responder's Bible",
 		sub: 'For Police Officers, Firefighters, EMTs, Paramedics, Dispatchers, Nurses, and Search and Rescue',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'mens',
 		title: "Men's Bible",
 		sub: "He Hears His Father's Voice - For Men, Husbands, Fathers, and Young Men",
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'moms',
 		title: "Mom's Bible",
 		sub: "For Moms, Mothers, New Moms, Stepmoms, Grandmothers, Gift for Moms and Mother's Day Gifts",
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'pastors',
 		title: "Pastor's Bible",
 		sub: 'For Pastors, Preachers, Ministers, Elders, Deacons, Chaplains, and Church Leaders',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'peace',
 		title: 'Peace Bible',
 		sub: 'For Overcoming Anxiety, Depression, PTSD, Panic, Stress, Trauma, and Worry',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'presidents',
 		title: "President's Bible",
 		sub: 'For Presidents, CEOs, Executives, Public Servants, Officers, and Leaders',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'recovery',
 		title: 'Recovery Bible',
 		sub: 'For Overcoming Addiction, Recovery, Sobriety, Freedom, 12 Step Programs, and Families',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'seekers',
 		title: "Seeker's Bible",
 		sub: 'For Seekers, Skeptics, and Anyone Exploring the Christian Faith for the First Time',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'seventeen',
 		title: 'Seventeen Bible',
 		sub: 'For Seventeen-Year-Olds, Teens and Young Adults, 17th Birthday, Gift for Teens, Confirmation and Graduation Gifts',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'soldiers',
 		title: "Soldier's Bible",
 		sub: 'For all Soldiers, Army, Marine Corps, Navy, Air Force, Space Force, Coast Guard, and Veterans',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'teen',
 		title: 'Teen Bible',
 		sub: 'For Teens, Teenagers, Ages 13-19, Middle School, Junior High, High School, Junior College, Youth Group, Gift for Teens, Confirmation and Graduation Gifts',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'worship-leaders',
 		title: "Worship Leader's Bible",
 		sub: 'For Worship Leaders, Praise Teams, Worship Pastors, Musicians, Singers, and Choir Directors',
 		price: 99.99,
+		spec: SPEC_TARGETED,
 	},
 	{
 		slug: 'journaling',
 		title: 'She Hears Her Father\u2019s Voice',
 		sub: 'For Women \u00b7 Wide Margin \u00b7 Note-Taking \u00b7 8x10 Journaling Edition',
 		price: 124.99,
+		spec: SPEC_JOURNALING,
 	},
 ];
 
@@ -141,6 +177,80 @@ const tiers = [
 
 const RETAIL = '$99.99';
 const RETAIL_8 = '$124.99';
+
+// ───────────────────────── GENERAL AUDIENCE ─────────────────────────
+// The same Divine Voice Color Bible without an audience on the cover, in three cover
+// colours and two bindings, in Regular and Large Print. Added 2026-08-29.
+//
+// ORDER ON THE PAGE — targeted editions FIRST, then these. Kevin ruled it and the search
+// data backs it: Amazon autocomplete for "bible for" returns nine AUDIENCE terms and zero
+// translations, and "large print bible" completes to "large print bibles for seniors" then
+// ESV/NIV/KJV/NLT — so large print demand is itself audience-shaped and its remaining slots
+// belong to acronyms we cannot outrank. Leading with these would open on our weakest lane.
+// Do not reorder without new measurements.
+//
+// One CARD per colour carrying both binding prices, rather than six near-identical cards
+// per line — twelve more covers directly under the sixteen targeted ones reads as noise.
+// Cache-buster for the card art. The first upload of these six covers was rendered in the
+// wrong style (a 3-D mock-up rather than the house flat front) and was replaced in place at
+// the same R2 keys, so the Cloudflare edge holds the old image for those paths. Bump this
+// whenever a general card is re-rendered to the same filename.
+const CARD_V = '2';
+const GENERAL_TAIL = 'Full Color Throughout · 6×9 Paperback or Hardback';
+const LP_TAIL = 'Large Print · Full Color Throughout · 6×9 Paperback or Hardback';
+const generalColors = [
+	{ key: 'charcoal', name: 'Charcoal' },
+	{ key: 'plum', name: 'Plum' },
+	{ key: 'white', name: 'White' },
+];
+// Prices in dollars; ISBNs are per binding. MUST match functions/dvc-checkout.ts EDITIONS.
+const generalLines = [
+	{
+		line: 'regular',
+		label: 'Regular Print',
+		tail: GENERAL_TAIL,
+		pb: 79.99,
+		hb: 99.99,
+		isbn: {
+			charcoal: { pb: '979-8-89307-291-4', hb: '979-8-89307-294-5' },
+			plum: { pb: '979-8-89307-292-1', hb: '979-8-89307-295-2' },
+			white: { pb: '979-8-89307-293-8', hb: '979-8-89307-306-5' },
+		},
+	},
+	{
+		line: 'largeprint',
+		label: 'Large Print',
+		tail: LP_TAIL,
+		pb: 99.99,
+		hb: 124.99,
+		isbn: {
+			charcoal: { pb: '979-8-89307-310-2', hb: '979-8-89307-307-2' },
+			plum: { pb: '979-8-89307-311-9', hb: '979-8-89307-308-9' },
+			white: { pb: '979-8-89307-312-6', hb: '979-8-89307-309-6' },
+		},
+	},
+];
+// Flat SKU list — one entry per purchasable thing, used by the order builder and mirrored
+// in the checkout function. Key shape: general-<line>-<colour>-<binding>.
+const generalSkus = generalLines.flatMap((l) =>
+	generalColors.flatMap((c) =>
+		(['pb', 'hb'] as const).map((b) => ({
+			key: `general-${l.line}-${c.key}-${b}`,
+			line: l.line,
+			lineLabel: l.label,
+			color: c.name,
+			binding: b === 'pb' ? 'Paperback' : 'Hardback',
+			// No dust jacket here: the approved cover for these ISBNs is case laminate.
+			spec:
+				l.line === 'largeprint'
+					? `6×9 Large Print ${b === 'pb' ? 'Paperback' : 'Hardback'}`
+					: `6×9 ${b === 'pb' ? 'Paperback' : 'Hardback'}`,
+			price: b === 'pb' ? l.pb : l.hb,
+			isbn: l.isbn[c.key as 'charcoal' | 'plum' | 'white'][b],
+			img: `https://assets.spiritmediapublishing.com/FHB/print/general-${l.line}-${c.key}-600.webp?v=${CARD_V}`,
+		})),
+	),
+);
 
 // Interior sample excerpts (Genesis) — direct PDF, hosted on R2.
 const SAMPLE_REGULAR =
@@ -179,8 +289,8 @@ const CONTACT = 'mailto:hello@spiritmediapublishing.com?subject=Father%27s%20Hea
 const VOICE = { father: '#2563eb', son: '#c8102e', spirit: '#6a3fa0' };
 const printFaq = [
 	{
-		q: 'Are the sixteen editions different Bibles?',
-		a: `Every one is the complete Father's Heart Bible™ in Divine Voice Color — all 66 books, 1,189 chapters, 31,085 verses, nothing abridged, the same fresh translation from the original Hebrew, Aramaic and Greek. What changes is who it was made for: the cover, the opening pages written for that reader, and the passages chosen for where they are. Buy the Teen Bible for a teenager and the Soldier's Bible for a soldier — each one arrives looking and sounding like it was meant for them, and each one carries the whole Bible.`,
+		q: 'Are the different editions different Bibles?',
+		a: `No. Every one is the complete Father's Heart Bible™ in Divine Voice Color — all 66 books, 1,189 chapters, 31,085 verses, nothing abridged, the same fresh translation from the original Hebrew, Aramaic and Greek. What changes is who it was made for: the cover, the opening pages written for that reader, and the passages chosen for where they are. Buy the Teen Bible for a teenager and the Soldier's Bible for a soldier — each one arrives looking and sounding like it was meant for them, and each one carries the whole Bible. Prefer no audience on the cover? The General Audience editions are the same Bible in three cover colors, and in Large Print if you'd like the type set larger.`,
 	},
 	{
 		q: 'Can I return my order?',
@@ -208,7 +318,7 @@ const printFaq = [
 	},
 	{
 		q: 'What’s included in each edition?',
-		a: `The complete Bible in Divine Voice Color, 876 pages, 6×9 hardcover with a dust jacket and full color throughout. A presentation page for the reader's name. Opening pages on intimacy, identity, inheritance and hearing His voice. An introduction to every one of the 66 books, and a Father's note closing each one with a short prayer. 1,354 study notes across 777 chapters — 1,075 explaining a word, name, custom or background, 248 marking where the text reveals the Father, and 31 recording a difference among the manuscripts.`,
+		a: `The complete Bible in Divine Voice Color with full color throughout — 876 pages at 6×9, or 1,016 in Large Print. The targeted editions are 6×9 hardcover, case laminate; the General Audience editions come in paperback or hardback. A presentation page for the reader's name. Opening pages on intimacy, identity, inheritance and hearing His voice. An introduction to every one of the 66 books, and a Father's note closing each one with a short prayer. 1,354 study notes across 777 chapters — 1,075 explaining a word, name, custom or background, 248 marking where the text reveals the Father, and 31 recording a difference among the manuscripts.`,
 	},
 	{
 		q: 'Which languages can I read it in?',
@@ -238,7 +348,10 @@ const faqSchema = {
 };
 
 // Book + Offer structured data — the /print page is the commerce surface, so the
-// purchasable price range lives here (ebook direct $7.49 → hardback $44.99).
+// purchasable price range lives here: ebook direct $7.49 → Large Print hardback $124.99.
+// The high end was $44.99, left behind by the DVC line; corrected 2026-08-29 when the
+// General Audience editions landed. offerCount counts the distinct purchasable products:
+// 16 targeted + 12 general (3 colours x 2 bindings x 2 line) + ebook.
 const bookSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'Book',
@@ -256,8 +369,8 @@ const bookSchema = {
 		'@type': 'AggregateOffer',
 		priceCurrency: 'USD',
 		lowPrice: '7.49',
-		highPrice: '44.99',
-		offerCount: 4,
+		highPrice: '124.99',
+		offerCount: 29,
 		availability: 'https://schema.org/InStock',
 		url: 'https://fathersheartbible.com/print/',
 	},
@@ -391,7 +504,7 @@ function markVoices(v: {
 	<main>
 		<!-- ═══════════════ HERO ═══════════════ (shared component — same size as other pages) -->
 		<VideoHeroInner
-			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/print-hero-group.webp"
+			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/print-hero-targeted.webp"
 			imagePosition="center top"
 			headingLift="0.5in"
 			heading="Now in Print"
@@ -406,11 +519,7 @@ function markVoices(v: {
 			     tv demo." So the three voices are set large and are the ONLY saturated color on the
 			     page — every button, tier and label below is neutral grey so nothing competes with
 			     them or with the covers. -->
-			<div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-5" aria-label="Father, Son and Spirit in Divine Voice Color">
-				<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.06em; color: ${VOICE.father}; background: #fff; border: 2px solid ${VOICE.father}; padding: 0.5rem 1.15rem; border-radius: 6px; line-height: 1;`}>FATHER</span>
-				<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.06em; color: ${VOICE.son}; background: #fff; border: 2px solid ${VOICE.son}; padding: 0.5rem 1.15rem; border-radius: 6px; line-height: 1;`}>SON</span>
-				<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.06em; color: ${VOICE.spirit}; background: #fff; border: 2px solid ${VOICE.spirit}; padding: 0.5rem 1.15rem; border-radius: 6px; line-height: 1;`}>SPIRIT</span>
-			</div>
+			<VoiceChips />
 			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">{DVC_TAIL}</p>
 			<p class="text-center mb-10" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em;">{DVC_TAIL2}</p>
 
@@ -453,6 +562,86 @@ function markVoices(v: {
 			<p class="text-center mt-6" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600;">Direct from SMP includes free shipping — a $15 value.</p>
 		</Section>
 
+		<!-- ═══════════════ GENERAL AUDIENCE — REGULAR PRINT, THEN LARGE PRINT ═══════════════ -->
+		{generalLines.map((l, i) => (
+			<Section variant={i === 0 ? 'warm' : 'light'}>
+				<div class="text-center mb-8">
+					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">General Audience</p>
+					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">{l.label}</h2>
+					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 40rem;">
+						{l.line === 'largeprint'
+							? 'The same complete Bible, set larger for easier reading — and a natural gift for parents and grandparents.'
+							: 'The complete Divine Voice Color Bible without an audience on the cover. Three colors, two bindings.'}
+					</p>
+					<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em; margin: 0.9rem 0 0;">{l.tail}</p>
+					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em; margin: 0.35rem 0 0;">{DVC_TAIL2}</p>
+					<VoiceChips class="mt-5 mb-0" />
+				</div>
+
+				{/* The page's previous hero, reused here rather than retired: it shows the generic
+				    cover in exactly these three colours, which is what this block sells. Only the
+				    Regular Print block gets it — there is no equivalent Large Print photograph, and
+				    repeating this one under a Large Print heading would misdescribe the product. */}
+				{l.line === 'regular' && (
+					<img
+						src="https://assets.spiritmediapublishing.com/FHB/print/print-hero-group.webp"
+						alt="Eight friends holding the Father's Heart Bible in charcoal, plum and white"
+						width="1536" height="1024" loading="lazy" decoding="async"
+						class="block w-full h-auto mx-auto mb-10 rounded-2xl"
+						style="max-width: 56rem;"
+					/>
+				)}
+
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
+					{generalColors.map((c) => (
+						<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+							<img
+								src={`https://assets.spiritmediapublishing.com/FHB/print/general-${l.line}-${c.key}-600.webp?v=${CARD_V}`}
+								srcset={`https://assets.spiritmediapublishing.com/FHB/print/general-${l.line}-${c.key}-600.webp?v=${CARD_V} 600w, https://assets.spiritmediapublishing.com/FHB/print/general-${l.line}-${c.key}-1200.webp?v=${CARD_V} 1200w`}
+								sizes="(min-width: 640px) 240px, 60vw"
+								alt={`Father's Heart Bible — ${l.label}, ${c.name} cover`}
+								width="600" height="764" loading="lazy" decoding="async"
+								class="block w-full h-auto" style="max-width: 220px;"
+							/>
+							<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{c.name}</h3>
+							{/* Same affordances as the targeted cards, so the page reads as one thing.
+							    Look inside is driven off src/data/lookinside.json, keyed by LINE (the
+							    three colours share an interior, so they share the sample pages).
+							    "Full details" waits on the product pages for these two lines. */}
+							<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.9rem;">
+								{builtPages.has(`${l.line === 'largeprint' ? 'large-print' : 'fathers-heart'}-bible`) && (
+									<>
+										<a
+											href={`/bibles/${l.line === 'largeprint' ? 'large-print' : 'fathers-heart'}-bible`}
+											style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;"
+										>Full details</a>
+										<span aria-hidden="true" style="color: #a1a1aa;">·</span>
+									</>
+								)}
+								<LookInside
+									slug={l.line === 'largeprint' ? 'largeprint' : 'general'}
+									title={`Father’s Heart Bible — ${l.label}`}
+									variant="link"
+									label="Look inside"
+								/>
+							</div>
+							<div class="flex flex-col gap-2 w-full mt-auto">
+								{(['pb', 'hb'] as const).map((b) => (
+									<button
+										type="button"
+										data-add={`general-${l.line}-${c.key}-${b}`}
+										class="inline-flex items-center justify-center rounded-full font-semibold"
+										style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.55rem 1rem; font-size: 0.8rem; cursor: pointer;"
+									>{b === 'pb' ? 'Paperback' : 'Hardback'} · ${(b === 'pb' ? l.pb : l.hb).toFixed(2)}</button>
+								))}
+							</div>
+						</div>
+					))}
+				</div>
+				<p class="text-center mt-6" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600;">Direct from SMP includes free shipping — a $15 value.</p>
+			</Section>
+		))}
+
 		<!-- ═══════════════ HIS VOICE — DVC ON THE PAGE ═══════════════ -->
 		<Section variant="warm">
 			<div class="text-center mb-8">
@@ -484,12 +673,13 @@ function markVoices(v: {
 
 		<!-- ═══════════════ BULK ORDERS ═══════════════ -->
 		<Section variant="soft">
-			<div class="max-w-3xl mx-auto">
+			<div class="max-w-5xl mx-auto">
 				<div class="text-center mb-8">
 					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Bulk Order Discounts</p>
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Order in Bulk and Save</h2>
-					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 44rem;">Bring the Father's heart to your whole business, congregation, or community.<br />Mix and match any of the sixteen editions — your combined total sets the discount.</p>
+					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 44rem;">Bring the Father's heart to your whole business, congregation, or community.<br />Mix and match any edition, color or binding — your combined total sets the discount.</p>
 					<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; margin: 0.75rem auto 0; max-width: 32rem;">Order direct from Spirit Media Publishing — any quantity, free shipping.</p>
+					<VoiceChips class="mt-5 mb-0" />
 				</div>
 
 				<div class="rounded-2xl p-6 md:p-8" style="background: #fff; border: 1px solid var(--color-hairline);" data-bulk>
@@ -504,12 +694,15 @@ function markVoices(v: {
 						))}
 					</div>
 
+					<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: -0.9rem 0 1.4rem;">The percentage applies to every edition; the prices shown are for a {RETAIL} edition.</p>
+
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Choose how many of each edition</p>
+					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 0 0 0.5rem;">Targeted Editions</p>
 					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
 						{dvcEditions.map((e) => (
-							<div class="flex items-center gap-3" style="max-width: 30rem; width: 100%; margin: 0 auto;">
+							<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
 								<img src={`https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-600.webp`} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-								<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-weight: 600; color: var(--color-ink); font-size: 0.95rem;">{e.title}</span>
+								<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.title}</span> <span style="white-space: nowrap; font-weight: 600;">${e.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{e.spec}</span></span>
 								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
 									<button type="button" class="qty-step" data-slug={e.slug} data-dir="-1" aria-label={`Fewer ${e.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
 									<input type="number" class="qty-in" data-slug={e.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.title} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
@@ -518,6 +711,25 @@ function markVoices(v: {
 							</div>
 						))}
 					</div>
+
+					{generalLines.map((l) => (
+						<>
+							<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.6rem 0 0.5rem;">General Audience — {l.label}</p>
+							<div style="display: flex; flex-direction: column; gap: 0.55rem;">
+								{generalSkus.filter((s) => s.line === l.line).map((s) => (
+									<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
+										<img src={s.img} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
+										<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">Father’s Heart Bible — {s.color}</span> <span style="white-space: nowrap; font-weight: 600;">${s.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{s.spec}</span></span>
+										<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
+											<button type="button" class="qty-step" data-slug={s.key} data-dir="-1" aria-label={`Fewer ${l.label} ${s.color} ${s.binding}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
+											<input type="number" class="qty-in" data-slug={s.key} value="0" min="0" step="1" inputmode="numeric" aria-label={`${l.label} ${s.color} ${s.binding} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
+											<button type="button" class="qty-step" data-slug={s.key} data-dir="1" aria-label={`More ${l.label} ${s.color} ${s.binding}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
+										</div>
+									</div>
+								))}
+							</div>
+						</>
+					))}
 
 					<div class="flex flex-wrap items-center justify-between gap-4 pt-4 mt-5" style="border-top: 1px solid var(--color-hairline);">
 						<div>
@@ -624,6 +836,13 @@ function markVoices(v: {
 			moms: 99.99, pastors: 99.99, peace: 99.99, presidents: 99.99, recovery: 99.99,
 			seekers: 99.99, seventeen: 99.99, soldiers: 99.99, teen: 99.99,
 			'worship-leaders': 99.99, journaling: 124.99,
+			// General Audience — Regular Print (876pp) and Large Print (1016pp).
+			'general-regular-charcoal-pb': 79.99, 'general-regular-charcoal-hb': 99.99,
+			'general-regular-plum-pb': 79.99, 'general-regular-plum-hb': 99.99,
+			'general-regular-white-pb': 79.99, 'general-regular-white-hb': 99.99,
+			'general-largeprint-charcoal-pb': 99.99, 'general-largeprint-charcoal-hb': 124.99,
+			'general-largeprint-plum-pb': 99.99, 'general-largeprint-plum-hb': 124.99,
+			'general-largeprint-white-pb': 99.99, 'general-largeprint-white-hb': 124.99,
 		};
 		const TIERS = [
 			{ min: 250, pct: 30 }, { min: 100, pct: 25 }, { min: 50, pct: 20 },
@@ -643,8 +862,16 @@ function markVoices(v: {
 			const total = Object.values(counts).reduce((a, b) => a + b, 0);
 			const tier = tierFor(total);
 			const pct = tier ? tier.pct : 0;
-			let sum = 0;
-			for (const [k, n] of Object.entries(counts)) sum += n * PRICE[k] * (1 - pct / 100);
+			// Round the discounted UNIT to whole cents, then multiply — the exact order
+			// functions/dvc-checkout.ts uses, because Stripe is charged a per-unit amount in
+			// cents. Multiplying first and rounding once at the end drifts from what the
+			// customer is actually charged: a 500-copy order of a $99.99 edition at 30% off
+			// showed $34,996.50 here while Stripe billed $34,995.00.
+			let cents = 0;
+			for (const [k, n] of Object.entries(counts)) {
+				cents += Math.round((PRICE[k] * 100 * (100 - pct)) / 100) * n;
+			}
+			const sum = cents / 100;
 			countEl.textContent = total;
 			saveEl.textContent = pct ? `save ${pct}%` : 'full price';
 			out.textContent = fmt(sum);

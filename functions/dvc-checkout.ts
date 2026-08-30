@@ -9,8 +9,8 @@
 // 25-copy minimum (Kevin 2026-08-23: "1 check out with up to 9 individual bibles at
 // full price then volume discounts added according to quantities ordered").
 //
-// The COMBINED total across all 16 editions sets the tier — mix and match. Prices are
-// authoritative HERE, server-side, so the browser cannot tamper with them.
+// The COMBINED total across every edition, colour and binding sets the tier — mix and
+// match. Prices are authoritative HERE, server-side, so the browser cannot tamper with them.
 //
 // SHIPPING IS FREE and baked into the unit price. Chosen over a 5% discount because a
 // discount would put our direct price below Amazon's list and invite Amazon to price-match;
@@ -59,6 +59,72 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string }> =
 		title: 'She Hears Her Father’s Voice — Journaling Bible',
 		retail: 12499,
 		img: `${ASSETS}/dvc-journaling-600.webp`,
+	},
+
+	// ── General Audience, added 2026-08-29 ──
+	// The same Bible without an audience on the cover: three colours, two bindings, in
+	// Regular Print (876pp) and Large Print (1,016pp). They join the SAME mix-and-match
+	// ladder as the targeted editions — the combined total across everything sets the tier.
+	// MUST match src/pages/print.astro `generalSkus` and the PRICE map in its inline script.
+	'general-regular-charcoal-pb': {
+		title: 'Charcoal, Paperback',
+		retail: 7999,
+		img: `${ASSETS}/general-regular-charcoal-600.webp?v=2`,
+	},
+	'general-regular-charcoal-hb': {
+		title: 'Charcoal, Hardback',
+		retail: 9999,
+		img: `${ASSETS}/general-regular-charcoal-600.webp?v=2`,
+	},
+	'general-regular-plum-pb': {
+		title: 'Plum, Paperback',
+		retail: 7999,
+		img: `${ASSETS}/general-regular-plum-600.webp?v=2`,
+	},
+	'general-regular-plum-hb': {
+		title: 'Plum, Hardback',
+		retail: 9999,
+		img: `${ASSETS}/general-regular-plum-600.webp?v=2`,
+	},
+	'general-regular-white-pb': {
+		title: 'White, Paperback',
+		retail: 7999,
+		img: `${ASSETS}/general-regular-white-600.webp?v=2`,
+	},
+	'general-regular-white-hb': {
+		title: 'White, Hardback',
+		retail: 9999,
+		img: `${ASSETS}/general-regular-white-600.webp?v=2`,
+	},
+	'general-largeprint-charcoal-pb': {
+		title: 'Large Print — Charcoal, Paperback',
+		retail: 9999,
+		img: `${ASSETS}/general-largeprint-charcoal-600.webp?v=2`,
+	},
+	'general-largeprint-charcoal-hb': {
+		title: 'Large Print — Charcoal, Hardback',
+		retail: 12499,
+		img: `${ASSETS}/general-largeprint-charcoal-600.webp?v=2`,
+	},
+	'general-largeprint-plum-pb': {
+		title: 'Large Print — Plum, Paperback',
+		retail: 9999,
+		img: `${ASSETS}/general-largeprint-plum-600.webp?v=2`,
+	},
+	'general-largeprint-plum-hb': {
+		title: 'Large Print — Plum, Hardback',
+		retail: 12499,
+		img: `${ASSETS}/general-largeprint-plum-600.webp?v=2`,
+	},
+	'general-largeprint-white-pb': {
+		title: 'Large Print — White, Paperback',
+		retail: 9999,
+		img: `${ASSETS}/general-largeprint-white-600.webp?v=2`,
+	},
+	'general-largeprint-white-hb': {
+		title: 'Large Print — White, Hardback',
+		retail: 12499,
+		img: `${ASSETS}/general-largeprint-white-600.webp?v=2`,
 	},
 };
 

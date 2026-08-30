@@ -3,6 +3,16 @@
 
 pre-commit:
   commands:
+    edition-metadata:
+      # Listing copy on /bibles/* must match the edition's Google Docs metadata sheet —
+      # the same source the Ingram listing uses. Hand-written copy once put "the complete
+      # Bible, nothing abridged, all 1,354 notes" on the Large Print page when its sheet
+      # says 30 books and 587 notes. Only runs when an edition data file is staged.
+      glob: "src/data/editions/*.json"
+      run: /home/deploy/bin/fhb-edition-metadata.py check --all
+      skip:
+        - merge
+        - rebase
     perf-traits-doc:
       run: /home/deploy/bin/perf-traits-audit.sh --commit-hook
       stage_fixed: true
