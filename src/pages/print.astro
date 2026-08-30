@@ -13,9 +13,9 @@ import Layout from '../layouts/Layout.astro';
 // over each card"). Copy is lifted from the metadata sheets so the site and the trade
 // listings cannot drift apart.
 // The spec, stated once for all sixteen. Concrete facts rather than "premium" — every
-// Bible on the shelf claims premium; 6x9 hardback with a dust jacket, full color and
+// Bible on the shelf claims premium; 6x9 case-laminate hardback, full color and
 // 876 pages is checkable and does more selling (Kevin asked 2026-08-23).
-const DVC_TAIL = 'Full Color Throughout · 6×9 Hardback with Dust Jacket';
+const DVC_TAIL = 'Full Color Throughout · 6×9 Hardback, Case Laminate';
 const DVC_TAIL2 =
 	'Red Letter \u00b7 Blue Letter \u00b7 Purple Letter \u00b7 Three-Color Divine Voice \u00b7 Complete Bible';
 // ── The one-line spec every order row carries (Kevin 2026-08-29) ──
@@ -30,9 +30,11 @@ const DVC_TAIL2 =
 //   binding read off the APPROVED cover for each ISBN. The general hardback is CASE
 //     LAMINATE (2026-08-24-general/APPROVALS.json approves COVER-Case for 979-8-89307-294-5),
 //     so it must NOT claim a dust jacket; jacket files exist but are not the approved
-//     binding. Large Print follows the same pattern. Only the 15 targeted editions carry
-//     "with Dust Jacket", which is the page's own approved header copy.
-const SPEC_TARGETED = '6×9 Hardback with Dust Jacket';
+//     binding. NOTHING claims a dust jacket: every sheet says case laminate, the ISBNs sit
+//     in `hardcover_case_laminate`, the delivered cover is ...-CASE-876pp.pdf, and the
+//     journaling sheet states "No dust jacket: not offered at 8 x 10". Jacket PDFs exist
+//     but carry no ISBN and no delivery record — they are not what ships.
+const SPEC_TARGETED = '6×9 Hardback, Case Laminate';
 const SPEC_JOURNALING = '8×10 Hardback · Wide Margin';
 
 const dvcEditions = [
@@ -316,7 +318,7 @@ const printFaq = [
 	},
 	{
 		q: 'What’s included in each edition?',
-		a: `The complete Bible in Divine Voice Color with full color throughout — 876 pages at 6×9, or 1,016 in Large Print. The targeted editions are hardcover with a dust jacket; the General Audience editions come in paperback or hardback. A presentation page for the reader's name. Opening pages on intimacy, identity, inheritance and hearing His voice. An introduction to every one of the 66 books, and a Father's note closing each one with a short prayer. 1,354 study notes across 777 chapters — 1,075 explaining a word, name, custom or background, 248 marking where the text reveals the Father, and 31 recording a difference among the manuscripts.`,
+		a: `The complete Bible in Divine Voice Color with full color throughout — 876 pages at 6×9, or 1,016 in Large Print. The targeted editions are 6×9 hardcover, case laminate; the General Audience editions come in paperback or hardback. A presentation page for the reader's name. Opening pages on intimacy, identity, inheritance and hearing His voice. An introduction to every one of the 66 books, and a Father's note closing each one with a short prayer. 1,354 study notes across 777 chapters — 1,075 explaining a word, name, custom or background, 248 marking where the text reveals the Father, and 31 recording a difference among the manuscripts.`,
 	},
 	{
 		q: 'Which languages can I read it in?',

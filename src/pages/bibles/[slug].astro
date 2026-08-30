@@ -101,7 +101,10 @@ const pillars: Pillar[] = fm?.pillars ?? [];
 const coverUrl = `${ASSETS}/${ed.coverImage ?? `dvc-${ed.slug}`}-1200.webp${ed.coverImage ? '?v=2' : ''}`;
 const pages = ed.pages ?? fm?.pages ?? 876;
 const trim = ed.trim ?? '6 x 9 in';
-const binding = ed.binding ?? 'Hardcover, case laminate with dust jacket';
+// Sourced per edition from the metadata sheet; the fallback matches what those
+// sheets say. It previously read "with dust jacket", which no sheet supports —
+// the journaling sheet says outright "No dust jacket: not offered at 8 x 10".
+const binding = ed.binding ?? 'Hardcover, case laminate';
 
 // "Intimacy for Teens" -> "for Teens". The pillar titles are uniform across the interiors,
 // so the audience phrase the printed book uses is the one the page uses too — no second
