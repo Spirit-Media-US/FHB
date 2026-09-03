@@ -67,6 +67,51 @@ function fmtAddr(a: Record<string, string> | null | undefined): string {
 		.join('\n');
 }
 
+// metadata.breakdown is the raw SKU tally dvc-checkout writes ("dads:1",
+// "general-largeprint-plum-hb:2"). Fine in the internal notification, wrong in a
+// customer's confirmation — turn it into something a buyer recognises.
+const TITLES: Record<string, string> = {
+	chosen: 'Chosen Bible',
+	couples: 'Couple’s Bible',
+	dads: 'Dad’s Bible',
+	'first-responders': 'First Responder’s Bible',
+	mens: 'Men’s Bible',
+	moms: 'Mom’s Bible',
+	pastors: 'Pastor’s Bible',
+	peace: 'Peace Bible',
+	presidents: 'President’s Bible',
+	recovery: 'Recovery Bible',
+	seekers: 'Seeker’s Bible',
+	seventeen: 'Seventeen Bible',
+	soldiers: 'Soldier’s Bible',
+	teen: 'Teen Bible',
+	'worship-leaders': 'Worship Leader’s Bible',
+	journaling: 'She Hears Her Father’s Voice — Journaling Bible',
+};
+
+function skuTitle(sku: string): string {
+	if (TITLES[sku]) return `${TITLES[sku]} — Divine Voice Color`;
+	const m = /^general-(regular|largeprint)-(charcoal|plum|white)-(pb|hb)$/.exec(sku);
+	if (!m) return sku;
+	const [, size, colour, binding] = m;
+	const c = colour.charAt(0).toUpperCase() + colour.slice(1);
+	return `Father’s Heart Bible — ${size === 'largeprint' ? 'Large Print' : 'Regular Print'}, ${c}, ${binding === 'hb' ? 'Hardback' : 'Paperback'}`;
+}
+
+function fmtOrder(breakdown: string | undefined): string {
+	if (!breakdown) return 'Father’s Heart Bible';
+	return breakdown
+		.split(/[,\s]+/)
+		.filter(Boolean)
+		.map((part) => {
+			const i = part.lastIndexOf(':');
+			if (i < 0) return `  ${skuTitle(part)}`;
+			const qty = part.slice(i + 1);
+			return `  ${qty} × ${skuTitle(part.slice(0, i))}`;
+		})
+		.join('\n');
+}
+
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	const ack = () => new Response('ok', { status: 200 });
 	const raw = await request.text();
@@ -114,7 +159,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		`New print order — Father's Heart Bible\n\n` +
 		`Total: ${amount} (incl. tax ${tax})\n` +
 		`Copies: ${m.total ?? '?'}  ·  Discount: ${m.pct_off ?? '?'}% off\n` +
-		`Editions: ${m.breakdown ?? '?'}\n\n` +
+		`Editions:\n${fmtOrder(m.breakdown)}\n\n` +
 		`Ship to:\n${name}\n${fmtAddr(ship.address)}\n\n` +
 		`Customer email: ${email}\n` +
 		`Phone: ${s.customer_details?.phone ?? '(none)'}\n` +
@@ -124,11 +169,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	// no confirmation their ORDER (as opposed to their payment) existed.
 	const custText =
 		`Thank you — we've received your order.\n\n` +
-		`Order: ${m.breakdown ?? m.total ?? 'Father’s Heart Bible'}\n` +
+		`What you ordered:\n${fmtOrder(m.breakdown)}\n\n` +
 		`Total paid: ${amount}\n` +
 		`Order reference: ${s.id ?? '?'}\n\n` +
 		`Shipping to:\n${name}\n${fmtAddr(ship.address)}\n\n` +
-		`Shipping is free. Most orders arrive in 7–10 days; larger bulk orders take 3–4 weeks.\n\n` +
+		(Number(m.total) > 9
+			? `Shipping is free. Larger bulk orders take about 3–4 weeks to reach you.\n\n`
+			: `Shipping is free, and most orders arrive within 7–10 days.\n\n`) +
 		`Need to change or ask about this order? Just reply to this email and it comes\n` +
 		`straight to us — please include your order reference above.\n\n` +
 		`Spirit Media Publishing\n`;
