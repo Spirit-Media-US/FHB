@@ -85,10 +85,18 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	}
 	if (event?.type !== 'checkout.session.completed') return ack();
 	const s = event.data?.object ?? {};
-	if (s?.metadata?.kind !== 'print_bulk') return ack();
+	// Both checkout paths land here: the retired 25-copy /print-checkout stamps
+	// `print_bulk`, the live /dvc-checkout stamps `dvc_print`. Matching only the
+	// former meant NO /print order notified anyone between the mix-and-match
+	// rewrite and 2026-09-03, when a customer asked why he got no confirmation.
+	const kind = s?.metadata?.kind;
+	if (kind !== 'print_bulk' && kind !== 'dvc_print') return ack();
 
 	const email = s.customer_details?.email ?? '(no email)';
-	const ship = s.shipping_details ?? s.customer_details ?? {};
+	// Stripe moved the collected address to collected_information.shipping_details;
+	// top-level shipping_details is null on current API versions. Try newest first.
+	const ship =
+		s.collected_information?.shipping_details ?? s.shipping_details ?? s.customer_details ?? {};
 	const name = ship.name ?? s.customer_details?.name ?? '(no name)';
 	const amount = ((s.amount_total ?? 0) / 100).toLocaleString('en-US', {
 		style: 'currency',
@@ -103,7 +111,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	const m = s.metadata ?? {};
 
 	const text =
-		`New bulk print order — Father's Heart Bible\n\n` +
+		`New print order — Father's Heart Bible\n\n` +
 		`Total: ${amount} (incl. tax ${tax})\n` +
 		`Copies: ${m.total ?? '?'}  ·  Discount: ${m.pct_off ?? '?'}% off\n` +
 		`Editions: ${m.breakdown ?? '?'}\n\n` +
@@ -111,20 +119,36 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		`Customer email: ${email}\n` +
 		`Phone: ${s.customer_details?.phone ?? '(none)'}\n` +
 		`Stripe session: ${s.id ?? '?'}\n`;
-	const html = `<pre style="font:14px/1.5 ui-monospace,monospace">${text
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')}</pre>`;
+	// The buyer's own confirmation. Until 2026-09-03 we sent the customer NOTHING —
+	// Stripe's payment receipt was the only thing they ever received, so a buyer had
+	// no confirmation their ORDER (as opposed to their payment) existed.
+	const custText =
+		`Thank you — we've received your order.\n\n` +
+		`Order: ${m.breakdown ?? m.total ?? 'Father’s Heart Bible'}\n` +
+		`Total paid: ${amount}\n` +
+		`Order reference: ${s.id ?? '?'}\n\n` +
+		`Shipping to:\n${name}\n${fmtAddr(ship.address)}\n\n` +
+		`Shipping is free. Most orders arrive in 7–10 days; larger bulk orders take 3–4 weeks.\n\n` +
+		`Need to change or ask about this order? Just reply to this email and it comes\n` +
+		`straight to us — please include your order reference above.\n\n` +
+		`Spirit Media Publishing\n`;
 
-	// Email the notification (fire-and-forget; still ACK Stripe regardless).
-	if (env.MAILGUN_API_KEY) {
+	const send = async (to: string, subject: string, body: string, replyTo?: string) => {
+		if (!env.MAILGUN_API_KEY) return;
 		const domain = env.MAILGUN_SENDING_DOMAIN || 'send.spiritmediapublishing.com';
-		const body = new URLSearchParams();
-		body.set('from', NOTIFY_FROM);
-		body.set('to', env.PRINT_ORDER_NOTIFY_TO || NOTIFY_TO_DEFAULT);
-		body.set('subject', `📚 Bulk order — ${m.total ?? '?'} copies · ${amount}`);
-		body.set('text', text);
-		body.set('html', html);
-		body.set('o:tracking', 'no');
+		const form = new URLSearchParams();
+		form.set('from', NOTIFY_FROM);
+		form.set('to', to);
+		form.set('subject', subject);
+		form.set('text', body);
+		form.set(
+			'html',
+			`<pre style="font:14px/1.5 ui-monospace,monospace">${body
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')}</pre>`,
+		);
+		form.set('o:tracking', 'no');
+		if (replyTo) form.set('h:Reply-To', replyTo);
 		try {
 			await fetch(`https://api.mailgun.net/v3/${domain}/messages`, {
 				method: 'POST',
@@ -132,11 +156,22 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 					Authorization: `Basic ${btoa(`api:${env.MAILGUN_API_KEY}`)}`,
 					'Content-Type': 'application/x-www-form-urlencoded',
 				},
-				body,
+				body: form,
 			});
 		} catch {
 			/* swallow — Stripe still gets its ACK; retry not helpful for email */
 		}
+	};
+
+	// Fire-and-forget both; still ACK Stripe regardless of either outcome.
+	await send(
+		env.PRINT_ORDER_NOTIFY_TO || NOTIFY_TO_DEFAULT,
+		`📚 Print order — ${m.total ?? '?'} copies · ${amount}`,
+		text,
+		email !== '(no email)' ? email : undefined,
+	);
+	if (email !== '(no email)') {
+		await send(email, `Your Father’s Heart Bible order — ${amount}`, custText, NOTIFY_TO_DEFAULT);
 	}
 	return ack();
 };

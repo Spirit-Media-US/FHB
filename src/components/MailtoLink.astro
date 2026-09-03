@@ -1,8 +1,16 @@
 ---
 /**
- * MailtoLink — spam-safe email link component.
- * The address is split into user + domain so it never appears as a
- * plain mailto: in the HTML source. JS assembles it on click.
+ * MailtoLink — email link that always does something.
+ *
+ * History: this component used to render href="#" and assemble the address in JS
+ * on click (window.location = 'mailto:…') to keep the address out of the HTML
+ * source. That silently broke for every visitor without a registered mail handler
+ * — most webmail users — where setting location to a mailto: is a no-op. A
+ * customer reported "I clicked CONTACT and nothing happens" on 2026-09-03.
+ *
+ * Now: a real mailto: href (works with a mail client, and is right-click
+ * copyable without one), plus a clipboard fallback that surfaces the address
+ * inline when the mailto doesn't take the visitor anywhere.
  *
  * Usage:
  *   <MailtoLink email="info@spiritmedia.us" class="text-red hover:underline">
@@ -17,25 +25,40 @@ interface Props {
 }
 
 const { email, class: className, 'aria-label': ariaLabel, ...rest } = Astro.props;
-const [user, domain] = email.split('@');
 ---
 
 <a
-  href="#"
+  href={`mailto:${email}`}
   class={className}
-  data-e={user}
-  data-d={domain}
-  aria-label={ariaLabel}
-  role="link"
+  data-mailto={email}
+  aria-label={ariaLabel ?? `Email ${email}`}
   {...rest}
 ><slot /></a>
 
 <script>
-  document.querySelectorAll<HTMLAnchorElement>('a[data-e][data-d]').forEach((el) => {
-    el.addEventListener('click', (e) => {
-      e.preventDefault();
-      const addr = el.dataset.e + '@' + el.dataset.d;
-      window.location.href = 'mailto:' + addr;
+  // Fallback: if the browser has no mail handler the click does nothing visible.
+  // Detect that (the page is still here, unblurred, a moment later) and reveal
+  // the address so the visitor can copy it instead of hitting a dead link.
+  document.querySelectorAll<HTMLAnchorElement>('a[data-mailto]').forEach((el) => {
+    el.addEventListener('click', () => {
+      const addr = el.dataset.mailto;
+      if (!addr) return;
+      let left = false;
+      const mark = () => { left = true; };
+      window.addEventListener('blur', mark, { once: true });
+      window.addEventListener('pagehide', mark, { once: true });
+      setTimeout(() => {
+        window.removeEventListener('blur', mark);
+        if (left || document.hidden) return;
+        navigator.clipboard?.writeText(addr).catch(() => {});
+        const note = document.createElement('span');
+        note.textContent = ` — ${addr} (copied)`;
+        note.style.cssText = 'font-size:0.9em;opacity:0.85;';
+        if (!el.nextElementSibling?.hasAttribute?.('data-mailto-note')) {
+          note.setAttribute('data-mailto-note', '');
+          el.insertAdjacentElement('afterend', note);
+        }
+      }, 800);
     });
   });
 </script>
