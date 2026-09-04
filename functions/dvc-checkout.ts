@@ -179,7 +179,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		return json({ disabled: true, message: 'Checkout is not enabled yet.' });
 	}
 
-	const origin = new URL(request.url).origin;
+	// The apex router proxies this request, so new URL(request.url).origin resolves to
+	// the raw Pages host and buyers were returned to fathersheartbible.pages.dev after
+	// paying. Rewrite ONLY the production Pages host: preview deployments carry a
+	// subdomain (dev.… / <hash>.…) and must keep sending their test purchases to
+	// themselves, not to production.
+	const reqUrl = new URL(request.url);
+	const origin =
+		reqUrl.hostname === 'fathersheartbible.pages.dev'
+			? 'https://fathersheartbible.com'
+			: reqUrl.origin;
 	const form: Record<string, string | number> = {
 		mode: 'payment',
 		// /order re-reads the session from Stripe and shows the buyer what they bought.
