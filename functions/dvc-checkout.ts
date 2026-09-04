@@ -182,7 +182,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	const origin = new URL(request.url).origin;
 	const form: Record<string, string | number> = {
 		mode: 'payment',
-		success_url: `${origin}/print?order=success`,
+		// /order re-reads the session from Stripe and shows the buyer what they bought.
+		// This used to be /print?order=success, which print.astro never read — so a buyer
+		// landed back on the same order form with no acknowledgement (found 2026-09-03).
+		success_url: `${origin}/order?s={CHECKOUT_SESSION_ID}`,
 		cancel_url: `${origin}/print?order=canceled`,
 		'automatic_tax[enabled]': 'true',
 		// Free shipping is baked into the unit price; the address is still collected for
