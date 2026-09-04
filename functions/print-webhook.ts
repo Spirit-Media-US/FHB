@@ -1,14 +1,21 @@
-// /print-webhook — Stripe webhook for bulk print orders (Cloudflare Pages Function).
+// /print-webhook — Stripe webhook for every store sale (Cloudflare Pages Function).
 //
-// On `checkout.session.completed` for a print_bulk order, emails Kevin the
-// order details (what to print + where to ship). Signature-verified with
-// STRIPE_PRINT_WEBHOOK_SECRET. Always ACKs 2xx so Stripe doesn't retry-storm.
+// On `checkout.session.completed` it emails us the fulfilment details and the buyer
+// their confirmation, then stamps `notified_at` on the session so an order nobody was
+// told about can be found later. Covers all three kinds the store creates:
+// `dvc_print` (the live /print checkout), `print_bulk` (the retired 25-copy path) and
+// `ebook_direct`. Signature-verified with STRIPE_PRINT_WEBHOOK_SECRET.
+//
+// It ACKs 2xx for anything it deliberately ignores, but answers 5xx when an email
+// genuinely failed, so Stripe redelivers instead of the order vanishing quietly.
 //
 // NB: path is /print-webhook, not /api/* — the apex router proxies /api/* to
 // the community app, so this marketing function lives off that prefix.
 
 interface Env {
 	STRIPE_PRINT_WEBHOOK_SECRET?: string;
+	// Also used to stamp notified_at back onto the session (see markNotified).
+	STRIPE_FHB_SECRET_KEY?: string;
 	MAILGUN_API_KEY?: string;
 	MAILGUN_SENDING_DOMAIN?: string;
 	PRINT_ORDER_NOTIFY_TO?: string;
@@ -166,6 +173,29 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		: '$0.00';
 	const m = s.metadata ?? {};
 
+	// Stamp the session once its emails are away. This is what makes an un-notified
+	// order *findable*: fhb-order-reconcile.py sweeps paid sessions missing
+	// `notified_at` and sends them itself. Stripe holds the mark, so there is no
+	// second ledger to drift out of step with the orders it describes. Best-effort —
+	// a failed stamp only costs a duplicate send from the reconciler, never a miss.
+	const markNotified = async () => {
+		if (!env.STRIPE_FHB_SECRET_KEY || !s.id) return;
+		try {
+			await fetch(`https://api.stripe.com/v1/checkout/sessions/${s.id}`, {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${env.STRIPE_FHB_SECRET_KEY}`,
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: new URLSearchParams({
+					'metadata[notified_at]': new Date().toISOString(),
+				}),
+			});
+		} catch {
+			/* the reconciler is the backstop */
+		}
+	};
+
 	// Returns whether the message was actually accepted, so a failed send can be
 	// escalated rather than swallowed (see the retry note at the end of the handler).
 	const send = async (to: string, subject: string, body: string, replyTo?: string) => {
@@ -223,7 +253,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 					`Trouble opening it? Just reply to this email.\n\nSpirit Media Publishing\n`,
 				NOTIFY_TO_DEFAULT,
 			));
-		return okKevin && okCust ? ack() : retry();
+		if (okKevin && okCust) {
+			await markNotified();
+			return ack();
+		}
+		return retry();
 	}
 
 	const text =
@@ -261,5 +295,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		email === '(no email)' ||
 		(await send(email, `Your Father’s Heart Bible order — ${amount}`, custText, NOTIFY_TO_DEFAULT));
 
-	return okKevin && okCust ? ack() : retry();
+	if (okKevin && okCust) {
+		await markNotified();
+		return ack();
+	}
+	return retry();
 };
