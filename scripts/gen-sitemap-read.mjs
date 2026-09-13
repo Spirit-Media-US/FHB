@@ -236,6 +236,12 @@ const keys = [...groups.keys()].sort((a, b) => {
 
 let count = 0;
 const perLang = Object.fromEntries(LIVE_LANGS.map((l) => [l, 0]));
+// PROPOSAL (Track B, 2026-09-13) — per-language segments, OFF unless SITEMAP_SPLIT=1.
+// Emits public/sitemap-read-<lang>.xml (each <url> keeps the FULL alternate set, so
+// hreflang stays reciprocal across files) + public/sitemap-read-index.xml. Lets GSC/Bing
+// report indexing per language. sitemap-read.xml is still written unchanged.
+const SPLIT = process.env.SITEMAP_SPLIT === '1';
+const segs = new Map(LIVE_LANGS.map((l) => [l, []]));
 for (const key of keys) {
   const langs = groups.get(key);
   const alts = [...langs.entries()]
@@ -245,9 +251,9 @@ for (const key of keys) {
     ? `<xhtml:link rel="alternate" hreflang="x-default" href="${esc(langs.get('en'))}"/>`
     : '';
   for (const [l, u] of langs) {
-    parts.push(
-      `<url><loc>${esc(u)}</loc><changefreq>monthly</changefreq><priority>0.8</priority>${alts}${xdefault}</url>`,
-    );
+    const entry = `<url><loc>${esc(u)}</loc><changefreq>monthly</changefreq><priority>0.8</priority>${alts}${xdefault}</url>`;
+    parts.push(entry);
+    if (SPLIT) segs.get(l).push(entry);
     count++;
     perLang[l]++;
   }
@@ -256,6 +262,25 @@ parts.push('</urlset>');
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, parts.join(''));
+
+if (SPLIT) {
+  const HEAD =
+    '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">';
+  const index = [];
+  for (const [l, entries] of segs) {
+    if (!entries.length) continue; // never publish an empty segment
+    const name = `sitemap-read-${l}.xml`;
+    fs.writeFileSync(path.join(path.dirname(OUT), name), HEAD + entries.join('') + '</urlset>');
+    index.push(`<sitemap><loc>${SITE}/${name}</loc></sitemap>`);
+  }
+  fs.writeFileSync(
+    path.join(path.dirname(OUT), 'sitemap-read-index.xml'),
+    '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
+      index.join('') +
+      '</sitemapindex>',
+  );
+  console.log(`gen-sitemap-read: SPLIT — ${index.length} segments + sitemap-read-index.xml`);
+}
 
 // 50,000-URL / 50 MB sitemap limits: at ~2.6k URLs we are far inside both. If a
 // future canon push crosses 45,000 URLs, shard by language here and emit an index.
