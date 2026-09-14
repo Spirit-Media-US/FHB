@@ -130,8 +130,44 @@ for (const lang of LIVE_LANGS) {
 }
 
 // URL for a chapter. English is the implicit default and has NO lang segment.
+// D7 localized book-name URLs (community lib/slug-map.ts, phase 1 = es). The URL
+// uses the language's own book token; the English key stays the data key. MUST
+// mirror community's LOCALIZED_SLUG_LANGS + slug rule — read both from the
+// community repo rather than keeping a second copy that can drift.
+const LOCALIZED = (() => {
+  try {
+    const src = fs.readFileSync('/srv/sites/community/src/lib/slug-map.ts', 'utf8');
+    const m = src.match(/LOCALIZED_SLUG_LANGS[^=]*=\s*\[([^\]]*)\]/);
+    return m ? [...m[1].matchAll(/"([a-z-]+)"/g)].map((x) => x[1]) : [];
+  } catch {
+    return [];
+  }
+})();
+const slugifyName = (name) =>
+  name.normalize('NFKD').replace(/\p{M}+/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const LOCAL_SLUGS = new Map(); // lang -> Map(key -> local slug)
+for (const lang of LOCALIZED) {
+  try {
+    const dict = JSON.parse(fs.readFileSync(`/srv/sites/community/src/i18n/${lang}.json`, 'utf8'));
+    const t = new Map();
+    const seen = new Set();
+    for (const [key, name] of Object.entries(dict.books || {})) {
+      const slug = slugifyName((dict.booksRomanized || {})[key] || name || '');
+      if (!slug || seen.has(slug)) throw new Error(`bad slug table for ${lang}: ${key} -> '${slug}'`);
+      seen.add(slug);
+      t.set(key, slug);
+    }
+    LOCAL_SLUGS.set(lang, t);
+    console.log(`[gen-sitemap-read] localized book slugs: ${lang} (${t.size} books)`);
+  } catch (err) {
+    // Same fail-safe as the reader: a broken table means English keys, never a guessed slug.
+    console.warn(`[gen-sitemap-read] ${lang} slug table unusable (${err.message}); using English keys`);
+  }
+}
+const urlSlug = (lang, key) => LOCAL_SLUGS.get(lang)?.get(key) ?? key;
+
 const chapterUrl = (lang, slug, n) =>
-  lang === 'en' ? `${SITE}/read/${slug}/${n}/` : `${SITE}/read/${lang}/${slug}/${n}/`;
+  lang === 'en' ? `${SITE}/read/${urlSlug(lang, slug)}/${n}/` : `${SITE}/read/${lang}/${urlSlug(lang, slug)}/${n}/`;
 
 // ── LIVE GUARD: never advertise a chapter production does not serve ──────────
 // The chapter data above is the translation pipeline's BUILD-TIME output, which
