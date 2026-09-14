@@ -130,8 +130,65 @@ for (const lang of LIVE_LANGS) {
 }
 
 // URL for a chapter. English is the implicit default and has NO lang segment.
+// D7 localized book-name URLs (community lib/slug-map.ts, phase 1 = es). The URL
+// uses the language's own book token; the English key stays the data key. MUST
+// mirror community's LOCALIZED_SLUG_LANGS + slug rule — read both from the
+// community repo rather than keeping a second copy that can drift.
+const LOCALIZED = (() => {
+  try {
+    const src = fs.readFileSync('/srv/sites/community/src/lib/slug-map.ts', 'utf8');
+    const m = src.match(/LOCALIZED_SLUG_LANGS[^=]*=\s*\[([^\]]*)\]/);
+    return m ? [...m[1].matchAll(/"([a-z-]+)"/g)].map((x) => x[1]) : [];
+  } catch {
+    return [];
+  }
+})();
+const slugifyName = (name) =>
+  name.normalize('NFKD').replace(/\p{M}+/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const LOCAL_SLUGS = new Map(); // lang -> Map(key -> local slug)
+for (const lang of LOCALIZED) {
+  try {
+    const dict = JSON.parse(fs.readFileSync(`/srv/sites/community/src/i18n/${lang}.json`, 'utf8'));
+    const t = new Map();
+    const seen = new Set();
+    for (const [key, name] of Object.entries(dict.books || {})) {
+      const slug = slugifyName((dict.booksRomanized || {})[key] || name || '');
+      if (!slug || seen.has(slug)) throw new Error(`bad slug table for ${lang}: ${key} -> '${slug}'`);
+      seen.add(slug);
+      t.set(key, slug);
+    }
+    LOCAL_SLUGS.set(lang, t);
+    console.log(`[gen-sitemap-read] localized book slugs: ${lang} (${t.size} books)`);
+  } catch (err) {
+    // Same fail-safe as the reader: a broken table means English keys, never a guessed slug.
+    console.warn(`[gen-sitemap-read] ${lang} slug table unusable (${err.message}); using English keys`);
+  }
+}
+// SHIP-ORDER GUARD: only use a language's local slugs once PRODUCTION serves them.
+// Community (which answers /read/es/juan/…) and this app deploy independently; a
+// marketing deploy that lands first must keep English keys, or the live guard below
+// would find every localized book 404 and silently drop the language (seen on the
+// 2026-09-14 dev build: es 1189 -> 174). Probe one known book per language.
+if (process.env.SITEMAP_SKIP_LIVE_CHECK !== '1') {
+  for (const [lang, t] of [...LOCAL_SLUGS]) {
+    const probe = `${SITE}/read/${lang}/${t.get('john') ?? [...t.values()][0]}/1/`;
+    let ok = false;
+    try {
+      const r = await fetch(probe, { redirect: 'manual' });
+      ok = r.status === 200;
+    } catch {
+      ok = false;
+    }
+    if (!ok) {
+      LOCAL_SLUGS.delete(lang);
+      console.warn(`[gen-sitemap-read] ${lang}: production does not serve localized slugs yet (${probe}) — using English keys`);
+    }
+  }
+}
+const urlSlug = (lang, key) => LOCAL_SLUGS.get(lang)?.get(key) ?? key;
+
 const chapterUrl = (lang, slug, n) =>
-  lang === 'en' ? `${SITE}/read/${slug}/${n}/` : `${SITE}/read/${lang}/${slug}/${n}/`;
+  lang === 'en' ? `${SITE}/read/${urlSlug(lang, slug)}/${n}/` : `${SITE}/read/${lang}/${urlSlug(lang, slug)}/${n}/`;
 
 // ── LIVE GUARD: never advertise a chapter production does not serve ──────────
 // The chapter data above is the translation pipeline's BUILD-TIME output, which
