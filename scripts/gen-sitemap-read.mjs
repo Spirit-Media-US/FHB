@@ -164,6 +164,27 @@ for (const lang of LOCALIZED) {
     console.warn(`[gen-sitemap-read] ${lang} slug table unusable (${err.message}); using English keys`);
   }
 }
+// SHIP-ORDER GUARD: only use a language's local slugs once PRODUCTION serves them.
+// Community (which answers /read/es/juan/…) and this app deploy independently; a
+// marketing deploy that lands first must keep English keys, or the live guard below
+// would find every localized book 404 and silently drop the language (seen on the
+// 2026-09-14 dev build: es 1189 -> 174). Probe one known book per language.
+if (process.env.SITEMAP_SKIP_LIVE_CHECK !== '1') {
+  for (const [lang, t] of [...LOCAL_SLUGS]) {
+    const probe = `${SITE}/read/${lang}/${t.get('john') ?? [...t.values()][0]}/1/`;
+    let ok = false;
+    try {
+      const r = await fetch(probe, { redirect: 'manual' });
+      ok = r.status === 200;
+    } catch {
+      ok = false;
+    }
+    if (!ok) {
+      LOCAL_SLUGS.delete(lang);
+      console.warn(`[gen-sitemap-read] ${lang}: production does not serve localized slugs yet (${probe}) — using English keys`);
+    }
+  }
+}
 const urlSlug = (lang, key) => LOCAL_SLUGS.get(lang)?.get(key) ?? key;
 
 const chapterUrl = (lang, slug, n) =>
