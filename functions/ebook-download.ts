@@ -5,13 +5,20 @@
 // a private R2 bucket (FHB_EBOOK); nothing is public. DRM-free (social-watermarking
 // TODO: stamp the buyer email — kept simple for v1).
 
+import EBOOK from './ebook-current.json';
+
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
 	FHB_EBOOK?: R2Bucket;
 }
 
-const EPUB_KEY = 'fathers-heart-bible.epub';
-const EPUB_NAME = 'Fathers-Heart-Bible-2026.2.epub';
+// Which object ships is decided by the eBook RECORD (projects/fhb-ebook/epub-manifest.json),
+// not by this file: ebook-current.json is a derived view written by
+// bin/fhb-ebook-config.py --write, and a daily reconcile checks the R2 object's sha256
+// against the record. Next edition = promote -> upload to the new key -> --write.
+// (Until 2026-09-14 this hard-coded the v21 key and served a pre-2026.6 book.)
+const EPUB_KEY: string = EBOOK.key;
+const EPUB_NAME: string = EBOOK.filename;
 
 async function sessionPaid(env: Env, sid: string): Promise<boolean> {
 	if (!/^cs_[A-Za-z0-9_]+$/.test(sid)) return false;
