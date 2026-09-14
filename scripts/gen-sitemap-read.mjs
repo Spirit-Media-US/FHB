@@ -293,12 +293,23 @@ const keys = [...groups.keys()].sort((a, b) => {
 
 let count = 0;
 const perLang = Object.fromEntries(LIVE_LANGS.map((l) => [l, 0]));
-// PROPOSAL (Track B, 2026-09-13) — per-language segments, OFF unless SITEMAP_SPLIT=1.
+// Per-language segments — ON (D97, Kevin approved 2026-09-14). This constant IS the
+// committed config; SITEMAP_SPLIT=0/1 overrides it for tests only.
 // Emits public/sitemap-read-<lang>.xml (each <url> keeps the FULL alternate set, so
-// hreflang stays reciprocal across files) + public/sitemap-read-index.xml. Lets GSC/Bing
-// report indexing per language. sitemap-read.xml is still written unchanged.
-const SPLIT = process.env.SITEMAP_SPLIT === '1';
+// hreflang stays reciprocal across files) + public/sitemap-read-index.xml, which
+// robots.txt advertises, so GSC/Bing report indexing per language. sitemap-read.xml
+// (the combined file) is still written unchanged: fhb-index-submit.py / IndexNow and
+// fhb-submit-reader-sitemap.sh read it.
+const SPLIT_BY_LANGUAGE = true;
+const SPLIT = process.env.SITEMAP_SPLIT ? process.env.SITEMAP_SPLIT === '1' : SPLIT_BY_LANGUAGE;
 const segs = new Map(LIVE_LANGS.map((l) => [l, []]));
+// The reader hubs live in the English segment, so the segments together hold EVERY
+// URL of the combined file (nothing lost when a console reads only the index).
+if (SPLIT && segs.has('en')) {
+  for (const hub of [`${SITE}/read/`, `${SITE}/read/en/`]) {
+    segs.get('en').push(`<url><loc>${esc(hub)}</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>`);
+  }
+}
 for (const key of keys) {
   const langs = groups.get(key);
   const alts = [...langs.entries()]
