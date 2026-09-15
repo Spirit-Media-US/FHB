@@ -26,10 +26,10 @@ const page = await sanityClient.fetch(`*[_type == "page" && slug == "review"][0]
 	seoTitle, seoDescription, heroEyebrow, heroHeading, heroSubheading, heroImage
 }`);
 
-const title = page?.seoTitle || "Reader Reviews | Father's Heart Bible™";
+const title = page?.seoTitle || "Reader Reviews | FHB — Father's Heart Bible™";
 const description =
 	page?.seoDescription ||
-	"Read what The Father's Heart Bible means to readers around the world — and share your own experience.";
+	"Read what The Father's Heart Bible (FHB) means to readers around the world — and share your own experience.";
 const heroHeading = page?.heroHeading || 'Read and loved around the world.';
 const heroSubheading =
 	page?.heroSubheading ||
@@ -413,7 +413,7 @@ const heroImageMobile = page?.heroImage
 		const share = ev.target.closest('.rv-share');
 		if (share) {
 			const text = `"${share.dataset.title}" — ${share.dataset.name || 'a reader'}'s review of The Father's Heart Bible`;
-			if (navigator.share) { try { await navigator.share({ title: "Father's Heart Bible", text, url: SHARE_URL }); } catch { /* cancelled */ } }
+			if (navigator.share) { try { await navigator.share({ title: "Father's Heart Bible (FHB)", text, url: SHARE_URL }); } catch { /* cancelled */ } }
 			else openShareMenu(share, text, SHARE_URL);
 			return;
 		}
