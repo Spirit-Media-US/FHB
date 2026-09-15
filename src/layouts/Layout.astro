@@ -75,7 +75,7 @@ const siteSettings = await sanityClient.fetch(`
   }
 `);
 
-const siteName = siteSettings?.siteName || "Father's Heart Bible";
+const siteName = siteSettings?.siteName || "Father's Heart Bible (FHB)";
 
 // ── Global chrome (shared Header/Footer mounted once here, per the SMP model;
 // synced from the community repo into src/chrome at build) ──
@@ -107,7 +107,7 @@ const fhbFooterLegal = [
 // OG image — default to the branded 1200×630 share card, allow per-page override
 const ogImage =
 	image || 'https://assets.spiritmediapublishing.com/FHB/share/fhb-og-default.jpg?v=3';
-const ogImageAlt = imageAlt || "Father's Heart Bible — Come home to Me as your Father";
+const ogImageAlt = imageAlt || "Father's Heart Bible (FHB) — Come home to Me as your Father";
 // Emit explicit dimensions/type only for known 1200×630 JPG cards (our share
 // cards + w=1200&h=630 Sanity crops); skip for arbitrary blog hero images.
 const ogSized = ogImage.includes('/FHB/share/') || ogImage.includes('w=1200&h=630');
