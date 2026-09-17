@@ -109,21 +109,41 @@ const bindings = [
 }
 
 <style>
+	/* NO `white-space: nowrap` HERE. It was the actual cause of the spill Kevin saw: the logo
+	   plus "· Hardback $99.99" needs about 199px and a card is 133px wide at phone width, so
+	   the label ran straight out of the pill — measured as scrollWidth > clientWidth on 32 of
+	   44 buttons at 400px, while every button still reported a normal single-line HEIGHT. A
+	   height check would have passed. Letting the content wrap keeps it inside the pill, and
+	   the logo and type step down on narrow screens so it usually stays on one line anyway. */
 	.buy-btn {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		gap: 0.4rem;
+		flex-wrap: wrap;
+		gap: 0.2rem 0.4rem;
 		border-radius: 999px;
 		font-weight: 600;
 		font-family: var(--font-sans);
 		background: var(--color-primary-fixed, #ffd9e0);
 		color: var(--color-ink, #1a1c1c);
 		border: 1.5px solid var(--color-primary, #b60057);
-		padding: 0.5rem 0.9rem;
+		padding: 0.5rem 0.75rem;
 		font-size: 0.8rem;
+		line-height: 1.25;
 		cursor: pointer;
-		white-space: nowrap;
+		text-align: center;
+	}
+	.buy-btn img {
+		flex: none;
+	}
+	@media (max-width: 640px) {
+		.buy-btn {
+			padding: 0.45rem 0.55rem;
+			font-size: 0.72rem;
+		}
+		.buy-btn img {
+			width: 40px !important;
+		}
 	}
 	.buy-btn-off {
 		background: #fdeef3;
