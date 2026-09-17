@@ -44,36 +44,169 @@ const CARDS = `${ASSETS}/cards/v2`;
 // Kept as a field rather than deleted: it is the place any future multi-item SKU would say
 // so, and the comment is the record of why the answer is one.
 const EDITIONS: Record<string, { title: string; retail: number; img: string; books?: number }> = {
-	chosen: { title: 'Chosen Bible', retail: 9999, img: `${CARDS}/dvc-chosen-600.webp` },
-	couples: { title: 'Couple’s Bible', retail: 9999, img: `${CARDS}/dvc-couples-600.webp` },
-	dads: { title: 'Dad’s Bible', retail: 9999, img: `${CARDS}/dvc-dads-600.webp` },
-	'first-responders': {
-		title: 'First Responder’s Bible',
+	// EVERY EDITION IS SOLD IN BOTH BINDINGS (Kevin 2026-09-17), so each one is TWO SKUs,
+	// keyed <slug>-hb / <slug>-pb exactly like the Large Print volumes. A bare slug is no
+	// longer sellable: a single key could not say which binding the buyer chose, and the
+	// price differs by $20. Prices are ISBNS.json's and pricing-verify compares them.
+	// Titles carry the binding because this string is what shows on the Stripe receipt.
+	'chosen-hb': {
+		title: 'Chosen Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-chosen-600.webp`,
+	},
+	'chosen-pb': {
+		title: 'Chosen Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-chosen-600.webp`,
+	},
+	'couples-hb': {
+		title: 'Couple’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-couples-600.webp`,
+	},
+	'couples-pb': {
+		title: 'Couple’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-couples-600.webp`,
+	},
+	'dads-hb': {
+		title: 'Dad’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-dads-600.webp`,
+	},
+	'dads-pb': {
+		title: 'Dad’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-dads-600.webp`,
+	},
+	'first-responders-hb': {
+		title: 'First Responder’s Bible — Hardback',
 		retail: 9999,
 		img: `${CARDS}/dvc-first-responders-600.webp`,
 	},
-	mens: { title: 'Men’s Bible', retail: 9999, img: `${CARDS}/dvc-mens-600.webp` },
-	moms: { title: 'Mom’s Bible', retail: 9999, img: `${CARDS}/dvc-moms-600.webp` },
-	pastors: { title: 'Pastor’s Bible', retail: 9999, img: `${CARDS}/dvc-pastors-600.webp` },
-	peace: { title: 'Peace Bible', retail: 9999, img: `${CARDS}/dvc-peace-600.webp` },
-	presidents: {
-		title: 'President’s Bible',
+	'first-responders-pb': {
+		title: 'First Responder’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-first-responders-600.webp`,
+	},
+	'mens-hb': {
+		title: 'Men’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-mens-600.webp`,
+	},
+	'mens-pb': {
+		title: 'Men’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-mens-600.webp`,
+	},
+	'moms-hb': {
+		title: 'Mom’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-moms-600.webp`,
+	},
+	'moms-pb': {
+		title: 'Mom’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-moms-600.webp`,
+	},
+	'pastors-hb': {
+		title: 'Pastor’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-pastors-600.webp`,
+	},
+	'pastors-pb': {
+		title: 'Pastor’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-pastors-600.webp`,
+	},
+	'peace-hb': {
+		title: 'Peace Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-peace-600.webp`,
+	},
+	'peace-pb': {
+		title: 'Peace Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-peace-600.webp`,
+	},
+	'presidents-hb': {
+		title: 'President’s Bible — Hardback',
 		retail: 9999,
 		img: `${CARDS}/dvc-presidents-600.webp`,
 	},
-	recovery: { title: 'Recovery Bible', retail: 9999, img: `${CARDS}/dvc-recovery-600.webp` },
-	seekers: { title: 'Seeker’s Bible', retail: 9999, img: `${CARDS}/dvc-seekers-600.webp` },
-	seventeen: { title: 'Seventeen Bible', retail: 9999, img: `${CARDS}/dvc-seventeen-600.webp` },
-	soldiers: { title: 'Soldier’s Bible', retail: 9999, img: `${CARDS}/dvc-soldiers-600.webp` },
-	teen: { title: 'Teen Bible', retail: 9999, img: `${CARDS}/dvc-teen-600.webp` },
-	'worship-leaders': {
-		title: 'Worship Leader’s Bible',
+	'presidents-pb': {
+		title: 'President’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-presidents-600.webp`,
+	},
+	'recovery-hb': {
+		title: 'Recovery Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-recovery-600.webp`,
+	},
+	'recovery-pb': {
+		title: 'Recovery Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-recovery-600.webp`,
+	},
+	'seekers-hb': {
+		title: 'Seeker’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-seekers-600.webp`,
+	},
+	'seekers-pb': {
+		title: 'Seeker’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-seekers-600.webp`,
+	},
+	'seventeen-hb': {
+		title: 'Seventeen Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-seventeen-600.webp`,
+	},
+	'seventeen-pb': {
+		title: 'Seventeen Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-seventeen-600.webp`,
+	},
+	'soldiers-hb': {
+		title: 'Soldier’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-soldiers-600.webp`,
+	},
+	'soldiers-pb': {
+		title: 'Soldier’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-soldiers-600.webp`,
+	},
+	'teen-hb': {
+		title: 'Teen Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-teen-600.webp`,
+	},
+	'teen-pb': {
+		title: 'Teen Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-teen-600.webp`,
+	},
+	'worship-leaders-hb': {
+		title: 'Worship Leader’s Bible — Hardback',
 		retail: 9999,
 		img: `${CARDS}/dvc-worship-leaders-600.webp`,
 	},
-	journaling: {
-		title: 'She Hears Her Father’s Voice — Journaling Bible',
+	'worship-leaders-pb': {
+		title: 'Worship Leader’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-worship-leaders-600.webp`,
+	},
+	'journaling-hb': {
+		title: 'She Hears Her Father’s Voice — Journaling Bible — Hardback',
 		retail: 12499,
+		img: `${ASSETS}/dvc-journaling-600.webp`,
+	},
+	'journaling-pb': {
+		title: 'She Hears Her Father’s Voice — Journaling Bible — Paperback',
+		retail: 11499,
 		img: `${ASSETS}/dvc-journaling-600.webp`,
 	},
 

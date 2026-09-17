@@ -18,6 +18,7 @@
  *   4. Every SKU the page can add is a SKU the server will sell.
  *   5. `books` weights match on both sides — the ladder must count the same on both.
  *   6. No RETIRED ISBN appears anywhere in src/ or functions/.
+ *   7. Every targeted edition is priced in BOTH bindings, and matches ISBNS.json.
  *
  * Self-check: run with --selftest to confirm each assertion actually FAILS when broken. A
  * gate that has never rejected anything is unproven.
@@ -131,6 +132,24 @@ if (haveIsbns) {
 		const got = server[`lp-set-${key}`]?.cents;
 		check(got === want, `lp-set-${key}: ${CHECKOUT} says ${got} cents, ISBNS.json says ${want}`);
 	}
+
+	// Every targeted edition, both bindings. Added 2026-09-17 with the second binding: the
+	// sixteen editions doubled to thirty-two SKUs, and until this loop existed the ISBN
+	// master gated only the Large Print — the new SKUs could drift from it silently.
+	// ISBNS.json is also asserted to still HOLD a price for each, so deleting one there
+	// fails the build instead of quietly skipping the comparison.
+	const targeted = { ...isbns.hardcover_case_laminate, journaling: isbns.also_listed.journaling };
+	check(Object.keys(targeted).length === 16, `expected 16 targeted editions in ISBNS.json, found ${Object.keys(targeted).length}`);
+	for (const [slug, ed] of Object.entries(targeted)) {
+		check(ed.price_usd != null, `${slug}: ISBNS.json has no price_usd — the master cannot gate what it does not record`);
+		check(ed.isbn && ed.isbn_paperback, `${slug}: ISBNS.json is missing an ISBN for one binding — do not sell a binding with no ISBN`);
+		if (!ed.price_usd) continue;
+		for (const [binding, key] of [['Hardcover', 'hb'], ['Paperback', 'pb']]) {
+			const want = cents(ed.price_usd[binding]);
+			const got = server[`${slug}-${key}`]?.cents;
+			check(got === want, `${slug}-${key}: ${CHECKOUT} says ${got} cents, ISBNS.json says ${want}`);
+		}
+	}
 } else {
 	console.log(`  · ISBNS.json not mounted at ${ISBNS} — SKIPPED (not passed) the ISBN-master comparison`);
 }
@@ -172,10 +191,25 @@ if (process.argv.includes('--selftest')) {
 			return broken['lp-set-hb'].cents !== server['lp-set-hb'].cents;
 		}],
 		['books weight drift', () => {
-			const broken = parsePrint(printSrc.replace("'lp-set-hb': 3", "'lp-set-hb': 1"));
+			// The mutation must be one the CURRENT file actually contains. This case used to
+			// flip "'lp-set-hb': 3" to 1; when Kevin corrected the set's weight to 1 on
+			// 2026-09-17 that string vanished, the replace became a no-op, and the case
+			// reported a clean pass while testing nothing. Assert the mutation BIT first.
+			const from = "'lp-set-hb': 1";
+			const to = "'lp-set-hb': 2";
+			if (!printSrc.includes(from)) return false;
+			const broken = parsePrint(printSrc.replace(from, to));
 			return broken['lp-set-hb'].books !== server['lp-set-hb'].books;
 		}],
 		['retired ISBN detected', () => /89307-294-5/.test('isbn 979-8-89307-294-5')],
+		['targeted binding price drift', () => {
+			const broken = parseCheckout(checkoutSrc.replace("'chosen-pb': {\n\t\ttitle: 'Chosen Bible — Paperback',\n\t\tretail: 7999", "'chosen-pb': {\n\t\ttitle: 'Chosen Bible — Paperback',\n\t\tretail: 8999"));
+			return haveIsbns && broken['chosen-pb'].cents !== cents(isbns.hardcover_case_laminate.chosen.price_usd.Paperback);
+		}],
+		['a targeted SKU missing server-side', () => {
+			const broken = parseCheckout(checkoutSrc.replace("'teen-pb': {", "'teen-pbX': {"));
+			return broken['teen-pb'] == null;
+		}],
 	];
 	let bad = 0;
 	for (const [name, fn] of cases) {
