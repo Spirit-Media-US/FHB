@@ -848,16 +848,20 @@ function markVoices(v: {
 						{/* THE SAME TWO BUTTONS AND ONE LINK AS EVERY OTHER CARD (Kevin 2026-09-17:
 						     "LP Editions need buttons formatted like all other buttons... No third
 						     button"). Vol 3 has no Amazon listing — Ingram rejected its paperback
-						     (D134) and Kevin ruled its buy control stays inactive (D164) — so it
-						     renders the placeholders and no direct link, rather than a fourth
-						     control saying so. */}
+						     (D134) and Kevin ruled its buy control stays inactive (D164) — so its
+						     two Amazon controls render as faded placeholders, not links.
+						     THE DIRECT LINK STAYS ON ALL THREE (Kevin 2026-09-17, "fix the
+						     Volume 3 · Mist Blue card to balance with the other 2 cards"):
+						     dropping it left Vol 3's buy block empty, 41px shorter and visibly
+						     hollow beside its siblings. D164 is satisfied by the faded Amazon
+						     placeholders — it governs the BUY control, and the direct link goes
+						     to the bulk enquiry form, which takes no payment. */}
 						<div class="flex flex-col gap-2 w-full mt-auto">
 							<BuyControls
-								hbHref={amazonLinks[v.key]?.formats?.hardback}
-								pbHref={amazonLinks[v.key]?.formats?.paperback}
+								hbHref={v.comingSoon ? undefined : amazonLinks[v.key]?.formats?.hardback}
+								pbHref={v.comingSoon ? undefined : amazonLinks[v.key]?.formats?.paperback}
 								hbPrice={v.hb}
 								pbPrice={v.pb}
-								showDirect={!v.comingSoon}
 							/>
 						</div>
 					</div>
@@ -884,7 +888,10 @@ function markVoices(v: {
 						</button>
 					))}
 				</div>
-				<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.85rem; font-weight: 600; margin: 1rem 0 0;">A set counts as three books toward the bulk discounts below.</p>
+				{/* NO "a set counts as three books" LINE HERE (Kevin 2026-09-17: "This is NOT
+				     true and should not have been added"). The code always agreed with him —
+				     dvc-checkout.ts:295/301 and the cart weights above both count a set as
+				     books: 1 — so the sentence promised a bulk tier the checkout never gave. */}
 			</div>
 			<p class="text-center mt-6" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600;">Direct from SMP includes free shipping — a $15 value.</p>
 		</Section>
