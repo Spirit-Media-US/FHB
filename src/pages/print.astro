@@ -3,6 +3,7 @@ import LookInside from '../components/LookInside.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import VoiceChips from '../components/VoiceChips.astro';
+import { cardUrl } from '../data/card-art';
 import Layout from '../layouts/Layout.astro';
 
 // THE DIVINE VOICE COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
@@ -195,15 +196,13 @@ const RETAIL_8 = '$124.99';
 //
 // One CARD per colour carrying both binding prices, rather than six near-identical cards
 // per line — twelve more covers directly under the sixteen targeted ones reads as noise.
-// Cache-buster for the card art. The first upload of these six covers was rendered in the
-// wrong style (a 3-D mock-up rather than the house flat front) and was replaced in place at
-// the same R2 keys, so the Cloudflare edge holds the old image for those paths. Bump this
-// whenever a general card is re-rendered to the same filename.
-const CARD_V = '2';
+// Card art comes from `cardUrl` (src/data/card-art.ts). There is no CARD_V any more: the
+// general covers needed one because an earlier re-render was written over the same R2 keys
+// and the edge kept serving the withdrawn art. The re-rendered cards went to NEW keys
+// instead, which needs no cache-buster and leaves what is live untouched.
 // The Large Print volume cards are new keys (lp-vol1/2/3, lp-set), so nothing is cached for
 // them yet — but they get their own cache-buster because they are re-rendered on their own
-// schedule, and bumping CARD_V to reprint a volume would needlessly bust the six general
-// cards at the edge too.
+// schedule, and they are not in the card-art set.
 const LP_CARD_V = '1';
 const GENERAL_TAIL = 'Full Color Throughout · 6×9 Paperback or Hardback';
 const LP_TAIL = 'Large Print · Full Color Throughout · 6×9 Paperback or Hardback';
@@ -325,7 +324,7 @@ const generalSkus = generalLines.flatMap((l) =>
 			spec: `6×9 ${b === 'pb' ? 'Paperback' : 'Hardback'}`,
 			price: b === 'pb' ? l.pb : l.hb,
 			isbn: l.isbn[c.key as 'charcoal' | 'plum' | 'white'][b],
-			img: `https://assets.spiritmediapublishing.com/FHB/print/general-${l.line}-${c.key}-600.webp?v=${CARD_V}`,
+			img: cardUrl(`general-${l.line}-${c.key}`),
 		})),
 	),
 );
@@ -605,8 +604,8 @@ function markVoices(v: {
 				{dvcEditions.map((e) => (
 					<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
 						<img
-							src={`https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-600.webp`}
-							srcset={`https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-600.webp 600w, https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-1200.webp 1200w`}
+							src={cardUrl(`dvc-${e.slug}`)}
+							srcset={`${cardUrl(`dvc-${e.slug}`)} 600w, ${cardUrl(`dvc-${e.slug}`, 1200)} 1200w`}
 							sizes="(min-width: 1024px) 260px, 44vw"
 							alt={`Father's Heart Bible (FHB) — ${e.title}, Divine Voice Color`}
 							width="600" height="764" loading="lazy" decoding="async"
@@ -670,8 +669,8 @@ function markVoices(v: {
 					{generalColors.map((c) => (
 						<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
 							<img
-								src={`https://assets.spiritmediapublishing.com/FHB/print/general-${l.line}-${c.key}-600.webp?v=${CARD_V}`}
-								srcset={`https://assets.spiritmediapublishing.com/FHB/print/general-${l.line}-${c.key}-600.webp?v=${CARD_V} 600w, https://assets.spiritmediapublishing.com/FHB/print/general-${l.line}-${c.key}-1200.webp?v=${CARD_V} 1200w`}
+								src={cardUrl(`general-${l.line}-${c.key}`)}
+								srcset={`${cardUrl(`general-${l.line}-${c.key}`)} 600w, ${cardUrl(`general-${l.line}-${c.key}`, 1200)} 1200w`}
 								sizes="(min-width: 640px) 240px, 60vw"
 								alt={`Father's Heart Bible (FHB) — ${l.label}, ${c.name} cover`}
 								width="600" height="764" loading="lazy" decoding="async"
@@ -851,7 +850,7 @@ function markVoices(v: {
 					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
 						{dvcEditions.map((e) => (
 							<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
-								<img src={`https://assets.spiritmediapublishing.com/FHB/print/dvc-${e.slug}-600.webp`} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
+								<img src={cardUrl(`dvc-${e.slug}`)} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
 								<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.title}</span> <span style="white-space: nowrap; font-weight: 600;">${e.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{e.spec}</span></span>
 								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
 									<button type="button" class="qty-step" data-slug={e.slug} data-dir="-1" aria-label={`Fewer ${e.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>

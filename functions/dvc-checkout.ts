@@ -24,6 +24,11 @@ interface Env {
 }
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
+// Re-rendered 3-D cards live under NEW keys rather than over the live ones, so the edge
+// has nothing stale to serve and nothing live was mutated. Mirrors src/data/card-art.ts:
+// a SKU whose card has not been re-rendered (journaling's 8x10, D166) still points at
+// ASSETS. Both sides are verified against the edge in the build.
+const CARDS = `${ASSETS}/cards/v2`;
 
 // Retail in cents. The fifteen 6x9 targeted editions share one price; the 8x10 journaling
 // edition is its own.
@@ -33,32 +38,32 @@ const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
 // volumes, so one set moves the buyer three books up the ladder (Kevin 2026-09-16). Every
 // other SKU is one book and omits the field.
 const EDITIONS: Record<string, { title: string; retail: number; img: string; books?: number }> = {
-	chosen: { title: 'Chosen Bible', retail: 9999, img: `${ASSETS}/dvc-chosen-600.webp` },
-	couples: { title: 'Couple’s Bible', retail: 9999, img: `${ASSETS}/dvc-couples-600.webp` },
-	dads: { title: 'Dad’s Bible', retail: 9999, img: `${ASSETS}/dvc-dads-600.webp` },
+	chosen: { title: 'Chosen Bible', retail: 9999, img: `${CARDS}/dvc-chosen-600.webp` },
+	couples: { title: 'Couple’s Bible', retail: 9999, img: `${CARDS}/dvc-couples-600.webp` },
+	dads: { title: 'Dad’s Bible', retail: 9999, img: `${CARDS}/dvc-dads-600.webp` },
 	'first-responders': {
 		title: 'First Responder’s Bible',
 		retail: 9999,
-		img: `${ASSETS}/dvc-first-responders-600.webp`,
+		img: `${CARDS}/dvc-first-responders-600.webp`,
 	},
-	mens: { title: 'Men’s Bible', retail: 9999, img: `${ASSETS}/dvc-mens-600.webp` },
-	moms: { title: 'Mom’s Bible', retail: 9999, img: `${ASSETS}/dvc-moms-600.webp` },
-	pastors: { title: 'Pastor’s Bible', retail: 9999, img: `${ASSETS}/dvc-pastors-600.webp` },
-	peace: { title: 'Peace Bible', retail: 9999, img: `${ASSETS}/dvc-peace-600.webp` },
+	mens: { title: 'Men’s Bible', retail: 9999, img: `${CARDS}/dvc-mens-600.webp` },
+	moms: { title: 'Mom’s Bible', retail: 9999, img: `${CARDS}/dvc-moms-600.webp` },
+	pastors: { title: 'Pastor’s Bible', retail: 9999, img: `${CARDS}/dvc-pastors-600.webp` },
+	peace: { title: 'Peace Bible', retail: 9999, img: `${CARDS}/dvc-peace-600.webp` },
 	presidents: {
 		title: 'President’s Bible',
 		retail: 9999,
-		img: `${ASSETS}/dvc-presidents-600.webp`,
+		img: `${CARDS}/dvc-presidents-600.webp`,
 	},
-	recovery: { title: 'Recovery Bible', retail: 9999, img: `${ASSETS}/dvc-recovery-600.webp` },
-	seekers: { title: 'Seeker’s Bible', retail: 9999, img: `${ASSETS}/dvc-seekers-600.webp` },
-	seventeen: { title: 'Seventeen Bible', retail: 9999, img: `${ASSETS}/dvc-seventeen-600.webp` },
-	soldiers: { title: 'Soldier’s Bible', retail: 9999, img: `${ASSETS}/dvc-soldiers-600.webp` },
-	teen: { title: 'Teen Bible', retail: 9999, img: `${ASSETS}/dvc-teen-600.webp` },
+	recovery: { title: 'Recovery Bible', retail: 9999, img: `${CARDS}/dvc-recovery-600.webp` },
+	seekers: { title: 'Seeker’s Bible', retail: 9999, img: `${CARDS}/dvc-seekers-600.webp` },
+	seventeen: { title: 'Seventeen Bible', retail: 9999, img: `${CARDS}/dvc-seventeen-600.webp` },
+	soldiers: { title: 'Soldier’s Bible', retail: 9999, img: `${CARDS}/dvc-soldiers-600.webp` },
+	teen: { title: 'Teen Bible', retail: 9999, img: `${CARDS}/dvc-teen-600.webp` },
 	'worship-leaders': {
 		title: 'Worship Leader’s Bible',
 		retail: 9999,
-		img: `${ASSETS}/dvc-worship-leaders-600.webp`,
+		img: `${CARDS}/dvc-worship-leaders-600.webp`,
 	},
 	journaling: {
 		title: 'She Hears Her Father’s Voice — Journaling Bible',
@@ -74,32 +79,32 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 	'general-regular-charcoal-pb': {
 		title: 'Charcoal, Paperback',
 		retail: 7999,
-		img: `${ASSETS}/general-regular-charcoal-600.webp?v=2`,
+		img: `${CARDS}/general-regular-charcoal-600.webp`,
 	},
 	'general-regular-charcoal-hb': {
 		title: 'Charcoal, Hardback',
 		retail: 9999,
-		img: `${ASSETS}/general-regular-charcoal-600.webp?v=2`,
+		img: `${CARDS}/general-regular-charcoal-600.webp`,
 	},
 	'general-regular-plum-pb': {
 		title: 'Plum, Paperback',
 		retail: 7999,
-		img: `${ASSETS}/general-regular-plum-600.webp?v=2`,
+		img: `${CARDS}/general-regular-plum-600.webp`,
 	},
 	'general-regular-plum-hb': {
 		title: 'Plum, Hardback',
 		retail: 9999,
-		img: `${ASSETS}/general-regular-plum-600.webp?v=2`,
+		img: `${CARDS}/general-regular-plum-600.webp`,
 	},
 	'general-regular-white-pb': {
 		title: 'White, Paperback',
 		retail: 7999,
-		img: `${ASSETS}/general-regular-white-600.webp?v=2`,
+		img: `${CARDS}/general-regular-white-600.webp`,
 	},
 	'general-regular-white-hb': {
 		title: 'White, Hardback',
 		retail: 9999,
-		img: `${ASSETS}/general-regular-white-600.webp?v=2`,
+		img: `${CARDS}/general-regular-white-600.webp`,
 	},
 	// ── Large Print, rebuilt as THREE VOLUMES 2026-09-17 ──
 	// The single-volume Large Print (three cover colours, ISBNs 307-2/308-9/309-6/310-2/
