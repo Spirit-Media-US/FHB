@@ -1,4 +1,5 @@
 ---
+import BuyControls from '../components/BuyControls.astro';
 import LookInside from '../components/LookInside.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
@@ -180,7 +181,11 @@ const dvcEditions = [
 	},
 	{
 		slug: 'journaling',
-		title: 'She Hears Her Father\u2019s Voice',
+		title: 'She Hears Her Father\u2019s Voice - Journaling Bible',
+		// The order form heads these rows with "Journaling Bible" already, so the row itself
+		// carries only the book's own name (Kevin 2026-09-17, both halves of the same note).
+		rowTitle: 'She Hears Her Father\u2019s Voice',
+		groupHeading: 'Journaling Bible',
 		sub: 'For Women \u00b7 Wide Margin \u00b7 Note-Taking \u00b7 8x10 Journaling Edition',
 		hb: 124.99,
 		pb: 114.99,
@@ -671,7 +676,13 @@ function markVoices(v: {
 
 			<div class="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7 max-w-6xl mx-auto">
 				{dvcEditions.map((e) => (
-					<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+					/* The journaling edition gets a heavier frame (Kevin 2026-09-17, "make the frame
+					   around the card little thicker so set it apart"). It is the only 8×10 in a line
+					   of 6×9s — the frame is making that point, not decorating. */
+					<div
+						class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5"
+						style={`background: var(--color-soft, #faf6f2); border: ${e.slug === 'journaling' ? '3px solid var(--color-primary, #b60057)' : '1px solid var(--color-hairline)'};`}
+					>
 						<img
 							src={cardUrl(`dvc-${e.slug}`)}
 							srcset={`${cardUrl(`dvc-${e.slug}`)} 600w, ${cardUrl(`dvc-${e.slug}`, 1200)} 1200w`}
@@ -690,41 +701,13 @@ function markVoices(v: {
 								{builtPages.has(`${e.slug}-bible`) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 								<LookInside slug={e.slug} title={e.title} variant="link" label="Look inside" />
 							</div>
-							{/* ONE AMAZON LINK PER BINDING, each carrying its own price (Kevin
-							     2026-09-17: "1 link to HB on Amazon showing price and 1 link to PB on
-							     Amazon showing price. Not 3 buttons."). The single `url` field is not
-							     used here — it points at whichever binding was listed first, so it
-							     would send a paperback shopper to the hardback.
-							     A binding with NO listing renders nothing at all rather than a
-							     disabled pill: four editions are genuinely unlisted in one binding,
-							     and a link is never invented to fill the gap (D184). */}
-							{(['hb', 'pb'] as const).map((b) => {
-								const href = amazonLinks[e.slug]?.formats?.[b === 'hb' ? 'hardback' : 'paperback'];
-								return href ? (
-									<a
-										href={href}
-										target="_blank"
-										rel="noopener"
-										class="inline-flex items-center justify-center rounded-full font-semibold"
-										style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.55rem 1rem; font-size: 0.8rem; text-decoration: none;"
-									>Amazon · {b === 'hb' ? 'Hardback' : 'Paperback'} ${(b === 'hb' ? e.hb : e.pb).toFixed(2)}</a>
-								) : null;
-							})}
-							{!amazonLinks[e.slug]?.formats?.hardback && !amazonLinks[e.slug]?.formats?.paperback && (
-								<span
-									aria-disabled="true"
-									class="inline-flex items-center justify-center rounded-full font-semibold"
-									style="font-family: var(--font-sans); background: #f2efec; color: #9a938c; border: 1.5px solid var(--color-hairline); padding: 0.55rem 1rem; font-size: 0.8rem; cursor: default;"
-								>Amazon — coming soon</span>
-							)}
-							{/* Direct is a LINK, not a third and fourth button (Kevin 2026-09-17). It
-							     goes to the bulk form, which is where both bindings are actually
-							     chosen and where the free shipping and the volume ladder apply — so
-							     the card stays two Amazon buttons plus one line of text. */}
-							<a
-								href="#bulk-order"
-								style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 3px; text-align: center; padding: 0.15rem 0;"
-							>Buy Direct &amp; Save + Free Shipping</a>
+							{/* One shared control set for every card on the page — see BuyControls. */}
+							<BuyControls
+								hbHref={amazonLinks[e.slug]?.formats?.hardback}
+								pbHref={amazonLinks[e.slug]?.formats?.paperback}
+								hbPrice={e.hb}
+								pbPrice={e.pb}
+							/>
 						</div>
 					</div>
 				))}
@@ -791,15 +774,17 @@ function markVoices(v: {
 									label="Look inside"
 								/>
 							</div>
+							{/* Same control set as every other card (Kevin 2026-09-17: "General editions
+							     buttons need Amazon"). The colour's Amazon links come from the bookstore
+							     via amazon-links.json, keyed by the SKU colour key — charcoal and white
+							     hardback have no listing yet and render as placeholders. */}
 							<div class="flex flex-col gap-2 w-full mt-auto">
-								{(['hb', 'pb'] as const).map((b) => (
-									<button
-										type="button"
-										data-add={`general-${l.line}-${c.key}-${b}`}
-										class="inline-flex items-center justify-center rounded-full font-semibold"
-										style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.55rem 1rem; font-size: 0.8rem; cursor: pointer;"
-									>{b === 'pb' ? 'Paperback' : 'Hardback'} · ${(b === 'pb' ? l.pb : l.hb).toFixed(2)}</button>
-								))}
+								<BuyControls
+									hbHref={amazonLinks[`general-${l.line}-${c.key}`]?.formats?.hardback}
+									pbHref={amazonLinks[`general-${l.line}-${c.key}`]?.formats?.paperback}
+									hbPrice={l.hb}
+									pbPrice={l.pb}
+								/>
 							</div>
 						</div>
 					))}
@@ -839,7 +824,20 @@ function markVoices(v: {
 						    single shared sample would show a reader pages their volume does not
 						    contain. Keyed to the look-inside manifest built from that volume's
 						    interior. */}
+						{/* "Full details" through the SAME builtPages gate the targeted cards use — not
+						     special-cased. It appears because D181's per-volume pages now exist
+						     (src/data/editions/lp-vol{1,2,3}.json, built from each volume's own
+						     metadata sheet), which is what made the LP cards the odd ones out. */}
 						<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.9rem;">
+							{builtPages.has(`${v.key}-bible`) && (
+								<>
+									<a
+										href={`/bibles/${v.key}-bible`}
+										style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;"
+									>Full details</a>
+									<span aria-hidden="true" style="color: #a1a1aa;">·</span>
+								</>
+							)}
 							<LookInside
 								slug={v.key}
 								title={`FHB — Large Print Volume ${v.vol}, ${v.range}`}
@@ -847,35 +845,22 @@ function markVoices(v: {
 								label="Look inside"
 							/>
 						</div>
+						{/* THE SAME TWO BUTTONS AND ONE LINK AS EVERY OTHER CARD (Kevin 2026-09-17:
+						     "LP Editions need buttons formatted like all other buttons... No third
+						     button"). Vol 3 has no Amazon listing — Ingram rejected its paperback
+						     (D134) and Kevin ruled its buy control stays inactive (D164) — so it
+						     renders the placeholders and no direct link, rather than a fourth
+						     control saying so. */}
 						<div class="flex flex-col gap-2 w-full mt-auto">
-							{(['hb', 'pb'] as const).map((b) => (
-								<button
-									type="button"
-									data-add={v.comingSoon ? undefined : `${v.key}-${b}`}
-									disabled={v.comingSoon}
-									aria-disabled={v.comingSoon ? 'true' : undefined}
-									class="inline-flex items-center justify-center rounded-full font-semibold"
-									style={
-										v.comingSoon
-											? 'font-family: var(--font-sans); background: #f4f4f5; color: #9a9aa2; border: 1.5px solid #d8d8dd; padding: 0.55rem 1rem; font-size: 0.8rem; cursor: not-allowed;'
-											: 'font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.55rem 1rem; font-size: 0.8rem; cursor: pointer;'
-									}
-								>{b === 'pb' ? 'Paperback' : 'Hardback'} · ${(b === 'pb' ? v.pb : v.hb).toFixed(2)}</button>
-							))}
+							<BuyControls
+								hbHref={amazonLinks[v.key]?.formats?.hardback}
+								pbHref={amazonLinks[v.key]?.formats?.paperback}
+								hbPrice={v.hb}
+								pbPrice={v.pb}
+								showDirect={!v.comingSoon}
+							/>
 							{v.comingSoon && (
 								<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.78rem; margin: 0.15rem 0 0;">Listing coming soon</p>
-							)}
-							{/* Amazon, when the volume has a listing. Vol 3 has none — Ingram rejected
-							     its paperback (D134) and Kevin ruled the button stays inactive (D164) —
-							     so it simply has no entry in amazon-links.json and shows nothing here. */}
-							{amazonLinks[v.key] && (
-								<a
-									href={amazonLinks[v.key].url}
-									target="_blank"
-									rel="noopener"
-									class="inline-flex items-center justify-center rounded-full font-semibold"
-									style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.55rem 1rem; font-size: 0.8rem; text-decoration: none;"
-								>Amazon →</a>
 							)}
 						</div>
 					</div>
@@ -891,7 +876,7 @@ function markVoices(v: {
 							type="button"
 							data-add={`lp-set-${b}`}
 							class="inline-flex items-center justify-center gap-2 rounded-full font-semibold"
-							style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.6rem 1.15rem; font-size: 0.85rem; cursor: pointer;"
+							style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.6rem 1.15rem; font-size: 0.85rem; cursor: pointer;"
 						>
 							{/* LIST PRICE STRUCK ON THE LEFT, THE SET PRICE ON THE RIGHT (Kevin
 							     2026-09-17). The list figure is SUMMED from the three volume prices
@@ -973,15 +958,22 @@ function markVoices(v: {
 						     per SKU. The cover art repeats because it IS the same book. */}
 						{dvcEditions.flatMap((e) =>
 							(['hb', 'pb'] as const).map((b) => (
+								<>
+								{/* A heading above the first row of an edition that needs naming as its
+								     own thing — the journaling Bible is the only 8×10 in the list. */}
+								{e.groupHeading && b === 'hb' && (
+									<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.2rem 0 0.1rem;">{e.groupHeading}</p>
+								)}
 								<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
 									<img src={cardUrl(`dvc-${e.slug}`)} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-									<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.title}</span> <span style="white-space: nowrap; font-weight: 600;">${(b === 'hb' ? e.hb : e.pb).toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">· {e.spec(b)}</span></span>
+									<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.rowTitle ?? e.title}</span> <span style="white-space: nowrap; font-weight: 600;">${(b === 'hb' ? e.hb : e.pb).toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">· {e.spec(b)}</span></span>
 									<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
-										<button type="button" class="qty-step" data-slug={`${e.slug}-${b}`} data-dir="-1" aria-label={`Fewer ${e.title} ${b === 'hb' ? 'Hardback' : 'Paperback'}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
+										<button type="button" class="qty-step" data-slug={`${e.slug}-${b}`} data-dir="-1" aria-label={`Fewer ${e.title} ${b === 'hb' ? 'Hardback' : 'Paperback'}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
 										<input type="number" class="qty-in" data-slug={`${e.slug}-${b}`} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.title} ${b === 'hb' ? 'Hardback' : 'Paperback'} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
-										<button type="button" class="qty-step" data-slug={`${e.slug}-${b}`} data-dir="1" aria-label={`More ${e.title} ${b === 'hb' ? 'Hardback' : 'Paperback'}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
+										<button type="button" class="qty-step" data-slug={`${e.slug}-${b}`} data-dir="1" aria-label={`More ${e.title} ${b === 'hb' ? 'Hardback' : 'Paperback'}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
 									</div>
 								</div>
+								</>
 							)),
 						)}
 					</div>
@@ -995,9 +987,9 @@ function markVoices(v: {
 										<img src={s.img} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
 										<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">Father’s Heart Bible — {s.color}</span> <span style="white-space: nowrap; font-weight: 600;">${s.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{s.spec}</span></span>
 										<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
-											<button type="button" class="qty-step" data-slug={s.key} data-dir="-1" aria-label={`Fewer ${l.label} ${s.color} ${s.binding}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
+											<button type="button" class="qty-step" data-slug={s.key} data-dir="-1" aria-label={`Fewer ${l.label} ${s.color} ${s.binding}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
 											<input type="number" class="qty-in" data-slug={s.key} value="0" min="0" step="1" inputmode="numeric" aria-label={`${l.label} ${s.color} ${s.binding} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
-											<button type="button" class="qty-step" data-slug={s.key} data-dir="1" aria-label={`More ${l.label} ${s.color} ${s.binding}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
+											<button type="button" class="qty-step" data-slug={s.key} data-dir="1" aria-label={`More ${l.label} ${s.color} ${s.binding}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
 										</div>
 									</div>
 								))}
@@ -1012,9 +1004,9 @@ function markVoices(v: {
 								<img src={s.img} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
 								<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{s.title}</span> <span style="white-space: nowrap; font-weight: 600;">${s.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{s.spec}</span></span>
 								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
-									<button type="button" class="qty-step" data-slug={s.key} data-dir="-1" aria-label={`Fewer ${s.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
+									<button type="button" class="qty-step" data-slug={s.key} data-dir="-1" aria-label={`Fewer ${s.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
 									<input type="number" class="qty-in" data-slug={s.key} value="0" min="0" step="1" inputmode="numeric" aria-label={`${s.title} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
-									<button type="button" class="qty-step" data-slug={s.key} data-dir="1" aria-label={`More ${s.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
+									<button type="button" class="qty-step" data-slug={s.key} data-dir="1" aria-label={`More ${s.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
 								</div>
 							</div>
 						))}
@@ -1025,7 +1017,7 @@ function markVoices(v: {
 							<span style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem;"><span data-count>0</span> copies · <span data-save style="color: #3f3f46; font-weight: 700;">—</span> · free shipping</span>
 							<div data-total-out style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700;">$0.00</div>
 						</div>
-						<button type="button" data-checkout class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; border: 0; cursor: pointer; font-size: 1rem;">Checkout →</button>
+						<button type="button" data-checkout class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: var(--color-on-primary, #f9f9f9); padding: 0.8rem 1.8rem; border: 0; cursor: pointer; font-size: 1rem;">Checkout →</button>
 					</div>
 					<p data-bulk-msg style="font-family: var(--font-sans); font-size: 0.85rem; color: var(--color-muted); margin: 0.75rem 0 0; display: none;"></p>
 				</div>
@@ -1044,9 +1036,9 @@ function markVoices(v: {
 						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.4rem;">eBook</h3>
 						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.5; margin: 0 0 1.25rem; flex: 1;">Read on any device — Kindle, phone, or tablet. The complete translation, reflowable with pop-up footnotes.</p>
 						<div class="flex flex-col gap-2 w-full mx-auto" style="max-width: 15rem;">
-							<button type="button" data-ebook-buy class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; border: 0; padding: 0.75rem 1.4rem; cursor: pointer; font-size: 0.92rem;">Buy Direct · {EBOOK_DIRECT} →</button>
-							<a href={`https://www.amazon.com/dp/${ebookAsin}`} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Kindle on Amazon · {EBOOK_AMAZON} →</a>
-							<a href={EBOOK_NOOK_URL} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Nook at B&N · {EBOOK_NOOK} →</a>
+							<button type="button" data-ebook-buy class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: var(--color-on-primary, #f9f9f9); border: 0; padding: 0.75rem 1.4rem; cursor: pointer; font-size: 0.92rem;">Buy Direct · {EBOOK_DIRECT} →</button>
+							<a href={`https://www.amazon.com/dp/${ebookAsin}`} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Kindle on Amazon · {EBOOK_AMAZON} →</a>
+							<a href={EBOOK_NOOK_URL} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Nook at B&N · {EBOOK_NOOK} →</a>
 						</div>
 						<p data-ebook-msg style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.7rem 0 0; display: none;"></p>
 						<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">Direct = instant EPUB download, DRM-free — read it anywhere.</p>

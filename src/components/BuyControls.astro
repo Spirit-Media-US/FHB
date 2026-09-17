@@ -1,0 +1,135 @@
+---
+// The buy controls every product card on /print carries, in one place.
+//
+// WHY A COMPONENT: the targeted cards, the General Audience colour cards and the Large Print
+// volume cards had three separate copies of this markup, which is how they drifted into three
+// different shapes — Kevin's round-3 review found the LP cards carrying a third button and the
+// general cards carrying none (2026-09-17, "LP Editions need buttons formatted like all other
+// buttons... No third button" / "General editions buttons need Amazon"). One component means
+// "formatted like all other buttons" is structurally true rather than re-checked by eye.
+//
+// THE SHAPE, fixed for every card:
+//   Amazon · Hardback  $x.xx        ← link, or a disabled PLACEHOLDER when unlisted
+//   Amazon · Paperback $y.yy        ← link, or a disabled PLACEHOLDER when unlisted
+//   Buy Direct & Save + Free Shipping   ← a LINK, never a button, to the bulk form
+//
+// PLACEHOLDERS RATHER THAN OMISSIONS (Kevin: "add placeholders for ALL buttons"): a binding
+// with no Amazon listing still renders its button, disabled, in the same position — so every
+// card has the same control set and the grid lines up instead of going ragged. Four bindings
+// are genuinely unlisted (men's and Peace paperback, Recovery and Teen hardback) and a link is
+// never invented to fill one (D184).
+interface Props {
+	/** Amazon URLs per binding. Absent = no listing = a disabled placeholder. */
+	hbHref?: string;
+	pbHref?: string;
+	hbPrice: number;
+	pbPrice: number;
+	/** Where "Buy Direct" goes. */
+	directHref?: string;
+	/** Suppress the direct link where buying direct is not offered yet. */
+	showDirect?: boolean;
+}
+const {
+	hbHref,
+	pbHref,
+	hbPrice,
+	pbPrice,
+	directHref = '#bulk-order',
+	showDirect = true,
+} = Astro.props;
+
+const AMAZON_LOGO = 'https://assets.spiritmediapublishing.com/FHB/print/amazon-logo.webp';
+
+const bindings = [
+	{ label: 'Hardback', href: hbHref, price: hbPrice },
+	{ label: 'Paperback', href: pbHref, price: pbPrice },
+] as const;
+---
+
+{/* LIGHT PINK on every button (Kevin 2026-09-17, "Turn all button light pink"), taken from
+    the existing brand token --color-primary-fixed rather than a new colour invented for this
+    page. Ink on light pink is a strong contrast; the disabled placeholder drops to a muted
+    pink with grey text so it reads as unavailable without becoming pink-on-pink. */}
+{
+	bindings.map((b) =>
+		b.href ? (
+			<a
+				href={b.href}
+				target="_blank"
+				rel="noopener"
+				class="buy-btn"
+				style="text-decoration: none;"
+			>
+				{/* Empty alt: the button text already says Amazon, so a second announcement is
+				    noise to a screen reader. Explicit width/height so it cannot shift layout
+				    (performance gate, trait 8). Served from OUR asset host — the logo Kevin
+				    supplied was fetched, cleaned and uploaded to R2 rather than hotlinked. */}
+				<img
+					src={AMAZON_LOGO}
+					alt=""
+					width="64"
+					height="19"
+					loading="lazy"
+					decoding="async"
+					style="width: 52px; height: auto; display: block;"
+				/>
+				<span>· {b.label} ${b.price.toFixed(2)}</span>
+			</a>
+		) : (
+			<span class="buy-btn buy-btn-off" aria-disabled="true">
+				<img
+					src={AMAZON_LOGO}
+					alt=""
+					width="64"
+					height="19"
+					loading="lazy"
+					decoding="async"
+					style="width: 52px; height: auto; display: block; opacity: 0.45;"
+				/>
+				<span>· {b.label} — coming soon</span>
+			</span>
+		),
+	)
+}
+{
+	showDirect && (
+		<a href={directHref} class="buy-direct">
+			Buy Direct &amp; Save + Free Shipping
+		</a>
+	)
+}
+
+<style>
+	.buy-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		border-radius: 999px;
+		font-weight: 600;
+		font-family: var(--font-sans);
+		background: var(--color-primary-fixed, #ffd9e0);
+		color: var(--color-ink, #1a1c1c);
+		border: 1.5px solid var(--color-primary, #b60057);
+		padding: 0.5rem 0.9rem;
+		font-size: 0.8rem;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+	.buy-btn-off {
+		background: #fdeef3;
+		color: #9a8c90;
+		border-color: #eccdd6;
+		cursor: default;
+	}
+	.buy-direct {
+		font-family: var(--font-sans);
+		font-size: 0.82rem;
+		font-weight: 700;
+		color: var(--color-primary, #b60057);
+		text-decoration: underline;
+		text-underline-offset: 3px;
+		text-align: center;
+		padding: 0.15rem 0;
+	}
+</style>

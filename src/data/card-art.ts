@@ -31,7 +31,16 @@ const BASE = 'https://assets.spiritmediapublishing.com/FHB/print';
 // book through a displacement map, so the type is never regenerated) is being prototyped.
 export const CARDS_V2 = new Set<string>([]);
 
-/** The card image URL for `key` ("dvc-teen", "general-regular-plum") at 600 or 1200. */
+// The Large Print cards live on their OWN prefix and their own version line: they are
+// re-rendered on a different schedule from the sixteen house cards, so bumping one line must
+// not move the other. v4 is the transparent-background re-render (2026-09-17); the root-level
+// lp-vol*.webp keys are the superseded pre-v3 art and must not be served any more — they are
+// left in place because a live R2 file is never deleted, not because anything should use them.
+const LP_PREFIX = `${BASE}/lp/v4`;
+const LP_KEYS = new Set(['lp-vol1', 'lp-vol2', 'lp-vol3', 'lp-set']);
+
+/** The card image URL for `key` ("dvc-teen", "general-regular-plum", "lp-vol1") at 600 or 1200. */
 export function cardUrl(key: string, size: 600 | 1200 = 600): string {
+	if (LP_KEYS.has(key)) return `${LP_PREFIX}/${key}-${size}.webp`;
 	return CARDS_V2.has(key) ? `${BASE}/cards/v2/${key}-${size}.webp` : `${BASE}/${key}-${size}.webp`;
 }
