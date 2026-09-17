@@ -18,6 +18,15 @@
 // card has the same control set and the grid lines up instead of going ragged. Four bindings
 // are genuinely unlisted (men's and Peace paperback, Recovery and Teen hardback) and a link is
 // never invented to fill one (D184).
+//
+// A PLACEHOLDER CARRIES THE SAME LABEL AS A LIVE BUTTON — binding and price, nothing else
+// (Kevin 2026-09-17: "remove 'coming soon' ... Do show the price and everything ready to be
+// linked and activated"). The trailing phrase was spilling the label onto a second line, and
+// it made activation a copy edit as well as a link change. Now the ONLY difference between a
+// placeholder and a live button is the href and the fade, so turning one live when the listing
+// appears is adding the URL and nothing else.
+//
+// The fade is VISUAL ONLY. aria-disabled stays, because a screen reader gets no colour.
 interface Props {
 	/** Amazon URLs per binding. Absent = no listing = a disabled placeholder. */
 	hbHref?: string;
@@ -86,7 +95,7 @@ const bindings = [
 					decoding="async"
 					style="width: 52px; height: auto; display: block; opacity: 0.45;"
 				/>
-				<span>· {b.label} — coming soon</span>
+				<span>· {b.label} ${b.price.toFixed(2)}</span>
 			</span>
 		),
 	)
