@@ -27,7 +27,12 @@ const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
 
 // Retail in cents. The fifteen 6x9 targeted editions share one price; the 8x10 journaling
 // edition is its own.
-const EDITIONS: Record<string, { title: string; retail: number; img: string }> = {
+//
+// `books` is HOW MANY BOOKS THIS SKU PUTS IN THE BUYER'S HANDS, and it is what the volume
+// ladder counts — not the number of line items. The Large Print set is three physical
+// volumes, so one set moves the buyer three books up the ladder (Kevin 2026-09-16). Every
+// other SKU is one book and omits the field.
+const EDITIONS: Record<string, { title: string; retail: number; img: string; books?: number }> = {
 	chosen: { title: 'Chosen Bible', retail: 9999, img: `${ASSETS}/dvc-chosen-600.webp` },
 	couples: { title: 'Couple’s Bible', retail: 9999, img: `${ASSETS}/dvc-couples-600.webp` },
 	dads: { title: 'Dad’s Bible', retail: 9999, img: `${ASSETS}/dvc-dads-600.webp` },
@@ -63,8 +68,8 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string }> =
 
 	// ── General Audience, added 2026-08-29 ──
 	// The same Bible without an audience on the cover: three colours, two bindings, in
-	// Regular Print (876pp) and Large Print (1,016pp). They join the SAME mix-and-match
-	// ladder as the targeted editions — the combined total across everything sets the tier.
+	// Regular Print (876pp). Large Print is now the three-volume set below. They join the
+	// SAME mix-and-match ladder as the targeted editions — the combined total sets the tier.
 	// MUST match src/pages/print.astro `generalSkus` and the PRICE map in its inline script.
 	'general-regular-charcoal-pb': {
 		title: 'Charcoal, Paperback',
@@ -96,37 +101,83 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string }> =
 		retail: 9999,
 		img: `${ASSETS}/general-regular-white-600.webp?v=2`,
 	},
-	'general-largeprint-charcoal-pb': {
-		title: 'Large Print — Charcoal, Paperback',
+	// ── Large Print, rebuilt as THREE VOLUMES 2026-09-17 ──
+	// The single-volume Large Print (three cover colours, ISBNs 307-2/308-9/309-6/310-2/
+	// 311-9/312-6) is RETIRED and its six SKUs are gone from this map. It was an ABRIDGED
+	// book — 30 books in full text and the other 36 in selected passages — because the
+	// complete text at 14pt does not fit one binding. The set is the complete Bible: one
+	// cover colour per volume, and together all 66 books.
+	// Prices are Kevin's, 2026-09-14, and live in
+	// projects/fhb-print-bible/editions/ISBNS.json as the single source: Vol 3 is about half
+	// the size of Vols 1 and 2 and is priced accordingly.
+	'lp-vol1-pb': {
+		title: 'Large Print Vol. 1, Genesis–Esther (Wheat), Paperback',
 		retail: 9999,
-		img: `${ASSETS}/general-largeprint-charcoal-600.webp?v=2`,
+		img: `${ASSETS}/lp-vol1-600.webp?v=1`,
 	},
-	'general-largeprint-charcoal-hb': {
-		title: 'Large Print — Charcoal, Hardback',
-		retail: 12499,
-		img: `${ASSETS}/general-largeprint-charcoal-600.webp?v=2`,
+	'lp-vol1-hb': {
+		title: 'Large Print Vol. 1, Genesis–Esther (Wheat), Hardback',
+		retail: 11499,
+		img: `${ASSETS}/lp-vol1-600.webp?v=1`,
 	},
-	'general-largeprint-plum-pb': {
-		title: 'Large Print — Plum, Paperback',
+	'lp-vol2-pb': {
+		title: 'Large Print Vol. 2, Job–Malachi (Sage), Paperback',
 		retail: 9999,
-		img: `${ASSETS}/general-largeprint-plum-600.webp?v=2`,
+		img: `${ASSETS}/lp-vol2-600.webp?v=1`,
 	},
-	'general-largeprint-plum-hb': {
-		title: 'Large Print — Plum, Hardback',
-		retail: 12499,
-		img: `${ASSETS}/general-largeprint-plum-600.webp?v=2`,
+	'lp-vol2-hb': {
+		title: 'Large Print Vol. 2, Job–Malachi (Sage), Hardback',
+		retail: 11499,
+		img: `${ASSETS}/lp-vol2-600.webp?v=1`,
 	},
-	'general-largeprint-white-pb': {
-		title: 'Large Print — White, Paperback',
+	'lp-vol3-pb': {
+		title: 'Large Print Vol. 3, New Testament (Mist Blue), Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lp-vol3-600.webp?v=1`,
+	},
+	'lp-vol3-hb': {
+		title: 'Large Print Vol. 3, New Testament (Mist Blue), Hardback',
 		retail: 9999,
-		img: `${ASSETS}/general-largeprint-white-600.webp?v=2`,
+		img: `${ASSETS}/lp-vol3-600.webp?v=1`,
 	},
-	'general-largeprint-white-hb': {
-		title: 'Large Print — White, Hardback',
-		retail: 12499,
-		img: `${ASSETS}/general-largeprint-white-600.webp?v=2`,
+	// THE SET IS A NORMAL PRODUCT (Kevin 2026-09-16, dissolving D147). It carries its own
+	// price and the SAME ladder as everything else — no better-of rule, no stacking rule, no
+	// special case. The saving against buying the three volumes separately is simply the set
+	// price, and LP_SET_NEVER_COSTS_MORE below asserts that it is a saving.
+	'lp-set-pb': {
+		title: 'Large Print — Complete Three-Volume Set, Paperback',
+		retail: 24999,
+		img: `${ASSETS}/lp-set-600.webp?v=1`,
+		books: 3,
+	},
+	'lp-set-hb': {
+		title: 'Large Print — Complete Three-Volume Set, Hardback',
+		retail: 29999,
+		img: `${ASSETS}/lp-set-600.webp?v=1`,
+		books: 3,
 	},
 };
+
+// The SET MUST NEVER COST MORE than the same three volumes bought separately, in either
+// binding. Kevin's prices satisfy it today (299.99 < 329.97 HB, 249.99 < 279.97 PB), but a
+// later edit to one volume's price could silently invert it, and a "set" that costs more
+// than its parts is the kind of defect a buyer finds before we do. Checked at module load so
+// a bad price cannot reach a checkout session, and asserted directly by the unit test.
+export const setSavings = (binding: 'pb' | 'hb') => {
+	const parts = (['lp-vol1', 'lp-vol2', 'lp-vol3'] as const).reduce(
+		(s, v) => s + EDITIONS[`${v}-${binding}`].retail,
+		0,
+	);
+	return parts - EDITIONS[`lp-set-${binding}`].retail;
+};
+for (const binding of ['pb', 'hb'] as const) {
+	if (setSavings(binding) < 0) {
+		throw new Error(
+			`Large Print set (${binding}) costs more than its three volumes bought separately — ` +
+				'fix the prices in projects/fhb-print-bible/editions/ISBNS.json and here.',
+		);
+	}
+}
 
 // Volume ladder. 1–9 pays full price; the published tiers stop at 250 because anyone
 // buying 500+ negotiates directly, and publishing a 40% tier would permanently anchor the
@@ -170,7 +221,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		if (!Number.isFinite(n) || n < 0) return json({ error: 'invalid_selection' }, 400);
 		counts[slug] = n;
 	}
-	const total = Object.values(counts).reduce((s, n) => s + n, 0);
+	// THRESHOLDS COUNT BOOKS. Counting line items instead would let ten sets — thirty
+	// books — sit below the 25-book tier, and would make the ladder mean something
+	// different for the one SKU that is not a single book.
+	const total = Object.entries(counts).reduce(
+		(s, [slug, n]) => s + n * (EDITIONS[slug].books ?? 1),
+		0,
+	);
 	const tier = tierFor(total);
 	// tierFor covers everything from 1 upward, so a null here means an empty order.
 	if (total < 1 || tier === null) return json({ error: 'empty' }, 400);

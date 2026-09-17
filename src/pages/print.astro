@@ -26,9 +26,12 @@ const DVC_TAIL2 =
 //
 // Every value below is MEASURED, not assumed:
 //   page counts read off the built interiors in projects/fhb-print-bible/current/
-//     — targeted 876pp, journaling 788pp @ 8x10, large print 1,016pp
+//     — targeted 876pp, journaling 788pp @ 8x10, large print 1,134 + 1,142 + 680pp
+//       across three volumes (the single 1,016pp Large Print is retired)
 //   binding read off the APPROVED cover for each ISBN. The general hardback is CASE
-//     LAMINATE (2026-08-24-general/APPROVALS.json approves COVER-Case for 979-8-89307-294-5),
+//     LAMINATE (2026-08-24-general/APPROVALS.json approves COVER-Case for the general
+//     hardback — recorded there against the B&W ISBN it was approved under, which the
+//     colour numbers 336-2/337-9/338-6 have since replaced; the BINDING is unchanged),
 //     so it must NOT claim a dust jacket; jacket files exist but are not the approved
 //     binding. NOTHING claims a dust jacket: every sheet says case laminate, the ISBNs sit
 //     in `hardcover_case_laminate`, the delivered cover is ...-CASE-876pp.pdf, and the
@@ -196,6 +199,11 @@ const RETAIL_8 = '$124.99';
 // the same R2 keys, so the Cloudflare edge holds the old image for those paths. Bump this
 // whenever a general card is re-rendered to the same filename.
 const CARD_V = '2';
+// The Large Print volume cards are new keys (lp-vol1/2/3, lp-set), so nothing is cached for
+// them yet — but they get their own cache-buster because they are re-rendered on their own
+// schedule, and bumping CARD_V to reprint a volume would needlessly bust the six general
+// cards at the edge too.
+const LP_CARD_V = '1';
 const GENERAL_TAIL = 'Full Color Throughout · 6×9 Paperback or Hardback';
 const LP_TAIL = 'Large Print · Full Color Throughout · 6×9 Paperback or Hardback';
 const generalColors = [
@@ -204,6 +212,14 @@ const generalColors = [
 	{ key: 'white', name: 'White' },
 ];
 // Prices in dollars; ISBNs are per binding. MUST match functions/dvc-checkout.ts EDITIONS.
+//
+// THE COLOUR ISBNs, not the B&W ones (Kevin 2026-09-11): a black-and-white ISBN cannot carry
+// a full-colour edition, so 291-4/292-1/293-8/294-5/295-2/306-5 are RETIRED and replaced by
+// the six below. Authority is projects/fhb-print-bible/editions/ISBNS.json — never retype a
+// number from memory; scripts/pricing-verify.mjs fails the build if these drift from it.
+//
+// LARGE PRINT IS NO LONGER A LINE HERE. It is three volumes, not three cover colours of one
+// book, so it has its own block below.
 const generalLines = [
 	{
 		line: 'regular',
@@ -212,23 +228,87 @@ const generalLines = [
 		pb: 79.99,
 		hb: 99.99,
 		isbn: {
-			charcoal: { pb: '979-8-89307-291-4', hb: '979-8-89307-294-5' },
-			plum: { pb: '979-8-89307-292-1', hb: '979-8-89307-295-2' },
-			white: { pb: '979-8-89307-293-8', hb: '979-8-89307-306-5' },
+			charcoal: { pb: '979-8-89307-333-1', hb: '979-8-89307-336-2' },
+			plum: { pb: '979-8-89307-334-8', hb: '979-8-89307-337-9' },
+			white: { pb: '979-8-89307-335-5', hb: '979-8-89307-338-6' },
 		},
+	},
+];
+
+// ───────────────────────── LARGE PRINT — THREE VOLUMES ─────────────────────────
+// The single-volume Large Print is RETIRED (ISBNs 307-2/308-9/309-6/310-2/311-9/312-6). It
+// was an ABRIDGED book — 30 books in full text, the other 36 as selected passages — because
+// the complete text at 14pt does not fit one binding. The set is the whole Bible: one cover
+// colour per volume, 2,956 pages across three books (Kevin 2026-09-11 and 2026-09-14,
+// "Large Print Colour IS the 3-volume set").
+// Page counts are MEASURED from current/fhb-interior-lp-vol{1,2,3}.pdf; prices are Kevin's,
+// from ISBNS.json — Vol 3 is about half the size of Vols 1 and 2 and is priced accordingly.
+const lpVolumes = [
+	{
+		key: 'lp-vol1',
+		vol: 1,
+		range: 'Genesis–Esther',
+		color: 'Wheat',
+		pages: 1134,
+		pb: 99.99,
+		hb: 114.99,
+		isbn: { pb: '979-8-89307-339-3', hb: '979-8-89307-343-0' },
 	},
 	{
-		line: 'largeprint',
-		label: 'Large Print',
-		tail: LP_TAIL,
+		key: 'lp-vol2',
+		vol: 2,
+		range: 'Job–Malachi',
+		color: 'Sage',
+		pages: 1142,
 		pb: 99.99,
-		hb: 124.99,
-		isbn: {
-			charcoal: { pb: '979-8-89307-310-2', hb: '979-8-89307-307-2' },
-			plum: { pb: '979-8-89307-311-9', hb: '979-8-89307-308-9' },
-			white: { pb: '979-8-89307-312-6', hb: '979-8-89307-309-6' },
-		},
+		hb: 114.99,
+		isbn: { pb: '979-8-89307-340-9', hb: '979-8-89307-345-4' },
 	},
+	{
+		key: 'lp-vol3',
+		vol: 3,
+		range: 'New Testament',
+		color: 'Mist Blue',
+		pages: 680,
+		pb: 79.99,
+		hb: 99.99,
+		isbn: { pb: '979-8-89307-341-6', hb: '979-8-89307-344-7' },
+	},
+];
+// THE STRUCK-THROUGH LIST PRICE IS COMPUTED, NEVER TYPED. It is the sum of the three volume
+// prices, so it moves by itself if a volume price moves — which is the whole point. Typing
+// "$329.97" would go stale silently and advertise a saving we do not give.
+const lpListPb = lpVolumes.reduce((s, v) => s + v.pb, 0);
+const lpListHb = lpVolumes.reduce((s, v) => s + v.hb, 0);
+// The only Large Print figures we SET (Kevin 2026-09-16). The set is a normal product on the
+// same ladder as every edition — no better-of rule, no stacking rule, no special case. Its
+// threshold weight is THREE BOOKS, because that is what the buyer receives.
+const lpSetPb = 249.99;
+const lpSetHb = 299.99;
+const lpTotalPages = lpVolumes.reduce((s, v) => s + v.pages, 0);
+const lpSkus = [
+	...lpVolumes.flatMap((v) =>
+		(['pb', 'hb'] as const).map((b) => ({
+			key: `${v.key}-${b}`,
+			title: `Large Print Vol. ${v.vol}, ${v.range} (${v.color})`,
+			spec: `6×9 Large Print ${b === 'pb' ? 'Paperback' : 'Hardback'} · ${v.pages.toLocaleString('en-US')} pages`,
+			price: b === 'pb' ? v.pb : v.hb,
+			isbn: v.isbn[b],
+			img: `https://assets.spiritmediapublishing.com/FHB/print/${v.key}-600.webp?v=${LP_CARD_V}`,
+			books: 1,
+		})),
+	),
+	...(['pb', 'hb'] as const).map((b) => ({
+		key: `lp-set-${b}`,
+		title: 'Large Print — Complete Three-Volume Set',
+		spec: `All three volumes · ${lpTotalPages.toLocaleString('en-US')} pages · ${b === 'pb' ? 'Paperback' : 'Hardback'}`,
+		price: b === 'pb' ? lpSetPb : lpSetHb,
+		// The set carries no ISBN of its own: Kevin assigned numbers per volume, and it is
+		// billed as the three volume SKUs together. Do not invent one.
+		isbn: '',
+		img: `https://assets.spiritmediapublishing.com/FHB/print/lp-set-600.webp?v=${LP_CARD_V}`,
+		books: 3,
+	})),
 ];
 // Flat SKU list — one entry per purchasable thing, used by the order builder and mirrored
 // in the checkout function. Key shape: general-<line>-<colour>-<binding>.
@@ -241,10 +321,7 @@ const generalSkus = generalLines.flatMap((l) =>
 			color: c.name,
 			binding: b === 'pb' ? 'Paperback' : 'Hardback',
 			// No dust jacket here: the approved cover for these ISBNs is case laminate.
-			spec:
-				l.line === 'largeprint'
-					? `6×9 Large Print ${b === 'pb' ? 'Paperback' : 'Hardback'}`
-					: `6×9 ${b === 'pb' ? 'Paperback' : 'Hardback'}`,
+			spec: `6×9 ${b === 'pb' ? 'Paperback' : 'Hardback'}`,
 			price: b === 'pb' ? l.pb : l.hb,
 			isbn: l.isbn[c.key as 'charcoal' | 'plum' | 'white'][b],
 			img: `https://assets.spiritmediapublishing.com/FHB/print/general-${l.line}-${c.key}-600.webp?v=${CARD_V}`,
@@ -318,7 +395,7 @@ const printFaq = [
 	},
 	{
 		q: 'What’s included in each edition?',
-		a: `The complete Bible in Divine Voice Color with full color throughout — 876 pages at 6×9, or 1,016 in Large Print. The targeted editions are 6×9 hardcover, case laminate; the General Audience editions come in paperback or hardback. A presentation page for the reader's name. Opening pages on intimacy, identity, inheritance and hearing His voice. An introduction to every one of the 66 books, and a Father's note closing each one with a short prayer. 1,354 study notes across 777 chapters — 1,075 explaining a word, name, custom or background, 248 marking where the text reveals the Father, and 31 recording a difference among the manuscripts.`,
+		a: `The complete Bible in Divine Voice Color with full color throughout — 876 pages at 6×9; in Large Print the same complete text runs to 2,956 pages and comes as a three-volume set. The targeted editions are 6×9 hardcover, case laminate; the General Audience editions come in paperback or hardback. A presentation page for the reader's name. Opening pages on intimacy, identity, inheritance and hearing His voice. An introduction to every one of the 66 books, and a Father's note closing each one with a short prayer. 1,354 study notes across 777 chapters — 1,075 explaining a word, name, custom or background, 248 marking where the text reveals the Father, and 31 recording a difference among the manuscripts.`,
 	},
 	{
 		q: 'Which languages can I read it in?',
@@ -569,9 +646,7 @@ function markVoices(v: {
 					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">General Audience</p>
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">{l.label}</h2>
 					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 40rem;">
-						{l.line === 'largeprint'
-							? 'The same complete Bible, set larger for easier reading — and a natural gift for parents and grandparents.'
-							: 'The complete Divine Voice Color Bible without an audience on the cover. Three colors, two bindings.'}
+						The complete Divine Voice Color Bible without an audience on the cover. Three colors, two bindings.
 					</p>
 					<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em; margin: 0.9rem 0 0;">{l.tail}</p>
 					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em; margin: 0.35rem 0 0;">{DVC_TAIL2}</p>
@@ -579,9 +654,7 @@ function markVoices(v: {
 				</div>
 
 				{/* The page's previous hero, reused here rather than retired: it shows the generic
-				    cover in exactly these three colours, which is what this block sells. Only the
-				    Regular Print block gets it — there is no equivalent Large Print photograph, and
-				    repeating this one under a Large Print heading would misdescribe the product. */}
+				    cover in exactly these three colours, which is what this block sells. */}
 				{l.line === 'regular' && (
 					<img
 						src="https://assets.spiritmediapublishing.com/FHB/print/print-hero-group.webp"
@@ -609,17 +682,17 @@ function markVoices(v: {
 							    three colours share an interior, so they share the sample pages).
 							    "Full details" waits on the product pages for these two lines. */}
 							<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.9rem;">
-								{builtPages.has(`${l.line === 'largeprint' ? 'large-print' : 'fathers-heart'}-bible`) && (
+								{builtPages.has('fathers-heart-bible') && (
 									<>
 										<a
-											href={`/bibles/${l.line === 'largeprint' ? 'large-print' : 'fathers-heart'}-bible`}
+											href="/bibles/fathers-heart-bible"
 											style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;"
 										>Full details</a>
 										<span aria-hidden="true" style="color: #a1a1aa;">·</span>
 									</>
 								)}
 								<LookInside
-									slug={l.line === 'largeprint' ? 'largeprint' : 'general'}
+									slug="general"
 									title={`FHB — Father’s Heart Bible — ${l.label}`}
 									variant="link"
 									label="Look inside"
@@ -641,6 +714,80 @@ function markVoices(v: {
 				<p class="text-center mt-6" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600;">Direct from SMP includes free shipping — a $15 value.</p>
 			</Section>
 		))}
+
+		<!-- ═══════════════ LARGE PRINT — THE THREE-VOLUME SET ═══════════════ -->
+		{/* Sold as three volumes AND as a set. The set card comes last and is the one that
+		    carries a struck-through price, because the saving only exists against buying all
+		    three — showing a strike on a single volume would be untrue. */}
+		<Section variant="light">
+			<div class="text-center mb-8">
+				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">General Audience</p>
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Large Print — Three Volumes</h2>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 40rem;">The complete Bible set larger for easier reading. At this size the whole text does not fit one binding, so it comes as three volumes — {lpTotalPages.toLocaleString('en-US')} pages, nothing abridged. Take the set, or the volume you read most.</p>
+				<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em; margin: 0.9rem 0 0;">{LP_TAIL}</p>
+				<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em; margin: 0.35rem 0 0;">{DVC_TAIL2}</p>
+				<VoiceChips class="mt-5 mb-0" />
+			</div>
+
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
+				{lpVolumes.map((v) => (
+					<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+						<img
+							src={`https://assets.spiritmediapublishing.com/FHB/print/${v.key}-600.webp?v=${LP_CARD_V}`}
+							srcset={`https://assets.spiritmediapublishing.com/FHB/print/${v.key}-600.webp?v=${LP_CARD_V} 600w, https://assets.spiritmediapublishing.com/FHB/print/${v.key}-1200.webp?v=${LP_CARD_V} 1200w`}
+							sizes="(min-width: 640px) 240px, 60vw"
+							alt={`Father's Heart Bible (FHB) — Large Print Volume ${v.vol}, ${v.range}, ${v.color} cover`}
+							width="600" height="764" loading="lazy" decoding="async"
+							class="block w-full h-auto" style="max-width: 220px;"
+						/>
+						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.15rem;">Volume {v.vol} · {v.color}</h3>
+						<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; margin: 0 0 0.6rem;">{v.range} · {v.pages.toLocaleString('en-US')} pages</p>
+						{/* Each volume has its OWN sample pages — they are different books, and a
+						    single shared sample would show a reader pages their volume does not
+						    contain. Keyed to the look-inside manifest built from that volume's
+						    interior. */}
+						<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.9rem;">
+							<LookInside
+								slug={v.key}
+								title={`FHB — Large Print Volume ${v.vol}, ${v.range}`}
+								variant="link"
+								label="Look inside"
+							/>
+						</div>
+						<div class="flex flex-col gap-2 w-full mt-auto">
+							{(['pb', 'hb'] as const).map((b) => (
+								<button
+									type="button"
+									data-add={`${v.key}-${b}`}
+									class="inline-flex items-center justify-center rounded-full font-semibold"
+									style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.55rem 1rem; font-size: 0.8rem; cursor: pointer;"
+								>{b === 'pb' ? 'Paperback' : 'Hardback'} · ${(b === 'pb' ? v.pb : v.hb).toFixed(2)}</button>
+							))}
+						</div>
+					</div>
+				))}
+			</div>
+
+			<div class="rounded-2xl p-6 md:p-7 mt-8 mx-auto text-center" style="background: #fff; border: 1px solid var(--color-hairline); max-width: 44rem;">
+				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.35rem;">The complete set — all three volumes</h3>
+				<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin: 0 0 1rem;">Genesis–Esther, Job–Malachi and the New Testament · {lpTotalPages.toLocaleString('en-US')} pages · all 66 books</p>
+				<div class="flex flex-col sm:flex-row gap-3 justify-center">
+					{(['pb', 'hb'] as const).map((b) => (
+						<button
+							type="button"
+							data-add={`lp-set-${b}`}
+							class="inline-flex items-center justify-center gap-2 rounded-full font-semibold"
+							style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.6rem 1.15rem; font-size: 0.85rem; cursor: pointer;"
+						>
+							<span>{b === 'pb' ? 'Paperback set' : 'Hardback set'} · ${(b === 'pb' ? lpSetPb : lpSetHb).toFixed(2)}</span>
+							<span style="color: #71717a; font-weight: 600; text-decoration: line-through;">${(b === 'pb' ? lpListPb : lpListHb).toFixed(2)}</span>
+						</button>
+					))}
+				</div>
+				<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.85rem; font-weight: 600; margin: 1rem 0 0;">A set counts as three books toward the bulk discounts below.</p>
+			</div>
+			<p class="text-center mt-6" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600;">Direct from SMP includes free shipping — a $15 value.</p>
+		</Section>
 
 		<!-- ═══════════════ HIS VOICE — DVC ON THE PAGE ═══════════════ -->
 		<Section variant="warm">
@@ -732,6 +879,21 @@ function markVoices(v: {
 							</div>
 						</>
 					))}
+
+					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.6rem 0 0.5rem;">General Audience — Large Print</p>
+					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
+						{lpSkus.map((s) => (
+							<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
+								<img src={s.img} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
+								<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{s.title}</span> <span style="white-space: nowrap; font-weight: 600;">${s.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{s.spec}</span></span>
+								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
+									<button type="button" class="qty-step" data-slug={s.key} data-dir="-1" aria-label={`Fewer ${s.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
+									<input type="number" class="qty-in" data-slug={s.key} value="0" min="0" step="1" inputmode="numeric" aria-label={`${s.title} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
+									<button type="button" class="qty-step" data-slug={s.key} data-dir="1" aria-label={`More ${s.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
+								</div>
+							</div>
+						))}
+					</div>
 
 					<div class="flex flex-wrap items-center justify-between gap-4 pt-4 mt-5" style="border-top: 1px solid var(--color-hairline);">
 						<div>
@@ -838,14 +1000,21 @@ function markVoices(v: {
 			moms: 99.99, pastors: 99.99, peace: 99.99, presidents: 99.99, recovery: 99.99,
 			seekers: 99.99, seventeen: 99.99, soldiers: 99.99, teen: 99.99,
 			'worship-leaders': 99.99, journaling: 124.99,
-			// General Audience — Regular Print (876pp) and Large Print (1016pp).
+			// General Audience — Regular Print (876pp).
 			'general-regular-charcoal-pb': 79.99, 'general-regular-charcoal-hb': 99.99,
 			'general-regular-plum-pb': 79.99, 'general-regular-plum-hb': 99.99,
 			'general-regular-white-pb': 79.99, 'general-regular-white-hb': 99.99,
-			'general-largeprint-charcoal-pb': 99.99, 'general-largeprint-charcoal-hb': 124.99,
-			'general-largeprint-plum-pb': 99.99, 'general-largeprint-plum-hb': 124.99,
-			'general-largeprint-white-pb': 99.99, 'general-largeprint-white-hb': 124.99,
+			// Large Print — three volumes and the set. The retired single-volume Large Print
+			// SKUs (general-largeprint-*) are gone from here and from dvc-checkout.ts.
+			'lp-vol1-pb': 99.99, 'lp-vol1-hb': 114.99,
+			'lp-vol2-pb': 99.99, 'lp-vol2-hb': 114.99,
+			'lp-vol3-pb': 79.99, 'lp-vol3-hb': 99.99,
+			'lp-set-pb': 249.99, 'lp-set-hb': 299.99,
 		};
+		// HOW MANY BOOKS EACH SKU PUTS IN THE BUYER'S HANDS — what the ladder counts, and the
+		// reason a set is not one line item's worth of progress toward a tier. Anything absent
+		// is one book. MUST match the `books` field in functions/dvc-checkout.ts EDITIONS.
+		const BOOKS = { 'lp-set-pb': 3, 'lp-set-hb': 3 };
 		const TIERS = [
 			{ min: 250, pct: 30 }, { min: 100, pct: 25 }, { min: 50, pct: 20 },
 			{ min: 25, pct: 15 }, { min: 10, pct: 10 }, { min: 1, pct: 0 },
@@ -861,7 +1030,9 @@ function markVoices(v: {
 		const msg = root.querySelector('[data-bulk-msg]');
 
 		function render() {
-			const total = Object.values(counts).reduce((a, b) => a + b, 0);
+			// Thresholds count BOOKS, not line items — the same rule the server applies, so
+			// the tier shown here is the tier Stripe charges.
+			const total = Object.entries(counts).reduce((a, [k, n]) => a + n * (BOOKS[k] || 1), 0);
 			const tier = tierFor(total);
 			const pct = tier ? tier.pct : 0;
 			// Round the discounted UNIT to whole cents, then multiply — the exact order
