@@ -291,7 +291,11 @@ const lpSkus = [
 		(['pb', 'hb'] as const).map((b) => ({
 			key: `${v.key}-${b}`,
 			title: `Large Print Vol. ${v.vol}, ${v.range} (${v.color})`,
-			spec: `6×9 Large Print ${b === 'pb' ? 'Paperback' : 'Hardback'} · ${v.pages.toLocaleString('en-US')} pages`,
+			// Format only, like every other listing (Kevin 2026-09-17: "No other listings show
+			// page numbers. Be consistent. People do not buy based on page numbers."). The
+			// measured `pages` field STAYS on lpVolumes — it feeds the metadata sheets and
+			// Ingram, where it is a required fact; it is the STOREFRONT that drops it.
+			spec: `6×9 Large Print ${b === 'pb' ? 'Paperback' : 'Hardback'}`,
 			price: b === 'pb' ? v.pb : v.hb,
 			isbn: v.isbn[b],
 			img: `https://assets.spiritmediapublishing.com/FHB/print/${v.key}-600.webp?v=${LP_CARD_V}`,
@@ -301,7 +305,7 @@ const lpSkus = [
 	...(['pb', 'hb'] as const).map((b) => ({
 		key: `lp-set-${b}`,
 		title: 'Large Print — Complete Three-Volume Set',
-		spec: `All three volumes · ${lpTotalPages.toLocaleString('en-US')} pages · ${b === 'pb' ? 'Paperback' : 'Hardback'}`,
+		spec: `All three volumes · ${b === 'pb' ? 'Paperback' : 'Hardback'}`,
 		price: b === 'pb' ? lpSetPb : lpSetHb,
 		// The set carries no ISBN of its own: Kevin assigned numbers per volume, and it is
 		// billed as the three volume SKUs together. Do not invent one.
@@ -741,7 +745,7 @@ function markVoices(v: {
 							class="block w-full h-auto" style="max-width: 220px;"
 						/>
 						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.15rem;">Volume {v.vol} · {v.color}</h3>
-						<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; margin: 0 0 0.6rem;">{v.range} · {v.pages.toLocaleString('en-US')} pages</p>
+						<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; margin: 0 0 0.6rem;">{v.range}</p>
 						{/* Each volume has its OWN sample pages — they are different books, and a
 						    single shared sample would show a reader pages their volume does not
 						    contain. Keyed to the look-inside manifest built from that volume's
@@ -770,7 +774,7 @@ function markVoices(v: {
 
 			<div class="rounded-2xl p-6 md:p-7 mt-8 mx-auto text-center" style="background: #fff; border: 1px solid var(--color-hairline); max-width: 44rem;">
 				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.35rem;">The complete set — all three volumes</h3>
-				<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin: 0 0 1rem;">Genesis–Esther, Job–Malachi and the New Testament · {lpTotalPages.toLocaleString('en-US')} pages · all 66 books</p>
+				<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin: 0 0 1rem;">Genesis–Esther, Job–Malachi and the New Testament · all 66 books</p>
 				<div class="flex flex-col sm:flex-row gap-3 justify-center">
 					{(['pb', 'hb'] as const).map((b) => (
 						<button
