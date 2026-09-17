@@ -124,32 +124,32 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 	'lp-vol1-pb': {
 		title: 'Large Print Vol. 1, Genesis–Esther (Wheat), Paperback',
 		retail: 9999,
-		img: `${ASSETS}/lp-vol1-600.webp?v=1`,
+		img: `${ASSETS}/lp/v2/lp-vol1-600.webp`,
 	},
 	'lp-vol1-hb': {
 		title: 'Large Print Vol. 1, Genesis–Esther (Wheat), Hardback',
 		retail: 11499,
-		img: `${ASSETS}/lp-vol1-600.webp?v=1`,
+		img: `${ASSETS}/lp/v2/lp-vol1-600.webp`,
 	},
 	'lp-vol2-pb': {
 		title: 'Large Print Vol. 2, Job–Malachi (Sage), Paperback',
 		retail: 9999,
-		img: `${ASSETS}/lp-vol2-600.webp?v=1`,
+		img: `${ASSETS}/lp/v2/lp-vol2-600.webp`,
 	},
 	'lp-vol2-hb': {
 		title: 'Large Print Vol. 2, Job–Malachi (Sage), Hardback',
 		retail: 11499,
-		img: `${ASSETS}/lp-vol2-600.webp?v=1`,
+		img: `${ASSETS}/lp/v2/lp-vol2-600.webp`,
 	},
 	'lp-vol3-pb': {
 		title: 'Large Print Vol. 3, New Testament (Mist Blue), Paperback',
 		retail: 7999,
-		img: `${ASSETS}/lp-vol3-600.webp?v=1`,
+		img: `${ASSETS}/lp/v2/lp-vol3-600.webp`,
 	},
 	'lp-vol3-hb': {
 		title: 'Large Print Vol. 3, New Testament (Mist Blue), Hardback',
 		retail: 9999,
-		img: `${ASSETS}/lp-vol3-600.webp?v=1`,
+		img: `${ASSETS}/lp/v2/lp-vol3-600.webp`,
 	},
 	// THE SET IS A NORMAL PRODUCT (Kevin 2026-09-16, dissolving D147). It carries its own
 	// price and the SAME ladder as everything else — no better-of rule, no stacking rule, no
@@ -158,13 +158,13 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 	'lp-set-pb': {
 		title: 'Large Print — Complete Three-Volume Set, Paperback',
 		retail: 24999,
-		img: `${ASSETS}/lp-set-600.webp?v=1`,
+		img: `${ASSETS}/lp/v2/lp-set-600.webp`,
 		books: 1,
 	},
 	'lp-set-hb': {
 		title: 'Large Print — Complete Three-Volume Set, Hardback',
 		retail: 29999,
-		img: `${ASSETS}/lp-set-600.webp?v=1`,
+		img: `${ASSETS}/lp/v2/lp-set-600.webp`,
 		books: 1,
 	},
 };

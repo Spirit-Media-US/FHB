@@ -203,7 +203,11 @@ const RETAIL_8 = '$124.99';
 // The Large Print volume cards are new keys (lp-vol1/2/3, lp-set), so nothing is cached for
 // them yet — but they get their own cache-buster because they are re-rendered on their own
 // schedule, and they are not in the card-art set.
-const LP_CARD_V = '1';
+// The Large Print cards moved to a NEW PREFIX, FHB/print/lp/v2/, rebuilt in the flat
+// house style (Kevin 2026-09-17: "Just need new LPs to match"). New keys, so there is
+// nothing cached to bust and LP_CARD_V is gone — the old angled cards stay untouched at
+// their own keys, which makes the swap reversible by changing this one path back.
+const LP_CARDS = 'https://assets.spiritmediapublishing.com/FHB/print/lp/v2';
 const GENERAL_TAIL = 'Full Color Throughout · 6×9 Paperback or Hardback';
 const LP_TAIL = 'Large Print · Full Color Throughout · 6×9 Paperback or Hardback';
 const generalColors = [
@@ -307,7 +311,7 @@ const lpSkus = [
 			spec: `6×9 Large Print ${b === 'pb' ? 'Paperback' : 'Hardback'}`,
 			price: b === 'pb' ? v.pb : v.hb,
 			isbn: v.isbn[b],
-			img: `https://assets.spiritmediapublishing.com/FHB/print/${v.key}-600.webp?v=${LP_CARD_V}`,
+			img: `${LP_CARDS}/${v.key}-600.webp`,
 			books: 1,
 		})),
 	),
@@ -319,7 +323,7 @@ const lpSkus = [
 		// The set carries no ISBN of its own: Kevin assigned numbers per volume, and it is
 		// billed as the three volume SKUs together. Do not invent one.
 		isbn: '',
-		img: `https://assets.spiritmediapublishing.com/FHB/print/lp-set-600.webp?v=${LP_CARD_V}`,
+		img: `${LP_CARDS}/lp-set-600.webp`,
 		// ONE product on the ladder, not three (Kevin 2026-09-17) — see lpSetPb above.
 		books: 1,
 	})),
@@ -747,8 +751,8 @@ function markVoices(v: {
 				{lpVolumes.map((v) => (
 					<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
 						<img
-							src={`https://assets.spiritmediapublishing.com/FHB/print/${v.key}-600.webp?v=${LP_CARD_V}`}
-							srcset={`https://assets.spiritmediapublishing.com/FHB/print/${v.key}-600.webp?v=${LP_CARD_V} 600w, https://assets.spiritmediapublishing.com/FHB/print/${v.key}-1200.webp?v=${LP_CARD_V} 1200w`}
+							src={`${LP_CARDS}/${v.key}-600.webp`}
+							srcset={`${LP_CARDS}/${v.key}-600.webp 600w, ${LP_CARDS}/${v.key}-1200.webp 1200w`}
 							sizes="(min-width: 640px) 240px, 60vw"
 							alt={`Father's Heart Bible (FHB) — Large Print Volume ${v.vol}, ${v.range}, ${v.color} cover`}
 							width="600" height="764" loading="lazy" decoding="async"
