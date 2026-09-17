@@ -33,10 +33,16 @@ const CARDS = `${ASSETS}/cards/v2`;
 // Retail in cents. The fifteen 6x9 targeted editions share one price; the 8x10 journaling
 // edition is its own.
 //
-// `books` is HOW MANY BOOKS THIS SKU PUTS IN THE BUYER'S HANDS, and it is what the volume
-// ladder counts — not the number of line items. The Large Print set is three physical
-// volumes, so one set moves the buyer three books up the ladder (Kevin 2026-09-16). Every
-// other SKU is one book and omits the field.
+// `books` WEIGHTS A SKU ON THE VOLUME LADDER, and every SKU now weighs ONE.
+//
+// CORRECTED BY KEVIN 2026-09-17: "A 3 book set is 1 product not 12 products when selling 4
+// sets, but 4 sets = 4 products. So the bulk discounts apply just like all other products."
+// The set is ONE PRODUCT on the shelf, not three, so it moves the buyer ONE step up the
+// ladder exactly like every other SKU — no multiplying, no dividing, no special case for
+// the one SKU that happens to arrive as three volumes. The previous weight of 3 made four
+// sets count as twelve books and reach the 10% tier that four of anything else would not.
+// Kept as a field rather than deleted: it is the place any future multi-item SKU would say
+// so, and the comment is the record of why the answer is one.
 const EDITIONS: Record<string, { title: string; retail: number; img: string; books?: number }> = {
 	chosen: { title: 'Chosen Bible', retail: 9999, img: `${CARDS}/dvc-chosen-600.webp` },
 	couples: { title: 'Couple’s Bible', retail: 9999, img: `${CARDS}/dvc-couples-600.webp` },
@@ -153,13 +159,13 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		title: 'Large Print — Complete Three-Volume Set, Paperback',
 		retail: 24999,
 		img: `${ASSETS}/lp-set-600.webp?v=1`,
-		books: 3,
+		books: 1,
 	},
 	'lp-set-hb': {
 		title: 'Large Print — Complete Three-Volume Set, Hardback',
 		retail: 29999,
 		img: `${ASSETS}/lp-set-600.webp?v=1`,
-		books: 3,
+		books: 1,
 	},
 };
 
@@ -226,9 +232,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		if (!Number.isFinite(n) || n < 0) return json({ error: 'invalid_selection' }, 400);
 		counts[slug] = n;
 	}
-	// THRESHOLDS COUNT BOOKS. Counting line items instead would let ten sets — thirty
-	// books — sit below the 25-book tier, and would make the ladder mean something
-	// different for the one SKU that is not a single book.
+	// THRESHOLDS COUNT PRODUCTS, one per SKU in the cart (Kevin 2026-09-17). A set is one
+	// product however many volumes are in the box, so four sets are four products — the
+	// same arithmetic as four of anything else.
 	const total = Object.entries(counts).reduce(
 		(s, [slug, n]) => s + n * (EDITIONS[slug].books ?? 1),
 		0,

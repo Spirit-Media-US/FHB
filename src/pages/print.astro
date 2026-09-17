@@ -289,7 +289,9 @@ const lpListPb = lpVolumes.reduce((s, v) => s + v.pb, 0);
 const lpListHb = lpVolumes.reduce((s, v) => s + v.hb, 0);
 // The only Large Print figures we SET (Kevin 2026-09-16). The set is a normal product on the
 // same ladder as every edition — no better-of rule, no stacking rule, no special case. Its
-// threshold weight is THREE BOOKS, because that is what the buyer receives.
+// threshold weight is ONE PRODUCT (Kevin 2026-09-17: "A 3 book set is 1 product not 12
+// products when selling 4 sets, but 4 sets = 4 products"), so it climbs the ladder exactly
+// as every other SKU does. MUST stay in step with `books` in functions/dvc-checkout.ts.
 const lpSetPb = 249.99;
 const lpSetHb = 299.99;
 const lpTotalPages = lpVolumes.reduce((s, v) => s + v.pages, 0);
@@ -318,7 +320,8 @@ const lpSkus = [
 		// billed as the three volume SKUs together. Do not invent one.
 		isbn: '',
 		img: `https://assets.spiritmediapublishing.com/FHB/print/lp-set-600.webp?v=${LP_CARD_V}`,
-		books: 3,
+		// ONE product on the ladder, not three (Kevin 2026-09-17) — see lpSetPb above.
+		books: 1,
 	})),
 ];
 // Flat SKU list — one entry per purchasable thing, used by the order builder and mirrored
@@ -1034,7 +1037,11 @@ function markVoices(v: {
 		// HOW MANY BOOKS EACH SKU PUTS IN THE BUYER'S HANDS — what the ladder counts, and the
 		// reason a set is not one line item's worth of progress toward a tier. Anything absent
 		// is one book. MUST match the `books` field in functions/dvc-checkout.ts EDITIONS.
-		const BOOKS = { 'lp-set-pb': 3, 'lp-set-hb': 3 };
+		// Every SKU weighs ONE product on the ladder, the set included (Kevin 2026-09-17:
+		// "4 sets = 4 products"). Kept explicit rather than emptied so this map stays the
+		// one place a future multi-item SKU would say otherwise — and so pricing-verify,
+		// which reads this map as TEXT, keeps asserting it against the server's weights.
+		const BOOKS = { 'lp-set-pb': 1, 'lp-set-hb': 1 };
 		const TIERS = [
 			{ min: 250, pct: 30 }, { min: 100, pct: 25 }, { min: 50, pct: 20 },
 			{ min: 25, pct: 15 }, { min: 10, pct: 10 }, { min: 1, pct: 0 },
