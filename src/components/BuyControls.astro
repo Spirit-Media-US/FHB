@@ -169,17 +169,20 @@ const bindings = [
 		text-align: center;
 		padding: 0.15rem 0;
 	}
-	/* One line, always, on the card that asked for it. white-space: nowrap is safe HERE and
-	   was not safe on .buy-btn: this link is plain text with no 52px logo beside it, so at
-	   0.72rem it measures inside even the journaling card's narrowed box. The size step is
-	   the fallback that keeps it true if the type scale ever changes. */
-	.buy-direct-tight {
-		font-size: 0.72rem;
-		white-space: nowrap;
-	}
-	@media (max-width: 400px) {
+	/* ONE LINE FROM 641px UP, AND NOWHERE NARROWER — because narrower is not physically
+	   possible, not because it was not asked for.
+	   Kevin asked for this link to hold one line on the journaling card, "even if it has to
+	   be little smaller". On a phone the targeted cards are two-across and the content box is
+	   133px; "Buy Direct & Save + Free Shipping" needs about 200px at 12px type, so one line
+	   there means roughly an 8px font — unreadable, and below any sensible minimum. I shipped
+	   `white-space: nowrap` unconditionally first and MEASURED the result: the link did not
+	   shrink to fit, it ran straight out of the card and put a horizontal scrollbar on the
+	   whole page at 400px. Exactly the .buy-btn spill again, one element over.
+	   So: nowrap + a size step where the box can hold it, and ordinary wrapping below that. */
+	@media (min-width: 641px) {
 		.buy-direct-tight {
-			font-size: 0.68rem;
+			font-size: 0.72rem;
+			white-space: nowrap;
 		}
 	}
 </style>
