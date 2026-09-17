@@ -24,109 +24,304 @@ interface Env {
 }
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
+// Re-rendered 3-D cards live under NEW keys rather than over the live ones, so the edge
+// has nothing stale to serve and nothing live was mutated. Mirrors src/data/card-art.ts:
+// a SKU whose card has not been re-rendered (journaling's 8x10, D166) still points at
+// ASSETS. Both sides are verified against the edge in the build.
+const CARDS = `${ASSETS}/cards/v2`;
 
 // Retail in cents. The fifteen 6x9 targeted editions share one price; the 8x10 journaling
 // edition is its own.
-const EDITIONS: Record<string, { title: string; retail: number; img: string }> = {
-	chosen: { title: 'Chosen Bible', retail: 9999, img: `${ASSETS}/dvc-chosen-600.webp` },
-	couples: { title: 'Couple’s Bible', retail: 9999, img: `${ASSETS}/dvc-couples-600.webp` },
-	dads: { title: 'Dad’s Bible', retail: 9999, img: `${ASSETS}/dvc-dads-600.webp` },
-	'first-responders': {
-		title: 'First Responder’s Bible',
+//
+// `books` WEIGHTS A SKU ON THE VOLUME LADDER, and every SKU now weighs ONE.
+//
+// CORRECTED BY KEVIN 2026-09-17: "A 3 book set is 1 product not 12 products when selling 4
+// sets, but 4 sets = 4 products. So the bulk discounts apply just like all other products."
+// The set is ONE PRODUCT on the shelf, not three, so it moves the buyer ONE step up the
+// ladder exactly like every other SKU — no multiplying, no dividing, no special case for
+// the one SKU that happens to arrive as three volumes. The previous weight of 3 made four
+// sets count as twelve books and reach the 10% tier that four of anything else would not.
+// Kept as a field rather than deleted: it is the place any future multi-item SKU would say
+// so, and the comment is the record of why the answer is one.
+const EDITIONS: Record<string, { title: string; retail: number; img: string; books?: number }> = {
+	// EVERY EDITION IS SOLD IN BOTH BINDINGS (Kevin 2026-09-17), so each one is TWO SKUs,
+	// keyed <slug>-hb / <slug>-pb exactly like the Large Print volumes. A bare slug is no
+	// longer sellable: a single key could not say which binding the buyer chose, and the
+	// price differs by $20. Prices are ISBNS.json's and pricing-verify compares them.
+	// Titles carry the binding because this string is what shows on the Stripe receipt.
+	'chosen-hb': {
+		title: 'Chosen Bible — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/dvc-first-responders-600.webp`,
+		img: `${CARDS}/dvc-chosen-600.webp`,
 	},
-	mens: { title: 'Men’s Bible', retail: 9999, img: `${ASSETS}/dvc-mens-600.webp` },
-	moms: { title: 'Mom’s Bible', retail: 9999, img: `${ASSETS}/dvc-moms-600.webp` },
-	pastors: { title: 'Pastor’s Bible', retail: 9999, img: `${ASSETS}/dvc-pastors-600.webp` },
-	peace: { title: 'Peace Bible', retail: 9999, img: `${ASSETS}/dvc-peace-600.webp` },
-	presidents: {
-		title: 'President’s Bible',
+	'chosen-pb': {
+		title: 'Chosen Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-chosen-600.webp`,
+	},
+	'couples-hb': {
+		title: 'Couple’s Bible — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/dvc-presidents-600.webp`,
+		img: `${CARDS}/dvc-couples-600.webp`,
 	},
-	recovery: { title: 'Recovery Bible', retail: 9999, img: `${ASSETS}/dvc-recovery-600.webp` },
-	seekers: { title: 'Seeker’s Bible', retail: 9999, img: `${ASSETS}/dvc-seekers-600.webp` },
-	seventeen: { title: 'Seventeen Bible', retail: 9999, img: `${ASSETS}/dvc-seventeen-600.webp` },
-	soldiers: { title: 'Soldier’s Bible', retail: 9999, img: `${ASSETS}/dvc-soldiers-600.webp` },
-	teen: { title: 'Teen Bible', retail: 9999, img: `${ASSETS}/dvc-teen-600.webp` },
-	'worship-leaders': {
-		title: 'Worship Leader’s Bible',
+	'couples-pb': {
+		title: 'Couple’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-couples-600.webp`,
+	},
+	'dads-hb': {
+		title: 'Dad’s Bible — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/dvc-worship-leaders-600.webp`,
+		img: `${CARDS}/dvc-dads-600.webp`,
 	},
-	journaling: {
-		title: 'She Hears Her Father’s Voice — Journaling Bible',
+	'dads-pb': {
+		title: 'Dad’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-dads-600.webp`,
+	},
+	'first-responders-hb': {
+		title: 'First Responder’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-first-responders-600.webp`,
+	},
+	'first-responders-pb': {
+		title: 'First Responder’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-first-responders-600.webp`,
+	},
+	'mens-hb': {
+		title: 'Men’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-mens-600.webp`,
+	},
+	'mens-pb': {
+		title: 'Men’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-mens-600.webp`,
+	},
+	'moms-hb': {
+		title: 'Mom’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-moms-600.webp`,
+	},
+	'moms-pb': {
+		title: 'Mom’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-moms-600.webp`,
+	},
+	'pastors-hb': {
+		title: 'Pastor’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-pastors-600.webp`,
+	},
+	'pastors-pb': {
+		title: 'Pastor’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-pastors-600.webp`,
+	},
+	'peace-hb': {
+		title: 'Peace Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-peace-600.webp`,
+	},
+	'peace-pb': {
+		title: 'Peace Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-peace-600.webp`,
+	},
+	'presidents-hb': {
+		title: 'President’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-presidents-600.webp`,
+	},
+	'presidents-pb': {
+		title: 'President’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-presidents-600.webp`,
+	},
+	'recovery-hb': {
+		title: 'Recovery Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-recovery-600.webp`,
+	},
+	'recovery-pb': {
+		title: 'Recovery Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-recovery-600.webp`,
+	},
+	'seekers-hb': {
+		title: 'Seeker’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-seekers-600.webp`,
+	},
+	'seekers-pb': {
+		title: 'Seeker’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-seekers-600.webp`,
+	},
+	'seventeen-hb': {
+		title: 'Seventeen Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-seventeen-600.webp`,
+	},
+	'seventeen-pb': {
+		title: 'Seventeen Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-seventeen-600.webp`,
+	},
+	'soldiers-hb': {
+		title: 'Soldier’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-soldiers-600.webp`,
+	},
+	'soldiers-pb': {
+		title: 'Soldier’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-soldiers-600.webp`,
+	},
+	'teen-hb': {
+		title: 'Teen Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-teen-600.webp`,
+	},
+	'teen-pb': {
+		title: 'Teen Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-teen-600.webp`,
+	},
+	'worship-leaders-hb': {
+		title: 'Worship Leader’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-worship-leaders-600.webp`,
+	},
+	'worship-leaders-pb': {
+		title: 'Worship Leader’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-worship-leaders-600.webp`,
+	},
+	'journaling-hb': {
+		title: 'She Hears Her Father’s Voice — Journaling Bible — Hardback',
 		retail: 12499,
+		img: `${ASSETS}/dvc-journaling-600.webp`,
+	},
+	'journaling-pb': {
+		title: 'She Hears Her Father’s Voice — Journaling Bible — Paperback',
+		retail: 11499,
 		img: `${ASSETS}/dvc-journaling-600.webp`,
 	},
 
 	// ── General Audience, added 2026-08-29 ──
 	// The same Bible without an audience on the cover: three colours, two bindings, in
-	// Regular Print (876pp) and Large Print (1,016pp). They join the SAME mix-and-match
-	// ladder as the targeted editions — the combined total across everything sets the tier.
+	// Regular Print (888pp). Large Print is now the three-volume set below. They join the
+	// SAME mix-and-match ladder as the targeted editions — the combined total sets the tier.
 	// MUST match src/pages/print.astro `generalSkus` and the PRICE map in its inline script.
 	'general-regular-charcoal-pb': {
 		title: 'Charcoal, Paperback',
 		retail: 7999,
-		img: `${ASSETS}/general-regular-charcoal-600.webp?v=2`,
+		img: `${CARDS}/general-regular-charcoal-600.webp`,
 	},
 	'general-regular-charcoal-hb': {
 		title: 'Charcoal, Hardback',
 		retail: 9999,
-		img: `${ASSETS}/general-regular-charcoal-600.webp?v=2`,
+		img: `${CARDS}/general-regular-charcoal-600.webp`,
 	},
 	'general-regular-plum-pb': {
 		title: 'Plum, Paperback',
 		retail: 7999,
-		img: `${ASSETS}/general-regular-plum-600.webp?v=2`,
+		img: `${CARDS}/general-regular-plum-600.webp`,
 	},
 	'general-regular-plum-hb': {
 		title: 'Plum, Hardback',
 		retail: 9999,
-		img: `${ASSETS}/general-regular-plum-600.webp?v=2`,
+		img: `${CARDS}/general-regular-plum-600.webp`,
 	},
 	'general-regular-white-pb': {
 		title: 'White, Paperback',
 		retail: 7999,
-		img: `${ASSETS}/general-regular-white-600.webp?v=2`,
+		img: `${CARDS}/general-regular-white-600.webp`,
 	},
 	'general-regular-white-hb': {
 		title: 'White, Hardback',
 		retail: 9999,
-		img: `${ASSETS}/general-regular-white-600.webp?v=2`,
+		img: `${CARDS}/general-regular-white-600.webp`,
 	},
-	'general-largeprint-charcoal-pb': {
-		title: 'Large Print — Charcoal, Paperback',
+	// ── Large Print, rebuilt as THREE VOLUMES 2026-09-17 ──
+	// The single-volume Large Print (three cover colours, ISBNs 307-2/308-9/309-6/310-2/
+	// 311-9/312-6) is RETIRED and its six SKUs are gone from this map. It was an ABRIDGED
+	// book — 30 books in full text and the other 36 in selected passages — because the
+	// complete text at 14pt does not fit one binding. The set is the complete Bible: one
+	// cover colour per volume, and together all 66 books.
+	// Prices are Kevin's, 2026-09-14, and live in
+	// projects/fhb-print-bible/editions/ISBNS.json as the single source: Vol 3 is about half
+	// the size of Vols 1 and 2 and is priced accordingly.
+	'lp-vol1-pb': {
+		title: 'Large Print Vol. 1, Genesis–Esther (Wheat), Paperback',
 		retail: 9999,
-		img: `${ASSETS}/general-largeprint-charcoal-600.webp?v=2`,
+		img: `${ASSETS}/lp/v4/lp-vol1-600.webp`,
 	},
-	'general-largeprint-charcoal-hb': {
-		title: 'Large Print — Charcoal, Hardback',
-		retail: 12499,
-		img: `${ASSETS}/general-largeprint-charcoal-600.webp?v=2`,
+	'lp-vol1-hb': {
+		title: 'Large Print Vol. 1, Genesis–Esther (Wheat), Hardback',
+		retail: 11499,
+		img: `${ASSETS}/lp/v4/lp-vol1-600.webp`,
 	},
-	'general-largeprint-plum-pb': {
-		title: 'Large Print — Plum, Paperback',
+	'lp-vol2-pb': {
+		title: 'Large Print Vol. 2, Job–Malachi (Sage), Paperback',
 		retail: 9999,
-		img: `${ASSETS}/general-largeprint-plum-600.webp?v=2`,
+		img: `${ASSETS}/lp/v4/lp-vol2-600.webp`,
 	},
-	'general-largeprint-plum-hb': {
-		title: 'Large Print — Plum, Hardback',
-		retail: 12499,
-		img: `${ASSETS}/general-largeprint-plum-600.webp?v=2`,
+	'lp-vol2-hb': {
+		title: 'Large Print Vol. 2, Job–Malachi (Sage), Hardback',
+		retail: 11499,
+		img: `${ASSETS}/lp/v4/lp-vol2-600.webp`,
 	},
-	'general-largeprint-white-pb': {
-		title: 'Large Print — White, Paperback',
+	'lp-vol3-pb': {
+		title: 'Large Print Vol. 3, New Testament (Mist Blue), Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lp/v4/lp-vol3-600.webp`,
+	},
+	'lp-vol3-hb': {
+		title: 'Large Print Vol. 3, New Testament (Mist Blue), Hardback',
 		retail: 9999,
-		img: `${ASSETS}/general-largeprint-white-600.webp?v=2`,
+		img: `${ASSETS}/lp/v4/lp-vol3-600.webp`,
 	},
-	'general-largeprint-white-hb': {
-		title: 'Large Print — White, Hardback',
-		retail: 12499,
-		img: `${ASSETS}/general-largeprint-white-600.webp?v=2`,
+	// THE SET IS A NORMAL PRODUCT (Kevin 2026-09-16, dissolving D147). It carries its own
+	// price and the SAME ladder as everything else — no better-of rule, no stacking rule, no
+	// special case. The saving against buying the three volumes separately is simply the set
+	// price, and LP_SET_NEVER_COSTS_MORE below asserts that it is a saving.
+	'lp-set-pb': {
+		title: 'Large Print — Complete Three-Volume Set, Paperback',
+		retail: 24999,
+		img: `${ASSETS}/lp/v4/lp-set-600.webp`,
+		books: 1,
+	},
+	'lp-set-hb': {
+		title: 'Large Print — Complete Three-Volume Set, Hardback',
+		retail: 29999,
+		img: `${ASSETS}/lp/v4/lp-set-600.webp`,
+		books: 1,
 	},
 };
+
+// The SET MUST NEVER COST MORE than the same three volumes bought separately, in either
+// binding. Kevin's prices satisfy it today (299.99 < 329.97 HB, 249.99 < 279.97 PB), but a
+// later edit to one volume's price could silently invert it, and a "set" that costs more
+// than its parts is the kind of defect a buyer finds before we do. Checked at module load so
+// a bad price cannot reach a checkout session, and asserted directly by the unit test.
+export const setSavings = (binding: 'pb' | 'hb') => {
+	const parts = (['lp-vol1', 'lp-vol2', 'lp-vol3'] as const).reduce(
+		(s, v) => s + EDITIONS[`${v}-${binding}`].retail,
+		0,
+	);
+	return parts - EDITIONS[`lp-set-${binding}`].retail;
+};
+for (const binding of ['pb', 'hb'] as const) {
+	if (setSavings(binding) < 0) {
+		throw new Error(
+			`Large Print set (${binding}) costs more than its three volumes bought separately — ` +
+				'fix the prices in projects/fhb-print-bible/editions/ISBNS.json and here.',
+		);
+	}
+}
 
 // Volume ladder. 1–9 pays full price; the published tiers stop at 250 because anyone
 // buying 500+ negotiates directly, and publishing a 40% tier would permanently anchor the
@@ -170,7 +365,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		if (!Number.isFinite(n) || n < 0) return json({ error: 'invalid_selection' }, 400);
 		counts[slug] = n;
 	}
-	const total = Object.values(counts).reduce((s, n) => s + n, 0);
+	// THRESHOLDS COUNT PRODUCTS, one per SKU in the cart (Kevin 2026-09-17). A set is one
+	// product however many volumes are in the box, so four sets are four products — the
+	// same arithmetic as four of anything else.
+	const total = Object.entries(counts).reduce(
+		(s, [slug, n]) => s + n * (EDITIONS[slug].books ?? 1),
+		0,
+	);
 	const tier = tierFor(total);
 	// tierFor covers everything from 1 upward, so a null here means an empty order.
 	if (total < 1 || tier === null) return json({ error: 'empty' }, 400);

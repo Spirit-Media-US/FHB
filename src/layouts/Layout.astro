@@ -380,7 +380,23 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		</Footer>
 		<WelcomeTour />
 		<script>
-			// Scroll reveal observer
+			// Scroll reveal observer.
+			//
+			// THRESHOLD 0 — any intersecting pixel — because a RATIO cannot be satisfied by a
+			// tall element. The old 0.1 asked for 10% of the element on screen at once; the
+			// /print bulk form's wrapper is ~8,190px, so it needed 819px of viewport and stayed
+			// at `opacity: 0` FOREVER on any normal laptop. The whole form was invisible on a
+			// page that built green and logged no console error (Kevin found it, 2026-09-17).
+			//
+			// A clamped per-element threshold was tried first and FAILED IN THE BROWSER: the
+			// height has to be read when the observer is wired up, which is before images have
+			// laid out, so a section that measures short at parse time gets the full 0.1 and
+			// then grows past what the viewport can ever deliver. Any fix that depends on a
+			// height measured at script time has this bug. Threshold 0 needs no measurement.
+			//
+			// What changes elsewhere: a short element now reveals as its first pixel clears the
+			// -40px bottom margin instead of its first 10%, which is a few pixels of scroll
+			// earlier. Nothing else on the site depended on the ratio.
 			const observer = new IntersectionObserver((entries) => {
 				entries.forEach((entry) => {
 					if (entry.isIntersecting) {
@@ -388,7 +404,7 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 						observer.unobserve(entry.target);
 					}
 				});
-			}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+			}, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
 
 			document.querySelectorAll('[data-reveal], [data-stagger], [data-grow-line]').forEach((el) => observer.observe(el));
 

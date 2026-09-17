@@ -1,6 +1,7 @@
 ---
 import LookInside from '../../components/LookInside.astro';
 import Section from '../../components/Section.astro';
+import { cardUrl } from '../../data/card-art';
 import frontmatter from '../../data/editions/frontmatter.json';
 import shared from '../../data/editions/shared.json';
 // /bibles/<slug>-bible — the PRODUCT page for every Divine Voice Color edition.
@@ -95,16 +96,16 @@ const fm = (frontmatter as Record<string, { pages?: number; pillars?: Pillar[] }
 ];
 type Pillar = { title: string; line: string; verses: [string, string][] };
 const pillars: Pillar[] = fm?.pillars ?? [];
-// ?v= because the General Audience covers were replaced in place at the same R2
-// keys after the first upload was rendered in the wrong style; without it the edge
-// keeps serving the withdrawn 3-D mock-up. Keep in step with CARD_V in print.astro.
-const coverUrl = `${ASSETS}/${ed.coverImage ?? `dvc-${ed.slug}`}-1200.webp${ed.coverImage ? '?v=2' : ''}`;
-const pages = ed.pages ?? fm?.pages ?? 876;
+// cardUrl decides the location: a card re-rendered to a NEW key resolves there, and one
+// that has not been re-rendered (journaling's 8x10, D166) keeps the key it has. The old
+// `?v=` is gone with it — a new key has nothing cached against it to bust.
+const coverUrl = cardUrl(ed.coverImage ?? `dvc-${ed.slug}`, 1200);
+const pages = ed.pages ?? fm?.pages ?? 888;
 const trim = ed.trim ?? '6 x 9 in';
 // Sourced per edition from the metadata sheet; the fallback matches what those
 // sheets say. It previously read "with dust jacket", which no sheet supports —
 // the journaling sheet says outright "No dust jacket: not offered at 8 x 10".
-const binding = ed.binding ?? 'Hardcover, case laminate';
+const binding = ed.binding ?? 'Paperback or Hardback';
 
 // "Intimacy for Teens" -> "for Teens". The pillar titles are uniform across the interiors,
 // so the audience phrase the printed book uses is the one the page uses too — no second

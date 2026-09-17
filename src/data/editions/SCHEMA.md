@@ -15,7 +15,7 @@ it, never retype it.
                                          // /print subtitle, refine for the page
   "isbn": "979-8-89307-…",
   "price": 99.99,
-  "pages": 876,                          // 788 for the journaling edition
+  "pages": 888,                          // 848 for the 8x10 journaling edition
   "published": "September 2026",         // display; ISO is derived
   "trim": "6 x 9 in",                    // optional — 8 x 10 in for journaling
   "binding": "Hardcover, case laminate with dust jacket",   // optional
@@ -58,12 +58,12 @@ Do not write these into a per-edition file — the template supplies them for al
 ## Rules
 
 - **Facts are shared; audience is not.** All sixteen editions are the identical translation and
-  the identical 876 pages (the journaling edition is 788pp at 8×10). Only the cover, the opening
+  the identical 888 pages (the journaling edition is 848pp at 8×10). Only the cover, the opening
   audience page and the three pillar pages differ — verified by diffing the interiors. Never write
   that an edition has its own notes, summaries or prayers. Write instead about who it was made for.
-- Shared numbers, correct: 66 books · 1,189 chapters · 31,085 verses · 1,354 study notes across
+- Shared numbers, correct: 66 books · 1,189 chapters · 31,085 verses · 1,355 study notes across
   777 chapters (1,075 background, 248 revealing the Father, 31 manuscript) · 170 translation rules
-  · our Father 125,457 words across 5,623 verses · the Son 39,936 · more than one word in four.
+  · our Father 128,579 words across 5,615 verses · the Son 35,725 · more than one word in four.
 - **Scripture is quoted from FHB only, never another translation**, and never invented.
 - Reading is free in 25 languages; **listening is English and Telugu only** — do not widen it.
 - American spelling. Never call our Father "God" where "our Father" is meant, but "God" is right
