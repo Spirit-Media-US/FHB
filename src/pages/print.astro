@@ -44,11 +44,18 @@ const DVC_TAIL2 =
 //     in `hardcover_case_laminate`, the delivered cover is ...-CASE-888pp.pdf, and the
 //     journaling sheet states "No dust jacket: not offered at 8 x 10". Jacket PDFs exist
 //     but carry no ISBN and no delivery record — they are not what ships.
-// Both bindings now, so the spec names the TRIM and what the hardback is, and the buy
-// buttons name the binding. It used to read "Hardback", which became untrue the moment
-// the paperback went on sale beside it.
-const SPEC_TARGETED = '6×9 · Hardback (case laminate) or Paperback';
-const SPEC_JOURNALING = '8×10 · Wide Margin · Hardback or Paperback';
+// ONE BINDING PER SPEC, because one spec is printed on one ROW and a row is one binding
+// (Kevin 2026-09-17: "HB needs to list HB and PB needs to list PB. No HB or PB on the same
+// line"). A single constant naming both bindings put "Hardback ... or Paperback" on the
+// hardback row, which reads as indecision about what is being bought.
+//
+// "(case laminate)" IS OFF THE STOREFRONT. It is Ingram's vocabulary — it stays in the
+// metadata sheets and the ISBN records, where it is a required fact, and never appears in
+// front of a buyer. Matches the Large Print rows, which already read "6×9 Large Print
+// Hardback".
+const specTargeted = (b: 'hb' | 'pb') => `6×9 ${b === 'hb' ? 'Hardback' : 'Paperback'}`;
+const specJournaling = (b: 'hb' | 'pb') =>
+	`8×10 Wide Margin ${b === 'hb' ? 'Hardback' : 'Paperback'}`;
 
 const dvcEditions = [
 	{
@@ -57,7 +64,7 @@ const dvcEditions = [
 		sub: 'For the Fatherless, Foster Youth, Adoptive and Foster Families, Youth Aging Out of Care, and Anyone Raised Without a Father',
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'couples',
@@ -65,7 +72,7 @@ const dvcEditions = [
 		sub: 'For Married Couples, Engaged Couples, Newlyweds, Dating Couples, Domestic Partners, Gift for Couples and Anniversary Gifts',
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'dads',
@@ -73,7 +80,7 @@ const dvcEditions = [
 		sub: "For Dads, Fathers, New Dads, Stepdads, Granddads, Gift for Dads and Father's Day Gifts",
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'first-responders',
@@ -81,7 +88,7 @@ const dvcEditions = [
 		sub: 'For Police Officers, Firefighters, EMTs, Paramedics, Dispatchers, Nurses, and Search and Rescue',
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'mens',
@@ -89,7 +96,7 @@ const dvcEditions = [
 		sub: "He Hears His Father's Voice - For Men, Husbands, Fathers, and Young Men",
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'moms',
@@ -97,7 +104,7 @@ const dvcEditions = [
 		sub: "For Moms, Mothers, New Moms, Stepmoms, Grandmothers, Gift for Moms and Mother's Day Gifts",
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'pastors',
@@ -105,7 +112,7 @@ const dvcEditions = [
 		sub: 'For Pastors, Preachers, Ministers, Elders, Deacons, Chaplains, and Church Leaders',
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'peace',
@@ -113,7 +120,7 @@ const dvcEditions = [
 		sub: 'For Overcoming Anxiety, Depression, PTSD, Panic, Stress, Trauma, and Worry',
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'presidents',
@@ -121,7 +128,7 @@ const dvcEditions = [
 		sub: 'For Presidents, CEOs, Executives, Public Servants, Officers, and Leaders',
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'recovery',
@@ -129,7 +136,7 @@ const dvcEditions = [
 		sub: 'For Overcoming Addiction, Recovery, Sobriety, Freedom, 12 Step Programs, and Families',
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'seekers',
@@ -137,7 +144,7 @@ const dvcEditions = [
 		sub: 'For Seekers, Skeptics, and Anyone Exploring the Christian Faith for the First Time',
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'seventeen',
@@ -145,7 +152,7 @@ const dvcEditions = [
 		sub: 'For Seventeen-Year-Olds, Teens and Young Adults, 17th Birthday, Gift for Teens, Confirmation and Graduation Gifts',
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'soldiers',
@@ -153,7 +160,7 @@ const dvcEditions = [
 		sub: 'For all Soldiers, Army, Marine Corps, Navy, Air Force, Space Force, Coast Guard, and Veterans',
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'teen',
@@ -161,7 +168,7 @@ const dvcEditions = [
 		sub: 'For Teens, Teenagers, Ages 13-19, Middle School, Junior High, High School, Junior College, Youth Group, Gift for Teens, Confirmation and Graduation Gifts',
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'worship-leaders',
@@ -169,7 +176,7 @@ const dvcEditions = [
 		sub: 'For Worship Leaders, Praise Teams, Worship Pastors, Musicians, Singers, and Choir Directors',
 		hb: 99.99,
 		pb: 79.99,
-		spec: SPEC_TARGETED,
+		spec: specTargeted,
 	},
 	{
 		slug: 'journaling',
@@ -177,7 +184,7 @@ const dvcEditions = [
 		sub: 'For Women \u00b7 Wide Margin \u00b7 Note-Taking \u00b7 8x10 Journaling Edition',
 		hb: 124.99,
 		pb: 114.99,
-		spec: SPEC_JOURNALING,
+		spec: specJournaling,
 	},
 ];
 
@@ -340,7 +347,7 @@ const lpSetHb = 299.99;
 const lpTotalPages = lpVolumes.reduce((s, v) => s + v.pages, 0);
 const lpSkus = [
 	...lpVolumes.flatMap((v) =>
-		(['pb', 'hb'] as const).map((b) => ({
+		(['hb', 'pb'] as const).map((b) => ({
 			key: `${v.key}-${b}`,
 			title: `Large Print Vol. ${v.vol}, ${v.range} (${v.color})`,
 			// Format only, like every other listing (Kevin 2026-09-17: "No other listings show
@@ -354,10 +361,12 @@ const lpSkus = [
 			books: 1,
 		})),
 	),
-	...(['pb', 'hb'] as const).map((b) => ({
+	...(['hb', 'pb'] as const).map((b) => ({
 		key: `lp-set-${b}`,
 		title: 'Large Print — Complete Three-Volume Set',
-		spec: `All three volumes · ${b === 'pb' ? 'Paperback' : 'Hardback'}`,
+		// The title already says "Complete Three-Volume Set" — repeating "all three volumes"
+		// here said the same thing twice on one row (Kevin 2026-09-17).
+		spec: b === 'hb' ? 'Hardback' : 'Paperback',
 		price: b === 'pb' ? lpSetPb : lpSetHb,
 		// The set carries no ISBN of its own: Kevin assigned numbers per volume, and it is
 		// billed as the three volume SKUs together. Do not invent one.
@@ -371,7 +380,7 @@ const lpSkus = [
 // in the checkout function. Key shape: general-<line>-<colour>-<binding>.
 const generalSkus = generalLines.flatMap((l) =>
 	generalColors.flatMap((c) =>
-		(['pb', 'hb'] as const).map((b) => ({
+		(['hb', 'pb'] as const).map((b) => ({
 			key: `general-${l.line}-${c.key}-${b}`,
 			line: l.line,
 			lineLabel: l.label,
@@ -452,7 +461,7 @@ const printFaq = [
 	},
 	{
 		q: 'What’s included in each edition?',
-		a: `The complete Bible in Divine Voice Color with full color throughout — 888 pages at 6×9; in Large Print the same complete text runs to 2,956 pages and comes as a three-volume set. Every edition comes in both hardback (6×9 case laminate) and paperback. A presentation page for the reader's name. Opening pages on intimacy, identity, inheritance and hearing His voice. An introduction to every one of the 66 books, and a Father's note closing each one with a short prayer. 1,354 study notes across 777 chapters — 1,075 explaining a word, name, custom or background, 248 marking where the text reveals the Father, and 31 recording a difference among the manuscripts.`,
+		a: `The complete Bible in Divine Voice Color with full color throughout — 888 pages at 6×9; in Large Print the same complete text runs to 2,956 pages and comes as a three-volume set. Every edition comes in both hardback and paperback. A presentation page for the reader's name. Opening pages on intimacy, identity, inheritance and hearing His voice. An introduction to every one of the 66 books, and a Father's note closing each one with a short prayer. 1,354 study notes across 777 chapters — 1,075 explaining a word, name, custom or background, 248 marking where the text reveals the Father, and 31 recording a difference among the manuscripts.`,
 	},
 	{
 		q: 'Which languages can I read it in?',
@@ -783,7 +792,7 @@ function markVoices(v: {
 								/>
 							</div>
 							<div class="flex flex-col gap-2 w-full mt-auto">
-								{(['pb', 'hb'] as const).map((b) => (
+								{(['hb', 'pb'] as const).map((b) => (
 									<button
 										type="button"
 										data-add={`general-${l.line}-${c.key}-${b}`}
@@ -839,7 +848,7 @@ function markVoices(v: {
 							/>
 						</div>
 						<div class="flex flex-col gap-2 w-full mt-auto">
-							{(['pb', 'hb'] as const).map((b) => (
+							{(['hb', 'pb'] as const).map((b) => (
 								<button
 									type="button"
 									data-add={v.comingSoon ? undefined : `${v.key}-${b}`}
@@ -877,7 +886,7 @@ function markVoices(v: {
 				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.35rem;">The complete set — all three volumes</h3>
 				<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin: 0 0 1rem;">Genesis–Esther, Job–Malachi and the New Testament · all 66 books</p>
 				<div class="flex flex-col sm:flex-row gap-3 justify-center">
-					{(['pb', 'hb'] as const).map((b) => (
+					{(['hb', 'pb'] as const).map((b) => (
 						<button
 							type="button"
 							data-add={`lp-set-${b}`}
@@ -966,7 +975,7 @@ function markVoices(v: {
 							(['hb', 'pb'] as const).map((b) => (
 								<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
 									<img src={cardUrl(`dvc-${e.slug}`)} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-									<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.title}</span> <span style="white-space: nowrap; font-weight: 600;">${(b === 'hb' ? e.hb : e.pb).toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{b === 'hb' ? 'Hardback' : 'Paperback'} · {e.spec}</span></span>
+									<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.title}</span> <span style="white-space: nowrap; font-weight: 600;">${(b === 'hb' ? e.hb : e.pb).toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">· {e.spec(b)}</span></span>
 									<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
 										<button type="button" class="qty-step" data-slug={`${e.slug}-${b}`} data-dir="-1" aria-label={`Fewer ${e.title} ${b === 'hb' ? 'Hardback' : 'Paperback'}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: #fff; color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
 										<input type="number" class="qty-in" data-slug={`${e.slug}-${b}`} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.title} ${b === 'hb' ? 'Hardback' : 'Paperback'} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />

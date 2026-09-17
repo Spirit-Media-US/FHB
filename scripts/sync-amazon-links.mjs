@@ -50,10 +50,26 @@ const SLUGS = [
 // is deliberately no fhb-lp-vol3 to join to, and the page keeps its unlinked state.
 const LP_KEYS = { 'lp-vol1': 'fhb-lp-vol1', 'lp-vol2': 'fhb-lp-vol2' };
 
+// The General Audience colours are their own bookstore documents too (created 2026-09-17,
+// ASINs from D164 and each verified by reading the listing TITLE back — D184). Their page
+// keys are the SKU colour keys print.astro already uses.
+const GENERAL_KEYS = {
+	'general-regular-charcoal': 'fhb-general-charcoal',
+	'general-regular-plum': 'fhb-general-plum',
+	'general-regular-white': 'fhb-general-white',
+};
+
+// A listing's primary URL, DERIVED rather than stored twice. Some documents carry only
+// per-binding links because only one binding is listed; storing a separate `amazon` copy of
+// one of them is a second master that can drift from the first. Hardback leads, matching the
+// order the storefront and the ISBN records use.
+const primary = (doc) => doc?.amazon ?? doc?.formats?.hardback ?? doc?.formats?.paperback ?? null;
+
 const docs = await client.fetch(`*[_type == "book" && _id in $ids]{_id, amazon, formats}`, {
 	ids: [
 		...SLUGS.map((s) => `fhb-edition-${s}`),
 		...Object.values(LP_KEYS),
+		...Object.values(GENERAL_KEYS),
 		'fhb-ebook-intimate-translation',
 	],
 });
@@ -65,23 +81,23 @@ for (const slug of SLUGS) {
 	const doc = byId[`fhb-edition-${slug}`];
 	// `amazon` is the edition's primary listing; `formats` carries the per-binding ASINs. Both
 	// are copied so the page can offer the binding a buyer is actually looking at.
-	if (!doc?.amazon) {
+	if (!primary(doc)) {
 		missing.push(slug);
 		continue;
 	}
-	out[slug] = { url: doc.amazon, formats: doc.formats ?? {} };
+	out[slug] = { url: primary(doc), formats: doc.formats ?? {} };
 }
-for (const [key, id] of Object.entries(LP_KEYS)) {
+for (const [key, id] of Object.entries({ ...LP_KEYS, ...GENERAL_KEYS })) {
 	const doc = byId[id];
-	if (!doc?.amazon) {
+	if (!primary(doc)) {
 		missing.push(key);
 		continue;
 	}
-	out[key] = { url: doc.amazon, formats: doc.formats ?? {} };
+	out[key] = { url: primary(doc), formats: doc.formats ?? {} };
 }
 
 const ebook = byId['fhb-ebook-intimate-translation'];
-if (ebook?.amazon) out.ebook = { url: ebook.amazon, formats: ebook.formats ?? {} };
+if (primary(ebook)) out.ebook = { url: primary(ebook), formats: ebook.formats ?? {} };
 
 writeFileSync(
 	new URL('../src/data/amazon-links.json', import.meta.url),
