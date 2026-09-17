@@ -380,17 +380,47 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		</Footer>
 		<WelcomeTour />
 		<script>
-			// Scroll reveal observer
-			const observer = new IntersectionObserver((entries) => {
-				entries.forEach((entry) => {
-					if (entry.isIntersecting) {
-						entry.target.classList.add('revealed');
-						observer.unobserve(entry.target);
-					}
-				});
-			}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
-			document.querySelectorAll('[data-reveal], [data-stagger], [data-grow-line]').forEach((el) => observer.observe(el));
+			// Scroll reveal observer.
+			//
+			// A FIXED THRESHOLD OF 0.1 IS UNREACHABLE FOR A TALL SECTION, and an element that
+			// never intersects keeps `opacity: 0` forever. The /print bulk order form sits in a
+			// 7,862px wrapper: 10% of it is 786px of viewport, more than a laptop has, so the
+			// observer never fired and the whole form was INVISIBLE on a page that built green
+			// and logged no error (Kevin found it, 2026-09-17). The ratio a viewport can ever
+			// deliver is capped at viewportHeight / elementHeight — ask for more than that and
+			// the reveal is not "late", it is impossible.
+			//
+			// So the threshold is CLAMPED PER ELEMENT to something the viewport can actually
+			// produce. Everything that fits comfortably keeps the original 0.1 and animates
+			// exactly as before; only the elements that could never reach it are changed.
+			const revealed = (entry, obs) => {
+				if (entry.isIntersecting) {
+					entry.target.classList.add('revealed');
+					obs.unobserve(entry.target);
+				}
+			};
+			// One observer per distinct threshold — threshold is a property of the observer,
+			// not of the element — kept in a cache so tall sections do not each make their own.
+			const revealObservers = new Map();
+			const observerFor = (threshold) => {
+				const key = threshold.toFixed(3);
+				let obs = revealObservers.get(key);
+				if (!obs) {
+					obs = new IntersectionObserver(
+						(entries) => entries.forEach((e) => revealed(e, obs)),
+						{ threshold, rootMargin: '0px 0px -40px 0px' },
+					);
+					revealObservers.set(key, obs);
+				}
+				return obs;
+			};
+			document.querySelectorAll('[data-reveal], [data-stagger], [data-grow-line]').forEach((el) => {
+				const h = (el as HTMLElement).offsetHeight;
+				// 0.8 of the viewport, not the whole of it: the -40px bottom margin and any
+				// sticky chrome eat into what actually counts as intersecting.
+				const reachable = h > 0 ? (window.innerHeight * 0.8) / h : 1;
+				observerFor(Math.max(0, Math.min(0.1, reachable))).observe(el);
+			});
 
 			// Counter animation
 			const counterObserver = new IntersectionObserver((entries) => {

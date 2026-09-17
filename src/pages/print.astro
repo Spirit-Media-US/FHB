@@ -242,7 +242,11 @@ const RETAIL_8 = '$124.99';
 // the LP spine should show true thickness, Kevin chose the house look exactly — the card
 // sells the cover, the listing sells the book, so a 680pp and a 1,142pp volume get the same
 // board edge. New prefix again per D165: v2 is untouched and this reverts by path alone.
-const LP_CARDS = 'https://assets.spiritmediapublishing.com/FHB/print/lp/v3';
+// v4 (2026-09-17): v3 composited the book onto OPAQUE WHITE and saved RGB, so every LP
+// card carried a white square where the sixteen house cards let the tile's warm grey show
+// through — Kevin saw it as "white background instead of gray". v4 is the same render on a
+// TRANSPARENT frame, saved RGBA. Verified by the corner pixel's alpha, not by eye.
+const LP_CARDS = 'https://assets.spiritmediapublishing.com/FHB/print/lp/v4';
 const GENERAL_TAIL = 'Full Color Throughout · 6×9 Paperback or Hardback';
 const LP_TAIL = 'Large Print · Full Color Throughout · 6×9 Paperback or Hardback';
 const generalColors = [
@@ -677,33 +681,41 @@ function markVoices(v: {
 								{builtPages.has(`${e.slug}-bible`) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 								<LookInside slug={e.slug} title={e.title} variant="link" label="Look inside" />
 							</div>
-							{amazonLinks[e.slug] ? (
-								<a
-									href={amazonLinks[e.slug].url}
-									target="_blank"
-									rel="noopener"
-									class="inline-flex items-center justify-center rounded-full font-semibold"
-									style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.55rem 1rem; font-size: 0.8rem; text-decoration: none;"
-								>Amazon →</a>
-							) : (
+							{/* ONE AMAZON LINK PER BINDING, each carrying its own price (Kevin
+							     2026-09-17: "1 link to HB on Amazon showing price and 1 link to PB on
+							     Amazon showing price. Not 3 buttons."). The single `url` field is not
+							     used here — it points at whichever binding was listed first, so it
+							     would send a paperback shopper to the hardback.
+							     A binding with NO listing renders nothing at all rather than a
+							     disabled pill: four editions are genuinely unlisted in one binding,
+							     and a link is never invented to fill the gap (D184). */}
+							{(['hb', 'pb'] as const).map((b) => {
+								const href = amazonLinks[e.slug]?.formats?.[b === 'hb' ? 'hardback' : 'paperback'];
+								return href ? (
+									<a
+										href={href}
+										target="_blank"
+										rel="noopener"
+										class="inline-flex items-center justify-center rounded-full font-semibold"
+										style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.55rem 1rem; font-size: 0.8rem; text-decoration: none;"
+									>Amazon · {b === 'hb' ? 'Hardback' : 'Paperback'} ${(b === 'hb' ? e.hb : e.pb).toFixed(2)}</a>
+								) : null;
+							})}
+							{!amazonLinks[e.slug]?.formats?.hardback && !amazonLinks[e.slug]?.formats?.paperback && (
 								<span
 									aria-disabled="true"
 									class="inline-flex items-center justify-center rounded-full font-semibold"
 									style="font-family: var(--font-sans); background: #f2efec; color: #9a938c; border: 1.5px solid var(--color-hairline); padding: 0.55rem 1rem; font-size: 0.8rem; cursor: default;"
 								>Amazon — coming soon</span>
 							)}
-							{/* BOTH BINDINGS, one button each — the same shape the Large Print volumes
-							     use, deliberately not a second pattern. Kevin 2026-09-17: "now all our
-							     editions come in HB and PB." Hardback first: the ISBN master lists
-							     hardcover then paperback, most durable binding first. */}
-							{(['hb', 'pb'] as const).map((b) => (
-								<button
-									type="button"
-									data-add={`${e.slug}-${b}`}
-									class="inline-flex items-center justify-center rounded-full font-semibold"
-									style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.55rem 1rem; font-size: 0.8rem; cursor: pointer;"
-								>{b === 'hb' ? 'Hardback' : 'Paperback'} · ${(b === 'hb' ? e.hb : e.pb).toFixed(2)}</button>
-							))}
+							{/* Direct is a LINK, not a third and fourth button (Kevin 2026-09-17). It
+							     goes to the bulk form, which is where both bindings are actually
+							     chosen and where the free shipping and the volume ladder apply — so
+							     the card stays two Amazon buttons plus one line of text. */}
+							<a
+								href="#bulk-order"
+								style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 3px; text-align: center; padding: 0.15rem 0;"
+							>Buy Direct &amp; Save + Free Shipping</a>
 						</div>
 					</div>
 				))}
@@ -872,8 +884,12 @@ function markVoices(v: {
 							class="inline-flex items-center justify-center gap-2 rounded-full font-semibold"
 							style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.6rem 1.15rem; font-size: 0.85rem; cursor: pointer;"
 						>
-							<span>{b === 'pb' ? 'Paperback set' : 'Hardback set'} · ${(b === 'pb' ? lpSetPb : lpSetHb).toFixed(2)}</span>
+							{/* LIST PRICE STRUCK ON THE LEFT, THE SET PRICE ON THE RIGHT (Kevin
+							     2026-09-17). The list figure is SUMMED from the three volume prices
+							     above — never typed — so it cannot drift from what the volumes cost. */}
+							<span>{b === 'pb' ? 'Paperback set' : 'Hardback set'}</span>
 							<span style="color: #71717a; font-weight: 600; text-decoration: line-through;">${(b === 'pb' ? lpListPb : lpListHb).toFixed(2)}</span>
+							<span>${(b === 'pb' ? lpSetPb : lpSetHb).toFixed(2)}</span>
 						</button>
 					))}
 				</div>
@@ -913,7 +929,8 @@ function markVoices(v: {
 
 		<!-- ═══════════════ BULK ORDERS ═══════════════ -->
 		<Section variant="soft">
-			<div class="max-w-5xl mx-auto">
+			{/* The anchor every card's "Buy Direct & Save + Free Shipping" link points at. */}
+			<div class="max-w-5xl mx-auto" id="bulk-order" style="scroll-margin-top: 90px;">
 				<div class="text-center mb-8">
 					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Bulk Order Discounts</p>
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Order in Bulk and Save</h2>
