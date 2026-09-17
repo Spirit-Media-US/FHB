@@ -273,6 +273,13 @@ const lpVolumes = [
 		pb: 79.99,
 		hb: 99.99,
 		isbn: { pb: '979-8-89307-341-6', hb: '979-8-89307-344-7' },
+		// D164 (Kevin 2026-09-17): "New vol 3 of 3 listing will show soon. Leave button
+		// inactive." Vol 3 keeps its place in the line — the set reads as complete and only
+		// the buy control is unavailable — until its listing is live. Ingram rejected this
+		// volume's paperback for spine type safety (D134, ISBN 9798893073416), so this is a
+		// FULFILMENT state, not a display preference: the button must not take money for a
+		// book that cannot be printed today. Delete this flag when the listing appears.
+		comingSoon: true,
 	},
 ];
 // THE STRUCK-THROUGH LIST PRICE IS COMPUTED, NEVER TYPED. It is the sum of the three volume
@@ -762,11 +769,20 @@ function markVoices(v: {
 							{(['pb', 'hb'] as const).map((b) => (
 								<button
 									type="button"
-									data-add={`${v.key}-${b}`}
+									data-add={v.comingSoon ? undefined : `${v.key}-${b}`}
+									disabled={v.comingSoon}
+									aria-disabled={v.comingSoon ? 'true' : undefined}
 									class="inline-flex items-center justify-center rounded-full font-semibold"
-									style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.55rem 1rem; font-size: 0.8rem; cursor: pointer;"
+									style={
+										v.comingSoon
+											? 'font-family: var(--font-sans); background: #f4f4f5; color: #9a9aa2; border: 1.5px solid #d8d8dd; padding: 0.55rem 1rem; font-size: 0.8rem; cursor: not-allowed;'
+											: 'font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.55rem 1rem; font-size: 0.8rem; cursor: pointer;'
+									}
 								>{b === 'pb' ? 'Paperback' : 'Hardback'} · ${(b === 'pb' ? v.pb : v.hb).toFixed(2)}</button>
 							))}
+							{v.comingSoon && (
+								<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.78rem; margin: 0.15rem 0 0;">Listing coming soon</p>
+							)}
 						</div>
 					</div>
 				))}
