@@ -328,12 +328,14 @@ const lpVolumes = [
 		pb: 79.99,
 		hb: 99.99,
 		isbn: { pb: '979-8-89307-341-6', hb: '979-8-89307-344-7' },
-		// D164 (Kevin 2026-09-17): "New vol 3 of 3 listing will show soon. Leave button
-		// inactive." Vol 3 keeps its place in the line — the set reads as complete and only
-		// the buy control is unavailable — until its listing is live. Ingram rejected this
-		// volume's paperback for spine type safety (D134, ISBN 9798893073416), so this is a
-		// FULFILMENT state, not a display preference: the button must not take money for a
-		// book that cannot be printed today. Delete this flag when the listing appears.
+		// AMAZON ONLY — this flag no longer touches the DIRECT route (Kevin 2026-09-17,
+		// SUPERSEDING D164's "leave button inactive": "we sell ALL editions. The form should
+		// sell ALL editions now. All will show on Amazon soon."). Vol 3 is purchasable direct
+		// like every other SKU. What stays faded is its two AMAZON buttons — there is still no
+		// listing to send a buyer to, which was D164's actual point.
+		// The flag is what FORCES those placeholders: without it, an lp-vol3 entry appearing in
+		// amazon-links.json would activate the buttons before anyone had checked the listing.
+		// Delete it once the listing is verified live, reading the title back (D184).
 		comingSoon: true,
 	},
 ];
@@ -678,9 +680,21 @@ function markVoices(v: {
 				{dvcEditions.map((e) => (
 					/* The journaling edition gets a heavier frame (Kevin 2026-09-17, "make the frame
 					   around the card little thicker so set it apart"). It is the only 8×10 in a line
-					   of 6×9s — the frame is making that point, not decorating. */
+					   of 6×9s — the frame is making that point, not decorating.
+
+					   AND ITS SPACING IS COMPENSATED, not just its frame (Kevin 2026-09-17: "make
+					   the card balance space like the rest of the cards"). A 3px border instead
+					   of 1px takes 4px off the content box, so the journaling card was laying its
+					   contents out 4px narrower than its neighbours — the visible imbalance, and
+					   what wrapped its direct link. Subtracting those 2px per side from the
+					   padding gives it the SAME inner width as every other card while keeping the
+					   heavier frame Kevin asked for. */
 					<div
-						class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5"
+						class={`flex flex-col items-center text-center rounded-2xl ${
+							e.slug === 'journaling'
+								? 'p-[calc(1rem-2px)] md:p-[calc(1.25rem-2px)]'
+								: 'p-4 md:p-5'
+						}`}
 						style={`background: var(--color-soft, #faf6f2); border: ${e.slug === 'journaling' ? '3px solid var(--color-primary, #b60057)' : '1px solid var(--color-hairline)'};`}
 					>
 						<img
@@ -707,6 +721,7 @@ function markVoices(v: {
 								pbHref={amazonLinks[e.slug]?.formats?.paperback}
 								hbPrice={e.hb}
 								pbPrice={e.pb}
+								tightDirect={e.slug === 'journaling'}
 							/>
 						</div>
 					</div>
@@ -729,13 +744,18 @@ function markVoices(v: {
 					<VoiceChips class="mt-5 mb-0" />
 				</div>
 
-				{/* The page's previous hero, reused here rather than retired: it shows the generic
-				    cover in exactly these three colours, which is what this block sells. */}
+				{/* NEW PHOTO, Kevin 2026-09-17 — a NEW R2 KEY (…-v2), never an overwrite, so the
+				    old image is untouched and this reverts by path (D165).
+				    ALT REWRITTEN WITH IT: the previous alt described the retired picture (three
+				    general colours) and would have been a lie about this one. This photo shows
+				    eight people holding EIGHT TARGETED editions — I read the covers off the
+				    image rather than trusting the filename. Flagged to jonah: the covers shown
+				    are targeted editions while this block sells the three general colours. */}
 				{l.line === 'regular' && (
 					<img
-						src="https://assets.spiritmediapublishing.com/FHB/print/print-hero-group.webp"
-						alt="Eight friends holding the Father's Heart Bible (FHB) in charcoal, plum and white"
-						width="1536" height="1024" loading="lazy" decoding="async"
+						src="https://assets.spiritmediapublishing.com/FHB/print/print-hero-group-v2.webp"
+						alt="Eight friends by a mountain lake, each holding a Father's Heart Bible (FHB) edition — Chosen, Couple's, Men's, Mom's, Seeker's, Dad's, First Responder's and Peace"
+						width="2048" height="1152" loading="lazy" decoding="async"
 						class="block w-full h-auto mx-auto mb-10 rounded-2xl"
 						style="max-width: 56rem;"
 					/>
@@ -1021,7 +1041,11 @@ function markVoices(v: {
 							<span style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem;"><span data-count>0</span> copies · <span data-save style="color: #3f3f46; font-weight: 700;">—</span> · free shipping</span>
 							<div data-total-out style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700;">$0.00</div>
 						</div>
-						<button type="button" data-checkout class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 2px solid var(--color-primary, #b60057); padding: 0.8rem 1.8rem; cursor: pointer; font-size: 1rem;">Checkout →</button>
+						{/* THE ONE BUTTON THAT IS NOT LIGHT PINK (Kevin 2026-09-17, ruling B1). Every
+						     other control on the page went light pink; this one completes a
+						     purchase, and it must not read as one more button among many. Solid
+						     brand pink with white type — the page's strongest control, deliberately. */}
+						<button type="button" data-checkout class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; border: 2px solid var(--color-primary, #b60057); padding: 0.8rem 1.8rem; cursor: pointer; font-size: 1rem;">Checkout →</button>
 					</div>
 					<p data-bulk-msg style="font-family: var(--font-sans); font-size: 0.85rem; color: var(--color-muted); margin: 0.75rem 0 0; display: none;"></p>
 				</div>
@@ -1050,6 +1074,13 @@ function markVoices(v: {
 					<div class="flex flex-col text-center rounded-2xl p-7" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
 						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.4rem;">Audiobook</h3>
 						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.5; margin: 0 0 1.25rem; flex: 1;">The whole Bible, narrated — all 66 books, chapter by chapter, offline in your favorite audiobook app.</p>
+						{/* 🔒 THE ONE DELIBERATE "COMING SOON" ON THIS PAGE — LEAVE IT (Kevin
+						     2026-09-17, ruling C1). Every buy button elsewhere dropped the phrase
+						     because it spilled the label and said nothing a price did not say
+						     better. This control is different: the audiobook has no price and no
+						     listing, so those two words are the only information it carries.
+						     Blanking it to satisfy a literal "zero occurrences of coming soon"
+						     check would leave an empty button. Do not "fix" this later. */}
 						<div class="flex flex-col gap-2 w-full mx-auto" style="max-width: 15rem;">
 							<span class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #f3f3f3; color: var(--color-muted); border: 1.5px solid var(--color-hairline); padding: 0.75rem 1.4rem; font-size: 0.92rem; cursor: default;">Coming soon</span>
 						</div>

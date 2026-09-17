@@ -37,6 +37,13 @@ interface Props {
 	directHref?: string;
 	/** Suppress the direct link where buying direct is not offered yet. */
 	showDirect?: boolean;
+	/**
+	 * Shrink the direct link so it holds ONE line in a narrower content box (Kevin
+	 * 2026-09-17: "make this fit on one line ... even if it has to be little smaller").
+	 * Only the journaling card needs it: its 3px frame takes 4px off the inner width,
+	 * which is exactly enough to wrap "Buy Direct & Save + Free Shipping".
+	 */
+	tightDirect?: boolean;
 }
 const {
 	hbHref,
@@ -45,6 +52,7 @@ const {
 	pbPrice,
 	directHref = '#bulk-order',
 	showDirect = true,
+	tightDirect = false,
 } = Astro.props;
 
 const AMAZON_LOGO = 'https://assets.spiritmediapublishing.com/FHB/print/amazon-logo.webp';
@@ -102,7 +110,7 @@ const bindings = [
 }
 {
 	showDirect && (
-		<a href={directHref} class="buy-direct">
+		<a href={directHref} class={tightDirect ? 'buy-direct buy-direct-tight' : 'buy-direct'}>
 			Buy Direct &amp; Save + Free Shipping
 		</a>
 	)
@@ -160,5 +168,18 @@ const bindings = [
 		text-underline-offset: 3px;
 		text-align: center;
 		padding: 0.15rem 0;
+	}
+	/* One line, always, on the card that asked for it. white-space: nowrap is safe HERE and
+	   was not safe on .buy-btn: this link is plain text with no 52px logo beside it, so at
+	   0.72rem it measures inside even the journaling card's narrowed box. The size step is
+	   the fallback that keeps it true if the type scale ever changes. */
+	.buy-direct-tight {
+		font-size: 0.72rem;
+		white-space: nowrap;
+	}
+	@media (max-width: 400px) {
+		.buy-direct-tight {
+			font-size: 0.68rem;
+		}
 	}
 </style>
