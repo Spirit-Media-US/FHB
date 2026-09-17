@@ -39,12 +39,19 @@ const { slug, title, variant = 'button', size = 'md', label = 'Look inside' } = 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print/lookinside';
 
 type Page = { file: string; label: string; w: number; h: number };
-const entry = (data as Record<string, { count: number; pages: Page[] }>)[slug];
+const entry = (data as Record<string, { count: number; dir?: string; pages: Page[] }>)[slug];
 const pages: Page[] = entry?.pages ?? [];
 const total = pages.length;
 
+// A rebuilt sample goes to a NEW prefix and the manifest names it here, because the new
+// pages reuse the old FILENAMES with different content — overwriting in place would serve
+// stale pages from the edge with nothing to bust them, and destroy the only copy of the
+// old sample at the same time. An edition with no `dir` has not been rebuilt: it keeps its
+// original location and a rebuild of the others cannot touch it.
+const dir = entry?.dir ?? slug;
+
 const items = pages.map((p, i) => ({
-	src: `${ASSETS}/${slug}/${p.file}`,
+	src: `${ASSETS}/${dir}/${p.file}`,
 	label: p.label,
 	w: p.w,
 	h: p.h,
