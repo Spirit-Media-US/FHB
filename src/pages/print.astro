@@ -14,7 +14,8 @@ import Layout from '../layouts/Layout.astro';
 // listings cannot drift apart.
 // The spec, stated once for all sixteen. Concrete facts rather than "premium" — every
 // Bible on the shelf claims premium; 6x9 case-laminate hardback, full color and
-// 876 pages is checkable and does more selling (Kevin asked 2026-08-23).
+// 888 pages is checkable and does more selling (Kevin asked 2026-08-23; the figure was
+// 876 until Kevin approved the 888pp set on 2026-09-14, D67 — the argument is unchanged).
 const DVC_TAIL = 'Full Color Throughout · 6×9 Hardback, Case Laminate';
 const DVC_TAIL2 =
 	'Red Letter \u00b7 Blue Letter \u00b7 Purple Letter \u00b7 Three-Color Divine Voice \u00b7 Complete Bible';
@@ -26,7 +27,7 @@ const DVC_TAIL2 =
 //
 // Every value below is MEASURED, not assumed:
 //   page counts read off the built interiors in projects/fhb-print-bible/current/
-//     — targeted 876pp, journaling 788pp @ 8x10, large print 1,134 + 1,142 + 680pp
+//     — targeted 888pp, journaling 848pp @ 8x10, large print 1,134 + 1,142 + 680pp
 //       across three volumes (the single 1,016pp Large Print is retired)
 //   binding read off the APPROVED cover for each ISBN. The general hardback is CASE
 //     LAMINATE (2026-08-24-general/APPROVALS.json approves COVER-Case for the general
@@ -34,7 +35,7 @@ const DVC_TAIL2 =
 //     colour numbers 336-2/337-9/338-6 have since replaced; the BINDING is unchanged),
 //     so it must NOT claim a dust jacket; jacket files exist but are not the approved
 //     binding. NOTHING claims a dust jacket: every sheet says case laminate, the ISBNs sit
-//     in `hardcover_case_laminate`, the delivered cover is ...-CASE-876pp.pdf, and the
+//     in `hardcover_case_laminate`, the delivered cover is ...-CASE-888pp.pdf, and the
 //     journaling sheet states "No dust jacket: not offered at 8 x 10". Jacket PDFs exist
 //     but carry no ISBN and no delivery record — they are not what ships.
 const SPEC_TARGETED = '6×9 Hardback, Case Laminate';
@@ -387,7 +388,7 @@ const printFaq = [
 	},
 	{
 		q: 'Is there a cheaper version?',
-		a: `The whole Bible is already free. Every word of the Father’s Heart Bible™ can be read online at no cost, by anyone, anywhere in the world, in twenty-five languages — with English and Telugu also free to listen to, and more languages being recorded. Nobody has to buy anything to receive our Father’s voice. As for print: the Father’s Heart Bible™ is currently printed on demand on premium white paper, as the industry requires — and with paper costs up about 25% over the last two years and 876 pages to a complete Bible, the cost per copy runs high. More affordable offset-printed editions will be added in the future. Read it all today at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
+		a: `The whole Bible is already free. Every word of the Father’s Heart Bible™ can be read online at no cost, by anyone, anywhere in the world, in twenty-five languages — with English and Telugu also free to listen to, and more languages being recorded. Nobody has to buy anything to receive our Father’s voice. As for print: the Father’s Heart Bible™ is currently printed on demand on premium white paper, as the industry requires — and with paper costs up about 25% over the last two years and 888 pages to a complete Bible, the cost per copy runs high. More affordable offset-printed editions will be added in the future. Read it all today at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
 	},
 	{
 		q: 'What is Divine Voice Color?',
@@ -395,7 +396,7 @@ const printFaq = [
 	},
 	{
 		q: 'What’s included in each edition?',
-		a: `The complete Bible in Divine Voice Color with full color throughout — 876 pages at 6×9; in Large Print the same complete text runs to 2,956 pages and comes as a three-volume set. The targeted editions are 6×9 hardcover, case laminate; the General Audience editions come in paperback or hardback. A presentation page for the reader's name. Opening pages on intimacy, identity, inheritance and hearing His voice. An introduction to every one of the 66 books, and a Father's note closing each one with a short prayer. 1,354 study notes across 777 chapters — 1,075 explaining a word, name, custom or background, 248 marking where the text reveals the Father, and 31 recording a difference among the manuscripts.`,
+		a: `The complete Bible in Divine Voice Color with full color throughout — 888 pages at 6×9; in Large Print the same complete text runs to 2,956 pages and comes as a three-volume set. The targeted editions are 6×9 hardcover, case laminate; the General Audience editions come in paperback or hardback. A presentation page for the reader's name. Opening pages on intimacy, identity, inheritance and hearing His voice. An introduction to every one of the 66 books, and a Father's note closing each one with a short prayer. 1,354 study notes across 777 chapters — 1,075 explaining a word, name, custom or background, 248 marking where the text reveals the Father, and 31 recording a difference among the manuscripts.`,
 	},
 	{
 		q: 'Which languages can I read it in?',
@@ -409,7 +410,7 @@ const printFaq = [
 	},
 	{
 		q: 'Why is the Father’s Heart Bible™ thicker than other bibles?',
-		a: `Two reasons, and both are honest ones. A complete Bible in readable type runs 876 pages here, and print-on-demand uses a premium, heavier white paper — the thin, opaque bible paper you know from other editions comes from offset printing at volume, which we will move to in future. Slimmer thinline editions will follow.`,
+		a: `Two reasons, and both are honest ones. A complete Bible in readable type runs 888 pages here, and print-on-demand uses a premium, heavier white paper — the thin, opaque bible paper you know from other editions comes from offset printing at volume, which we will move to in future. Slimmer thinline editions will follow.`,
 	},
 ];
 // Plain-text answers for FAQPage JSON-LD.
@@ -1000,7 +1001,7 @@ function markVoices(v: {
 			moms: 99.99, pastors: 99.99, peace: 99.99, presidents: 99.99, recovery: 99.99,
 			seekers: 99.99, seventeen: 99.99, soldiers: 99.99, teen: 99.99,
 			'worship-leaders': 99.99, journaling: 124.99,
-			// General Audience — Regular Print (876pp).
+			// General Audience — Regular Print (888pp).
 			'general-regular-charcoal-pb': 79.99, 'general-regular-charcoal-hb': 99.99,
 			'general-regular-plum-pb': 79.99, 'general-regular-plum-hb': 99.99,
 			'general-regular-white-pb': 79.99, 'general-regular-white-hb': 99.99,

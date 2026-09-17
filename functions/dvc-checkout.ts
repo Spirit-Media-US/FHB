@@ -68,7 +68,7 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 
 	// ── General Audience, added 2026-08-29 ──
 	// The same Bible without an audience on the cover: three colours, two bindings, in
-	// Regular Print (876pp). Large Print is now the three-volume set below. They join the
+	// Regular Print (888pp). Large Print is now the three-volume set below. They join the
 	// SAME mix-and-match ladder as the targeted editions — the combined total sets the tier.
 	// MUST match src/pages/print.astro `generalSkus` and the PRICE map in its inline script.
 	'general-regular-charcoal-pb': {
