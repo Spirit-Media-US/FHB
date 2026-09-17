@@ -3,6 +3,11 @@ import LookInside from '../components/LookInside.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import VoiceChips from '../components/VoiceChips.astro';
+// GENERATED from the SMP bookstore's Sanity documents by scripts/sync-amazon-links.mjs —
+// the bookstore is the one master for an Amazon link and no ASIN is typed into this page.
+// An edition absent from this file keeps its "coming soon" state, so a listing appearing
+// later needs a re-run of the sync, not an edit here.
+import amazonLinks from '../data/amazon-links.json';
 import { cardUrl } from '../data/card-art';
 import Layout from '../layouts/Layout.astro';
 
@@ -207,7 +212,18 @@ const RETAIL_8 = '$124.99';
 // house style (Kevin 2026-09-17: "Just need new LPs to match"). New keys, so there is
 // nothing cached to bust and LP_CARD_V is gone — the old angled cards stay untouched at
 // their own keys, which makes the swap reversible by changing this one path back.
-const LP_CARDS = 'https://assets.spiritmediapublishing.com/FHB/print/lp/v2';
+//
+// v3 (Kevin 2026-09-17, on seeing Vol 3 live: "are NOT like the others"). v2 was built by
+// build_lp_flat_cards.py, which had drifted from the house renderer: it cut a real spine
+// strip from each case PDF and scaled its width by the volume's measured thickness, so the
+// LP cards carried a wide gradient-shaded spine block, a hard outline and no cast shadow —
+// a different product family beside the sixteen DVC cards, and worst on Vol 3, whose Mist
+// Blue cover is nearest the grey wash. v3 renders through lifted_from_wrap.py, the same flat
+// house renderer behind the live cards, via mockups/build_lp_house_cards.py. Asked whether
+// the LP spine should show true thickness, Kevin chose the house look exactly — the card
+// sells the cover, the listing sells the book, so a 680pp and a 1,142pp volume get the same
+// board edge. New prefix again per D165: v2 is untouched and this reverts by path alone.
+const LP_CARDS = 'https://assets.spiritmediapublishing.com/FHB/print/lp/v3';
 const GENERAL_TAIL = 'Full Color Throughout · 6×9 Paperback or Hardback';
 const LP_TAIL = 'Large Print · Full Color Throughout · 6×9 Paperback or Hardback';
 const generalColors = [
@@ -397,7 +413,7 @@ const printFaq = [
 	},
 	{
 		q: 'How long does shipping take?',
-		a: `Order direct from us today and shipping is free — most orders arrive in 7–10 days, and larger bulk orders in 3–4 weeks. The Divine Voice Color editions arrive on Amazon shortly; until then, direct is the way to get one. <a href="${CONTACT}" style="${LINK}">Reach out</a> if you need them by a particular date.`,
+		a: `Order direct from us today and shipping is free — most orders arrive in 7–10 days, and larger bulk orders in 3–4 weeks. The Divine Voice Color editions are on Amazon now, and every card above links to its listing. Ordering direct from us includes free shipping. <a href="${CONTACT}" style="${LINK}">Reach out</a> if you need them by a particular date.`,
 	},
 	{
 		q: 'Is the color throughout the whole Bible?',
@@ -443,7 +459,10 @@ const faqSchema = {
 };
 
 // Book + Offer structured data — the /print page is the commerce surface, so the
-// purchasable price range lives here: ebook direct $7.49 → Large Print hardback $124.99.
+// purchasable price range lives here: ebook direct $7.49 → the journaling 8x10 at $124.99.
+// NOT "Large Print hardback $124.99", as this line read until 2026-09-17: the LP hardbacks
+// are $114.99 here and in dvc-checkout.ts, and Ingram's US retail drops to $114.99 effective
+// 18-SEP-26 (Kevin). $124.99 is the journaling edition's price, and always was.
 // The high end was $44.99, left behind by the DVC line; corrected 2026-08-29 when the
 // General Audience editions landed. offerCount counts the distinct purchasable products:
 // 16 targeted + 12 general (3 colours x 2 bindings x 2 line) + ebook.
@@ -639,11 +658,21 @@ function markVoices(v: {
 								{builtPages.has(`${e.slug}-bible`) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 								<LookInside slug={e.slug} title={e.title} variant="link" label="Look inside" />
 							</div>
-							<span
-								aria-disabled="true"
-								class="inline-flex items-center justify-center rounded-full font-semibold"
-								style="font-family: var(--font-sans); background: #f2efec; color: #9a938c; border: 1.5px solid var(--color-hairline); padding: 0.55rem 1rem; font-size: 0.8rem; cursor: default;"
-							>Amazon — coming soon</span>
+							{amazonLinks[e.slug] ? (
+								<a
+									href={amazonLinks[e.slug].url}
+									target="_blank"
+									rel="noopener"
+									class="inline-flex items-center justify-center rounded-full font-semibold"
+									style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.55rem 1rem; font-size: 0.8rem; text-decoration: none;"
+								>Amazon →</a>
+							) : (
+								<span
+									aria-disabled="true"
+									class="inline-flex items-center justify-center rounded-full font-semibold"
+									style="font-family: var(--font-sans); background: #f2efec; color: #9a938c; border: 1.5px solid var(--color-hairline); padding: 0.55rem 1rem; font-size: 0.8rem; cursor: default;"
+								>Amazon — coming soon</span>
+							)}
 							<button
 								type="button"
 								data-add={e.slug}
@@ -789,6 +818,18 @@ function markVoices(v: {
 							))}
 							{v.comingSoon && (
 								<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.78rem; margin: 0.15rem 0 0;">Listing coming soon</p>
+							)}
+							{/* Amazon, when the volume has a listing. Vol 3 has none — Ingram rejected
+							     its paperback (D134) and Kevin ruled the button stays inactive (D164) —
+							     so it simply has no entry in amazon-links.json and shows nothing here. */}
+							{amazonLinks[v.key] && (
+								<a
+									href={amazonLinks[v.key].url}
+									target="_blank"
+									rel="noopener"
+									class="inline-flex items-center justify-center rounded-full font-semibold"
+									style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 1.5px solid #3f3f46; padding: 0.55rem 1rem; font-size: 0.8rem; text-decoration: none;"
+								>Amazon →</a>
 							)}
 						</div>
 					</div>
