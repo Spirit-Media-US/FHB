@@ -368,7 +368,7 @@ const lpSkus = [
 			books: 1,
 			// The row's own page and its own sample. `liSlug` joins builtPages
 			// (`<slug>-bible`); `liKey` is the look-inside manifest key. They are separate
-			// fields because the SET's two names differ — page `large-print`, sample
+			// fields because the SET's two names differ — page `lp-set`, sample
 			// `largeprint` — and collapsing them would have sent the set row to a 404.
 			liSlug: v.key,
 			liKey: v.key,
@@ -387,7 +387,10 @@ const lpSkus = [
 		img: `${LP_CARDS}/lp-set-600.webp`,
 		// ONE product on the ladder, not three (Kevin 2026-09-17) — see lpSetPb above.
 		books: 1,
-		liSlug: 'large-print',
+		// D181: the set's page is /bibles/lp-set-bible, built from its own metadata sheet
+		// (src/data/editions/lp-set.json). The old `large-print` page came from the RETIRED
+		// single-volume sheet and is 301'd to this one in public/_redirects.
+		liSlug: 'lp-set',
 		liKey: 'largeprint',
 	})),
 ];
@@ -949,6 +952,16 @@ function markVoices(v: {
 						</button>
 					))}
 				</div>
+				{/* D181: the set has its own page now, so the summary box links to it through the
+				     SAME builtPages gate every other card uses — src/data/editions/lp-set.json is
+				     what says the page will be built. No look-inside link here: the set has no
+				     viewer on this page (see `liOnPage`), and the rule is to render the line
+				     without the missing link rather than link to nothing. */}
+				{builtPages.has('lp-set-bible') && (
+					<p style="font-family: var(--font-sans); font-size: 0.82rem; margin: 0.9rem 0 0;">
+						<a href="/bibles/lp-set-bible" style="font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
+					</p>
+				)}
 				{/* NO "a set counts as three books" LINE HERE (Kevin 2026-09-17: "This is NOT
 				     true and should not have been added"). The code always agreed with him —
 				     dvc-checkout.ts:295/301 and the cart weights above both count a set as
