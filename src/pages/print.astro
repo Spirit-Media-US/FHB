@@ -1233,11 +1233,20 @@ function markVoices(v: {
 		font-family: var(--font-sans);
 		font-size: 0.78rem;
 	}
+	/* BOTH LINKS UNBOLD AND THE SAME SIZE (Kevin 2026-09-18: "Full details (not bold) ·
+	   Look inside (bold) unbold both"). They came from different places — the anchor is
+	   written here, the trigger inside LookInside — and rendered 600 and 700 at two
+	   different sizes. The trigger now reads its weight and size from tokens the component
+	   exposes, set just below, so both are one declaration rather than an override war. */
+	.row-links {
+		--li-link-weight: 400;
+		--li-link-size: 0.78rem;
+	}
 	.row-links a,
 	.row-links :global(.li-trigger) {
 		font-family: var(--font-sans);
 		font-size: 0.78rem;
-		font-weight: 600;
+		font-weight: 400;
 		color: #71717a;
 		text-decoration: underline;
 		text-underline-offset: 2px;

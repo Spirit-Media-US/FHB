@@ -206,9 +206,16 @@ const ph = pages[0]?.h ?? 1400;
 	}
 	/* On a card the trigger is one of two peer links, so it takes the card's link
 	   shape rather than a pill that would compete with the buttons around it. */
+	/* Weight and size are TOKENS so a host row can match its neighbouring link without
+	   fighting this component's specificity from outside (2026-09-18, Kevin: "Full details
+	   (not bold) · Look inside (bold) unbold both"). The bulk form's second line sets them;
+	   every card keeps the defaults below unchanged. A page-level `:global(.li-trigger)`
+	   override LOST to this rule — the trigger stayed 700 while its neighbour was 600 — so
+	   the knob belongs here, at the source, not in an ever-more-specific override. */
 	.li-link .li-trigger {
-		display: inline; font-family: var(--font-sans); font-size: 0.82rem;
-		font-weight: 700; color: #3f3f46; background: none; border: 0;
+		display: inline; font-family: var(--font-sans);
+		font-size: var(--li-link-size, 0.82rem);
+		font-weight: var(--li-link-weight, 700); color: #3f3f46; background: none; border: 0;
 		border-radius: 0; padding: 0; text-decoration: underline;
 		text-underline-offset: 2px; cursor: pointer;
 	}
