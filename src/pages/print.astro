@@ -464,11 +464,16 @@ const printFaq = [
 	},
 	{
 		q: 'Can I return my order?',
-		// KEVIN'S OWN WORDING, VERBATIM (2026-09-17). A returns promise is his to word, so the
-		// one thing not to do here is improve it: jonah has put to him that "Amazon or other
-		// retailers follow Amazon's return policy" reads oddly, since another retailer follows
-		// its own. Until he rules, this stays exactly as he wrote it.
-		a: `Yes. For orders placed directly with us, <a href="${CONTACT}" style="${LINK}">reach out</a> and we'll make it right. Copies bought on Amazon or other retailers follow Amazon's return policy.`,
+		// KEVIN'S WORDING, AND IT IS HIS 21:54:56 REVISION — NOT the 21:52:04 first pass.
+		// He wrote "follow Amazon's return policy" at 21:52 and replaced it two minutes later
+		// with "follow THEIR return policy" (A1a, J1). The sentence's own subject is the
+		// reason: it already says "or other retailers", so naming Amazon in the predicate
+		// contradicts it — a Barnes & Noble buyer does not follow Amazon's policy.
+		// This shipped wrong once because it was checked against the superseded sentence
+		// quoted in an earlier brief, found present, and read as confirmation. Matching the
+		// wrong authority returns a true answer to the wrong question. The task register
+		// carries the quote WITH its timestamp; that is the authority, not a brief.
+		a: `Yes. For orders placed directly with us, <a href="${CONTACT}" style="${LINK}">reach out</a> and we'll make it right. Copies bought on Amazon or other retailers follow their return policy.`,
 	},
 	{
 		q: 'How is the Father’s Heart Bible™ different from other translations?',
