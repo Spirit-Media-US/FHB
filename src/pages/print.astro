@@ -1,4 +1,5 @@
 ---
+import BindingQty from '../components/BindingQty.astro';
 import BuyControls from '../components/BuyControls.astro';
 import LookInside from '../components/LookInside.astro';
 import Section from '../components/Section.astro';
@@ -54,9 +55,15 @@ const DVC_TAIL2 =
 // metadata sheets and the ISBN records, where it is a required fact, and never appears in
 // front of a buyer. Matches the Large Print rows, which already read "6×9 Large Print
 // Hardback".
-const specTargeted = (b: 'hb' | 'pb') => `6×9 ${b === 'hb' ? 'Hardback' : 'Paperback'}`;
-const specJournaling = (b: 'hb' | 'pb') =>
-	`8×10 Wide Margin ${b === 'hb' ? 'Hardback' : 'Paperback'}`;
+// The TRIM is binding-independent; the binding is not. Split so a row that sells BOTH
+// bindings can state the trim once without naming a binding it does not exclusively sell
+// (the bulk form's rows do exactly this since 2026-09-18 — see BindingQty.astro). One
+// definition each, so the two can never drift apart.
+const trimTargeted = '6×9';
+const trimJournaling = '8×10 Wide Margin';
+const binding = (b: 'hb' | 'pb') => (b === 'hb' ? 'Hardback' : 'Paperback');
+const specTargeted = (b: 'hb' | 'pb') => `${trimTargeted} ${binding(b)}`;
+const specJournaling = (b: 'hb' | 'pb') => `${trimJournaling} ${binding(b)}`;
 
 const dvcEditions = [
 	{
@@ -190,6 +197,10 @@ const dvcEditions = [
 		hb: 124.99,
 		pb: 114.99,
 		spec: specJournaling,
+		// The only edition that is not 6\u00d79. Stated here so the bulk form's one-row-per-
+		// edition layout can print the trim without naming a binding \u2014 everything else
+		// falls back to trimTargeted.
+		trim: trimJournaling,
 	},
 ];
 
@@ -368,7 +379,7 @@ const lpSkus = [
 			books: 1,
 			// The row's own page and its own sample. `liSlug` joins builtPages
 			// (`<slug>-bible`); `liKey` is the look-inside manifest key. They are separate
-			// fields because the SET's two names differ — page `large-print`, sample
+			// fields because the SET's two names differ — page `lp-set`, sample
 			// `largeprint` — and collapsing them would have sent the set row to a 404.
 			liSlug: v.key,
 			liKey: v.key,
@@ -387,10 +398,35 @@ const lpSkus = [
 		img: `${LP_CARDS}/lp-set-600.webp`,
 		// ONE product on the ladder, not three (Kevin 2026-09-17) — see lpSetPb above.
 		books: 1,
-		liSlug: 'large-print',
+		// D181: the set's page is /bibles/lp-set-bible, built from its own metadata sheet
+		// (src/data/editions/lp-set.json). The old `large-print` page came from the RETIRED
+		// single-volume sheet and is 301'd to this one in public/_redirects.
+		liSlug: 'lp-set',
 		liKey: 'largeprint',
 	})),
 ];
+// ONE ENTRY PER LARGE PRINT PRODUCT, both bindings on it — what the bulk form renders since
+// 2026-09-18 (Kevin: the form ran 46 rows because every product was listed twice). DERIVED
+// from lpSkus rather than re-listed, so a price or title can never disagree between the row
+// a shopper reads and the SKU the checkout charges. lpSkus itself is unchanged: it stays the
+// flat purchasable list the order builder and dvc-checkout.ts mirror, and which
+// pricing-verify asserts across all three.
+const lpRows = [...lpVolumes.map((v) => v.key), 'lp-set'].map((k) => {
+	const hb = lpSkus.find((s) => s.key === `${k}-hb`)!;
+	const pb = lpSkus.find((s) => s.key === `${k}-pb`)!;
+	return {
+		hbKey: hb.key,
+		pbKey: pb.key,
+		hb: hb.price,
+		pb: pb.price,
+		title: hb.title,
+		img: hb.img,
+		liSlug: hb.liSlug,
+		liKey: hb.liKey,
+		// Binding-free: the counters name the binding, so the row must not.
+		trim: hb.spec.replace(/ Hardback$/, ''),
+	};
+});
 // Flat SKU list — one entry per purchasable thing, used by the order builder and mirrored
 // in the checkout function. Key shape: general-<line>-<colour>-<binding>.
 const generalSkus = generalLines.flatMap((l) =>
@@ -949,6 +985,16 @@ function markVoices(v: {
 						</button>
 					))}
 				</div>
+				{/* D181: the set has its own page now, so the summary box links to it through the
+				     SAME builtPages gate every other card uses — src/data/editions/lp-set.json is
+				     what says the page will be built. No look-inside link here: the set has no
+				     viewer on this page (see `liOnPage`), and the rule is to render the line
+				     without the missing link rather than link to nothing. */}
+				{builtPages.has('lp-set-bible') && (
+					<p style="font-family: var(--font-sans); font-size: 0.82rem; margin: 0.9rem 0 0;">
+						<a href="/bibles/lp-set-bible" style="font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
+					</p>
+				)}
 				{/* NO "a set counts as three books" LINE HERE (Kevin 2026-09-17: "This is NOT
 				     true and should not have been added"). The code always agreed with him —
 				     dvc-checkout.ts:295/301 and the cart weights above both count a set as
@@ -1017,22 +1063,24 @@ function markVoices(v: {
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Choose how many of each edition</p>
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 0 0 0.5rem;">Targeted Editions</p>
 					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
-						{/* ONE ROW PER BINDING. A single row with one counter could only ever buy one
-						     of the two bindings, and the shopper would have no way to say which —
-						     the same reason the general colours and the LP volumes each get a row
-						     per SKU. The cover art repeats because it IS the same book. */}
-						{dvcEditions.flatMap((e) =>
-							(['hb', 'pb'] as const).map((b) => (
+						{/* ONE ROW PER EDITION, TWO COUNTERS (Kevin 2026-09-18, see BindingQty.astro).
+						     This used to emit a row per BINDING, which drew every edition's cover
+						     art TWICE and made the form 46 rows for 23 books. Both bindings are
+						     still independently purchasable; they now share the one picture of the
+						     one book, and each price sits beside the counter that buys it.
+						     The superseded comment reasoned that a single row "could only ever buy
+						     one of the two bindings" — true of one counter, not of two. */}
+						{dvcEditions.map((e) => (
 								<>
 								{/* A heading above the first row of an edition that needs naming as its
 								     own thing — the journaling Bible is the only 8×10 in the list. */}
-								{e.groupHeading && b === 'hb' && (
+								{e.groupHeading && (
 									<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.2rem 0 0.1rem;">{e.groupHeading}</p>
 								)}
 								<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
 									<img src={cardUrl(`dvc-${e.slug}`)} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
 									<div style="flex: 1; min-width: 0;">
-									<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.rowTitle ?? e.title}</span> <span style="white-space: nowrap; font-weight: 600;">${(b === 'hb' ? e.hb : e.pb).toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">· {e.spec(b)}</span></span>
+									<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.rowTitle ?? e.title}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">· {(e as { trim?: string }).trim ?? trimTargeted}</span></span>
 									{/* SECOND LINE: the same two links the card above carries (Kevin
 									     2026-09-17). Same gates, not a second set of rules — "Full
 									     details" only when builtPages has the page, "Look inside"
@@ -1049,26 +1097,23 @@ function markVoices(v: {
 										{liOnPage.has(e.slug) && <LookInside slug={e.slug} title={e.title} variant="link" label="Look inside" reuse />}
 									</div>
 									</div>
-									<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
-										<button type="button" class="qty-step" data-slug={`${e.slug}-${b}`} data-dir="-1" aria-label={`Fewer ${e.title} ${b === 'hb' ? 'Hardback' : 'Paperback'}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
-										<input type="number" class="qty-in" data-slug={`${e.slug}-${b}`} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.title} ${b === 'hb' ? 'Hardback' : 'Paperback'} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
-										<button type="button" class="qty-step" data-slug={`${e.slug}-${b}`} data-dir="1" aria-label={`More ${e.title} ${b === 'hb' ? 'Hardback' : 'Paperback'}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
-									</div>
+									<BindingQty hbSlug={`${e.slug}-hb`} pbSlug={`${e.slug}-pb`} hb={e.hb} pb={e.pb} label={e.title} />
 								</div>
 								</>
-							)),
-						)}
+						))}
 					</div>
 
 					{generalLines.map((l) => (
 						<>
 							<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.6rem 0 0.5rem;">General Audience — {l.label}</p>
 							<div style="display: flex; flex-direction: column; gap: 0.55rem;">
-								{generalSkus.filter((s) => s.line === l.line).map((s) => (
+								{/* ONE ROW PER COLOUR, both bindings on it — same change as the targeted
+								     block above. A colour is one book; it was drawn twice. */}
+								{generalColors.map((c) => (
 									<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
-										<img src={s.img} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
+										<img src={cardUrl(`general-${l.line}-${c.key}`)} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
 										<div style="flex: 1; min-width: 0;">
-										<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">Father’s Heart Bible — {s.color}</span> <span style="white-space: nowrap; font-weight: 600;">${s.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{s.spec}</span></span>
+										<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">Father’s Heart Bible — {c.name}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{trimTargeted}</span></span>
 										{/* The three colours SHARE an interior, so they share one
 										     look-inside key — keyed by LINE, exactly as the cards
 										     above do it. */}
@@ -1082,11 +1127,7 @@ function markVoices(v: {
 											{liOnPage.has('general') && <LookInside slug="general" title={`FHB — Father’s Heart Bible — ${l.label}`} variant="link" label="Look inside" reuse />}
 										</div>
 										</div>
-										<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
-											<button type="button" class="qty-step" data-slug={s.key} data-dir="-1" aria-label={`Fewer ${l.label} ${s.color} ${s.binding}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
-											<input type="number" class="qty-in" data-slug={s.key} value="0" min="0" step="1" inputmode="numeric" aria-label={`${l.label} ${s.color} ${s.binding} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
-											<button type="button" class="qty-step" data-slug={s.key} data-dir="1" aria-label={`More ${l.label} ${s.color} ${s.binding}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
-										</div>
+										<BindingQty hbSlug={`general-${l.line}-${c.key}-hb`} pbSlug={`general-${l.line}-${c.key}-pb`} hb={l.hb} pb={l.pb} label={`${l.label} ${c.name}`} />
 									</div>
 								))}
 							</div>
@@ -1095,29 +1136,25 @@ function markVoices(v: {
 
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.6rem 0 0.5rem;">General Audience — Large Print</p>
 					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
-						{lpSkus.map((s) => (
+						{lpRows.map((r) => (
 							<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
-								<img src={s.img} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
+								<img src={r.img} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
 								<div style="flex: 1; min-width: 0;">
-								<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{s.title}</span> <span style="white-space: nowrap; font-weight: 600;">${s.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{s.spec}</span></span>
+								<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{r.title}</span> {r.trim && <span style="color: var(--color-muted); font-size: 0.85rem;">{r.trim}</span>}</span>
 								{/* EACH VOLUME HAS ITS OWN SAMPLE — they are different books, and a
 								     shared one would show a reader pages their volume does not
 								     contain. The SET row points at the set's own page and sample. */}
 								<div class="row-links">
-									{builtPages.has(`${s.liSlug}-bible`) && (
+									{builtPages.has(`${r.liSlug}-bible`) && (
 										<>
-											<a href={`/bibles/${s.liSlug}-bible`}>Full details</a>
+											<a href={`/bibles/${r.liSlug}-bible`}>Full details</a>
 											<span aria-hidden="true" class="row-dot">·</span>
 										</>
 									)}
-									{liOnPage.has(s.liKey) && <LookInside slug={s.liKey} title={s.title} variant="link" label="Look inside" reuse />}
+									{liOnPage.has(r.liKey) && <LookInside slug={r.liKey} title={r.title} variant="link" label="Look inside" reuse />}
 								</div>
 								</div>
-								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
-									<button type="button" class="qty-step" data-slug={s.key} data-dir="-1" aria-label={`Fewer ${s.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
-									<input type="number" class="qty-in" data-slug={s.key} value="0" min="0" step="1" inputmode="numeric" aria-label={`${s.title} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
-									<button type="button" class="qty-step" data-slug={s.key} data-dir="1" aria-label={`More ${s.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">+</button>
-								</div>
+								<BindingQty hbSlug={r.hbKey} pbSlug={r.pbKey} hb={r.hb} pb={r.pb} label={r.title} />
 							</div>
 						))}
 					</div>
