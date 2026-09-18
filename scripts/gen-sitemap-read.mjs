@@ -329,7 +329,10 @@ for (const key of keys) {
 parts.push('</urlset>');
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
-fs.writeFileSync(OUT, parts.join(''));
+// sitemap-read.xml is written BELOW when SPLIT is on — as the INDEX, not the combined
+// urlset. Writing the 26 MB combined file here first would hand Cloudflare a file it
+// refuses (25 MiB hard cap) on every deploy, which is exactly the outage this fixes.
+if (!SPLIT) fs.writeFileSync(OUT, parts.join(''));
 
 if (SPLIT) {
   const HEAD =
@@ -341,13 +344,36 @@ if (SPLIT) {
     fs.writeFileSync(path.join(path.dirname(OUT), name), HEAD + entries.join('') + '</urlset>');
     index.push(`<sitemap><loc>${SITE}/${name}</loc></sitemap>`);
   }
-  fs.writeFileSync(
-    path.join(path.dirname(OUT), 'sitemap-read-index.xml'),
+  const indexXml =
     '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
-      index.join('') +
-      '</sitemapindex>',
+    index.join('') +
+    '</sitemapindex>';
+  fs.writeFileSync(path.join(path.dirname(OUT), 'sitemap-read-index.xml'), indexXml);
+  // sitemap-read.xml IS THE INDEX NOW (2026-09-18). It was the combined urlset, and Russian
+  // going 526 -> 1,189 chapters took it to 26,396,429 bytes against Cloudflare Pages' hard
+  // 25 MiB per-file cap: every FHB deploy, marketing AND reader, failed on it.
+  // The URL is kept, deliberately, rather than retired — llms.txt names it as the
+  // authoritative machine-readable list, GSC and Bing have it registered, and
+  // fhb-index-submit.py reads it. All of those keep working against an index: GSC and Bing
+  // accept index files natively, and the submitter was taught to FOLLOW one FIRST, in a
+  // separate change that landed before this line existed. That order is not incidental —
+  // reversed, the weekly IndexNow ping would have collected 25 sitemap urls instead of
+  // 15,199 chapter urls and reported success.
+  // The segments together hold every url the combined file held (asserted just below), so
+  // nothing is lost by the hop.
+  fs.writeFileSync(OUT, indexXml);
+  const segTotal = [...segs.values()].reduce((n, e) => n + e.length, 0);
+  if (segTotal !== count + (segs.get('en') ? 2 : 0)) {
+    console.error(
+      `gen-sitemap-read: SEGMENT TOTAL ${segTotal} != combined ${count + 2} — ` +
+        'the index would publish fewer urls than the combined file held. Refusing.',
+    );
+    process.exit(1);
+  }
+  console.log(
+    `gen-sitemap-read: SPLIT — ${index.length} segments holding ${segTotal} urls; ` +
+      'sitemap-read.xml and sitemap-read-index.xml both written as the index',
   );
-  console.log(`gen-sitemap-read: SPLIT — ${index.length} segments + sitemap-read-index.xml`);
 }
 
 // 50,000-URL / 50 MB sitemap limits: at ~2.6k URLs we are far inside both. If a
