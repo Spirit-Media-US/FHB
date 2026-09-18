@@ -1,0 +1,114 @@
+---
+/* Two quantity counters — hardback and paperback — on ONE product row.
+ *
+ * WHY THIS EXISTS (Kevin 2026-09-18): the bulk form ran 46 rows because every edition was
+ * listed twice, once per binding, with its cover art drawn BOTH times. Kevin: "It is ok the
+ * way it is especially for mobile, but it is super long now... any options we have not
+ * considered yet to shorten the bulk sale form. The thumbnails can not be smaller."
+ *
+ * Measured: 46 rows = 23 editions x 2 bindings, and all 23 duplicated. One row per EDITION
+ * carrying TWO counters halves the form to 23 rows, keeps every SKU independently
+ * purchasable, and keeps the thumbnail at its current 118px — nothing is shrunk or removed,
+ * the duplicate art simply stops being drawn.
+ *
+ * The row-per-binding comment this replaces reasoned that a single row "could only ever buy
+ * one of the two bindings, and the shopper would have no way to say which." That is true of
+ * one counter. It is not true of two, so the constraint it recorded was narrower than the
+ * rule it produced.
+ *
+ * Each counter keeps its own data-slug, so the checkout, the ladder (which counts BOOKS,
+ * not line items) and the live total are untouched — this is a layout change, not a
+ * pricing one.
+ */
+interface Props {
+	hbSlug: string;
+	pbSlug: string;
+	hb: number;
+	pb: number;
+	label: string; // the product name, for accessible labels only
+}
+const { hbSlug, pbSlug, hb, pb, label } = Astro.props;
+const rows = [
+	{ slug: hbSlug, price: hb, binding: 'Hardback' },
+	{ slug: pbSlug, price: pb, binding: 'Paperback' },
+];
+---
+{/* Stacks under the title on a phone and sits alongside it from sm up. The prices live
+    HERE rather than on the title line, because with one row per edition there are two of
+    them and they belong next to the control that buys each. */}
+<div class="binding-qty">
+	{rows.map((r) => (
+		<div class="binding-qty__row">
+			<span class="binding-qty__label">
+				<span class="binding-qty__binding">{r.binding}</span>
+				<span class="binding-qty__price">${r.price.toFixed(2)}</span>
+			</span>
+			<div class="binding-qty__ctl">
+				<button type="button" class="qty-step" data-slug={r.slug} data-dir="-1" aria-label={`Fewer ${label} ${r.binding}`}>−</button>
+				<input type="number" class="qty-in" data-slug={r.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${label} ${r.binding} quantity`} />
+				<button type="button" class="qty-step" data-slug={r.slug} data-dir="1" aria-label={`More ${label} ${r.binding}`}>+</button>
+			</div>
+		</div>
+	))}
+</div>
+
+<style>
+	.binding-qty {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		flex-shrink: 0;
+	}
+	.binding-qty__row {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 0.5rem;
+	}
+	.binding-qty__label {
+		font-family: var(--font-sans);
+		font-size: 0.8rem;
+		display: flex;
+		gap: 0.35rem;
+		align-items: baseline;
+		justify-content: flex-end;
+		white-space: nowrap;
+	}
+	.binding-qty__binding { color: var(--color-muted); }
+	.binding-qty__price { font-weight: 700; color: var(--color-ink); }
+	.binding-qty__ctl {
+		display: inline-flex;
+		align-items: center;
+		border: 1.5px solid var(--color-hairline);
+		border-radius: 999px;
+		overflow: hidden;
+	}
+	.binding-qty__ctl :global(.qty-step) {
+		font-family: var(--font-sans);
+		width: 2.2rem;
+		height: 2.2rem;
+		border: 0;
+		background: var(--color-primary-fixed, #ffd9e0);
+		color: var(--color-ink);
+		font-size: 1.15rem;
+		cursor: pointer;
+	}
+	.binding-qty__ctl :global(.qty-in) {
+		width: 3.2rem;
+		text-align: center;
+		border: 0;
+		background: #fff;
+		font-family: var(--font-sans);
+		font-size: 1rem;
+		color: var(--color-ink);
+		-moz-appearance: textfield;
+	}
+	/* On a narrow phone the two labelled counters sit side by side under the title rather
+	   than stacked, so a row stays roughly the height of the 118px thumbnail beside it and
+	   the form does not get taller than the two-row version it replaces. */
+	@media (max-width: 520px) {
+		.binding-qty { flex-direction: row; gap: 0.5rem; width: 100%; }
+		.binding-qty__row { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+		.binding-qty__label { font-size: 0.72rem; }
+	}
+</style>
