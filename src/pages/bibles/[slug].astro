@@ -139,6 +139,19 @@ const datePublished = ed.datePublished ?? isoDate(ed.published);
 // alternateName are the same string.
 const schemaName = ed.title === ed.name ? `Father’s Heart Bible — ${ed.name}` : ed.title;
 
+// "Also known as" is a READER-FACING list, not the keyword field (Kevin 2026-09-18). The
+// sheet's 500-byte Ingram line opens with fhb;fhb bible;father's heart bible fhb — correct
+// there, because on a retailer those are invisible backend terms and repeating the brand is
+// free. Rendered as chips on a product page they read as keyword stuffing. The full line
+// still goes to JSON-LD via keywordsSchema; only the visible chips are filtered.
+const BRAND_KEYWORDS = new Set([
+	'fhb',
+	'fhb bible',
+	"father's heart bible fhb",
+	'father’s heart bible fhb',
+]);
+const visibleKeywords = ed.listing.keywords.filter((k) => !BRAND_KEYWORDS.has(k.toLowerCase()));
+
 // SCREEN divine-voice palette — the same values /read has always used, adopted here so a
 // visitor sees one red on the product page and on the reader. Print ink is unchanged:
 // the interiors keep 3563ae / f04933 / 91278f. Kevin approved screen-only, 2026-08-24.
@@ -189,7 +202,11 @@ const productSchema = {
 	'@type': 'Book',
 	'@id': `${url}#book`,
 	name: schemaName,
-	alternateName: ed.name,
+	// FHB has no established search demand the way NIV or ESV does, so the abbreviation has
+	// to be TEACHABLE to an engine: the Book entity declares both the edition name and the
+	// abbreviation as alternate names (Kevin approved 2026-09-18). Other pages already do
+	// this; the 22 edition pages — the ones carrying the SKUs — did not.
+	alternateName: [ed.name, 'FHB'],
 	bookFormat: 'https://schema.org/Hardcover',
 	numberOfPages: pages,
 	isbn: ed.isbn,
@@ -359,17 +376,16 @@ const faqSchema = {
 						['Dimensions', trim],
 						['Interior', 'Full color throughout'],
 						['ISBN-13', ed.isbn],
-						['BISAC codes', null],
+						// BISAC codes are OFF the storefront (Kevin 2026-09-18). They are the book
+						// trade's shelf classification and belong in the metadata sheet and the ONIX
+						// feed, where retailers read them. A shopper has never heard of BISAC, and a
+						// raw code like REL012160 reads as an error on a product page. Same rule as
+						// "case laminate": trade vocabulary stays in the trade fields. The codes are
+						// still carried in ed.listing.bisac for the feed — just not rendered here.
 					].map(([k, v], n) => (
 						<div class="flex flex-wrap gap-2 px-5 py-3" style={`font-family: var(--font-sans); font-size: 0.9rem; ${n % 2 ? 'background: #fafafa;' : ''}`}>
 							<span style="color: #71717a; min-width: 10rem;">{k}</span>
-							{v === null ? (
-								<span style="color: var(--color-ink); font-weight: 600; flex: 1;">
-									{ed.listing.bisac.map(([code, label]) => (<span style="display: block;">{`${code}  ${label}`}</span>))}
-								</span>
-							) : (
-								<span style="color: var(--color-ink); font-weight: 600; flex: 1;">{v}</span>
-							)}
+							<span style="color: var(--color-ink); font-weight: 600; flex: 1;">{v}</span>
 						</div>
 					))}
 				</div>
@@ -428,7 +444,7 @@ const faqSchema = {
 				))}
 				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.1rem; font-weight: 600; margin: 2.6rem 0 0.7rem;">Also known as</h3>
 				<div class="flex flex-wrap gap-2">
-					{ed.listing.keywords.map((k) => (
+					{visibleKeywords.map((k) => (
 						<span style="font-family: var(--font-sans); font-size: 0.82rem; color: #3f3f46; background: var(--color-surface-low); border: 1px solid var(--color-hairline); border-radius: 999px; padding: 0.3rem 0.75rem;">{k}</span>
 					))}
 				</div>
