@@ -139,6 +139,49 @@ const datePublished = ed.datePublished ?? isoDate(ed.published);
 // alternateName are the same string.
 const schemaName = ed.title === ed.name ? `Father’s Heart Bible — ${ed.name}` : ed.title;
 
+// "Also known as" is a READER-FACING list, not the keyword field (Kevin 2026-09-18). The
+// sheet's 500-byte Ingram line opens with fhb;fhb bible;father's heart bible fhb — correct
+// there, because on a retailer those are invisible backend terms and repeating the brand is
+// free. Rendered as chips on a product page they read as keyword stuffing. The full line
+// still goes to JSON-LD via keywordsSchema; only the visible chips are filtered.
+const BRAND_KEYWORDS = new Set([
+	'fhb',
+	'fhb bible',
+	"father's heart bible fhb",
+	'father’s heart bible fhb',
+]);
+const visibleKeywords = ed.listing.keywords.filter((k) => !BRAND_KEYWORDS.has(k.toLowerCase()));
+
+// shared.json is what is IDENTICAL IN ALL EDITIONS. One preface paragraph is not: it counts
+// this edition's notes and chapters ("1,355 notes across 777 chapters"), which are the 6x9
+// single-volume figures. Inherited by every page, it contradicted the Large Print set on its
+// own page — 777 chapters in one sentence and 1,189 in another (Kevin 2026-09-18). A count
+// is edition-specific by definition, so it is dropped from the shared preface rather than
+// duplicated per edition. The figures themselves live in each edition's listing copy.
+const editionSpecificNote = (p: string) => /\bnotes across\b.*\bchapters\b/.test(p);
+
+// Two bindings, two prices, and the struck-through LIST price is COMPUTED from the volume
+// prices — never typed (Kevin 2026-09-18). Typing "$329.97" would go stale silently and
+// advertise a saving we do not give. Same rule print.astro already follows.
+type PricedEdition = Edition & { pricePaperback?: number; listFromVolumes?: string[] };
+const edp = ed as PricedEdition;
+const volumeFiles = import.meta.glob<{ default: PricedEdition }>('../../data/editions/*.json', {
+	eager: true,
+});
+const bySlug = new Map(
+	Object.values(volumeFiles)
+		.map((m) => m.default)
+		.filter((e) => e?.slug)
+		.map((e) => [e.slug, e]),
+);
+const listVolumes = (edp.listFromVolumes ?? [])
+	.map((s) => bySlug.get(s))
+	.filter(Boolean) as PricedEdition[];
+const listHb = listVolumes.length ? listVolumes.reduce((s, v) => s + v.price, 0) : null;
+const listPb = listVolumes.every((v) => typeof v.pricePaperback === 'number')
+	? listVolumes.reduce((s, v) => s + (v.pricePaperback ?? 0), 0) || null
+	: null;
+
 // SCREEN divine-voice palette — the same values /read has always used, adopted here so a
 // visitor sees one red on the product page and on the reader. Print ink is unchanged:
 // the interiors keep 3563ae / f04933 / 91278f. Kevin approved screen-only, 2026-08-24.
@@ -189,10 +232,17 @@ const productSchema = {
 	'@type': 'Book',
 	'@id': `${url}#book`,
 	name: schemaName,
-	alternateName: ed.name,
+	// FHB has no established search demand the way NIV or ESV does, so the abbreviation has
+	// to be TEACHABLE to an engine: the Book entity declares both the edition name and the
+	// abbreviation as alternate names (Kevin approved 2026-09-18). Other pages already do
+	// this; the 22 edition pages — the ones carrying the SKUs — did not.
+	alternateName: [ed.name, 'FHB'],
 	bookFormat: 'https://schema.org/Hardcover',
 	numberOfPages: pages,
-	isbn: ed.isbn,
+	// The Large Print SET carries no ISBN of its own — Kevin assigned numbers per volume, as
+	// lp-set.json's _isbnNote records. An empty string is not an ISBN, so the property is
+	// omitted rather than emitted blank, which is invalid structured data.
+	...(ed.isbn ? { isbn: ed.isbn } : {}),
 	inLanguage: 'en',
 	datePublished,
 	description: `${ed.sub}. The complete Bible in Divine Voice Color — our Father's words in blue, the Son's in red, the Spirit's in purple.`,
@@ -255,7 +305,20 @@ const faqSchema = {
 						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.son}; background: #fff; border: 2px solid ${VOICE.son}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>SON</span>
 						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.spirit}; background: #fff; border: 2px solid ${VOICE.spirit}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>SPIRIT</span>
 					</div>
-					<p style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">${ed.price.toFixed(2)}</p>
+					<p style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">
+						<span>{edp.pricePaperback ? "Hardback " : ""}${ed.price.toFixed(2)}</span>
+						{listHb && listHb > ed.price && (
+							<span style="font-size: 1rem; font-weight: 500; color: #71717a; text-decoration: line-through; margin-left: 0.55rem;">${listHb.toFixed(2)}</span>
+						)}
+					</p>
+					{typeof edp.pricePaperback === "number" && (
+						<p style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">
+							<span>Paperback ${edp.pricePaperback.toFixed(2)}</span>
+							{listPb && listPb > edp.pricePaperback && (
+								<span style="font-size: 1rem; font-weight: 500; color: #71717a; text-decoration: line-through; margin-left: 0.55rem;">${listPb.toFixed(2)}</span>
+							)}
+						</p>
+					)}
 					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">Free shipping — a $15 value.</p>
 					<div class="flex flex-wrap items-center gap-3">
 						<a href="/print" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Buy Now</a>
@@ -354,22 +417,24 @@ const faqSchema = {
 						['Publication date', ed.published],
 						['Language', 'English'],
 						['Translation', 'Father’s Heart Bible™ — An Intimate Translation'],
-						['Print length', `${pages} pages`],
 						['Binding', binding],
 						['Dimensions', trim],
 						['Interior', 'Full color throughout'],
+						// Empty for the Large Print SET, which has no ISBN of its own — the row is
+						// dropped rather than printed with a blank value (filtered below).
 						['ISBN-13', ed.isbn],
-						['BISAC codes', null],
-					].map(([k, v], n) => (
+						// BISAC codes are OFF the storefront (Kevin 2026-09-18). They are the book
+						// trade's shelf classification and belong in the metadata sheet and the ONIX
+						// feed, where retailers read them. A shopper has never heard of BISAC, and a
+						// raw code like REL012160 reads as an error on a product page. Same rule as
+						// "case laminate": trade vocabulary stays in the trade fields. The codes are
+						// still carried in ed.listing.bisac for the feed — just not rendered here.
+					]
+						.filter(([, v]) => v)
+						.map(([k, v], n) => (
 						<div class="flex flex-wrap gap-2 px-5 py-3" style={`font-family: var(--font-sans); font-size: 0.9rem; ${n % 2 ? 'background: #fafafa;' : ''}`}>
 							<span style="color: #71717a; min-width: 10rem;">{k}</span>
-							{v === null ? (
-								<span style="color: var(--color-ink); font-weight: 600; flex: 1;">
-									{ed.listing.bisac.map(([code, label]) => (<span style="display: block;">{`${code}  ${label}`}</span>))}
-								</span>
-							) : (
-								<span style="color: var(--color-ink); font-weight: 600; flex: 1;">{v}</span>
-							)}
+							<span style="color: var(--color-ink); font-weight: 600; flex: 1;">{v}</span>
 						</div>
 					))}
 				</div>
@@ -421,14 +486,14 @@ const faqSchema = {
 				{shared.preface.map((sec) => (
 					<div style="margin: 0 0 1.7rem;">
 						<h4 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.98rem; font-weight: 800; margin: 0 0 0.5rem;">{sec.h}</h4>
-						{sec.p.map((para) => (
+						{sec.p.filter((para) => !editionSpecificNote(para)).map((para) => (
 							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1rem; line-height: 1.7; margin: 0 0 0.7rem;" set:html={colorWords(para)}></p>
 						))}
 					</div>
 				))}
 				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.1rem; font-weight: 600; margin: 2.6rem 0 0.7rem;">Also known as</h3>
 				<div class="flex flex-wrap gap-2">
-					{ed.listing.keywords.map((k) => (
+					{visibleKeywords.map((k) => (
 						<span style="font-family: var(--font-sans); font-size: 0.82rem; color: #3f3f46; background: var(--color-surface-low); border: 1px solid var(--color-hairline); border-radius: 999px; padding: 0.3rem 0.75rem;">{k}</span>
 					))}
 				</div>
