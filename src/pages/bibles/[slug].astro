@@ -152,6 +152,36 @@ const BRAND_KEYWORDS = new Set([
 ]);
 const visibleKeywords = ed.listing.keywords.filter((k) => !BRAND_KEYWORDS.has(k.toLowerCase()));
 
+// shared.json is what is IDENTICAL IN ALL EDITIONS. One preface paragraph is not: it counts
+// this edition's notes and chapters ("1,355 notes across 777 chapters"), which are the 6x9
+// single-volume figures. Inherited by every page, it contradicted the Large Print set on its
+// own page — 777 chapters in one sentence and 1,189 in another (Kevin 2026-09-18). A count
+// is edition-specific by definition, so it is dropped from the shared preface rather than
+// duplicated per edition. The figures themselves live in each edition's listing copy.
+const editionSpecificNote = (p: string) => /\bnotes across\b.*\bchapters\b/.test(p);
+
+// Two bindings, two prices, and the struck-through LIST price is COMPUTED from the volume
+// prices — never typed (Kevin 2026-09-18). Typing "$329.97" would go stale silently and
+// advertise a saving we do not give. Same rule print.astro already follows.
+type PricedEdition = Edition & { pricePaperback?: number; listFromVolumes?: string[] };
+const edp = ed as PricedEdition;
+const volumeFiles = import.meta.glob<{ default: PricedEdition }>('../../data/editions/*.json', {
+	eager: true,
+});
+const bySlug = new Map(
+	Object.values(volumeFiles)
+		.map((m) => m.default)
+		.filter((e) => e?.slug)
+		.map((e) => [e.slug, e]),
+);
+const listVolumes = (edp.listFromVolumes ?? [])
+	.map((s) => bySlug.get(s))
+	.filter(Boolean) as PricedEdition[];
+const listHb = listVolumes.length ? listVolumes.reduce((s, v) => s + v.price, 0) : null;
+const listPb = listVolumes.every((v) => typeof v.pricePaperback === 'number')
+	? listVolumes.reduce((s, v) => s + (v.pricePaperback ?? 0), 0) || null
+	: null;
+
 // SCREEN divine-voice palette — the same values /read has always used, adopted here so a
 // visitor sees one red on the product page and on the reader. Print ink is unchanged:
 // the interiors keep 3563ae / f04933 / 91278f. Kevin approved screen-only, 2026-08-24.
@@ -272,7 +302,20 @@ const faqSchema = {
 						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.son}; background: #fff; border: 2px solid ${VOICE.son}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>SON</span>
 						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.spirit}; background: #fff; border: 2px solid ${VOICE.spirit}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>SPIRIT</span>
 					</div>
-					<p style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">${ed.price.toFixed(2)}</p>
+					<p style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">
+						<span>{edp.pricePaperback ? "Hardback " : ""}${ed.price.toFixed(2)}</span>
+						{listHb && listHb > ed.price && (
+							<span style="font-size: 1rem; font-weight: 500; color: #71717a; text-decoration: line-through; margin-left: 0.55rem;">${listHb.toFixed(2)}</span>
+						)}
+					</p>
+					{typeof edp.pricePaperback === "number" && (
+						<p style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">
+							<span>Paperback ${edp.pricePaperback.toFixed(2)}</span>
+							{listPb && listPb > edp.pricePaperback && (
+								<span style="font-size: 1rem; font-weight: 500; color: #71717a; text-decoration: line-through; margin-left: 0.55rem;">${listPb.toFixed(2)}</span>
+							)}
+						</p>
+					)}
 					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">Free shipping — a $15 value.</p>
 					<div class="flex flex-wrap items-center gap-3">
 						<a href="/print" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Buy Now</a>
@@ -371,7 +414,6 @@ const faqSchema = {
 						['Publication date', ed.published],
 						['Language', 'English'],
 						['Translation', 'Father’s Heart Bible™ — An Intimate Translation'],
-						['Print length', `${pages} pages`],
 						['Binding', binding],
 						['Dimensions', trim],
 						['Interior', 'Full color throughout'],
@@ -437,7 +479,7 @@ const faqSchema = {
 				{shared.preface.map((sec) => (
 					<div style="margin: 0 0 1.7rem;">
 						<h4 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.98rem; font-weight: 800; margin: 0 0 0.5rem;">{sec.h}</h4>
-						{sec.p.map((para) => (
+						{sec.p.filter((para) => !editionSpecificNote(para)).map((para) => (
 							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1rem; line-height: 1.7; margin: 0 0 0.7rem;" set:html={colorWords(para)}></p>
 						))}
 					</div>
