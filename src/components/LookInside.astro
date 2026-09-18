@@ -33,8 +33,24 @@ interface Props {
 	/** 'lg' matches the page's primary CTA when the two sit side by side. */
 	size?: 'md' | 'lg';
 	label?: string;
+	/**
+	 * Render ONLY the trigger and reuse the viewer another instance of the same `slug`
+	 * already placed on this page — no second manifest, no second modal. For an edition
+	 * that appears more than once: its product card, plus its two rows in the bulk order
+	 * form. The page MUST still carry one full (non-reuse) instance of that slug, or the
+	 * button opens nothing — the caller owns that pairing, so only pass `reuse` for a slug
+	 * you can see rendered in full elsewhere on the same page.
+	 */
+	reuse?: boolean;
 }
-const { slug, title, variant = 'button', size = 'md', label = 'Look inside' } = Astro.props;
+const {
+	slug,
+	title,
+	variant = 'button',
+	size = 'md',
+	label = 'Look inside',
+	reuse = false,
+} = Astro.props;
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print/lookinside';
 
@@ -68,9 +84,18 @@ const ph = pages[0]?.h ?? 1400;
 // having to zoom. That value lives in CSS because it differs by breakpoint.
 ---
 
+{/* The reuse form: a trigger and nothing else. It carries no manifest and no modal — it
+    points at the full instance for this slug, which the script binds on load. */}
+{total > 0 && reuse && (
+	<div class={`lookinside li-${variant} li-size-${size}`}>
+		<button type="button" class="li-trigger" data-li-open-ref={slug} aria-haspopup="dialog">
+			<span>{label}</span>
+		</button>
+	</div>
+)}
 {
-	total > 0 && (
-		<div class={`lookinside li-${variant} li-size-${size}`} data-lookinside data-total={total}>
+	total > 0 && !reuse && (
+		<div class={`lookinside li-${variant} li-size-${size}`} data-lookinside data-li-slug={slug} data-total={total}>
 			<button type="button" class="li-trigger" data-li-open aria-haspopup="dialog">
 				{variant === 'button' && (
 					<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -405,6 +430,10 @@ const ph = pages[0]?.h ?? 1400;
 </style>
 
 <script>
+	// Which slugs have already claimed their remote triggers — see the binding at the foot
+	// of this block. Module scope, so it is per page load, not per root.
+	const CLAIMED = new Set();
+
 	document.querySelectorAll('[data-lookinside]').forEach((root) => {
 		if (root.hasAttribute('data-li-ready')) return;
 		root.setAttribute('data-li-ready', '');
@@ -702,6 +731,19 @@ const ph = pages[0]?.h ?? 1400;
 		modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
 
 		root.querySelector('[data-li-open]')?.addEventListener('click', open);
+		// REMOTE TRIGGERS — a `reuse` button anywhere on the page opens THIS viewer, so an
+		// edition appearing more than once (its product card, plus its two rows in the bulk
+		// form) ships ONE copy of the manifest and modal instead of three. Measured on
+		// /print: 46 extra FULL instances took the page from 1.16MB to 3.03MB.
+		// Claimed by slug, first root wins, so a duplicate full instance can never leave two
+		// viewers fighting over one button.
+		const slug = root.getAttribute('data-li-slug');
+		if (slug && !CLAIMED.has(slug)) {
+			CLAIMED.add(slug);
+			document
+				.querySelectorAll(`[data-li-open-ref="${CSS.escape(slug)}"]`)
+				.forEach((btn) => btn.addEventListener('click', open));
+		}
 		root.querySelector('[data-li-close]')?.addEventListener('click', close);
 		prevBtn.addEventListener('click', () => turn(-1));
 		nextBtn.addEventListener('click', () => turn(1));

@@ -366,6 +366,12 @@ const lpSkus = [
 			isbn: v.isbn[b],
 			img: `${LP_CARDS}/${v.key}-600.webp`,
 			books: 1,
+			// The row's own page and its own sample. `liSlug` joins builtPages
+			// (`<slug>-bible`); `liKey` is the look-inside manifest key. They are separate
+			// fields because the SET's two names differ — page `large-print`, sample
+			// `largeprint` — and collapsing them would have sent the set row to a 404.
+			liSlug: v.key,
+			liKey: v.key,
 		})),
 	),
 	...(['hb', 'pb'] as const).map((b) => ({
@@ -381,6 +387,8 @@ const lpSkus = [
 		img: `${LP_CARDS}/lp-set-600.webp`,
 		// ONE product on the ladder, not three (Kevin 2026-09-17) — see lpSetPb above.
 		books: 1,
+		liSlug: 'large-print',
+		liKey: 'largeprint',
 	})),
 ];
 // Flat SKU list — one entry per purchasable thing, used by the order builder and mirrored
@@ -428,6 +436,18 @@ const builtPages = new Set(
 		.filter(Boolean)
 		.map((slug) => `${slug}-bible`),
 );
+// WHICH LOOK-INSIDE VIEWERS THIS PAGE RENDERS IN FULL. A `reuse` trigger opens a viewer
+// another instance already placed here, so a trigger for a slug NOT in this set is a button
+// that does nothing — the silent cousin of a 404. The bulk form's rows are gated on it.
+// `largeprint` is deliberately ABSENT: the manifest does hold a set sample, but the set is
+// sold from a summary box rather than a card, so no viewer for it exists on this page. Its
+// two rows therefore show "Full details" alone — the rule is to render the line without the
+// missing link, never a link to nothing. Give the set a viewer and it joins this set.
+const liOnPage = new Set<string>([
+	...dvcEditions.map((e) => e.slug),
+	'general',
+	...lpVolumes.map((v) => v.key),
+]);
 const TRANSLATION_URL = '/the-fathers-heart-bible/translation-philosophy/';
 const CONTACT = 'mailto:hello@spiritmediapublishing.com?subject=Father%27s%20Heart%20Bible%20print';
 // SCREEN divine-voice palette — the same values /read has always used, adopted here so a
@@ -1006,7 +1026,24 @@ function markVoices(v: {
 								)}
 								<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
 									<img src={cardUrl(`dvc-${e.slug}`)} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-									<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.rowTitle ?? e.title}</span> <span style="white-space: nowrap; font-weight: 600;">${(b === 'hb' ? e.hb : e.pb).toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">· {e.spec(b)}</span></span>
+									<div style="flex: 1; min-width: 0;">
+									<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.rowTitle ?? e.title}</span> <span style="white-space: nowrap; font-weight: 600;">${(b === 'hb' ? e.hb : e.pb).toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">· {e.spec(b)}</span></span>
+									{/* SECOND LINE: the same two links the card above carries (Kevin
+									     2026-09-17). Same gates, not a second set of rules — "Full
+									     details" only when builtPages has the page, "Look inside"
+									     only where the manifest has that edition's sample. A row
+									     whose edition lacks either shows the line without it rather
+									     than linking to a 404. */}
+									<div class="row-links">
+										{builtPages.has(`${e.slug}-bible`) && (
+											<>
+												<a href={`/bibles/${e.slug}-bible`}>Full details</a>
+												<span aria-hidden="true" class="row-dot">·</span>
+											</>
+										)}
+										{liOnPage.has(e.slug) && <LookInside slug={e.slug} title={e.title} variant="link" label="Look inside" reuse />}
+									</div>
+									</div>
 									<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
 										<button type="button" class="qty-step" data-slug={`${e.slug}-${b}`} data-dir="-1" aria-label={`Fewer ${e.title} ${b === 'hb' ? 'Hardback' : 'Paperback'}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
 										<input type="number" class="qty-in" data-slug={`${e.slug}-${b}`} value="0" min="0" step="1" inputmode="numeric" aria-label={`${e.title} ${b === 'hb' ? 'Hardback' : 'Paperback'} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
@@ -1025,7 +1062,21 @@ function markVoices(v: {
 								{generalSkus.filter((s) => s.line === l.line).map((s) => (
 									<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
 										<img src={s.img} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-										<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">Father’s Heart Bible — {s.color}</span> <span style="white-space: nowrap; font-weight: 600;">${s.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{s.spec}</span></span>
+										<div style="flex: 1; min-width: 0;">
+										<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">Father’s Heart Bible — {s.color}</span> <span style="white-space: nowrap; font-weight: 600;">${s.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{s.spec}</span></span>
+										{/* The three colours SHARE an interior, so they share one
+										     look-inside key — keyed by LINE, exactly as the cards
+										     above do it. */}
+										<div class="row-links">
+											{builtPages.has('fathers-heart-bible') && (
+												<>
+													<a href="/bibles/fathers-heart-bible">Full details</a>
+													<span aria-hidden="true" class="row-dot">·</span>
+												</>
+											)}
+											{liOnPage.has('general') && <LookInside slug="general" title={`FHB — Father’s Heart Bible — ${l.label}`} variant="link" label="Look inside" reuse />}
+										</div>
+										</div>
 										<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
 											<button type="button" class="qty-step" data-slug={s.key} data-dir="-1" aria-label={`Fewer ${l.label} ${s.color} ${s.binding}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
 											<input type="number" class="qty-in" data-slug={s.key} value="0" min="0" step="1" inputmode="numeric" aria-label={`${l.label} ${s.color} ${s.binding} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
@@ -1042,7 +1093,21 @@ function markVoices(v: {
 						{lpSkus.map((s) => (
 							<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
 								<img src={s.img} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-								<span style="flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{s.title}</span> <span style="white-space: nowrap; font-weight: 600;">${s.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{s.spec}</span></span>
+								<div style="flex: 1; min-width: 0;">
+								<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{s.title}</span> <span style="white-space: nowrap; font-weight: 600;">${s.price.toFixed(2)}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{s.spec}</span></span>
+								{/* EACH VOLUME HAS ITS OWN SAMPLE — they are different books, and a
+								     shared one would show a reader pages their volume does not
+								     contain. The SET row points at the set's own page and sample. */}
+								<div class="row-links">
+									{builtPages.has(`${s.liSlug}-bible`) && (
+										<>
+											<a href={`/bibles/${s.liSlug}-bible`}>Full details</a>
+											<span aria-hidden="true" class="row-dot">·</span>
+										</>
+									)}
+									{liOnPage.has(s.liKey) && <LookInside slug={s.liKey} title={s.title} variant="link" label="Look inside" reuse />}
+								</div>
+								</div>
 								<div style="display: inline-flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden;">
 									<button type="button" class="qty-step" data-slug={s.key} data-dir="-1" aria-label={`Fewer ${s.title}`} style="font-family: var(--font-sans); width: 2.2rem; height: 2.2rem; border: 0; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink); font-size: 1.15rem; cursor: pointer;">−</button>
 									<input type="number" class="qty-in" data-slug={s.key} value="0" min="0" step="1" inputmode="numeric" aria-label={`${s.title} quantity`} style="width: 3.2rem; text-align: center; border: 0; background: #fff; font-family: var(--font-sans); font-size: 1rem; color: var(--color-ink); -moz-appearance: textfield;" />
@@ -1154,6 +1219,39 @@ function markVoices(v: {
 	}
 	.faq-item[open] > summary .faq-chev {
 		transform: rotate(180deg);
+	}
+
+	/* The bulk form's second line. SUBORDINATE ON PURPOSE (jonah): the form is 46 rows long
+	   and the quantity steppers are what a buyer came to use — these links inform, they do
+	   not compete. Smaller, muted until hover, tight under the title line. */
+	.row-links {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		flex-wrap: wrap;
+		margin-top: 0.15rem;
+		font-family: var(--font-sans);
+		font-size: 0.78rem;
+	}
+	.row-links a,
+	.row-links :global(.li-trigger) {
+		font-family: var(--font-sans);
+		font-size: 0.78rem;
+		font-weight: 600;
+		color: #71717a;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+		background: none;
+		border: 0;
+		padding: 0;
+		cursor: pointer;
+	}
+	.row-links a:hover,
+	.row-links :global(.li-trigger):hover {
+		color: var(--color-ink);
+	}
+	.row-dot {
+		color: #a1a1aa;
 	}
 </style>
 
