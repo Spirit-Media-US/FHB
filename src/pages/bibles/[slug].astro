@@ -239,7 +239,10 @@ const productSchema = {
 	alternateName: [ed.name, 'FHB'],
 	bookFormat: 'https://schema.org/Hardcover',
 	numberOfPages: pages,
-	isbn: ed.isbn,
+	// The Large Print SET carries no ISBN of its own — Kevin assigned numbers per volume, as
+	// lp-set.json's _isbnNote records. An empty string is not an ISBN, so the property is
+	// omitted rather than emitted blank, which is invalid structured data.
+	...(ed.isbn ? { isbn: ed.isbn } : {}),
 	inLanguage: 'en',
 	datePublished,
 	description: `${ed.sub}. The complete Bible in Divine Voice Color — our Father's words in blue, the Son's in red, the Spirit's in purple.`,
@@ -417,6 +420,8 @@ const faqSchema = {
 						['Binding', binding],
 						['Dimensions', trim],
 						['Interior', 'Full color throughout'],
+						// Empty for the Large Print SET, which has no ISBN of its own — the row is
+						// dropped rather than printed with a blank value (filtered below).
 						['ISBN-13', ed.isbn],
 						// BISAC codes are OFF the storefront (Kevin 2026-09-18). They are the book
 						// trade's shelf classification and belong in the metadata sheet and the ONIX
@@ -424,7 +429,9 @@ const faqSchema = {
 						// raw code like REL012160 reads as an error on a product page. Same rule as
 						// "case laminate": trade vocabulary stays in the trade fields. The codes are
 						// still carried in ed.listing.bisac for the feed — just not rendered here.
-					].map(([k, v], n) => (
+					]
+						.filter(([, v]) => v)
+						.map(([k, v], n) => (
 						<div class="flex flex-wrap gap-2 px-5 py-3" style={`font-family: var(--font-sans); font-size: 0.9rem; ${n % 2 ? 'background: #fafafa;' : ''}`}>
 							<span style="color: #71717a; min-width: 10rem;">{k}</span>
 							<span style="color: var(--color-ink); font-weight: 600; flex: 1;">{v}</span>
