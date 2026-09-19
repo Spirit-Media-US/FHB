@@ -17,6 +17,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+// This script rebuilds src/content/bible wholesale, exactly like community's copy, so
+// anything written into that tree with no source is destroyed on the next run. That cost
+// ~883 generated English meta descriptions on 2026-09-19. The guard is shared rather than
+// copied: one implementation, every destroyer.
+import { guardFieldLoss } from '/home/deploy/bin/lib/derived-guard.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -169,7 +174,12 @@ if (!fs.existsSync(LOCKED_DIR)) {
 		for (const file of files) {
 			const data = readJson(path.join(bookDir, file));
 			const out = flattenChapter(data, 'locked', existing[`${slug}/${data.chapter}`]);
-			fs.writeFileSync(path.join(outBookDir, chapterFile(data.chapter)), JSON.stringify(out, null, 2));
+			{
+				const __f = path.join(outBookDir, chapterFile(data.chapter));
+				const __c = JSON.stringify(out, null, 2);
+				guardFieldLoss(__f, __c, { label: 'FHB sync-translations' });
+				fs.writeFileSync(__f, __c);
+			}
 			chapters.push(data.chapter);
 			totalChapters++;
 		}
@@ -215,7 +225,12 @@ if (fs.existsSync(READING_EDITION_MANIFEST)) {
 			const out = flattenChapter(readJson(draftPath), 'reading-edition', existing[`${slug}/${ch}`]);
 			out.promotedAt = info.promoted_at || null;
 			out.promotedBy = info.promoted_by || null;
-			fs.writeFileSync(path.join(outBookDir, chapterFile(ch)), JSON.stringify(out, null, 2));
+			{
+				const __f = path.join(outBookDir, chapterFile(ch));
+				const __c = JSON.stringify(out, null, 2);
+				guardFieldLoss(__f, __c, { label: 'FHB sync-translations' });
+				fs.writeFileSync(__f, __c);
+			}
 			reChapters.push(ch);
 			readingEditionTotal++;
 			totalChapters++;
