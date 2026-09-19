@@ -163,6 +163,27 @@
 	   CSS — keep both surfaces in sync. */
 	--font-headline: "Epilogue", "Epilogue fallback", system-ui, sans-serif;
 	--font-body: "Manrope", "Manrope fallback", system-ui, sans-serif;
+	--font-serif: "Epilogue", "Epilogue fallback", system-ui, sans-serif;
+	--font-sans: "Manrope", "Manrope fallback", system-ui, sans-serif;
+}
+
+/* Telugu companion face — SCOPED TO TELUGU PAGES (was global; narrowed 2026-09-19).
+   Kevin added Noto Sans Telugu to --font-serif/--font-sans on 2026-07-22 so Telugu
+   renders properly. That intent is unchanged here for pages whose content is Telugu.
+
+   What changed is WHERE it applies. Sitting in the base vars, every page paid for it
+   the moment one Telugu glyph appeared — and the English homepage renders the language
+   switcher's endonyms, so తెలుగు (six characters) pulled a 35.7KB webfont on every
+   English visit. Measured 2026-09-19: fonts were 291KB across 9 files, larger than the
+   document, CSS, scripts and images combined, and the last resources to finish; mobile
+   PSI swung between 86 (LCP 3.45s) and 98 (LCP 2.3s) as those bytes raced the hero
+   image. Every OTHER non-Latin endonym on that page — Arabic, Devanagari, CJK,
+   Cyrillic, Gurmukhi, Bengali, Tamil, Hangul — already falls back to a system font with
+   no webfont at all, so system fallback for a six-character label is this site's own
+   existing norm rather than a new compromise.
+
+   :lang(te) matches <html lang="te"> from Layout.astro, so Telugu pages keep the face. */
+:lang(te) {
 	--font-serif: "Epilogue", "Epilogue fallback", "Noto Sans Telugu", system-ui, sans-serif;
 	--font-sans: "Manrope", "Manrope fallback", "Noto Sans Telugu", system-ui, sans-serif;
 }
