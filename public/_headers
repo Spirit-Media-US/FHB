@@ -11,6 +11,33 @@
 
 /
   Link: <https://assets.spiritmediapublishing.com/FHB/hero-desktop.webp>; rel=preload; as=image; imagesrcset="https://assets.spiritmediapublishing.com/FHB/hero-tablet.webp 800w, https://assets.spiritmediapublishing.com/FHB/hero-desktop.webp 1200w"; imagesizes="(max-width: 1023px) 800px, 1200px"; media="(min-width: 1024px)"
+  # EDGE-CACHE THE HOMEPAGE (2026-09-19). No Cache-Control was set for HTML anywhere in
+  # this file, so Pages' default — max-age=0, must-revalidate — reached every visitor and
+  # Cloudflare never served this page from an edge. Measured consequence, from REAL USERS
+  # (Chrome UX Report, 28 days, many samples):
+  #
+  #   TTFB  2.4s at the 75th percentile — 44% of loads over 1.8s, only 24% good
+  #   LCP   3.4s  ->  FAILS the Core Web Vitals assessment (needs <= 2.5s)
+  #
+  # LCP CONTAINS TTFB. With 2.4s gone before the first byte arrives, roughly one second of
+  # the 2.5s budget remains to fetch and paint the hero, which is not enough: 15% of loads
+  # exceed 4s. The page itself is fast — Lighthouse from a warm nearby edge scores 98 with
+  # LCP 2.2s. It renders quickly and waits slowly, and no amount of shaving bytes repairs a
+  # round trip that happens before any byte is sent. Two earlier rounds of font and image
+  # work moved the lab score a few points and could not move this, because they were
+  # optimising the wrong half of the timeline.
+  #
+  # Why these exact values: they are the policy the READER has run in production for months
+  # (max-age=60, s-maxage=300, stale-while-revalidate=600), so this adopts a proven setting
+  # rather than inventing one. max-age=0 keeps BROWSERS revalidating, so a returning visitor
+  # never holds a stale homepage; s-maxage lets CLOUDFLARE answer from an edge near the
+  # user, which is the entire point.
+  #
+  # Deploy safety: deploy-live.sh purges the edge cache after each deploy, so new content is
+  # never hidden behind this. That purge had silently stopped running and was repaired the
+  # same day this header was added — if it breaks again, THIS header is what makes the
+  # breakage visible to visitors, so treat a stale homepage as a purge failure first.
+  Cache-Control: public, max-age=0, s-maxage=300, stale-while-revalidate=600
 
 # Favicons: short cache so future swaps revalidate quickly (URL ?v= bump forces immediate refresh)
 /favicon*
