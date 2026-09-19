@@ -272,6 +272,52 @@ for (const [lang, books] of byLang) {
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+// ── <lastmod>, per chapter (2026-09-19) ──────────────────────────────────────────
+// WHY THIS MATTERS MORE THAN IT LOOKS. This sitemap emitted <changefreq> and
+// <priority> — the two hints Google has said publicly that it IGNORES — and no
+// <lastmod>, the one it actually uses to schedule crawling. FHB publishes ~16,400
+// reader URLs against a measured Googlebot budget of 6,060 requests/week: 0.39
+// crawls per URL per week. At that ratio the budget is not merely small, it is spent
+// BLIND — nothing distinguishes a chapter we rewrote this morning from one untouched
+// since June, so re-crawls land on pages Google already has while 147 sampled URLs
+// sit unreached at last_crawl=None.
+//
+// SOURCE: the reader data the site actually serves, which carries a per-chapter
+// updatedAt (one file per BOOK, so ~66 reads per language rather than 16,400).
+//
+// NEVER GUESS A DATE. A sitemap claiming everything changed today is worse than one
+// with no lastmod at all: Google learns the signal is noise and discounts it, and we
+// would have spent the credibility we are trying to build. So if the reader data is
+// missing, or a chapter has no updatedAt, the URL is emitted WITHOUT a lastmod.
+// Absent is honest; invented is not.
+const BIBLE_DATA = '/srv/sites/community/public/bible-data';
+const lastmodCache = new Map();          // `${lang}/${slug}` -> Map(chapter -> 'YYYY-MM-DD')
+let lastmodHits = 0;
+let lastmodMisses = 0;
+
+function bookLastmods(lang, slug) {
+  const ck = `${lang}/${slug}`;
+  if (lastmodCache.has(ck)) return lastmodCache.get(ck);
+  const out = new Map();
+  try {
+    const doc = JSON.parse(fs.readFileSync(path.join(BIBLE_DATA, lang, `${slug}.json`), 'utf8'));
+    for (const [n, ch] of Object.entries(doc.chapters || {})) {
+      const raw = ch && ch.updatedAt;
+      if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}/.test(raw)) out.set(Number(n), raw.slice(0, 10));
+    }
+  } catch { /* no reader data for this book: emit no lastmod, never a guess */ }
+  lastmodCache.set(ck, out);
+  return out;
+}
+
+function lastmodFor(lang, key) {
+  const i = key.lastIndexOf('/');
+  const d = bookLastmods(lang, key.slice(0, i)).get(Number(key.slice(i + 1)));
+  if (d) { lastmodHits++; return `<lastmod>${d}</lastmod>`; }
+  lastmodMisses++;
+  return '';
+}
+
 const parts = [];
 parts.push('<?xml version="1.0" encoding="UTF-8"?>');
 parts.push(
@@ -319,7 +365,7 @@ for (const key of keys) {
     ? `<xhtml:link rel="alternate" hreflang="x-default" href="${esc(langs.get('en'))}"/>`
     : '';
   for (const [l, u] of langs) {
-    const entry = `<url><loc>${esc(u)}</loc><changefreq>monthly</changefreq><priority>0.8</priority>${alts}${xdefault}</url>`;
+    const entry = `<url><loc>${esc(u)}</loc>${lastmodFor(l, key)}<changefreq>monthly</changefreq><priority>0.8</priority>${alts}${xdefault}</url>`;
     parts.push(entry);
     if (SPLIT) segs.get(l).push(entry);
     count++;
