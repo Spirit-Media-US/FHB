@@ -1,0 +1,336 @@
+---
+// /telugu-bible — the Telugu Bible page.
+//
+// SUBJECT: the Telugu edition of the Father's Heart Bible, not a country and not
+// an audience. Sibling in kind to the /guides/* pages (same Layout, same section
+// order, same schema stack) — deliberately NOT CountryBible, which answers
+// demographic questions about a nation.
+//
+// EVERY CHAPTER LINKED HERE WAS CHOSEN FROM MEASURED DEMAND, not from instinct:
+//   - Search Console, 90 days to 2026-09-16, pages containing /read/te/:
+//     keerthanalu 23 (171 impressions, pos 8.4), keerthanalu 90 telugu bible (35),
+//     ephesians 6 in telugu (33), keerthanalu 15 telugu bible (32),
+//     aposthula karyamulu 16 in telugu (31), keerthanalu 23 telugu bible (30),
+//     ephesians 6 telugu (21), habakkuk 2 3 telugu (19), keerthanalu 91 (19),
+//     luke 11 telugu (19), keerthanalu 92 telugu bible (17),
+//     ephesians 3 in telugu (16), luke 10 in telugu (12), keerthanalu 20 (12).
+//   - Ahrefs (projects/fhb-te-seo): `telugu bible` 28,000/mo KD 0,
+//     `keerthanalu 91` 2,700, `keerthanalu 23` 700, `కీర్తనలు 121` 200,
+//     `కీర్తనలు 103` 100, `ఆదికాండము 1` 150.
+// `telugu samethalu` (2,600) is Telugu FOLK PROVERBS, not the book of Proverbs —
+// the known trap in this language. Deliberately not served here.
+//
+// NO AUDIO CLAIM. src/lib/audio-reader.ts in the community app narrates English
+// only; Telugu has exactly one approved test chapter (Genesis 1). Saying "with
+// audio" here would be a claim of a feature this edition lacks.
+//
+// Canon figures (66 books / 1,189 chapters) are MEASURED from
+// /srv/sites/community/src/content/bible-te, not quoted from a note.
+import AuthorBio from '../components/AuthorBio.astro';
+import ReviewLink from '../components/ReviewLink.astro';
+import Layout from '../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/telugu-bible/'; // trailing slash = the canonical form Layout.astro emits
+const TITLE = "Telugu Bible — Read the Father's Heart Bible Free Online";
+const DESCRIPTION =
+	'Telugu Bible: read the Father’s Heart Bible free online — all 66 books, 1,189 chapters, in Telugu. No account, no app. A fresh translation revealing our Father.';
+const PUBLISHED = '2026-09-19';
+const MODIFIED = '2026-09-19';
+
+const READ_TE = 'https://fathersheartbible.com/read/te/';
+
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: 'Founder & CEO, Spirit Media Publishing',
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+// Psalms carries the overwhelming majority of measured Telugu chapter demand,
+// in both scripts. Ordered by measured demand, highest first.
+const PSALMS = [
+	{
+		ch: 23,
+		roman: 'Keerthanalu 23',
+		note: 'The Lord is my shepherd — the most-opened Telugu chapter on the site.',
+	},
+	{ ch: 91, roman: 'Keerthanalu 91', note: 'He who dwells in the shelter of the Most High.' },
+	{
+		ch: 90,
+		roman: 'Keerthanalu 90',
+		note: 'The prayer of Moses — our Father, our dwelling place in every generation.',
+	},
+	{ ch: 121, roman: 'Keerthanalu 121', note: 'I lift up my eyes to the hills.' },
+	{
+		ch: 119,
+		roman: 'Keerthanalu 119',
+		note: 'The longest chapter in Scripture — a love for His word, verse by verse.',
+	},
+	{ ch: 103, roman: 'Keerthanalu 103', note: 'As a father has compassion on his children.' },
+	{
+		ch: 92,
+		roman: 'Keerthanalu 92',
+		note: 'A song for the Sabbath — planted in the house of our Father.',
+	},
+	{ ch: 20, roman: 'Keerthanalu 20', note: 'May He answer you in the day of trouble.' },
+	{ ch: 15, roman: 'Keerthanalu 15', note: 'Who may dwell in Your holy hill?' },
+	{ ch: 1, roman: 'Keerthanalu 1', note: 'Like a tree planted by streams of water.' },
+];
+
+// Everything Telugu readers reach for outside Psalms, again from measured demand.
+const BEYOND = [
+	{
+		href: `${READ_TE}ephesiyulaku/6/`,
+		label: 'ఎఫెసీయులకు 6',
+		roman: 'Ephesians 6',
+		note: 'The armour of our Father — the most-searched non-Psalm chapter in Telugu.',
+	},
+	{
+		href: `${READ_TE}ephesiyulaku/3/`,
+		label: 'ఎఫెసీయులకు 3',
+		roman: 'Ephesians 3',
+		note: 'Paul kneels before the Father from whom every family is named.',
+	},
+	{
+		href: `${READ_TE}aposthula-karyamulu/16/`,
+		label: 'అపొస్తలుల కార్యములు 16',
+		roman: 'Acts 16',
+		note: 'Midnight songs in a Philippian prison, and a household set free.',
+	},
+	{
+		href: `${READ_TE}luka/11/`,
+		label: 'లూకా 11',
+		roman: 'Luke 11',
+		note: '“When you pray, say: Father” — and the Father who gives good gifts.',
+	},
+	{
+		href: `${READ_TE}luka/10/`,
+		label: 'లూకా 10',
+		roman: 'Luke 10',
+		note: 'The good Samaritan, and Mary at His feet.',
+	},
+	{
+		href: `${READ_TE}habakkuku/2/`,
+		label: 'హబక్కూకు 2',
+		roman: 'Habakkuk 2',
+		note: '“Though it linger, wait for it” — the vision that is yet for an appointed time.',
+	},
+	{
+		href: `${READ_TE}adikandam/1/`,
+		label: 'ఆదికాండము 1',
+		roman: 'Genesis 1',
+		note: 'Where the whole story starts — a Father speaking a world into being.',
+	},
+];
+
+const FAQS = [
+	{
+		question: 'Is there a free Telugu Bible I can read online?',
+		answer:
+			"Yes. The Father's Heart Bible™ is free to read online in Telugu — all 66 books and 1,189 chapters, with no account, no purchase and no app to install. Open it at fathersheartbible.com/read/te/ on any phone or computer.",
+	},
+	{
+		question: "What is the Father's Heart Bible in Telugu?",
+		answer:
+			'తండ్రి హృదయ బైబిల్ — a fresh Telugu translation of the whole Bible whose distinctive is that it reveals God as our Father wherever Scripture reveals Him that way. It is not a revision of an existing Telugu Bible; it is translated afresh, book by book, from Genesis to Revelation.',
+	},
+	{
+		question: 'Which Telugu Bible chapters do people read most?',
+		answer:
+			'కీర్తనలు (Psalms) carries most of it — Keerthanalu 23 and Keerthanalu 91 above all, then 90, 121, 119 and 103. Outside the Psalms the most-opened chapters are Ephesians 6, Acts 16, Luke 11 and Habakkuk 2.',
+	},
+	{
+		question: 'How do I find a particular chapter in the Telugu Bible?',
+		answer:
+			'Every Telugu chapter has its own address in the form fathersheartbible.com/read/te/<book>/<chapter>/, using the Latin-script Telugu book name — so Psalm 23 is /read/te/keerthanalu/23/ and Genesis 1 is /read/te/adikandam/1/. You can also open the Telugu reader and pick the book and chapter from the list.',
+	},
+	{
+		question: 'Does the Telugu Bible have audio?',
+		answer:
+			"Not yet. Audio narration is currently available on the English edition of the Father's Heart Bible™; the Telugu text is complete and free to read today, and Telugu narration is not yet published.",
+	},
+	{
+		question: 'Is the whole Bible available in Telugu, or only part of it?',
+		answer:
+			'The whole Bible. The Telugu edition publishes all 66 books and every one of their 1,189 chapters — Old Testament and New — not a sample or a selection of favourites.',
+	},
+];
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: 'Telugu Bible: Read the Father’s Heart Bible Free Online',
+	description: DESCRIPTION,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: PUBLISHED,
+	dateModified: MODIFIED,
+	inLanguage: 'en-US',
+	about: { '@type': 'Language', name: 'Telugu', alternateName: 'తెలుగు' },
+	articleSection: 'Bible Translations',
+	keywords:
+		'telugu bible, bible in telugu, telugu bible online, keerthanalu, telugu bible read online free',
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{ '@type': 'ListItem', position: 2, name: 'Telugu Bible', item: PAGE_URL },
+	],
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [articleSchema, breadcrumbSchema, faqSchema];
+
+const TOC = [
+	{ id: 'what-it-is', label: 'What it is' },
+	{ id: 'how-it-reads', label: 'How it reads in Telugu' },
+	{ id: 'psalms', label: 'Keerthanalu — the Psalms' },
+	{ id: 'beyond-psalms', label: 'Beyond the Psalms' },
+	{ id: 'find-a-chapter', label: 'Finding a chapter' },
+	{ id: 'faq', label: 'FAQ' },
+];
+---
+
+<Layout title={TITLE} description={DESCRIPTION} jsonLd={jsonLd} pageType="article" articleAuthor="Kevin White" articlePublishedTime={PUBLISHED} articleSection="Bible Translations" articleTags={["Telugu Bible", "Bible in Telugu", "Father's Heart Bible"]}>
+	<main id="main-content">
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Telugu Bible</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);" lang="te">తెలుగు బైబిల్</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">The Telugu Bible</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; leading the Father&rsquo;s Heart Bible&trade; translation</span>
+					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<strong style="color: var(--color-ink);">You can read the whole Bible in Telugu, free, right now &mdash; all 66 books and 1,189 chapters of the Father&rsquo;s Heart Bible&trade;, with no account, no purchase and no app.</strong> The Telugu edition, <span lang="te">తండ్రి హృదయ బైబిల్</span>, is a fresh translation rather than a revision of an older one, and it carries the distinctive the whole project exists for: wherever Scripture reveals God as a Father, this Bible says so plainly. <a href={READ_TE} style="color: var(--color-brand);" class="hover:underline">Open the Telugu reader</a> and you can be in <span lang="te">కీర్తనలు</span> 23 in a few seconds.
+				</p>
+
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">The complete Bible in Telugu, free online &mdash; a fresh translation that lets Telugu readers hear God speak as a Father.</p>
+				</aside>
+
+				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>
+					<ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
+						{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}
+					</ul>
+				</nav>
+
+				<h2 id="what-it-is" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">What the Telugu Father&rsquo;s Heart Bible is</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">It is the complete Bible in Telugu: sixty-six books, 1,189 chapters, Genesis through Revelation, published in full rather than as a sample. It lives online and it is free &mdash; there is no sign-up wall, nothing to buy and nothing to download before you can read. Every chapter has its own permanent address, so a chapter you find today can be bookmarked, shared in a message, or opened again next year at the same link.</p>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">It is also a fresh translation, not a re-typeset of an existing Telugu Bible. That matters because the thing this translation exists to recover is easy to lose in revision: the family language of Scripture. Where the text reveals God as a Father to His sons and daughters, the Father&rsquo;s Heart Bible&trade; renders it that way in Telugu, instead of flattening it into the language of a distant ruler. You can read <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why the translation exists</a> in more depth, and the same Bible is available in <a href="/a-bible-for-the-whole-world/" style="color: var(--color-brand);" class="hover:underline">many other languages</a>.</p>
+
+				<h2 id="how-it-reads" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">How this translation reads in Telugu</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Telugu Christians have had Scripture in their language for generations, and much of that inheritance is beautiful and formal. The Father&rsquo;s Heart Bible&trade; does not compete with it on ceremony. It aims at plainness &mdash; the Telugu a family actually speaks &mdash; and at warmth, because the relationship the text describes is a family one.</p>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The books carry their familiar Telugu names: <span lang="te">ఆదికాండము</span> for Genesis, <span lang="te">కీర్తనలు</span> for Psalms, <span lang="te">యోహాను</span> for John, <span lang="te">అపొస్తలుల కార్యములు</span> for Acts. Read a few chapters and the difference from a formal rendering shows up quickly: our Father addresses His people as His own, and the text lets Him.</p>
+
+				<h2 id="psalms" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);"><span lang="te">కీర్తనలు</span> &mdash; the Psalms Telugu readers open most</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">More Telugu readers arrive at a Psalm than at any other part of Scripture, and the same handful come up again and again. These are those chapters, in the order they are actually opened &mdash; each one a direct link into the Telugu text:</p>
+				<ul class="space-y-3 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: disc;">
+					{PSALMS.map((p) => (
+						<li>
+							<a href={`${READ_TE}keerthanalu/${p.ch}/`} style="color: var(--color-brand);" class="hover:underline font-semibold"><span lang="te">కీర్తనలు</span> {p.ch}</a>
+							<span> &mdash; {p.roman} &mdash; {p.note}</span>
+						</li>
+					))}
+				</ul>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">If you are starting anywhere, start at <a href={`${READ_TE}keerthanalu/23/`} style="color: var(--color-brand);" class="hover:underline"><span lang="te">కీర్తనలు</span> 23</a>. It is six verses long, it is the chapter Telugu readers open more than any other on this site, and it is the shortest route into what this translation is for.</p>
+
+				<h2 id="beyond-psalms" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Beyond the Psalms</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Outside the Psalms, Telugu readers reach most often for a short list of chapters &mdash; a letter about standing firm, a prison that opens at midnight, a lesson on how to pray, and the first page of everything:</p>
+				<ul class="space-y-3 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: disc;">
+					{BEYOND.map((b) => (
+						<li>
+							<a href={b.href} style="color: var(--color-brand);" class="hover:underline font-semibold"><span lang="te">{b.label}</span></a>
+							<span> &mdash; {b.roman} &mdash; {b.note}</span>
+						</li>
+					))}
+				</ul>
+
+				<h2 id="find-a-chapter" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Finding any chapter in the Telugu Bible</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Every Telugu chapter has a plain, permanent address built from the book name in Latin script and the chapter number:</p>
+				<ul class="space-y-2 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: disc;">
+					<li><code>fathersheartbible.com/read/te/keerthanalu/91/</code> &mdash; Psalm 91</li>
+					<li><code>fathersheartbible.com/read/te/adikandam/1/</code> &mdash; Genesis 1</li>
+					<li><code>fathersheartbible.com/read/te/yohanu/3/</code> &mdash; John 3</li>
+				</ul>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">You do not have to remember any of that. <a href={READ_TE} style="color: var(--color-brand);" class="hover:underline">Open the Telugu reader</a> and pick the book and chapter from the list, or use the chapter picker inside any chapter to jump straight to a verse. English book names work too &mdash; <code>/read/te/psalms/91/</code> lands on the same Telugu chapter.</p>
+
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Telugu Bible free</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">The whole Bible in Telugu, online and free &mdash; a fresh translation revealing God as a loving Father to His sons and daughters.</p>
+					<a href={`${READ_TE}keerthanalu/23/`} class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Open <span lang="te">కీర్తనలు</span> 23<span aria-hidden="true">&rarr;</span></a>
+				</aside>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="space-y-6">
+					{FAQS.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Keep going: open the <a href={READ_TE} style="color: var(--color-brand);" class="hover:underline">Telugu Bible</a> or the <a href="/marathi-bible/" style="color: var(--color-brand);" class="hover:underline">Marathi Bible</a>, see <a href="/a-bible-for-the-whole-world/" style="color: var(--color-brand);" class="hover:underline">every language the Father&rsquo;s Heart Bible is being translated into</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why this translation exists</a>, or read about <a href="/bible-in/india/" style="color: var(--color-brand);" class="hover:underline">the Bible in India</a>. New to Scripture? Start with <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start reading the Bible</a>.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">The whole Bible, in Telugu, free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Sixty-six books and 1,189 chapters, online at no cost &mdash; a fresh Telugu translation that reveals God as a loving Father.</p>
+				<a href={READ_TE} class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read in Telugu<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<ReviewLink class="mb-10" />
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>
