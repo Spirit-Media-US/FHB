@@ -212,6 +212,38 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		     ═══════════════════════════════════════════════════════════ -->
 		<CoverMarquee />
 
+		<!-- intro + CTAs — Kevin 2026-09-24: the FHB back-cover copy, verbatim,
+		     minus its closing tagline. The three colour words use the VoiceChips
+		     palette. Then the two original buttons, then the tagline as the section's
+		     closing line (Kevin 2026-09-24: below the buttons; it appears ONCE).
+		     Rhythm with CoverMarquee: 2rem between every part, 1rem between
+		     paragraphs, 3rem / 4rem (lg) clear space above and below the group.
+		     Ported from the SMP homepage 2026-09-24. SMP's type-body-lg / btn classes
+		     don't exist here, so it wears this page's own body-copy and CTA styles.
+		     The tagline is NOT repeated here: this site's CoverMarquee still renders
+		     it, and it must appear once (pending Kevin's call on where it lives). -->
+		<div class="mx-auto max-w-3xl text-center px-6 pt-8 pb-12 lg:pb-16">
+			<p class="text-xl leading-relaxed" style="font-family: var(--font-body); color: var(--color-muted);">For a hundred and twenty-five years, red letters have shown you the Son speaking. Our Father speaks more than three times as often — 128,579 words across 5,615 verses. Father's Heart Bible is the first Bible in print where you can see who is speaking.</p>
+			<p class="mt-4 text-xl leading-relaxed" style="font-family: var(--font-body); color: var(--color-muted);">Our Father's words in <strong style="color:#2563eb">BLUE</strong>. The Son's in <strong style="color:#c8102e">RED</strong>. The Spirit's in <strong style="color:#6a3fa0">PURPLE</strong>.</p>
+			<p class="mt-4 text-xl leading-relaxed" style="font-family: var(--font-body); color: var(--color-muted);">More than one word in four of the Bible is a divine voice speaking. This is not a study Bible about our Father. It is His voice, made visible, so you can hear it.</p>
+			<div class="mt-8 flex flex-wrap justify-center gap-4">
+				<a
+					href="/print"
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
+					style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border: 1px solid #FFD9E0;"
+					onmouseover="this.style.opacity='0.9'"
+					onmouseout="this.style.opacity='1'"
+				>Get It in Print</a>
+				<a
+					href="/read"
+					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
+					style="font-family: var(--font-sans); background-color: transparent; color: #4A4A4A; border: 1px solid #4A4A4A;"
+					onmouseover="this.style.opacity='0.8'"
+					onmouseout="this.style.opacity='1'"
+				>Read &amp; Listen Free</a>
+			</div>
+		</div>
+
 		<!-- ═══════════════════════════════════════════════════════════
 		     DESKTOP HERO SUBTEXT — appears below the desktop hero only
 		     (mobile subtitle + CTAs already rendered in the mobile hero above)
