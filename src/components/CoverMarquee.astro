@@ -54,11 +54,14 @@ const LARGE_PRINT = [
 	['lp-set', 'Large Print three-volume set'],
 ];
 
-// Displayed box is 120x153 CSS px. The source cards are 600 wide; every one is
-// 600x764 except the 8x10 journaling card (600x725), so its height attribute is its
-// own — a shared number would letterbox it and report the wrong aspect to the
-// browser. width/height are the DISPLAY size, which is what protects CLS.
-const H = (key: string) => (key === 'dvc-journaling' ? 145 : 153);
+// Displayed box is 180 CSS px wide (1.5x the original 120 — Kevin 2026-09-24). The
+// source cards are 600 wide, so even a 2x screen draws 360 of 600 available pixels.
+// Every card is 600x764 except the 8x10 journaling card (600x725), so height is
+// computed from each card's own ratio — a shared number would letterbox it and report
+// the wrong aspect to the browser. width/height are the DISPLAY size (180x229 and
+// 180x218), which is what protects CLS.
+const W = 180;
+const H = (key: string) => Math.round((W * (key === 'dvc-journaling' ? 725 : 764)) / 600);
 const covers = [
 	...DVC.map(([slug, name]) => ({ key: `dvc-${slug}`, name })),
 	...GENERAL.map(([key, name]) => ({ key, name })),
@@ -83,7 +86,7 @@ const covers = [
 								<img
 									src={c.src}
 									alt={copy === 1 ? '' : `Father's Heart Bible — ${c.name}`}
-									width="120"
+									width={W}
 									height={c.h}
 									loading="lazy"
 									decoding="async"
@@ -128,7 +131,9 @@ const covers = [
 		display: flex;
 		width: max-content;
 		will-change: transform;
-		animation: fhbm-scroll 70s linear infinite;
+		/* 100s, not 70s: the 1.5x tiles make the track 200/140 as long, so the duration
+		   scales with it to keep the same on-screen speed (~px per second). */
+		animation: fhbm-scroll 100s linear infinite;
 	}
 	.fhbm-row {
 		display: flex;
@@ -140,7 +145,7 @@ const covers = [
 	}
 	.fhbm-row img {
 		display: block;
-		width: 120px;
+		width: 180px;
 		height: auto;
 	}
 	@keyframes fhbm-scroll {
