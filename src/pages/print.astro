@@ -339,15 +339,8 @@ const lpVolumes = [
 		pb: 79.99,
 		hb: 99.99,
 		isbn: { pb: '979-8-89307-341-6', hb: '979-8-89307-344-7' },
-		// AMAZON ONLY — this flag no longer touches the DIRECT route (Kevin 2026-09-17,
-		// SUPERSEDING D164's "leave button inactive": "we sell ALL editions. The form should
-		// sell ALL editions now. All will show on Amazon soon."). Vol 3 is purchasable direct
-		// like every other SKU. What stays faded is its two AMAZON buttons — there is still no
-		// listing to send a buyer to, which was D164's actual point.
-		// The flag is what FORCES those placeholders: without it, an lp-vol3 entry appearing in
-		// amazon-links.json would activate the buttons before anyone had checked the listing.
-		// Delete it once the listing is verified live, reading the title back (D184).
-		comingSoon: true,
+		// Its Amazon buttons went live 2026-09-24 once both listings appeared (D164 said leave
+		// them inactive UNTIL then); the links come from amazon-links.json like every volume.
 	},
 ];
 // THE STRUCK-THROUGH LIST PRICE IS COMPUTED, NEVER TYPED. It is the sum of the three volume
@@ -944,19 +937,16 @@ function markVoices(v: {
 						</div>
 						{/* THE SAME TWO BUTTONS AND ONE LINK AS EVERY OTHER CARD (Kevin 2026-09-17:
 						     "LP Editions need buttons formatted like all other buttons... No third
-						     button"). Vol 3 has no Amazon listing — Ingram rejected its paperback
-						     (D134) and Kevin ruled its buy control stays inactive (D164) — so its
-						     two Amazon controls render as faded placeholders, not links.
+						     button"). All three volumes carry live Amazon links (Vol 3's from
+						     2026-09-24, when its listings appeared — D164 closed).
 						     THE DIRECT LINK STAYS ON ALL THREE (Kevin 2026-09-17, "fix the
 						     Volume 3 · Mist Blue card to balance with the other 2 cards"):
 						     dropping it left Vol 3's buy block empty, 41px shorter and visibly
-						     hollow beside its siblings. D164 is satisfied by the faded Amazon
-						     placeholders — it governs the BUY control, and the direct link goes
-						     to the bulk enquiry form, which takes no payment. */}
+						     hollow beside its siblings. */}
 						<div class="flex flex-col gap-2 w-full mt-auto">
 							<BuyControls
-								hbHref={v.comingSoon ? undefined : amazonLinks[v.key]?.formats?.hardback}
-								pbHref={v.comingSoon ? undefined : amazonLinks[v.key]?.formats?.paperback}
+								hbHref={amazonLinks[v.key]?.formats?.hardback}
+								pbHref={amazonLinks[v.key]?.formats?.paperback}
 								hbPrice={v.hb}
 								pbPrice={v.pb}
 							/>

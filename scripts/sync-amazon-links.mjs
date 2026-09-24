@@ -44,11 +44,11 @@ const SLUGS = [
 	'journaling',
 ];
 
-// The Large Print volumes are their own bookstore documents (fhb-lp-vol1/2), created
-// 2026-09-17 when their listings were found by ISBN. Vol 3 has no listing yet — Ingram
-// rejected its paperback (D134) and Kevin ruled the button stays inactive (D164) — so there
-// is deliberately no fhb-lp-vol3 to join to, and the page keeps its unlinked state.
-const LP_KEYS = { 'lp-vol1': 'fhb-lp-vol1', 'lp-vol2': 'fhb-lp-vol2' };
+// The Large Print volumes are their own bookstore documents (fhb-lp-vol1/2 created
+// 2026-09-17, fhb-lp-vol3 2026-09-24). Vol 3 waited on its listing (D134/D164); both bindings
+// appeared 2026-09-24 — hardback B0HKBR7HS7 found by its ISBN, paperback B0HKBPPFYR as that
+// listing's own paired format (title "Vol 3 of 3 ... Paperback", our publisher, $79.99).
+const LP_KEYS = { 'lp-vol1': 'fhb-lp-vol1', 'lp-vol2': 'fhb-lp-vol2', 'lp-vol3': 'fhb-lp-vol3' };
 
 // The General Audience colours are their own bookstore documents too (created 2026-09-17,
 // ASINs from D164 and each verified by reading the listing TITLE back — D184). Their page
