@@ -1,4 +1,5 @@
 ---
+import CoverMarquee from '../components/CoverMarquee.astro';
 import ImageGrid from '../components/ImageGrid.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
@@ -293,6 +294,13 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				<p style="font-family: var(--font-body); color: rgba(255,255,255,0.92); font-size: 1.05rem; margin: 0.75rem 0 0;"><a href="/read" style="color: inherit; text-decoration: underline;">Read/listen here for free</a></p>
 			</div>
 		</section>
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     COVER MARQUEE — title + scrolling covers + FATHER|SON|SPIRIT + tagline.
+		     Kevin 2026-09-24 placed this DIRECTLY BELOW THE FOLD (not above it), so
+		     the hero above keeps the LCP and the PSI score. First thing on scroll.
+		     ═══════════════════════════════════════════════════════════ -->
+		<CoverMarquee />
 
 		<!-- ═══════════════════════════════════════════════════════════
 		     DESKTOP HERO SUBTEXT — appears below the desktop hero only
