@@ -13,6 +13,15 @@
 interface Props {
 	videoSrc?: string;
 	imageSrc?: string;
+	// Non-Sanity (R2) heroes: a smaller file served below 1024px via <picture>, matching
+	// Layout's media-gated preloadImageMobile/Desktop exactly (no DPR-driven srcset pick).
+	imageSrcMobile?: string;
+	imageWidth?: number;
+	imageHeight?: number;
+	// Phones (<768px) only: show the WHOLE image uncropped at its natural aspect ratio, with
+	// the heading stacked BELOW it instead of overlaid. Tablet/desktop are unchanged. Opt-in
+	// (/print, Kevin 2026-09-24: all 14 people must be visible on a phone); default off.
+	stackOnMobile?: boolean;
 	imagePosition?: string;
 	headingLift?: string;
 	headingClass?: string;
@@ -30,6 +39,10 @@ interface Props {
 const {
 	videoSrc,
 	imageSrc,
+	imageSrcMobile,
+	imageWidth = 1600,
+	imageHeight = 900,
+	stackOnMobile = false,
 	imagePosition = 'center',
 	headingLift = '0',
 	headingClass = 'text-4xl md:text-6xl',
@@ -55,27 +68,36 @@ const hasW = imageSrc && /[?&]w=\d+/.test(imageSrc);
 const heroSrcset = hasW
 	? `${imageSrc.replace(/([?&])w=\d+/, '$1w=720')} 720w, ${imageSrc.replace(/([?&])w=\d+/, '$1w=1280')} 1280w`
 	: undefined;
+// Only /print passes imageSrcMobile; every other caller keeps its bare <img> markup.
+const HeroPicture = imageSrcMobile ? 'picture' : Fragment;
 const heroSrcMain = hasW ? imageSrc.replace(/([?&])w=\d+/, '$1w=1280') : imageSrc;
 ---
 
 <section
-	class="relative flex items-end justify-center overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]"
+	class={stackOnMobile
+		? 'relative flex flex-col md:flex-row md:items-end justify-center overflow-hidden md:min-h-[600px] lg:min-h-[calc(50vh_+_2in)]'
+		: 'relative flex items-end justify-center overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]'}
 	style="background-color: var(--color-inverse-surface); margin-top: -1px;"
 >
 	{imageSrc ? (
-		<img
-			class="absolute inset-0 w-full h-full object-cover"
-			src={heroSrcMain}
-			srcset={heroSrcset}
-			sizes="100vw"
-			alt=""
-			aria-hidden="true"
-			width="1600"
-			height="900"
-			fetchpriority="high"
-			decoding="async"
-			style={`opacity: 1; object-position: ${imagePosition};`}
-		/>
+		<HeroPicture {...(imageSrcMobile ? { class: 'contents' } : {})}>
+			{imageSrcMobile && <source media="(max-width: 1023px)" srcset={imageSrcMobile} />}
+			<img
+				class={stackOnMobile
+					? 'block w-full h-auto md:absolute md:inset-0 md:h-full md:object-cover'
+					: 'absolute inset-0 w-full h-full object-cover'}
+				src={heroSrcMain}
+				srcset={heroSrcset}
+				sizes="100vw"
+				alt=""
+				aria-hidden="true"
+				width={imageWidth}
+				height={imageHeight}
+				fetchpriority="high"
+				decoding="async"
+				style={`opacity: 1; object-position: ${imagePosition};`}
+			/>
+		</HeroPicture>
 	) : (
 		<video
 			class="absolute inset-0 w-full h-full object-cover"
@@ -94,7 +116,7 @@ const heroSrcMain = hasW ? imageSrc.replace(/([?&])w=\d+/, '$1w=1280') : imageSr
 	{href && (
 		<a href={href} aria-label={linkLabel} class="absolute inset-0 z-[2]"></a>
 	)}
-	<div class={`relative z-10 text-center px-6 max-w-3xl mx-auto ${contentPad}`}>
+	<div class={`relative z-10 text-center px-6 max-w-3xl mx-auto ${stackOnMobile ? `pt-6 ${contentPad} md:pt-0` : contentPad}`}>
 		<h1
 			class={`${headingClass} font-medium leading-snug tracking-tight`}
 			style={`font-family: var(--font-headline); color: #FFFFFF; margin-bottom: ${headingLift}; text-shadow: 0 2px 18px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.45);`} data-hero-entrance
