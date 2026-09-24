@@ -1,0 +1,162 @@
+---
+import { cardUrl } from '../data/card-art';
+// FHB cover marquee — Kevin 2026-09-24.
+//
+// "Scrolling marquee of 3D image thumbnails of all FHB covers as shown on /print",
+// with the title above and the FATHER | SON | SPIRIT chips under it. The tagline
+// moved below the homepage's two buttons 2026-09-24 (Kevin), so it closes the section
+// (as on the SMP homepage's copy of this component). Kevin ruled 2026-09-24 that the
+// block sits DIRECTLY BELOW THE FOLD, not above it, "so it doesn't affect the psi" — the hero above is untouched and
+// stays the LCP element.
+//
+// Engineering constraints (rules/performance-gate.md, and the job brief):
+//   • CSS transform animation only — no JS loop, nothing driving it per frame.
+//   • Explicit width/height on every thumbnail so nothing shifts as it loads.
+//   • Every thumbnail lazy-loaded: legitimate now that the block is below the fold.
+//   • prefers-reduced-motion: reduce → no motion at all; the strip becomes a
+//     normal horizontally-scrollable row.
+//   • No vh/svh anywhere.
+//
+// The images are the SAME R2 keys /print serves, resolved through card-art.ts so a
+// card swap there moves this strip too. No new art is rendered and nothing is
+// uploaded — the marquee is a second consumer of what /print already shows.
+import VoiceChips from './VoiceChips.astro';
+
+// The sixteen targeted DVC editions, then the three general colours, then the three
+// Large Print volumes and the set — the same products /print lists, in its order.
+const DVC = [
+	['chosen', 'Chosen Bible'],
+	['couples', "Couple's Bible"],
+	['dads', "Dad's Bible"],
+	['first-responders', "First Responder's Bible"],
+	['mens', "Men's Bible"],
+	['moms', "Mom's Bible"],
+	['pastors', "Pastor's Bible"],
+	['peace', 'Peace Bible'],
+	['presidents', "President's Bible"],
+	['recovery', 'Recovery Bible'],
+	['seekers', "Seeker's Bible"],
+	['seventeen', 'Seventeen Bible'],
+	['soldiers', "Soldier's Bible"],
+	['teen', 'Teen Bible'],
+	['worship-leaders', "Worship Leader's Bible"],
+	['journaling', 'She Hears Her Father’s Voice Journaling Bible'],
+];
+const GENERAL = [
+	['general-regular-charcoal', 'Charcoal edition'],
+	['general-regular-plum', 'Plum edition'],
+	['general-regular-white', 'White edition'],
+];
+const LARGE_PRINT = [
+	['lp-vol1', 'Large Print Volume 1'],
+	['lp-vol2', 'Large Print Volume 2'],
+	['lp-vol3', 'Large Print Volume 3'],
+	['lp-set', 'Large Print three-volume set'],
+];
+
+// Displayed box is 180 CSS px wide (1.5x the original 120 — Kevin 2026-09-24). The
+// source cards are 600 wide, so even a 2x screen draws 360 of 600 available pixels.
+// Every card is 600x764 except the 8x10 journaling card (600x725), so height is
+// computed from each card's own ratio — a shared number would letterbox it and report
+// the wrong aspect to the browser. width/height are the DISPLAY size (180x229 and
+// 180x218), which is what protects CLS.
+const W = 180;
+const H = (key: string) => Math.round((W * (key === 'dvc-journaling' ? 725 : 764)) / 600);
+const covers = [
+	...DVC.map(([slug, name]) => ({ key: `dvc-${slug}`, name })),
+	...GENERAL.map(([key, name]) => ({ key, name })),
+	...LARGE_PRINT.map(([key, name]) => ({ key, name })),
+].map((c) => ({ ...c, src: cardUrl(c.key), h: H(c.key) }));
+---
+
+<section class="fhbm" aria-labelledby="fhbm-title">
+	<h2 id="fhbm-title" class="fhbm-title">Father&rsquo;s Heart Bible™ + Divine Voice Color™ is Here</h2>
+
+	<!-- The strip. The track holds the covers TWICE and travels exactly -50%, so the
+	     second copy is under the cursor at the moment the first wraps — that is what
+	     makes the loop seamless without any JS. aria-hidden on the duplicate so a
+	     screen reader hears each cover once. -->
+	<div class="fhbm-viewport">
+		<div class="fhbm-track">
+			{[0, 1].map((copy) => (
+				<ul class="fhbm-row" aria-hidden={copy === 1 ? 'true' : undefined}>
+					{covers.map((c) => (
+						<li>
+							<a href="/print" tabindex={copy === 1 ? -1 : undefined}>
+								<img
+									src={c.src}
+									alt={copy === 1 ? '' : `Father's Heart Bible — ${c.name}`}
+									width={W}
+									height={c.h}
+									loading="lazy"
+									decoding="async"
+								/>
+							</a>
+						</li>
+					))}
+				</ul>
+			))}
+		</div>
+	</div>
+
+	<div class="fhbm-chips"><VoiceChips size="1.25rem" class="mb-0" /></div>
+</section>
+
+<style>
+	.fhbm {
+		background-color: var(--color-canvas, #faf7f2);
+		padding: 3rem 0 0;
+		overflow: hidden;
+	}
+	@media (min-width: 1024px) {
+		.fhbm { padding-top: 4rem; }
+	}
+	.fhbm-title {
+		font-family: var(--font-headline);
+		color: var(--color-ink, #241b17);
+		text-align: center;
+		margin: 0 1.5rem 2rem;
+		font-weight: 500;
+		line-height: 1.25;
+		letter-spacing: -0.01em;
+		font-size: clamp(1.35rem, 3.4vw, 2.5rem);
+	}
+	/* "On one line" is a desktop requirement. Below 768px a forced single line would
+	   shrink the type past legibility, so it wraps there instead (brief, §on one line). */
+	@media (min-width: 768px) {
+		.fhbm-title { white-space: nowrap; }
+	}
+	.fhbm-viewport { overflow: hidden; }
+	.fhbm-track {
+		display: flex;
+		width: max-content;
+		will-change: transform;
+		/* 100s, not 70s: the 1.5x tiles make the track 200/140 as long, so the duration
+		   scales with it to keep the same on-screen speed (~px per second). */
+		animation: fhbm-scroll 100s linear infinite;
+	}
+	.fhbm-row {
+		display: flex;
+		align-items: flex-end;
+		gap: 1.25rem;
+		margin: 0;
+		padding: 0 0.625rem;
+		list-style: none;
+	}
+	.fhbm-row img {
+		display: block;
+		width: 180px;
+		height: auto;
+	}
+	@keyframes fhbm-scroll {
+		from { transform: translate3d(0, 0, 0); }
+		to { transform: translate3d(-50%, 0, 0); }
+	}
+	/* No motion for anyone who asked for none: the strip stops and becomes a plain
+	   scrollable row so every cover is still reachable. */
+	@media (prefers-reduced-motion: reduce) {
+		.fhbm-track { animation: none; }
+		.fhbm-viewport { overflow-x: auto; }
+	}
+	.fhbm-chips { margin-top: 2rem; }
+</style>
