@@ -728,6 +728,8 @@ function markVoices(v: {
 >
 	<main>
 		<!-- ═══════════════ HERO ═══════════════ (shared component — same size as other pages) -->
+		<!-- Heading hidden visually (Kevin 2026-09-24) but kept as the page H1 for screen readers
+		     and search. Mobile padding zeroed so the empty text box leaves no dark strip. -->
 		<VideoHeroInner
 			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/print-hero-a01-2400.webp"
 			imageSrcMobile="https://assets.spiritmediapublishing.com/FHB/print/print-hero-a01-1600.webp"
@@ -736,8 +738,9 @@ function markVoices(v: {
 			stackOnMobile={true}
 			imagePosition="54% 30%"
 			headingLift="0"
-			contentPad="pb-6 md:pb-4 lg:pb-5"
+			contentPad="pt-0! pb-0 md:pb-4 lg:pb-5"
 			heading="Now in Print"
+			headingClass="sr-only"
 		/>
 
 		<!-- ═══════════════ THE DVC LINE — 16 EDITIONS ═══════════════ -->
@@ -1237,9 +1240,9 @@ function markVoices(v: {
 
 		<!-- ═══════════════ PEOPLE BAND (variety of readers with FHB) ═══════════════ -->
 		<div class="grid grid-cols-1 sm:grid-cols-3">
-			<img src="https://assets.spiritmediapublishing.com/FHB/print/print-band-white.webp" alt="A man reading the White edition of the Father's Heart Bible in a cafe" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
-			<img src="https://assets.spiritmediapublishing.com/FHB/print/people-2.webp" alt="A father and son reading the Father's Heart Bible together" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
-			<img src="https://assets.spiritmediapublishing.com/FHB/print/people-3.webp" alt="A grandmother and granddaughter reading the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/people-ds005-1200.webp" alt="Three smiling young men in a park, arms around each other, holding the Teen, Chosen and Peace editions of the Father's Heart Bible" width="1200" height="800" loading="lazy" decoding="async" class="w-full aspect-[3/2] object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/people-d010-1200.webp" alt="Three friends on a city rooftop at dusk, reading the Divine Voice Color edition of the Father's Heart Bible together" width="1200" height="800" loading="lazy" decoding="async" class="w-full aspect-[3/2] object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/people-ds004-1200.webp" alt="Three college students on campus, smiling at each other and holding the Teen, Chosen and Peace editions of the Father's Heart Bible" width="1200" height="800" loading="lazy" decoding="async" class="w-full aspect-[3/2] object-cover block" />
 		</div>
 	</main>
 </Layout>
