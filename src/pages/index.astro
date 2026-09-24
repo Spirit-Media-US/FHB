@@ -61,14 +61,10 @@ const seoTitle =
 const seoDescription =
 	pageData?.seoDescription ||
 	"Read the Bible free online with verse-by-verse audio — the Father's Heart Bible™ (FHB) reveals God as a loving Father. Now being prepared in 24 world languages. No app, no account.";
-// Evergreen hero. The June 2026 Father's-Day "first public reading" launch copy
-// was retired 2026-06-22 now that the launch has passed and the full canon is live.
-const heroEyebrow = 'Free to Read';
-const heroHeadingLine1 = 'Now in Print';
+// Hero copy retired from the photo 2026-09-24 (Kevin: no title or text on the
+// hero image). heroSubheading still feeds the intro section below.
 const heroSubheading =
 	'The complete Father\u2019s Heart Bible\u2122 \u2014 Genesis to Revelation \u2014 is free to read online, with verse-by-verse audio.';
-const heroSubheading2 =
-	'No app, no account. Open it on any device and encounter the Father\u2019s heart for yourself.';
 // The hero/section "Read FHB →" CTAs were removed (2026-06-02) — the nav now
 // carries the Read FHB entry point. The Free Book + Join/Partner CTAs remain.
 const heroVideoSrc =
@@ -78,9 +74,10 @@ const heroVideoSrc =
 // 2.3s emulated CPU decode delay on Lighthouse mobile). R2 URLs preloaded via
 // fetchpriority=high in Layout.astro, promoted to HTTP/2 103 Early Hints by
 // CF Pages via _headers Link: directive. Sanity hero fields ignored here.
-const heroMobile = 'https://assets.spiritmediapublishing.com/FHB/hero-print2-mobile.webp';
-const heroTablet = 'https://assets.spiritmediapublishing.com/FHB/hero-print2-tablet.webp';
-const heroDesktop = 'https://assets.spiritmediapublishing.com/FHB/hero-print2-desktop.webp';
+// A03 (Kevin 2026-09-24), 2400x920. Phones/tablets <1024 get 960w, desktop 1920w;
+// 1600/2400 are also on R2. hero-print2-* stay on R2 for a cheap revert.
+const heroMobile = 'https://assets.spiritmediapublishing.com/FHB/hero-a03-960.webp';
+const heroDesktop = 'https://assets.spiritmediapublishing.com/FHB/hero-a03-1920.webp';
 
 // Helper — append Sanity CDN transforms to any cdn.sanity.io URL safely
 function sanityTransform(url: string, w: number, q = 75): string {
@@ -176,124 +173,36 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 	<main>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     MOBILE HERO — text-LCP with brand image revealed post-trace.
-		     Section paints with dark gradient only. Bg-image div is in DOM
-		     at opacity:0 (excluded from LCP candidates per Web Vitals spec).
-		     Image fades in on first user interaction (touchstart / pointerdown
-		     / keydown) for real users — typically within 1–2s — OR via 30s
-		     post-load fallback. Lighthouse PSI emulator dispatches no synthetic
-		     touch/pointer events and its trace ends well before 30s, so the
-		     image never enters the LCP candidate pool during the audit. H1
-		     remains the LCP element, brand visual preserved for real users.
+		     HERO — A03, the photo alone (Kevin 2026-09-24: no title or text on it).
+		     A03 was made to the band's own 2400x920 ratio, so the section takes the
+		     image's aspect ratio at every width: edge to edge, nothing cropped, every
+		     head whole, no vh. Phones get the same whole photo (the /print ruling).
+		     One LCP image; each breakpoint preloads the file it serves (Layout).
+		     The header is FIXED + transparent over this page (darkHero), so the photo
+		     starts below it: over the image, the nav sat on back-row heads at 1024 and
+		     the logo at 390. Padding = measured header height per breakpoint (72 /
+		     91.5 at 1024-1279 where the nav wraps / 74.75); re-measure if the header changes.
 		     ═══════════════════════════════════════════════════════════ -->
-		<section class="lg:hidden relative flex items-start justify-center overflow-hidden px-6" style="background: linear-gradient(180deg, #2f3131 0%, #241b17 100%); min-height: 600px; padding-top: 4rem; padding-bottom: 4rem;">
-			<div id="mobile-hero-bg" aria-hidden="true" data-bg={heroMobile} style="position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0;transition:opacity 0.6s ease-out;"></div>
-			<div aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(36,27,23,0.55) 0%,rgba(36,27,23,0.75) 100%);pointer-events:none;"></div>
-			<div class="relative z-10 max-w-2xl mx-auto text-center">
-				<p
-					class="text-sm font-bold uppercase tracking-[0.18em]"
-					style="font-family: var(--font-body); color: #FFB1C4; margin: 0 0 1rem; font-size: 0.875rem; line-height: 1.25rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em;"
-				>
-					{heroEyebrow}
-				</p>
-				<p
-					role="heading"
-					aria-level="1"
-					class="text-[3.7125rem] font-medium leading-snug tracking-tight"
-					style="font-family: var(--font-headline); color: #FFFFFF; font-size: 3.7125rem; line-height: 1.375; font-weight: 500; letter-spacing: -0.025em; margin: 0;"
-				>
-					<a href="/print" style="color: inherit; text-decoration: none;">{heroHeadingLine1}</a>
-				</p>
-				<p style="font-family: var(--font-body); color: rgba(255,255,255,0.92); font-size: 0.95rem; margin: 0.6rem 0 0;"><a href="/read" style="color: inherit; text-decoration: underline;">Read/listen here for free</a></p>
-				<p
-					class="text-lg leading-relaxed"
-					style="font-family: var(--font-body); color: rgba(255,255,255,0.85); margin-top: 1.5rem; font-size: 1.125rem; line-height: 1.625;"
-				>
-					{heroSubheading}
-				</p>
-				<p
-					class="text-base leading-relaxed"
-					style="font-family: var(--font-body); color: rgba(255,255,255,0.8); margin-top: 1rem; font-size: 1rem; line-height: 1.625;"
-				>
-					{heroSubheading2}
-				</p>
-			</div>
-		</section>
-
-		<script is:inline>
-			// Reveal the mobile hero bg-image after Lighthouse's audit window
-			// closes. Triggers on first touchstart/pointerdown/keydown (real
-			// mobile users tap or scroll within 1–2s — scroll on touchscreens
-			// fires touchstart first). 30s post-load fallback covers users who
-			// never interact. Scroll is intentionally NOT in the trigger list
-			// because Lighthouse may dispatch synthetic scroll events during
-			// the audit. Touch/pointer/keydown are not synthesized.
-			(() => {
-				const bg = document.getElementById('mobile-hero-bg');
-				if (!bg) return;
-				const url = bg.dataset.bg;
-				if (!url) return;
-				let done = false;
-				const triggers = ['touchstart', 'pointerdown', 'keydown'];
-				const apply = () => {
-					if (done) return;
-					done = true;
-					triggers.forEach(e => window.removeEventListener(e, apply));
-					bg.style.backgroundImage = `url('${url}')`;
-					requestAnimationFrame(() => { bg.style.opacity = '1'; });
-				};
-				triggers.forEach(e => window.addEventListener(e, apply, { once: true, passive: true }));
-				addEventListener('load', () => setTimeout(apply, 30000), { once: true });
-			})();
-		</script>
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     DESKTOP HERO — full-viewport image with overlaid H1 (lg+ only)
-		     ═══════════════════════════════════════════════════════════ -->
-		<section
-			class="hidden lg:flex relative items-end justify-center overflow-hidden"
-			style="background-color: var(--color-deep); margin-top: -1px; min-height: calc(50vh + 2in);"
-			id="hero-section"
-		>
-			<!-- LCP element (desktop only): poster image from R2 via picture element
-			     with a media-gated source. Mobile (<1024px) falls through to the 1x1
-			     GIF image fallback — never fetches any hero asset. Inline layout
-			     styles so paint does not wait for Tailwind CSS. -->
+		<style is:inline>
+			#hero-section { padding-top: 72px; }
+			@media (min-width: 1024px) { #hero-section { padding-top: 92px; } }
+			@media (min-width: 1280px) { #hero-section { padding-top: 75px; } }
+		</style>
+		<section id="hero-section" style="background-color: var(--color-deep); margin-top: -1px; line-height: 0;">
+			<h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Father&rsquo;s Heart Bible&trade; &mdash; Now in Print</h1>
 			<picture>
-				<source
-					media="(min-width: 1024px)"
-					srcset={`${heroTablet} 800w, ${heroDesktop} 1200w`}
-					sizes="(max-width: 1279px) 800px, 1200px"
-				/>
+				<source media="(min-width: 1024px)" srcset={heroDesktop} width="1920" height="736" />
 				<img
 					id="hero-poster"
-					src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-					alt=""
-					width="1200"
-					height="343"
+					src={heroMobile}
+					alt="Thirteen friends outside a stone church, each holding a different edition of the Father’s Heart Bible"
+					width="960"
+					height="368"
 					fetchpriority="high"
 					decoding="async"
-					aria-hidden="true"
-					style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 1.5s ease;opacity:1"
+					style="display:block;width:100%;height:auto;aspect-ratio:2400/920;"
 				/>
 			</picture>
-			{/* Hero video disabled — the print-edition photo IS the hero now. Removing
-			    this slot makes the desktop video-rotation script a no-op (it bails when
-			    #hero-video-slot is absent), so the poster photo stays put. */}
-			<!-- Dark overlay: keeps the transparent header's white logo/nav/CTA legible
-			     at the top and the white heading legible at the bottom, while the
-			     poster/video still reads through the lighter middle. -->
-			<div aria-hidden="true" class="absolute inset-0 z-[1]" style="background: linear-gradient(to bottom, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.18) 32%, rgba(0,0,0,0.30) 65%, rgba(0,0,0,0.62) 100%); pointer-events:none;"></div>
-			<div id="hero-text" class="relative z-10 text-center px-6 max-w-3xl mx-auto lg:pb-40" style="transition: color 1.2s ease;">
-				<h1
-					id="hero-heading"
-					class="md:text-[6.1875rem] font-medium leading-snug tracking-tight"
-					style="font-family: var(--font-headline); color: #FFFFFF; transition: color 1.2s ease; font-size: 6.1875rem; line-height: 1.375; font-weight: 500;" data-hero-entrance
-				>
-					<a href="/print" style="color: inherit; text-decoration: none;">{heroHeadingLine1}</a>
-				</h1>
-				<p style="font-family: var(--font-body); color: rgba(255,255,255,0.92); font-size: 1.05rem; margin: 0.75rem 0 0;"><a href="/read" style="color: inherit; text-decoration: underline;">Read/listen here for free</a></p>
-			</div>
 		</section>
 
 		<!-- ═══════════════════════════════════════════════════════════
