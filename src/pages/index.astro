@@ -210,6 +210,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		     Kevin 2026-09-24 placed this DIRECTLY BELOW THE FOLD (not above it), so
 		     the hero above keeps the LCP and the PSI score. First thing on scroll.
 		     ═══════════════════════════════════════════════════════════ -->
+		<section class="overflow-hidden" style="background-color: var(--color-canvas);">
 		<CoverMarquee />
 
 		<!-- intro + CTAs — Kevin 2026-09-24: the FHB back-cover copy, verbatim,
@@ -220,8 +221,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		     paragraphs, 3rem / 4rem (lg) clear space above and below the group.
 		     Ported from the SMP homepage 2026-09-24. SMP's type-body-lg / btn classes
 		     don't exist here, so it wears this page's own body-copy and CTA styles.
-		     The tagline is NOT repeated here: this site's CoverMarquee still renders
-		     it, and it must appear once (pending Kevin's call on where it lives). -->
+		     Marquee + this block share one <section> so they read as one group. -->
 		<div class="mx-auto max-w-3xl text-center px-6 pt-8 pb-12 lg:pb-16">
 			<p class="text-xl leading-relaxed" style="font-family: var(--font-body); color: var(--color-muted);">For a hundred and twenty-five years, red letters have shown you the Son speaking. Our Father speaks more than three times as often — 128,579 words across 5,615 verses. Father's Heart Bible is the first Bible in print where you can see who is speaking.</p>
 			<p class="mt-4 text-xl leading-relaxed" style="font-family: var(--font-body); color: var(--color-muted);">Our Father's words in <strong style="color:#2563eb">BLUE</strong>. The Son's in <strong style="color:#c8102e">RED</strong>. The Spirit's in <strong style="color:#6a3fa0">PURPLE</strong>.</p>
@@ -242,7 +242,13 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					onmouseout="this.style.opacity='1'"
 				>Read &amp; Listen Free</a>
 			</div>
+			<p class="fhb-tagline mt-8">Receive the Father. Hear his voice. His heart is for you.</p>
 		</div>
+		</section>
+		<style>
+			.fhb-tagline { font-family: var(--font-body); color: var(--color-muted); line-height: 1.4; font-size: clamp(1rem, 2.1vw, 1.45rem); text-wrap: balance; }
+			@media (min-width: 768px) { .fhb-tagline { white-space: nowrap; } }
+		</style>
 
 		<!-- ═══════════════════════════════════════════════════════════
 		     DESKTOP HERO SUBTEXT — appears below the desktop hero only

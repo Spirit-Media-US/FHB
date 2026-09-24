@@ -3,9 +3,10 @@ import { cardUrl } from '../data/card-art';
 // FHB cover marquee — Kevin 2026-09-24.
 //
 // "Scrolling marquee of 3D image thumbnails of all FHB covers as shown on /print",
-// with the title above, the FATHER | SON | SPIRIT chips under it, and the tagline
-// under those. Kevin ruled 2026-09-24 that the block sits DIRECTLY BELOW THE FOLD,
-// not above it, "so it doesn't affect the psi" — the hero above is untouched and
+// with the title above and the FATHER | SON | SPIRIT chips under it. The tagline
+// moved below the homepage's two buttons 2026-09-24 (Kevin), so it closes the section
+// (as on the SMP homepage's copy of this component). Kevin ruled 2026-09-24 that the
+// block sits DIRECTLY BELOW THE FOLD, not above it, "so it doesn't affect the psi" — the hero above is untouched and
 // stays the LCP element.
 //
 // Engineering constraints (rules/performance-gate.md, and the job brief):
@@ -96,21 +97,22 @@ const covers = [
 	</div>
 
 	<div class="fhbm-chips"><VoiceChips size="1.25rem" class="mb-0" /></div>
-
-	<p class="fhbm-tagline">Receive the Father. Hear his voice. His heart is for you.</p>
 </section>
 
 <style>
 	.fhbm {
 		background-color: var(--color-canvas, #faf7f2);
-		padding: 2.25rem 0 2.5rem;
+		padding: 3rem 0 0;
 		overflow: hidden;
+	}
+	@media (min-width: 1024px) {
+		.fhbm { padding-top: 4rem; }
 	}
 	.fhbm-title {
 		font-family: var(--font-headline);
 		color: var(--color-ink, #241b17);
 		text-align: center;
-		margin: 0 1.25rem 1.5rem;
+		margin: 0 1.5rem 2rem;
 		font-weight: 500;
 		line-height: 1.25;
 		letter-spacing: -0.01em;
@@ -151,16 +153,5 @@ const covers = [
 		.fhbm-track { animation: none; }
 		.fhbm-viewport { overflow-x: auto; }
 	}
-	.fhbm-chips { margin-top: 1.75rem; }
-	.fhbm-tagline {
-		font-family: var(--font-body);
-		color: var(--color-muted, #5a5250);
-		text-align: center;
-		margin: 1.25rem 1.25rem 0;
-		line-height: 1.4;
-		font-size: clamp(1rem, 2.1vw, 1.45rem);
-	}
-	@media (min-width: 768px) {
-		.fhbm-tagline { white-space: nowrap; }
-	}
+	.fhbm-chips { margin-top: 2rem; }
 </style>
