@@ -25,6 +25,9 @@ interface Props {
 	// enough on a phone that the transparent header's logo would sit on the faces.
 	stackOnMobile?: boolean;
 	imagePosition?: string;
+	// Opt-in dimming (0–1) over the dark section background; default 1 = true brightness
+	// per the no-overlay rule below. Only /the-fathers-heart-bible/ sets it (2026-09-25, pending Kevin).
+	imageOpacity?: number;
 	headingLift?: string;
 	headingClass?: string;
 	contentPad?: string;
@@ -46,6 +49,7 @@ const {
 	imageHeight = 900,
 	stackOnMobile = false,
 	imagePosition = 'center',
+	imageOpacity = 1,
 	headingLift = '0',
 	headingClass = 'text-4xl md:text-6xl',
 	contentPad = 'pb-10 md:pb-16 lg:pb-24',
@@ -97,7 +101,7 @@ const heroSrcMain = hasW ? imageSrc.replace(/([?&])w=\d+/, '$1w=1280') : imageSr
 				height={imageHeight}
 				fetchpriority="high"
 				decoding="async"
-				style={`opacity: 1; object-position: ${imagePosition};`}
+				style={`opacity: ${imageOpacity}; object-position: ${imagePosition};`}
 			/>
 		</HeroPicture>
 	) : (
