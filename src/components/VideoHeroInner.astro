@@ -26,9 +26,11 @@ interface Props {
 	stackOnMobile?: boolean;
 	imagePosition?: string;
 	// Opt-in dimming (0–1) over the dark section background; default 1 = true brightness
-	// per the no-overlay rule below. Only /the-fathers-heart-bible/ sets it. REMOVED from
-	// /a-bible-for-the-whole-world/ 2026-09-28 — Kevin: "Remove the gray tint over the hero".
-	// It had shipped unapproved after sitting on dev for 3 days (commit b015224, "pending Kevin").
+	// per the no-overlay rule below. NO PAGE SETS IT. Both pages that did were removed
+	// 2026-09-28 on Kevin's instruction — /a-bible-for-the-whole-world/ (b015224, "pending
+	// Kevin") and /the-fathers-heart-bible/ (5df76c9, a WIP auto-save nobody proposed).
+	// Kevin: "Remove the gray tint over the hero... 60% ocupancy needs to be 100%."
+	// Do not tint a hero again without asking him.
 	imageOpacity?: number;
 	headingLift?: string;
 	headingClass?: string;
