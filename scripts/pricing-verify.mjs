@@ -138,8 +138,27 @@ if (haveIsbns) {
 	// master gated only the Large Print — the new SKUs could drift from it silently.
 	// ISBNS.json is also asserted to still HOLD a price for each, so deleting one there
 	// fails the build instead of quietly skipping the comparison.
-	const targeted = { ...isbns.hardcover_case_laminate, journaling: isbns.also_listed.journaling };
-	check(Object.keys(targeted).length === 16, `expected 16 targeted editions in ISBNS.json, found ${Object.keys(targeted).length}`);
+	const all = { ...isbns.hardcover_case_laminate, journaling: isbns.also_listed.journaling };
+	// ON SALE vs MERELY PRICED (Kevin 2026-09-28). Seven editions — athletes, graduates,
+	// grandparents, intercessors, nurses, teachers, womens — hold ISBNs and a price
+	// (99.99/79.99, Kevin's ruling) but have NO card art: dvc-<slug>-600.webp is 404 on the
+	// asset host, and they are not on /print. Putting them in the checkout today would put a
+	// broken image in the cart. So the master now records `on_sale`, and this gate splits:
+	//   on sale      -> must be priced AND match the checkout function, exactly as before
+	//   not on sale  -> must be ABSENT from the checkout function
+	// That second assertion is why this is not a hole: an unsellable edition leaking into
+	// checkout now FAILS the build, which nothing checked before.
+	const targeted = Object.fromEntries(
+		Object.entries(all).filter(([, ed]) => ed.on_sale !== false));
+	const notYet = Object.entries(all).filter(([, ed]) => ed.on_sale === false);
+	check(Object.keys(all).length === 23, `expected 23 targeted editions in ISBNS.json, found ${Object.keys(all).length}`);
+	check(Object.keys(targeted).length === 16, `expected 16 editions ON SALE, found ${Object.keys(targeted).length}`);
+	for (const [slug] of notYet) {
+		for (const key of ['hb', 'pb']) {
+			check(server[`${slug}-${key}`] === undefined,
+				`${slug}-${key}: on_sale is false in ISBNS.json but ${CHECKOUT} sells it`);
+		}
+	}
 	for (const [slug, ed] of Object.entries(targeted)) {
 		check(ed.price_usd != null, `${slug}: ISBNS.json has no price_usd — the master cannot gate what it does not record`);
 		check(ed.isbn && ed.isbn_paperback, `${slug}: ISBNS.json is missing an ISBN for one binding — do not sell a binding with no ISBN`);
