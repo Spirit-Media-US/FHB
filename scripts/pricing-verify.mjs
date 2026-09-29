@@ -152,7 +152,9 @@ if (haveIsbns) {
 		Object.entries(all).filter(([, ed]) => ed.on_sale !== false));
 	const notYet = Object.entries(all).filter(([, ed]) => ed.on_sale === false);
 	check(Object.keys(all).length === 23, `expected 23 targeted editions in ISBNS.json, found ${Object.keys(all).length}`);
-	check(Object.keys(targeted).length === 16, `expected 16 editions ON SALE, found ${Object.keys(targeted).length}`);
+	// 16 -> 23 on 2026-09-29: the seven above went on sale once their card art was live (200,
+	// byte-verified) — the count follows the master, it is not how the gate is cleared.
+	check(Object.keys(targeted).length === 23, `expected 23 editions ON SALE, found ${Object.keys(targeted).length}`);
 	for (const [slug] of notYet) {
 		for (const key of ['hb', 'pb']) {
 			check(server[`${slug}-${key}`] === undefined,

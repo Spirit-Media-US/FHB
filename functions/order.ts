@@ -38,6 +38,13 @@ const TITLES: Record<string, string> = {
 	soldiers: 'Soldier’s Bible',
 	teen: 'Teen Bible',
 	'worship-leaders': 'Worship Leader’s Bible',
+	athletes: 'Athlete’s Bible',
+	graduates: 'Graduate’s Bible',
+	grandparents: 'Grandparent’s Bible',
+	intercessors: 'Intercessor’s Bible',
+	nurses: 'Nurse’s Bible',
+	teachers: 'Teacher’s Bible',
+	womens: 'Women’s Bible',
 	journaling: 'She Hears Her Father’s Voice — Journaling Bible',
 };
 

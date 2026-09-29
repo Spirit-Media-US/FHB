@@ -49,6 +49,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 	// longer sellable: a single key could not say which binding the buyer chose, and the
 	// price differs by $20. Prices are ISBNS.json's and pricing-verify compares them.
 	// Titles carry the binding because this string is what shows on the Stripe receipt.
+	'athletes-hb': {
+		title: 'Athlete’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-athletes-600.webp`,
+	},
+	'athletes-pb': {
+		title: 'Athlete’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-athletes-600.webp`,
+	},
 	'chosen-hb': {
 		title: 'Chosen Bible — Hardback',
 		retail: 9999,
@@ -89,6 +99,36 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		retail: 7999,
 		img: `${CARDS}/dvc-first-responders-600.webp`,
 	},
+	'graduates-hb': {
+		title: 'Graduate’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-graduates-600.webp`,
+	},
+	'graduates-pb': {
+		title: 'Graduate’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-graduates-600.webp`,
+	},
+	'grandparents-hb': {
+		title: 'Grandparent’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-grandparents-600.webp`,
+	},
+	'grandparents-pb': {
+		title: 'Grandparent’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-grandparents-600.webp`,
+	},
+	'intercessors-hb': {
+		title: 'Intercessor’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-intercessors-600.webp`,
+	},
+	'intercessors-pb': {
+		title: 'Intercessor’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-intercessors-600.webp`,
+	},
 	'mens-hb': {
 		title: 'Men’s Bible — Hardback',
 		retail: 9999,
@@ -108,6 +148,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		title: 'Mom’s Bible — Paperback',
 		retail: 7999,
 		img: `${CARDS}/dvc-moms-600.webp`,
+	},
+	'nurses-hb': {
+		title: 'Nurse’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-nurses-600.webp`,
+	},
+	'nurses-pb': {
+		title: 'Nurse’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-nurses-600.webp`,
 	},
 	'pastors-hb': {
 		title: 'Pastor’s Bible — Hardback',
@@ -179,6 +229,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		retail: 7999,
 		img: `${CARDS}/dvc-soldiers-600.webp`,
 	},
+	'teachers-hb': {
+		title: 'Teacher’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-teachers-600.webp`,
+	},
+	'teachers-pb': {
+		title: 'Teacher’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-teachers-600.webp`,
+	},
 	'teen-hb': {
 		title: 'Teen Bible — Hardback',
 		retail: 9999,
@@ -188,6 +248,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		title: 'Teen Bible — Paperback',
 		retail: 7999,
 		img: `${CARDS}/dvc-teen-600.webp`,
+	},
+	'womens-hb': {
+		title: 'Women’s Bible — Hardback',
+		retail: 9999,
+		img: `${CARDS}/dvc-womens-600.webp`,
+	},
+	'womens-pb': {
+		title: 'Women’s Bible — Paperback',
+		retail: 7999,
+		img: `${CARDS}/dvc-womens-600.webp`,
 	},
 	'worship-leaders-hb': {
 		title: 'Worship Leader’s Bible — Hardback',
