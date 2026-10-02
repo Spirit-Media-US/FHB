@@ -48,6 +48,8 @@ export default defineConfig({
 				`${SITE}/map`,
 				`${SITE}/shareables`,
 				`${SITE}/events/`,
+				// Served by the fhb-podcast Worker (route fathersheartbible.com/audio-bible*) — Kevin 2026-10-02.
+				`${SITE}/audio-bible`,
 			],
 			// Exclude /privacy + /terms (low-value), and /blog/preview/* — the latter
 			// are noindex draft-preview duplicates of the real posts; advertising them

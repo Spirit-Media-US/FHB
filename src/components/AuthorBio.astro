@@ -9,8 +9,18 @@
 // don't ship a generic placeholder card).
 interface Props {
 	author: string;
+	// Optional per-page overrides (default = the registry entry below, so every
+	// existing caller renders exactly as before). Added 2026-10-02 for the
+	// Italian + Tangkhul language pages, which show Kevin as EDITOR with the bio
+	// from the FHB metadata sheets (Kevin: "About the editor" on those two pages).
+	label?: string;
+	role?: string;
+	bio?: string;
+	portraitAlt?: string;
+	ariaLabel?: string;
+	moreLabel?: string;
 }
-const { author } = Astro.props;
+const { author, label, role, bio, portraitAlt, ariaLabel, moreLabel } = Astro.props;
 
 // Author registry — extend when FHB welcomes more bylines.
 // `photoUrl` is a direct Sanity CDN URL; the renderer appends size + format
@@ -41,13 +51,13 @@ const photoUrl = entry?.photoUrl || null;
 ---
 
 {entry && (
-	<section class="author-bio" aria-label={`About ${entry.displayName}`}>
+	<section class="author-bio" aria-label={ariaLabel ?? `About ${entry.displayName}`}>
 		<div class="author-bio__inner">
 			{photoUrl && (
-				<a href={entry.profileUrl} class="author-bio__photo-link" aria-label={`Read more about ${entry.displayName}`}>
+				<a href={entry.profileUrl} class="author-bio__photo-link" aria-label={moreLabel ?? `Read more about ${entry.displayName}`}>
 					<img
 						src={`${photoUrl}?w=320&h=320&fit=crop&crop=focalpoint&auto=format`}
-						alt={`Portrait of ${entry.displayName}`}
+						alt={portraitAlt ?? `Portrait of ${entry.displayName}`}
 						class="author-bio__photo"
 						loading="lazy"
 						decoding="async"
@@ -57,12 +67,12 @@ const photoUrl = entry?.photoUrl || null;
 				</a>
 			)}
 			<div class="author-bio__text">
-				<p class="author-bio__label">About the author</p>
+				<p class="author-bio__label">{label ?? 'About the author'}</p>
 				<h3 class="author-bio__name">
 					<a href={entry.profileUrl}>{entry.displayName}</a>
 				</h3>
-				<p class="author-bio__role">{entry.role}</p>
-				<p class="author-bio__copy">{entry.bio}</p>
+				<p class="author-bio__role">{role ?? entry.role}</p>
+				<p class="author-bio__copy">{bio ?? entry.bio}</p>
 			</div>
 		</div>
 	</section>

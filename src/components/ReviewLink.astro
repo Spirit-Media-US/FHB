@@ -4,7 +4,8 @@
 // subtle (small sans text, muted rule) so it never competes with the page's
 // primary CTA. Absolute URL because some host pages are served on the apex by
 // the community app via the router.
-const { class: className = '' } = Astro.props;
+// `label` (optional, plain text) lets a non-English page localize the link text.
+const { class: className = '', label } = Astro.props;
 ---
 
 <p
@@ -16,6 +17,6 @@ const { class: className = '' } = Astro.props;
 		class="hover:underline"
 		style="color: var(--color-brand); font-weight: 600;"
 	>
-		&hearts; See what readers are saying &rarr;
+		{label ?? <>&hearts; See what readers are saying &rarr;</>}
 	</a>
 </p>
