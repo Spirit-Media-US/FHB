@@ -1,0 +1,305 @@
+---
+// /italian-bible — the Italian Bible page. DRAFT for Kevin's review (2026-10-02).
+//
+// SUBJECT: the Italian edition of the Father's Heart Bible. Same kind of page as
+// /marathi-bible and /telugu-bible (same Layout, section order and schema stack),
+// deliberately NOT CountryBible (/bible-in/italy answers demographic questions about
+// a nation). One difference from Marathi, on purpose: the copy is IN ITALIAN, because
+// Italian searchers search in Italian ("salmo 91", "la bibbia"), not in English.
+//
+// EVERY CHAPTER LINKED HERE WAS CHOSEN FROM MEASURED DEMAND:
+//   - Ahrefs, country=it (projects/fhb-it-seo/STUDY.md, 2026-09-27):
+//     `salmo 91` 28,000/mo KD 0 · `padre nostro` 17,000 KD 0 (Matthew 6) ·
+//     `salmo 23` 12,000 KD 0 · `la bibbia` 5,300 KD 0 · `salmo 51` 3,100 ·
+//     `salmo 121` 3,000 · `isaia 41 10` 2,600 · `salmo 27` 2,100 ·
+//     `genesi 1` 900 · `giovanni 3 16` 900.
+//   - Search Console has no usable /read/it/ demand yet (2 impressions in 28 days to
+//     2026-09-30; the edition went live 2026-09-28).
+//
+// MEASURED TRAPS, deliberately not served (STUDY.md):
+//   - Singular beats plural 31:1 — the chapter is "Salmo 91", the book is "Salmi".
+//   - `bibbia cei` 1,200 — people search by edition name; ours is not a CEI text, so no claim.
+//
+// EDITION NAME stays the ENGLISH "Father's Heart Bible": the Italian title is an OPEN
+// term in languages/it.json that needs native sign-off (Kevin 2026-09-23).
+//
+// NO AUDIO CLAIM. Italian has no published narration.
+//
+// Canon figures (66 books / 1,189 chapters) are MEASURED from
+// /srv/sites/community/src/content/bible-it.
+//
+// Quoted fragments in the notes are from OUR Italian canon (bible-it), not CEI.
+// NATIVE REVIEW: the Italian copy on this page has NOT had a native Italian read yet.
+import AuthorBio from '../components/AuthorBio.astro';
+import ReviewLink from '../components/ReviewLink.astro';
+import Layout from '../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/italian-bible/'; // trailing slash = the canonical form Layout.astro emits
+const TITLE = "La Bibbia in italiano — Father's Heart Bible, gratis online";
+const DESCRIPTION =
+	'La Bibbia in italiano, gratis online: tutti i 66 libri e i 1.189 capitoli del Father’s Heart Bible. Nessun account, nessuna app. Una nuova traduzione che rivela il Padre.';
+const PUBLISHED = '2026-10-02';
+const MODIFIED = '2026-10-02';
+
+const READ_IT = 'https://fathersheartbible.com/read/it/';
+
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('it-IT', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: 'Founder & CEO, Spirit Media Publishing',
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+// Italian chapter demand is led by the Psalms, in this order (Ahrefs, country=it).
+const PSALMS = [
+	{
+		ch: 91,
+		note: 'Chi abita al riparo dell’Altissimo: il capitolo più cercato in Italia, con grande distacco.',
+	},
+	{ ch: 23, note: '«Il mio Padre è il mio pastore»: sei versetti, quelli a cui si torna sempre.' },
+	{
+		ch: 51,
+		note: '«Crea in me un cuore puro, Padre mio»: la preghiera di chi vuole ricominciare.',
+	},
+	{ ch: 121, note: '«Alzo gli occhi verso i monti»: il mio aiuto viene dal mio Padre.' },
+	{ ch: 27, note: '«Il mio Padre è la mia luce e la mia salvezza»: di chi dovrei avere paura?' },
+];
+
+// The other chapters Italians look up by name. Each opens at the chapter searched.
+const CHAPTERS = [
+	{
+		slug: 'matthew',
+		ch: 6,
+		it: 'Matteo 6',
+		note: 'Il Padre nostro, la preghiera che Gesù ha insegnato ai suoi.',
+	},
+	{
+		slug: 'isaiah',
+		ch: 41,
+		it: 'Isaia 41',
+		note: '«Non temere, perché io sono con te»: la promessa del versetto 10.',
+	},
+	{
+		slug: 'genesis',
+		ch: 1,
+		it: 'Genesi 1',
+		note: 'In principio: la creazione, giorno dopo giorno.',
+	},
+	{
+		slug: 'john',
+		ch: 3,
+		it: 'Giovanni 3',
+		note: 'Il capitolo di Giovanni 3:16, sull’amore del Padre per il mondo.',
+	},
+];
+
+const FAQS = [
+	{
+		question: 'Esiste una Bibbia in italiano da leggere online gratis?',
+		answer:
+			"Sì. Il Father's Heart Bible™ si legge gratis online in italiano: tutti i 66 libri e i 1.189 capitoli, senza account, senza acquisti e senza app da installare. Lo trovi su fathersheartbible.com/read/it/ da qualsiasi telefono o computer.",
+	},
+	{
+		question: "Che cos'è il Father's Heart Bible in italiano?",
+		answer:
+			'È una nuova traduzione italiana di tutta la Bibbia, nata per far emergere il linguaggio di famiglia della Scrittura: dove il testo rivela Dio come Padre, questa traduzione lo dice chiaramente. Non è una revisione di una Bibbia italiana già esistente, e non è il testo CEI.',
+	},
+	{
+		question: 'Come leggo il Salmo 91 in italiano?',
+		answer:
+			'Il Salmo 91 si trova su fathersheartbible.com/read/it/psalms/91/, gratis e senza registrazione. Seguono il Salmo 23, il Salmo 51, il Salmo 121 e il Salmo 27.',
+	},
+	{
+		question: 'Dove si trova il Padre nostro nella Bibbia?',
+		answer:
+			'Nel Vangelo di Matteo, capitolo 6 (versetti 9-13), e in forma più breve in Luca 11. Puoi leggere Matteo 6 in italiano su fathersheartbible.com/read/it/matthew/6/.',
+	},
+	{
+		question: "La Bibbia in italiano ha l'audio?",
+		answer:
+			"Non ancora. La narrazione audio è disponibile per l'edizione inglese del Father's Heart Bible™. Il testo italiano è completo e si legge gratis già oggi; la narrazione in italiano non è ancora pubblicata.",
+	},
+	{
+		question: "C'è tutta la Bibbia in italiano o solo una parte?",
+		answer:
+			"Tutta la Bibbia. L'edizione italiana pubblica tutti i 66 libri e ciascuno dei loro 1.189 capitoli, Antico e Nuovo Testamento, non un estratto o una selezione.",
+	},
+];
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: 'La Bibbia in italiano: il Father’s Heart Bible gratis online',
+	description: DESCRIPTION,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: PUBLISHED,
+	dateModified: MODIFIED,
+	inLanguage: 'it-IT',
+	about: { '@type': 'Language', name: 'Italian', alternateName: 'Italiano' },
+	articleSection: 'Bible Translations',
+	keywords: 'la bibbia, bibbia in italiano, bibbia online gratis, salmo 91, salmo 23, padre nostro',
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{ '@type': 'ListItem', position: 2, name: 'La Bibbia in italiano', item: PAGE_URL },
+	],
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [articleSchema, breadcrumbSchema, faqSchema];
+
+const TOC = [
+	{ id: 'cosa-e', label: "Che cos'è" },
+	{ id: 'come-si-legge', label: 'Come si legge in italiano' },
+	{ id: 'salmi', label: 'I Salmi' },
+	{ id: 'capitoli', label: 'I capitoli più cercati' },
+	{ id: 'trovare-un-capitolo', label: 'Trovare un capitolo' },
+	{ id: 'faq', label: 'Domande frequenti' },
+];
+---
+
+<Layout title={TITLE} description={DESCRIPTION} lang="it" jsonLd={jsonLd} pageType="article" articleAuthor="Kevin White" articlePublishedTime={PUBLISHED} articleSection="Bible Translations" articleTags={["Bibbia in italiano", "La Bibbia", "Father's Heart Bible"]}>
+	<main id="main-content">
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">La Bibbia in italiano</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Father&rsquo;s Heart Bible&trade;</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">La Bibbia in italiano</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>Di <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; guida la traduzione del Father&rsquo;s Heart Bible&trade;</span>
+					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<strong style="color: var(--color-ink);">Puoi leggere tutta la Bibbia in italiano, gratis, adesso &mdash; tutti i 66 libri e i 1.189 capitoli del Father&rsquo;s Heart Bible&trade;, senza account, senza acquisti e senza app.</strong> L&rsquo;edizione italiana è una traduzione nuova, non la revisione di una precedente, e porta con sé la ragione per cui tutto il progetto esiste: dovunque la Scrittura rivela Dio come Padre, questa Bibbia lo dice chiaramente. <a href={READ_IT} style="color: var(--color-brand);" class="hover:underline">Apri la Bibbia in italiano</a> e in pochi secondi sei al Salmo 91.
+				</p>
+
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">In breve</p>
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">La Bibbia completa in italiano, gratis online &mdash; una nuova traduzione che fa sentire ai lettori italiani la voce di un Padre.</p>
+				</aside>
+
+				<nav aria-label="In questa pagina" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">In questa pagina</p>
+					<ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
+						{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}
+					</ul>
+				</nav>
+
+				<h2 id="cosa-e" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Che cos&rsquo;è il Father&rsquo;s Heart Bible in italiano</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">È la Bibbia completa in italiano: sessantasei libri, 1.189 capitoli, dalla Genesi all&rsquo;Apocalisse, pubblicata per intero e non come assaggio. Si legge online ed è gratuita &mdash; nessuna registrazione obbligatoria, niente da comprare, niente da installare prima di cominciare. Ogni capitolo ha il suo indirizzo permanente, così un capitolo trovato oggi si può salvare tra i preferiti, inviare a qualcuno in un messaggio o riaprire l&rsquo;anno prossimo allo stesso link.</p>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">È una traduzione nuova, non una ristampa di una Bibbia italiana esistente, e in questa differenza sta tutto il senso del progetto. Ciò che questa traduzione vuole recuperare è il linguaggio di famiglia della Scrittura: dove il testo rivela Dio come Padre dei suoi figli e delle sue figlie, il Father&rsquo;s Heart Bible&trade; lo rende così in italiano, invece di appiattirlo nel vocabolario di un sovrano lontano. Puoi leggere <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">perché esiste questa traduzione</a> e scoprire <a href="/a-bible-for-the-whole-world/" style="color: var(--color-brand);" class="hover:underline">le altre lingue in cui viene realizzata</a>.</p>
+
+				<h2 id="come-si-legge" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Come si legge questa traduzione in italiano</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">L&rsquo;Italia custodisce la Scrittura da quasi duemila anni, spesso in una lingua solenne e liturgica. Questa edizione non cerca di essere più solenne. Punta all&rsquo;italiano che si parla in famiglia, perché la relazione che il testo descrive è una relazione di famiglia &mdash; un Padre e i suoi figli, non un sovrano e i suoi sudditi.</p>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">I libri mantengono i loro nomi italiani &mdash; Genesi, Salmi, Giovanni, Atti &mdash; mentre gli indirizzi dei capitoli usano i nomi inglesi dei libri (per esempio <code>/read/it/psalms/91/</code>), gli stessi in tutte le lingue del sito. Leggi qualche capitolo e la differenza si nota subito: nostro Padre parla al suo popolo come a figli suoi, e il testo glielo lascia fare.</p>
+
+				<h2 id="salmi" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">I Salmi più cercati in italiano</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">In Italia la ricerca della Bibbia parte quasi sempre da un Salmo, e pochi Salmi raccolgono la maggior parte delle ricerche. Eccoli, nell&rsquo;ordine in cui vengono cercati &mdash; ognuno è un link diretto al testo italiano:</p>
+				<ul class="space-y-3 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: disc;">
+					{PSALMS.map((p) => (
+						<li>
+							<a href={`${READ_IT}psalms/${p.ch}/`} style="color: var(--color-brand);" class="hover:underline font-semibold">Salmo {p.ch}</a>
+							<span> &mdash; {p.note}</span>
+						</li>
+					))}
+				</ul>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Se leggi un solo capitolo, leggi il <a href={`${READ_IT}psalms/91/`} style="color: var(--color-brand);" class="hover:underline">Salmo 91</a>. È il capitolo più cercato in Italia, ed è una promessa di riparo pronunciata su chiunque voglia accoglierla.</p>
+
+				<h2 id="capitoli" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Gli altri capitoli che gli italiani cercano per nome</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Oltre ai Salmi, questi sono i capitoli cercati più spesso. Ogni link apre il capitolo, e ogni capitolo di ciascun libro è pubblicato:</p>
+				<ul class="space-y-3 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: disc;">
+					{CHAPTERS.map((b) => (
+						<li>
+							<a href={`${READ_IT}${b.slug}/${b.ch}/`} style="color: var(--color-brand);" class="hover:underline font-semibold">{b.it}</a>
+							<span> &mdash; {b.note}</span>
+						</li>
+					))}
+				</ul>
+
+				<h2 id="trovare-un-capitolo" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Come trovare qualsiasi capitolo della Bibbia in italiano</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Ogni capitolo italiano ha un indirizzo semplice e permanente, fatto del nome del libro e del numero del capitolo:</p>
+				<ul class="space-y-2 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: disc;">
+					<li><code>fathersheartbible.com/read/it/psalms/91/</code> &mdash; Salmo 91</li>
+					<li><code>fathersheartbible.com/read/it/genesis/1/</code> &mdash; Genesi 1</li>
+					<li><code>fathersheartbible.com/read/it/john/3/</code> &mdash; Giovanni 3</li>
+				</ul>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Non c&rsquo;è niente da memorizzare. <a href={READ_IT} style="color: var(--color-brand);" class="hover:underline">Apri la Bibbia in italiano</a> e scegli libro e capitolo dall&rsquo;elenco, oppure usa il selettore dentro qualsiasi capitolo per andare dritto a un versetto.</p>
+
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Leggi la Bibbia in italiano, gratis</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Tutta la Bibbia in italiano, online e gratuita &mdash; una nuova traduzione che rivela Dio come un Padre amorevole per i suoi figli e le sue figlie.</p>
+					<a href={`${READ_IT}psalms/91/`} class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Apri il Salmo 91<span aria-hidden="true">&rarr;</span></a>
+				</aside>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Domande frequenti</h2>
+				<div class="space-y-6">
+					{FAQS.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Continua: apri la <a href={READ_IT} style="color: var(--color-brand);" class="hover:underline">Bibbia in italiano</a>, scopri <a href="/a-bible-for-the-whole-world/" style="color: var(--color-brand);" class="hover:underline">tutte le lingue in cui il Father&rsquo;s Heart Bible viene tradotto</a>, leggi <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">perché esiste questa traduzione</a>, oppure leggi della <a href="/bible-in/italy/" style="color: var(--color-brand);" class="hover:underline">Bibbia in Italia</a> (in inglese). Sei nuovo alla Scrittura? Comincia da <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">dove iniziare a leggere la Bibbia</a> (in inglese).
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Tutta la Bibbia, in italiano, gratis</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Sessantasei libri e 1.189 capitoli, online e senza costi &mdash; una nuova traduzione italiana che rivela Dio come un Padre amorevole.</p>
+				<a href={READ_IT} class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Leggi in italiano<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<ReviewLink class="mb-10" />
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>
