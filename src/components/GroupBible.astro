@@ -232,7 +232,7 @@ const versesItemList = {
 		'@type': 'ListItem',
 		position: i + 1,
 		name: v.ref,
-		url: `https://fathersheartbible.com/read/${v.slug}/${v.ch}`,
+		url: `https://fathersheartbible.com/read/${v.slug}/${v.ch}/`,
 		description: v.note ? `${v.text} — ${v.note}` : v.text,
 	})),
 };
@@ -348,46 +348,46 @@ const bookSchema = {
 	audience: { '@type': 'PeopleAudience', audienceType: group },
 	potentialAction: {
 		'@type': 'ReadAction',
-		target: 'https://fathersheartbible.com/read',
+		target: 'https://fathersheartbible.com/read/',
 	},
 	workExample: [
 		{
 			'@type': 'Book',
 			bookFormat: 'https://schema.org/EBook',
 			name: "The Father's Heart Bible — Free Online (with audio)",
-			url: 'https://fathersheartbible.com/read',
+			url: 'https://fathersheartbible.com/read/',
 			offers: {
 				'@type': 'Offer',
 				price: '0',
 				priceCurrency: 'USD',
 				availability: 'https://schema.org/InStock',
-				url: 'https://fathersheartbible.com/read',
+				url: 'https://fathersheartbible.com/read/',
 			},
 		},
 		{
 			'@type': 'Book',
 			bookFormat: 'https://schema.org/Paperback',
 			name: "The Father's Heart Bible — Paperback",
-			url: 'https://fathersheartbible.com/print',
+			url: 'https://fathersheartbible.com/print/',
 			offers: {
 				'@type': 'Offer',
 				price: '39.99',
 				priceCurrency: 'USD',
 				availability: 'https://schema.org/InStock',
-				url: 'https://fathersheartbible.com/print',
+				url: 'https://fathersheartbible.com/print/',
 			},
 		},
 		{
 			'@type': 'Book',
 			bookFormat: 'https://schema.org/Hardcover',
 			name: "The Father's Heart Bible — Hardback",
-			url: 'https://fathersheartbible.com/print',
+			url: 'https://fathersheartbible.com/print/',
 			offers: {
 				'@type': 'Offer',
 				price: '44.99',
 				priceCurrency: 'USD',
 				availability: 'https://schema.org/InStock',
-				url: 'https://fathersheartbible.com/print',
+				url: 'https://fathersheartbible.com/print/',
 			},
 		},
 	],
@@ -549,7 +549,7 @@ const relatedGroups: Group[] = _sibSlugs
 				)}
 				<div class="mt-7 space-y-5">
 					{verses.map((v) => (
-						<a href={`https://fathersheartbible.com/read/${v.slug}/${v.ch}`} class="block rounded-2xl p-5 no-underline transition-opacity hover:opacity-90" style={`background-color: ${TINT_PINK}; border: 1px solid rgba(0,0,0,0.06);`}>
+						<a href={`https://fathersheartbible.com/read/${v.slug}/${v.ch}/`} class="block rounded-2xl p-5 no-underline transition-opacity hover:opacity-90" style={`background-color: ${TINT_PINK}; border: 1px solid rgba(0,0,0,0.06);`}>
 							<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.text}&rdquo;</p>
 							{v.note && (<p class="mt-2 text-sm leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{v.note}</p>)}
 							<span class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">{v.ref}<span aria-hidden="true">&rarr;</span></span>
@@ -658,8 +658,8 @@ const relatedGroups: Group[] = _sibSlugs
 						<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{ctaMidHeading}</h2>
 						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.85);" set:html={ctaMidBodyHtml}></p>
 						<div class="mt-6 flex flex-wrap justify-center md:justify-start gap-3">
-							<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; listen free<span aria-hidden="true">&rarr;</span></a>
-							<a href="/print" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="border: 1.5px solid rgba(255,255,255,0.7); color: #fff; font-family: var(--font-sans);">Now in Print</a>
+							<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; listen free<span aria-hidden="true">&rarr;</span></a>
+							<a href="/print/" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="border: 1.5px solid rgba(255,255,255,0.7); color: #fff; font-family: var(--font-sans);">Now in Print</a>
 						</div>
 					</div>
 				</div>
@@ -741,8 +741,8 @@ const relatedGroups: Group[] = _sibSlugs
 						<p class="mt-4 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={whichBibleNoteHtml}></p>
 					)}
 					<div class="mt-6 flex flex-wrap gap-3">
-						<a href="https://fathersheartbible.com/read" class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="background-color: var(--color-brand); color: #fff; font-family: var(--font-sans);">Read the Father's Heart Bible™ free</a>
-						<a href="/print" class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="border: 1.5px solid var(--color-brand); color: var(--color-brand); font-family: var(--font-sans);">Get the print edition</a>
+						<a href="https://fathersheartbible.com/read/" class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="background-color: var(--color-brand); color: #fff; font-family: var(--font-sans);">Read the Father's Heart Bible™ free</a>
+						<a href="/print/" class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="border: 1.5px solid var(--color-brand); color: var(--color-brand); font-family: var(--font-sans);">Get the print edition</a>
 					</div>
 				</div>
 			</section>
@@ -817,8 +817,8 @@ const relatedGroups: Group[] = _sibSlugs
 					</button>
 				</div>
 				<div class="mt-8 flex flex-wrap justify-center gap-3">
-					<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; listen free<span aria-hidden="true">&rarr;</span></a>
-					<a href="/print" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="border: 1.5px solid var(--color-brand); color: var(--color-brand); font-family: var(--font-sans);">Now in Print</a>
+					<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; listen free<span aria-hidden="true">&rarr;</span></a>
+					<a href="/print/" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="border: 1.5px solid var(--color-brand); color: var(--color-brand); font-family: var(--font-sans);">Now in Print</a>
 				</div>
 			</div>
 		</section>

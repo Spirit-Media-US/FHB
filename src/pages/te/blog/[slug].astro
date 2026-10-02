@@ -1,4 +1,5 @@
 ---
+import { canonHref } from '../../../lib/canon-href';
 // /te/blog/<slug> — Telugu edition of a blog post (in-house machine translation
 // PILOT, Kevin 2026-07-21; doctrine: projects/fhb-translation/MASTER-PLAN.md).
 //
@@ -39,7 +40,7 @@ const te: any = (overlayModules[`../../../data/te-blog/${slug}.json`] as any)?.d
 const post = await sanityClient.fetch(`*[_type == "blogPost" && slug.current == $slug][0]`, {
 	slug,
 });
-if (!post || !te) return Astro.redirect('/blog');
+if (!post || !te) return Astro.redirect('/blog/');
 
 // ── Telugu overlay onto the English structure ───────────────────────────────
 const spanText = (blockKey: string, spanKey: string, fallback: string): string =>
@@ -72,7 +73,7 @@ function renderPortableText(blocks: any[]): string {
 		const markDefs = Array.isArray(block.markDefs) ? block.markDefs : [];
 		const linkByKey: Record<string, string> = {};
 		for (const md of markDefs) {
-			if (md && md._type === 'link' && md._key && md.href) linkByKey[md._key] = md.href;
+			if (md && md._type === 'link' && md._key && md.href) linkByKey[md._key] = canonHref(md.href);
 		}
 		const inner = children
 			.map((child: any) => {
@@ -170,8 +171,8 @@ const publishDate = new Date(post.publishDate).toLocaleDateString('te-IN', {
 	day: 'numeric',
 });
 
-const enUrl = `https://fathersheartbible.com/blog/${slug}`;
-const teUrl = `https://fathersheartbible.com/te/blog/${slug}`;
+const enUrl = `https://fathersheartbible.com/blog/${slug}/`;
+const teUrl = `https://fathersheartbible.com/te/blog/${slug}/`;
 
 const faqs = (post.faqs || []).map((f: any) => ({
 	question: te.spans?.[`fq:${f._key}`] ?? f.question,

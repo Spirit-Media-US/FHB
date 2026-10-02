@@ -86,7 +86,7 @@ const {
 	tags = [],
 } = Astro.props as Props;
 
-const PAGE_URL = `https://fathersheartbible.com/meaning/${slug}`;
+const PAGE_URL = `https://fathersheartbible.com/meaning/${slug}/`;
 const HERO_IMG = `${heroBase}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
 const OG_IMG = `${heroBase}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
 const mod = modified || published;
@@ -96,7 +96,7 @@ const formatDate = (iso: string) =>
 		month: 'long',
 		day: 'numeric',
 	});
-const reader = (s: string, ch: number) => `https://fathersheartbible.com/read/${s}/${ch}`;
+const reader = (s: string, ch: number) => `https://fathersheartbible.com/read/${s}/${ch}/`;
 const refLabel = (ref: string) => ref.split('–')[0].split(':')[0];
 
 const KEVIN_WHITE_AUTHOR = {
@@ -267,7 +267,7 @@ const TOC = [
 				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
 					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">{ctaMidHeading}</p>
 					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaMidBodyHtml} />
-					<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a>
+					<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a>
 				</aside>
 
 				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
@@ -285,7 +285,7 @@ const TOC = [
 			<div class="mx-auto max-w-2xl text-center">
 				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible free</h2>
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaBottomBodyHtml} />
-				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+				<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
 			</div>
 		</section>
 

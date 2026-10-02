@@ -5,7 +5,7 @@ import { sanityClient } from '../lib/sanity';
 
 const rawSanityPosts = await sanityClient.fetch(`
   *[_type == "blogPost"] | order(publishDate desc) {
-    "slug": "/blog/" + slug.current,
+    "slug": "/blog/" + slug.current + "/",
     title,
     excerpt,
     "image": coalesce(heroImage.asset->url + "?w=800&auto=format", "/fhb-logo.png"),
@@ -43,7 +43,7 @@ const jsonLd = {
 			'@type': 'Blog',
 			headline: "Father's Heart Bible Blog — Hearing Our Father's Voice in Scripture",
 			name: "Father's Heart Bible Blog",
-			url: 'https://fathersheartbible.com/blog',
+			url: 'https://fathersheartbible.com/blog/',
 			description:
 				"The Father's Heart Bible blog — articles on hearing the Father's voice across Scripture, the orphan spirit and sonship, and what changes when you read every verse with the Father's heart in view.",
 			publisher: {
@@ -65,7 +65,7 @@ const jsonLd = {
 					'@type': 'ListItem',
 					position: 2,
 					name: 'Blog',
-					item: 'https://fathersheartbible.com/blog',
+					item: 'https://fathersheartbible.com/blog/',
 				},
 			],
 		},
