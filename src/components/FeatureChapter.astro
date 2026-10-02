@@ -49,7 +49,7 @@ const sup = (n: number) => SUPERSCRIPTS[n] ?? `^${n}`;
 // Absolute to the production apex: the reader (/read/*) is served by the
 // community app via the apex Worker, which only runs on fathersheartbible.com —
 // a relative /read link 404s on the dev .pages.dev preview. Always point to prod.
-const readerHref = `https://fathersheartbible.com/read/${slug}/${chapter}`;
+const readerHref = `https://fathersheartbible.com/read/${slug}/${chapter}/`;
 const audioSrc = `https://media.spiritmediapublishing.com/audio/en/${slug}/${chapter}.mp3`;
 const ref = `${book} ${chapter}`;
 ---
@@ -67,7 +67,7 @@ const ref = `${book} ${chapter}`;
 
 		{playable ? (
 			<!-- Ungated inline narration (blogs, Kevin 2026-06-06): plays for everyone,
-			     no join required. The Bible reader (/read) audio stays join-gated separately. -->
+			     no join required. The Bible reader (/read/) audio stays join-gated separately. -->
 			<div class="mb-6 px-4 py-4 rounded-xl" style="background-color: #ffffff; border: 1px solid #f4c0d0;">
 				<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: #a04060; font-family: var(--font-sans);">
 					🎧 Listen to {ref}

@@ -11,6 +11,7 @@ import RelatedPosts from '../../../components/RelatedPosts.astro';
 import ReviewLink from '../../../components/ReviewLink.astro';
 import ShareBar from '../../../components/ShareBar.astro';
 import Layout from '../../../layouts/Layout.astro';
+import { canonHref } from '../../../lib/canon-href';
 import { previewClient, urlFor } from '../../../lib/sanity';
 
 // Dev-only draft preview. Emitted only when PUBLIC_PREVIEW_DRAFTS=1 (deploy-preview
@@ -31,7 +32,7 @@ const post = await previewClient.fetch(`*[_type == "blogPost" && slug.current ==
 });
 
 if (!post) {
-	return Astro.redirect('/blog');
+	return Astro.redirect('/blog/');
 }
 
 // Slugify heading text for jump-link anchors. Lowercases, strips punctuation,
@@ -139,7 +140,7 @@ function renderPortableText(blocks: any[]): string {
 		const markDefs = Array.isArray(block.markDefs) ? block.markDefs : [];
 		const linkByKey: Record<string, string> = {};
 		for (const md of markDefs) {
-			if (md && md._type === 'link' && md._key && md.href) linkByKey[md._key] = md.href;
+			if (md && md._type === 'link' && md._key && md.href) linkByKey[md._key] = canonHref(md.href);
 		}
 		const textContent = children
 			.map((child: any) => {
@@ -242,7 +243,8 @@ function renderBlogTable(b: any): string {
 	const cell = (s: any) =>
 		esc(s).replace(
 			/\[([^\]]+)\]\((\/[^)\s]+|https?:\/\/[^)\s]+)\)/g,
-			'<a href="$2" class="underline underline-offset-2">$1</a>',
+			(_m: string, txt: string, url: string) =>
+				`<a href="${canonHref(url)}" class="underline underline-offset-2">${txt}</a>`,
 		);
 	const rows = Array.isArray(b?.rows) ? b.rows : [];
 	if (!rows.length) return '';
@@ -340,7 +342,7 @@ const KEVIN_WHITE_AUTHOR = {
 	],
 };
 
-const postUrl = `https://fathersheartbible.com/blog/${post.slug.current}`;
+const postUrl = `https://fathersheartbible.com/blog/${post.slug.current}/`;
 
 // Normalize dateModified — accept full ISO datetime or fall back to publishDate.
 const dateModified = post.dateModified || post.publishDate;
@@ -495,7 +497,7 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
         <div class="mx-auto max-w-3xl">
           <div class="flex flex-wrap gap-2">
             {tags.map((tag: string) => (
-              <a href={`/blog?tag=${encodeURIComponent(tag)}`} class="text-xs font-semibold rounded-full px-3 py-1 transition-colors no-underline" style="color: var(--color-muted); background-color: var(--color-surface);">
+              <a href={`/blog/?tag=${encodeURIComponent(tag)}`} class="text-xs font-semibold rounded-full px-3 py-1 transition-colors no-underline" style="color: var(--color-muted); background-color: var(--color-surface);">
                 {tag}
               </a>
             ))}
@@ -529,7 +531,7 @@ const jsonLd = [blogPostingSchema, breadcrumbSchema, faqSchema].filter(Boolean);
     <!-- SHARE BAR -->
     <AuthorBio author={author} />
 
-    <ShareBar title={post.title} url={`https://fathersheartbible.com/blog/${post.slug.current}`} />
+    <ShareBar title={post.title} url={`https://fathersheartbible.com/blog/${post.slug.current}/`} />
 
     <ReviewLink class="mt-8" />
 

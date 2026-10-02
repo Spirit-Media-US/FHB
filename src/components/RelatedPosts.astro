@@ -9,7 +9,7 @@ const { currentSlug, currentTags = [] } = Astro.props;
 
 const allPosts = await sanityClient.fetch(
 	`*[_type == "blogPost" && slug.current != $slug] {
-    "slug": "/blog/" + slug.current,
+    "slug": "/blog/" + slug.current + "/",
     title,
     excerpt,
     heroImage,

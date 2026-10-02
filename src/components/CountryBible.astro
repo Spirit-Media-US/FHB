@@ -265,7 +265,7 @@ const versesItemList = {
 		'@type': 'ListItem',
 		position: i + 1,
 		name: v.ref,
-		url: `https://fathersheartbible.com/read/${v.slug}/${v.ch}`,
+		url: `https://fathersheartbible.com/read/${v.slug}/${v.ch}/`,
 		description: v.text,
 	})),
 };
@@ -513,7 +513,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 							);
 						})}
 					</ul>
-					<p class="mt-6 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Every language is a door. You can <a href="https://fathersheartbible.com/read" style="color: var(--color-brand);" class="hover:underline">start reading the editions available today</a>, free. English has verse-by-verse audio.</p>
+					<p class="mt-6 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Every language is a door. You can <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">start reading the editions available today</a>, free. English has verse-by-verse audio.</p>
 					{_previews.length > 0 && <TranslationPreview previews={_previews} />}
 				</div>
 			</section>
@@ -570,7 +570,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">A few of the most-read passages in the world, in the Father&rsquo;s Heart Bible&trade; &mdash; tap any reference to read and listen free.</p>
 				<div class="mt-7 space-y-5">
 					{verses.map((v) => (
-						<a href={`https://fathersheartbible.com/read/${v.slug}/${v.ch}`} class="block rounded-2xl p-5 no-underline transition-opacity hover:opacity-90" style={`background-color: ${tintWarm}; border: 1px solid rgba(0,0,0,0.06);`}>
+						<a href={`https://fathersheartbible.com/read/${v.slug}/${v.ch}/`} class="block rounded-2xl p-5 no-underline transition-opacity hover:opacity-90" style={`background-color: ${tintWarm}; border: 1px solid rgba(0,0,0,0.06);`}>
 							<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.text}&rdquo;</p>
 							<span class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">{v.ref}<span aria-hidden="true">&rarr;</span></span>
 						</a>
@@ -584,7 +584,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 			<div class="mx-auto max-w-2xl text-center">
 				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{ctaMidHeading}</h2>
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaMidBodyHtml}></p>
-				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read FHB free<span aria-hidden="true">&rarr;</span></a>
+				<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read FHB free<span aria-hidden="true">&rarr;</span></a>
 			</div>
 		</section>
 
@@ -657,7 +657,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 			<div class="mx-auto max-w-2xl text-center">
 				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible&trade; free</h2>
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaBottomBodyHtml}></p>
-				<a href="https://fathersheartbible.com/read" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Start reading<span aria-hidden="true">&rarr;</span></a>
+				<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 mt-6 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Start reading<span aria-hidden="true">&rarr;</span></a>
 			</div>
 		</section>
 

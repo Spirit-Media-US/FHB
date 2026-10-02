@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { canonHref } from '../lib/canon-href';
 import { urlFor } from '../lib/sanity';
 // Shared renderer for a Messages from the Father post — used by both
 // /words/[slug] (published) and /words/preview/[slug] (drafts) so the two
@@ -37,7 +38,7 @@ function renderBlocks(blocks: any[], voice: 'word' | 'prose'): string {
 		const markDefs = Array.isArray(block.markDefs) ? block.markDefs : [];
 		const linkByKey: Record<string, string> = {};
 		for (const md of markDefs) {
-			if (md && md._type === 'link' && md._key && md.href) linkByKey[md._key] = md.href;
+			if (md && md._type === 'link' && md._key && md.href) linkByKey[md._key] = canonHref(md.href);
 		}
 		const inner = children
 			.map((child: any) => {
@@ -107,7 +108,7 @@ const heroImageMobile = msg.heroImage
 	: '';
 
 const receivedBy = msg.receivedBy || 'Kevin White';
-const postUrl = `https://fathersheartbible.com/words/${msg.slug.current}`;
+const postUrl = `https://fathersheartbible.com/words/${msg.slug.current}/`;
 
 // Same unified author entity as the blog (E-E-A-T: visible human steward).
 const KEVIN_WHITE_AUTHOR = {
@@ -373,7 +374,7 @@ const jsonLd = [
 							and now available in three print editions.
 						</p>
 						<div class="mt-7 flex flex-wrap items-center justify-center md:justify-start gap-3" style="font-family: var(--font-sans);">
-							<a href="/read" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A;">
+							<a href="/read/" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A;">
 								Read free online
 							</a>
 							<a href="/print/" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="border: 1px solid #a04060; color: #a04060;">

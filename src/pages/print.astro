@@ -502,7 +502,7 @@ const SAMPLE_LP =
 	'https://assets.spiritmediapublishing.com/FHB/print-samples/FHB-Genesis-sample-largeprint-14pt.pdf';
 
 // Print FAQ — rendered as a no-JS <details> accordion + FAQPage JSON-LD (AEO).
-const READ_URL = '/read';
+const READ_URL = '/read/';
 const CAMPAIGN_URL = '/a-bible-for-the-whole-world/';
 // Neutral: the only color between the header and the footer is the three voices and
 // the cover art (Kevin 2026-08-23).
@@ -683,7 +683,7 @@ const dvcVerses = [
 		verses: [
 			{
 				ref: 'Genesis 1:3',
-				href: '/read/genesis/1#v3',
+				href: '/read/genesis/1/#v3',
 				text: 'Then our Father said, "Let there be light," and there was light.',
 				father: ['"Let there be light,"'],
 				son: [],
@@ -691,7 +691,7 @@ const dvcVerses = [
 			},
 			{
 				ref: 'Jeremiah 29:11',
-				href: '/read/jeremiah/29#v11',
+				href: '/read/jeremiah/29/#v11',
 				text: 'For I know the plans I have for you, declares your Father — plans for peace, not disaster, to give you a future and hope.',
 				father: [
 					'For I know the plans I have for you,',
@@ -708,7 +708,7 @@ const dvcVerses = [
 		verses: [
 			{
 				ref: 'Matthew 11:28',
-				href: '/read/matthew/11#v28',
+				href: '/read/matthew/11/#v28',
 				text: 'Come to me, all you who are weary and burdened, and I will give you rest.',
 				father: [],
 				son: ['Come to me, all you who are weary and burdened, and I will give you rest.'],
@@ -716,7 +716,7 @@ const dvcVerses = [
 			},
 			{
 				ref: 'John 14:6',
-				href: '/read/john/14#v6',
+				href: '/read/john/14/#v6',
 				text: 'Jesus told him, "I am the way, and the truth, and the life. No one comes to the Father except through me."',
 				father: [],
 				son: [
@@ -732,7 +732,7 @@ const dvcVerses = [
 		verses: [
 			{
 				ref: 'Acts 8:29',
-				href: '/read/acts/8#v29',
+				href: '/read/acts/8/#v29',
 				text: 'And the Holy Spirit said to Philip, "Go over and catch up with that chariot."',
 				father: [],
 				son: [],
@@ -740,7 +740,7 @@ const dvcVerses = [
 			},
 			{
 				ref: 'Acts 10:15',
-				href: '/read/acts/10#v15',
+				href: '/read/acts/10/#v15',
 				text: 'The voice came to him again, a second time: "What I have made clean, don\'t call common."',
 				father: [],
 				son: [],
@@ -846,7 +846,7 @@ function markVoices(v: {
 						<div class="flex flex-col gap-2 w-full mt-auto">
 							<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.2rem;">
 								{builtPages.has(`${e.slug}-bible`) && (
-									<a href={`/bibles/${e.slug}-bible`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
+									<a href={`/bibles/${e.slug}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
 								)}
 								{builtPages.has(`${e.slug}-bible`) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 								<LookInside slug={e.slug} title={e.title} variant="link" label="Look inside" />
@@ -917,7 +917,7 @@ function markVoices(v: {
 								{builtPages.has('fathers-heart-bible') && (
 									<>
 										<a
-											href="/bibles/fathers-heart-bible"
+											href="/bibles/fathers-heart-bible/"
 											style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;"
 										>Full details</a>
 										<span aria-hidden="true" style="color: #a1a1aa;">·</span>
@@ -988,7 +988,7 @@ function markVoices(v: {
 							{builtPages.has(`${v.key}-bible`) && (
 								<>
 									<a
-										href={`/bibles/${v.key}-bible`}
+										href={`/bibles/${v.key}-bible/`}
 										style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;"
 									>Full details</a>
 									<span aria-hidden="true" style="color: #a1a1aa;">·</span>
@@ -1048,7 +1048,7 @@ function markVoices(v: {
 				     without the missing link rather than link to nothing. */}
 				{builtPages.has('lp-set-bible') && (
 					<p style="font-family: var(--font-sans); font-size: 0.82rem; margin: 0.9rem 0 0;">
-						<a href="/bibles/lp-set-bible" style="font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
+						<a href="/bibles/lp-set-bible/" style="font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
 					</p>
 				)}
 				{/* NO "a set counts as three books" LINE HERE (Kevin 2026-09-17: "This is NOT
@@ -1146,7 +1146,7 @@ function markVoices(v: {
 									<div class="row-links">
 										{builtPages.has(`${e.slug}-bible`) && (
 											<>
-												<a href={`/bibles/${e.slug}-bible`}>Full details</a>
+												<a href={`/bibles/${e.slug}-bible/`}>Full details</a>
 												<span aria-hidden="true" class="row-dot">·</span>
 											</>
 										)}
@@ -1176,7 +1176,7 @@ function markVoices(v: {
 										<div class="row-links">
 											{builtPages.has('fathers-heart-bible') && (
 												<>
-													<a href="/bibles/fathers-heart-bible">Full details</a>
+													<a href="/bibles/fathers-heart-bible/">Full details</a>
 													<span aria-hidden="true" class="row-dot">·</span>
 												</>
 											)}
@@ -1203,7 +1203,7 @@ function markVoices(v: {
 								<div class="row-links">
 									{builtPages.has(`${r.liSlug}-bible`) && (
 										<>
-											<a href={`/bibles/${r.liSlug}-bible`}>Full details</a>
+											<a href={`/bibles/${r.liSlug}-bible/`}>Full details</a>
 											<span aria-hidden="true" class="row-dot">·</span>
 										</>
 									)}

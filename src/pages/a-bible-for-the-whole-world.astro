@@ -21,7 +21,7 @@ const heroHeading = 'Sharing Our Father';
 // Featured blog card ("The Father's Vision") shown under the give-by-check box.
 const visionPost =
 	await sanityClient.fetch(`*[_type == "blogPost" && slug.current == "the-fathers-vision"][0] {
-    "slug": "/blog/" + slug.current,
+    "slug": "/blog/" + slug.current + "/",
     title,
     excerpt,
     "image": coalesce(heroImage.asset->url + "?w=800&auto=format", "/fhb-logo.png"),
@@ -141,7 +141,7 @@ const partnershipFaq = [
 	{
 		q: 'The Bible is free to read online — so why give?',
 		a: 'The Father’s Heart Bible™ is free to read or listen to online, and in time it will be free on every major digital Bible platform. But printing, publishing, and translating into new languages carry real costs — and that is what your gift makes possible, putting a physical Father’s Heart Bible into hands that have never held one.',
-		link: { href: '/read', label: 'Read or listen free →' },
+		link: { href: '/read/', label: 'Read or listen free →' },
 	},
 ];
 ---
@@ -156,10 +156,10 @@ const partnershipFaq = [
 	jsonLd={{
 		"@context": "https://schema.org",
 		"@graph": [
-			{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/a-bible-for-the-whole-world" },
+			{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/a-bible-for-the-whole-world/" },
 			{ "@type": "BreadcrumbList", "itemListElement": [
 				{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
-				{ "@type": "ListItem", "position": 2, "name": "Sharing Our Father", "item": "https://fathersheartbible.com/a-bible-for-the-whole-world" }
+				{ "@type": "ListItem", "position": 2, "name": "Sharing Our Father", "item": "https://fathersheartbible.com/a-bible-for-the-whole-world/" }
 			]},
 			{ "@type": "FAQPage", "mainEntity": partnershipFaq.map((f) => ({
 				"@type": "Question",
@@ -185,7 +185,7 @@ const partnershipFaq = [
 		<!-- ═══════════════ PAGE 1 — title, invitation, timeline, you're invited ═══════════════ -->
 		<Section variant="light">
 			<div class="text-center mb-10" data-reveal>
-				<p class="text-sm md:text-base mb-3" style="font-family: var(--font-sans); color: var(--color-muted);">A portion of every <a href="/print" style="color: var(--color-brand); text-decoration: underline;">Father&rsquo;s Heart Bible sold</a> helps fund</p>
+				<p class="text-sm md:text-base mb-3" style="font-family: var(--font-sans); color: var(--color-muted);">A portion of every <a href="/print/" style="color: var(--color-brand); text-decoration: underline;">Father&rsquo;s Heart Bible sold</a> helps fund</p>
 				<!-- Testimony video — small, borderless (transparent) lazy YouTube facade; replaces the funding-connection banner image. -->
 				<figure style="margin: 1.5rem 0 0;">
 					<button
