@@ -43,6 +43,11 @@ const MODIFIED = '2026-10-02';
 
 const READ_IT = 'https://fathersheartbible.com/read/it/';
 
+// Contributor bio — Kevin White, from the FHB metadata sheets (Italian Bible: Metadata), in Italian
+// (Kevin 2026-10-02 "6. yes": the page stays fully in Italian). Not yet natively reviewed.
+const EDITOR_BIO_IT =
+	'Kevin White è egli stesso un figlio amato, marito e padre. È autore di best seller internazionali, oratore e pastore nel mondo del lavoro, con decenni di esperienza nel fondare chiese, guidare organizzazioni non profit, avviare aziende e formare leader in tutto il mondo. Kevin e Shelly, la sua fidanzata dai tempi del liceo e compagna di matrimonio e di missione da quasi quarant’anni, hanno fondato insieme Spirit Media Publishing e si dedicano ad aiutare figli e figlie amati a rivelare il cuore di nostro Padre alle nazioni. Kevin e Shelly vivono in North Carolina con la loro famiglia.';
+
 const formatDate = (iso: string) =>
 	new Date(`${iso}T12:00:00Z`).toLocaleDateString('it-IT', {
 		year: 'numeric',
@@ -298,8 +303,18 @@ const TOC = [
 			</div>
 		</section>
 
-		<ReviewLink class="mb-10" />
+		<ReviewLink class="mb-10" label="♥ Leggi cosa dicono i lettori (in inglese) →" />
 
-		<AuthorBio author="Kevin White" />
+		{/* Kevin 2026-10-02: "8. Yes" — About the EDITOR, from the metadata sheets (Contributor #2: Kevin White, Editor);
+		    "6. yes" — the page stays fully in Italian, so the sheet's English bio is rendered in Italian here. */}
+		<AuthorBio
+			author="Kevin White"
+			label="Informazioni sul curatore"
+			role="Curatore, Father’s Heart Bible™"
+			bio={EDITOR_BIO_IT}
+			portraitAlt="Ritratto di Kevin White"
+			ariaLabel="Informazioni su Kevin White"
+			moreLabel="Scopri di più su Kevin White"
+		/>
 	</main>
 </Layout>

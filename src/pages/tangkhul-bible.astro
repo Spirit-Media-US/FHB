@@ -26,7 +26,8 @@
 //
 // Canon figures (66 books / 1,189 chapters) are MEASURED from
 // /srv/sites/community/src/content/bible-nmf. Native review of the edition is in progress
-// (that is what publication on 2026-09-30 was for) — the FAQ says so plainly.
+// (that is what publication on 2026-09-30 was for). The FAQ invites EVERY Tangkhul speaker
+// to suggest improvements via the reader's chapter comments (Kevin 2026-10-02, "7").
 import AuthorBio from '../components/AuthorBio.astro';
 import ReviewLink from '../components/ReviewLink.astro';
 import Layout from '../layouts/Layout.astro';
@@ -39,6 +40,10 @@ const PUBLISHED = '2026-10-02';
 const MODIFIED = '2026-10-02';
 
 const READ_NMF = 'https://fathersheartbible.com/read/nmf/';
+
+// Contributor bio — Kevin White, verbatim from the FHB metadata sheets (General + Italian Bible: Metadata).
+const EDITOR_BIO =
+	"Kevin White himself is a beloved son, husband, and father. He is an international best selling author, speaker, and marketplace pastor with decades of experience planting churches, leading nonprofits, starting companies, and developing leaders around the world. Kevin and Shelly, his high school sweetheart and partner in marriage and mission for nearly forty years, co-founded Spirit Media Publishing and are devoted to empowering beloved sons and daughters in revealing our Father's heart to the nations. Kevin and Shelly live in North Carolina with their family.";
 
 const formatDate = (iso: string) =>
 	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
@@ -132,9 +137,9 @@ const FAQS = [
 			'The whole Bible. The Tangkhul edition publishes all 66 books and every one of their 1,189 chapters — Old Testament and New — not a sample or a selection.',
 	},
 	{
-		question: 'Has the Tangkhul translation been reviewed by Tangkhul speakers?',
+		question: 'Can Tangkhul speakers suggest improvements to the translation?',
 		answer:
-			'Review by Tangkhul speakers is under way now — the edition was published so that readers and reviewers can read it in full. Corrections from Tangkhul readers are welcome and are folded into the text as they come in.',
+			'Every Tangkhul speaker is invited to help make it better. The edition was published in full so that Tangkhul readers can read it and suggest improvements: open any chapter at fathersheartbible.com/read/nmf/, scroll to the comments at the end of the chapter, and post your suggestion — joining the Family is free. Suggestions are read and folded into the text as they come in.',
 	},
 ];
 
@@ -292,6 +297,12 @@ const TOC = [
 
 		<ReviewLink class="mb-10" />
 
-		<AuthorBio author="Kevin White" />
+		{/* Kevin 2026-10-02 ("8. Yes"): About the EDITOR, bio verbatim from the FHB metadata sheets (Contributor #2: Kevin White, Editor). */}
+		<AuthorBio
+			author="Kevin White"
+			label="About the editor"
+			role="Editor, Father’s Heart Bible™"
+			bio={EDITOR_BIO}
+		/>
 	</main>
 </Layout>
