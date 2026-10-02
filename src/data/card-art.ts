@@ -42,9 +42,12 @@ const LP_KEYS = new Set(['lp-vol1', 'lp-vol2', 'lp-vol3', 'lp-set']);
 // The LANGUAGE edition cards ("lang-es", "lang-te", …) live on their own prefix and version
 // line too, for the same reason as Large Print: more languages land on their own schedule.
 const LANG_PREFIX = `${BASE}/lang/v1`;
+// Language cards also come at 360 (= the marquee's 180 CSS px at 2x): the second marquee row
+// sits inside the lazy-load distance on first paint, and 600px art there cost ~400KB on the
+// homepage's mobile Lighthouse run (measured 2026-10-02); 360 is every pixel a 2x screen draws.
 
 /** The card image URL for `key` ("dvc-teen", "general-regular-plum", "lp-vol1", "lang-es") at 600 or 1200. */
-export function cardUrl(key: string, size: 600 | 1200 = 600): string {
+export function cardUrl(key: string, size: 360 | 600 | 1200 = 600): string {
 	if (LP_KEYS.has(key)) return `${LP_PREFIX}/${key}-${size}.webp`;
 	if (key.startsWith('lang-')) return `${LANG_PREFIX}/${key}-${size}.webp`;
 	return CARDS_V2.has(key) ? `${BASE}/cards/v2/${key}-${size}.webp` : `${BASE}/${key}-${size}.webp`;
