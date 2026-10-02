@@ -1,5 +1,6 @@
 ---
 import { cardUrl } from '../data/card-art';
+import { languageEditions } from '../data/language-editions';
 // FHB cover marquee — Kevin 2026-09-24.
 //
 // "Scrolling marquee of 3D image thumbnails of all FHB covers as shown on /print",
@@ -22,15 +23,21 @@ import { cardUrl } from '../data/card-art';
 // uploaded — the marquee is a second consumer of what /print already shows.
 import VoiceChips from './VoiceChips.astro';
 
-// The sixteen targeted DVC editions, then the three general colours, then the three
+// The twenty-three targeted DVC editions (the seven added 2026-09-29 included, Kevin
+// 2026-10-02), then the three general colours, then the three
 // Large Print volumes and the set — the same products /print lists, in its order.
 const DVC = [
+	['athletes', "Athlete's Bible"],
 	['chosen', 'Chosen Bible'],
 	['couples', "Couple's Bible"],
 	['dads', "Dad's Bible"],
 	['first-responders', "First Responder's Bible"],
+	['graduates', "Graduate's Bible"],
+	['grandparents', "Grandparent's Bible"],
+	['intercessors', "Intercessor's Bible"],
 	['mens', "Men's Bible"],
 	['moms', "Mom's Bible"],
+	['nurses', "Nurse's Bible"],
 	['pastors', "Pastor's Bible"],
 	['peace', 'Peace Bible'],
 	['presidents', "President's Bible"],
@@ -38,7 +45,9 @@ const DVC = [
 	['seekers', "Seeker's Bible"],
 	['seventeen', 'Seventeen Bible'],
 	['soldiers', "Soldier's Bible"],
+	['teachers', "Teacher's Bible"],
 	['teen', 'Teen Bible'],
+	['womens', "Women's Bible"],
 	['worship-leaders', "Worship Leader's Bible"],
 	['journaling', 'She Hears Her Father’s Voice Journaling Bible'],
 ];
@@ -67,6 +76,26 @@ const covers = [
 	...GENERAL.map(([key, name]) => ({ key, name })),
 	...LARGE_PRINT.map(([key, name]) => ({ key, name })),
 ].map((c) => ({ ...c, src: cardUrl(c.key), h: H(c.key) }));
+
+// SECOND ROW (Kevin 2026-10-02): every LANGUAGE edition, running the OPPOSITE way. Same
+// card style, size, spacing and on-screen speed as the English row — it is the same strip
+// markup with a direction flag, not a second implementation. Language cards are all 600x764.
+const langCovers = languageEditions.map((l) => ({
+	key: `lang-${l.code}`,
+	name: `${l.name} (${l.english})`,
+	src: cardUrl(`lang-${l.code}`),
+	h: H(`lang-${l.code}`),
+}));
+
+// SPEED IS PER PIXEL, NOT PER LOOP. The loop travels one copy of the row, so its duration
+// must scale with the row's length or a longer row runs faster. 100s was tuned (2026-09-24)
+// for the 23-cover row of that day: 100/23 s per cover keeps that exact on-screen speed for
+// any count, for both rows.
+const SECONDS_PER_COVER = 100 / 23;
+const rows = [
+	{ covers, reverse: false, href: '/print/' },
+	{ covers: langCovers, reverse: true, href: '/print/#language-editions' },
+].filter((r) => r.covers.length > 0);
 ---
 
 <section class="fhbm" aria-labelledby="fhbm-title">
@@ -76,28 +105,33 @@ const covers = [
 	     second copy is under the cursor at the moment the first wraps — that is what
 	     makes the loop seamless without any JS. aria-hidden on the duplicate so a
 	     screen reader hears each cover once. -->
-	<div class="fhbm-viewport">
-		<div class="fhbm-track">
-			{[0, 1].map((copy) => (
-				<ul class="fhbm-row" aria-hidden={copy === 1 ? 'true' : undefined}>
-					{covers.map((c) => (
-						<li>
-							<a href="/print/" tabindex={copy === 1 ? -1 : undefined}>
-								<img
-									src={c.src}
-									alt={copy === 1 ? '' : `Father's Heart Bible — ${c.name}`}
-									width={W}
-									height={c.h}
-									loading="lazy"
-									decoding="async"
-								/>
-							</a>
-						</li>
-					))}
-				</ul>
-			))}
+	{rows.map((row) => (
+		<div class="fhbm-viewport">
+			<div
+				class={row.reverse ? 'fhbm-track fhbm-track--reverse' : 'fhbm-track'}
+				style={`animation-duration: ${(row.covers.length * SECONDS_PER_COVER).toFixed(1)}s;`}
+			>
+				{[0, 1].map((copy) => (
+					<ul class="fhbm-row" aria-hidden={copy === 1 ? 'true' : undefined}>
+						{row.covers.map((c) => (
+							<li>
+								<a href={row.href} tabindex={copy === 1 ? -1 : undefined}>
+									<img
+										src={c.src}
+										alt={copy === 1 ? '' : `Father's Heart Bible — ${c.name}`}
+										width={W}
+										height={c.h}
+										loading="lazy"
+										decoding="async"
+									/>
+								</a>
+							</li>
+						))}
+					</ul>
+				))}
+			</div>
 		</div>
-	</div>
+	))}
 
 	<div class="fhbm-chips"><VoiceChips size="1.25rem" class="mb-0" /></div>
 </section>
@@ -148,6 +182,10 @@ const covers = [
 		width: 180px;
 		height: auto;
 	}
+	/* The language row runs the other way. Same keyframes played backwards, so it starts
+	   at -50% and travels to 0 — the seamless-loop arithmetic is unchanged. */
+	.fhbm-track--reverse { animation-direction: reverse; }
+	.fhbm-viewport + .fhbm-viewport { margin-top: 1.25rem; }
 	@keyframes fhbm-scroll {
 		from { transform: translate3d(0, 0, 0); }
 		to { transform: translate3d(-50%, 0, 0); }
