@@ -83,6 +83,7 @@ const covers = [
 const langCovers = languageEditions.map((l) => ({
 	key: `lang-${l.code}`,
 	name: `${l.name} (${l.english})`,
+	caption: l.english,
 	src: cardUrl(`lang-${l.code}`, 360),
 	h: H(`lang-${l.code}`),
 }));
@@ -92,9 +93,17 @@ const langCovers = languageEditions.map((l) => ({
 // for the 23-cover row of that day: 100/23 s per cover keeps that exact on-screen speed for
 // any count, for both rows.
 const SECONDS_PER_COVER = 100 / 23;
+// Row titles (Kevin 2026-10-03). The audience figure is Kevin's count of targeted audience
+// editions (the row also carries journaling, the general colours and Large Print). The
+// language figure is COUNTED, never typed: it says how many language covers the row shows.
 const rows = [
-	{ covers, reverse: false, href: '/print/' },
-	{ covers: langCovers, reverse: true, href: '/print/#language-editions' },
+	{ covers, reverse: false, href: '/print/', label: '22 Audience Editions' },
+	{
+		covers: langCovers,
+		reverse: true,
+		href: '/print/#language-editions',
+		label: `${langCovers.length} Language Editions`,
+	},
 ].filter((r) => r.covers.length > 0);
 ---
 
@@ -106,6 +115,8 @@ const rows = [
 	     makes the loop seamless without any JS. aria-hidden on the duplicate so a
 	     screen reader hears each cover once. -->
 	{rows.map((row) => (
+		<>
+		<p class="fhbm-label">{row.label}</p>
 		<div class="fhbm-viewport">
 			<div
 				class={row.reverse ? 'fhbm-track fhbm-track--reverse' : 'fhbm-track'}
@@ -124,6 +135,7 @@ const rows = [
 										loading="lazy"
 										decoding="async"
 									/>
+									{'caption' in c && <span class="fhbm-cap">{c.caption}</span>}
 								</a>
 							</li>
 						))}
@@ -131,6 +143,7 @@ const rows = [
 				))}
 			</div>
 		</div>
+		</>
 	))}
 
 	<div class="fhbm-chips"><VoiceChips size="1.25rem" class="mb-0" /></div>
@@ -185,7 +198,29 @@ const rows = [
 	/* The language row runs the other way. Same keyframes played backwards, so it starts
 	   at -50% and travels to 0 — the seamless-loop arithmetic is unchanged. */
 	.fhbm-track--reverse { animation-direction: reverse; }
-	.fhbm-viewport + .fhbm-viewport { margin-top: 1.25rem; }
+	/* Row title: the /print eyebrow style (General Audience / Language Editions), not a new design. */
+	.fhbm-label {
+		font-family: var(--font-sans);
+		color: #71717a;
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.14em;
+		text-align: center;
+		margin: 0 1.5rem 0.75rem;
+	}
+	.fhbm-viewport + .fhbm-label { margin-top: 1.75rem; }
+	/* English name under each language cover (Kevin 2026-10-03); the /print card's sub style. */
+	.fhbm-cap {
+		display: block;
+		margin-top: 0.4rem;
+		text-align: center;
+		font-family: var(--font-body);
+		color: var(--color-muted);
+		font-size: 0.8rem;
+		line-height: 1.3;
+	}
+	.fhbm-row a { display: block; text-decoration: none; }
 	@keyframes fhbm-scroll {
 		from { transform: translate3d(0, 0, 0); }
 		to { transform: translate3d(-50%, 0, 0); }
