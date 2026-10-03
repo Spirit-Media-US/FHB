@@ -20,6 +20,8 @@ import { execSync } from 'node:child_process';
  *   5. `books` weights match on both sides — the ladder must count the same on both.
  *   6. No RETIRED ISBN appears anywhere in src/ or functions/.
  *   7. Every targeted edition is priced in BOTH bindings, and matches ISBNS.json.
+ *   9. ONE volume ladder: dvc-checkout.ts TIERS, both of print.astro's copies and
+ *      src/data/print-tiers.ts (the language quick order form's) are the same tiers.
  *
  * Self-check: run with --selftest to confirm each assertion actually FAILS when broken. A
  * gate that has never rejected anything is unproven.
@@ -29,6 +31,7 @@ import { existsSync, readFileSync } from 'node:fs';
 const ISBNS = '/home/deploy/projects/fhb-print-bible/editions/ISBNS.json';
 const CHECKOUT = 'functions/dvc-checkout.ts';
 const PRINT = 'src/pages/print.astro';
+const TIERS_TS = 'src/data/print-tiers.ts';
 
 // The single-volume Large Print and the B&W general numbers. Retired, not merely old: a live
 // page carrying one of these sells a book that is not the book we print.
@@ -293,6 +296,41 @@ for (const n of RETIRED) {
 	check(!hits, `retired ISBN 979-8-89307-${n} still present in: ${hits.split('\n').join(', ')}`);
 }
 
+// ── 9. one volume ladder, wherever a total is shown ──────────────────────────────────
+// Canonical form: "min:pct" for every DISCOUNTED tier, ascending. Each source writes its
+// tiers its own way (min/pct, or qty/pct on /print's frontmatter), so each is parsed by the
+// block it lives in, not by a file-wide regex that could pick up a stray pair.
+function ladder(src, startRe, key) {
+	const at = src.search(startRe);
+	if (at < 0) return null;
+	const block = src.slice(at, src.indexOf('];', at));
+	const re = new RegExp(`${key}:\\s*(\\d+),\\s*pct:\\s*(\\d+)`, 'g');
+	return [...block.matchAll(re)]
+		.map((m) => [Number(m[1]), Number(m[2])])
+		.filter(([, pct]) => pct > 0)
+		.sort((a, b) => a[0] - b[0])
+		.map(([min, pct]) => `${min}:${pct}`)
+		.join(',');
+}
+const tiersTsSrc = readFileSync(TIERS_TS, 'utf8');
+const ladders = (srcs) => ({
+	[CHECKOUT]: ladder(srcs.checkout, /const TIERS\b/, 'min'),
+	[`${PRINT} (frontmatter tiers)`]: ladder(srcs.print, /const tiers = \[/, 'qty'),
+	[`${PRINT} (inline TIERS)`]: ladder(srcs.print, /const TIERS = \[/, 'min'),
+	[TIERS_TS]: ladder(srcs.tiersTs, /PRINT_TIERS\b/, 'min'),
+});
+const laddersAgree = (l) => {
+	const vals = Object.values(l);
+	return vals.every((v) => v && v === vals[0]);
+};
+const liveLadders = ladders({ checkout: checkoutSrc, print: printSrc, tiersTs: tiersTsSrc });
+check(
+	laddersAgree(liveLadders),
+	`volume tiers disagree: ${Object.entries(liveLadders)
+		.map(([f, v]) => `${f}=[${v ?? 'NOT FOUND'}]`)
+		.join(' ')}`,
+);
+
 // ── self-test: prove each assertion can actually fail ───────────────────────────────
 if (process.argv.includes('--selftest')) {
 	const cases = [
@@ -326,6 +364,20 @@ if (process.argv.includes('--selftest')) {
 				if (!printSrc.includes(from)) return false;
 				const broken = parsePrint(printSrc.replace(from, to));
 				return broken['lp-set-hb'].books !== server['lp-set-hb'].books;
+			},
+		],
+		[
+			'volume tier drift (language quick order form)',
+			() => {
+				const from = '{ min: 25, pct: 15 }';
+				if (!tiersTsSrc.includes(from)) return false;
+				return !laddersAgree(
+					ladders({
+						checkout: checkoutSrc,
+						print: printSrc,
+						tiersTs: tiersTsSrc.replace(from, '{ min: 20, pct: 15 }'),
+					}),
+				);
 			},
 		],
 		['retired ISBN detected', () => /89307-294-5/.test('isbn 979-8-89307-294-5')],

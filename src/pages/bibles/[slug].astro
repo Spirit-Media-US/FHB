@@ -1,9 +1,11 @@
 ---
+import LangQuickOrder from '../../components/LangQuickOrder.astro';
 import LookInside from '../../components/LookInside.astro';
 import Section from '../../components/Section.astro';
 import { cardUrl } from '../../data/card-art';
 import frontmatter from '../../data/editions/frontmatter.json';
 import shared from '../../data/editions/shared.json';
+import { LANG_HB, LANG_PB, langSlug, languageEditions } from '../../data/language-editions';
 // /bibles/<slug>-bible — the PRODUCT page for every Divine Voice Color edition.
 //
 // Why this exists alongside /bible-for/<audience>: those pages answer a PASTORAL search
@@ -110,6 +112,11 @@ const pillars: Pillar[] = fm?.pillars ?? [];
 // `?v=` is gone with it — a new key has nothing cached against it to bust.
 const coverUrl = cardUrl(ed.coverImage ?? `dvc-${ed.slug}`, 1200);
 const isLang = ed.kind === 'language';
+// The quick order form under the header (Kevin 2026-10-03) sells THIS language's two SKUs,
+// lang-<code>-hb/pb — the same record /print's rows and dvc-checkout.ts use. Matched by slug,
+// so an edition missing from language-editions.ts simply gets no form, never a wrong one.
+const langEd = isLang ? languageEditions.find((l) => langSlug(l) === ed.slug) : undefined;
+const buyHref = langEd ? '#order' : '/print/';
 // A language edition whose interior is still being built has NO page count yet: never fall
 // back to the English 888 for it.
 const pages = isLang ? (ed.pages ?? null) : (ed.pages ?? fm?.pages ?? 888);
@@ -343,11 +350,14 @@ const faqSchema = {
 					)}
 					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">Free shipping — a $15 value.</p>
 					<div class="flex flex-wrap items-center gap-3">
-						<a href="/print/" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Buy Now</a>
+						<a href={buyHref} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Buy Now</a>
 						<LookInside slug={ed.lookInsideKey ?? ed.slug} title={ed.name} size="lg" />
 					</div>
 				</div>
 			</div>
+			{langEd && (
+				<LangQuickOrder code={langEd.code} english={ed.english ?? langEd.english} name={langEd.name} hb={LANG_HB} pb={LANG_PB} returnPath={`/bibles/${ed.slug}-bible/`} />
+			)}
 		</Section>
 		<Section variant="warm">
 			<div class="max-w-3xl mx-auto">
