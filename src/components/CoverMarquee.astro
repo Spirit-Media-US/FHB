@@ -1,6 +1,6 @@
 ---
 import { cardUrl } from '../data/card-art';
-import { languageEditions } from '../data/language-editions';
+import { LANGUAGE_EDITION_TOTAL, languageEditions } from '../data/language-editions';
 // FHB cover marquee — Kevin 2026-09-24.
 //
 // "Scrolling marquee of 3D image thumbnails of all FHB covers as shown on /print",
@@ -95,14 +95,15 @@ const langCovers = languageEditions.map((l) => ({
 const SECONDS_PER_COVER = 100 / 23;
 // Row titles (Kevin 2026-10-03). The audience figure is Kevin's count of targeted audience
 // editions (the row also carries journaling, the general colours and Large Print). The
-// language figure is COUNTED, never typed: it says how many language covers the row shows.
+// language figure is Kevin's 26 (2026-10-03), counted from the edition list including the
+// ones whose covers have not landed — see language-editions.ts.
 const rows = [
 	{ covers, reverse: false, href: '/print/', label: '22 Audience Editions' },
 	{
 		covers: langCovers,
 		reverse: true,
 		href: '/print/#language-editions',
-		label: `${langCovers.length} Language Editions`,
+		label: `${LANGUAGE_EDITION_TOTAL} Language Editions`,
 	},
 ].filter((r) => r.covers.length > 0);
 ---
@@ -134,6 +135,7 @@ const rows = [
 										height={c.h}
 										loading="lazy"
 										decoding="async"
+										fetchpriority={'caption' in c ? 'low' : undefined}
 									/>
 									{'caption' in c && <span class="fhbm-cap">{c.caption}</span>}
 								</a>
