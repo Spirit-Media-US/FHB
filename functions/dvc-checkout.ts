@@ -370,6 +370,270 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		img: `${ASSETS}/lp/v4/lp-set-600.webp`,
 		books: 1,
 	},
+	// LANGUAGE EDITIONS (Kevin 2026-10-03: "all editions can be purchased now"). Keyed
+	// lang-<code>-hb / -pb. Prices are each language sheet's top table, recorded in ISBNS.json
+	// language_editions (on_sale + price_usd) and gated by pricing-verify. Card art mirrors
+	// src/data/card-art.ts (FHB/print/lang/v1/).
+	'lang-ar-hb': {
+		title: 'الكتاب المقدس العربي (Arabic) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-ar-600.webp`,
+	},
+	'lang-ar-pb': {
+		title: 'الكتاب المقدس العربي (Arabic) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-ar-600.webp`,
+	},
+	'lang-bn-hb': {
+		title: 'বাংলা বাইবেল (Bengali) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-bn-600.webp`,
+	},
+	'lang-bn-pb': {
+		title: 'বাংলা বাইবেল (Bengali) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-bn-600.webp`,
+	},
+	'lang-yue-hb': {
+		title: '廣東話聖經 (Cantonese) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-yue-600.webp`,
+	},
+	'lang-yue-pb': {
+		title: '廣東話聖經 (Cantonese) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-yue-600.webp`,
+	},
+	'lang-fil-hb': {
+		title: 'Bibliyang Filipino (Filipino) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-fil-600.webp`,
+	},
+	'lang-fil-pb': {
+		title: 'Bibliyang Filipino (Filipino) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-fil-600.webp`,
+	},
+	'lang-fr-hb': {
+		title: 'Bible Française (French) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-fr-600.webp`,
+	},
+	'lang-fr-pb': {
+		title: 'Bible Française (French) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-fr-600.webp`,
+	},
+	'lang-de-hb': {
+		title: 'Deutsche Bibel (German) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-de-600.webp`,
+	},
+	'lang-de-pb': {
+		title: 'Deutsche Bibel (German) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-de-600.webp`,
+	},
+	'lang-hi-hb': {
+		title: 'हिन्दी बाइबिल (Hindi) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-hi-600.webp`,
+	},
+	'lang-hi-pb': {
+		title: 'हिन्दी बाइबिल (Hindi) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-hi-600.webp`,
+	},
+	'lang-id-hb': {
+		title: 'Alkitab Indonesia (Indonesian) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-id-600.webp`,
+	},
+	'lang-id-pb': {
+		title: 'Alkitab Indonesia (Indonesian) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-id-600.webp`,
+	},
+	'lang-it-hb': {
+		title: 'Bibbia Italiana (Italian) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-it-600.webp`,
+	},
+	'lang-it-pb': {
+		title: 'Bibbia Italiana (Italian) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-it-600.webp`,
+	},
+	'lang-ja-hb': {
+		title: '日本語聖書 (Japanese) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-ja-600.webp`,
+	},
+	'lang-ja-pb': {
+		title: '日本語聖書 (Japanese) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-ja-600.webp`,
+	},
+	'lang-ko-hb': {
+		title: '한국어 성경 (Korean) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-ko-600.webp`,
+	},
+	'lang-ko-pb': {
+		title: '한국어 성경 (Korean) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-ko-600.webp`,
+	},
+	'lang-mr-hb': {
+		title: 'मराठी बायबल (Marathi) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-mr-600.webp`,
+	},
+	'lang-mr-pb': {
+		title: 'मराठी बायबल (Marathi) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-mr-600.webp`,
+	},
+	'lang-pcm-hb': {
+		title: 'Naija Bible (Nigerian Pidgin) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-pcm-600.webp`,
+	},
+	'lang-pcm-pb': {
+		title: 'Naija Bible (Nigerian Pidgin) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-pcm-600.webp`,
+	},
+	'lang-fa-hb': {
+		title: 'کتاب مقدس فارسی (Persian (Farsi)) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-fa-600.webp`,
+	},
+	'lang-fa-pb': {
+		title: 'کتاب مقدس فارسی (Persian (Farsi)) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-fa-600.webp`,
+	},
+	'lang-pt-hb': {
+		title: 'Bíblia Portuguesa (Portuguese) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-pt-600.webp`,
+	},
+	'lang-pt-pb': {
+		title: 'Bíblia Portuguesa (Portuguese) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-pt-600.webp`,
+	},
+	'lang-pa-hb': {
+		title: 'ਪੰਜਾਬੀ ਬਾਈਬਲ (Punjabi) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-pa-600.webp`,
+	},
+	'lang-pa-pb': {
+		title: 'ਪੰਜਾਬੀ ਬਾਈਬਲ (Punjabi) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-pa-600.webp`,
+	},
+	'lang-ru-hb': {
+		title: 'Русская Библия (Russian) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-ru-600.webp`,
+	},
+	'lang-ru-pb': {
+		title: 'Русская Библия (Russian) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-ru-600.webp`,
+	},
+	'lang-es-hb': {
+		title: 'Biblia Española (Spanish) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-es-600.webp`,
+	},
+	'lang-es-pb': {
+		title: 'Biblia Española (Spanish) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-es-600.webp`,
+	},
+	'lang-sw-hb': {
+		title: 'Biblia ya Kiswahili (Swahili) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-sw-600.webp`,
+	},
+	'lang-sw-pb': {
+		title: 'Biblia ya Kiswahili (Swahili) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-sw-600.webp`,
+	},
+	'lang-ta-hb': {
+		title: 'தமிழ் பைபிள் (Tamil) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-ta-600.webp`,
+	},
+	'lang-ta-pb': {
+		title: 'தமிழ் பைபிள் (Tamil) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-ta-600.webp`,
+	},
+	'lang-nmf-hb': {
+		title: 'Tangkhul Bible (Tangkhul) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-nmf-600.webp`,
+	},
+	'lang-nmf-pb': {
+		title: 'Tangkhul Bible (Tangkhul) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-nmf-600.webp`,
+	},
+	'lang-te-hb': {
+		title: 'తెలుగు బైబిల్ (Telugu) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-te-600.webp`,
+	},
+	'lang-te-pb': {
+		title: 'తెలుగు బైబిల్ (Telugu) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-te-600.webp`,
+	},
+	'lang-zh-hant-hb': {
+		title: '中文聖經 (Traditional Chinese) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-zh-hant-600.webp`,
+	},
+	'lang-zh-hant-pb': {
+		title: '中文聖經 (Traditional Chinese) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-zh-hant-600.webp`,
+	},
+	'lang-tr-hb': {
+		title: 'Türkçe Kutsal Kitap (Turkish) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-tr-600.webp`,
+	},
+	'lang-tr-pb': {
+		title: 'Türkçe Kutsal Kitap (Turkish) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-tr-600.webp`,
+	},
+	'lang-ur-hb': {
+		title: 'اردو بائبل (Urdu) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-ur-600.webp`,
+	},
+	'lang-ur-pb': {
+		title: 'اردو بائبل (Urdu) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-ur-600.webp`,
+	},
+	'lang-vi-hb': {
+		title: 'Kinh Thánh Tiếng Việt (Vietnamese) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-vi-600.webp`,
+	},
+	'lang-vi-pb': {
+		title: 'Kinh Thánh Tiếng Việt (Vietnamese) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-vi-600.webp`,
+	},
 };
 
 // The SET MUST NEVER COST MORE than the same three volumes bought separately, in either
