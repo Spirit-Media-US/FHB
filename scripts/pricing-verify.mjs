@@ -4,8 +4,10 @@ import { execSync } from 'node:child_process';
  * pricing-verify.mjs — the print page, the checkout function and the ISBN master must agree.
  *
  * WHY THIS EXISTS. Prices live in three places by necessity: ISBNS.json is the business
- * record, functions/dvc-checkout.ts is what Stripe is actually charged, and the PRICE map in
- * print.astro drives the live total a buyer watches while they choose. Displaying one price
+ * record, functions/dvc-checkout.ts is what Stripe is actually charged, and every order form
+ * embeds the prices that drive the live total a buyer watches while they choose. Since
+ * 2026-10-03 the forms are read from the BUILT pages (dist/), not from source text: each
+ * [data-order] root carries its prices and tiers as JSON, so this checks exactly what ships. Displaying one price
  * and charging another is the worst outcome on the page, and nothing about editing one of the
  * three reminds you about the other two.
  *
@@ -15,13 +17,14 @@ import { execSync } from 'node:child_process';
  * Checks, each of which has failed somewhere before:
  *   1. The Large Print set never costs more than its three volumes bought separately.
  *   2. Volume and set prices match ISBNS.json, the single source.
- *   3. dvc-checkout.ts and print.astro agree on every shared SKU, to the cent.
- *   4. Every SKU the page can add is a SKU the server will sell.
- *   5. `books` weights match on both sides — the ladder must count the same on both.
+ *   3. Every built order form and dvc-checkout.ts agree on every SKU, to the cent.
+ *   4. Every SKU a form can add is a SKU the server will sell, and the catalog order form
+ *      (/print/order/) and /print's quick order box offer EVERY SKU the server sells.
+ *   5. Every SKU weighs one product on the ladder server-side, as the forms count it.
  *   6. No RETIRED ISBN appears anywhere in src/ or functions/.
  *   7. Every targeted edition is priced in BOTH bindings, and matches ISBNS.json.
- *   9. ONE volume ladder: dvc-checkout.ts TIERS, both of print.astro's copies and
- *      src/data/print-tiers.ts (the language quick order form's) are the same tiers.
+ *   9. ONE volume ladder: dvc-checkout.ts TIERS, src/data/print-tiers.ts and the tiers every
+ *      built order form embeds are the same tiers.
  *
  * Self-check: run with --selftest to confirm each assertion actually FAILS when broken. A
  * gate that has never rejected anything is unproven.
@@ -30,7 +33,10 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const ISBNS = '/home/deploy/projects/fhb-print-bible/editions/ISBNS.json';
 const CHECKOUT = 'functions/dvc-checkout.ts';
-const PRINT = 'src/pages/print.astro';
+const DIST = 'dist';
+// The forms that must offer the whole catalog, and one language page as the per-language form.
+const FULL_FORMS = ['dist/print/order/index.html', 'dist/print/index.html'];
+const LANG_FORM = 'dist/bibles/spanish-bible/index.html';
 const TIERS_TS = 'src/data/print-tiers.ts';
 
 // The single-volume Large Print and the B&W general numbers. Retired, not merely old: a live
@@ -64,7 +70,6 @@ const haveIsbns = existsSync(ISBNS);
 const isbns = haveIsbns ? JSON.parse(readFileSync(ISBNS, 'utf8')) : null;
 
 const checkoutSrc = readFileSync(CHECKOUT, 'utf8');
-const printSrc = readFileSync(PRINT, 'utf8');
 
 /** Retail cents per SKU from dvc-checkout.ts EDITIONS, plus each SKU's `books` weight. */
 function parseCheckout(src) {
@@ -97,34 +102,37 @@ function parseCheckout(src) {
 	return out;
 }
 
-/** Dollar prices per SKU from the PRICE map in print.astro's inline script, plus BOOKS. */
-function parsePrint(src) {
-	const start = src.indexOf('const PRICE = {');
-	const body = src.slice(start, src.indexOf('};', start));
-	const out = {};
-	for (const m of body.matchAll(/'?([a-z0-9-]+)'?:\s*([\d.]+)/g)) {
-		out[m[1]] = { cents: cents(m[2]), books: 1 };
-	}
-	const bs = src.indexOf('const BOOKS = {');
-	if (bs !== -1) {
-		const bbody = src.slice(bs, src.indexOf('};', bs));
-		for (const m of bbody.matchAll(/'?([a-z0-9-]+)'?:\s*(\d+)/g)) {
-			if (out[m[1]]) out[m[1]].books = Number(m[2]);
-		}
-	}
-	return out;
+/** Every [data-order] config embedded in a built page: { prices: {sku: usd}, tiers }. */
+const unescape = (v) =>
+	v
+		.replace(/&quot;/g, '"')
+		.replace(/&#34;/g, '"')
+		.replace(/&#39;/g, "'")
+		.replace(/&lt;/g, '<')
+		.replace(/&gt;/g, '>')
+		.replace(/&amp;/g, '&');
+function parseForms(html) {
+	return [...html.matchAll(/data-order="([^"]*)"/g)].map((m) => JSON.parse(unescape(m[1])));
 }
+const pageCents = (form) =>
+	Object.fromEntries(Object.entries(form.prices ?? {}).map(([k, v]) => [k, cents(v)]));
 
 const server = parseCheckout(checkoutSrc);
-const page = parsePrint(printSrc);
 check(
 	Object.keys(server).length > 20,
 	`parsed only ${Object.keys(server).length} SKUs from ${CHECKOUT} — the parser, not the data, is probably wrong`,
 );
-check(
-	Object.keys(page).length > 20,
-	`parsed only ${Object.keys(page).length} SKUs from ${PRINT} — the parser, not the data, is probably wrong`,
-);
+// The built forms. Missing dist/ is a FAILURE, not a skip: this gate exists to compare what
+// ships, and it runs after `astro build` in npm run build.
+const forms = {};
+for (const f of [...FULL_FORMS, LANG_FORM]) {
+	if (!existsSync(f)) {
+		check(false, `${f} not built — run after astro build (${DIST}/ is what this gate checks)`);
+		continue;
+	}
+	forms[f] = parseForms(readFileSync(f, 'utf8'));
+	check(forms[f].length === 1, `${f}: expected ONE order form, found ${forms[f].length}`);
+}
 
 // ── 1. the set is a saving, in both bindings ────────────────────────────────────────
 for (const b of ['pb', 'hb']) {
@@ -261,27 +269,35 @@ if (haveIsbns) {
 	);
 }
 
-// ── 3+4+5. the page and the server agree ────────────────────────────────────────────
-for (const [slug, p] of Object.entries(page)) {
-	const s = server[slug];
-	check(
-		s != null,
-		`${slug} is priced in ${PRINT} but the server will not sell it — the buyer would be charged nothing for it`,
-	);
-	if (s) {
-		check(s.cents === p.cents, `${slug}: page shows ${p.cents} cents, server charges ${s.cents}`);
-		check(
-			s.books === p.books,
-			`${slug}: page counts ${p.books} book(s) toward a tier, server counts ${s.books}`,
-		);
+// ── 3+4+5. every built form and the server agree ────────────────────────────────────
+function formsAgree(srv, fms) {
+	const errs = [];
+	for (const [file, list] of Object.entries(fms)) {
+		for (const form of list) {
+			const page = pageCents(form);
+			if (Object.keys(page).length < 2) errs.push(`${file}: order form carries no prices`);
+			for (const [slug, c] of Object.entries(page)) {
+				const sv = srv[slug];
+				if (sv == null)
+					errs.push(`${file}: ${slug} is priced on the page but the server will not sell it`);
+				else if (sv.cents !== c)
+					errs.push(`${file}: ${slug} shows ${c} cents, server charges ${sv.cents}`);
+			}
+			if (FULL_FORMS.includes(file)) {
+				for (const slug of Object.keys(srv)) {
+					if (page[slug] == null)
+						errs.push(`${file}: ${slug} is sellable server-side but missing from this form`);
+				}
+			}
+		}
 	}
+	for (const [slug, sv] of Object.entries(srv)) {
+		if (sv.books !== 1)
+			errs.push(`${slug}: server counts ${sv.books} products toward a tier, the forms count 1`);
+	}
+	return errs;
 }
-for (const slug of Object.keys(server)) {
-	check(
-		page[slug] != null,
-		`${slug} is sellable server-side but missing from the PRICE map in ${PRINT} — its live total would read $0.00`,
-	);
-}
+for (const e of formsAgree(server, forms)) check(false, e);
 
 // ── 6. no retired ISBN anywhere the site can render ──────────────────────────────────
 for (const n of RETIRED) {
@@ -313,17 +329,24 @@ function ladder(src, startRe, key) {
 		.join(',');
 }
 const tiersTsSrc = readFileSync(TIERS_TS, 'utf8');
-const ladders = (srcs) => ({
+const canon = (tiers) =>
+	tiers
+		.filter((t) => t.pct > 0)
+		.sort((a, b) => a.min - b.min)
+		.map((t) => `${t.min}:${t.pct}`)
+		.join(',');
+const ladders = (srcs, fms) => ({
 	[CHECKOUT]: ladder(srcs.checkout, /const TIERS\b/, 'min'),
-	[`${PRINT} (frontmatter tiers)`]: ladder(srcs.print, /const tiers = \[/, 'qty'),
-	[`${PRINT} (inline TIERS)`]: ladder(srcs.print, /const TIERS = \[/, 'min'),
 	[TIERS_TS]: ladder(srcs.tiersTs, /PRINT_TIERS\b/, 'min'),
+	...Object.fromEntries(
+		Object.entries(fms).flatMap(([f, list]) => list.map((form) => [f, canon(form.tiers ?? [])])),
+	),
 });
 const laddersAgree = (l) => {
 	const vals = Object.values(l);
 	return vals.every((v) => v && v === vals[0]);
 };
-const liveLadders = ladders({ checkout: checkoutSrc, print: printSrc, tiersTs: tiersTsSrc });
+const liveLadders = ladders({ checkout: checkoutSrc, tiersTs: tiersTsSrc }, forms);
 check(
 	laddersAgree(liveLadders),
 	`volume tiers disagree: ${Object.entries(liveLadders)
@@ -346,37 +369,44 @@ if (process.argv.includes('--selftest')) {
 			},
 		],
 		[
-			'page/server price drift',
+			'built form/server price drift',
 			() => {
-				const broken = parsePrint(printSrc.replace("'lp-set-hb': 299.99", "'lp-set-hb': 289.99"));
-				return broken['lp-set-hb'].cents !== server['lp-set-hb'].cents;
+				// Mutate a COPY of the parsed forms; assert the mutation bit before trusting it.
+				const f = FULL_FORMS[0];
+				if (!forms[f]?.[0]?.prices?.['lp-set-hb']) return false;
+				const broken = structuredClone(forms);
+				broken[f][0].prices['lp-set-hb'] = 289.99;
+				return formsAgree(server, broken).length > 0;
+			},
+		],
+		[
+			'a server SKU missing from the catalog form',
+			() => {
+				const f = FULL_FORMS[0];
+				if (!forms[f]?.[0]?.prices?.['lang-es-pb']) return false;
+				const broken = structuredClone(forms);
+				delete broken[f][0].prices['lang-es-pb'];
+				return formsAgree(server, broken).length > 0;
 			},
 		],
 		[
 			'books weight drift',
 			() => {
-				// The mutation must be one the CURRENT file actually contains. This case used to
-				// flip "'lp-set-hb': 3" to 1; when Kevin corrected the set's weight to 1 on
-				// 2026-09-17 that string vanished, the replace became a no-op, and the case
-				// reported a clean pass while testing nothing. Assert the mutation BIT first.
-				const from = "'lp-set-hb': 1";
-				const to = "'lp-set-hb': 2";
-				if (!printSrc.includes(from)) return false;
-				const broken = parsePrint(printSrc.replace(from, to));
-				return broken['lp-set-hb'].books !== server['lp-set-hb'].books;
+				const broken = structuredClone(server);
+				broken['lp-set-hb'].books = 3;
+				return formsAgree(broken, forms).length > 0;
 			},
 		],
 		[
-			'volume tier drift (language quick order form)',
+			'volume tier drift (src/data/print-tiers.ts)',
 			() => {
 				const from = '{ min: 25, pct: 15 }';
 				if (!tiersTsSrc.includes(from)) return false;
 				return !laddersAgree(
-					ladders({
-						checkout: checkoutSrc,
-						print: printSrc,
-						tiersTs: tiersTsSrc.replace(from, '{ min: 20, pct: 15 }'),
-					}),
+					ladders(
+						{ checkout: checkoutSrc, tiersTs: tiersTsSrc.replace(from, '{ min: 20, pct: 15 }') },
+						forms,
+					),
 				);
 			},
 		],
@@ -423,5 +453,5 @@ if (fail.length) {
 	process.exit(1);
 }
 console.log(
-	`✓ pricing-verify: ${Object.keys(server).length} SKUs agree across ${CHECKOUT}, ${PRINT}${haveIsbns ? ' and ISBNS.json' : ''}; Large Print set is a saving in both bindings; no retired ISBN in src/ or functions/`,
+	`✓ pricing-verify: ${Object.keys(server).length} SKUs agree across ${CHECKOUT}, ${Object.keys(forms).length} built order forms${haveIsbns ? ' and ISBNS.json' : ''}; one volume ladder; Large Print set is a saving in both bindings; no retired ISBN in src/ or functions/`,
 );

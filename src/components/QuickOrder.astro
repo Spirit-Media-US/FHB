@@ -1,0 +1,87 @@
+---
+/* /print's QUICK ORDER BOX (Kevin 2026-10-03): edition → binding → quantity → Checkout, with
+ * one link to the catalog order form for churches and groups. It replaced the whole-catalog
+ * bulk form that ran 55 rows down the page; that form lives on at /print/order/ as the
+ * catalog, with accordions and search.
+ *
+ * Same family as every order form: OrderRow (bare) + OrderSummary + src/scripts/order-form.ts,
+ * so the volume ladder, the first-order 15% and the cents rule are the server's own. The cards
+ * above pre-select their edition here (BuyControls `pick`).
+ */
+import { CATALOG_CATEGORIES, catalogPrices, catalogRows } from '../data/print-catalog';
+import { PRINT_TIERS } from '../data/print-tiers';
+import OrderRow from './OrderRow.astro';
+import OrderSummary from './OrderSummary.astro';
+
+// Runtime consts (biome cannot see .astro template use; keep these lines).
+const groups = CATALOG_CATEGORIES.map((c) => ({
+	...c,
+	rows: catalogRows.filter((r) => r.category === c.key),
+}));
+const tiers = PRINT_TIERS;
+const start = catalogRows[0];
+const config = JSON.stringify({
+	prices: catalogPrices(),
+	tiers: PRINT_TIERS,
+	returnPath: '/print/',
+});
+---
+<div class="qo" data-order={config}>
+	<label class="qo__label" for="qo-edition">Edition</label>
+	<select id="qo-edition" class="qo__select" data-pick>
+		{groups.map((g) => (
+			<optgroup label={g.label}>
+				{g.rows.map((r) => (
+					<option value={r.id} selected={r.id === start.id}>{r.native ? `${r.title} — ${r.native}` : r.title}</option>
+				))}
+			</optgroup>
+		))}
+	</select>
+	<p class="qo__label qo__label--gap" id="qo-binding">Binding and quantity</p>
+	<OrderRow id={start.id} title={start.title} trim={start.trim} hb={start.hb} pb={start.pb} bare />
+	<div class="qo__foot">
+		<OrderSummary tiers={tiers} idp="qo" />
+	</div>
+	<p class="qo__catalog"><a href="/print/order/">Ordering for a church or group? Use the catalog order form →</a></p>
+</div>
+
+<style>
+	.qo {
+		max-width: 34rem;
+		margin: 0 auto;
+		padding: 1.25rem;
+		background: #fff;
+		border: 1px solid var(--color-hairline);
+		border-radius: 1rem;
+		font-family: var(--font-sans);
+	}
+	.qo__label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--color-ink); margin: 0 0 0.3rem; }
+	.qo__label--gap { margin-top: 0.9rem; }
+	.qo__select {
+		box-sizing: border-box;
+		width: 100%;
+		min-height: 48px;
+		padding: 0.55rem 0.8rem;
+		border: 1.5px solid var(--color-hairline);
+		border-radius: 0.7rem;
+		background: #fff;
+		font: inherit;
+		font-size: 1rem;
+		color: var(--color-ink);
+	}
+	.qo__foot { margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--color-hairline); }
+	.qo__catalog { margin: 1rem 0 0; text-align: center; }
+	.qo__catalog a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		color: #3f3f46;
+		font-size: 0.92rem;
+		font-weight: 600;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+	@media (max-width: 640px) {
+		.qo { padding: 1rem 0.9rem; }
+	}
+</style>

@@ -1,7 +1,7 @@
 ---
-import BindingQty from '../components/BindingQty.astro';
 import BuyControls from '../components/BuyControls.astro';
 import LookInside from '../components/LookInside.astro';
+import QuickOrder from '../components/QuickOrder.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import VoiceChips from '../components/VoiceChips.astro';
@@ -11,6 +11,7 @@ import VoiceChips from '../components/VoiceChips.astro';
 // later needs a re-run of the sync, not an edit here.
 import amazonLinks from '../data/amazon-links.json';
 import { cardUrl } from '../data/card-art';
+import { dvcEditions as dvcEditionList } from '../data/dvc-editions';
 import {
 	LANG_HB,
 	LANG_PB,
@@ -35,242 +36,9 @@ import Layout from '../layouts/Layout.astro';
 const DVC_TAIL = 'Full Color Throughout · 6×9 · Hardback or Paperback';
 const DVC_TAIL2 =
 	'Red Letter \u00b7 Blue Letter \u00b7 Purple Letter \u00b7 Three-Color Divine Voice \u00b7 Complete Bible';
-// ── The one-line spec every order row carries (Kevin 2026-08-29) ──
-// "Chosen Bible $99.99 6x9 Hardback" — title, price and format together, so a buyer
-// choosing between 28 rows can tell them apart without scrolling back to the section
-// heading. The facts that actually decide it: TRIM, BINDING, LARGE PRINT or not, and PAGE
-// COUNT (the only number that separates Regular from Large Print at a glance).
-//
-// Every value below is MEASURED, not assumed:
-//   page counts read off the built interiors in projects/fhb-print-bible/current/
-//     — targeted 888pp, journaling 848pp @ 8x10, large print 1,134 + 1,142 + 680pp
-//       across three volumes (the single 1,016pp Large Print is retired)
-//   binding read off the APPROVED cover for each ISBN. The general hardback is CASE
-//     LAMINATE (2026-08-24-general/APPROVALS.json approves COVER-Case for the general
-//     hardback — recorded there against the B&W ISBN it was approved under, which the
-//     colour numbers 336-2/337-9/338-6 have since replaced; the BINDING is unchanged),
-//     so it must NOT claim a dust jacket; jacket files exist but are not the approved
-//     binding. NOTHING claims a dust jacket: every sheet says case laminate, the ISBNs sit
-//     in `hardcover_case_laminate`, the delivered cover is ...-CASE-888pp.pdf, and the
-//     journaling sheet states "No dust jacket: not offered at 8 x 10". Jacket PDFs exist
-//     but carry no ISBN and no delivery record — they are not what ships.
-// ONE BINDING PER SPEC, because one spec is printed on one ROW and a row is one binding
-// (Kevin 2026-09-17: "HB needs to list HB and PB needs to list PB. No HB or PB on the same
-// line"). A single constant naming both bindings put "Hardback ... or Paperback" on the
-// hardback row, which reads as indecision about what is being bought.
-//
-// "(case laminate)" IS OFF THE STOREFRONT. It is Ingram's vocabulary — it stays in the
-// metadata sheets and the ISBN records, where it is a required fact, and never appears in
-// front of a buyer. Matches the Large Print rows, which already read "6×9 Large Print
-// Hardback".
-// The TRIM is binding-independent; the binding is not. Split so a row that sells BOTH
-// bindings can state the trim once without naming a binding it does not exclusively sell
-// (the bulk form's rows do exactly this since 2026-09-18 — see BindingQty.astro). One
-// definition each, so the two can never drift apart.
-const trimTargeted = '6×9';
-const trimJournaling = '8×10 Wide Margin';
-const binding = (b: 'hb' | 'pb') => (b === 'hb' ? 'Hardback' : 'Paperback');
-const specTargeted = (b: 'hb' | 'pb') => `${trimTargeted} ${binding(b)}`;
-const specJournaling = (b: 'hb' | 'pb') => `${trimJournaling} ${binding(b)}`;
-
-// CARD SUBTITLES (Kevin 2026-10-03: every card uniform in structure, length and detail):
-// "For " + the edition's metadata-sheet For box (master: projects/fhb-global/fors.d/<slug>.json,
-// which the sheet's For row is written from), in order, title-cased, as many entries as fit
-// ~125 characters (at least four). Never invented — regenerate from the master, don't hand-edit.
-const dvcEditions = [
-	{
-		slug: 'athletes',
-		title: "Athlete's Bible",
-		sub: 'For Christian Athletes, Football Players, Basketball Players, Pickleball Players, Soccer Players, and Baseball Players',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'chosen',
-		title: 'Chosen Bible',
-		sub: 'For Children in Foster Care, Adopted Sons and Daughters, People Raised Without a Father, and People Who Lost a Father Young',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'couples',
-		title: "Couple's Bible",
-		sub: 'For Engaged Couples, Newlyweds, Married Couples, Christian Couples, Husbands and Wives, and Blended Families',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'dads',
-		title: "Dad's Bible",
-		sub: 'For New Dads, First Time Dads, Stepdads, Single Dads, Bonus Dads, Dads-To-Be, Grandfathers, and Fathers-In-Law',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'first-responders',
-		title: "First Responder's Bible",
-		sub: 'For Firefighters, Police Officers, Paramedics, EMTs, Emergency Dispatchers, Search and Rescue Teams, and Lifeguards',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'graduates',
-		title: "Graduate's Bible",
-		sub: 'For High School Graduates, College Graduates, Graduate School Graduates, Trade School Graduates, and GED Graduates',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'grandparents',
-		title: "Grandparent's Bible",
-		sub: 'For Grandmothers, Grandfathers, New Grandparents, Great-Grandparents, and Grandparents Raising Grandchildren',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'intercessors',
-		title: "Intercessor's Bible",
-		sub: 'For Intercessors, Prayer Warriors, Prayer Teams, Prayer Partners, Prayer Ministry Leaders, and Prayer Chain Members',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'mens',
-		title: "Men's Bible",
-		sub: 'For Young Men, Single Men, Husbands, Fathers, Men in the Trades, Business Owners, and Men Who Mentor Other Men',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'moms',
-		title: "Mom's Bible",
-		sub: 'For New Moms, First Time Moms, Stepmoms, Single Moms, Bonus Moms, Moms-To-Be, Grandmothers, Soccer Moms, and Mothers-In-Law',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'nurses',
-		title: "Nurse's Bible",
-		sub: 'For Registered Nurses, Nurse Practitioners, Licensed Practical Nurses, Nursing Students, and Nursing Assistants',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'pastors',
-		title: "Pastor's Bible",
-		sub: "For Senior Pastors, Youth Pastors, Church Planters, Missionaries, Pastors' Wives, Seminary Students, and Deaconesses",
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'peace',
-		title: 'Peace Bible',
-		sub: "For People Living with Anxiety, People Who Feel Overwhelmed, People Who Can't Sleep, People in Grief, and Caregivers",
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'presidents',
-		title: "President's Bible",
-		sub: 'For Presidents and Heads of State, Governors, Mayors, Legislators, Judges, Business Executives, Bosses, CEOs, and Supervisors',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'recovery',
-		title: 'Recovery Bible',
-		sub: 'For People in Recovery, 12-Step Group Members, Sponsors, Families of Those in Recovery, and The Newly Sober',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'seekers',
-		title: "Seeker's Bible",
-		sub: 'For People Curious About Faith, Skeptics, New Believers, People Raised in Another Faith, and People Raised in No Faith',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'seventeen',
-		title: 'Seventeen Bible',
-		sub: 'For High School Juniors, High School Seniors, New Drivers, First-Job Holders, and College-Bound Students',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'soldiers',
-		title: "Soldier's Bible",
-		sub: 'For Active-Duty Service Members, Veterans, Military Spouses, Military Families, and Recruits in Basic Training',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'teachers',
-		title: "Teacher's Bible",
-		sub: 'For Preschool Teachers, Elementary Teachers, High School Teachers, Special Education Teachers, and Homeschool Parents',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'teen',
-		title: 'Teen Bible',
-		sub: 'For Middle Schoolers, High Schoolers, Teen Girls, Teen Boys, Teens in Youth Group, 13-Year-Old Boys, and 13-Year-Old Girls',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'womens',
-		title: "Women's Bible",
-		sub: 'For Young Women, Single Women, Married Women, Widows, Working Women, Women in Ministry, and Women Walking Through Infertility',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'worship-leaders',
-		title: "Worship Leader's Bible",
-		sub: 'For Worship Pastors, Singers, Songwriters, Church Musicians, Choir Members, Worship Team Members, Violinists, and Cellists',
-		hb: 99.99,
-		pb: 79.99,
-		spec: specTargeted,
-	},
-	{
-		slug: 'journaling',
-		title: 'She Hears Her Father\u2019s Voice - Journaling Bible',
-		// The order form heads these rows with "Journaling Bible" already, so the row itself
-		// carries only the book's own name (Kevin 2026-09-17, both halves of the same note).
-		rowTitle: 'She Hears Her Father\u2019s Voice',
-		groupHeading: 'Journaling Bible',
-		sub: 'For Women \u00b7 Wide Margin \u00b7 Note-Taking \u00b7 8x10 Journaling Edition',
-		hb: 124.99,
-		pb: 114.99,
-		spec: specJournaling,
-		// The only edition that is not 6\u00d79. Stated here so the bulk form's one-row-per-
-		// edition layout can print the trim without naming a binding \u2014 everything else
-		// falls back to trimTargeted.
-		trim: trimJournaling,
-	},
-];
+// The audience editions and their spec helpers live in src/data/dvc-editions.ts (shared with /print/order/).
+// Runtime value used in the template below (biome cannot see .astro template use, keep this line).
+const dvcEditions = dvcEditionList;
 
 // Digital editions. eBook is live on Amazon (Kindle) + Barnes & Noble (Nook) at
 // $9.99, AND sold direct here ($7.49, our own fulfillment). Audiobook coming soon.
@@ -280,23 +48,6 @@ const EBOOK_NOOK = '$9.99';
 const EBOOK_NOOK_URL =
 	'https://www.barnesandnoble.com/w/fathers-heart-bible-spirit-media-publishing/1150585116?ean=2940196931611';
 const EBOOK_DIRECT = '$7.49';
-
-// Volume ladder — the COMBINED total across all 16 editions sets the tier (mix and match).
-// 1–9 pays full price; the published ladder stops at 250 because anyone buying 500+
-// negotiates directly, and a published 40% tier would permanently anchor a $99.99 Bible at
-// $59.99 (Kevin 2026-08-23, after reviewing category benchmarks: Bible bulk discounting
-// runs 30–55%, but on $5–15 units, not a premium single-volume edition).
-// MUST match functions/dvc-checkout.ts TIERS.
-const tiers = [
-	{ qty: 10, pct: 10, unit: 89.99, unit8: 112.49 },
-	{ qty: 25, pct: 15, unit: 84.99, unit8: 106.24 },
-	{ qty: 50, pct: 20, unit: 79.99, unit8: 99.99 },
-	{ qty: 100, pct: 25, unit: 74.99, unit8: 93.74 },
-	{ qty: 250, pct: 30, unit: 69.99, unit8: 87.49 },
-];
-
-const RETAIL = '$99.99';
-const RETAIL_8 = '$124.99';
 
 // ───────────────────────── GENERAL AUDIENCE ─────────────────────────
 // The same Divine Voice Color Bible without an audience on the cover, in three cover
@@ -424,88 +175,6 @@ const lpListHb = lpVolumes.reduce((s, v) => s + v.hb, 0);
 const lpSetPb = 249.99;
 const lpSetHb = 299.99;
 const lpTotalPages = lpVolumes.reduce((s, v) => s + v.pages, 0);
-const lpSkus = [
-	...lpVolumes.flatMap((v) =>
-		(['hb', 'pb'] as const).map((b) => ({
-			key: `${v.key}-${b}`,
-			title: `Large Print Vol. ${v.vol}, ${v.range} (${v.color})`,
-			// Format only, like every other listing (Kevin 2026-09-17: "No other listings show
-			// page numbers. Be consistent. People do not buy based on page numbers."). The
-			// measured `pages` field STAYS on lpVolumes — it feeds the metadata sheets and
-			// Ingram, where it is a required fact; it is the STOREFRONT that drops it.
-			spec: `6×9 Large Print ${b === 'pb' ? 'Paperback' : 'Hardback'}`,
-			price: b === 'pb' ? v.pb : v.hb,
-			isbn: v.isbn[b],
-			img: `${LP_CARDS}/${v.key}-600.webp`,
-			books: 1,
-			// The row's own page and its own sample. `liSlug` joins builtPages
-			// (`<slug>-bible`); `liKey` is the look-inside manifest key. They are separate
-			// fields because the SET's two names differ — page `lp-set`, sample
-			// `largeprint` — and collapsing them would have sent the set row to a 404.
-			liSlug: v.key,
-			liKey: v.key,
-		})),
-	),
-	...(['hb', 'pb'] as const).map((b) => ({
-		key: `lp-set-${b}`,
-		title: 'Large Print — Complete Three-Volume Set',
-		// The title already says "Complete Three-Volume Set" — repeating "all three volumes"
-		// here said the same thing twice on one row (Kevin 2026-09-17).
-		spec: b === 'hb' ? 'Hardback' : 'Paperback',
-		price: b === 'pb' ? lpSetPb : lpSetHb,
-		// The set carries no ISBN of its own: Kevin assigned numbers per volume, and it is
-		// billed as the three volume SKUs together. Do not invent one.
-		isbn: '',
-		img: `${LP_CARDS}/lp-set-600.webp`,
-		// ONE product on the ladder, not three (Kevin 2026-09-17) — see lpSetPb above.
-		books: 1,
-		// D181: the set's page is /bibles/lp-set-bible, built from its own metadata sheet
-		// (src/data/editions/lp-set.json). The old `large-print` page came from the RETIRED
-		// single-volume sheet and is 301'd to this one in public/_redirects.
-		liSlug: 'lp-set',
-		liKey: 'largeprint',
-	})),
-];
-// ONE ENTRY PER LARGE PRINT PRODUCT, both bindings on it — what the bulk form renders since
-// 2026-09-18 (Kevin: the form ran 46 rows because every product was listed twice). DERIVED
-// from lpSkus rather than re-listed, so a price or title can never disagree between the row
-// a shopper reads and the SKU the checkout charges. lpSkus itself is unchanged: it stays the
-// flat purchasable list the order builder and dvc-checkout.ts mirror, and which
-// pricing-verify asserts across all three.
-const lpRows = [...lpVolumes.map((v) => v.key), 'lp-set'].map((k) => {
-	const hb = lpSkus.find((s) => s.key === `${k}-hb`)!;
-	const pb = lpSkus.find((s) => s.key === `${k}-pb`)!;
-	return {
-		hbKey: hb.key,
-		pbKey: pb.key,
-		hb: hb.price,
-		pb: pb.price,
-		title: hb.title,
-		img: hb.img,
-		liSlug: hb.liSlug,
-		liKey: hb.liKey,
-		// Binding-free: the counters name the binding, so the row must not.
-		trim: hb.spec.replace(/ Hardback$/, ''),
-	};
-});
-// Flat SKU list — one entry per purchasable thing, used by the order builder and mirrored
-// in the checkout function. Key shape: general-<line>-<colour>-<binding>.
-const generalSkus = generalLines.flatMap((l) =>
-	generalColors.flatMap((c) =>
-		(['hb', 'pb'] as const).map((b) => ({
-			key: `general-${l.line}-${c.key}-${b}`,
-			line: l.line,
-			lineLabel: l.label,
-			color: c.name,
-			binding: b === 'pb' ? 'Paperback' : 'Hardback',
-			// No dust jacket here: the approved cover for these ISBNs is case laminate.
-			spec: `6×9 ${b === 'pb' ? 'Paperback' : 'Hardback'}`,
-			price: b === 'pb' ? l.pb : l.hb,
-			isbn: l.isbn[c.key as 'charcoal' | 'plum' | 'white'][b],
-			img: cardUrl(`general-${l.line}-${c.key}`),
-		})),
-	),
-);
 
 // Interior sample excerpts (Genesis) — direct PDF, hosted on R2.
 const SAMPLE_REGULAR =
@@ -533,18 +202,6 @@ const builtPages = new Set(
 		.filter(Boolean)
 		.map((slug) => `${slug}-bible`),
 );
-// WHICH LOOK-INSIDE VIEWERS THIS PAGE RENDERS IN FULL. A `reuse` trigger opens a viewer
-// another instance already placed here, so a trigger for a slug NOT in this set is a button
-// that does nothing — the silent cousin of a 404. The bulk form's rows are gated on it.
-// `largeprint` is deliberately ABSENT: the manifest does hold a set sample, but the set is
-// sold from a summary box rather than a card, so no viewer for it exists on this page. Its
-// two rows therefore show "Full details" alone — the rule is to render the line without the
-// missing link, never a link to nothing. Give the set a viewer and it joins this set.
-const liOnPage = new Set<string>([
-	...dvcEditions.map((e) => e.slug),
-	'general',
-	...lpVolumes.map((v) => v.key),
-]);
 // A language card shows Look inside only once its sample pages are in lookinside.json.
 // Runtime value used in the template below (biome cannot see .astro template use, keep this line).
 const langCards = languageEditions;
@@ -875,6 +532,7 @@ function markVoices(v: {
 								hbPrice={e.hb}
 								pbPrice={e.pb}
 								tightDirect={e.slug === 'journaling'}
+								pick={e.slug}
 							/>
 						</div>
 					</div>
@@ -960,6 +618,7 @@ function markVoices(v: {
 									pbHref={amazonLinks[`general-${l.line}-${c.key}`]?.formats?.paperback}
 									hbPrice={l.hb}
 									pbPrice={l.pb}
+									pick={`general-${l.line}-${c.key}`}
 								/>
 							</div>
 						</div>
@@ -1035,6 +694,7 @@ function markVoices(v: {
 								pbHref={amazonLinks[v.key]?.formats?.paperback}
 								hbPrice={v.hb}
 								pbPrice={v.pb}
+								pick={v.key}
 							/>
 						</div>
 					</div>
@@ -1048,7 +708,8 @@ function markVoices(v: {
 					{(['hb', 'pb'] as const).map((b) => (
 						<button
 							type="button"
-							data-add={`lp-set-${b}`}
+							data-pick-edition="lp-set"
+							data-pick-bind={b}
 							class="inline-flex items-center justify-center gap-2 rounded-full font-semibold"
 							style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.6rem 1.15rem; font-size: 0.85rem; cursor: pointer;"
 						>
@@ -1117,7 +778,7 @@ function markVoices(v: {
 								{builtPages.has(`${langSlug(l)}-bible`) && langHasLi(l) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 								{langHasLi(l) && <LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" />}
 							</div>
-							<BuyControls hbHref={l.amazon?.hardback} pbHref={l.amazon?.paperback} hbPrice={LANG_HB} pbPrice={LANG_PB} />
+							<BuyControls hbHref={l.amazon?.hardback} pbHref={l.amazon?.paperback} hbPrice={LANG_HB} pbPrice={LANG_PB} pick={`lang-${l.code}`} />
 						</div>
 					</div>
 				))}
@@ -1153,171 +814,17 @@ function markVoices(v: {
 			<p class="text-center mt-8" style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.9rem;">Every verse from the Father’s Heart Bible™ — read the whole Bible free at <a href={READ_URL} style="color: #3f3f46; text-decoration: underline;">fathersheartbible.com/read</a>.</p>
 		</Section>
 
-		<!-- ═══════════════ BULK ORDERS ═══════════════ -->
+		<!-- ═══════════════ QUICK ORDER ═══════════════ -->
 		<Section variant="soft">
-			{/* The anchor every card's "Buy Direct & Save + Free Shipping" link points at. */}
+			{/* The anchor every card's "Buy Direct & Save + Free Shipping" link points at. The
+			    whole-catalog form that stood here (55 rows) is the catalog order form at
+			    /print/order/ since Kevin 2026-10-03; this is the short quick order box. */}
 			<div class="max-w-5xl mx-auto" id="bulk-order" style="scroll-margin-top: 90px;">
-				<div class="text-center mb-8">
-					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Bulk Order Discounts</p>
-					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Order in Bulk and Save</h2>
-					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 44rem;">Bring the Father's heart to your whole business, congregation, or community.<br />Mix and match any edition, color or binding — your combined total sets the discount.</p>
-					<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; margin: 0.75rem auto 0; max-width: 32rem;">Order direct from Spirit Media Publishing — any quantity, free shipping.</p>
-					<VoiceChips class="mt-5 mb-0" />
+				<div class="text-center mb-6">
+					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Order Direct</p>
+					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Quick Order</h2>
 				</div>
-
-				<div class="rounded-2xl p-6 md:p-8" style="background: #fff; border: 1px solid var(--color-hairline);" data-bulk>
-					{/* PERCENTAGES ONLY — no example prices. They were fine when every edition was
-					    $99.99, but the page now sells at $79.99, $99.99 and $124.99, so "50+ →
-					    $79.99" reads as the price of whatever the customer is looking at. The
-					    percentage is true of every SKU without a caveat, and the live total below
-					    shows the real money as soon as quantities are picked. */}
-					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Volume discounts — the more you order, the more you save</p>
-					<div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-6">
-						{tiers.map((t) => (
-							<div class="tier-card rounded-xl text-center" data-tier-min={t.qty} style="padding: 0.7rem 0.4rem; border: 1.5px solid #d4d4d8; background: #f4f4f5;">
-								<span style="display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.02em; color: #3f3f46;">Save {t.pct}%</span>
-								<span style="display: block; font-size: 1.15rem; font-weight: 700; color: var(--color-ink); margin-top: 0.1rem; line-height: 1.1;">{t.qty}+</span>
-							</div>
-						))}
-					</div>
-
-					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.85rem; color: var(--color-ink); margin: 0 0 0.6rem;">Choose how many of each edition</p>
-					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 0 0 0.5rem;">Targeted Editions</p>
-					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
-						{/* ONE ROW PER EDITION, TWO COUNTERS (Kevin 2026-09-18, see BindingQty.astro).
-						     This used to emit a row per BINDING, which drew every edition's cover
-						     art TWICE and made the form 46 rows for 23 books. Both bindings are
-						     still independently purchasable; they now share the one picture of the
-						     one book, and each price sits beside the counter that buys it.
-						     The superseded comment reasoned that a single row "could only ever buy
-						     one of the two bindings" — true of one counter, not of two. */}
-						{dvcEditions.map((e) => (
-								<>
-								{/* A heading above the first row of an edition that needs naming as its
-								     own thing — the journaling Bible is the only 8×10 in the list. */}
-								{e.groupHeading && (
-									<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.2rem 0 0.1rem;">{e.groupHeading}</p>
-								)}
-								<div class="bulk-row flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
-									<img src={cardUrl(`dvc-${e.slug}`)} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-									<div style="flex: 1; min-width: 0;">
-									<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.rowTitle ?? e.title}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">· {(e as { trim?: string }).trim ?? trimTargeted}</span></span>
-									{/* SECOND LINE: the same two links the card above carries (Kevin
-									     2026-09-17). Same gates, not a second set of rules — "Full
-									     details" only when builtPages has the page, "Look inside"
-									     only where the manifest has that edition's sample. A row
-									     whose edition lacks either shows the line without it rather
-									     than linking to a 404. */}
-									<div class="row-links">
-										{builtPages.has(`${e.slug}-bible`) && (
-											<>
-												<a href={`/bibles/${e.slug}-bible/`}>Full details</a>
-												<span aria-hidden="true" class="row-dot">·</span>
-											</>
-										)}
-										{liOnPage.has(e.slug) && <LookInside slug={e.slug} title={e.title} variant="link" label="Look inside" reuse />}
-									</div>
-									</div>
-									<BindingQty hbSlug={`${e.slug}-hb`} pbSlug={`${e.slug}-pb`} hb={e.hb} pb={e.pb} label={e.title} />
-								</div>
-								</>
-						))}
-					</div>
-
-					{generalLines.map((l) => (
-						<>
-							<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.6rem 0 0.5rem;">General Audience — {l.label}</p>
-							<div style="display: flex; flex-direction: column; gap: 0.55rem;">
-								{/* ONE ROW PER COLOUR, both bindings on it — same change as the targeted
-								     block above. A colour is one book; it was drawn twice. */}
-								{generalColors.map((c) => (
-									<div class="bulk-row flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
-										<img src={cardUrl(`general-${l.line}-${c.key}`)} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-										<div style="flex: 1; min-width: 0;">
-										<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">Father’s Heart Bible — {c.name}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{trimTargeted}</span></span>
-										{/* The three colours SHARE an interior, so they share one
-										     look-inside key — keyed by LINE, exactly as the cards
-										     above do it. */}
-										<div class="row-links">
-											{builtPages.has('fathers-heart-bible') && (
-												<>
-													<a href="/bibles/fathers-heart-bible/">Full details</a>
-													<span aria-hidden="true" class="row-dot">·</span>
-												</>
-											)}
-											{liOnPage.has('general') && <LookInside slug="general" title={`FHB — Father’s Heart Bible — ${l.label}`} variant="link" label="Look inside" reuse />}
-										</div>
-										</div>
-										<BindingQty hbSlug={`general-${l.line}-${c.key}-hb`} pbSlug={`general-${l.line}-${c.key}-pb`} hb={l.hb} pb={l.pb} label={`${l.label} ${c.name}`} />
-									</div>
-								))}
-							</div>
-						</>
-					))}
-
-					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.6rem 0 0.5rem;">General Audience — Large Print</p>
-					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
-						{lpRows.map((r) => (
-							<div class="bulk-row flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
-								<img src={r.img} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-								<div style="flex: 1; min-width: 0;">
-								<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{r.title}</span> {r.trim && <span style="color: var(--color-muted); font-size: 0.85rem;">{r.trim}</span>}</span>
-								{/* EACH VOLUME HAS ITS OWN SAMPLE — they are different books, and a
-								     shared one would show a reader pages their volume does not
-								     contain. The SET row points at the set's own page and sample. */}
-								<div class="row-links">
-									{builtPages.has(`${r.liSlug}-bible`) && (
-										<>
-											<a href={`/bibles/${r.liSlug}-bible/`}>Full details</a>
-											<span aria-hidden="true" class="row-dot">·</span>
-										</>
-									)}
-									{liOnPage.has(r.liKey) && <LookInside slug={r.liKey} title={r.title} variant="link" label="Look inside" reuse />}
-								</div>
-								</div>
-								<BindingQty hbSlug={r.hbKey} pbSlug={r.pbKey} hb={r.hb} pb={r.pb} label={r.title} />
-							</div>
-						))}
-					</div>
-
-					{/* LANGUAGE EDITIONS (Kevin 2026-10-03: "all editions can be purchased now"). Same
-					    row, same two counters, same links as every other edition; SKUs lang-<code>-hb/pb. */}
-					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.6rem 0 0.5rem;">Language Editions</p>
-					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
-						{langCards.map((l) => (
-							<div class="bulk-row flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
-								<img src={cardUrl(`lang-${l.code}`)} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
-								<div style="flex: 1; min-width: 0;">
-									<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span lang={l.code} dir={l.rtl ? 'rtl' : undefined} style="font-weight: 600;">{l.name}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">· {l.english} · {trimTargeted}</span></span>
-									<div class="row-links">
-										{builtPages.has(`${langSlug(l)}-bible`) && (
-											<>
-												<a href={`/bibles/${langSlug(l)}-bible/`}>Full details</a>
-												{langHasLi(l) && <span aria-hidden="true" class="row-dot">·</span>}
-											</>
-										)}
-										{langHasLi(l) && <LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" reuse />}
-									</div>
-								</div>
-								<BindingQty hbSlug={`lang-${l.code}-hb`} pbSlug={`lang-${l.code}-pb`} hb={LANG_HB} pb={LANG_PB} label={`${l.name} (${l.english})`} />
-							</div>
-						))}
-					</div>
-
-					<div class="flex flex-wrap items-center justify-between gap-4 pt-4 mt-5" style="border-top: 1px solid var(--color-hairline);">
-						<div>
-							<span style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem;"><span data-count>0</span> copies · <span data-save style="color: #3f3f46; font-weight: 700;">—</span> · free shipping</span>
-							<div data-total-out style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700;">$0.00</div>
-						</div>
-						{/* THE ONE BUTTON THAT IS NOT LIGHT PINK (Kevin 2026-09-17, ruling B1). Every
-						     other control on the page went light pink; this one completes a
-						     purchase, and it must not read as one more button among many. Solid
-						     brand pink with white type — the page's strongest control, deliberately. */}
-						<button type="button" data-checkout class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; border: 2px solid var(--color-primary, #b60057); padding: 0.8rem 1.8rem; cursor: pointer; font-size: 1rem;">Checkout →</button>
-					</div>
-					<p data-bulk-msg style="font-family: var(--font-sans); font-size: 0.85rem; color: var(--color-muted); margin: 0.75rem 0 0; display: none;"></p>
-				</div>
-				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.8rem; margin-top: 1rem;">Fulfilled direct by Spirit Media Publishing · order any quantity · free shipping · sales tax calculated at checkout · mix editions freely. Need 500 or more? <a href="mailto:hello@spiritmediapublishing.com?subject=FHB%20bulk%20order%20(500%2B)" style="color: #3f3f46; text-decoration: underline;">Contact us</a>.</p>
+				<QuickOrder />
 			</div>
 		</Section>
 
@@ -1469,142 +976,6 @@ function markVoices(v: {
 		}
 	}
 </style>
-
-<script is:inline>
-	(() => {
-		const root = document.querySelector('[data-bulk]');
-		if (!root) return;
-		// Prices and tiers are mirrored here for live totals only — functions/dvc-checkout.ts
-		// is authoritative, so a tampered browser cannot change what Stripe charges.
-		const PRICE = {
-			// Targeted editions — BOTH bindings (Kevin 2026-09-17). Prices are ISBNS.json's,
-			// which pricing-verify compares against on every build.
-			'chosen-hb': 99.99, 'chosen-pb': 79.99, 'couples-hb': 99.99, 'couples-pb': 79.99, 'dads-hb': 99.99, 'dads-pb': 79.99,
-			'first-responders-hb': 99.99, 'first-responders-pb': 79.99, 'mens-hb': 99.99, 'mens-pb': 79.99, 'moms-hb': 99.99, 'moms-pb': 79.99,
-			'pastors-hb': 99.99, 'pastors-pb': 79.99, 'peace-hb': 99.99, 'peace-pb': 79.99, 'presidents-hb': 99.99, 'presidents-pb': 79.99,
-			'recovery-hb': 99.99, 'recovery-pb': 79.99, 'seekers-hb': 99.99, 'seekers-pb': 79.99, 'seventeen-hb': 99.99, 'seventeen-pb': 79.99,
-			'soldiers-hb': 99.99, 'soldiers-pb': 79.99, 'teen-hb': 99.99, 'teen-pb': 79.99, 'worship-leaders-hb': 99.99, 'worship-leaders-pb': 79.99,
-			// The seven added 2026-09-29 (on sale once their card art landed).
-			'athletes-hb': 99.99, 'athletes-pb': 79.99, 'graduates-hb': 99.99, 'graduates-pb': 79.99, 'grandparents-hb': 99.99, 'grandparents-pb': 79.99, 'intercessors-hb': 99.99, 'intercessors-pb': 79.99,
-			'nurses-hb': 99.99, 'nurses-pb': 79.99, 'teachers-hb': 99.99, 'teachers-pb': 79.99, 'womens-hb': 99.99, 'womens-pb': 79.99,
-			'journaling-hb': 124.99, 'journaling-pb': 114.99,
-			// General Audience — Regular Print (888pp).
-			'general-regular-charcoal-pb': 79.99, 'general-regular-charcoal-hb': 99.99,
-			'general-regular-plum-pb': 79.99, 'general-regular-plum-hb': 99.99,
-			'general-regular-white-pb': 79.99, 'general-regular-white-hb': 99.99,
-			// Large Print — three volumes and the set. The retired single-volume Large Print
-			// SKUs (general-largeprint-*) are gone from here and from dvc-checkout.ts.
-			'lp-vol1-pb': 99.99, 'lp-vol1-hb': 114.99,
-			'lp-vol2-pb': 99.99, 'lp-vol2-hb': 114.99,
-			'lp-vol3-pb': 79.99, 'lp-vol3-hb': 99.99,
-			'lp-set-pb': 249.99, 'lp-set-hb': 299.99,
-			// Language editions (Kevin 2026-10-03) — each sheet's top table; pricing-verify gates them.
-			'lang-ar-hb': 99.99, 'lang-ar-pb': 79.99, 'lang-bn-hb': 99.99, 'lang-bn-pb': 79.99, 'lang-yue-hb': 99.99, 'lang-yue-pb': 79.99, 'lang-fil-hb': 99.99, 'lang-fil-pb': 79.99,
-			'lang-fr-hb': 99.99, 'lang-fr-pb': 79.99, 'lang-de-hb': 99.99, 'lang-de-pb': 79.99, 'lang-hi-hb': 99.99, 'lang-hi-pb': 79.99, 'lang-id-hb': 99.99, 'lang-id-pb': 79.99,
-			'lang-it-hb': 99.99, 'lang-it-pb': 79.99, 'lang-ja-hb': 99.99, 'lang-ja-pb': 79.99, 'lang-ko-hb': 99.99, 'lang-ko-pb': 79.99, 'lang-mr-hb': 99.99, 'lang-mr-pb': 79.99,
-			'lang-pcm-hb': 99.99, 'lang-pcm-pb': 79.99, 'lang-fa-hb': 99.99, 'lang-fa-pb': 79.99, 'lang-pt-hb': 99.99, 'lang-pt-pb': 79.99, 'lang-pa-hb': 99.99, 'lang-pa-pb': 79.99,
-			'lang-ru-hb': 99.99, 'lang-ru-pb': 79.99, 'lang-es-hb': 99.99, 'lang-es-pb': 79.99, 'lang-sw-hb': 99.99, 'lang-sw-pb': 79.99, 'lang-ta-hb': 99.99, 'lang-ta-pb': 79.99,
-			'lang-nmf-hb': 99.99, 'lang-nmf-pb': 79.99, 'lang-te-hb': 99.99, 'lang-te-pb': 79.99, 'lang-zh-hant-hb': 99.99, 'lang-zh-hant-pb': 79.99, 'lang-tr-hb': 99.99, 'lang-tr-pb': 79.99,
-			'lang-ur-hb': 99.99, 'lang-ur-pb': 79.99, 'lang-vi-hb': 99.99, 'lang-vi-pb': 79.99,
-		};
-		// HOW MANY BOOKS EACH SKU PUTS IN THE BUYER'S HANDS — what the ladder counts, and the
-		// reason a set is not one line item's worth of progress toward a tier. Anything absent
-		// is one book. MUST match the `books` field in functions/dvc-checkout.ts EDITIONS.
-		// Every SKU weighs ONE product on the ladder, the set included (Kevin 2026-09-17:
-		// "4 sets = 4 products"). Kept explicit rather than emptied so this map stays the
-		// one place a future multi-item SKU would say otherwise — and so pricing-verify,
-		// which reads this map as TEXT, keeps asserting it against the server's weights.
-		const BOOKS = { 'lp-set-pb': 1, 'lp-set-hb': 1 };
-		const TIERS = [
-			{ min: 250, pct: 30 }, { min: 100, pct: 25 }, { min: 50, pct: 20 },
-			{ min: 25, pct: 15 }, { min: 10, pct: 10 }, { min: 1, pct: 0 },
-		];
-		const tierFor = (t) => TIERS.find((x) => t >= x.min) || null;
-		const fmt = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-		const counts = {};
-		Object.keys(PRICE).forEach((k) => (counts[k] = 0));
-
-		const out = root.querySelector('[data-total-out]');
-		const countEl = root.querySelector('[data-count]');
-		const saveEl = root.querySelector('[data-save]');
-		const msg = root.querySelector('[data-bulk-msg]');
-
-		function render() {
-			// Thresholds count BOOKS, not line items — the same rule the server applies, so
-			// the tier shown here is the tier Stripe charges.
-			const total = Object.entries(counts).reduce((a, [k, n]) => a + n * (BOOKS[k] || 1), 0);
-			const tier = tierFor(total);
-			const pct = tier ? tier.pct : 0;
-			// Round the discounted UNIT to whole cents, then multiply — the exact order
-			// functions/dvc-checkout.ts uses, because Stripe is charged a per-unit amount in
-			// cents. Multiplying first and rounding once at the end drifts from what the
-			// customer is actually charged: a 500-copy order of a $99.99 edition at 30% off
-			// showed $34,996.50 here while Stripe billed $34,995.00.
-			let cents = 0;
-			for (const [k, n] of Object.entries(counts)) {
-				cents += Math.round((PRICE[k] * 100 * (100 - pct)) / 100) * n;
-			}
-			const sum = cents / 100;
-			countEl.textContent = total;
-			saveEl.textContent = pct ? `save ${pct}%` : 'full price';
-			out.textContent = fmt(sum);
-			root.querySelectorAll('.tier-card').forEach((c) => {
-				const on = tier && Number(c.dataset.tierMin) === tier.min;
-				c.style.outline = on ? '2px solid #3f3f46' : 'none';
-				c.style.outlineOffset = '2px';
-			});
-		}
-		function bump(slug, d) {
-			counts[slug] = Math.max(0, (counts[slug] || 0) + d);
-			const input = root.querySelector(`.qty-in[data-slug="${slug}"]`);
-			if (input) input.value = counts[slug];
-			render();
-		}
-		root.querySelectorAll('.qty-step').forEach((b) =>
-			b.addEventListener('click', () => bump(b.dataset.slug, Number(b.dataset.dir))));
-		root.querySelectorAll('.qty-in').forEach((el) =>
-			el.addEventListener('input', () => {
-				counts[el.dataset.slug] = Math.max(0, Math.floor(Number(el.value) || 0));
-				render();
-			}));
-
-		// "Direct from SMP" on a card adds one and scrolls to the order builder, so a single
-		// copy and a bulk order go through the same checkout (Kevin 2026-08-23).
-		document.querySelectorAll('[data-add]').forEach((b) =>
-			b.addEventListener('click', () => {
-				bump(b.dataset.add, 1);
-				root.scrollIntoView({ behavior: 'smooth', block: 'center' });
-			}));
-
-		root.querySelector('[data-checkout]').addEventListener('click', async (ev) => {
-			const btn = ev.currentTarget;
-			const total = Object.values(counts).reduce((a, b) => a + b, 0);
-			msg.style.display = 'block';
-			if (total < 1) { msg.textContent = 'Choose at least one Bible to continue.'; return; }
-			msg.textContent = 'Opening secure checkout…';
-			btn.disabled = true;
-			try {
-				const r = await fetch('/dvc-checkout', {
-					method: 'POST',
-					headers: { 'content-type': 'application/json' },
-					body: JSON.stringify({ counts }),
-				});
-				const d = await r.json();
-				if (d.url) { window.location.href = d.url; return; }
-				msg.textContent = d.disabled
-					? 'Direct ordering opens shortly — please check back.'
-					: 'Sorry, something went wrong. Please try again.';
-			} catch {
-				msg.textContent = 'Sorry, something went wrong. Please try again.';
-			}
-			btn.disabled = false;
-		});
-
-		render();
-	})();
-</script>
-
-
 <script is:inline>
 	(() => {
 		const btn = document.querySelector('[data-ebook-buy]');

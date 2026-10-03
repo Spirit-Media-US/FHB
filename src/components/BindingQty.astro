@@ -20,6 +20,8 @@
  * not line items) and the live total are untouched — this is a layout change, not a
  * pricing one.
  */
+import { firstOrderUnit } from '../lib/order-pricing';
+
 interface Props {
 	hbSlug: string;
 	pbSlug: string;
@@ -28,6 +30,9 @@ interface Props {
 	label: string; // the product name, for accessible labels only
 }
 const { hbSlug, pbSlug, hb, pb, label } = Astro.props;
+// The list price struck through and the first-order price beside it (Kevin 2026-10-03).
+const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+const first = (usd: number) => money(firstOrderUnit(Math.round(usd * 100)));
 const rows = [
 	{ slug: hbSlug, price: hb, binding: 'Hardback' },
 	{ slug: pbSlug, price: pb, binding: 'Paperback' },
@@ -41,7 +46,7 @@ const rows = [
 		<div class="binding-qty__row">
 			<span class="binding-qty__label">
 				<span class="binding-qty__binding">{r.binding}</span>
-				<span class="binding-qty__price">${r.price.toFixed(2)}</span>
+				<span class="binding-qty__price"><s>${r.price.toFixed(2)}</s> <b>{first(r.price)}</b></span>
 			</span>
 			<div class="binding-qty__ctl">
 				<button type="button" class="qty-step" data-slug={r.slug} data-dir="-1" aria-label={`Fewer ${label} ${r.binding}`}>−</button>
@@ -75,7 +80,9 @@ const rows = [
 		white-space: nowrap;
 	}
 	.binding-qty__binding { color: var(--color-muted); }
-	.binding-qty__price { font-weight: 700; color: var(--color-ink); }
+	.binding-qty__price { color: var(--color-ink); }
+	.binding-qty__price s { color: var(--color-muted); font-weight: 400; }
+	.binding-qty__price b { font-weight: 700; }
 	.binding-qty__ctl {
 		display: inline-flex;
 		align-items: center;
@@ -111,7 +118,7 @@ const rows = [
 	@media (max-width: 640px) {
 		.binding-qty { flex-direction: row; gap: 0.75rem; width: 100%; flex-basis: 100%; }
 		.binding-qty__row { flex: 1 1 0; min-width: 0; flex-direction: column; align-items: stretch; gap: 0.2rem; }
-		.binding-qty__label { justify-content: flex-start; font-size: 0.8rem; }
+		.binding-qty__label { justify-content: flex-start; font-size: 0.8rem; flex-wrap: wrap; white-space: normal; }
 		.binding-qty__ctl { display: flex; }
 		.binding-qty__ctl :global(.qty-step) { width: 44px; height: 44px; flex-shrink: 0; }
 		.binding-qty__ctl :global(.qty-in) { flex: 1 1 auto; min-width: 0; width: auto; height: 44px; }

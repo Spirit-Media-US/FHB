@@ -7,9 +7,14 @@
  * equal to the server's by pricing-verify), and the cents rule — round the discounted UNIT,
  * then multiply — is the one print.astro and dvc-checkout.ts use, so the total shown is the
  * total Stripe charges. The server stays authoritative either way.
+ *
+ * Since 2026-10-03 the summary, the first-order 15% and the behaviour are the shared order-form
+ * family (OrderSummary + src/scripts/order-form.ts + src/lib/order-pricing.ts), the same as
+ * /print's quick order box and the catalog order form /print/order/.
  */
 import { PRINT_TIERS } from '../data/print-tiers';
 import BindingQty from './BindingQty.astro';
+import OrderSummary from './OrderSummary.astro';
 
 interface Props {
 	code: string;
@@ -23,27 +28,21 @@ interface Props {
 const { code, english, name, hb, pb, returnPath } = Astro.props;
 const hbSlug = `lang-${code}-hb`;
 const pbSlug = `lang-${code}-pb`;
-const ladder = [...PRINT_TIERS].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min);
-const tierLine = ladder.map((t) => `${t.pct}% off ${t.min}+`).join(' · ');
+// Runtime const: biome cannot see .astro template use (keep this line).
+const tiers = PRINT_TIERS;
 const config = JSON.stringify({
 	prices: { [hbSlug]: hb, [pbSlug]: pb },
 	tiers: PRINT_TIERS,
 	returnPath,
 });
 ---
-<div id="order" class="lqo" data-lqo={config}>
+<div id="order" class="lqo" data-order={config}>
 	<p class="lqo__eyebrow">Order direct · free shipping</p>
 	<h2 class="lqo__title">Order the {english} Edition</h2>
 	<BindingQty hbSlug={hbSlug} pbSlug={pbSlug} hb={hb} pb={pb} label={`${name} (${english})`} />
-	<p class="lqo__tiers">Bulk savings: {tierLine} copies. Hardback and paperback count together.</p>
 	<div class="lqo__foot">
-		<div>
-			<span class="lqo__meta"><span data-lqo-count>0</span> copies · <span data-lqo-save>full price</span></span>
-			<div class="lqo__total" data-lqo-total>$0.00</div>
-		</div>
-		<button type="button" class="lqo__checkout" data-lqo-checkout>Checkout →</button>
+		<OrderSummary tiers={tiers} idp={`lqo-${code}`} />
 	</div>
-	<p class="lqo__msg" data-lqo-msg hidden></p>
 </div>
 
 <style>
@@ -72,132 +71,14 @@ const config = JSON.stringify({
 		font-weight: 600;
 		margin: 0 0 0.9rem;
 	}
-	.lqo__tiers {
-		font-family: var(--font-sans);
-		color: var(--color-muted);
-		font-size: 0.8rem;
-		line-height: 1.5;
-		margin: 0.9rem 0 0;
-	}
 	.lqo__foot {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.75rem 1rem;
 		margin-top: 0.9rem;
 		padding-top: 0.9rem;
 		border-top: 1px solid var(--color-hairline);
-	}
-	.lqo__meta {
-		font-family: var(--font-sans);
-		color: var(--color-muted);
-		font-size: 0.85rem;
-	}
-	.lqo__total {
-		font-family: var(--font-headline);
-		color: var(--color-ink);
-		font-size: 1.5rem;
-		font-weight: 700;
-		line-height: 1.3;
-	}
-	/* The one solid-pink control, as on /print (Kevin 2026-09-17, B1): it completes a purchase. */
-	.lqo__checkout {
-		font-family: var(--font-sans);
-		font-weight: 600;
-		font-size: 1rem;
-		min-height: 44px;
-		padding: 0.7rem 1.8rem;
-		border-radius: 999px;
-		background: var(--color-primary, #b60057);
-		color: #fff;
-		border: 2px solid var(--color-primary, #b60057);
-		cursor: pointer;
-	}
-	.lqo__checkout:disabled { opacity: 0.6; cursor: wait; }
-	.lqo__msg {
-		font-family: var(--font-sans);
-		font-size: 0.85rem;
-		color: var(--color-muted);
-		margin: 0.7rem 0 0;
 	}
 	/* BindingQty right-aligns its counters for /print's rows; here they lead the card. */
 	.lqo :global(.binding-qty__row) { justify-content: space-between; }
 	@media (max-width: 640px) {
 		.lqo { padding: 1rem 0.9rem 0.95rem; }
-		.lqo__checkout { width: 100%; }
-		.lqo__foot > div { width: 100%; }
 	}
 </style>
-
-<script is:inline>
-	(() => {
-		const root = document.querySelector('[data-lqo]');
-		if (!root) return;
-		const cfg = JSON.parse(root.dataset.lqo);
-		const counts = {};
-		Object.keys(cfg.prices).forEach((k) => (counts[k] = 0));
-		const tierFor = (t) => cfg.tiers.find((x) => t >= x.min) || null;
-		const fmt = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-		const countEl = root.querySelector('[data-lqo-count]');
-		const saveEl = root.querySelector('[data-lqo-save]');
-		const out = root.querySelector('[data-lqo-total]');
-		const msg = root.querySelector('[data-lqo-msg]');
-
-		function render() {
-			const total = Object.values(counts).reduce((a, n) => a + n, 0);
-			const tier = tierFor(total);
-			const pct = tier ? tier.pct : 0;
-			// Round the discounted UNIT to whole cents, then multiply — dvc-checkout.ts's order.
-			let cents = 0;
-			for (const [k, n] of Object.entries(counts)) {
-				cents += Math.round((Math.round(cfg.prices[k] * 100) * (100 - pct)) / 100) * n;
-			}
-			countEl.textContent = total;
-			saveEl.textContent = pct ? `save ${pct}%` : 'full price';
-			out.textContent = fmt(cents / 100);
-		}
-		const sync = (slug) => {
-			const input = root.querySelector(`.qty-in[data-slug="${slug}"]`);
-			if (input) input.value = counts[slug];
-		};
-		root.querySelectorAll('.qty-step').forEach((b) =>
-			b.addEventListener('click', () => {
-				const s = b.dataset.slug;
-				counts[s] = Math.max(0, (counts[s] || 0) + Number(b.dataset.dir));
-				sync(s);
-				render();
-			}));
-		root.querySelectorAll('.qty-in').forEach((el) =>
-			el.addEventListener('input', () => {
-				counts[el.dataset.slug] = Math.max(0, Math.floor(Number(el.value) || 0));
-				render();
-			}));
-
-		root.querySelector('[data-lqo-checkout]').addEventListener('click', async (ev) => {
-			const btn = ev.currentTarget;
-			const total = Object.values(counts).reduce((a, b) => a + b, 0);
-			msg.hidden = false;
-			if (total < 1) { msg.textContent = 'Choose at least one copy to continue.'; return; }
-			msg.textContent = 'Opening secure checkout…';
-			btn.disabled = true;
-			try {
-				const r = await fetch('/dvc-checkout', {
-					method: 'POST',
-					headers: { 'content-type': 'application/json' },
-					body: JSON.stringify({ counts, returnPath: cfg.returnPath }),
-				});
-				const d = await r.json();
-				if (d.url) { window.location.href = d.url; return; }
-				msg.textContent = d.disabled
-					? 'Direct ordering opens shortly — please check back.'
-					: 'Sorry, something went wrong. Please try again.';
-			} catch {
-				msg.textContent = 'Sorry, something went wrong. Please try again.';
-			}
-			btn.disabled = false;
-		});
-
-		render();
-	})();
-</script>
