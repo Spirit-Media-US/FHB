@@ -1117,7 +1117,7 @@ function markVoices(v: {
 								{builtPages.has(`${langSlug(l)}-bible`) && langHasLi(l) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 								{langHasLi(l) && <LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" />}
 							</div>
-							<BuyControls hbHref={l.amazon?.hardback} pbHref={l.amazon?.paperback} hbPrice={LANG_HB} pbPrice={LANG_PB} showDirect={false} />
+							<BuyControls hbHref={l.amazon?.hardback} pbHref={l.amazon?.paperback} hbPrice={LANG_HB} pbPrice={LANG_PB} />
 						</div>
 					</div>
 				))}
@@ -1276,6 +1276,30 @@ function markVoices(v: {
 								</div>
 								</div>
 								<BindingQty hbSlug={r.hbKey} pbSlug={r.pbKey} hb={r.hb} pb={r.pb} label={r.title} />
+							</div>
+						))}
+					</div>
+
+					{/* LANGUAGE EDITIONS (Kevin 2026-10-03: "all editions can be purchased now"). Same
+					    row, same two counters, same links as every other edition; SKUs lang-<code>-hb/pb. */}
+					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.6rem 0 0.5rem;">Language Editions</p>
+					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
+						{langCards.map((l) => (
+							<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
+								<img src={cardUrl(`lang-${l.code}`)} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
+								<div style="flex: 1; min-width: 0;">
+									<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span lang={l.code} dir={l.rtl ? 'rtl' : undefined} style="font-weight: 600;">{l.name}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">· {l.english} · {trimTargeted}</span></span>
+									<div class="row-links">
+										{builtPages.has(`${langSlug(l)}-bible`) && (
+											<>
+												<a href={`/bibles/${langSlug(l)}-bible/`}>Full details</a>
+												{langHasLi(l) && <span aria-hidden="true" class="row-dot">·</span>}
+											</>
+										)}
+										{langHasLi(l) && <LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" reuse />}
+									</div>
+								</div>
+								<BindingQty hbSlug={`lang-${l.code}-hb`} pbSlug={`lang-${l.code}-pb`} hb={LANG_HB} pb={LANG_PB} label={`${l.name} (${l.english})`} />
 							</div>
 						))}
 					</div>
@@ -1455,6 +1479,14 @@ function markVoices(v: {
 			'lp-vol2-pb': 99.99, 'lp-vol2-hb': 114.99,
 			'lp-vol3-pb': 79.99, 'lp-vol3-hb': 99.99,
 			'lp-set-pb': 249.99, 'lp-set-hb': 299.99,
+			// Language editions (Kevin 2026-10-03) — each sheet's top table; pricing-verify gates them.
+			'lang-ar-hb': 99.99, 'lang-ar-pb': 79.99, 'lang-bn-hb': 99.99, 'lang-bn-pb': 79.99, 'lang-yue-hb': 99.99, 'lang-yue-pb': 79.99, 'lang-fil-hb': 99.99, 'lang-fil-pb': 79.99,
+			'lang-fr-hb': 99.99, 'lang-fr-pb': 79.99, 'lang-de-hb': 99.99, 'lang-de-pb': 79.99, 'lang-hi-hb': 99.99, 'lang-hi-pb': 79.99, 'lang-id-hb': 99.99, 'lang-id-pb': 79.99,
+			'lang-it-hb': 99.99, 'lang-it-pb': 79.99, 'lang-ja-hb': 99.99, 'lang-ja-pb': 79.99, 'lang-ko-hb': 99.99, 'lang-ko-pb': 79.99, 'lang-mr-hb': 99.99, 'lang-mr-pb': 79.99,
+			'lang-pcm-hb': 99.99, 'lang-pcm-pb': 79.99, 'lang-fa-hb': 99.99, 'lang-fa-pb': 79.99, 'lang-pt-hb': 99.99, 'lang-pt-pb': 79.99, 'lang-pa-hb': 99.99, 'lang-pa-pb': 79.99,
+			'lang-ru-hb': 99.99, 'lang-ru-pb': 79.99, 'lang-es-hb': 99.99, 'lang-es-pb': 79.99, 'lang-sw-hb': 99.99, 'lang-sw-pb': 79.99, 'lang-ta-hb': 99.99, 'lang-ta-pb': 79.99,
+			'lang-nmf-hb': 99.99, 'lang-nmf-pb': 79.99, 'lang-te-hb': 99.99, 'lang-te-pb': 79.99, 'lang-zh-hant-hb': 99.99, 'lang-zh-hant-pb': 79.99, 'lang-tr-hb': 99.99, 'lang-tr-pb': 79.99,
+			'lang-ur-hb': 99.99, 'lang-ur-pb': 79.99, 'lang-vi-hb': 99.99, 'lang-vi-pb': 79.99,
 		};
 		// HOW MANY BOOKS EACH SKU PUTS IN THE BUYER'S HANDS — what the ladder counts, and the
 		// reason a set is not one line item's worth of progress toward a tier. Anything absent

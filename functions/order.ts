@@ -48,8 +48,45 @@ const TITLES: Record<string, string> = {
 	journaling: 'She Hears Her Father’s Voice — Journaling Bible',
 };
 
+// Language editions (Kevin 2026-10-03), SKUs lang-<code>-hb/pb — mirrors src/data/language-editions.ts.
+const LANG_TITLES: Record<string, string> = {
+	ar: 'الكتاب المقدس العربي (Arabic) — Father’s Heart Bible',
+	bn: 'বাংলা বাইবেল (Bengali) — Father’s Heart Bible',
+	yue: '廣東話聖經 (Cantonese) — Father’s Heart Bible',
+	fil: 'Bibliyang Filipino (Filipino) — Father’s Heart Bible',
+	fr: 'Bible Française (French) — Father’s Heart Bible',
+	de: 'Deutsche Bibel (German) — Father’s Heart Bible',
+	hi: 'हिन्दी बाइबिल (Hindi) — Father’s Heart Bible',
+	id: 'Alkitab Indonesia (Indonesian) — Father’s Heart Bible',
+	it: 'Bibbia Italiana (Italian) — Father’s Heart Bible',
+	ja: '日本語聖書 (Japanese) — Father’s Heart Bible',
+	ko: '한국어 성경 (Korean) — Father’s Heart Bible',
+	mr: 'मराठी बायबल (Marathi) — Father’s Heart Bible',
+	pcm: 'Naija Bible (Nigerian Pidgin) — Father’s Heart Bible',
+	fa: 'کتاب مقدس فارسی (Persian (Farsi)) — Father’s Heart Bible',
+	pt: 'Bíblia Portuguesa (Portuguese) — Father’s Heart Bible',
+	pa: 'ਪੰਜਾਬੀ ਬਾਈਬਲ (Punjabi) — Father’s Heart Bible',
+	ru: 'Русская Библия (Russian) — Father’s Heart Bible',
+	es: 'Biblia Española (Spanish) — Father’s Heart Bible',
+	sw: 'Biblia ya Kiswahili (Swahili) — Father’s Heart Bible',
+	ta: 'தமிழ் பைபிள் (Tamil) — Father’s Heart Bible',
+	nmf: 'Tangkhul Bible (Tangkhul) — Father’s Heart Bible',
+	te: 'తెలుగు బైబిల్ (Telugu) — Father’s Heart Bible',
+	'zh-hant': '中文聖經 (Traditional Chinese) — Father’s Heart Bible',
+	tr: 'Türkçe Kutsal Kitap (Turkish) — Father’s Heart Bible',
+	ur: 'اردو بائبل (Urdu) — Father’s Heart Bible',
+	vi: 'Kinh Thánh Tiếng Việt (Vietnamese) — Father’s Heart Bible',
+};
+
 function skuTitle(sku: string): string {
 	if (TITLES[sku]) return `${TITLES[sku]} — Divine Voice Color`;
+	// Every SKU carries its binding (<slug>-hb / -pb, since 2026-09-17); the map is keyed by
+	// edition, so read the binding off the end rather than printing the raw SKU.
+	const b = /^(.+)-(hb|pb)$/.exec(sku);
+	const bind = b ? (b[2] === 'hb' ? 'Hardback' : 'Paperback') : '';
+	const lang = b && /^lang-(.+)$/.exec(b[1]);
+	if (lang && LANG_TITLES[lang[1]]) return `${LANG_TITLES[lang[1]]}, ${bind}`;
+	if (b && TITLES[b[1]]) return `${TITLES[b[1]]} — Divine Voice Color, ${bind}`;
 	const m = /^general-(regular|largeprint)-(charcoal|plum|white)-(pb|hb)$/.exec(sku);
 	if (!m) return sku;
 	const [, size, colour, binding] = m;
