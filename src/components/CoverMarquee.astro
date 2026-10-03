@@ -1,6 +1,6 @@
 ---
 import { cardUrl } from '../data/card-art';
-import { LANGUAGE_EDITION_TOTAL, languageEditions } from '../data/language-editions';
+import { LANGUAGE_EDITION_TOTAL, langSlug, languageEditions } from '../data/language-editions';
 // FHB cover marquee — Kevin 2026-09-24.
 //
 // "Scrolling marquee of 3D image thumbnails of all FHB covers as shown on /print",
@@ -72,18 +72,23 @@ const LARGE_PRINT = [
 const W = 180;
 const H = (key: string) => Math.round((W * (key === 'dvc-journaling' ? 725 : 764)) / 600);
 const covers = [
-	...DVC.map(([slug, name]) => ({ key: `dvc-${slug}`, name })),
-	...GENERAL.map(([key, name]) => ({ key, name })),
-	...LARGE_PRINT.map(([key, name]) => ({ key, name })),
+	// Every cover links to ITS product page (Kevin 2026-10-03), not to /print.
+	...DVC.map(([slug, name]) => ({ key: `dvc-${slug}`, name, href: `/bibles/${slug}-bible/` })),
+	...GENERAL.map(([key, name]) => ({ key, name, href: '/bibles/fathers-heart-bible/' })),
+	...LARGE_PRINT.map(([key, name]) => ({ key, name, href: `/bibles/${key}-bible/` })),
 ].map((c) => ({ ...c, src: cardUrl(c.key), h: H(c.key) }));
 
 // SECOND ROW (Kevin 2026-10-02): every LANGUAGE edition, running the OPPOSITE way. Same
 // card style, size, spacing and on-screen speed as the English row — it is the same strip
 // markup with a direction flag, not a second implementation. Language cards are all 600x764.
-const langCovers = languageEditions.map((l) => ({
+// READ ORDER (Kevin 2026-10-03: "reads in REVERSE alphabetical order"). This row travels
+// left-to-right, so covers ENTER from the left in reverse DOM order. Reversing the list here
+// makes them arrive A→Z in the direction the row moves.
+const langCovers = [...languageEditions].reverse().map((l) => ({
 	key: `lang-${l.code}`,
 	name: `${l.name} (${l.english})`,
 	caption: l.english,
+	href: `/bibles/${langSlug(l)}-bible/`,
 	src: cardUrl(`lang-${l.code}`, 360),
 	h: H(`lang-${l.code}`),
 }));
@@ -127,7 +132,7 @@ const rows = [
 					<ul class="fhbm-row" aria-hidden={copy === 1 ? 'true' : undefined}>
 						{row.covers.map((c) => (
 							<li>
-								<a href={row.href} tabindex={copy === 1 ? -1 : undefined}>
+								<a href={c.href ?? row.href} tabindex={copy === 1 ? -1 : undefined}>
 									<img
 										src={c.src}
 										alt={copy === 1 ? '' : `Father's Heart Bible — ${c.name}`}

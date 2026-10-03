@@ -74,6 +74,15 @@ type Edition = {
 		bisac: [string, string][];
 	};
 	faq: { q: string; a: string }[];
+	/** LANGUAGE editions (Kevin 2026-10-03). `lang` is the BCP-47 code of the book's text. */
+	kind?: 'audience' | 'language';
+	lang?: string;
+	dir?: 'rtl';
+	english?: string;
+	/** The verse as printed in THIS edition's language, from its canon, shown above the FHB English. */
+	hookNative?: { text: string; father?: string[]; son?: string[]; spirit?: string[] };
+	/** Kevin 2026-10-01: the ONE sentence every language edition states about its source. */
+	translationStatement?: string;
 };
 
 export async function getStaticPaths() {
@@ -100,7 +109,10 @@ const pillars: Pillar[] = fm?.pillars ?? [];
 // that has not been re-rendered (journaling's 8x10, D166) keeps the key it has. The old
 // `?v=` is gone with it — a new key has nothing cached against it to bust.
 const coverUrl = cardUrl(ed.coverImage ?? `dvc-${ed.slug}`, 1200);
-const pages = ed.pages ?? fm?.pages ?? 888;
+const isLang = ed.kind === 'language';
+// A language edition whose interior is still being built has NO page count yet: never fall
+// back to the English 888 for it.
+const pages = isLang ? (ed.pages ?? null) : (ed.pages ?? fm?.pages ?? 888);
 const trim = ed.trim ?? '6 x 9 in';
 // Sourced per edition from the metadata sheet; the fallback matches what those
 // sheets say. It previously read "with dust jacket", which no sheet supports —
@@ -199,6 +211,14 @@ function mark(text: string, spans: string[], color: string): string {
 let hookHtml = mark(ed.hook.text, ed.hook.father ?? [], VOICE.father);
 hookHtml = mark(hookHtml, ed.hook.son ?? [], VOICE.son);
 hookHtml = mark(hookHtml, ed.hook.spirit ?? [], VOICE.spirit);
+const hn = ed.hookNative;
+let hookNativeHtml = hn ? mark(hn.text, hn.father ?? [], VOICE.father) : '';
+if (hn)
+	hookNativeHtml = mark(
+		mark(hookNativeHtml, hn.son ?? [], VOICE.son),
+		hn.spirit ?? [],
+		VOICE.spirit,
+	);
 
 // color the COLOUR WORDS, not the sentence around them (Kevin 2026-08-23). The claim is
 // "our Father's words in BLUE" — so BLUE is what should be blue. coloring the whole line
@@ -238,12 +258,12 @@ const productSchema = {
 	// this; the 22 edition pages — the ones carrying the SKUs — did not.
 	alternateName: [ed.name, 'FHB'],
 	bookFormat: 'https://schema.org/Hardcover',
-	numberOfPages: pages,
+	...(pages ? { numberOfPages: pages } : {}),
 	// The Large Print SET carries no ISBN of its own — Kevin assigned numbers per volume, as
 	// lp-set.json's _isbnNote records. An empty string is not an ISBN, so the property is
 	// omitted rather than emitted blank, which is invalid structured data.
 	...(ed.isbn ? { isbn: ed.isbn } : {}),
-	inLanguage: 'en',
+	inLanguage: ed.lang ?? 'en',
 	datePublished,
 	description: `${ed.sub}. The complete Bible in Divine Voice Color — our Father's words in blue, the Son's in red, the Spirit's in purple.`,
 	image: coverUrl,
@@ -297,8 +317,8 @@ const faqSchema = {
 					</div>
 				</div>
 				<div>
-					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Divine Voice Color</p>
-					<h1 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2.4rem; font-weight: 600; margin: 0 0 0.6rem;">{ed.name}</h1>
+					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">{isLang ? `${ed.english} edition · Divine Voice Color` : 'Divine Voice Color'}</p>
+					<h1 lang={isLang ? ed.lang : undefined} dir={isLang ? ed.dir : undefined} style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2.4rem; font-weight: 600; margin: 0 0 0.6rem;">{ed.name}</h1>
 					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.55; margin: 0 0 1.2rem;">{ed.sub}</p>
 					<div class="flex flex-wrap items-center gap-2 mb-5">
 						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.father}; background: #fff; border: 2px solid ${VOICE.father}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>FATHER</span>
@@ -331,6 +351,9 @@ const faqSchema = {
 			<div class="max-w-3xl mx-auto">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">{ed.hook.h2}</h2>
 				<div class="rounded-2xl p-7" style="background: #fff; border: 1px solid var(--color-hairline);">
+					{hn && (
+						<p lang={ed.lang} dir={ed.dir} style="font-family: var(--font-serif); font-size: 1.2rem; line-height: 1.8; color: var(--color-ink); margin: 0 0 1rem;" set:html={hookNativeHtml}></p>
+					)}
 					<p style="font-family: var(--font-serif); font-size: 1.1rem; line-height: 1.7; color: var(--color-ink); margin: 0;" set:html={hookHtml}></p>
 					<a href={ed.hook.href} style="display: inline-block; font-family: var(--font-sans); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.03em; color: #71717a; margin: 1rem 0 0; text-decoration: underline;">{ed.hook.ref} (FHB)</a>
 				</div>
@@ -342,13 +365,13 @@ const faqSchema = {
 			<div class="max-w-3xl mx-auto">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">What makes this a Bible for {ed.audienceNoun}</h2>
 				{ed.listing.short350.map((para) => (
-					<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colorWords(para)}></p>
+					<p dir={isLang ? 'auto' : undefined} style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colorWords(para)}></p>
 				))}
 			</div>
 		</Section>
 		<!-- What this reader actually gets that no other edition has. "From the front matter"
 		     named a location in the book; this names the value. (Kevin 2026-08-23) -->
-		<Section variant="soft">
+		{!isLang && (<Section variant="soft">
 			<div class="max-w-3xl mx-auto">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 0.4rem;">{pillars.length ? `Identity, intimacy, and inheritance ${pillarSuffix.toLowerCase()}` : 'What every copy opens with'}</h2>
 				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.98rem; line-height: 1.65; margin: 0 0 2rem;">Every copy opens with these pages, written for {ed.audienceSingular ?? ed.audienceNoun}, before Genesis 1:1.</p>
@@ -396,7 +419,7 @@ const faqSchema = {
 				</div>
 
 			</div>
-		</Section>
+		</Section>)}
 		<!-- What's inside + product details, laid out as a retail listing rather than a list -->
 		<Section variant="soft">
 			<div class="max-w-4xl mx-auto">
@@ -415,7 +438,9 @@ const faqSchema = {
 					{[
 						['Publisher', 'Spirit Media Publishing'],
 						['Publication date', ed.published],
-						['Language', 'English'],
+						['Language', isLang ? ed.english : 'English'],
+						// Language editions only: their page counts differ per language and come from each sheet.
+						['Pages', isLang ? (pages ? String(pages) : 'Being set — final page count to come') : ''],
 						['Translation', 'Father’s Heart Bible™ — An Intimate Translation'],
 						['Binding', binding],
 						['Dimensions', trim],
@@ -447,9 +472,9 @@ const faqSchema = {
 			<div class="max-w-3xl mx-auto">
 				{ed.listing.long.map((sec) => (
 					<div class="mb-8">
-						<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.8rem;">{sec.h}</h2>
+						{sec.h && (<h2 dir={isLang ? 'auto' : undefined} style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.8rem;">{sec.h}</h2>)}
 						{sec.body.map((para) => (
-							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colorWords(para)}></p>
+							<p dir={isLang ? 'auto' : undefined} style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;" set:html={colorWords(para)}></p>
 						))}
 					</div>
 				))}
@@ -459,6 +484,9 @@ const faqSchema = {
 		<Section variant="warm">
 			<div class="max-w-3xl mx-auto">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1rem;">About this translation</h2>
+				{ed.translationStatement && (
+					<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem; font-weight: 600;">{ed.translationStatement}</p>
+				)}
 				{shared.about.map((para) => (
 					<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1.02rem; line-height: 1.7; margin: 0 0 0.9rem;">{para}</p>
 				))}
