@@ -686,7 +686,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	const json = (body: unknown, status = 200) =>
 		new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
-	let payload: { counts?: Record<string, number> };
+	let payload: { counts?: Record<string, number>; returnPath?: string };
 	try {
 		payload = await request.json();
 	} catch {
@@ -730,7 +730,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		// This used to be /print?order=success, which print.astro never read — so a buyer
 		// landed back on the same order form with no acknowledgement (found 2026-09-03).
 		success_url: `${origin}/order?s={CHECKOUT_SESSION_ID}`,
-		cancel_url: `${origin}/print?order=canceled`,
+		// A language edition's quick order form (/bibles/<language>-bible/#order) sends its own
+		// path so a cancelled checkout returns there. Only that exact shape is accepted — any
+		// other value falls back to /print, so this can never become an open redirect.
+		cancel_url: /^\/bibles\/[a-z0-9-]+-bible\/$/.test(payload.returnPath ?? '')
+			? `${origin}${payload.returnPath}?order=canceled#order`
+			: `${origin}/print?order=canceled`,
 		'automatic_tax[enabled]': 'true',
 		// Free shipping is baked into the unit price; the address is still collected for
 		// tax calculation and fulfilment.
