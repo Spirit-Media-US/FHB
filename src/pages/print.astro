@@ -11,7 +11,12 @@ import VoiceChips from '../components/VoiceChips.astro';
 // later needs a re-run of the sync, not an edit here.
 import amazonLinks from '../data/amazon-links.json';
 import { cardUrl } from '../data/card-art';
-import { LANG_HB, LANG_PB, languageEditions } from '../data/language-editions';
+import {
+	LANG_HB,
+	LANG_PB,
+	LANGUAGE_EDITION_TOTAL,
+	languageEditions,
+} from '../data/language-editions';
 import Layout from '../layouts/Layout.astro';
 
 // THE DIVINE VOICE COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
@@ -1071,7 +1076,7 @@ function markVoices(v: {
 		<Section id="language-editions" variant="warm">
 			<div class="text-center mb-8">
 				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Language Editions</p>
-				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">In {languageEditions.length} Languages</h2>
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">In {LANGUAGE_EDITION_TOTAL} Languages</h2>
 				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 40rem;">The complete Divine Voice Color Bible in the reader’s own language. Two bindings.</p>
 				<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em; margin: 0.9rem 0 0;">{DVC_TAIL}</p>
 			</div>

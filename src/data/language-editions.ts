@@ -3,8 +3,8 @@
 // ONLY editions whose press files are FINISHED are listed: interior + case + jacket +
 // paperback + metadata sheet present in the language submission set (Drive
 // 1faik2I_8shdwAi352TDaSUUtRI4-16jk). 22 as of 2026-10-03. A language whose covers are not
-// delivered is in the list with `ready: false` and renders NOWHERE until its cover lands —
-// no card is ever faked. Kevin 2026-10-03: "Build marquee and /print for 26 languages" —
+// delivered shows its DESIGNED front (design: true) — Kevin 2026-10-03 — and `ready: false`
+// would hide an edition entirely. Kevin 2026-10-03: "Build marquee and /print for 26 languages" —
 // the 22 complete + Arabic, Farsi, Urdu (right-to-left, being built) + Tangkhul (hold lifted,
 // being built). Flip `ready` (and add its card art) as each cover is delivered.
 //
@@ -26,6 +26,10 @@ export interface LanguageEdition {
 	amazon?: { hardback?: string; paperback?: string };
 	/** false = press files not delivered yet: counted in the 26, never shown. */
 	ready?: boolean;
+	/** card art is the edition's DESIGNED front (locked 74-cover set, language-bible-titles) because
+	 *  its press cover is not delivered yet (Kevin 2026-10-03: use it meanwhile). Swap to the
+	 *  delivered case PDF via build_lang_cards.py under a NEW R2 key when it lands. */
+	design?: boolean;
 	/** right-to-left script */
 	rtl?: boolean;
 }
@@ -35,10 +39,10 @@ export const LANG_PB = 79.99;
 
 // Alphabetical by English name, as the targeted editions are alphabetical on /print.
 export const allLanguageEditions: LanguageEdition[] = [
-	{ code: 'ar', name: 'الكتاب المقدس العربي', english: 'Arabic', rtl: true, ready: false },
+	{ code: 'ar', name: 'الكتاب المقدس العربي', english: 'Arabic', rtl: true, design: true },
 	{ code: 'bn', name: 'বাংলা বাইবেল', english: 'Bengali' },
 	{ code: 'yue', name: '廣東話聖經', english: 'Cantonese' },
-	{ code: 'fa', name: 'کتاب مقدس فارسی', english: 'Farsi', rtl: true, ready: false },
+	{ code: 'fa', name: 'کتاب مقدس فارسی', english: 'Farsi', rtl: true, design: true },
 	{ code: 'fil', name: 'Bibliyang Filipino', english: 'Filipino' },
 	{ code: 'fr', name: 'Bible Française', english: 'French' },
 	{ code: 'de', name: 'Deutsche Bibel', english: 'German' },
@@ -55,11 +59,11 @@ export const allLanguageEditions: LanguageEdition[] = [
 	{ code: 'es', name: 'Biblia Española', english: 'Spanish' },
 	{ code: 'sw', name: 'Biblia ya Kiswahili', english: 'Swahili' },
 	{ code: 'ta', name: 'தமிழ் பைபிள்', english: 'Tamil' },
-	{ code: 'nmf', name: 'Tangkhul Bible', english: 'Tangkhul', ready: false },
+	{ code: 'nmf', name: 'Tangkhul Bible', english: 'Tangkhul', design: true },
 	{ code: 'te', name: 'తెలుగు బైబిల్', english: 'Telugu' },
 	{ code: 'zh-hant', name: '中文聖經', english: 'Traditional Chinese' },
 	{ code: 'tr', name: 'Türkçe Kutsal Kitap', english: 'Turkish' },
-	{ code: 'ur', name: 'اردو بائبل', english: 'Urdu', rtl: true, ready: false },
+	{ code: 'ur', name: 'اردو بائبل', english: 'Urdu', rtl: true, design: true },
 	{ code: 'vi', name: 'Kinh Thánh Tiếng Việt', english: 'Vietnamese' },
 ];
 
