@@ -1333,26 +1333,23 @@ function markVoices(v: {
 						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.5; margin: 0 0 1.25rem; flex: 1;">Read on any device — Kindle, phone, or tablet. The complete translation, reflowable with pop-up footnotes.</p>
 						<div class="flex flex-col gap-2 w-full mx-auto" style="max-width: 15rem;">
 							<button type="button" data-ebook-buy class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 2px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; cursor: pointer; font-size: 0.92rem;">Buy Direct · {EBOOK_DIRECT} →</button>
-							<a href={`https://www.amazon.com/dp/${ebookAsin}`} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Kindle on Amazon · {EBOOK_AMAZON} →</a>
-							<a href={EBOOK_NOOK_URL} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Nook at B&N · {EBOOK_NOOK} →</a>
+							<a href={`https://www.amazon.com/dp/${ebookAsin}`} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Kindle · {EBOOK_AMAZON} →</a>
+							<a href="https://books.apple.com/us/book/id6790611840" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Apple Books · $9.99 →</a>
+							<a href="https://play.google.com/store/books/details?id=qY4BEgAAQBAJ" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Google Play · $9.99 →</a>
+							<a href={EBOOK_NOOK_URL} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Nook · {EBOOK_NOOK} →</a>
 						</div>
 						<p data-ebook-msg style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.7rem 0 0; display: none;"></p>
 						<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">Direct = instant EPUB download, DRM-free — read it anywhere.</p>
 					</div>
 					<div class="flex flex-col text-center rounded-2xl p-7" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
-						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.4rem;">Audiobook</h3>
-						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.5; margin: 0 0 1.25rem; flex: 1;">The whole Bible, narrated — all 66 books, chapter by chapter, offline in your favorite audiobook app.</p>
-						{/* 🔒 THE ONE DELIBERATE "COMING SOON" ON THIS PAGE — LEAVE IT (Kevin
-						     2026-09-17, ruling C1). Every buy button elsewhere dropped the phrase
-						     because it spilled the label and said nothing a price did not say
-						     better. This control is different: the audiobook has no price and no
-						     listing, so those two words are the only information it carries.
-						     Blanking it to satisfy a literal "zero occurrences of coming soon"
-						     check would leave an empty button. Do not "fix" this later. */}
-						<div class="flex flex-col gap-2 w-full mx-auto" style="max-width: 15rem;">
-							<span class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #f3f3f3; color: var(--color-muted); border: 1.5px solid var(--color-hairline); padding: 0.75rem 1.4rem; font-size: 0.92rem; cursor: default;">Coming soon</span>
+						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.4rem;">Audio Bible</h3>
+						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.5; margin: 0 0 1.25rem; flex: 1;">Listen free, chapter by chapter.</p>
+						<div class="flex flex-col gap-2 w-full mx-auto">
+							<a href="https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Spotify →</a>
+							<a href="https://podcasts.apple.com/us/podcast/id6818374650" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Apple Podcasts →</a>
+							<a href="https://www.youtube.com/@FathersHeartBible" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">YouTube →</a>
 						</div>
-						<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">Coming to Spotify, Apple, Google Play — and here, direct.</p>
+						<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">Audiobook edition coming to Google Play.</p>
 					</div>
 				</div>
 			</Section>
