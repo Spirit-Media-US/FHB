@@ -15,8 +15,10 @@ import {
 	LANG_HB,
 	LANG_PB,
 	LANGUAGE_EDITION_TOTAL,
-	languageEditions,
+	langSlug,
+	type languageEditions,
 } from '../data/language-editions';
+import lookinsideData from '../data/lookinside.json';
 import Layout from '../layouts/Layout.astro';
 
 // THE DIVINE VOICE COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
@@ -71,11 +73,15 @@ const binding = (b: 'hb' | 'pb') => (b === 'hb' ? 'Hardback' : 'Paperback');
 const specTargeted = (b: 'hb' | 'pb') => `${trimTargeted} ${binding(b)}`;
 const specJournaling = (b: 'hb' | 'pb') => `${trimJournaling} ${binding(b)}`;
 
+// CARD SUBTITLES (Kevin 2026-10-03: every card uniform in structure, length and detail):
+// "For " + the edition's metadata-sheet For box (master: projects/fhb-global/fors.d/<slug>.json,
+// which the sheet's For row is written from), in order, title-cased, as many entries as fit
+// ~125 characters (at least four). Never invented — regenerate from the master, don't hand-edit.
 const dvcEditions = [
 	{
 		slug: 'athletes',
 		title: "Athlete's Bible",
-		sub: 'A gift Bible for athletes and coaches.',
+		sub: 'For Christian Athletes, Football Players, Basketball Players, Pickleball Players, Soccer Players, and Baseball Players',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -83,7 +89,7 @@ const dvcEditions = [
 	{
 		slug: 'chosen',
 		title: 'Chosen Bible',
-		sub: 'For the Fatherless, Foster Youth, Adoptive and Foster Families, Youth Aging Out of Care, and Anyone Raised Without a Father',
+		sub: 'For Children in Foster Care, Adopted Sons and Daughters, People Raised Without a Father, and People Who Lost a Father Young',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -91,7 +97,7 @@ const dvcEditions = [
 	{
 		slug: 'couples',
 		title: "Couple's Bible",
-		sub: 'For Married Couples, Engaged Couples, Newlyweds, Dating Couples, Domestic Partners, Gift for Couples and Anniversary Gifts',
+		sub: 'For Engaged Couples, Newlyweds, Married Couples, Christian Couples, Husbands and Wives, and Blended Families',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -99,7 +105,7 @@ const dvcEditions = [
 	{
 		slug: 'dads',
 		title: "Dad's Bible",
-		sub: "For Dads, Fathers, New Dads, Stepdads, Granddads, Gift for Dads and Father's Day Gifts",
+		sub: 'For New Dads, First Time Dads, Stepdads, Single Dads, Bonus Dads, Dads-To-Be, Grandfathers, and Fathers-In-Law',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -107,7 +113,7 @@ const dvcEditions = [
 	{
 		slug: 'first-responders',
 		title: "First Responder's Bible",
-		sub: 'For Police Officers, Firefighters, EMTs, Paramedics, Dispatchers, Nurses, and Search and Rescue',
+		sub: 'For Firefighters, Police Officers, Paramedics, EMTs, Emergency Dispatchers, Search and Rescue Teams, and Lifeguards',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -115,7 +121,7 @@ const dvcEditions = [
 	{
 		slug: 'graduates',
 		title: "Graduate's Bible",
-		sub: 'A graduation gift Bible.',
+		sub: 'For High School Graduates, College Graduates, Graduate School Graduates, Trade School Graduates, and GED Graduates',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -123,7 +129,7 @@ const dvcEditions = [
 	{
 		slug: 'grandparents',
 		title: "Grandparent's Bible",
-		sub: 'A gift Bible for grandparents.',
+		sub: 'For Grandmothers, Grandfathers, New Grandparents, Great-Grandparents, and Grandparents Raising Grandchildren',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -131,7 +137,7 @@ const dvcEditions = [
 	{
 		slug: 'intercessors',
 		title: "Intercessor's Bible",
-		sub: 'A gift Bible for intercessors.',
+		sub: 'For Intercessors, Prayer Warriors, Prayer Teams, Prayer Partners, Prayer Ministry Leaders, and Prayer Chain Members',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -139,7 +145,7 @@ const dvcEditions = [
 	{
 		slug: 'mens',
 		title: "Men's Bible",
-		sub: "He Hears His Father's Voice - For Men, Husbands, Fathers, and Young Men",
+		sub: 'For Young Men, Single Men, Husbands, Fathers, Men in the Trades, Business Owners, and Men Who Mentor Other Men',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -147,7 +153,7 @@ const dvcEditions = [
 	{
 		slug: 'moms',
 		title: "Mom's Bible",
-		sub: "For Moms, Mothers, New Moms, Stepmoms, Grandmothers, Gift for Moms and Mother's Day Gifts",
+		sub: 'For New Moms, First Time Moms, Stepmoms, Single Moms, Bonus Moms, Moms-To-Be, Grandmothers, Soccer Moms, and Mothers-In-Law',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -155,7 +161,7 @@ const dvcEditions = [
 	{
 		slug: 'nurses',
 		title: "Nurse's Bible",
-		sub: 'A gift Bible for nurses.',
+		sub: 'For Registered Nurses, Nurse Practitioners, Licensed Practical Nurses, Nursing Students, and Nursing Assistants',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -163,7 +169,7 @@ const dvcEditions = [
 	{
 		slug: 'pastors',
 		title: "Pastor's Bible",
-		sub: 'For Pastors, Preachers, Ministers, Elders, Deacons, Chaplains, and Church Leaders',
+		sub: "For Senior Pastors, Youth Pastors, Church Planters, Missionaries, Pastors' Wives, Seminary Students, and Deaconesses",
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -171,7 +177,7 @@ const dvcEditions = [
 	{
 		slug: 'peace',
 		title: 'Peace Bible',
-		sub: 'For Overcoming Anxiety, Depression, PTSD, Panic, Stress, Trauma, and Worry',
+		sub: "For People Living with Anxiety, People Who Feel Overwhelmed, People Who Can't Sleep, People in Grief, and Caregivers",
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -179,7 +185,7 @@ const dvcEditions = [
 	{
 		slug: 'presidents',
 		title: "President's Bible",
-		sub: 'For Presidents, CEOs, Executives, Public Servants, Officers, and Leaders',
+		sub: 'For Presidents and Heads of State, Governors, Mayors, Legislators, Judges, Business Executives, Bosses, CEOs, and Supervisors',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -187,7 +193,7 @@ const dvcEditions = [
 	{
 		slug: 'recovery',
 		title: 'Recovery Bible',
-		sub: 'For Overcoming Addiction, Recovery, Sobriety, Freedom, 12 Step Programs, and Families',
+		sub: 'For People in Recovery, 12-Step Group Members, Sponsors, Families of Those in Recovery, and The Newly Sober',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -195,7 +201,7 @@ const dvcEditions = [
 	{
 		slug: 'seekers',
 		title: "Seeker's Bible",
-		sub: 'For Seekers, Skeptics, and Anyone Exploring the Christian Faith for the First Time',
+		sub: 'For People Curious About Faith, Skeptics, New Believers, People Raised in Another Faith, and People Raised in No Faith',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -203,7 +209,7 @@ const dvcEditions = [
 	{
 		slug: 'seventeen',
 		title: 'Seventeen Bible',
-		sub: 'For Seventeen-Year-Olds, Teens and Young Adults, 17th Birthday, Gift for Teens, Confirmation and Graduation Gifts',
+		sub: 'For High School Juniors, High School Seniors, New Drivers, First-Job Holders, and College-Bound Students',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -211,7 +217,7 @@ const dvcEditions = [
 	{
 		slug: 'soldiers',
 		title: "Soldier's Bible",
-		sub: 'For all Soldiers, Army, Marine Corps, Navy, Air Force, Space Force, Coast Guard, and Veterans',
+		sub: 'For Active-Duty Service Members, Veterans, Military Spouses, Military Families, and Recruits in Basic Training',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -219,7 +225,7 @@ const dvcEditions = [
 	{
 		slug: 'teachers',
 		title: "Teacher's Bible",
-		sub: 'A teacher appreciation gift Bible.',
+		sub: 'For Preschool Teachers, Elementary Teachers, High School Teachers, Special Education Teachers, and Homeschool Parents',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -227,7 +233,7 @@ const dvcEditions = [
 	{
 		slug: 'teen',
 		title: 'Teen Bible',
-		sub: 'For Teens, Teenagers, Ages 13-19, Middle School, Junior High, High School, Junior College, Youth Group, Gift for Teens, Confirmation and Graduation Gifts',
+		sub: 'For Middle Schoolers, High Schoolers, Teen Girls, Teen Boys, Teens in Youth Group, 13-Year-Old Boys, and 13-Year-Old Girls',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -235,7 +241,7 @@ const dvcEditions = [
 	{
 		slug: 'womens',
 		title: "Women's Bible",
-		sub: 'A gift Bible for women.',
+		sub: 'For Young Women, Single Women, Married Women, Widows, Working Women, Women in Ministry, and Women Walking Through Infertility',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -243,7 +249,7 @@ const dvcEditions = [
 	{
 		slug: 'worship-leaders',
 		title: "Worship Leader's Bible",
-		sub: 'For Worship Leaders, Praise Teams, Worship Pastors, Musicians, Singers, and Choir Directors',
+		sub: 'For Worship Pastors, Singers, Songwriters, Church Musicians, Choir Members, Worship Team Members, Violinists, and Cellists',
 		hb: 99.99,
 		pb: 79.99,
 		spec: specTargeted,
@@ -539,6 +545,9 @@ const liOnPage = new Set<string>([
 	'general',
 	...lpVolumes.map((v) => v.key),
 ]);
+// A language card shows Look inside only once its sample pages are in lookinside.json.
+const langHasLi = (l: (typeof languageEditions)[number]) =>
+	Boolean((lookinsideData as Record<string, { pages?: unknown[] }>)[langSlug(l)]?.pages?.length);
 const TRANSLATION_URL = '/the-fathers-heart-bible/translation-philosophy/';
 const CONTACT = 'mailto:hello@spiritmediapublishing.com?subject=Father%27s%20Heart%20Bible%20print';
 // SCREEN divine-voice palette — the same values /read has always used, adopted here so a
@@ -915,6 +924,9 @@ function markVoices(v: {
 								class="block w-full h-auto" style="max-width: 220px;"
 							/>
 							<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{c.name}</h3>
+							{/* Uniform with every other card (Kevin 2026-10-03). The general sheet has no For
+							    box; its subtitle reads "Holy Bible for Everyone", so that is the line. */}
+							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.6rem;">For Everyone — the complete Divine Voice Color Bible without an audience on the cover</p>
 							{/* Same affordances as the targeted cards, so the page reads as one thing.
 							    Look inside is driven off src/data/lookinside.json, keyed by LINE (the
 							    three colours share an interior, so they share the sample pages).
@@ -1093,8 +1105,16 @@ function markVoices(v: {
 							class="block w-full h-auto" style="max-width: 220px;"
 						/>
 						<h3 lang={l.code} dir={l.rtl ? 'rtl' : undefined} style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{l.name}</h3>
-						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">{l.english}</p>
+						<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">{l.english}</p>
+						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">{l.sub}</p>
 						<div class="flex flex-col gap-2 w-full mt-auto">
+							<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.2rem;">
+								{builtPages.has(`${langSlug(l)}-bible`) && (
+									<a href={`/bibles/${langSlug(l)}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
+								)}
+								{builtPages.has(`${langSlug(l)}-bible`) && langHasLi(l) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
+								{langHasLi(l) && <LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" />}
+							</div>
 							<BuyControls hbHref={l.amazon?.hardback} pbHref={l.amazon?.paperback} hbPrice={LANG_HB} pbPrice={LANG_PB} showDirect={false} />
 						</div>
 					</div>
