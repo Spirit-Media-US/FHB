@@ -11,6 +11,12 @@ import VoiceChips from '../components/VoiceChips.astro';
 // later needs a re-run of the sync, not an edit here.
 import amazonLinks from '../data/amazon-links.json';
 import { cardUrl } from '../data/card-art';
+import {
+	LANG_HB,
+	LANG_PB,
+	LANGUAGE_EDITION_TOTAL,
+	languageEditions,
+} from '../data/language-editions';
 import Layout from '../layouts/Layout.astro';
 
 // THE DIVINE VOICE COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
@@ -1057,6 +1063,43 @@ function markVoices(v: {
 				     books: 1 — so the sentence promised a bulk tier the checkout never gave. */}
 			</div>
 			<p class="text-center mt-6" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600;">Direct from SMP includes free shipping — a $15 value.</p>
+		</Section>
+
+		<!-- ═══════════════ LANGUAGE EDITIONS ═══════════════ -->
+		{/* Kevin 2026-10-02. Every language edition whose press files are finished (see
+		    src/data/language-editions.ts for what qualifies). Same card, frame, image size and
+		    button set as the targeted cards. Amazon buttons are PLACEHOLDERS — none of these is
+		    listed yet — and a link is never invented to fill one (D184); activation is adding
+		    the URL. No "Buy Direct" link: the direct checkout (functions/dvc-checkout.ts) has no
+		    language SKUs, so offering it would send a reader to a form that cannot sell this
+		    book. The card title is the edition's own name, in its own script. */}
+		<Section id="language-editions" variant="warm">
+			<div class="text-center mb-8">
+				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Language Editions</p>
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">In {LANGUAGE_EDITION_TOTAL} Languages</h2>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 40rem;">The complete Divine Voice Color Bible in the reader’s own language. Two bindings.</p>
+				<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em; margin: 0.9rem 0 0;">{DVC_TAIL}</p>
+			</div>
+
+			<div class="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7 max-w-6xl mx-auto">
+				{languageEditions.map((l) => (
+					<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+						<img
+							src={cardUrl(`lang-${l.code}`)}
+							srcset={`${cardUrl(`lang-${l.code}`)} 600w, ${cardUrl(`lang-${l.code}`, 1200)} 1200w`}
+							sizes="(min-width: 1024px) 260px, 44vw"
+							alt={`Father's Heart Bible (FHB) — ${l.name}, the ${l.english} edition`}
+							width="600" height="764" loading="lazy" decoding="async"
+							class="block w-full h-auto" style="max-width: 220px;"
+						/>
+						<h3 lang={l.code} dir={l.rtl ? 'rtl' : undefined} style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{l.name}</h3>
+						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">{l.english}</p>
+						<div class="flex flex-col gap-2 w-full mt-auto">
+							<BuyControls hbHref={l.amazon?.hardback} pbHref={l.amazon?.paperback} hbPrice={LANG_HB} pbPrice={LANG_PB} showDirect={false} />
+						</div>
+					</div>
+				))}
+			</div>
 		</Section>
 
 		<!-- ═══════════════ HIS VOICE — DVC ON THE PAGE ═══════════════ -->
