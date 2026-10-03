@@ -103,12 +103,17 @@ const rows = [
 		color: var(--color-ink);
 		-moz-appearance: textfield;
 	}
-	/* On a narrow phone the two labelled counters sit side by side under the title rather
-	   than stacked, so a row stays roughly the height of the 118px thumbnail beside it and
-	   the form does not get taller than the two-row version it replaces. */
-	@media (max-width: 520px) {
-		.binding-qty { flex-direction: row; gap: 0.5rem; width: 100%; }
-		.binding-qty__row { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
-		.binding-qty__label { font-size: 0.72rem; }
+	/* On a phone the two labelled counters sit side by side on their OWN full-width line
+	   under the thumbnail and title (print.astro .bulk-row wraps there), each counter
+	   stretching to half the row. Round 4 (Kevin 2026-10-03): the earlier 520px rule kept
+	   them beside the title, which pushed them off a 390px screen; and every control is now
+	   44px tall, the minimum comfortable tap target. */
+	@media (max-width: 640px) {
+		.binding-qty { flex-direction: row; gap: 0.75rem; width: 100%; flex-basis: 100%; }
+		.binding-qty__row { flex: 1 1 0; min-width: 0; flex-direction: column; align-items: stretch; gap: 0.2rem; }
+		.binding-qty__label { justify-content: flex-start; font-size: 0.8rem; }
+		.binding-qty__ctl { display: flex; }
+		.binding-qty__ctl :global(.qty-step) { width: 44px; height: 44px; flex-shrink: 0; }
+		.binding-qty__ctl :global(.qty-in) { flex: 1 1 auto; min-width: 0; width: auto; height: 44px; }
 	}
 </style>
