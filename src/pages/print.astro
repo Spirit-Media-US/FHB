@@ -16,7 +16,7 @@ import {
 	LANG_PB,
 	LANGUAGE_EDITION_TOTAL,
 	langSlug,
-	type languageEditions,
+	languageEditions,
 } from '../data/language-editions';
 import lookinsideData from '../data/lookinside.json';
 import Layout from '../layouts/Layout.astro';
@@ -546,6 +546,8 @@ const liOnPage = new Set<string>([
 	...lpVolumes.map((v) => v.key),
 ]);
 // A language card shows Look inside only once its sample pages are in lookinside.json.
+// Runtime value used in the template below (biome cannot see .astro template use, keep this line).
+const langCards = languageEditions;
 const langHasLi = (l: (typeof languageEditions)[number]) =>
 	Boolean((lookinsideData as Record<string, { pages?: unknown[] }>)[langSlug(l)]?.pages?.length);
 const TRANSLATION_URL = '/the-fathers-heart-bible/translation-philosophy/';
@@ -1094,7 +1096,7 @@ function markVoices(v: {
 			</div>
 
 			<div class="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7 max-w-6xl mx-auto">
-				{languageEditions.map((l) => (
+				{langCards.map((l) => (
 					<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
 						<img
 							src={cardUrl(`lang-${l.code}`)}
