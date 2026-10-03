@@ -218,9 +218,16 @@ const rows = [
 	}
 	.fhbm-viewport + .fhbm-label { margin-top: 1.75rem; }
 	/* English name under each language cover (Kevin 2026-10-03); the /print card's sub style. */
+	/* Centred under the FRONT COVER, not the whole mock-up (Kevin 2026-10-03, round 4). In
+	   every 600px language card the front board runs x 24..466 (measured on all 26: opaque
+	   face 16..466, spine fold at 24; build_general_cards FACE_X/FACE_W); the 3D shadow fills
+	   the rest. So the caption box is that span as a fraction of the image width — it scales
+	   with the image at any size and adds no height. */
 	.fhbm-cap {
 		display: block;
 		margin-top: 0.4rem;
+		margin-left: 4%;
+		width: 73.67%;
 		text-align: center;
 		font-family: var(--font-body);
 		color: var(--color-muted);

@@ -1198,7 +1198,7 @@ function markVoices(v: {
 								{e.groupHeading && (
 									<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.2rem 0 0.1rem;">{e.groupHeading}</p>
 								)}
-								<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
+								<div class="bulk-row flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
 									<img src={cardUrl(`dvc-${e.slug}`)} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
 									<div style="flex: 1; min-width: 0;">
 									<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{e.rowTitle ?? e.title}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">· {(e as { trim?: string }).trim ?? trimTargeted}</span></span>
@@ -1231,7 +1231,7 @@ function markVoices(v: {
 								{/* ONE ROW PER COLOUR, both bindings on it — same change as the targeted
 								     block above. A colour is one book; it was drawn twice. */}
 								{generalColors.map((c) => (
-									<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
+									<div class="bulk-row flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
 										<img src={cardUrl(`general-${l.line}-${c.key}`)} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
 										<div style="flex: 1; min-width: 0;">
 										<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">Father’s Heart Bible — {c.name}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">{trimTargeted}</span></span>
@@ -1258,7 +1258,7 @@ function markVoices(v: {
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.6rem 0 0.5rem;">General Audience — Large Print</p>
 					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
 						{lpRows.map((r) => (
-							<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
+							<div class="bulk-row flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
 								<img src={r.img} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
 								<div style="flex: 1; min-width: 0;">
 								<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span style="font-weight: 600;">{r.title}</span> {r.trim && <span style="color: var(--color-muted); font-size: 0.85rem;">{r.trim}</span>}</span>
@@ -1285,7 +1285,7 @@ function markVoices(v: {
 					<p style="font-family: var(--font-sans); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #71717a; margin: 1.6rem 0 0.5rem;">Language Editions</p>
 					<div style="display: flex; flex-direction: column; gap: 0.55rem;">
 						{langCards.map((l) => (
-							<div class="flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
+							<div class="bulk-row flex items-center gap-3" style="max-width: 54rem; width: 100%; margin: 0 auto;">
 								<img src={cardUrl(`lang-${l.code}`)} alt="" width="600" height="764" loading="lazy" decoding="async" style="width: 118px; height: auto;" />
 								<div style="flex: 1; min-width: 0;">
 									<span style="font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink);"><span lang={l.code} dir={l.rtl ? 'rtl' : undefined} style="font-weight: 600;">{l.name}</span> <span style="color: var(--color-muted); font-size: 0.85rem;">· {l.english} · {trimTargeted}</span></span>
@@ -1448,6 +1448,28 @@ function markVoices(v: {
 	}
 	.row-dot {
 		color: #a1a1aa;
+	}
+
+	/* PHONE LAYOUT (Kevin 2026-10-03, round 4: the order form "does not show well" on
+	   mobile). Measured at 390px before this: the page scrolled sideways to 489px, the
+	   steppers were cut off at the right edge and the titles squeezed into a ~70px column.
+	   Below 640px the two counters now take their own full-width line under the thumbnail
+	   and title, so nothing overflows; the 118px thumbnail is unchanged (Kevin 2026-09-18:
+	   "The thumbnails can not be smaller"). The links get a 44px tap height. */
+	@media (max-width: 640px) {
+		.bulk-row {
+			flex-wrap: wrap;
+			row-gap: 0.5rem;
+			/* With the counters on their own line, a hairline says which book they buy. */
+			padding-bottom: 0.9rem;
+			border-bottom: 1px solid var(--color-hairline);
+		}
+		.bulk-row .row-links a,
+		.bulk-row .row-links :global(.li-trigger) {
+			display: inline-flex;
+			align-items: center;
+			min-height: 44px;
+		}
 	}
 </style>
 
