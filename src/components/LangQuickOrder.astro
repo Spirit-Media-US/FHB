@@ -10,7 +10,7 @@
  *
  * Since 2026-10-03 the summary, the first-order 15% and the behaviour are the shared order-form
  * family (OrderSummary + src/scripts/order-form.ts + src/lib/order-pricing.ts), the same as
- * /print's quick order box and the catalog order form /print/order/.
+ * the catalog order form on /print and /print/order/.
  */
 import { PRINT_TIERS } from '../data/print-tiers';
 import BindingQty from './BindingQty.astro';
@@ -37,6 +37,8 @@ const config = JSON.stringify({
 });
 ---
 <div id="order" class="lqo" data-order={config}>
+	{/* Kevin 2026-10-04: the same line on every single-edition form, at its top. */}
+	<p class="lqo__catalog"><a href="/print/order/">Need to order multiple editions? Use the catalog order form →</a></p>
 	<p class="lqo__eyebrow">Order direct · free shipping</p>
 	<h2 class="lqo__title">Order the {english} Edition</h2>
 	<BindingQty hbSlug={hbSlug} pbSlug={pbSlug} hb={hb} pb={pb} label={`${name} (${english})`} />
@@ -54,6 +56,17 @@ const config = JSON.stringify({
 		border: 1px solid var(--color-hairline);
 		border-radius: 1rem;
 		scroll-margin-top: 90px;
+	}
+	.lqo__catalog { margin: -0.4rem 0 0.4rem; font-family: var(--font-sans); }
+	.lqo__catalog a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		color: #3f3f46;
+		font-size: 0.9rem;
+		font-weight: 600;
+		text-decoration: underline;
+		text-underline-offset: 3px;
 	}
 	.lqo__eyebrow {
 		font-family: var(--font-sans);

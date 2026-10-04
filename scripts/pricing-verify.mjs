@@ -19,7 +19,7 @@ import { execSync } from 'node:child_process';
  *   2. Volume and set prices match ISBNS.json, the single source.
  *   3. Every built order form and dvc-checkout.ts agree on every SKU, to the cent.
  *   4. Every SKU a form can add is a SKU the server will sell, and the catalog order form
- *      (/print/order/) and /print's quick order box offer EVERY SKU the server sells.
+ *      on /print/order/ and on /print offers EVERY SKU the server sells.
  *   5. Every SKU weighs one product on the ladder server-side, as the forms count it.
  *   6. No RETIRED ISBN appears anywhere in src/ or functions/.
  *   7. Every targeted edition is priced in BOTH bindings, and matches ISBNS.json.
