@@ -307,7 +307,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	const text =
 		`New print order — Father's Heart Bible\n\n` +
 		`Total: ${amount} (incl. tax ${tax})\n` +
-		`Copies: ${m.total ?? '?'}  ·  Discount: ${m.pct_off ?? '?'}% off\n` +
+		`Copies: ${m.total ?? '?'}  ·  Discount: ${m.pct_off ?? '?'}% off${m.offer === 'first_order' ? ' (first order, WELCOME15)' : m.offer === 'volume' ? ' (volume)' : ''}\n` +
 		`Editions:\n${fmtOrder(m.breakdown)}\n\n` +
 		`Ship to:\n${name}\n${fmtAddr(ship.address)}\n\n` +
 		`Customer email: ${email}\n` +

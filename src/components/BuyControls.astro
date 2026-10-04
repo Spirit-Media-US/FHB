@@ -44,6 +44,9 @@ interface Props {
 	 * which is exactly enough to wrap "Buy Direct & Save + Free Shipping".
 	 */
 	tightDirect?: boolean;
+	/** /print: the catalog id ("teen", "lang-es") the quick order box pre-selects when the
+	 *  direct link is followed (src/scripts/order-form.ts). */
+	pick?: string;
 }
 const {
 	hbHref,
@@ -53,6 +56,7 @@ const {
 	directHref = '#bulk-order',
 	showDirect = true,
 	tightDirect = false,
+	pick,
 } = Astro.props;
 
 const AMAZON_LOGO = 'https://assets.spiritmediapublishing.com/FHB/print/amazon-logo.webp';
@@ -110,7 +114,7 @@ const bindings = [
 }
 {
 	showDirect && (
-		<a href={directHref} class={tightDirect ? 'buy-direct buy-direct-tight' : 'buy-direct'}>
+		<a href={directHref} class={tightDirect ? 'buy-direct buy-direct-tight' : 'buy-direct'} data-pick-edition={pick}>
 			Buy Direct &amp; Save + Free Shipping
 		</a>
 	)

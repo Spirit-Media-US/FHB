@@ -1,0 +1,98 @@
+---
+/* THE ORDER SUMMARY every print order form ends in (Kevin 2026-10-03): copies, subtotal, the
+ * ONE discount that applies (volume tier or 15% off a first order — never both), the total,
+ * the buyer's email and the Checkout button. Driven by src/scripts/order-form.ts.
+ *
+ * Price, not persuasion (Kevin 2026-10-03): the offer is a label and a line of fine print,
+ * nothing else. The email is asked for here because a first order can only be recognised by
+ * it; the server checks it before applying WELCOME15, and Stripe receives it pre-filled.
+ */
+import { FIRST_ORDER_FINE, FIRST_ORDER_LABEL, type Tier } from '../lib/order-pricing';
+
+interface Props {
+	tiers: Tier[];
+	/** a stable prefix for this form's element ids */
+	idp: string;
+}
+const { tiers, idp } = Astro.props;
+// Runtime consts: biome cannot see .astro template use and would turn template-only imports
+// into `import type` (a production ReferenceError). Keep these lines.
+const offerLabel = FIRST_ORDER_LABEL;
+const offerFine = FIRST_ORDER_FINE;
+const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min);
+---
+<div class="osum" data-summary>
+	<p class="osum__offer">{offerLabel}</p>
+	<p class="osum__fine">{offerFine}</p>
+	<p class="osum__tiers">
+		<span>Volume:</span>
+		{ladder.map((t) => <span class="osum__tier" data-tier={t.pct}>{t.pct}% off {t.min}+</span>)}
+	</p>
+	<dl class="osum__lines">
+		<div><dt><span data-sum-copies>0</span> <span data-sum-copies-word>copies</span></dt><dd data-sum-subtotal>$0.00</dd></div>
+		<div data-sum-disc hidden><dt data-sum-disc-label></dt><dd data-sum-disc-amt></dd></div>
+		<div class="osum__total"><dt>Total</dt><dd data-sum-total>$0.00</dd></div>
+	</dl>
+	<p class="osum__note">Free shipping · sales tax calculated at checkout</p>
+	<label class="osum__label" for={`${idp}-email`}>Email</label>
+	<input id={`${idp}-email`} class="osum__email" type="email" name="email" autocomplete="email" inputmode="email" required data-email />
+	<button type="button" class="osum__checkout" data-checkout>Checkout →</button>
+	<p class="osum__msg" data-msg hidden role="status"></p>
+</div>
+
+<style>
+	.osum { font-family: var(--font-sans); color: var(--color-ink); }
+	.osum__offer { font-weight: 700; font-size: 0.95rem; margin: 0; }
+	.osum__fine { color: var(--color-muted); font-size: 0.78rem; margin: 0.15rem 0 0; }
+	.osum__tiers {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 0.6rem;
+		color: var(--color-muted);
+		font-size: 0.78rem;
+		margin: 0.7rem 0 0;
+	}
+	.osum__tier[data-on] { color: var(--color-ink); font-weight: 700; }
+	.osum__lines { margin: 0.8rem 0 0; padding: 0.7rem 0 0; border-top: 1px solid var(--color-hairline); }
+	.osum__lines > div { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.9rem; line-height: 1.7; }
+	.osum__lines > div[hidden] { display: none; }
+	.osum__lines dt, .osum__lines dd { margin: 0; }
+	.osum__lines :global(.is-struck) { text-decoration: line-through; color: var(--color-muted); }
+	.osum__total { font-weight: 700; }
+	.osum__total dd { font-family: var(--font-headline); font-size: 1.5rem; line-height: 1.3; }
+	.osum__note { color: var(--color-muted); font-size: 0.78rem; margin: 0.2rem 0 0; }
+	.osum__label { display: block; font-size: 0.85rem; font-weight: 600; margin: 0.9rem 0 0.3rem; }
+	.osum__email {
+		box-sizing: border-box;
+		width: 100%;
+		min-height: 44px;
+		padding: 0.55rem 0.8rem;
+		border: 1.5px solid var(--color-hairline);
+		border-radius: 0.6rem;
+		font: inherit;
+		font-size: 1rem;
+		background: #fff;
+	}
+	/* The one solid-pink control (Kevin 2026-09-17, B1): it completes a purchase. */
+	.osum__checkout {
+		width: 100%;
+		margin-top: 0.75rem;
+		min-height: 48px;
+		padding: 0.7rem 1.8rem;
+		border-radius: 999px;
+		background: var(--color-primary, #b60057);
+		color: #fff;
+		border: 2px solid var(--color-primary, #b60057);
+		font-family: var(--font-sans);
+		font-weight: 600;
+		font-size: 1rem;
+		cursor: pointer;
+	}
+	.osum__checkout:disabled { opacity: 0.6; cursor: wait; }
+	.osum__msg { color: var(--color-muted); font-size: 0.85rem; margin: 0.6rem 0 0; }
+</style>
+
+<script>
+	// One controller for every order form on the page; Astro bundles and de-duplicates it.
+	import '../scripts/order-form';
+</script>

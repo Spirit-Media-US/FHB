@@ -19,6 +19,8 @@
 // NB: path is /dvc-checkout, not /api/* — the apex router proxies /api/* to the community
 // app, so this marketing function must live off that prefix.
 
+import { FIRST_ORDER_CODE, FIRST_ORDER_PCT, unitAfter } from '../src/lib/order-pricing';
+
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
 }
@@ -675,6 +677,61 @@ const tierFor = (total: number) => TIERS.find((t) => total >= t.min) ?? null;
 // Stripe Tax apply each state's rules.
 const TAX_CODE = 'txcd_99999999';
 
+// FIRST ORDER, 15% (Kevin 2026-10-03; WELCOME15). Stripe's own first_time_transaction check
+// cannot be trusted alone: every guest checkout creates a FRESH Customer, so a repeat buyer
+// always looks new to it (MEASURED 2026-10-03: a session pre-applying the code for an email
+// with two paid orders was created at the discounted total). So the server decides, from the
+// store's own record: a prior PAID Checkout Session under this email, or a succeeded charge on
+// a Customer with this email, means it is not a first order. The session-list email filter is
+// case-sensitive, so the address is tried as typed and lowercased. Any lookup failure answers
+// "not first" — the buyer still gets the volume tier; we never give the offer on a guess.
+const EMAIL_RE = /^[^\s@'"\\]+@[^\s@'"\\]+\.[^\s@'"\\]+$/;
+async function isFirstOrder(email: string, key: string): Promise<boolean> {
+	const get = async (path: string) => {
+		const r = await fetch(`https://api.stripe.com/v1/${path}`, {
+			headers: { authorization: `Bearer ${key}` },
+		});
+		if (!r.ok) throw new Error(`stripe ${r.status}`);
+		return (await r.json()) as { data: Record<string, unknown>[] };
+	};
+	try {
+		for (const e of new Set([email, email.toLowerCase()])) {
+			const s = await get(
+				`checkout/sessions?status=complete&limit=10&customer_details[email]=${encodeURIComponent(e)}`,
+			);
+			if (s.data.some((x) => x.payment_status === 'paid')) return false;
+		}
+		const c = await get(
+			`customers/search?limit=10&query=${encodeURIComponent(`email:'${email.toLowerCase()}'`)}`,
+		);
+		for (const cust of c.data) {
+			const ch = await get(`charges?limit=10&customer=${cust.id}`);
+			if (ch.data.some((x) => x.paid === true && x.status === 'succeeded')) return false;
+		}
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+/** The live WELCOME15 promotion code, only if its coupon still says FIRST_ORDER_PCT. */
+async function firstOrderPromo(key: string): Promise<string | null> {
+	try {
+		const r = await fetch(
+			`https://api.stripe.com/v1/promotion_codes?active=true&limit=1&code=${FIRST_ORDER_CODE}`,
+			{ headers: { authorization: `Bearer ${key}` } },
+		);
+		if (!r.ok) return null;
+		const d = (await r.json()) as {
+			data: { id: string; coupon?: { percent_off?: number; valid?: boolean } }[];
+		};
+		const p = d.data[0];
+		return p && p.coupon?.valid && p.coupon.percent_off === FIRST_ORDER_PCT ? p.id : null;
+	} catch {
+		return null;
+	}
+}
+
 function encodeForm(obj: Record<string, string | number>): string {
 	return Object.entries(obj)
 		.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
@@ -686,7 +743,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	const json = (body: unknown, status = 200) =>
 		new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
-	let payload: { counts?: Record<string, number>; returnPath?: string };
+	let payload: { counts?: Record<string, number>; returnPath?: string; email?: string };
 	try {
 		payload = await request.json();
 	} catch {
@@ -719,6 +776,20 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	// paying. Rewrite ONLY the production Pages host: preview deployments carry a
 	// subdomain (dev.… / <hash>.…) and must keep sending their test purchases to
 	// themselves, not to production.
+	// Best discount, never both: the first-order 15% replaces the volume tier only when it is
+	// larger AND this email has never paid before. Tie or larger tier → the tier, no lookup.
+	const email = String(payload.email ?? '').trim();
+	const validEmail = email.length <= 254 && EMAIL_RE.test(email);
+	let promo: string | null = null;
+	if (
+		validEmail &&
+		FIRST_ORDER_PCT > tier.pct &&
+		(await isFirstOrder(email, env.STRIPE_FHB_SECRET_KEY))
+	) {
+		promo = await firstOrderPromo(env.STRIPE_FHB_SECRET_KEY);
+	}
+	const pct = promo ? 0 : tier.pct;
+
 	const reqUrl = new URL(request.url);
 	const origin =
 		reqUrl.hostname === 'fathersheartbible.pages.dev'
@@ -735,7 +806,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		// other value falls back to /print, so this can never become an open redirect.
 		cancel_url: /^\/bibles\/[a-z0-9-]+-bible\/$/.test(payload.returnPath ?? '')
 			? `${origin}${payload.returnPath}?order=canceled#order`
-			: `${origin}/print?order=canceled`,
+			: payload.returnPath === '/print/order/'
+				? `${origin}/print/order/?order=canceled`
+				: `${origin}/print/?order=canceled#bulk-order`,
 		'automatic_tax[enabled]': 'true',
 		// Free shipping is baked into the unit price; the address is still collected for
 		// tax calculation and fulfilment.
@@ -743,7 +816,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		'phone_number_collection[enabled]': 'true',
 		'metadata[kind]': 'dvc_print',
 		'metadata[total]': total,
-		'metadata[pct_off]': tier.pct,
+		'metadata[pct_off]': promo ? FIRST_ORDER_PCT : pct,
+		'metadata[offer]': promo ? 'first_order' : pct > 0 ? 'volume' : 'none',
 		'metadata[breakdown]': Object.entries(counts)
 			.filter(([, n]) => n > 0)
 			.map(([k, n]) => `${k}:${n}`)
@@ -754,7 +828,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	for (const [slug, qty] of Object.entries(counts)) {
 		if (qty <= 0) continue;
 		const e = EDITIONS[slug];
-		const unit = Math.round((e.retail * (100 - tier.pct)) / 100);
+		const unit = unitAfter(e.retail, pct);
 		form[`line_items[${li}][quantity]`] = qty;
 		form[`line_items[${li}][price_data][currency]`] = 'usd';
 		form[`line_items[${li}][price_data][unit_amount]`] = unit;
@@ -762,13 +836,18 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		form[`line_items[${li}][price_data][product_data][name]`] =
 			`Father’s Heart Bible™ — ${e.title}`;
 		form[`line_items[${li}][price_data][product_data][description]`] =
-			tier.pct > 0
-				? `Divine Voice Color · Complete Bible · ${tier.pct}% volume discount · free shipping`
+			pct > 0
+				? `Divine Voice Color · Complete Bible · ${pct}% volume discount · free shipping`
 				: 'Divine Voice Color · Complete Bible · free shipping';
 		form[`line_items[${li}][price_data][product_data][images][0]`] = e.img;
 		form[`line_items[${li}][price_data][product_data][tax_code]`] = TAX_CODE;
 		li++;
 	}
+
+	if (validEmail) form.customer_email = email;
+	// Pre-applied, so the buyer never types it; Stripe shows WELCOME15 on the summary and counts
+	// its redemptions. Units above are at list price when it applies — the two never stack.
+	if (promo) form['discounts[0][promotion_code]'] = promo;
 
 	const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
 		method: 'POST',
