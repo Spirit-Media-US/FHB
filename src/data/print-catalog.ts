@@ -53,6 +53,8 @@ const LARGE_PRINT = [
 	{ id: 'lp-set', title: 'Large Print — Complete Three-Volume Set', hb: 299.99, pb: 249.99 },
 ];
 
+// Thumbnails: only the language cards are rendered at 360; every other card exists at 600/1200
+// only (a 360 key 404s — measured 2026-10-04), so those rows use 600. Same 360:458 aspect.
 export const catalogRows: CatalogRow[] = [
 	...GENERAL.map((c) => {
 		const title = `Father’s Heart Bible — ${c.name}`;
@@ -61,7 +63,7 @@ export const catalogRows: CatalogRow[] = [
 			category: 'general' as const,
 			title,
 			trim: trimTargeted,
-			img: cardUrl(`general-regular-${c.key}`, 360),
+			img: cardUrl(`general-regular-${c.key}`, 600),
 			hb: 99.99,
 			pb: 79.99,
 			search: norm(title, 'general regular print'),
@@ -72,7 +74,7 @@ export const catalogRows: CatalogRow[] = [
 		category: 'audience' as const,
 		title: e.title,
 		trim: e.trim ?? trimTargeted,
-		img: cardUrl(`dvc-${e.slug}`, 360),
+		img: cardUrl(`dvc-${e.slug}`, 600),
 		hb: e.hb,
 		pb: e.pb,
 		search: norm(e.title, e.groupHeading, 'audience'),
@@ -82,7 +84,7 @@ export const catalogRows: CatalogRow[] = [
 		category: 'large-print' as const,
 		title: v.title,
 		trim: '6×9 Large Print',
-		img: cardUrl(v.id, 360),
+		img: cardUrl(v.id, 600),
 		hb: v.hb,
 		pb: v.pb,
 		search: norm(v.title, 'large print'),
