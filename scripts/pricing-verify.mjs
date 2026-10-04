@@ -103,7 +103,7 @@ function parseCheckout(src) {
 }
 
 /** Every [data-order] config embedded in a built page: { prices: {sku: usd}, tiers }. */
-const unescape = (v) =>
+const htmlUnescape = (v) =>
 	v
 		.replace(/&quot;/g, '"')
 		.replace(/&#34;/g, '"')
@@ -112,7 +112,7 @@ const unescape = (v) =>
 		.replace(/&gt;/g, '>')
 		.replace(/&amp;/g, '&');
 function parseForms(html) {
-	return [...html.matchAll(/data-order="([^"]*)"/g)].map((m) => JSON.parse(unescape(m[1])));
+	return [...html.matchAll(/data-order="([^"]*)"/g)].map((m) => JSON.parse(htmlUnescape(m[1])));
 }
 const pageCents = (form) =>
 	Object.fromEntries(Object.entries(form.prices ?? {}).map(([k, v]) => [k, cents(v)]));
