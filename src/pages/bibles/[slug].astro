@@ -1,11 +1,12 @@
 ---
-import LangQuickOrder from '../../components/LangQuickOrder.astro';
+import EditionOrder from '../../components/EditionOrder.astro';
 import LookInside from '../../components/LookInside.astro';
 import Section from '../../components/Section.astro';
 import { cardUrl } from '../../data/card-art';
 import frontmatter from '../../data/editions/frontmatter.json';
 import shared from '../../data/editions/shared.json';
-import { LANG_HB, LANG_PB, langSlug, languageEditions } from '../../data/language-editions';
+import { langSlug, languageEditions } from '../../data/language-editions';
+import { catalogRows } from '../../data/print-catalog';
 // /bibles/<slug>-bible — the PRODUCT page for every Divine Voice Color edition.
 //
 // Why this exists alongside /bible-for/<audience>: those pages answer a PASTORAL search
@@ -112,11 +113,24 @@ const pillars: Pillar[] = fm?.pillars ?? [];
 // `?v=` is gone with it — a new key has nothing cached against it to bust.
 const coverUrl = cardUrl(ed.coverImage ?? `dvc-${ed.slug}`, 1200);
 const isLang = ed.kind === 'language';
-// The quick order form under the header (Kevin 2026-10-03) sells THIS language's two SKUs,
-// lang-<code>-hb/pb — the same record /print's rows and dvc-checkout.ts use. Matched by slug,
-// so an edition missing from language-editions.ts simply gets no form, never a wrong one.
+// THE ORDER FORM under the header, on EVERY edition (Kevin 2026-10-05; language pages since
+// 2026-10-03). It sells this edition's catalog row(s) from print-catalog.ts — the same record
+// /print's rows and dvc-checkout.ts use: lang-<code> for a language, the slug itself for an
+// audience or Large Print edition, and the three cover colours for the General edition, whose
+// page sells "Charcoal, Plum or White". A page with no catalog row FAILS THE BUILD: an edition
+// page that cannot be ordered is the defect this replaced.
 const langEd = isLang ? languageEditions.find((l) => langSlug(l) === ed.slug) : undefined;
-const buyHref = langEd ? '#order' : '/print/';
+const orderIds = langEd
+	? [`lang-${langEd.code}`]
+	: ed.slug === 'fathers-heart'
+		? catalogRows.filter((r) => r.category === 'general').map((r) => r.id)
+		: [ed.slug];
+const orderRows = catalogRows.filter((r) => orderIds.includes(r.id));
+if (!orderRows.length)
+	throw new Error(
+		`/bibles/${ed.slug}-bible/: no print-catalog row for [${orderIds.join(', ')}] — this edition page would have no order form`,
+	);
+const orderHeading = langEd ? `the ${ed.english ?? langEd.english} Edition` : ed.name;
 // A language edition whose interior is still being built has NO page count yet: never fall
 // back to the English 888 for it.
 const pages = isLang ? (ed.pages ?? null) : (ed.pages ?? fm?.pages ?? 888);
@@ -178,28 +192,6 @@ const visibleKeywords = ed.listing.keywords.filter((k) => !BRAND_KEYWORDS.has(k.
 // is edition-specific by definition, so it is dropped from the shared preface rather than
 // duplicated per edition. The figures themselves live in each edition's listing copy.
 const editionSpecificNote = (p: string) => /\bnotes across\b.*\bchapters\b/.test(p);
-
-// Two bindings, two prices, and the struck-through LIST price is COMPUTED from the volume
-// prices — never typed (Kevin 2026-09-18). Typing "$329.97" would go stale silently and
-// advertise a saving we do not give. Same rule print.astro already follows.
-type PricedEdition = Edition & { pricePaperback?: number; listFromVolumes?: string[] };
-const edp = ed as PricedEdition;
-const volumeFiles = import.meta.glob<{ default: PricedEdition }>('../../data/editions/*.json', {
-	eager: true,
-});
-const bySlug = new Map(
-	Object.values(volumeFiles)
-		.map((m) => m.default)
-		.filter((e) => e?.slug)
-		.map((e) => [e.slug, e]),
-);
-const listVolumes = (edp.listFromVolumes ?? [])
-	.map((s) => bySlug.get(s))
-	.filter(Boolean) as PricedEdition[];
-const listHb = listVolumes.length ? listVolumes.reduce((s, v) => s + v.price, 0) : null;
-const listPb = listVolumes.every((v) => typeof v.pricePaperback === 'number')
-	? listVolumes.reduce((s, v) => s + (v.pricePaperback ?? 0), 0) || null
-	: null;
 
 // SCREEN divine-voice palette — the same values /read has always used, adopted here so a
 // visitor sees one red on the product page and on the reader. Print ink is unchanged:
@@ -334,30 +326,16 @@ const faqSchema = {
 						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.son}; background: #fff; border: 2px solid ${VOICE.son}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>SON</span>
 						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.spirit}; background: #fff; border: 2px solid ${VOICE.spirit}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>SPIRIT</span>
 					</div>
-					<p style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">
-						<span>{edp.pricePaperback ? "Hardback " : ""}${ed.price.toFixed(2)}</span>
-						{listHb && listHb > ed.price && (
-							<span style="font-size: 1rem; font-weight: 500; color: #71717a; text-decoration: line-through; margin-left: 0.55rem;">${listHb.toFixed(2)}</span>
-						)}
-					</p>
-					{typeof edp.pricePaperback === "number" && (
-						<p style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">
-							<span>Paperback ${edp.pricePaperback.toFixed(2)}</span>
-							{listPb && listPb > edp.pricePaperback && (
-								<span style="font-size: 1rem; font-weight: 500; color: #71717a; text-decoration: line-through; margin-left: 0.55rem;">${listPb.toFixed(2)}</span>
-							)}
-						</p>
-					)}
+					{/* No price up here (Kevin 2026-10-05, B14a): it is the first thing a phone shows. The
+					     price line leads the order form below, which "Order" jumps to. */}
 					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">Free shipping — a $15 value.</p>
 					<div class="flex flex-wrap items-center gap-3">
-						<a href={buyHref} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Buy Now</a>
+						<a href="#order" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Order</a>
 						<LookInside slug={ed.lookInsideKey ?? ed.slug} title={ed.name} size="lg" />
 					</div>
 				</div>
 			</div>
-			{langEd && (
-				<LangQuickOrder code={langEd.code} english={ed.english ?? langEd.english} name={langEd.name} hb={LANG_HB} pb={LANG_PB} returnPath={`/bibles/${ed.slug}-bible/`} />
-			)}
+			<EditionOrder rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} />
 		</Section>
 		<Section variant="warm">
 			<div class="max-w-3xl mx-auto">

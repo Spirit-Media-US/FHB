@@ -1,0 +1,154 @@
+---
+/* THE ORDER FORM ON EVERY EDITION PAGE, under the header of /bibles/<slug>-bible/, anchored
+ * #order so the hero's Order button, the reader's "Now in Print" card and its popup land on it.
+ * Born as the language pages' quick order form (Kevin 2026-10-03); on EVERY edition since
+ * 2026-10-05 (Kevin: "The custom check out page needs to be added to ALL edition pages").
+ *
+ * Nothing here is new commerce: the rows are print-catalog.ts's (the same records /print's
+ * catalog form and dvc-checkout.ts sell), the counters are /print's BindingQty, the ladder is
+ * PRINT_TIERS (asserted equal to the server's by pricing-verify), and the cents rule — round
+ * the discounted UNIT, then multiply — is the one print.astro and dvc-checkout.ts use, so the
+ * total shown is the total Stripe charges. The server stays authoritative either way.
+ *
+ * The summary, the first-order 15% and the behaviour are the shared order-form family
+ * (OrderSummary + src/scripts/order-form.ts + src/lib/order-pricing.ts), the same as the
+ * catalog order form on /print and /print/order/.
+ */
+import type { CatalogRow } from '../data/print-catalog';
+import { PRINT_TIERS } from '../data/print-tiers';
+import { FIRST_ORDER_LABEL, firstOrderUnit } from '../lib/order-pricing';
+import BindingQty from './BindingQty.astro';
+import OrderSummary from './OrderSummary.astro';
+
+interface Props {
+	/** the edition's catalog row(s) — one, except the General edition, sold in three colours */
+	rows: CatalogRow[];
+	/** "the Spanish Edition", "Mom's Bible" — what the heading offers */
+	heading: string;
+	/** this page's path, so a cancelled checkout returns here rather than to /print */
+	returnPath: string;
+}
+const { rows, heading, returnPath } = Astro.props;
+const multi = rows.length > 1;
+// Runtime const: biome cannot see .astro template use (keep this line).
+const tiers = PRINT_TIERS;
+const config = JSON.stringify({
+	prices: Object.fromEntries(
+		rows.flatMap((r) => [
+			[`${r.id}-hb`, r.hb],
+			[`${r.id}-pb`, r.pb],
+		]),
+	),
+	tiers: PRINT_TIERS,
+	returnPath,
+});
+// THE PRICE LINE (Kevin 2026-10-05, B15): paperback first, then hardback, each at the
+// first-order unit price with the regular price struck through. Read from the first row; the
+// General colours share one price. pricing-verify reads data-line-sku and the two figures back
+// out of the built page and checks them against the server.
+const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+const lead = rows[0];
+const priceLine = [
+	{ binding: 'Paperback', sku: `${lead.id}-pb`, usd: lead.pb },
+	{ binding: 'Hardback', sku: `${lead.id}-hb`, usd: lead.hb },
+].map((l) => {
+	const list = Math.round(l.usd * 100);
+	return { ...l, first: money(firstOrderUnit(list)), reg: money(list) };
+});
+const idp = `eo-${lead.id}`;
+---
+<div id="order" class="lqo" data-order={config}>
+	{/* Kevin 2026-10-04: the same line on every single-edition form, at its top. */}
+	<p class="lqo__catalog"><a href="/print/order/">Need to order multiple editions? Use the catalog order form →</a></p>
+	<p class="lqo__eyebrow">Order direct · free shipping</p>
+	<h2 class="lqo__title">Order {heading}</h2>
+	<div class="eo-price" data-price-line>
+		{priceLine.map((l) => (
+			<p class="eo-price__row" data-line-sku={l.sku}>
+				<span class="eo-price__binding">{l.binding}</span> <b data-first>{l.first}</b> <span class="eo-price__reg">(reg. <s data-reg>{l.reg}</s>)</span>
+			</p>
+		))}
+		<p class="eo-price__note">{FIRST_ORDER_LABEL} · free shipping</p>
+	</div>
+	{rows.map((r) => (
+		<div class={multi ? 'eo-variant' : undefined}>
+			{multi && <p class="eo-variant__name">{r.title.replace(/^.*—\s*/, '')}</p>}
+			<BindingQty hbSlug={`${r.id}-hb`} pbSlug={`${r.id}-pb`} hb={r.hb} pb={r.pb} label={r.native ? `${r.native} (${r.title})` : r.title} />
+		</div>
+	))}
+	<div class="lqo__foot">
+		<OrderSummary tiers={tiers} idp={idp} />
+	</div>
+</div>
+
+<style>
+	.eo-price { margin: 0 0 1rem; font-family: var(--font-sans); }
+	.eo-price__row {
+		margin: 0 0 0.15rem;
+		font-size: 1.05rem;
+		color: var(--color-ink);
+	}
+	.eo-price__binding { font-weight: 600; }
+	.eo-price__row b { font-weight: 800; }
+	.eo-price__reg { color: #71717a; font-size: 0.9rem; }
+	.eo-price__note {
+		margin: 0.35rem 0 0;
+		color: #3f3f46;
+		font-size: 0.85rem;
+		font-weight: 600;
+	}
+	.eo-variant + .eo-variant { margin-top: 0.7rem; }
+	.eo-variant__name {
+		margin: 0 0 0.25rem;
+		font-family: var(--font-sans);
+		font-size: 0.85rem;
+		font-weight: 700;
+		color: var(--color-ink);
+	}
+	.lqo {
+		max-width: 34rem;
+		margin: 2.2rem auto 0;
+		padding: 1.25rem 1.25rem 1.1rem;
+		background: #fff;
+		border: 1px solid var(--color-hairline);
+		border-radius: 1rem;
+		scroll-margin-top: 90px;
+	}
+	.lqo__catalog { margin: -0.4rem 0 0.4rem; font-family: var(--font-sans); }
+	.lqo__catalog a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		color: #3f3f46;
+		font-size: 0.9rem;
+		font-weight: 600;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+	.lqo__eyebrow {
+		font-family: var(--font-sans);
+		color: #71717a;
+		font-size: 0.72rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		margin: 0 0 0.25rem;
+	}
+	.lqo__title {
+		font-family: var(--font-headline);
+		color: var(--color-ink);
+		font-size: 1.35rem;
+		font-weight: 600;
+		margin: 0 0 0.9rem;
+	}
+	.lqo__foot {
+		margin-top: 0.9rem;
+		padding-top: 0.9rem;
+		border-top: 1px solid var(--color-hairline);
+	}
+	/* BindingQty right-aligns its counters for /print's rows; here they lead the card. */
+	.lqo :global(.binding-qty__row) { justify-content: space-between; }
+	@media (max-width: 640px) {
+		.lqo { padding: 1rem 0.9rem 0.95rem; }
+	}
+</style>
