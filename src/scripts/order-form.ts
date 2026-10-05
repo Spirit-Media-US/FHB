@@ -1,6 +1,6 @@
 // THE ONE ORDER-FORM CONTROLLER for every print order form on the site (Kevin 2026-10-03):
-// the language quick order (/bibles/<language>-bible/#order), /print's quick order box and
-// the catalog order form /print/order/. Each form is a [data-order] root carrying its prices
+// the language quick order (/bibles/<language>-bible/#order) and the catalog order form
+// (CatalogOrderForm, on /print and /print/order/). Each form is a [data-order] root carrying its prices
 // and tiers as JSON; the arithmetic is src/lib/order-pricing.ts, which the server imports too,
 // so the total shown is the total Stripe charges. The server stays authoritative either way.
 //
@@ -8,7 +8,9 @@
 //   · BindingQty — two counters, `.qty-in[data-slug]` / `.qty-step[data-slug]`
 //   · a [data-row] — one counter plus a Hardback/Paperback toggle ([data-bind]); the counter
 //     edits whichever binding is pressed, and each binding keeps its own count
-import { FIRST_ORDER_LABEL, firstOrderUnit, quote, type Tier } from '../lib/order-pricing';
+// Every catalog row keeps its own counts, so a buyer builds the order edition by edition and
+// nothing resets; /print's cards ([data-pick-edition]) pre-fill a row without touching the rest.
+import { FIRST_ORDER_LABEL, quote, type Tier } from '../lib/order-pricing';
 
 interface Config {
 	prices: Record<string, number>;
@@ -92,40 +94,6 @@ function init(root: HTMLElement) {
 		});
 	}
 
-	// ── quick box: the edition picker re-points its one row at another edition ──
-	const picker = q<HTMLSelectElement>('[data-pick]');
-	function pick(id: string) {
-		const row = q('[data-row]');
-		if (!row || !cfg.prices[`${id}-hb`]) return;
-		for (const k of Object.keys(counts)) delete counts[k];
-		row.dataset.id = id;
-		for (const b of ['hb', 'pb']) {
-			const cents = Math.round(cfg.prices[`${id}-${b}`] * 100);
-			set(`[data-list="${b}"]`, money(cents));
-			set(`[data-first="${b}"]`, money(firstOrderUnit(cents)));
-		}
-		if (picker && picker.value !== id) picker.value = id;
-		paintRow(row);
-		render();
-	}
-	picker?.addEventListener('change', () => pick(picker.value));
-	// /print's cards: "Buy Direct" (and the Large Print set's two buttons) pre-select that
-	// edition and binding in the quick box with one copy, and bring the box into view.
-	if (picker) {
-		for (const a of document.querySelectorAll<HTMLElement>('[data-pick-edition]')) {
-			a.addEventListener('click', () => {
-				pick(a.dataset.pickEdition as string);
-				const row = q('[data-row]');
-				if (!row) return;
-				if (a.dataset.pickBind) row.dataset.bind = a.dataset.pickBind;
-				counts[rowSku(row)] ||= 1;
-				paintRow(row);
-				render();
-				if (a.tagName !== 'A') root.scrollIntoView({ behavior: 'smooth', block: 'center' });
-			});
-		}
-	}
-
 	// ── catalog search: filter rows, open the sections that hold a match ──
 	const search = q<HTMLInputElement>('[data-search]');
 	const sections = qa('[data-section]');
@@ -168,6 +136,28 @@ function init(root: HTMLElement) {
 	for (const sec of sections) {
 		sec.querySelector('[data-acc]')?.addEventListener('click', () => {
 			setOpen(sec, sec.querySelector('[data-acc]')?.getAttribute('aria-expanded') !== 'true');
+		});
+	}
+
+	// ── /print's cards: "Buy Direct" (and the Large Print set's two buttons) pre-fill that
+	// edition's catalog row (Kevin 2026-10-04): open its section, pick the binding, one copy if
+	// it has none, scroll to it. Every other row keeps its count.
+	for (const a of document.querySelectorAll<HTMLElement>('[data-pick-edition]')) {
+		const row = q(`[data-row][data-id="${a.dataset.pickEdition}"]`);
+		if (!row) continue;
+		a.addEventListener('click', (ev) => {
+			ev.preventDefault();
+			if (row.hidden && search) {
+				search.value = '';
+				filter(false);
+			}
+			const sec = row.closest<HTMLElement>('[data-section]');
+			if (sec) setOpen(sec, true);
+			if (a.dataset.pickBind) row.dataset.bind = a.dataset.pickBind;
+			counts[rowSku(row)] ||= 1;
+			paintRow(row);
+			render();
+			row.scrollIntoView({ behavior: 'smooth', block: 'center' });
 		});
 	}
 
@@ -246,14 +236,23 @@ function init(root: HTMLElement) {
 		window.setTimeout(() => email?.focus({ preventScroll: true }), 450);
 	});
 
-	// ...and steps aside while the summary itself is on screen, so it never covers Checkout.
+	// ...shows only while the form is on screen (on /print the form is one section of a long
+	// page), and steps aside while the summary itself is, so it never covers Checkout.
 	const bar = q('[data-bar]');
 	const summary = q('[data-summary]');
 	if (bar && summary && 'IntersectionObserver' in window) {
+		let formOn = false;
+		let summaryOn = false;
+		const paintBar = () => bar.toggleAttribute('data-away', !formOn || summaryOn);
 		new IntersectionObserver(([e]) => {
-			bar.toggleAttribute('data-away', e.isIntersecting);
+			summaryOn = e.isIntersecting;
+			paintBar();
 		}).observe(summary);
-	}
+		new IntersectionObserver(([e]) => {
+			formOn = e.isIntersecting;
+			paintBar();
+		}).observe(root);
+	} else bar?.removeAttribute('data-away');
 
 	for (const row of qa('[data-row]')) paintRow(row);
 	render();

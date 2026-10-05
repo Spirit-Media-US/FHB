@@ -1,5 +1,5 @@
 // EVERY PRINT EDITION WE SELL DIRECT, one row per EDITION (both bindings on the row), grouped
-// as the catalog order form /print/order/ shows them and as /print's quick order box lists
+// as the catalog order form (on /print and /print/order/) shows
 // them (Kevin 2026-10-03). The SKUs are functions/dvc-checkout.ts's; scripts/pricing-verify.mjs
 // reads the prices each BUILT order form carries and fails the build if any differs from the
 // server's, or if the catalog misses a SKU the server sells.

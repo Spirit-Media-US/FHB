@@ -3,9 +3,14 @@ import CoverMarquee from '../components/CoverMarquee.astro';
 import ImageGrid from '../components/ImageGrid.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
+import { cardUrl } from '../data/card-art';
 import { LANGUAGE_EDITION_TOTAL } from '../data/language-editions';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
+
+// Now in Print's book thumbnail: /print's General Edition card (600 and 1200 exist on R2).
+const printBookCard = cardUrl('general-regular-charcoal');
+const printBookCard2x = cardUrl('general-regular-charcoal', 1200);
 
 // Language list for the Organization JSON-LD `knowsLanguage` below — same
 // source as /glossary-review/ so the two can never drift. (The homepage
@@ -804,53 +809,59 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			</div>
 		</Section>
 
+		{/* NOW IN PRINT — the section's original shape (Kevin 2026-10-04): two columns, a BOOK
+		     THUMBNAIL left and the text right, stacked on phones. Not the hero photo, not full
+		     width. The card is /print's own General Edition art. */}
 		<Section variant="light">
-			<div class="text-center mb-8">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-4"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					Now in Print
-				</p>
-				<h2
-					class="text-3xl md:text-4xl font-light leading-tight mb-4"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					15% off your first order
-				</h2>
-				<p class="leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
-					22 audience editions &middot; {LANGUAGE_EDITION_TOTAL} languages
-				</p>
-				<div class="flex justify-center">
-					<a
-						href="/print/"
-						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
-						style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A;"
-						onmouseover="this.style.opacity='0.9'"
-						onmouseout="this.style.opacity='1'"
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
+				<div class="order-2" data-reveal="slide-right">
+					<p
+						class="text-xs font-semibold tracking-widest uppercase mb-4"
+						style="font-family: var(--font-sans); color: var(--color-gold);"
 					>
-						See the Print Editions
+						Now in Print
+					</p>
+					<h2
+						class="text-3xl md:text-4xl font-light leading-tight mb-4"
+						style="font-family: var(--font-serif); color: var(--color-ink);"
+					>
+						15% off your first order
+					</h2>
+					<p class="leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+						22 audience editions &middot; {LANGUAGE_EDITION_TOTAL} languages
+					</p>
+					<div class="flex justify-center md:justify-start">
+						<a
+							href="/print/"
+							class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
+							style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A;"
+							onmouseover="this.style.opacity='0.9'"
+							onmouseout="this.style.opacity='1'"
+						>
+							See the Print Editions
+						</a>
+					</div>
+					<p class="mt-6 text-base text-center md:text-left" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Also as an <a href="/print/#ebook" style="color: #4A4A4A; font-weight: 600;">eBook</a>
+					</p>
+				</div>
+				<div class="order-1 flex justify-center" data-reveal="slide-left">
+					<a href="/print/" class="block">
+						<img
+							src={printBookCard}
+							srcset={`${printBookCard} 600w, ${printBookCard2x} 1200w`}
+							sizes="(min-width: 768px) 288px, 224px"
+							alt="The Father's Heart Bible, General Edition in charcoal"
+							class="w-56 md:w-72 h-auto block"
+							loading="lazy"
+							decoding="async"
+							width="600"
+							height="764"
+							style="filter: drop-shadow(0 16px 32px rgba(0,0,0,0.22));"
+						/>
 					</a>
 				</div>
-				<p class="mt-6 text-base" style="font-family: var(--font-sans); color: var(--color-muted);">
-					Also as an <a href="/print/#ebook" style="color: #4A4A4A; font-weight: 600;">eBook</a>
-				</p>
 			</div>
-			<a href="/print/" class="block" style="text-decoration:none">
-				<picture>
-					<source media="(min-width: 1024px)" srcset="https://assets.spiritmediapublishing.com/FHB/hero-a03-1920.webp" width="1920" height="736" />
-					<img
-						src="https://assets.spiritmediapublishing.com/FHB/hero-a03-960.webp"
-						alt="Young people outside a stone church, each holding a different audience edition of the Father's Heart Bible"
-						class="w-full h-auto block"
-						loading="lazy"
-						decoding="async"
-						width="960"
-						height="368"
-						style="aspect-ratio: 2400/920;"
-					/>
-				</picture>
-			</a>
 		</Section>
 
 
