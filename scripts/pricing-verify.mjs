@@ -23,13 +23,16 @@ import { execSync } from 'node:child_process';
  *   5. Every SKU weighs one product on the ladder server-side, as the forms count it.
  *   6. No RETIRED ISBN appears anywhere in src/ or functions/.
  *   7. Every targeted edition is priced in BOTH bindings, and matches ISBNS.json.
+ *  10. EVERY edition page (/bibles/<slug>-bible/) has ONE order form at #order, no price
+ *      above it, and a price line — paperback first, then hardback — whose first-order and
+ *      regular figures are the server's price and order-pricing.ts's FIRST_ORDER_PCT rule.
  *   9. ONE volume ladder: dvc-checkout.ts TIERS, src/data/print-tiers.ts and the tiers every
  *      built order form embeds are the same tiers.
  *
  * Self-check: run with --selftest to confirm each assertion actually FAILS when broken. A
  * gate that has never rejected anything is unproven.
  */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 
 const ISBNS = '/home/deploy/projects/fhb-print-bible/editions/ISBNS.json';
 const CHECKOUT = 'functions/dvc-checkout.ts';
@@ -38,6 +41,8 @@ const DIST = 'dist';
 const FULL_FORMS = ['dist/print/order/index.html', 'dist/print/index.html'];
 const LANG_FORM = 'dist/bibles/spanish-bible/index.html';
 const TIERS_TS = 'src/data/print-tiers.ts';
+const PRICING_TS = 'src/lib/order-pricing.ts';
+const EDITIONS_DIR = 'src/data/editions';
 
 // The single-volume Large Print and the B&W general numbers. Retired, not merely old: a live
 // page carrying one of these sells a book that is not the book we print.
@@ -354,6 +359,78 @@ check(
 		.join(' ')}`,
 );
 
+// ── 10. every edition page: one form at #order, nothing priced above it, the price line ──
+// Kevin 2026-10-05: the form on ALL edition pages, no price at the top, and the line reading
+// "Paperback $67.99 (reg. $79.99) / Hardback $84.99 (reg. $99.99)". The expected figures are
+// computed here from the SERVER's cents and the one first-order rule, never read from the page.
+const firstPct = Number(/FIRST_ORDER_PCT\s*=\s*(\d+)/.exec(readFileSync(PRICING_TS, 'utf8'))?.[1]);
+check(firstPct > 0, `could not read FIRST_ORDER_PCT from ${PRICING_TS}`);
+const firstUnit = (c) => c - Math.round((c * firstPct) / 100);
+const usd = (c) => `$${(c / 100).toFixed(2)}`;
+const editionSlugs = readdirSync(EDITIONS_DIR)
+	.filter((f) => /^[a-z0-9-]+\.json$/.test(f))
+	.map((f) => JSON.parse(readFileSync(`${EDITIONS_DIR}/${f}`, 'utf8')))
+	.filter((e) => typeof e?.slug === 'string' && e.listing && e.hook)
+	.map((e) => e.slug);
+const editionPages = {};
+for (const slug of editionSlugs) {
+	const f = `${DIST}/bibles/${slug}-bible/index.html`;
+	if (!existsSync(f)) check(false, `${f} not built — edition ${slug} has no page`);
+	else editionPages[f] = readFileSync(f, 'utf8');
+}
+function editionPageErrs(pages, srv) {
+	const errs = [];
+	for (const [f, html] of Object.entries(pages)) {
+		const nForms = (html.match(/data-order="/g) ?? []).length;
+		if (nForms !== 1) errs.push(`${f}: expected ONE order form, found ${nForms}`);
+		const at = html.indexOf('id="order"');
+		if (at < 0) {
+			errs.push(`${f}: no #order — the hero's Order button jumps nowhere`);
+			continue;
+		}
+		const main = html.indexOf('<main');
+		const above = html.slice(main < 0 ? 0 : main, at).replace(/<script[\s\S]*?<\/script>/g, '');
+		const stray = /\$\d[\d,]*\.\d\d/.exec(above);
+		if (stray) errs.push(`${f}: a price (${stray[0]}) appears above the order form`);
+		const rows = [
+			...html.matchAll(
+				/data-line-sku="([a-z0-9-]+)"[\s\S]*?data-first[^>]*>([^<]*)<[\s\S]*?data-reg[^>]*>([^<]*)</g,
+			),
+		].map((m) => ({ sku: m[1], first: m[2].trim(), reg: m[3].trim() }));
+		if (rows.length !== 2 || !rows[0].sku.endsWith('-pb') || !rows[1].sku.endsWith('-hb')) {
+			errs.push(
+				`${f}: price line must be paperback then hardback, found [${rows.map((r) => r.sku).join(', ')}]`,
+			);
+			continue;
+		}
+		for (const r of rows) {
+			const sv = srv[r.sku];
+			if (sv == null) {
+				errs.push(`${f}: price line names ${r.sku}, which the server does not sell`);
+				continue;
+			}
+			if (r.reg !== usd(sv.cents))
+				errs.push(`${f}: ${r.sku} regular shows ${r.reg}, server charges ${usd(sv.cents)}`);
+			if (r.first !== usd(firstUnit(sv.cents)))
+				errs.push(
+					`${f}: ${r.sku} first-order shows ${r.first}, rule gives ${usd(firstUnit(sv.cents))}`,
+				);
+		}
+	}
+	return errs;
+}
+check(
+	editionSlugs.length > 40,
+	`found only ${editionSlugs.length} edition data files in ${EDITIONS_DIR}`,
+);
+for (const e of editionPageErrs(editionPages, server)) check(false, e);
+for (const [f, html] of Object.entries(editionPages)) forms[f] ??= parseForms(html);
+for (const e of formsAgree(
+	server,
+	Object.fromEntries(Object.keys(editionPages).map((f) => [f, forms[f]])),
+))
+	check(false, e);
+
 // ── self-test: prove each assertion can actually fail ───────────────────────────────
 if (process.argv.includes('--selftest')) {
 	const cases = [
@@ -410,6 +487,45 @@ if (process.argv.includes('--selftest')) {
 				);
 			},
 		],
+		[
+			'edition page price line shows a wrong first-order figure',
+			() => {
+				const f = Object.keys(editionPages).find((k) => k.includes('/moms-bible/'));
+				if (!f || editionPageErrs({ [f]: editionPages[f] }, server).length) return false;
+				const broken = editionPages[f].replace(/(data-first[^>]*>)\$67\.99/, '$1$69.99');
+				return broken !== editionPages[f] && editionPageErrs({ [f]: broken }, server).length > 0;
+			},
+		],
+		[
+			'edition page price line hardback first',
+			() => {
+				const f = Object.keys(editionPages).find((k) => k.includes('/moms-bible/'));
+				if (!f) return false;
+				const broken = editionPages[f].replace(
+					/data-line-sku="moms-pb"/,
+					'data-line-sku="moms-hbX"',
+				);
+				return broken !== editionPages[f] && editionPageErrs({ [f]: broken }, server).length > 0;
+			},
+		],
+		[
+			'edition page with a price above the form',
+			() => {
+				const f = Object.keys(editionPages).find((k) => k.includes('/filipino-bible/'));
+				if (!f) return false;
+				const broken = editionPages[f].replace('<main', '<main><p>$99.99</p');
+				return editionPageErrs({ [f]: broken }, server).length > 0;
+			},
+		],
+		[
+			'edition page with no order form',
+			() => {
+				const f = Object.keys(editionPages).find((k) => k.includes('/lp-set-bible/'));
+				if (!f) return false;
+				const broken = editionPages[f].replace('id="order"', 'id="ordr"');
+				return editionPageErrs({ [f]: broken }, server).length > 0;
+			},
+		],
 		['retired ISBN detected', () => /89307-294-5/.test('isbn 979-8-89307-294-5')],
 		[
 			'targeted binding price drift',
@@ -453,5 +569,5 @@ if (fail.length) {
 	process.exit(1);
 }
 console.log(
-	`✓ pricing-verify: ${Object.keys(server).length} SKUs agree across ${CHECKOUT}, ${Object.keys(forms).length} built order forms${haveIsbns ? ' and ISBNS.json' : ''}; one volume ladder; Large Print set is a saving in both bindings; no retired ISBN in src/ or functions/`,
+	`✓ pricing-verify: ${Object.keys(server).length} SKUs agree across ${CHECKOUT}, ${Object.keys(forms).length} built order forms (${Object.keys(editionPages).length} edition pages, price lines checked)${haveIsbns ? ' and ISBNS.json' : ''}; one volume ladder; Large Print set is a saving in both bindings; no retired ISBN in src/ or functions/`,
 );
