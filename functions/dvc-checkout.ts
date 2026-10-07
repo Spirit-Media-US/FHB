@@ -687,6 +687,29 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-yo-600.webp`,
 	},
+	// Amharic + Zulu (Kevin 2026-10-07: "orders fulfilled by SMP so we will fulfill any orders as
+	// soon as bibles are published"): sold now at the standard language prices; card = the approved
+	// design_fronts.py front on lang/v1 until a case is built.
+	'lang-am-hb': {
+		title: 'የአማርኛ መጽሐፍ ቅዱስ (Amharic) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-am-600.webp`,
+	},
+	'lang-am-pb': {
+		title: 'የአማርኛ መጽሐፍ ቅዱስ (Amharic) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-am-600.webp`,
+	},
+	'lang-zu-hb': {
+		title: 'IBhayibheli lesiZulu (Zulu) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v1/lang-zu-600.webp`,
+	},
+	'lang-zu-pb': {
+		title: 'IBhayibheli lesiZulu (Zulu) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v1/lang-zu-600.webp`,
+	},
 };
 
 // The SET MUST NEVER COST MORE than the same three volumes bought separately, in either
