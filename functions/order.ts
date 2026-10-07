@@ -76,6 +76,11 @@ const LANG_TITLES: Record<string, string> = {
 	tr: 'Türkçe Kutsal Kitap (Turkish) — Father’s Heart Bible',
 	ur: 'اردو بائبل (Urdu) — Father’s Heart Bible',
 	vi: 'Kinh Thánh Tiếng Việt (Vietnamese) — Father’s Heart Bible',
+	ceb: 'Cebuano nga Bibliya (Cebuano) — Father’s Heart Bible',
+	pl: 'Polska Biblia (Polish) — Father’s Heart Bible',
+	'zh-hans': '中文圣经 (Simplified Chinese) — Father’s Heart Bible',
+	uk: 'Українська Біблія (Ukrainian) — Father’s Heart Bible',
+	yo: 'Bíbélì Yorùbá (Yoruba) — Father’s Heart Bible',
 };
 
 function skuTitle(sku: string): string {

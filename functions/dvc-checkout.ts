@@ -375,16 +375,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 	// LANGUAGE EDITIONS (Kevin 2026-10-03: "all editions can be purchased now"). Keyed
 	// lang-<code>-hb / -pb. Prices are each language sheet's top table, recorded in ISBNS.json
 	// language_editions (on_sale + price_usd) and gated by pricing-verify. Card art mirrors
-	// src/data/card-art.ts (FHB/print/lang/v1/).
+	// src/data/card-art.ts (FHB/print/lang/v1/, v2 for cards cut from a built case).
 	'lang-ar-hb': {
 		title: 'الكتاب المقدس العربي (Arabic) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/lang/v1/lang-ar-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ar-600.webp`,
 	},
 	'lang-ar-pb': {
 		title: 'الكتاب المقدس العربي (Arabic) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/lang/v1/lang-ar-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ar-600.webp`,
 	},
 	'lang-bn-hb': {
 		title: 'বাংলা বাইবেল (Bengali) — Hardback',
@@ -509,12 +509,12 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 	'lang-fa-hb': {
 		title: 'کتاب مقدس فارسی (Persian (Farsi)) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/lang/v1/lang-fa-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-fa-600.webp`,
 	},
 	'lang-fa-pb': {
 		title: 'کتاب مقدس فارسی (Persian (Farsi)) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/lang/v1/lang-fa-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-fa-600.webp`,
 	},
 	'lang-pt-hb': {
 		title: 'Bíblia Portuguesa (Portuguese) — Hardback',
@@ -579,12 +579,12 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 	'lang-nmf-hb': {
 		title: 'Tangkhul Bible (Tangkhul) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/lang/v1/lang-nmf-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-nmf-600.webp`,
 	},
 	'lang-nmf-pb': {
 		title: 'Tangkhul Bible (Tangkhul) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/lang/v1/lang-nmf-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-nmf-600.webp`,
 	},
 	'lang-te-hb': {
 		title: 'తెలుగు బైబిల్ (Telugu) — Hardback',
@@ -619,12 +619,12 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 	'lang-ur-hb': {
 		title: 'اردو بائبل (Urdu) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/lang/v1/lang-ur-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ur-600.webp`,
 	},
 	'lang-ur-pb': {
 		title: 'اردو بائبل (Urdu) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/lang/v1/lang-ur-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ur-600.webp`,
 	},
 	'lang-vi-hb': {
 		title: 'Kinh Thánh Tiếng Việt (Vietnamese) — Hardback',
@@ -635,6 +635,57 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		title: 'Kinh Thánh Tiếng Việt (Vietnamese) — Paperback',
 		retail: 7999,
 		img: `${ASSETS}/lang/v1/lang-vi-600.webp`,
+	}, // 2026-10-07 (Kevin, 33 languages): the five editions live after the first 26 — prices from
+	// each sheet's top table ($99.99 / $79.99), cards cut from the built case (lang/v2).
+	'lang-ceb-hb': {
+		title: 'Cebuano nga Bibliya (Cebuano) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-ceb-600.webp`,
+	},
+	'lang-ceb-pb': {
+		title: 'Cebuano nga Bibliya (Cebuano) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-ceb-600.webp`,
+	},
+	'lang-pl-hb': {
+		title: 'Polska Biblia (Polish) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-pl-600.webp`,
+	},
+	'lang-pl-pb': {
+		title: 'Polska Biblia (Polish) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-pl-600.webp`,
+	},
+	'lang-zh-hans-hb': {
+		title: '中文圣经 (Simplified Chinese) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-zh-hans-600.webp`,
+	},
+	'lang-zh-hans-pb': {
+		title: '中文圣经 (Simplified Chinese) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-zh-hans-600.webp`,
+	},
+	'lang-uk-hb': {
+		title: 'Українська Біблія (Ukrainian) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-uk-600.webp`,
+	},
+	'lang-uk-pb': {
+		title: 'Українська Біблія (Ukrainian) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-uk-600.webp`,
+	},
+	'lang-yo-hb': {
+		title: 'Bíbélì Yorùbá (Yoruba) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-yo-600.webp`,
+	},
+	'lang-yo-pb': {
+		title: 'Bíbélì Yorùbá (Yoruba) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-yo-600.webp`,
 	},
 };
 
