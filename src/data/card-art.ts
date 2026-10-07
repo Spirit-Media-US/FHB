@@ -12,6 +12,8 @@
 // pose would have to be invented, on the one product whose selling point is its shape), so
 // it keeps the key it already has. Anything not in this set resolves to its existing
 // location, which makes the set the single place that decides.
+import registry from './edition-registry.json' with { type: 'json' };
+
 const BASE = 'https://assets.spiritmediapublishing.com/FHB/print';
 
 // EMPTIED 2026-09-17 (Kevin): "The current 3D mock-ups look like cartoons and NOT real
@@ -46,7 +48,9 @@ const LANG_PREFIX = `${BASE}/lang/v1`;
 // Editions set) by projects/fhb-lang-covers/cards/build_lang_cards.py — ar fa ur nmf replace
 // their v1 DESIGNED fronts (cover rule, Kevin 2026-10-06), and the five editions live after the
 // first 26 land here directly. A code not in this set keeps its v1 card.
-const LANG_V2 = new Set(['ar', 'fa', 'ur', 'nmf', 'pl', 'zh-hans', 'uk', 'yo', 'ceb']);
+// The set is READ from the edition registry (fhb-chain.py edition-emit measures which R2 line
+// holds each card), so a newly cut card needs no edit here.
+const LANG_V2 = new Set(registry.editions.filter((e) => e.card === 'v2').map((e) => e.code));
 // Language cards also come at 360 (= the marquee's 180 CSS px at 2x): the second marquee row
 // sits inside the lazy-load distance on first paint, and 600px art there cost ~400KB on the
 // homepage's mobile Lighthouse run (measured 2026-10-02); 360 is every pixel a 2x screen draws.
