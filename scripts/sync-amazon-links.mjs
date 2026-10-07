@@ -42,6 +42,15 @@ const SLUGS = [
 	'teen',
 	'worship-leaders',
 	'journaling',
+	// Added 2026-10-08 (Kevin: "the new audience bibles are not linked on /print"): bookstore
+	// documents created from listings whose ISBN-13 was read back against src/data/editions/<slug>.json.
+	'athletes',
+	'graduates',
+	'grandparents',
+	'intercessors',
+	'nurses',
+	'teachers',
+	'womens',
 ];
 
 // The Large Print volumes are their own bookstore documents (fhb-lp-vol1/2 created
