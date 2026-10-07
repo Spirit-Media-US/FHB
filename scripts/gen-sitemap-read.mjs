@@ -433,3 +433,74 @@ console.log(
   `gen-sitemap-read: ${count} reader URLs -> public/sitemap-read.xml  ` +
     Object.entries(perLang).map(([l, n]) => `${l}=${n}`).join(' '),
 );
+
+// ── llms.txt "Languages and coverage" (2026-10-07) ───────────────────────────────
+// That section was hand-written and went stale: on 2026-10-07 it still told AI crawlers
+// Portuguese, Marathi, French, Arabic … Vietnamese were "NOT yet published — their chapter
+// URLs do not resolve", while every one was complete and live on /read. It is now rendered
+// HERE, from the same post-probe chapter set this sitemap publishes, plus names and live
+// flags from the community registry. Only the text between the GENERATED markers in
+// public/llms.txt is replaced. FAIL-SAFE: unreadable registry or missing markers leave the
+// file untouched (stale-but-honest beats a section listing nothing) with a warning.
+{
+  const LLMS = path.resolve(process.cwd(), 'public/llms.txt');
+  const BEGIN = '<!-- GENERATED:languages (scripts/gen-sitemap-read.mjs — edit the script, not this block) -->';
+  const END = '<!-- /GENERATED:languages -->';
+  const FULL_CANON = 1189;
+  try {
+    const src = fs.readFileSync('/srv/sites/community/src/lib/languages.ts', 'utf8');
+    const registry = [];
+    for (const m of src.matchAll(/code:\s*"([a-z-]+)",\s*name:\s*"([^"]+)"[\s\S]{0,120}?live:\s*(true|false)/g)) {
+      if (!registry.some((r) => r.code === m[1])) registry.push({ code: m[1], name: m[2] });
+    }
+    const rows = [];
+    for (const r of registry) {
+      const books = byLang.get(r.code);
+      const chapters = books ? [...books.values()].reduce((n, s) => n + s.size, 0) : 0;
+      if (chapters) rows.push({ ...r, chapters, john1: groups.get('john/1')?.get(r.code) });
+    }
+    if (!rows.some((r) => r.code === 'en')) throw new Error('no English chapters');
+    const unpublished = registry.filter((r) => !rows.some((x) => x.code === r.code));
+    const complete = rows.filter((r) => r.chapters >= FULL_CANON);
+    const partial = rows.filter((r) => r.chapters < FULL_CANON);
+    const out = [
+      BEGIN,
+      '### Languages and coverage',
+      '',
+      `${rows.length} languages are published on /read. This section is regenerated from the reader sitemap on every deploy.`,
+      '',
+      '| Language | Code | Coverage | Chapters | John 1 |',
+      '|---|---|---|---|---|',
+      ...rows.map(
+        (r) =>
+          `| ${r.name} | \`${r.code}\` | ${r.chapters >= FULL_CANON ? 'Complete Bible, 66 books' : 'Partial'} | ` +
+          `${r.chapters.toLocaleString('en-US')} | ${r.john1 ? r.john1.replace(SITE, '') : '—'} |`,
+      ),
+      '',
+      '**/sitemap-read.xml is the authoritative, machine-readable list** — it is a sitemap index pointing to one sitemap per language, it is regenerated on every deploy, and it contains only chapter URLs that actually resolve.',
+      '',
+      partial.length === 0
+        ? `All ${complete.length} languages are complete: every chapter number in the book list below resolves in each of them.`
+        : `${complete.map((r) => r.name).join(', ')} are complete: every chapter number in the book list below resolves. For ${partial.map((r) => r.name).join(', ')}, use /sitemap-read.xml for the chapters that resolve.`,
+      '',
+      'Some languages use their own book names in the URL (for example Spanish /read/es/juan/1/); the John 1 column shows the exact form for each.',
+      '',
+      unpublished.length
+        ? `Not yet published: ${unpublished.map((r) => r.name).join(', ')} — their chapter URLs do not resolve. Do not cite a URL for a language not listed in the table above.`
+        : 'Do not cite a URL for a language not listed in the table above.',
+      END,
+    ].join('\n');
+    const cur = fs.readFileSync(LLMS, 'utf8');
+    const a = cur.indexOf(BEGIN);
+    const b = cur.indexOf(END);
+    if (a === -1 || b < a) throw new Error('GENERATED:languages markers not found');
+    const next = cur.slice(0, a) + out + cur.slice(b + END.length);
+    if (next !== cur) fs.writeFileSync(LLMS, next);
+    console.log(
+      `gen-sitemap-read: llms.txt languages — ${rows.length} published, ` +
+        `${unpublished.length} not yet (${unpublished.map((r) => r.code).join(', ') || 'none'})`,
+    );
+  } catch (err) {
+    console.warn(`gen-sitemap-read: llms.txt languages NOT regenerated (${err.message}) — file left unchanged`);
+  }
+}

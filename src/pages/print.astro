@@ -13,6 +13,7 @@ import amazonLinks from '../data/amazon-links.json';
 import { cardUrl } from '../data/card-art';
 import { dvcEditions as dvcEditionList } from '../data/dvc-editions';
 import {
+	comingSoonEditions,
 	LANG_HB,
 	LANG_PB,
 	LANGUAGE_EDITION_TOTAL,
@@ -743,10 +744,10 @@ function markVoices(v: {
 		<!-- ═══════════════ LANGUAGE EDITIONS ═══════════════ -->
 		{/* Kevin 2026-10-02. Every language edition whose press files are finished (see
 		    src/data/language-editions.ts for what qualifies). Same card, frame, image size and
-		    button set as the targeted cards. Amazon buttons are PLACEHOLDERS — none of these is
-		    listed yet — and a link is never invented to fill one (D184); activation is adding
-		    the URL. No "Buy Direct" link: the direct checkout (functions/dvc-checkout.ts) has no
-		    language SKUs, so offering it would send a reader to a form that cannot sell this
+		    button set as the targeted cards. An Amazon button is live only where language-editions.ts
+		    records that binding's listing (looked up by ISBN 2026-10-07); otherwise it stays the
+		    placeholder — a link is never invented to fill one (D184). No "Buy Direct" link: the
+		    direct checkout (functions/dvc-checkout.ts) has no language SKUs, so offering it would send a reader to a form that cannot sell this
 		    book. The card title is the edition's own name, in its own script. */}
 		<Section id="language-editions" variant="warm">
 			<div class="text-center mb-8">
@@ -783,6 +784,16 @@ function markVoices(v: {
 					</div>
 				))}
 			</div>
+			{/* Kevin 2026-10-07: the 33 include editions not yet built (Amharic, Zulu). Named here
+			    as coming soon — no card (no built cover yet), no page, no order form. */}
+			{comingSoonEditions.length > 0 && (
+				<p class="text-center mt-8" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; font-weight: 600; margin-left: auto; margin-right: auto; max-width: 40rem;">
+					Coming soon:{' '}
+					{comingSoonEditions.map((l, i) => (
+						<span>{i > 0 && ' · '}<span lang={l.code}>{l.name}</span> ({l.english})</span>
+					))}
+				</p>
+			)}
 		</Section>
 
 		<!-- ═══════════════ HIS VOICE — DVC ON THE PAGE ═══════════════ -->
