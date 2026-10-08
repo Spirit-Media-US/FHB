@@ -710,6 +710,18 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		retail: 7999,
 		img: `${ASSETS}/lang/v1/lang-zu-600.webp`,
 	},
+	// Romanian (live 2026-10-08, Ingram CSS9722429/CSS9722440): standard language prices from
+	// ISBNS.json; card cut from the built case (lang/v2).
+	'lang-ro-hb': {
+		title: 'Biblia Românească (Romanian) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-ro-600.webp`,
+	},
+	'lang-ro-pb': {
+		title: 'Biblia Românească (Romanian) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-ro-600.webp`,
+	},
 };
 
 // The SET MUST NEVER COST MORE than the same three volumes bought separately, in either
