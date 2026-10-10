@@ -41,7 +41,8 @@ const DVC_TAIL2 =
 // The audience editions and their spec helpers live in src/data/dvc-editions.ts (shared with /print/order/).
 // Runtime value used in the template below (biome cannot see .astro template use, keep this line).
 const dvcEditions = dvcEditionList;
-const AUDIENCE_TOTAL = dvcEditionList.filter((e) => e.slug !== 'journaling').length;
+// Kevin 2026-10-10 (3b): every card in the section counts, the 8x10 journaling edition included.
+const AUDIENCE_TOTAL = dvcEditionList.length;
 
 // Digital editions. Every eBook / audiobook store link comes from src/data/digital-listings.json —
 // the one master, each entry added only after its store page answered with the right title
@@ -507,8 +508,7 @@ function markVoices(v: {
 			<p class="text-center mb-10" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em;">{DVC_TAIL2}</p>
 
 			{/* Kevin 2026-10-10: below the title, chips and the two spec lines (his order); same eyebrow + heading as "Language Editions / In N Languages". The
-			    count is the 6x9 audience editions, computed so it cannot drift; the 8x10 journaling
-			    edition is a format, not a further audience. */}
+			    count is every card in the section (Kevin 2026-10-10: 23), computed so it cannot drift. */}
 			<div class="text-center mb-8">
 				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Audience Editions</p>
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">For {AUDIENCE_TOTAL} Distinct Audiences</h2>
@@ -659,7 +659,7 @@ function markVoices(v: {
 				    the stores sell — Google squares that same cover for its audiobook). Every store
 				    button is the Amazon shape, logo first (BuyControls). */}
 				{l.line === 'regular' && (
-					<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 max-w-3xl mx-auto mt-10">
+					<div class="grid grid-cols-1 gap-6 md:gap-8 max-w-4xl mx-auto mt-10">
 						<div id="ebook" class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline); scroll-margin-top: 90px;">
 							<img src={EBOOK_COVER} srcset={`${EBOOK_COVER} 600w, ${EBOOK_COVER_2X} 1200w`} sizes="(min-width: 640px) 200px, 50vw" alt="Father's Heart Bible (FHB) eBook cover" width="600" height="900" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 170px; border: 1px solid var(--color-hairline);" />
 							<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">eBook</h3>
