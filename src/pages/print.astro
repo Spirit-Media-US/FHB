@@ -800,7 +800,10 @@ function markVoices(v: {
 							{/* Kevin 2026-10-10: a language's eBook and audiobook sit on its own card, with its print
 							    buttons — from src/data/digital-listings.json, verified store pages only. */}
 							{langDigital(l.code).map((d) => (
-								<a href={d.url} target="_blank" rel="noopener" class="inline-flex flex-wrap items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); column-gap: 0.3em; padding: 0.6rem 0.7rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.8rem;"><span class="whitespace-nowrap">{d.kind} · {d.store} ·</span><span class="whitespace-nowrap">{d.price} →</span></a>
+								<a href={d.url} target="_blank" rel="noopener" class="inline-flex flex-col items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.45rem 0.5rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.8rem;">
+									<span class="whitespace-nowrap">{d.kind} · {d.price}</span>
+									<span class="whitespace-nowrap" style="font-weight: 500; font-size: 0.74rem;">{d.store} →</span>
+								</a>
 							))}
 						</div>
 					</div>
