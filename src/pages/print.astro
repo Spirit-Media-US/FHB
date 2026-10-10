@@ -11,6 +11,7 @@ import VoiceChips from '../components/VoiceChips.astro';
 // later needs a re-run of the sync, not an edit here.
 import amazonLinks from '../data/amazon-links.json';
 import { cardUrl } from '../data/card-art';
+import digital from '../data/digital-listings.json';
 import { dvcEditions as dvcEditionList } from '../data/dvc-editions';
 import {
 	comingSoonEditions,
@@ -40,14 +41,13 @@ const DVC_TAIL2 =
 // The audience editions and their spec helpers live in src/data/dvc-editions.ts (shared with /print/order/).
 // Runtime value used in the template below (biome cannot see .astro template use, keep this line).
 const dvcEditions = dvcEditionList;
+const AUDIENCE_TOTAL = dvcEditionList.filter((e) => e.slug !== 'journaling').length;
 
-// Digital editions. eBook is live on Amazon (Kindle) + Barnes & Noble (Nook) at
-// $9.99, AND sold direct here ($7.49, our own fulfillment). Audiobook coming soon.
-const ebookAsin = 'B0H8R2YP66';
-const EBOOK_AMAZON = '$9.99';
-const EBOOK_NOOK = '$9.99';
-const EBOOK_NOOK_URL =
-	'https://www.barnesandnoble.com/w/fathers-heart-bible-spirit-media-publishing/1150585116?ean=2940196931611';
+// Digital editions. Every eBook / audiobook store link comes from src/data/digital-listings.json —
+// the one master, each entry added only after its store page answered with the right title
+// (2026-10-10). The English eBook is also sold direct here ($7.49, our own fulfillment). Apple
+// Books and Nook were removed 2026-10-10: both listings 404 since D2D refused distribution.
+const digitalEn = digital.en;
 const EBOOK_DIRECT = '$7.49';
 
 // ───────────────────────── GENERAL AUDIENCE ─────────────────────────
@@ -206,6 +206,16 @@ const builtPages = new Set(
 // A language card shows Look inside only once its sample pages are in lookinside.json.
 // Runtime value used in the template below (biome cannot see .astro template use, keep this line).
 const langCards = languageEditions;
+type DigitalLink = { store: string; url: string; price: string; label?: string };
+const langDigital = (code: string) => {
+	const d = (
+		digital as unknown as Record<string, { ebook?: DigitalLink[]; audiobook?: DigitalLink[] }>
+	)[code];
+	return [
+		...(d?.ebook ?? []).map((x) => ({ ...x, kind: 'eBook' })),
+		...(d?.audiobook ?? []).map((x) => ({ ...x, kind: 'Audiobook' })),
+	];
+};
 const langHasLi = (l: (typeof languageEditions)[number]) =>
 	Boolean((lookinsideData as Record<string, { pages?: unknown[] }>)[langSlug(l)]?.pages?.length);
 const TRANSLATION_URL = '/the-fathers-heart-bible/translation-philosophy/';
@@ -476,6 +486,13 @@ function markVoices(v: {
 
 		<!-- ═══════════════ THE DVC LINE — 16 EDITIONS ═══════════════ -->
 		<Section variant="light">
+			{/* Kevin 2026-10-10: same eyebrow + heading as "Language Editions / In N Languages". The
+			    count is the 6x9 audience editions, computed so it cannot drift; the 8x10 journaling
+			    edition is a format, not a further audience. */}
+			<div class="text-center mb-8">
+				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Audience Editions</p>
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">For {AUDIENCE_TOTAL} Distinct Audiences</h2>
+			</div>
 			<div class="text-center mb-3">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2.1rem; font-weight: 600; margin: 0;">Father’s Heart Bible™ + Divine Voice™ Color Bibles</h2>
 			</div>
@@ -780,6 +797,11 @@ function markVoices(v: {
 								{langHasLi(l) && <LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" />}
 							</div>
 							<BuyControls hbHref={l.amazon?.hardback} pbHref={l.amazon?.paperback} hbPrice={LANG_HB} pbPrice={LANG_PB} pick={`lang-${l.code}`} />
+							{/* Kevin 2026-10-10: a language's eBook and audiobook sit on its own card, with its print
+							    buttons — from src/data/digital-listings.json, verified store pages only. */}
+							{langDigital(l.code).map((d) => (
+								<a href={d.url} target="_blank" rel="noopener" class="inline-flex flex-wrap items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); column-gap: 0.3em; padding: 0.6rem 0.7rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.8rem;"><span class="whitespace-nowrap">{d.kind} · {d.store} ·</span><span class="whitespace-nowrap">{d.price} →</span></a>
+							))}
 						</div>
 					</div>
 				))}
@@ -853,12 +875,18 @@ function markVoices(v: {
 						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.5; margin: 0 0 1.25rem;">Read on any device — Kindle, phone, or tablet. The complete translation, reflowable with pop-up footnotes.</p>
 						<div class="ebook-btns grid grid-cols-2 gap-2 w-full">
 							<button type="button" data-ebook-buy class="col-span-2 inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 2px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; cursor: pointer; font-size: 0.92rem;">Buy Direct · {EBOOK_DIRECT} →</button>
-							<a href={`https://www.amazon.com/dp/${ebookAsin}`} target="_blank" rel="noopener" class="inline-flex flex-wrap items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); column-gap: 0.3em; padding: 0.6rem 0.7rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.88rem;"><span class="whitespace-nowrap">Amazon Kindle ·</span><span class="whitespace-nowrap">{EBOOK_AMAZON} →</span></a>
-							<a href="https://books.apple.com/us/book/id6790611840" target="_blank" rel="noopener" class="inline-flex flex-wrap items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); column-gap: 0.3em; padding: 0.6rem 0.7rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.88rem;"><span class="whitespace-nowrap">Apple Books ·</span><span class="whitespace-nowrap">$9.99 →</span></a>
-							<a href="https://play.google.com/store/books/details?id=qY4BEgAAQBAJ" target="_blank" rel="noopener" class="inline-flex flex-wrap items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); column-gap: 0.3em; padding: 0.6rem 0.7rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.88rem;"><span class="whitespace-nowrap">Google Play ·</span><span class="whitespace-nowrap">$9.99 →</span></a>
-							<a href={EBOOK_NOOK_URL} target="_blank" rel="noopener" class="inline-flex flex-wrap items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); column-gap: 0.3em; padding: 0.6rem 0.7rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.88rem;"><span class="whitespace-nowrap">Nook ·</span><span class="whitespace-nowrap">{EBOOK_NOOK} →</span></a>
+							{digitalEn.ebook.map((d) => (
+								<a href={d.url} target="_blank" rel="noopener" class="inline-flex flex-wrap items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); column-gap: 0.3em; padding: 0.6rem 0.7rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.88rem;"><span class="whitespace-nowrap">{d.store} ·</span><span class="whitespace-nowrap">{d.price} →</span></a>
+							))}
 						</div>
 						<p data-ebook-msg style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.7rem 0 0; display: none;"></p>
+						{/* Listening Editions: the same text laid out for read-aloud / text-to-speech apps. */}
+						<p style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-ink); font-weight: 600; margin: 1rem 0 0.4rem;">Listening Edition (for read-aloud apps)</p>
+						<div class="grid grid-cols-2 gap-2 w-full">
+							{digitalEn.listening.map((d) => (
+								<a href={d.url} target="_blank" rel="noopener" class="inline-flex flex-wrap items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); column-gap: 0.3em; padding: 0.6rem 0.7rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.88rem;"><span class="whitespace-nowrap">{d.store}{d.label ? ` ${d.label}` : ''} ·</span><span class="whitespace-nowrap">{d.price} →</span></a>
+							))}
+						</div>
 						<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">Direct = instant EPUB download, DRM-free — read it anywhere.</p>
 					</div>
 					<div class="flex flex-col text-center rounded-2xl p-7" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
@@ -869,7 +897,12 @@ function markVoices(v: {
 							<a href="https://podcasts.apple.com/us/podcast/id6818374650" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Apple Podcasts →</a>
 							<a href="https://www.youtube.com/@FathersHeartBible" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">YouTube →</a>
 						</div>
-						<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">Audiobook edition coming to Google Play.</p>
+						<p style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-ink); font-weight: 600; margin: 1rem 0 0.4rem;">Complete audiobook</p>
+						<div class="flex flex-col gap-2 w-full mx-auto">
+							{digitalEn.audiobook.map((d) => (
+								<a href={d.url} target="_blank" rel="noopener" class="inline-flex flex-wrap items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); column-gap: 0.3em; padding: 0.6rem 0.7rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.88rem;"><span class="whitespace-nowrap">{d.store} audiobook ·</span><span class="whitespace-nowrap">{d.price} →</span></a>
+							))}
+						</div>
 					</div>
 				</div>
 			</Section>
