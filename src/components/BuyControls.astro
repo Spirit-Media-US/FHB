@@ -41,7 +41,7 @@ interface Props {
 	 * button the page script binds to ([data-ebook-buy]) instead of a link.
 	 */
 	stores?: {
-		logo?: 'amazon' | 'google' | 'kobo';
+		logo?: 'amazon' | 'google' | 'kobo' | 'spotify' | 'youtube' | 'applepodcasts';
 		label: string;
 		price: string;
 		href?: string;
@@ -61,6 +61,11 @@ interface Props {
 	/** /print: the catalog id ("teen", "lang-es") the catalog order form pre-fills when the
 	 *  direct link is followed (src/scripts/order-form.ts). */
 	pick?: string;
+	/** Compact pills that hold logo + label + price on ONE line (the General eBook/audiobook cards). */
+	compact?: boolean;
+	/** Pad the button set with invisible slots up to this many, so cards with fewer stores line up
+	 *  with the rest (Kevin 2026-10-10: keep space for eBook + audiobook to be added later). */
+	reserveSlots?: number;
 }
 const {
 	hbHref,
@@ -72,6 +77,8 @@ const {
 	tightDirect = false,
 	pick,
 	stores = [],
+	compact = false,
+	reserveSlots = 0,
 } = Astro.props;
 
 const AMAZON_LOGO = 'https://assets.spiritmediapublishing.com/FHB/print/amazon-logo.webp';
@@ -87,12 +94,31 @@ const LOGOS = {
 		h: 58,
 	},
 	kobo: { src: 'https://assets.spiritmediapublishing.com/FHB/print/kobo-logo.webp', w: 144, h: 58 },
+	// Free listening (Kevin 2026-10-10): Spotify's full logo from its newsroom brand files,
+	// YouTube's logo from YouTube's gstatic branding, Apple Podcasts' app icon from apple.com.
+	spotify: {
+		src: 'https://assets.spiritmediapublishing.com/FHB/print/spotify-logo.webp',
+		w: 212,
+		h: 58,
+	},
+	youtube: {
+		src: 'https://assets.spiritmediapublishing.com/FHB/print/youtube-logo.webp',
+		w: 258,
+		h: 58,
+	},
+	applepodcasts: {
+		src: 'https://assets.spiritmediapublishing.com/FHB/print/apple-podcasts-icon.webp',
+		w: 58,
+		h: 58,
+	},
 } as const;
 
 const bindings = [
 	{ label: 'Hardback', href: hbHref, price: hbPrice },
 	{ label: 'Paperback', href: pbHref, price: pbPrice },
 ].filter((b) => b.price !== undefined) as { label: string; href?: string; price: number }[];
+const btnClass = compact ? 'buy-btn buy-btn-compact' : 'buy-btn';
+const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
 ---
 
 {/* LIGHT PINK on every button (Kevin 2026-09-17, "Turn all button light pink"), taken from
@@ -148,15 +174,22 @@ const bindings = [
 				{logo && (
 					<img src={logo.src} alt="" width={logo.w} height={logo.h} loading="lazy" decoding="async" class="store-logo" />
 				)}
-				<span>{`${logo ? '· ' : ''}${st.label} ${st.price}`}</span>
+				{(st.label || st.price) && <span>{`${logo ? '· ' : ''}${[st.label, st.price].filter(Boolean).join(' ')}`}</span>}
 			</>
 		);
 		return st.ebookDirect ? (
-			<button type="button" data-ebook-buy class="buy-btn">{inner}</button>
+			<button type="button" data-ebook-buy class={btnClass}>{inner}</button>
 		) : (
-			<a href={st.href} target="_blank" rel="noopener" class="buy-btn" style="text-decoration: none;">{inner}</a>
+			<a href={st.href} target="_blank" rel="noopener" class={btnClass} style="text-decoration: none;">{inner}</a>
 		);
 	})
+}
+{
+	Array.from({ length: spare }, () => (
+		<span class="buy-btn buy-btn-slot" aria-hidden="true">
+			<span>&nbsp;</span>
+		</span>
+	))
 }
 {
 	showDirect && (
@@ -211,6 +244,31 @@ const bindings = [
 			width: auto !important;
 			height: 12px;
 		}
+	}
+	/* One line: logo, label and price never break apart. */
+	.buy-btn-compact {
+		flex-wrap: nowrap;
+		white-space: nowrap;
+		padding: 0.4rem 0.6rem;
+		font-size: 0.74rem;
+		gap: 0.3rem;
+	}
+	.buy-btn-compact .store-logo {
+		height: 13px;
+	}
+	/* From 641px up every pill holds logo + label + price on ONE line (Kevin 2026-10-10:
+	   "Google Play logo + Audiobook $24.99 on one line") — a two-line pill also made one
+	   card's controls taller than its neighbours'. Phones keep wrapping: a 133px card
+	   cannot hold the line, and nowrap there spills out of the pill (the measured bug above). */
+	@media (min-width: 641px) {
+		.buy-btn {
+			flex-wrap: nowrap;
+			white-space: nowrap;
+		}
+	}
+	/* A reserved, invisible slot: same box as a button, so every card's controls line up. */
+	.buy-btn-slot {
+		visibility: hidden;
 	}
 	.buy-btn-off {
 		background: #fdeef3;
