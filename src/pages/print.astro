@@ -11,6 +11,7 @@ import VoiceChips from '../components/VoiceChips.astro';
 // later needs a re-run of the sync, not an edit here.
 import amazonLinks from '../data/amazon-links.json';
 import { cardUrl } from '../data/card-art';
+import digital from '../data/digital-listings.json';
 import { dvcEditions as dvcEditionList } from '../data/dvc-editions';
 import {
 	comingSoonEditions,
@@ -40,14 +41,24 @@ const DVC_TAIL2 =
 // The audience editions and their spec helpers live in src/data/dvc-editions.ts (shared with /print/order/).
 // Runtime value used in the template below (biome cannot see .astro template use, keep this line).
 const dvcEditions = dvcEditionList;
+// Kevin 2026-10-10 (3b): every card in the section counts, the 8x10 journaling edition included.
+const AUDIENCE_TOTAL = dvcEditionList.length;
 
-// Digital editions. eBook is live on Amazon (Kindle) + Barnes & Noble (Nook) at
-// $9.99, AND sold direct here ($7.49, our own fulfillment). Audiobook coming soon.
-const ebookAsin = 'B0H8R2YP66';
-const EBOOK_AMAZON = '$9.99';
-const EBOOK_NOOK = '$9.99';
-const EBOOK_NOOK_URL =
-	'https://www.barnesandnoble.com/w/fathers-heart-bible-spirit-media-publishing/1150585116?ean=2940196931611';
+// Digital editions. Every eBook / audiobook store link comes from src/data/digital-listings.json —
+// the one master, each entry added only after its store page answered with the right title
+// (2026-10-10). The English eBook is also sold direct here ($7.49, our own fulfillment). Apple
+// Books and Nook were removed 2026-10-10: both listings 404 since D2D refused distribution.
+const digitalEn = digital.en;
+const EBOOK_COVER =
+	'https://assets.spiritmediapublishing.com/FHB/print/fhb-ebook-cover-2026-6-600.webp';
+const EBOOK_COVER_2X =
+	'https://assets.spiritmediapublishing.com/FHB/print/fhb-ebook-cover-2026-6-1200.webp';
+const storeLogo = (store: string) =>
+	store === 'Kindle'
+		? ('amazon' as const)
+		: store === 'Kobo'
+			? ('kobo' as const)
+			: ('google' as const);
 const EBOOK_DIRECT = '$7.49';
 
 // ───────────────────────── GENERAL AUDIENCE ─────────────────────────
@@ -206,6 +217,16 @@ const builtPages = new Set(
 // A language card shows Look inside only once its sample pages are in lookinside.json.
 // Runtime value used in the template below (biome cannot see .astro template use, keep this line).
 const langCards = languageEditions;
+type DigitalLink = { store: string; url: string; price: string; label?: string };
+const langDigital = (code: string) => {
+	const d = (
+		digital as unknown as Record<string, { ebook?: DigitalLink[]; audiobook?: DigitalLink[] }>
+	)[code];
+	return [
+		...(d?.ebook ?? []).map((x) => ({ ...x, kind: 'eBook' })),
+		...(d?.audiobook ?? []).map((x) => ({ ...x, kind: 'Audiobook' })),
+	];
+};
 const langHasLi = (l: (typeof languageEditions)[number]) =>
 	Boolean((lookinsideData as Record<string, { pages?: unknown[] }>)[langSlug(l)]?.pages?.length);
 const TRANSLATION_URL = '/the-fathers-heart-bible/translation-philosophy/';
@@ -484,8 +505,15 @@ function markVoices(v: {
 			     page — every button, tier and label below is neutral grey so nothing competes with
 			     them or with the covers. -->
 			<VoiceChips />
-			<p class="text-center" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">{DVC_TAIL}</p>
 			<p class="text-center mb-10" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em;">{DVC_TAIL2}</p>
+
+			{/* Kevin 2026-10-10: below the title, chips and the two spec lines (his order); same eyebrow + heading as "Language Editions / In N Languages". The
+			    count is every card in the section (Kevin 2026-10-10: 23), computed so it cannot drift. */}
+			<div class="text-center mb-8">
+				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Audience Editions</p>
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">For {AUDIENCE_TOTAL} Distinct Audiences</h2>
+				<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em; margin: 0.9rem 0 0;">{DVC_TAIL}</p>
+			</div>
 
 			<div class="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7 max-w-6xl mx-auto">
 				{dvcEditions.map((e) => (
@@ -626,6 +654,49 @@ function markVoices(v: {
 					))}
 				</div>
 				<p class="text-center mt-6" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600;">Direct from SMP includes free shipping — a $15 value.</p>
+				{/* Kevin 2026-10-10: the eBook and audiobook live HERE, with the print edition, not in a
+				    separate "Digital Editions" section. Cover = the BUILT eBook cover (2026.6, the file
+				    the stores sell — Google squares that same cover for its audiobook). Every store
+				    button is the Amazon shape, logo first (BuyControls). */}
+				{l.line === 'regular' && (
+					<div class="grid grid-cols-1 gap-6 md:gap-8 max-w-4xl mx-auto mt-10">
+						<div id="ebook" class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline); scroll-margin-top: 90px;">
+							<img src={EBOOK_COVER} srcset={`${EBOOK_COVER} 600w, ${EBOOK_COVER_2X} 1200w`} sizes="(min-width: 640px) 200px, 50vw" alt="Father's Heart Bible (FHB) eBook cover" width="600" height="900" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 170px; border: 1px solid var(--color-hairline);" />
+							<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">eBook</h3>
+							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">Read on any device. The complete translation, reflowable with pop-up footnotes.</p>
+							<div class="flex flex-col gap-2 w-full mt-auto">
+								<div class="flex flex-wrap justify-center gap-2 w-full">
+								<BuyControls showDirect={false} stores={[
+									...digitalEn.ebook.map((d) => ({ logo: storeLogo(d.store), label: d.store === 'Kindle' ? 'Kindle' : 'eBook', price: d.price, href: d.url })),
+									{ label: 'Buy Direct · eBook', price: EBOOK_DIRECT, ebookDirect: true },
+								]} />
+								</div>
+								<p data-ebook-msg style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.4rem 0 0; display: none;"></p>
+								<p style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-ink); font-weight: 600; margin: 0.7rem 0 0;">Listening Edition (for read-aloud apps)</p>
+								<div class="flex flex-wrap justify-center gap-2 w-full">
+								<BuyControls showDirect={false} stores={digitalEn.listening.map((d) => ({ logo: storeLogo(d.store), label: d.label ? `${d.store} ${d.label}` : d.store === 'Kindle' ? 'Kindle' : 'eBook', price: d.price, href: d.url }))} />
+								</div>
+							</div>
+							<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">Direct = instant EPUB download, DRM-free.</p>
+						</div>
+						<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+							<img src={EBOOK_COVER} srcset={`${EBOOK_COVER} 600w, ${EBOOK_COVER_2X} 1200w`} sizes="(min-width: 640px) 200px, 50vw" alt="Father's Heart Bible (FHB) audiobook cover" width="600" height="900" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 170px; border: 1px solid var(--color-hairline);" />
+							<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">Audiobook</h3>
+							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">The complete Bible, narrated — or listen free, chapter by chapter.</p>
+							<div class="flex flex-col gap-2 w-full">
+								<div class="flex flex-wrap justify-center gap-2 w-full">
+								<BuyControls showDirect={false} stores={digitalEn.audiobook.map((d) => ({ logo: storeLogo(d.store), label: 'Audiobook', price: d.price, href: d.url }))} />
+								</div>
+							</div>
+							<p style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.8rem 0 0;">
+								Listen free:{' '}
+								<a href="https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY" target="_blank" rel="noopener" style="color: #3f3f46; font-weight: 700;">Spotify</a> ·{' '}
+								<a href="https://podcasts.apple.com/us/podcast/id6818374650" target="_blank" rel="noopener" style="color: #3f3f46; font-weight: 700;">Apple Podcasts</a> ·{' '}
+								<a href="https://www.youtube.com/@FathersHeartBible" target="_blank" rel="noopener" style="color: #3f3f46; font-weight: 700;">YouTube</a>
+							</p>
+						</div>
+					</div>
+				)}
 			</Section>
 		))}
 
@@ -779,7 +850,16 @@ function markVoices(v: {
 								{builtPages.has(`${langSlug(l)}-bible`) && langHasLi(l) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 								{langHasLi(l) && <LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" />}
 							</div>
-							<BuyControls hbHref={l.amazon?.hardback} pbHref={l.amazon?.paperback} hbPrice={LANG_HB} pbPrice={LANG_PB} pick={`lang-${l.code}`} />
+							{/* Kevin 2026-10-10: the language's eBook and audiobook sit on its own card as store
+							    buttons in the Amazon shape, before Buy Direct (src/data/digital-listings.json). */}
+							<BuyControls
+								hbHref={l.amazon?.hardback}
+								pbHref={l.amazon?.paperback}
+								hbPrice={LANG_HB}
+								pbPrice={LANG_PB}
+								pick={`lang-${l.code}`}
+								stores={langDigital(l.code).map((d) => ({ logo: 'google' as const, label: d.kind, price: d.price, href: d.url }))}
+							/>
 						</div>
 					</div>
 				))}
@@ -840,39 +920,6 @@ function markVoices(v: {
 				<CatalogOrderForm returnPath="/print/" idp="pcat" level={3} />
 			</div>
 		</Section>
-
-			<!-- ═══════════════ DIGITAL EDITIONS ═══════════════ -->
-			<Section variant="light">
-				<div class="text-center mb-10">
-					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Digital Editions</p>
-					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Read it. Hear it.</h2>
-				</div>
-				<div class="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-5xl mx-auto">
-					<div id="ebook" class="flex flex-col text-center rounded-2xl p-7" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline); scroll-margin-top: 90px;">
-						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.4rem;">eBook</h3>
-						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.5; margin: 0 0 1.25rem;">Read on any device — Kindle, phone, or tablet. The complete translation, reflowable with pop-up footnotes.</p>
-						<div class="ebook-btns grid grid-cols-2 gap-2 w-full">
-							<button type="button" data-ebook-buy class="col-span-2 inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 2px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; cursor: pointer; font-size: 0.92rem;">Buy Direct · {EBOOK_DIRECT} →</button>
-							<a href={`https://www.amazon.com/dp/${ebookAsin}`} target="_blank" rel="noopener" class="inline-flex flex-wrap items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); column-gap: 0.3em; padding: 0.6rem 0.7rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.88rem;"><span class="whitespace-nowrap">Amazon Kindle ·</span><span class="whitespace-nowrap">{EBOOK_AMAZON} →</span></a>
-							<a href="https://books.apple.com/us/book/id6790611840" target="_blank" rel="noopener" class="inline-flex flex-wrap items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); column-gap: 0.3em; padding: 0.6rem 0.7rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.88rem;"><span class="whitespace-nowrap">Apple Books ·</span><span class="whitespace-nowrap">$9.99 →</span></a>
-							<a href="https://play.google.com/store/books/details?id=qY4BEgAAQBAJ" target="_blank" rel="noopener" class="inline-flex flex-wrap items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); column-gap: 0.3em; padding: 0.6rem 0.7rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.88rem;"><span class="whitespace-nowrap">Google Play ·</span><span class="whitespace-nowrap">$9.99 →</span></a>
-							<a href={EBOOK_NOOK_URL} target="_blank" rel="noopener" class="inline-flex flex-wrap items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); column-gap: 0.3em; padding: 0.6rem 0.7rem; min-height: 48px; text-align: center; line-height: 1.25; text-decoration: none; font-size: 0.88rem;"><span class="whitespace-nowrap">Nook ·</span><span class="whitespace-nowrap">{EBOOK_NOOK} →</span></a>
-						</div>
-						<p data-ebook-msg style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.7rem 0 0; display: none;"></p>
-						<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">Direct = instant EPUB download, DRM-free — read it anywhere.</p>
-					</div>
-					<div class="flex flex-col text-center rounded-2xl p-7" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
-						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.4rem;">Audio Bible</h3>
-						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; line-height: 1.5; margin: 0 0 1.25rem;">Listen free, chapter by chapter.</p>
-						<div class="flex flex-col gap-2 w-full mx-auto">
-							<a href="https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Spotify →</a>
-							<a href="https://podcasts.apple.com/us/podcast/id6818374650" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">Apple Podcasts →</a>
-							<a href="https://www.youtube.com/@FathersHeartBible" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); padding: 0.75rem 1.4rem; text-decoration: none; font-size: 0.92rem;">YouTube →</a>
-						</div>
-						<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">Audiobook edition coming to Google Play.</p>
-					</div>
-				</div>
-			</Section>
 
 			<!-- ═══════════════ FAQ ═══════════════ -->
 			<Section variant="soft">

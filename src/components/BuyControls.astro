@@ -31,8 +31,22 @@ interface Props {
 	/** Amazon URLs per binding. Absent = no listing = a disabled placeholder. */
 	hbHref?: string;
 	pbHref?: string;
-	hbPrice: number;
-	pbPrice: number;
+	/** Omit both prices on a card with no print binding (the eBook / audiobook cards). */
+	hbPrice?: number;
+	pbPrice?: number;
+	/**
+	 * Store buttons after the Amazon print buttons and BEFORE Buy Direct (Kevin 2026-10-10:
+	 * "all store buttons come before Buy Direct & Save"). Same pill, logo first, then
+	 * label + price — the Amazon shape. `ebookDirect` renders the direct eBook checkout
+	 * button the page script binds to ([data-ebook-buy]) instead of a link.
+	 */
+	stores?: {
+		logo?: 'amazon' | 'google' | 'kobo';
+		label: string;
+		price: string;
+		href?: string;
+		ebookDirect?: boolean;
+	}[];
 	/** Where "Buy Direct" goes. */
 	directHref?: string;
 	/** Suppress the direct link where buying direct is not offered yet. */
@@ -57,14 +71,28 @@ const {
 	showDirect = true,
 	tightDirect = false,
 	pick,
+	stores = [],
 } = Astro.props;
 
 const AMAZON_LOGO = 'https://assets.spiritmediapublishing.com/FHB/print/amazon-logo.webp';
+// Store logos, self-hosted on R2 like the Amazon one (never hotlinked). Google Play: Google's
+// own horizontal lockup from gstatic (play_prism_hlock_2x.png), the same mark as the 2016 logo
+// Kevin pointed at. Kobo: the "kobo" wordmark cut from Kobo Writing Life's own logo SVG
+// (kobo.com bot-checks our servers). Sized by HEIGHT so the three marks sit level.
+const LOGOS = {
+	amazon: { src: AMAZON_LOGO, w: 192, h: 58 },
+	google: {
+		src: 'https://assets.spiritmediapublishing.com/FHB/print/google-play-logo.webp',
+		w: 288,
+		h: 58,
+	},
+	kobo: { src: 'https://assets.spiritmediapublishing.com/FHB/print/kobo-logo.webp', w: 144, h: 58 },
+} as const;
 
 const bindings = [
 	{ label: 'Hardback', href: hbHref, price: hbPrice },
 	{ label: 'Paperback', href: pbHref, price: pbPrice },
-] as const;
+].filter((b) => b.price !== undefined) as { label: string; href?: string; price: number }[];
 ---
 
 {/* LIGHT PINK on every button (Kevin 2026-09-17, "Turn all button light pink"), taken from
@@ -113,6 +141,24 @@ const bindings = [
 	)
 }
 {
+	stores.map((st) => {
+		const logo = st.logo ? LOGOS[st.logo] : null;
+		const inner = (
+			<>
+				{logo && (
+					<img src={logo.src} alt="" width={logo.w} height={logo.h} loading="lazy" decoding="async" class="store-logo" />
+				)}
+				<span>{`${logo ? '· ' : ''}${st.label} ${st.price}`}</span>
+			</>
+		);
+		return st.ebookDirect ? (
+			<button type="button" data-ebook-buy class="buy-btn">{inner}</button>
+		) : (
+			<a href={st.href} target="_blank" rel="noopener" class="buy-btn" style="text-decoration: none;">{inner}</a>
+		);
+	})
+}
+{
 	showDirect && (
 		<a href={directHref} class={tightDirect ? 'buy-direct buy-direct-tight' : 'buy-direct'} data-pick-edition={pick}>
 			Buy Direct &amp; Save + Free Shipping
@@ -148,6 +194,11 @@ const bindings = [
 	.buy-btn img {
 		flex: none;
 	}
+	.buy-btn .store-logo {
+		height: 16px;
+		width: auto;
+		display: block;
+	}
 	@media (max-width: 640px) {
 		.buy-btn {
 			padding: 0.45rem 0.55rem;
@@ -155,6 +206,10 @@ const bindings = [
 		}
 		.buy-btn img {
 			width: 40px !important;
+		}
+		.buy-btn .store-logo {
+			width: auto !important;
+			height: 12px;
 		}
 	}
 	.buy-btn-off {
