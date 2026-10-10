@@ -66,6 +66,12 @@ interface Props {
 	/** Pad the button set with invisible slots up to this many, so cards with fewer stores line up
 	 *  with the rest (Kevin 2026-10-10: keep space for eBook + audiobook to be added later). */
 	reserveSlots?: number;
+	/** Barnes & Noble listing URLs per binding (src/data/bn-links.json — verified only). One
+	 *  compact pill: the B&N mark, then a link per binding (Kevin 2026-10-10). */
+	bn?: { hardback?: string; paperback?: string };
+	/** Keep an invisible B&N-sized slot when this card has no verified B&N listing, so the
+	 *  Buy Direct line still lines up across the row. */
+	reserveBn?: boolean;
 }
 const {
 	hbHref,
@@ -79,7 +85,13 @@ const {
 	stores = [],
 	compact = false,
 	reserveSlots = 0,
+	bn,
+	reserveBn = false,
 } = Astro.props;
+const bnLinks = [
+	{ label: 'Hardback', href: bn?.hardback },
+	{ label: 'Paperback', href: bn?.paperback },
+].filter((x) => x.href);
 
 const AMAZON_LOGO = 'https://assets.spiritmediapublishing.com/FHB/print/amazon-logo.webp';
 // Store logos, self-hosted on R2 like the Amazon one (never hotlinked). Google Play: Google's
@@ -94,6 +106,8 @@ const LOGOS = {
 		h: 58,
 	},
 	kobo: { src: 'https://assets.spiritmediapublishing.com/FHB/print/kobo-logo.webp', w: 144, h: 58 },
+	// B&N's own "B&N" mark from barnesandnoble.com's CDN.
+	bn: { src: 'https://assets.spiritmediapublishing.com/FHB/print/bn-logo.webp', w: 165, h: 58 },
 	// Free listening (Kevin 2026-10-10): Spotify's full logo from its newsroom brand files,
 	// YouTube's logo from YouTube's gstatic branding, Apple Podcasts' app icon from apple.com.
 	spotify: {
@@ -192,6 +206,27 @@ const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
 	))
 }
 {
+	bnLinks.length > 0 ? (
+		<span class="buy-btn buy-btn-bn">
+			<img src={LOGOS.bn.src} alt="Barnes & Noble" width={LOGOS.bn.w} height={LOGOS.bn.h} loading="lazy" decoding="async" class="store-logo" />
+			{bnLinks.map((x) => (
+				<>
+					<span aria-hidden="true">·</span>
+					<a href={x.href} target="_blank" rel="noopener" class="bn-link">
+						{x.label}
+					</a>
+				</>
+			))}
+		</span>
+	) : (
+		reserveBn && (
+			<span class="buy-btn buy-btn-slot" aria-hidden="true">
+				<span>&nbsp;</span>
+			</span>
+		)
+	)
+}
+{
 	showDirect && (
 		<a href={directHref} class={tightDirect ? 'buy-direct buy-direct-tight' : 'buy-direct'} data-pick-edition={pick}>
 			Buy Direct &amp; Save + Free Shipping
@@ -265,6 +300,16 @@ const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
 			flex-wrap: nowrap;
 			white-space: nowrap;
 		}
+	}
+	/* B&N: one pill, two links (a pill cannot be one link to two pages). */
+	.buy-btn-bn {
+		cursor: default;
+		gap: 0.3rem;
+	}
+	.bn-link {
+		color: inherit;
+		text-decoration: underline;
+		text-underline-offset: 2px;
 	}
 	/* A reserved, invisible slot: same box as a button, so every card's controls line up. */
 	.buy-btn-slot {

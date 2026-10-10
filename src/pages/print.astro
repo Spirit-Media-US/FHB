@@ -10,6 +10,7 @@ import VoiceChips from '../components/VoiceChips.astro';
 // An edition absent from this file keeps its "coming soon" state, so a listing appearing
 // later needs a re-run of the sync, not an edit here.
 import amazonLinks from '../data/amazon-links.json';
+import bnData from '../data/bn-links.json';
 import { cardUrl } from '../data/card-art';
 import digital from '../data/digital-listings.json';
 import { dvcEditions as dvcEditionList } from '../data/dvc-editions';
@@ -49,6 +50,9 @@ const AUDIENCE_TOTAL = dvcEditionList.length;
 // (2026-10-10). The English eBook is also sold direct here ($7.49, our own fulfillment). Apple
 // Books and Nook were removed 2026-10-10: both listings 404 since D2D refused distribution.
 const digitalEn = digital.en;
+// Barnes & Noble print listings, one master (src/data/bn-links.json): an entry exists only where
+// a B&N search by the binding's ISBN-13 opened that edition's own product page (2026-10-10).
+const bnLinks = bnData.links as Record<string, { hardback?: string; paperback?: string }>;
 const EBOOK_COVER =
 	'https://assets.spiritmediapublishing.com/FHB/print/fhb-ebook-cover-2026-6-600.webp';
 const EBOOK_COVER_2X =
@@ -562,6 +566,8 @@ function markVoices(v: {
 								pbPrice={e.pb}
 								tightDirect={e.slug === 'journaling'}
 								pick={e.slug}
+								bn={bnLinks[e.slug]}
+								reserveBn
 							/>
 						</div>
 					</div>
@@ -648,6 +654,8 @@ function markVoices(v: {
 									hbPrice={l.hb}
 									pbPrice={l.pb}
 									pick={`general-${l.line}-${c.key}`}
+									bn={bnLinks[`general-${l.line}-${c.key}`]}
+									reserveBn
 								/>
 							</div>
 						</div>
@@ -779,6 +787,8 @@ function markVoices(v: {
 								hbPrice={v.hb}
 								pbPrice={v.pb}
 								pick={v.key}
+								bn={bnLinks[v.key]}
+								reserveBn
 							/>
 						</div>
 					</div>
@@ -872,6 +882,8 @@ function markVoices(v: {
 								hbPrice={LANG_HB}
 								pbPrice={LANG_PB}
 								pick={`lang-${l.code}`}
+								bn={bnLinks[`lang-${l.code}`]}
+								reserveBn
 								reserveSlots={4}
 								tightDirect
 								stores={langDigital(l.code).map((d) => ({ logo: 'google' as const, label: d.kind, price: d.price, href: d.url }))}
