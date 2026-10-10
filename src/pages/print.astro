@@ -224,7 +224,7 @@ const langDigital = (code: string) => {
 	)[code];
 	return [
 		...(d?.ebook ?? []).map((x) => ({ ...x, kind: 'eBook' })),
-		...(d?.audiobook ?? []).map((x) => ({ ...x, kind: 'Audiobook' })),
+		...(d?.audiobook ?? []).map((x) => ({ ...x, kind: 'Audio' })),
 	];
 };
 const langHasLi = (l: (typeof languageEditions)[number]) =>
@@ -659,25 +659,31 @@ function markVoices(v: {
 				    the stores sell — Google squares that same cover for its audiobook). Every store
 				    button is the Amazon shape, logo first (BuyControls). */}
 				{l.line === 'regular' && (
-					<div class="grid grid-cols-1 gap-6 md:gap-8 max-w-4xl mx-auto mt-10">
+					<div class="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-6 md:gap-8 max-w-6xl mx-auto mt-10">
 						<div id="ebook" class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline); scroll-margin-top: 90px;">
 							<img src={EBOOK_COVER} srcset={`${EBOOK_COVER} 600w, ${EBOOK_COVER_2X} 1200w`} sizes="(min-width: 640px) 200px, 50vw" alt="Father's Heart Bible (FHB) eBook cover" width="600" height="900" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 170px; border: 1px solid var(--color-hairline);" />
 							<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">eBook</h3>
 							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">Read on any device. The complete translation, reflowable with pop-up footnotes.</p>
 							<div class="flex flex-col gap-2 w-full mt-auto">
 								<div class="flex flex-wrap justify-center gap-2 w-full">
-								<BuyControls showDirect={false} stores={[
+								<BuyControls compact showDirect={false} stores={[
 									...digitalEn.ebook.map((d) => ({ logo: storeLogo(d.store), label: d.store === 'Kindle' ? 'Kindle' : 'eBook', price: d.price, href: d.url })),
-									{ label: 'Buy Direct · eBook', price: EBOOK_DIRECT, ebookDirect: true },
+									{ label: 'Buy Direct', price: EBOOK_DIRECT, ebookDirect: true },
 								]} />
 								</div>
 								<p data-ebook-msg style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.4rem 0 0; display: none;"></p>
 								<p style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-ink); font-weight: 600; margin: 0.7rem 0 0;">Listening Edition (for read-aloud apps)</p>
 								<div class="flex flex-wrap justify-center gap-2 w-full">
-								<BuyControls showDirect={false} stores={digitalEn.listening.map((d) => ({ logo: storeLogo(d.store), label: d.label ? `${d.store} ${d.label}` : d.store === 'Kindle' ? 'Kindle' : 'eBook', price: d.price, href: d.url }))} />
+								<BuyControls compact showDirect={false} stores={digitalEn.listening.map((d) => ({ logo: storeLogo(d.store), label: d.label ? `${d.store} ${d.label}` : d.store === 'Kindle' ? 'Kindle' : 'eBook', price: d.price, href: d.url }))} />
 								</div>
 							</div>
-							<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">Direct = instant EPUB download, DRM-free.</p>
+							<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">
+								Direct = instant EPUB download, DRM-free.{' '}
+								<details class="drm-tip" style="display: inline;">
+									<summary style="display: inline; cursor: pointer; color: #3f3f46; font-weight: 700; text-decoration: underline; text-underline-offset: 2px;">What does DRM-free mean?</summary>
+									<span style="display: block; margin-top: 0.35rem;">No copy protection: open it in any reading app, on any device, and keep it forever.</span>
+								</details>
+							</p>
 						</div>
 						<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
 							<img src={EBOOK_COVER} srcset={`${EBOOK_COVER} 600w, ${EBOOK_COVER_2X} 1200w`} sizes="(min-width: 640px) 200px, 50vw" alt="Father's Heart Bible (FHB) audiobook cover" width="600" height="900" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 170px; border: 1px solid var(--color-hairline);" />
@@ -685,15 +691,21 @@ function markVoices(v: {
 							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">The complete Bible, narrated — or listen free, chapter by chapter.</p>
 							<div class="flex flex-col gap-2 w-full">
 								<div class="flex flex-wrap justify-center gap-2 w-full">
-								<BuyControls showDirect={false} stores={digitalEn.audiobook.map((d) => ({ logo: storeLogo(d.store), label: 'Audiobook', price: d.price, href: d.url }))} />
+								<BuyControls compact showDirect={false} stores={digitalEn.audiobook.map((d) => ({ logo: storeLogo(d.store), label: 'Audio', price: d.price, href: d.url }))} />
 								</div>
 							</div>
-							<p style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.8rem 0 0;">
-								Listen free:{' '}
-								<a href="https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY" target="_blank" rel="noopener" style="color: #3f3f46; font-weight: 700;">Spotify</a> ·{' '}
-								<a href="https://podcasts.apple.com/us/podcast/id6818374650" target="_blank" rel="noopener" style="color: #3f3f46; font-weight: 700;">Apple Podcasts</a> ·{' '}
-								<a href="https://www.youtube.com/@FathersHeartBible" target="_blank" rel="noopener" style="color: #3f3f46; font-weight: 700;">YouTube</a>
-							</p>
+							<p style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-ink); font-weight: 600; margin: 0.9rem 0 0.4rem;">Listen free, chapter by chapter</p>
+							<div class="flex flex-wrap justify-center gap-2 w-full">
+								<BuyControls
+									compact
+									showDirect={false}
+									stores={[
+										{ logo: 'spotify', label: '', price: '', href: 'https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY' },
+										{ logo: 'applepodcasts', label: 'Apple Podcasts', price: '', href: 'https://podcasts.apple.com/us/podcast/id6818374650' },
+										{ logo: 'youtube', label: '', price: '', href: 'https://www.youtube.com/@FathersHeartBible' },
+									]}
+								/>
+							</div>
 						</div>
 					</div>
 				)}
@@ -845,7 +857,7 @@ function markVoices(v: {
 						<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">{l.english}</p>
 						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">{l.sub}</p>
 						<div class="flex flex-col gap-2 w-full mt-auto">
-							<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.2rem;">
+							<div class="lang-links flex items-center justify-center gap-2 flex-nowrap whitespace-nowrap" style="margin: 0 0 0.2rem;">
 								{builtPages.has(`${langSlug(l)}-bible`) && (
 									<a href={`/bibles/${langSlug(l)}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
 								)}
@@ -860,6 +872,8 @@ function markVoices(v: {
 								hbPrice={LANG_HB}
 								pbPrice={LANG_PB}
 								pick={`lang-${l.code}`}
+								reserveSlots={4}
+								tightDirect
 								stores={langDigital(l.code).map((d) => ({ logo: 'google' as const, label: d.kind, price: d.price, href: d.url }))}
 							/>
 						</div>
@@ -959,6 +973,18 @@ function markVoices(v: {
 </Layout>
 
 <style>
+	/* Language cards: "Full details · Look inside" on ONE line (Kevin 2026-10-10). A phone card
+	   is ~133px wide, so the pair steps down in size there rather than wrapping. */
+	@media (max-width: 640px) {
+		:global(.lang-links) {
+			gap: 0.2rem !important;
+		}
+		:global(.lang-links a),
+		:global(.lang-links button),
+		:global(.lang-links span) {
+			font-size: 0.64rem !important;
+		}
+	}
 	/* FAQ accordion — native <details>, no JS. */
 	.faq-item > summary {
 		cursor: pointer;
