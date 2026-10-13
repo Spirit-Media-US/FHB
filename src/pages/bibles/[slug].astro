@@ -286,6 +286,15 @@ const productSchema = {
 		},
 	},
 };
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+		{ '@type': 'ListItem', position: 2, name: 'Print Editions', item: `${SITE}/print/` },
+		{ '@type': 'ListItem', position: 3, name: ed.name, item: `${SITE}/bibles/${ed.slug}-bible/` },
+	],
+};
 const faqSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'FAQPage',
@@ -305,6 +314,7 @@ const faqSchema = {
 >
 	<script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
 	<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+	<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
 
 	<main>
 		<Section variant="light">

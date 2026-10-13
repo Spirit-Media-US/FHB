@@ -3,6 +3,7 @@ import CTASection from '../../components/CTASection.astro';
 import ScriptureBlock from '../../components/ScriptureBlock.astro';
 import Section from '../../components/Section.astro';
 import VideoHeroInner from '../../components/VideoHeroInner.astro';
+import WaysToReceive from '../../components/WaysToReceive.astro';
 import Layout from '../../layouts/Layout.astro';
 import { sanityClient } from '../../lib/sanity';
 
@@ -18,10 +19,12 @@ const [pageData, media, kevinProfile] = await Promise.all([
 	),
 ]);
 
-const seoTitle = pageData?.seoTitle || "Leadership — Kevin White | FHB — Father's Heart Bible™";
+// NOTE: the LIVE title/description come from Sanity (page "about") when set there.
+const seoTitle =
+	pageData?.seoTitle || "Kevin and Shelly White — Leadership | Father's Heart Bible™ (FHB)";
 const seoDescription =
 	pageData?.seoDescription ||
-	"Learn the story behind the Father's Heart Bible (FHB) and translator Kevin White's vision: a translation that reveals God as Father through every Scripture passage.";
+	"Meet Kevin and Shelly White of Spirit Media Publishing, who lead the Father's Heart Bible™ (FHB). Kevin led the translation; this is the forty-year story behind it.";
 const kevinPortraitUrl =
 	kevinProfile?.portraitUrl || kevinProfile?.portrait?.asset?.url || media?.kevinPortraitUrl || '';
 const communityUrl = media?.communityUrl || '#join';
@@ -43,7 +46,16 @@ const heroVideoUrl =
         "@id": "https://kevinwhite.us/#person",
         "name": "Kevin White",
         "jobTitle": "Founder & CEO, Spirit Media Publishing",
-        "description": "Kevin White is leading the translation and publishing process of the Father's Heart Bible™, a translation centered on revealing God's heart as Father through every passage. Founder of Spirit Media Publishing.",
+        "description": "Kevin White led the translation and publishing process of the Father's Heart Bible™. An author, speaker, and marketplace pastor, he leads Spirit Media Publishing with his wife, Shelly White.",
+        // Shelly White is named here, on Kevin's entity, rather than as a second top-level Person:
+        // scripts/aeo-validate.mjs requires three real external profile URLs for every top-level
+        // Person, and none are on record for her. Add her own Person node when they are.
+        "spouse": {
+          "@type": "Person",
+          "name": "Shelly White",
+          "description": "Shelly White leads Spirit Media Publishing and Father's Heart Bible™ with her husband, Kevin White.",
+          "worksFor": { "@id": "https://spiritmediapublishing.com/#organization" }
+        },
         "image": kevinPortraitUrl,
         "worksFor": { "@type": "Organization", "name": "Spirit Media Publishing", "url": "https://spiritmediapublishing.com" },
         "url": "https://fathersheartbible.com/the-fathers-heart-bible/leadership/",
@@ -73,7 +85,7 @@ const heroVideoUrl =
       imageSrc="https://assets.spiritmediapublishing.com/FHB/print/leadership-hero.webp"
       href="/print/"
       heading="A forty-year journey to the Father's heart"
-      subheading="The Father's Heart Bible™ was not born from novelty. It was born from a long journey through Scripture, ministry, longing, and awakening."
+      subheading="Kevin and Shelly White lead Spirit Media Publishing, the publisher of the Father's Heart Bible™. Kevin led the translation. It was not born from novelty, but from a long journey through Scripture, ministry, longing, and awakening."
       primaryCtaLabel="Read FHB →"
       primaryCtaHref="/read/"
     />
@@ -289,6 +301,12 @@ const heroVideoUrl =
           </p>
         </div>
       </div>
+    </Section>
+
+
+    <!-- Every way to receive it — the crawlable link block shared with Home and About (Kevin 2026-10-13). -->
+    <Section variant="soft">
+      <WaysToReceive />
     </Section>
 
 

@@ -3,7 +3,15 @@ import ImageGrid from '../components/ImageGrid.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
+import WaysToReceive from '../components/WaysToReceive.astro';
 import { LANGUAGE_EDITION_TOTAL } from '../data/language-editions';
+import {
+	AUDIENCE_EDITION_TOTAL,
+	BOOK_ID,
+	LANGUAGE_TOTAL,
+	languageItemList,
+	topLanguages,
+} from '../data/receive';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
 
@@ -31,14 +39,17 @@ const [pageData, media, biblePageData, latestPosts] = await Promise.all([
 	),
 ]);
 
+// The definitional page: it owns "what is the Father's Heart Bible" and "Father's Heart Bible
+// translation". NOTE: the LIVE title/description come from Sanity (page "the-fathers-heart-bible")
+// when set there.
 const seoTitle =
-	pageData?.seoTitle || "What Is the Father's Heart Bible™ (FHB)? | Father's Heart Bible™";
+	pageData?.seoTitle || "What Is the Father's Heart Bible™ (FHB)? The 2026 Bible Translation";
 const seoDescription =
 	pageData?.seoDescription ||
-	'Learn what the Father\u2019s Heart Bible is, why it exists, and how this new Bible translation reveals God as Father where Scripture reveals Him.';
+	`Father's Heart Bible™ (FHB) is a complete, fresh Bible translation from the Hebrew, Aramaic and Greek, with our Father's words in blue. Free online, in print, ${LANGUAGE_TOTAL} languages.`;
 const heroHeading = 'What is the Father\u2019s Heart Bible\u2122?';
-const heroSubheading =
-	'The Father\u2019s Heart Bible\u2122 is a fresh English Bible translation from the original Hebrew, Aramaic, and Greek that reveals God as Father where Scripture reveals Him\u2014and helps readers encounter not only His name, but His heart.';
+// Answer-first: the page's question answered in its opening sentences, in plain text.
+const heroSubheading = `Father\u2019s Heart Bible\u2122 (FHB) is the complete Bible in a fresh translation from the original Hebrew, Aramaic, and Greek that reveals God as our Father where Scripture reveals Him. It is the first Bible in print to show which words a divine person spoke \u2014 our Father\u2019s in blue, the Son\u2019s in red, the Spirit\u2019s in purple. Free to read and hear online, and in print in ${LANGUAGE_TOTAL} languages.`;
 // Hero CTA: single "Read FHB" (the site's primary CTA). The old "Read Sample
 // Passages" button was removed (2026-06-06, Kevin) since Read FHB sat right
 // beside it — redundant.
@@ -83,40 +94,59 @@ const shifts = biblePageData?.shifts ?? [
 	{ from: 'Servant mindset', to: 'Beloved identity' },
 ];
 
-// FAQ — AEO-optimized question-and-answer pairs that mirror what people
-// actually search for. The visible section below renders these; the
-// FAQPage JSON-LD below mirrors them for rich-result eligibility.
+// FAQ — question-and-answer pairs that mirror what people actually search for. The visible
+// section below renders these; the FAQPage JSON-LD mirrors them word for word.
+// The divine-name answers quote the Bible's own "About this Translation" statement (shown in
+// full further up this page) — do not paraphrase it in terms of single Hebrew names.
+const DIVINE_NAMES =
+	'Where a word for God stands in a clearly relational or covenantal setting, it is rendered “our Father.” Elsewhere the customary rendering is kept, and Adonai and Kurios are always rendered “Lord.”';
 const faqs = [
 	{
 		q: "What is the Father's Heart Bible™?",
-		a: "The Father's Heart Bible™ (FHB) is an interpretive English Bible translation that reveals God as Father wherever Scripture reveals Him. Where the Hebrew text uses YHWH (the personal covenant name) in a relational context, FHB renders it 'our Father' — recovering the warmth the name carried for Israel and continuing the apostles' own hermeneutic on the page.",
+		a: "Father's Heart Bible™ (FHB) is the complete Bible — 66 books, 1,189 chapters, 31,085 verses — in a fresh translation from the original Hebrew, Aramaic, and Greek, governed by 170 written translation rules. It is the first Bible in print to show which words a divine person spoke, and which person spoke them: our Father's words in blue, the Son's in red, the Spirit's in purple.",
 	},
 	{
 		// The abbreviation needs its own QUESTION, not just a mention inside another answer
 		// (Kevin 2026-09-18). NIV, ESV and KJV carry their own search demand; FHB does not yet,
 		// so the pairing has to be stated in the form an engine can lift and a person can ask.
 		q: 'What does FHB stand for?',
-		a: "FHB stands for the Father's Heart Bible™ — an interpretive English Bible translation that reveals God as our Father. It is used the way NIV, ESV or KJV are used: FHB is the translation abbreviation, and Father's Heart Bible is the full name. Every FHB edition carries the same translation; the editions differ only in who they were made for, the print size and the binding.",
+		a: "FHB stands for Father's Heart Bible™. It is used the way NIV, ESV or KJV are used: FHB is the translation abbreviation, and Father's Heart Bible is the full name. Every FHB edition carries the same translation; the editions differ only in who they were made for, the print size and the binding.",
 	},
 	{
 		q: "How is the Father's Heart Bible™ different from other translations?",
-		a: "Most English translations flatten YHWH and Elohim into 'God' or 'the LORD,' which hides the Trinitarian and relational distinctions already in the original languages. FHB preserves those distinctions: when the text points to the Father, it reads 'our Father'; when the text points to a generic deity (or the serpent's distant 'God'), it reads 'God.' Footnotes document every distinctive choice.",
-	},
-	{
-		q: 'Is the Father’s Heart Bible™ a paraphrase?',
-		a: 'No. FHB is an interpretive translation grounded in the original Hebrew, Greek, and Aramaic — not a loosely reworded paraphrase. Translation choices are footnoted and traceable to the source text, and the work follows a documented methodology of canon-wide consistency.',
-	},
-	{
-		q: 'Who translated the Father’s Heart Bible™?',
-		a: "Kevin White is leading the translation and publishing process, supported by the Spirit Media Publishing team. Kevin is the author of Father's Heart → Beloved Identity (free download) and CEO of Spirit Media Publishing.",
-	},
-	{
-		q: 'Which books of the Bible are included?',
-		a: 'The full canon — Genesis to Revelation, available to read or listen to free online.',
+		a: `In two ways. First, how it renders the divine names: ${DIVINE_NAMES} Second, Divine Voice Color: for a hundred and twenty-five years, red letters have shown the Son speaking. FHB also prints our Father's words in blue — 128,579 words across 5,615 verses — and the Spirit's in purple, so you can see who is speaking.`,
 	},
 	{
 		q: 'Why does FHB render “God” as “our Father” in some places?',
-		a: 'The Hebrew uses two distinct divine names — YHWH (personal covenant name) and Elohim (generic word for deity) — and they fall on different lips and in different contexts. The apostles already read these differences and applied them to specific Persons of the Trinity (e.g. Joel 2:32 → Romans 10:13 applies the verse to Jesus). FHB does this work on the page rather than leaving it for the reader to assemble.',
+		a: `${DIVINE_NAMES} So John 3:16 reads, “For our Father so loved the world that he gave his one and only Son,” because the One who gives the Son there is the Father. The word “God” is kept wherever Scripture speaks of God as God, and where the original carries no divine name, the note says so.`,
+	},
+	{
+		q: 'Is the Father’s Heart Bible™ a red letter Bible?',
+		a: "It is a red letter Bible and more. A red letter Bible prints the words of Jesus in red. FHB prints the Son's words in red (35,725 words), our Father's in blue (128,579 words across 5,615 verses) and the Spirit's in purple (95 words). The color marks who spoke: words a divine person never spoke are never colored, and narration stays black.",
+	},
+	{
+		q: 'Is the Father’s Heart Bible™ a new, easy-to-read translation?',
+		a: 'Yes. FHB is a First Edition, published in 2026 — a fresh translation, not an adaptation of any existing English Bible. It renders the meaning of the original in clear, contemporary English, and reads 131,500 words shorter than the King James because contemporary English says the same thing in fewer words. Nothing is abridged: every verse, every book.',
+	},
+	{
+		q: 'Is the Father’s Heart Bible™ a paraphrase?',
+		a: 'No. FHB is an interpretive translation from the original Hebrew, Aramaic, and Greek, governed by 170 written translation rules. It is not a paraphrase, and not an adaptation of any existing English Bible. It is also not a study Bible or commentary: the notes serve the reader, not the scholar.',
+	},
+	{
+		q: 'Who translated the Father’s Heart Bible™?',
+		a: 'Kevin White of Spirit Media Publishing led the translation and publishing process. The 170 translation rules and every interpretive decision are his work; other readers reviewed it and offered feedback. How the text was produced is set out under “How it was made” on this page. FHB is published by Spirit Media Publishing, which Kevin and Shelly White lead.',
+	},
+	{
+		q: 'Can I read the Father’s Heart Bible™ online for free?',
+		a: 'Yes. The whole Bible, Genesis to Revelation, is free to read at fathersheartbible.com/read/ with verse-by-verse audio, and free to hear as an audio Bible on Spotify, Apple Podcasts and YouTube.',
+	},
+	{
+		q: 'What editions and formats does it come in?',
+		a: `In print, as hardcover and paperback: the Father's Heart Bible in three cover colors, ${AUDIENCE_EDITION_TOTAL} audience editions (for men, women, teens, moms, dads, graduates and more), a three-volume Large Print Bible in 14-point type, and a wide-margin 8x10 journaling Bible. It is also published as an eBook and an audiobook, and it is free to read and hear online.`,
+	},
+	{
+		q: 'Is the Father’s Heart Bible™ available in Spanish and other languages?',
+		a: `Yes. FHB is published in ${LANGUAGE_TOTAL} languages — English and ${LANGUAGE_EDITION_TOTAL} more, among them ${topLanguages(8).join(', ')}. Each one is published in print and free to read online.`,
 	},
 ];
 
@@ -137,18 +167,20 @@ const formatDate = (dateString: string) => {
 		{
 			"@context": "https://schema.org",
 			"@graph": [
-				{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/the-fathers-heart-bible/" },
+				{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/the-fathers-heart-bible/", "mainEntity": { "@id": BOOK_ID } },
 				{ "@type": "BreadcrumbList", "itemListElement": [
 					{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
 					{ "@type": "ListItem", "position": 2, "name": "About FHB", "item": "https://fathersheartbible.com/the-fathers-heart-bible/" }
-				]}
+				]},
+				// Mirrors the visible "Read the Bible free online in N languages" list below.
+				languageItemList
 			]
 		},
 		// Book schema — establishes FHB as a Bible translation entity for AI engines and search.
 		{
 			"@context": "https://schema.org",
 			"@type": "Book",
-			"@id": "https://fathersheartbible.com/#book",
+			"@id": BOOK_ID,
 			// Names, edition and description follow the Metadata & Messaging Guidelines
 			// verbatim: brand always carries the ™ and never a leading "The"; the full
 			// listed title is the alternateName; the description is the approved short
@@ -165,6 +197,8 @@ const formatDate = (dateString: string) => {
 			"description": "A fresh Bible translation from the original Hebrew, Aramaic, and Greek that reveals God as your Father. Come home to your Father. His heart is for you.",
 			"inLanguage": "en",
 			"url": "https://fathersheartbible.com",
+			"translationOfWork": { "@type": "Book", "name": "The Holy Bible" },
+			"isAccessibleForFree": true,
 			"sameAs": [
 				"https://www.instagram.com/fathersheartbible/",
 				"https://www.youtube.com/channel/UCzgp9q1JnqyyEgz_j--KiQg",
@@ -389,6 +423,12 @@ const formatDate = (dateString: string) => {
 						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{detail}</p>
 					</div>
 				))}
+			</div>
+			{/* Every way to receive it + the language list + well-known chapters (Kevin 2026-10-13):
+			    the crawlable link block shared with Home and Leadership. The full language list
+			    renders on THIS page only. */}
+			<div class="mt-14">
+				<WaysToReceive passages languages />
 			</div>
 		</Section>
 
