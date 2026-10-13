@@ -208,13 +208,13 @@ const upcoming: [string, string, string][] = [
 
 		<!-- ═══════════════ YOU'RE INVITED  |  OUR SHARED LEGACY ═══════════════ -->
 		<Section variant="light">
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-stretch">
 				<!-- You're Invited -->
-				<div data-reveal>
+				<div data-reveal class="legacy-col">
 						<p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">
-							You're Invited
+							Our Father&rsquo;s love compels us
 						</p>
-						<div class="rounded-2xl p-7 md:p-8" style="background: #FFE1E8; border: 1px solid var(--color-hairline);">
+						<div class="rounded-2xl p-7 md:p-8 legacy-fill" style="background: #FFE1E8; border: 1px solid var(--color-hairline);">
 						<img
 							src="https://cdn.sanity.io/images/rusi1hyi/production/78fe2b8fd627d52d8a2fc6401622e0cead9dbeb3-800x800.jpg?w=400&h=400&fm=webp&q=80"
 							alt="Kevin and Shelly White"
@@ -245,7 +245,7 @@ const upcoming: [string, string, string][] = [
 				</div>
 
 				<!-- The Father's legacy — why (Kevin 2026-10-13). Verses are the locked FHB text. -->
-				<div data-reveal>
+				<div data-reveal class="legacy-col legacy-why">
 					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
 						The Father&rsquo;s Legacy
 					</p>
@@ -254,11 +254,10 @@ const upcoming: [string, string, string][] = [
 					</h2>
 					<div class="space-y-4" style="margin-top: 1.5rem; font-family: var(--font-sans); color: var(--color-muted); line-height: 1.65;">
 						<p>He is the greatest desire in your soul and the greatest gift you will ever receive. Nothing else satisfies.</p>
-						<p>Jesus lived for one thing: &ldquo;Zeal for your house will consume me.&rdquo; &mdash; <a href="/read/john/2/" style="color: inherit; text-decoration: underline; text-underline-offset: 3px;">John 2:17 (FHB)</a>. His Father&rsquo;s house is not stone. It is His sons and daughters: &ldquo;Don&rsquo;t you know you are our Father&rsquo;s temple?&rdquo; &mdash; <a href="/read/1-corinthians/3/" style="color: inherit; text-decoration: underline; text-underline-offset: 3px;">1 Corinthians 3:16 (FHB)</a>.</p>
-						<p>&ldquo;What good does it do a person to gain the whole world and forfeit his soul?&rdquo; &mdash; <a href="/read/mark/8/" style="color: inherit; text-decoration: underline; text-underline-offset: 3px;">Mark 8:36 (FHB)</a>. What good is the whole world to someone who does not know his Father?</p>
+						<p>Jesus lived for one thing: &ldquo;Zeal for your house will consume me.&rdquo; &mdash; <a href="/read/john/2/" class="legacy-link">John 2:17 (FHB)</a>. His Father&rsquo;s house is not stone. It is His sons and daughters: &ldquo;Don&rsquo;t you know you are our Father&rsquo;s temple?&rdquo; &mdash; <a href="/read/1-corinthians/3/" class="legacy-link">1 Corinthians 3:16 (FHB)</a>.</p>
+						<p>&ldquo;What good does it do a person to gain the whole world and forfeit his soul?&rdquo; &mdash; <a href="/read/mark/8/" class="legacy-link">Mark 8:36 (FHB)</a>. What good is the whole world to someone who does not know his Father?</p>
 						<p style="font-family: var(--font-serif); font-size: 1.3rem; line-height: 1.4; color: var(--color-ink);">If sharing the Father with the world consumes you, we invite you to join us in the Father&rsquo;s heart legacy.</p>
 					</div>
-					<a href="#commitment" class="inline-flex items-center px-6 py-3 text-base font-semibold no-underline" style="margin-top: 1.25rem; font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border: 1px solid #FFD9E0;">Make it your legacy &darr;</a>
 				</div>
 			</div>
 		</Section>
@@ -387,18 +386,16 @@ const upcoming: [string, string, string][] = [
 				})}
 			</div>
 
-			<!-- More to come — the rest of the 80, folded -->
-			<details class="lang-more">
-				<summary>{upcoming.length} more to come &mdash; 80 languages in all</summary>
-				<div class="lang-grid" style="margin-top: 1rem;">
-					{upcoming.map(([name, flag]) => (
-						<div class="lang-chip">
-							<img src={`/flags/${flag}.svg`} alt="" width="22" height="15" loading="lazy" />
-							<span class="lang-name">{name}</span>
-						</div>
-					))}
-				</div>
-			</details>
+			<!-- More to come — the rest of the 80 (open: it sits at the bottom of the page now, Kevin 2026-10-13) -->
+			<h2 class="text-center text-xl md:text-2xl font-light" style="margin: 2.5rem 0 1rem; font-family: var(--font-serif); color: var(--color-ink);">{upcoming.length} more to come &mdash; 80 languages in all</h2>
+			<div class="lang-grid">
+				{upcoming.map(([name, flag]) => (
+					<div class="lang-chip">
+						<img src={`/flags/${flag}.svg`} alt="" width="22" height="15" loading="lazy" />
+						<span class="lang-name">{name}</span>
+					</div>
+				))}
+			</div>
 		</Section>
 
 		<!-- ═══════════════ THE FATHER'S VISION (blog card) ═══════════════ -->
@@ -452,12 +449,13 @@ const upcoming: [string, string, string][] = [
 	.lang-name { font-size: 0.9rem; font-weight: 600; color: var(--color-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 	.lang-num { font-size: 0.85rem; font-weight: 800; color: var(--color-brand); }
 	a.lang-chip:hover { border-color: var(--color-brand); }
-	.lang-more { margin-top: 1.5rem; text-align: center; }
-	.lang-more summary { cursor: pointer; list-style: none; display: inline-block; padding: 0.6rem 1.25rem; border: 1px solid var(--color-hairline); border-radius: 999px; font-family: var(--font-sans); font-weight: 600; font-size: 0.95rem; color: var(--color-ink); }
-	.lang-more summary::-webkit-details-marker { display: none; }
-	.lang-more summary::after { content: " +"; color: var(--color-gold); }
-	.lang-more[open] summary::after { content: " \2212"; }
-	.lang-more .lang-grid { text-align: left; }
+	.legacy-link { color: var(--color-brand); text-decoration: none; font-weight: 600; white-space: nowrap; }
+	.legacy-link:hover { text-decoration: underline; }
+	@media (min-width: 1024px) {
+		.legacy-col { display: flex; flex-direction: column; }
+		.legacy-fill { flex: 1; }
+		.legacy-why { justify-content: space-between; }
+	}
 </style>
 
 <script>
