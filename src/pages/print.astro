@@ -13,7 +13,7 @@ import amazonLinks from '../data/amazon-links.json';
 import bnData from '../data/bn-links.json';
 import { cardUrl } from '../data/card-art';
 import digital from '../data/digital-listings.json';
-import { dvcEditions as dvcEditionList } from '../data/dvc-editions';
+import { AUDIENCE_EDITION_TOTAL, dvcEditions as dvcEditionList } from '../data/dvc-editions';
 import {
 	allLanguageEditions,
 	comingSoonEditions,
@@ -44,8 +44,9 @@ const DVC_TAIL2 =
 // The audience editions and their spec helpers live in src/data/dvc-editions.ts (shared with /print/order/).
 // Runtime value used in the template below (biome cannot see .astro template use, keep this line).
 const dvcEditions = dvcEditionList;
-// Kevin 2026-10-10 (3b): every card in the section counts, the 8x10 journaling edition included.
-const AUDIENCE_TOTAL = dvcEditionList.length;
+// Kevin 2026-10-13: one audience count site-wide — every card in this section (journaling
+// included) plus the general edition and Large Print, which sit in their own sections below.
+const AUDIENCE_TOTAL = AUDIENCE_EDITION_TOTAL;
 
 // Digital editions. Every eBook / audiobook store link comes from src/data/digital-listings.json —
 // the one master, each entry added only after its store page answered with the right title

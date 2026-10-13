@@ -251,3 +251,9 @@ export const dvcEditions: DvcEdition[] = [
 		trim: trimJournaling,
 	},
 ];
+
+// THE AUDIENCE-EDITION COUNT — one number, used everywhere (Kevin 2026-10-13: "Let's get
+// this straight throughout"). Every card above (the journaling Bible included) plus the two
+// editions that are also made for a specific audience but live in their own sections on
+// /print: the general edition and Large Print.
+export const AUDIENCE_EDITION_TOTAL = dvcEditions.length + 2;

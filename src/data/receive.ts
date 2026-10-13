@@ -84,8 +84,7 @@ export function editionForAudiencePage(page: string): AudienceLink | undefined {
 	);
 }
 
-/** The 6x9 audience editions — every card on /print's audience section except the 8x10 journaling Bible. */
-export const AUDIENCE_EDITION_TOTAL = dvcEditions.filter((e) => e.slug !== 'journaling').length;
+export { AUDIENCE_EDITION_TOTAL } from './dvc-editions';
 
 /** English + every language edition in the registry. */
 export const LANGUAGE_TOTAL = LANGUAGE_EDITION_TOTAL + 1;
