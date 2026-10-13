@@ -98,7 +98,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 // title; Apple, Spotify and YouTube open our channels. Only stores where our listing has been
 // confirmed belong here (Kevin 2026-10-13: no logo on his word) — Walmart is out until someone
 // confirms it by eye; its site blocks our checks.
-const searchOn = [
+const searchOn: { label: string; logo: string; w: number; h?: number; href: string }[] = [
 	{
 		label: 'Amazon',
 		logo: 'amazon',
@@ -116,6 +116,19 @@ const searchOn = [
 		logo: 'barnesandnoble',
 		w: 150,
 		href: 'https://www.barnesandnoble.com/s/Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Books-A-Million',
+		logo: 'booksamillion',
+		w: 106,
+		h: 40,
+		href: 'https://www.booksamillion.com/search?query=Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Bookshop.org',
+		logo: 'bookshop',
+		w: 190,
+		href: 'https://bookshop.org/search?keywords=Father%27s+Heart+Bible',
 	},
 	{
 		label: 'Google',
@@ -666,7 +679,7 @@ const homeVoices: VoiceGroup[] = [
 				</h2>
 				<ul class="fhb-search-on">
 					{searchOn.map((x) => (
-						<li><a href={x.href} target="_blank" rel="noopener noreferrer" aria-label={`Father's Heart Bible on ${x.label}`}><img src={`/logos/stores/${x.logo}.svg`} alt={x.label} width={x.w} height="30" loading="lazy" decoding="async" /></a></li>
+						<li><a href={x.href} target="_blank" rel="noopener noreferrer" aria-label={`Father's Heart Bible on ${x.label}`}><img src={`/logos/stores/${x.logo}.svg`} alt={x.label} width={x.w} height={x.h ?? 28} style={x.h ? `height: ${x.h}px;` : undefined} loading="lazy" decoding="async" /></a></li>
 					))}
 				</ul>
 			</div>
