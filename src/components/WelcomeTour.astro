@@ -84,6 +84,8 @@
 <script>
 	(function () {
 		const SEEN = 'fhb_tour_seen';
+		// Never over the Legacy signing form (Kevin 2026-10-13).
+		if (location.pathname.startsWith('/legacy')) return;
 		try { if (localStorage.getItem(SEEN)) return; } catch { /* storage off → just run once in-session */ }
 
 		const root = document.getElementById('fhb-tour');
