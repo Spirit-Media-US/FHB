@@ -1,11 +1,14 @@
 ---
-import BiblesCounter from '../components/donations/BiblesCounter.astro';
+import CoverMarquee from '../components/CoverMarquee.astro';
 import DonationForm from '../components/donations/DonationForm.astro';
-import DonorFeed from '../components/donations/DonorFeed.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
+import { allLanguageEditions, langSlug } from '../data/language-editions';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
+
+// Language count is English + every language edition in the registry — never typed here.
+const LANGUAGE_TOTAL = allLanguageEditions.length + 1;
 
 const pageData = await sanityClient.fetch(`*[_type =="page" && slug =="partner"][0] {
     seoTitle, seoDescription
@@ -15,7 +18,7 @@ const seoTitle =
 	pageData?.seoTitle || "Sharing Our Father — Partner With the Father's Heart Bible™ (FHB)";
 const seoDescription =
 	pageData?.seoDescription ||
-	"Help take the Father's Heart Bible™ (FHB) to every nation — 25 languages reaching ~75% of humanity in 24 months. Donors of $100+ receive a free ComfortLeather™ edition.";
+	`Partner with us to take the Father's Heart Bible™ (FHB) to every nation, tribe, and tongue — now in ${LANGUAGE_TOTAL} languages reaching over 75% of humanity. Give monthly or once.`;
 const heroHeading = 'Sharing Our Father';
 
 // Featured blog card ("The Father's Vision") shown under the give-by-check box.
@@ -50,47 +53,51 @@ const visionDate = visionPost?.date
 		})()
 	: '';
 
-// ── PAGE 1 — Production Timeline (matches the partner brochure) ──
-const timeline = [
-	{ when: 'June 21, 2026', what: 'English opens online for reading or listening' },
-	{ when: 'July 4, 2026', what: 'English paperback & hardback published' },
-	{ when: 'August 2026', what: 'English eBook & audiobook published' },
-	{ when: 'September 2026', what: 'English digital Bibles published' },
-	{ when: 'October 2026', what: 'Spanish edition published' },
-	{ when: 'November 2026', what: 'English ComfortLeather™ edition published', emphasis: true },
-	{ when: 'December 2026', what: 'Mandarin edition published' },
-	{ when: '2027', what: 'A different language released monthly' },
-	{ when: '2028', what: "Study and Children's Bibles published" },
-];
-
-// ── PAGE 3 — the 25 languages (name, flag iso code, primary region, reach) ──
-const languages = [
-	{ name: 'English', code: 'us', region: 'Worldwide', reach: '1.5B', live: true },
-	{ name: 'Mandarin', code: 'cn', region: 'China', reach: '1.1B' },
-	{ name: 'Hindi', code: 'in', region: 'India', reach: '600M' },
-	{ name: 'Spanish', code: 'mx', region: 'Spain & Latin America', reach: '550M' },
-	{ name: 'French', code: 'fr', region: 'France & Africa', reach: '280M' },
-	{ name: 'Arabic', code: 'eg', region: 'Mideast & N. Africa', reach: '274M' },
-	{ name: 'Bengali', code: 'bd', region: 'Bangladesh & India', reach: '272M' },
-	{ name: 'Russian', code: 'ru', region: 'Russia & C. Asia', reach: '258M' },
-	{ name: 'Portuguese', code: 'br', region: 'Brazil & Portugal', reach: '257M' },
-	{ name: 'Urdu', code: 'pk', region: 'Pakistan & India', reach: '231M' },
-	{ name: 'Indonesian', code: 'id', region: 'Indonesia', reach: '199M' },
-	{ name: 'German', code: 'de', region: 'Germany & C. Europe', reach: '135M' },
-	{ name: 'Japanese', code: 'jp', region: 'Japan', reach: '125M' },
-	{ name: 'Nig. Pidgin', code: 'ng', region: 'Nigeria', reach: '121M' },
-	{ name: 'Punjabi', code: 'pk', region: 'Pakistan & India', reach: '113M' },
-	{ name: 'Marathi', code: 'in', region: 'India', reach: '99M' },
-	{ name: 'Telugu', code: 'in', region: 'India', reach: '96M' },
-	{ name: 'Filipino', code: 'ph', region: 'Philippines', reach: '90M' },
-	{ name: 'Turkish', code: 'tr', region: 'Türkiye', reach: '88M' },
-	{ name: 'Tamil', code: 'in', region: 'India & Sri Lanka', reach: '86M' },
-	{ name: 'Yue · Cantonese', code: 'hk', region: 'S. China & Hong Kong', reach: '86M' },
-	{ name: 'Vietnamese', code: 'vn', region: 'Vietnam', reach: '85M' },
-	{ name: 'Korean', code: 'kr', region: 'Korea', reach: '82M' },
-	{ name: 'Persian', code: 'ir', region: 'Iran & Afghanistan', reach: '80M' },
-	{ name: 'Swahili', code: 'ke', region: 'East Africa', reach: '80M' },
-];
+// ── The languages — English + every edition in the registry (alphabetical, as /print is).
+// Flag iso code and primary region per language code; the edition itself comes from the registry.
+const languageMeta: Record<string, { flag: string; region: string }> = {
+	am: { flag: 'et', region: 'Ethiopia' },
+	ar: { flag: 'eg', region: 'Mideast & N. Africa' },
+	bn: { flag: 'bd', region: 'Bangladesh & India' },
+	yue: { flag: 'hk', region: 'S. China & Hong Kong' },
+	ceb: { flag: 'ph', region: 'Philippines' },
+	fil: { flag: 'ph', region: 'Philippines' },
+	fr: { flag: 'fr', region: 'France & Africa' },
+	de: { flag: 'de', region: 'Germany & C. Europe' },
+	hi: { flag: 'in', region: 'India' },
+	id: { flag: 'id', region: 'Indonesia' },
+	it: { flag: 'it', region: 'Italy' },
+	ja: { flag: 'jp', region: 'Japan' },
+	ko: { flag: 'kr', region: 'Korea' },
+	mr: { flag: 'in', region: 'India' },
+	pcm: { flag: 'ng', region: 'Nigeria' },
+	fa: { flag: 'ir', region: 'Iran & Afghanistan' },
+	pl: { flag: 'pl', region: 'Poland' },
+	pt: { flag: 'br', region: 'Brazil & Portugal' },
+	pa: { flag: 'pk', region: 'Pakistan & India' },
+	ro: { flag: 'ro', region: 'Romania & Moldova' },
+	ru: { flag: 'ru', region: 'Russia & C. Asia' },
+	'zh-hans': { flag: 'cn', region: 'China' },
+	es: { flag: 'mx', region: 'Spain & Latin America' },
+	sw: { flag: 'ke', region: 'East Africa' },
+	ta: { flag: 'in', region: 'India & Sri Lanka' },
+	nmf: { flag: 'in', region: 'Northeast India' },
+	te: { flag: 'in', region: 'India' },
+	'zh-hant': { flag: 'tw', region: 'Taiwan & Hong Kong' },
+	tr: { flag: 'tr', region: 'Türkiye' },
+	uk: { flag: 'ua', region: 'Ukraine' },
+	ur: { flag: 'pk', region: 'Pakistan & India' },
+	vi: { flag: 'vn', region: 'Vietnam' },
+	yo: { flag: 'ng', region: 'Nigeria & West Africa' },
+	zu: { flag: 'za', region: 'South Africa' },
+};
+const languages = allLanguageEditions.map((l) => ({
+	name: l.english,
+	flag: languageMeta[l.code]?.flag,
+	region: languageMeta[l.code]?.region ?? '',
+	// coming-soon editions have no product page yet
+	href: l.soon ? undefined : `/bibles/${langSlug(l)}-bible/`,
+}));
 
 // ── PAGE 4 — "When His Sons & Daughters Come Home" (pains → what the Father restores) ──
 const painsVsFather = [
@@ -182,6 +189,19 @@ const partnershipFaq = [
 			contentPad="pb-6 md:pb-10"
 		/>
 
+		<!-- ═══════════════ REACH HEADLINE + COVER MARQUEES (audience + language editions) ═══════════════ -->
+		<div style="background-color: var(--color-canvas);">
+			<header class="text-center px-6 pt-12 lg:pt-16">
+				<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
+					Taking Father's Heart Bible™ to every nation, tribe, and tongue
+				</p>
+				<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+					{LANGUAGE_TOTAL} Languages Reaching<br /><span style="color: var(--color-brand);">Over 75% of Humanity</span>
+				</h2>
+			</header>
+			<CoverMarquee showTitle={false} />
+		</div>
+
 		<!-- ═══════════════ PAGE 1 — title, invitation, timeline, you're invited ═══════════════ -->
 		<Section variant="light">
 			<div class="text-center mb-10" data-reveal>
@@ -236,24 +256,8 @@ const partnershipFaq = [
 				</script>
 			</div>
 
-			<div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-8 lg:gap-12 items-start">
-				<!-- Production Timeline -->
-				<div data-reveal>
-					<p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">
-						Production Timeline
-					</p>
-					<ol class="rounded-2xl overflow-hidden border" style="list-style: none; padding: 0; margin: 0; border-color: var(--color-hairline); background: var(--color-surface);">
-						{timeline.map(({ when, what, emphasis }) => (
-							<li class="grid grid-cols-1 sm:grid-cols-[150px_1fr] gap-1 sm:gap-5 px-5 py-3.5" style={`border-bottom: 1px solid var(--color-hairline); ${emphasis ? 'background: var(--color-soft);' : ''}`}>
-								<span style="font-family: var(--font-body); font-size: 15px; font-weight: 700; color: var(--color-brand);">{when}</span>
-								<span style={`font-family: var(--font-body); font-size: 15px; line-height: 1.55; color: ${emphasis ? 'var(--color-ink)' : '#3F3338'}; ${emphasis ? 'font-weight: 600;' : ''}`}>{what}</span>
-							</li>
-						))}
-					</ol>
-				</div>
-
-				<!-- You're Invited -->
-				<div data-reveal>
+			<!-- You're Invited -->
+			<div class="max-w-2xl mx-auto" data-reveal>
 					<p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">
 						You're Invited
 					</p>
@@ -280,61 +284,26 @@ const partnershipFaq = [
 					</div>
 				</div>
 			</div>
-			</div>
 
 		</Section>
 
 		<!-- ═══════════════ MAKE A GIFT ═══════════════ -->
 		<Section variant="soft">
-			<!-- Urgency: launch-campaign deadline (Aug 30, 2026) with live countdown -->
-			<div class="max-w-2xl mx-auto mb-8 rounded-2xl px-6 py-5 text-center" data-reveal style="background-color: #FFE1E8; border: 1px solid #f4b8c8;">
-				<p class="text-xs font-semibold tracking-widest uppercase mb-1" style="font-family: var(--font-sans); color: var(--color-brand);">Launch Campaign</p>
-				<p class="text-lg md:text-xl font-semibold" style="font-family: var(--font-serif); color: var(--color-ink);" data-give-deadline>
-					<span data-give-countdown>Only days left</span> to give before <strong style="color: var(--color-brand);">August 30</strong>
-				</p>
-				<p class="mt-1 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">Every gift now fuels the first wave of Father&rsquo;s Heart Bibles to the nations.</p>
-				<a href="#donate" class="inline-flex items-center mt-3 px-6 py-2.5 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="font-family: var(--font-sans); background-color: var(--color-brand); color: #fff;">Give now &rarr;</a>
-			</div>
-			<script is:inline>
-				(() => {
-					function setCountdown() {
-						const el = document.querySelector('[data-give-countdown]');
-						if (!el) return;
-						const deadline = new Date('2026-08-30T23:59:59-04:00').getTime();
-						const days = Math.ceil((deadline - Date.now()) / 86400000);
-						if (days > 1) el.textContent = `Only ${days} days left`;
-						else if (days === 1) el.textContent = 'Only 1 day left';
-						else if (days === 0) el.textContent = 'Today is the last day';
-						else {
-							const line = document.querySelector('[data-give-deadline]');
-							if (line) line.textContent = 'Give today and help send the Father’s Heart Bible to the nations';
-						}
-					}
-					setCountdown();
-					document.addEventListener('astro:page-load', setCountdown);
-				})();
-			</script>
 			<div class="max-w-2xl mx-auto text-center mb-10" data-reveal>
 				<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
-					Make a Gift
+					Partner With Us
 				</p>
 				<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
-					Invest in A Bible for the Whole World
+					A Bible for the Whole World
 				</h2>
 				<p class="mt-4 leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-					Every gift helps publish and translate the Father's Heart Bible™. <strong style="color: var(--color-ink);">Every donor $100+ receives a free ComfortLeather™ edition</strong> — give monthly or once; every gift matters.
+					Come with us. Your gift helps translate, publish, and carry the Father's Heart Bible™ to the nations — give monthly or once; every gift matters.
 				</p>
 			</div>
 
-			<div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-start">
-				<!-- Left: progress + donor feed -->
-				<div class="lg:col-span-2 space-y-8" data-reveal>
-					<BiblesCounter target={1084} label="Bibles sponsored" />
-					<DonorFeed campaign="fhb" />
-				</div>
-				<!-- Right: donation form + give-by-check -->
-				<div id="donate" class="lg:col-span-3 scroll-mt-24" data-reveal>
-					<DonationForm />
+			<!-- Donation form, then The Father's Vision blog card -->
+			<div id="donate" class="max-w-xl mx-auto scroll-mt-24" data-reveal>
+				<DonationForm />
 					<!-- The Father's Vision blog card (restored) -->
 					{visionPost && (
 						<a href={visionPost.slug} class="group mt-5 block rounded-2xl border overflow-hidden transition-shadow hover:shadow-md" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
@@ -356,39 +325,6 @@ const partnershipFaq = [
 							</div>
 						</a>
 					)}
-				</div>
-			</div>
-
-			<!-- Three ways to go further — under Recent Supporters + The Father's Vision -->
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10" data-reveal>
-				<!-- Give by check -->
-				<div class="rounded-2xl overflow-hidden flex flex-col" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline);">
-					<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-card-check-v2.webp" alt="A family reading the Father's Heart Bible together" width="720" height="281" loading="lazy" decoding="async" class="w-full h-36 object-cover block" />
-					<div class="p-5 flex-1">
-						<p class="text-lg font-semibold mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">Prefer to give by check?</p>
-						<p class="text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">Make your check payable to <strong style="color: var(--color-ink);">Spirit Media Charities</strong> and mail to:</p>
-						<address class="not-italic text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">Spirit Media Charities &middot; 205 S Academy St #3251 &middot; Cary, NC 27519</address>
-						<p class="text-xs leading-snug" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.8;">Write <strong style="color: var(--color-ink);">&ldquo;FHB&rdquo;</strong> in the memo so your gift supports the Father&rsquo;s Heart Bible&trade;. All gifts are tax-deductible as allowed by the IRS.</p>
-					</div>
-				</div>
-				<!-- Sponsor a language -->
-				<div class="rounded-2xl overflow-hidden flex flex-col text-center" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline);">
-					<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-card-sponsor-v2.webp" alt="A family reading the Father's Heart Bible in a park" width="720" height="281" loading="lazy" decoding="async" class="w-full h-36 object-cover block" />
-					<div class="p-5 flex-1 flex flex-col">
-						<p class="text-lg font-semibold mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">Called to give more?</p>
-						<p class="text-sm leading-snug mb-3 flex-1" style="font-family: var(--font-sans); color: var(--color-muted);">Sponsor an entire language translation &mdash; and put the Father&rsquo;s Heart Bible into millions of hands in a language they&rsquo;ve never had it in.</p>
-						<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" class="inline-flex items-center justify-center text-sm font-semibold no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand);" aria-label="Email us about sponsoring a language" onclick="event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent('Sponsor a Language')">Sponsor a language &rarr;</a>
-					</div>
-				</div>
-				<!-- Pledge a matching challenge -->
-				<div class="rounded-2xl overflow-hidden flex flex-col text-center" style="background-color: var(--color-surface); border: 1px dashed var(--color-brand);">
-					<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-card-challenge-v2.webp" alt="A family reading their own Father's Heart Bible editions together on the couch" width="720" height="281" loading="lazy" decoding="async" class="w-full h-36 object-cover block" />
-					<div class="p-5 flex-1 flex flex-col">
-						<p class="text-lg font-semibold mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">Challenge Us!</p>
-						<p class="text-sm leading-snug mb-3 flex-1" style="font-family: var(--font-sans); color: var(--color-muted);">Pledge a matching-gift challenge and help us rally the community to unite and launch languages together. Matching-gift challenges foster generosity.</p>
-						<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" class="inline-flex items-center justify-center text-sm font-semibold no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand);" aria-label="Email Kevin about a matching gift challenge" onclick="event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent('Matching Gift Challenge')">Pledge a matching challenge &rarr;</a>
-					</div>
-				</div>
 			</div>
 
 			<!-- Partnership FAQ -->
@@ -418,24 +354,29 @@ const partnershipFaq = [
 					))}
 				</div>
 			</div>
+
+			<!-- Give by check — under the FAQ -->
+			<div class="max-w-md mx-auto mt-10" data-reveal>
+				<div class="rounded-2xl overflow-hidden flex flex-col" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline);">
+					<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-card-check-v2.webp" alt="A family reading the Father's Heart Bible together" width="720" height="281" loading="lazy" decoding="async" class="w-full h-36 object-cover block" />
+					<div class="p-5 flex-1">
+						<p class="text-lg font-semibold mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">Prefer to give by check?</p>
+						<p class="text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">Make your check payable to <strong style="color: var(--color-ink);">Spirit Media Charities</strong> and mail to:</p>
+						<address class="not-italic text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">Spirit Media Charities &middot; 205 S Academy St #3251 &middot; Cary, NC 27519</address>
+						<p class="text-xs leading-snug" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.8;">Write <strong style="color: var(--color-ink);">&ldquo;FHB&rdquo;</strong> in the memo so your gift supports the Father&rsquo;s Heart Bible&trade;. All gifts are tax-deductible as allowed by the IRS.</p>
+					</div>
+				</div>
+			</div>
 		</Section>
 
 		<!-- ═══════════════ PAGE 2 — reach map ═══════════════ -->
 		<Section variant="light">
 			<div class="max-w-4xl mx-auto">
-				<header class="text-center mb-8" data-reveal>
-					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
-						Taking Father's Heart Bible™ to every nation, tribe, and tongue
-					</p>
-					<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
-						25 Languages Reaching<br /><span style="color: var(--color-brand);">75% of Humanity</span>
-					</h2>
-				</header>
 
 				<div class="relative" style="width: 100vw; max-width: 100vw; margin-left: calc(50% - 50vw);" data-reveal>
 					<img
 						src="https://assets.spiritmediapublishing.com/FHB/partner/world-reach-map.jpg"
-						alt="World map — the 25 languages reaching about 75% of humanity"
+						alt="World map — the nations our first 25 languages reach, about 75% of humanity"
 						width="1600" height="1262" loading="lazy" decoding="async"
 						class="block w-full"
 					/>
@@ -444,7 +385,7 @@ const partnershipFaq = [
 					<!-- key, across the top of Antarctica (matches the brochure) -->
 					<div class="absolute left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-x-6 gap-y-1 px-4 md:px-6 py-2.5 rounded-xl text-[13px] md:text-[15px]"
 						style="bottom: 13%; max-width: 92vw; background: rgba(255,255,255,0.94); border: 1px solid #e6e0e2; box-shadow: 0 2px 10px rgba(0,0,0,0.10); font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">
-						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#ffbed0; border:1px solid #ef96ac;"></span>Reached by the 25 languages — ~6.5B people</span>
+						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#ffbed0; border:1px solid #ef96ac;"></span>Reached by our first 25 languages — ~6.5B people</span>
 						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#e7e7e3; border:1px solid #d2d2cd;"></span>Not yet reached</span>
 					</div>
 				</div>
@@ -460,30 +401,29 @@ const partnershipFaq = [
 		<Section variant="soft">
 			<div class="max-w-4xl mx-auto">
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-					<!-- English featured, top-left -->
-					<div class="grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl" style="border: 1px solid var(--color-hairline); background: #FFE1E8;">
-						<img src={`/flags/${languages[0].code}.svg`} alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" />
+					<!-- English featured, full width -->
+					<a href="/print/" class="lang-row sm:col-span-2 grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl no-underline" style="border: 1px solid var(--color-hairline); background: #FFE1E8;">
+						<img src="/flags/us.svg" alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" />
 						<span class="min-w-0">
-							<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">{languages[0].name}</span>
-							<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">{languages[0].region}</span>
+							<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">English</span>
+							<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">Worldwide</span>
 						</span>
-						<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand-dark, var(--color-brand));">{languages[0].reach}</span>
-					</div>
-					<!-- tagline, top-right beside English (matches the brochure) -->
-					<div class="flex items-center justify-center text-center px-4 py-2.5 text-lg italic font-bold" style="font-family: var(--font-serif); color: var(--color-brand);">
-						A new language published monthly
-					</div>
-					<!-- the other 24 languages -->
-					{languages.slice(1).map(({ name, code, region, reach }) => (
-						<div class="grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl" style="border: 1px solid var(--color-hairline); background: var(--color-surface);">
-							<img src={`/flags/${code}.svg`} alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" />
-							<span class="min-w-0">
-								<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">{name}</span>
-								<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">{region}</span>
-							</span>
-							<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand);">{reach}</span>
-						</div>
-					))}
+						<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand-dark, var(--color-brand));" aria-hidden="true">&rarr;</span>
+					</a>
+					<!-- every language edition, each linking to its own Bible -->
+					{languages.map(({ name, flag, region, href }) => {
+						const Row = href ? 'a' : 'div';
+						return (
+							<Row href={href} class="lang-row grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl no-underline" style="border: 1px solid var(--color-hairline); background: var(--color-surface);">
+								{flag ? <img src={`/flags/${flag}.svg`} alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" /> : <span />}
+								<span class="min-w-0">
+									<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">{name}</span>
+									<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">{region}</span>
+								</span>
+								<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand);" aria-hidden="true">{href ? '\u2192' : ''}</span>
+							</Row>
+						);
+					})}
 				</div>
 				<div class="text-center mt-9" data-reveal>
 					<p class="text-lg md:text-xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">Want to Sponsor a Language?</p>
@@ -492,26 +432,9 @@ const partnershipFaq = [
 			</div>
 		</Section>
 
-		<!-- ═══════════════ PAGE 4 — ComfortLeather + the Father's vision ═══════════════ -->
+		<!-- ═══════════════ PAGE 4 — the Father's vision ═══════════════ -->
 		<Section variant="light">
 			<div class="max-w-4xl mx-auto">
-				<!-- ComfortLeather -->
-				<div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-6 md:gap-8 items-center rounded-2xl p-6 md:p-8 mb-12" style="background: #FFE1E8;" data-reveal>
-					<img
-						src="https://cdn.sanity.io/images/rusi1hyi/production/8b5d1c39f892218c978d3e3caf5720e09833bbc4-1024x1024.png?w=420&fm=webp&q=80&auto=format"
-						alt="The ComfortLeather™ Edition of the Father's Heart Bible (FHB)"
-						width="360" height="360" loading="lazy" decoding="async"
-						class="w-full max-w-[180px] mx-auto rounded-xl"
-					/>
-					<div>
-						<p class="text-xs font-semibold tracking-widest uppercase mb-2" style="font-family: var(--font-sans); color: var(--color-gold);">Your Partnership Matters</p>
-						<h2 class="text-2xl md:text-3xl font-light leading-tight mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">The ComfortLeather™ Edition</h2>
-						<p class="leading-relaxed" style="font-family: var(--font-sans); color: #3F3338;">
-							A premium print Bible, bound in supple leather and crafted to be held, gifted, and treasured for a lifetime. <strong style="color: var(--color-ink);">Every donor $100+ receives one free</strong> — the very Bible you're helping send to the nations, placed in your own hands.
-						</p>
-					</div>
-				</div>
-
 				<!-- The Father's Vision -->
 				<header class="text-center mb-8" data-reveal>
 					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">The Father's Vision</p>
@@ -521,7 +444,7 @@ const partnershipFaq = [
 					</p>
 				</header>
 
-				<div class="relative grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-12" data-reveal>
+				<div class="relative grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5" data-reveal>
 					<!-- short arrow pointing right, between the two columns (desktop) -->
 					<div class="hidden md:flex absolute left-1/2 top-1/2 items-center justify-center rounded-full" style="width: 46px; height: 46px; transform: translate(-50%, -50%); background: #fff; box-shadow: 0 3px 12px rgba(0,0,0,0.18); z-index: 3;" aria-hidden="true">
 						<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="18" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
@@ -550,14 +473,6 @@ const partnershipFaq = [
 							))}
 						</ul>
 					</div>
-				</div>
-
-				<!-- CTA -->
-				<div class="text-center" data-reveal>
-					<a href="#donate" class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border-radius: 8px;" onmouseover="this.style.opacity='0.92'" onmouseout="this.style.opacity='1'">Invest in A Bible for the Whole World →</a>
-					<p class="text-base mt-6 leading-relaxed max-w-2xl mx-auto" style="font-family: var(--font-body); color: var(--color-muted);">
-						A ministry of Spirit Media Charities, a registered 501(c)(3). Gifts are tax-deductible as allowed by law. By check: Spirit Media Charities · 205 S Academy St #3251 · Cary, NC 27519 — write &ldquo;FHB&rdquo; in the memo.
-					</p>
 				</div>
 			</div>
 		</Section>
