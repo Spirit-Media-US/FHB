@@ -823,7 +823,7 @@ const relatedGroups: Group[] = _sibSlugs
 				</div>
 				<div class="mt-8 flex flex-wrap justify-center gap-3">
 					<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; listen free<span aria-hidden="true">&rarr;</span></a>
-					<a href="/print/" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="border: 1.5px solid var(--color-brand); color: var(--color-brand); font-family: var(--font-sans);">Now in Print</a>
+					<a href={audienceEdition?.href ?? '/print/'} class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="border: 1.5px solid var(--color-brand); color: var(--color-brand); font-family: var(--font-sans);">{audienceEdition ? `${audienceEdition.edition} in Print` : 'Now in Print'}</a>
 				</div>
 			</div>
 		</section>
