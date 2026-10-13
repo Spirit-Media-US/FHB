@@ -94,7 +94,9 @@ const photo3 = 'https://assets.spiritmediapublishing.com/FHB/print/people-ds004-
 const communityUrl = media?.communityUrl || '/join';
 const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 // "Search for Father's Heart Bible on" (Kevin 2026-10-13). Stores open their own search for the
-// title; Apple, Spotify and YouTube open our channels.
+// title; Apple, Spotify and YouTube open our channels. Only stores where our listing has been
+// confirmed belong here (Kevin 2026-10-13: no logo on his word) — Walmart is out until someone
+// confirms it by eye; its site blocks our checks.
 const searchOn = [
 	{
 		label: 'Amazon',
@@ -131,12 +133,6 @@ const searchOn = [
 		logo: 'spotify',
 		w: 30,
 		href: 'https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY',
-	},
-	{
-		label: 'Walmart',
-		logo: 'walmart',
-		w: 127,
-		href: 'https://www.walmart.com/search?q=Father%27s+Heart+Bible',
 	},
 	{ label: 'YouTube', logo: 'youtube', w: 34, href: 'https://www.youtube.com/@FathersHeartBible' },
 ];
