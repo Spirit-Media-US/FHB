@@ -482,12 +482,12 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 	'lang-it-hb': {
 		title: 'Bibbia Italiana (Italian) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/lang/v1/lang-it-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-it-600.webp`,
 	},
 	'lang-it-pb': {
 		title: 'Bibbia Italiana (Italian) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/lang/v1/lang-it-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-it-600.webp`,
 	},
 	'lang-ja-hb': {
 		title: '日本語聖書 (Japanese) — Hardback',
@@ -512,12 +512,12 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 	'lang-mr-hb': {
 		title: 'मराठी बायबल (Marathi) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/lang/v1/lang-mr-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-mr-600.webp`,
 	},
 	'lang-mr-pb': {
 		title: 'मराठी बायबल (Marathi) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/lang/v1/lang-mr-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-mr-600.webp`,
 	},
 	'lang-pcm-hb': {
 		title: 'Naija Bible (Nigerian Pidgin) — Hardback',
@@ -652,12 +652,12 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 	'lang-zh-hant-hb': {
 		title: '中文聖經 (Traditional Chinese) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/lang/v1/lang-zh-hant-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-zh-hant-600.webp`,
 	},
 	'lang-zh-hant-pb': {
 		title: '中文聖經 (Traditional Chinese) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/lang/v1/lang-zh-hant-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-zh-hant-600.webp`,
 	},
 	'lang-tr-hb': {
 		title: 'Türkçe Kutsal Kitap (Turkish) — Hardback',
