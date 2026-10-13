@@ -612,12 +612,12 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 	'lang-sw-hb': {
 		title: 'Biblia ya Kiswahili (Swahili) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/lang/v1/lang-sw-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-sw-600.webp`,
 	},
 	'lang-sw-pb': {
 		title: 'Biblia ya Kiswahili (Swahili) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/lang/v1/lang-sw-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-sw-600.webp`,
 	},
 	'lang-ta-hb': {
 		title: 'தமிழ் பைபிள் (Tamil) — Hardback',
