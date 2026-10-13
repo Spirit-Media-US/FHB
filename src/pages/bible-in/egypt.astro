@@ -7,6 +7,7 @@
 // street children. Strategic: Arabic carries the Father's heart across the
 // whole Arab world. Photos: Pexels.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -32,7 +33,7 @@ const verses = [
 const stats = [
 	{ label: 'People', value: '111 million' },
 	{ label: 'Christians', value: '~10% of Egypt' },
-	{ label: 'Arabic', value: '~274 million worldwide' },
+	{ label: 'Arabic', value: `${sp('ar')} worldwide` },
 	{ label: 'Christian since', value: 'the 1st century' },
 ];
 
@@ -64,8 +65,7 @@ const faqs = [
 	},
 	{
 		question: "Is the Father's Heart Bible available in Arabic?",
-		answer:
-			'Yes. The complete Arabic edition — all 66 books — is free to read at fathersheartbible.com/read/ar/ and published in print (fathersheartbible.com/bibles/arabic-bible/). Arabic is spoken by some 274 million people across Egypt and the wider Arab world.',
+		answer: `Yes. The complete Arabic edition — all 66 books — is free to read at fathersheartbible.com/read/ar/ and published in print (fathersheartbible.com/bibles/arabic-bible/). Arabic is spoken by some ${sp('ar')} people across Egypt and the wider Arab world.`,
 	},
 ];
 ---
@@ -151,17 +151,17 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father', bodyHtml: `In the land of the Exodus, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; quiet and personal, on the phone in your hand.` },
-		{ heading: 'Now in Arabic', bodyHtml: `The complete Arabic edition &mdash; for some 274 million speakers across Egypt and the Arab world &mdash; is published: <a href="https://fathersheartbible.com/read/ar/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/arabic-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
+		{ heading: 'Now in Arabic', bodyHtml: `The complete Arabic edition &mdash; for some ${sp('ar')} speakers across Egypt and the Arab world &mdash; is published: <a href="https://fathersheartbible.com/read/ar/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/arabic-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
 	]}
 	globalHeading="Egypt and the world"
 	globalIntroHtml={`Egypt is the cultural heart of the Arab world &mdash; its language, media, and ancient church reaching far beyond its borders. To give Egypt the Father&rsquo;s heart in Arabic is to open a door to a whole region.`}
 	globalStats={[
-		{ value: '~274 million', label: 'Arabic speakers across the Arab world the Arabic edition reaches' },
+		{ value: `${sp('ar')}`, label: 'Arabic speakers across the Arab world the Arabic edition reaches' },
 		{ value: 'the Arab world’s hub', label: 'Egypt’s media and culture shape the entire region' },
 		{ value: 'an ancient church', label: 'the Coptic faith has endured and spread for two millennia' },
 	]}
 	globalBlocks={[
-		{ heading: 'Arabic crosses every border', bodyHtml: `Arabic is spoken by some 274 million people from Morocco to the Gulf. An Arabic Father&rsquo;s Heart Bible&trade; reaches not one nation but a whole region in its heart language.` },
+		{ heading: 'Arabic crosses every border', bodyHtml: `Arabic is spoken by some ${sp('ar')} people from Morocco to the Gulf. An Arabic Father&rsquo;s Heart Bible&trade; reaches not one nation but a whole region in its heart language.` },
 		{ heading: 'The cultural heart of a region', bodyHtml: `Egypt&rsquo;s films, music, and dialect are understood across the Arab world. As Egypt receives the Father&rsquo;s heart, its influence carries far.` },
 		{ heading: 'An enduring, sending church', bodyHtml: `The Coptic Church has carried the faith for two thousand years and now reaches a global diaspora &mdash; ready to pass on the Father&rsquo;s heart.` },
 		{ heading: 'A wide diaspora', bodyHtml: `Millions of Egyptians and Arabic speakers live across the Gulf, Europe, and the Americas, carrying language and faith with them.` },
@@ -177,10 +177,10 @@ const faqs = [
 		{ label: 'Egypt — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/EG' },
 	]}
 	opportunityHeading="The translation opportunity in Egypt"
-	opportunityIntroHtml={`Arabic is the heart language of Egypt and the whole Arab world &mdash; some 274 million people waiting for a Bible that reveals not only the Almighty, but the Father&rsquo;s voice.`}
+	opportunityIntroHtml={`Arabic is the heart language of Egypt and the whole Arab world &mdash; some ${sp('ar')} people, now with a Bible that reveals not only the Almighty, but the Father&rsquo;s voice.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'Arabic', speakers: '274 million', code: 'ar' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Arabic', code: 'ar' },
 		{ language: 'Sa’idi Arabic', speakers: '19 million', status: 'Translation needed' },
 		{ language: 'Coptic (liturgical)', speakers: 'a sacred heritage', status: 'Translation needed' },
 	]}

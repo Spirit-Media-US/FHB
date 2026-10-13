@@ -7,6 +7,7 @@
 // Magi) and frame today's pains gently (hardship, disillusionment, searching).
 // Photos: Pexels.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -32,7 +33,7 @@ const verses = [
 const stats = [
 	{ label: 'People', value: '88 million' },
 	{ label: 'A searching nation', value: 'a deep spiritual hunger' },
-	{ label: 'Persian (Farsi)', value: '~80 million worldwide' },
+	{ label: 'Persian (Farsi)', value: `${sp('fa')} worldwide` },
 	{ label: 'In the Bible', value: 'Cyrus, Esther, the Magi' },
 ];
 
@@ -64,8 +65,7 @@ const faqs = [
 	},
 	{
 		question: "Is the Father's Heart Bible available in Persian?",
-		answer:
-			'Yes. The complete Persian edition — all 66 books — is free to read at fathersheartbible.com/read/fa/ and published in print (fathersheartbible.com/bibles/persian-bible/). Persian (Farsi) is spoken by some 80 million people across Iran, Afghanistan, Tajikistan, and a wide diaspora.',
+		answer: `Yes. The complete Persian edition — all 66 books — is free to read at fathersheartbible.com/read/fa/ and published in print (fathersheartbible.com/bibles/persian-bible/). Persian (Farsi) is spoken by some ${sp('fa')} people across Iran, Afghanistan, Tajikistan, and a wide diaspora.`,
 	},
 ];
 ---
@@ -151,12 +151,12 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father', bodyHtml: `For a searching nation, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; quiet and personal, on the phone in your hand.` },
-		{ heading: 'Now in Persian', bodyHtml: `The complete Persian edition &mdash; for some 80 million speakers across Iran, Afghanistan, Tajikistan, and beyond &mdash; is published: <a href="https://fathersheartbible.com/read/fa/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/persian-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
+		{ heading: 'Now in Persian', bodyHtml: `The complete Persian edition &mdash; for some ${sp('fa')} speakers across Iran, Afghanistan, Tajikistan, and beyond &mdash; is published: <a href="https://fathersheartbible.com/read/fa/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/persian-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
 	]}
 	globalHeading="Iran and the world"
 	globalIntroHtml={`Persian is far more than the tongue of one nation, and Iran&rsquo;s searching heart is felt across a wide diaspora. To give Iran the Father&rsquo;s heart in Persian is to reach a whole region and a people scattered worldwide.`}
 	globalStats={[
-		{ value: '~80 million', label: 'Persian speakers worldwide the Persian edition reaches' },
+		{ value: `${sp('fa')}`, label: 'Persian speakers worldwide the Persian edition reaches' },
 		{ value: 'a regional tongue', label: 'Persian links Iran, Afghanistan (Dari), and Tajikistan (Tajik)' },
 		{ value: 'a wide diaspora', label: 'millions of Iranians live across the world, many seeking faith' },
 	]}
@@ -177,10 +177,10 @@ const faqs = [
 		{ label: 'Iran — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/IR' },
 	]}
 	opportunityHeading="The translation opportunity for Iran"
-	opportunityIntroHtml={`Persian is the heart language of an ancient, searching people &mdash; some 80 million across Iran and the region &mdash; who long for a Bible that reveals not a distant power, but the Father&rsquo;s voice.`}
+	opportunityIntroHtml={`Persian is the heart language of an ancient, searching people &mdash; some ${sp('fa')} across Iran and the region &mdash; now with a Bible that reveals not a distant power, but the Father&rsquo;s voice.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'Persian (Farsi)', speakers: '80 million', code: 'fa' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Persian (Farsi)', code: 'fa' },
 		{ language: 'Dari (Afghan Persian)', speakers: '15 million', status: 'Translation needed' },
 		{ language: 'Kurdish', speakers: '16 million', status: 'Translation needed' },
 	]}

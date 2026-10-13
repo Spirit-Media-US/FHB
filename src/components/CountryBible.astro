@@ -1,5 +1,6 @@
 ---
 import { allLanguageEditions, langSlug } from '../data/language-editions';
+import { hasSpeakers, speakersLabel } from '../data/language-speakers';
 import { previewsForLanguages } from '../data/translation-previews';
 import Layout from '../layouts/Layout.astro';
 // CountryBible — reusable template for the /bible-in/<country> hub.
@@ -36,7 +37,9 @@ export interface CountryWhyBlock {
 }
 export interface CountryLanguage {
 	language: string;
-	speakers: string; // e.g. "97 million"
+	// Typed ONLY for a language with no figure in src/data/language-reach.json (Thai,
+	// Luganda, Sukuma…). A row with a `code` takes its worldwide speakers from that file.
+	speakers?: string; // e.g. "9 million"
 	// A PUBLISHED language carries its edition `code` and NOTHING else about its
 	// state: the row's status, wording and links are resolved once, below, from
 	// src/data/edition-registry.json (Kevin 2026-10-13: published, here, trusted —
@@ -205,12 +208,18 @@ const _previews =
 
 // Published editions: one lookup, one wording, for every country page.
 const _rows = (languages || []).map((l) => {
+	// `en` is the base edition: no registry row, but it is published and has a speakers figure.
 	const ed = l.code ? allLanguageEditions.find((e) => e.code === l.code) : undefined;
-	if (l.code && !ed)
+	if (l.code && l.code !== 'en' && !ed)
 		throw new Error(`CountryBible ${slug}: no edition "${l.code}" in the registry`);
+	if (!l.code && !l.speakers)
+		throw new Error(
+			`CountryBible ${slug}: "${l.language}" needs a code or a typed speakers figure`,
+		);
 	return {
 		...l,
-		status: ed ? 'Available' : l.status || 'Translation needed',
+		speakers: l.code && hasSpeakers(l.code) ? speakersLabel(l.code) : l.speakers,
+		status: l.code ? 'Available' : l.status || 'Translation needed',
 		readHref: ed ? `https://fathersheartbible.com/read/${ed.code}/` : undefined,
 		printHref: ed && !ed.soon ? `/bibles/${langSlug(ed)}-bible/` : undefined,
 	};

@@ -6,6 +6,7 @@
 // housing + relentless pressure + uncertainty. Strategic: gateway between China
 // and the world; a vast Cantonese diaspora. Photos: Pexels.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -31,7 +32,7 @@ const verses = [
 const stats = [
 	{ label: 'People', value: '7.5 million' },
 	{ label: 'Christian', value: '~12% of Hong Kong' },
-	{ label: 'Cantonese', value: '~86 million worldwide' },
+	{ label: 'Cantonese', value: `${sp('yue')} worldwide` },
 	{ label: 'A gateway', value: 'between China and the world' },
 ];
 
@@ -63,8 +64,7 @@ const faqs = [
 	},
 	{
 		question: "Is the Father's Heart Bible available in Cantonese?",
-		answer:
-			'Yes. The complete Cantonese edition — all 66 books — is free to read at fathersheartbible.com/read/yue/ and published in print (fathersheartbible.com/bibles/cantonese-bible/). Cantonese (Yue Chinese) is spoken by some 86 million people across Hong Kong, Guangdong, and the worldwide diaspora.',
+		answer: `Yes. The complete Cantonese edition — all 66 books — is free to read at fathersheartbible.com/read/yue/ and published in print (fathersheartbible.com/bibles/cantonese-bible/). Cantonese (Yue Chinese) is spoken by some ${sp('yue')} people across Hong Kong, Guangdong, and the worldwide diaspora.`,
 	},
 ];
 ---
@@ -150,12 +150,12 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father', bodyHtml: `Amid the city&rsquo;s rush, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; ready for the commute and the quiet late hour alike.` },
-		{ heading: 'Now in Cantonese', bodyHtml: `The complete Cantonese edition &mdash; for some 86 million speakers across Hong Kong, Guangdong, and the diaspora &mdash; is published: <a href="https://fathersheartbible.com/read/yue/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/cantonese-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
+		{ heading: 'Now in Cantonese', bodyHtml: `The complete Cantonese edition &mdash; for some ${sp('yue')} speakers across Hong Kong, Guangdong, and the diaspora &mdash; is published: <a href="https://fathersheartbible.com/read/yue/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/cantonese-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
 	]}
 	globalHeading="Hong Kong and the world"
 	globalIntroHtml={`Hong Kong has always looked outward &mdash; a gateway city and the heart of a worldwide Cantonese diaspora. To give Hong Kong the Father&rsquo;s heart in Cantonese is to touch the Chinese world far beyond its harbour.`}
 	globalStats={[
-		{ value: '~86 million', label: 'Cantonese speakers worldwide the Cantonese edition reaches' },
+		{ value: `${sp('yue')}`, label: 'Cantonese speakers worldwide the Cantonese edition reaches' },
 		{ value: 'a global diaspora', label: 'Cantonese is spoken in Chinatowns on every continent' },
 		{ value: 'a mission gateway', label: 'Hong Kong has long sent the gospel into the Chinese world' },
 	]}
@@ -176,10 +176,10 @@ const faqs = [
 		{ label: 'Hong Kong — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/HK' },
 	]}
 	opportunityHeading="The translation opportunity for Hong Kong"
-	opportunityIntroHtml={`Cantonese is the heart language of Hong Kong and a worldwide diaspora &mdash; some 86 million people who long for a Bible that reveals not a distant idea, but the Father&rsquo;s voice.`}
+	opportunityIntroHtml={`Cantonese is the heart language of Hong Kong and a worldwide diaspora &mdash; some ${sp('yue')} people now with a Bible that reveals not a distant idea, but the Father&rsquo;s voice.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'Cantonese (Yue)', speakers: '86 million', code: 'yue' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Cantonese (Yue)', code: 'yue' },
 		{ language: 'Hakka', speakers: '44 million', status: 'Translation needed' },
 		{ language: 'Teochew', speakers: '28 million', status: 'Translation needed' },
 	]}

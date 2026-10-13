@@ -6,6 +6,7 @@
 // featured (~57M worldwide). Signature pains: Tigray war orphans + famine.
 // Strategic: Addis Ababa = seat of the African Union. Photos: Pexels.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -63,8 +64,7 @@ const faqs = [
 	},
 	{
 		question: "Is the Father's Heart Bible available in Amharic?",
-		answer:
-			'Yes. The complete Amharic edition — all 66 books — is free to read at fathersheartbible.com/read/am/ and published in print (fathersheartbible.com/bibles/amharic-bible/). Amharic is the working language of Ethiopia, with some 57 million speakers. Oromo and Tigrinya editions are not yet available.',
+		answer: `Yes. The complete Amharic edition — all 66 books — is free to read at fathersheartbible.com/read/am/ and published in print (fathersheartbible.com/bibles/amharic-bible/). Amharic is the working language of Ethiopia, with some ${sp('am')} speakers. Oromo and Tigrinya editions are not yet available.`,
 	},
 	{
 		question: 'How old is Christianity in Ethiopia?',
@@ -155,12 +155,12 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father, in an ancient Christian land', bodyHtml: `In one of the oldest Christian nations on earth, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; fitting for a land of chanted, heard Scripture.` },
-		{ heading: 'Now in Amharic', bodyHtml: `The complete Amharic edition &mdash; the working language of Ethiopia, some 57 million speakers &mdash; is published: <a href="https://fathersheartbible.com/read/am/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/amharic-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
+		{ heading: 'Now in Amharic', bodyHtml: `The complete Amharic edition &mdash; the working language of Ethiopia, some ${sp('am')} speakers &mdash; is published: <a href="https://fathersheartbible.com/read/am/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/amharic-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
 	]}
 	globalHeading="Ethiopia and the world"
 	globalIntroHtml={`Ethiopia is the seat of the African Union and an ancient witness of the faith &mdash; and its people carry their devotion far beyond its borders. To give Ethiopia the Father&rsquo;s heart is to strengthen a church that has stood for 1,700 years and still sends.`}
 	globalStats={[
-		{ value: '~57 million', label: 'Amharic speakers worldwide the Amharic edition reaches' },
+		{ value: `${sp('am')}`, label: 'Amharic speakers worldwide the Amharic edition reaches' },
 		{ value: 'seat of the AU', label: 'Addis Ababa is the diplomatic capital of all Africa' },
 		{ value: '2M+ abroad', label: 'Ethiopians in the US, Israel, the Gulf, and Europe' },
 	]}
@@ -184,8 +184,8 @@ const faqs = [
 	opportunityHeading="The translation opportunity in Ethiopia"
 	opportunityIntroHtml={`English reaches many educated Ethiopians, but the nation&rsquo;s heart beats in Amharic &mdash; now published &mdash; with Oromo, Tigrinya, and dozens more still waiting for a Bible in the Father&rsquo;s voice.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'Amharic (አማርኛ)', speakers: '57 million', code: 'am' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Amharic (አማርኛ)', code: 'am' },
 		{ language: 'Oromo (Afaan Oromoo)', speakers: '37 million', status: 'Translation needed' },
 		{ language: 'Tigrinya', speakers: '9 million', status: 'Translation needed' },
 	]}

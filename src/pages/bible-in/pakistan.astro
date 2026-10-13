@@ -6,6 +6,7 @@
 // Honor that enduring church; frame pains gently (poverty, the 2022 floods,
 // orphans). Covers two UnlockMap languages. Photos: Pexels.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -31,8 +32,8 @@ const verses = [
 const stats = [
 	{ label: 'People', value: '240 million' },
 	{ label: 'Christians', value: 'a small, faithful minority' },
-	{ label: 'Urdu', value: '~231 million worldwide' },
-	{ label: 'Punjabi', value: '~113 million worldwide' },
+	{ label: 'Urdu', value: `${sp('ur')} worldwide` },
+	{ label: 'Punjabi', value: `${sp('pa')} worldwide` },
 ];
 
 const faqs = [
@@ -63,8 +64,7 @@ const faqs = [
 	},
 	{
 		question: "Is the Father's Heart Bible available in Urdu or Punjabi?",
-		answer:
-			'Yes. The complete Urdu and Punjabi editions — all 66 books each — are free to read at fathersheartbible.com/read/ur/ and fathersheartbible.com/read/pa/, and published in print. Urdu is the national language, with some 231 million speakers; Punjabi is the most-spoken language in Pakistan, with some 113 million worldwide.',
+		answer: `Yes. The complete Urdu and Punjabi editions — all 66 books each — are free to read at fathersheartbible.com/read/ur/ and fathersheartbible.com/read/pa/, and published in print. Urdu is the national language, with some ${sp('ur')} speakers; Punjabi is the most-spoken language in Pakistan, with some ${sp('pa')} worldwide.`,
 	},
 ];
 ---
@@ -150,13 +150,13 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father', bodyHtml: `For a faithful church and a searching land, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; a gift where reading is not always easy.` },
-		{ heading: 'Now in Urdu and Punjabi', bodyHtml: `The complete Urdu edition &mdash; the national language, some 231 million speakers &mdash; and Punjabi edition &mdash; the most-spoken tongue, some 113 million worldwide &mdash; are published: read <a href="https://fathersheartbible.com/read/ur/" style="color: var(--color-brand);" class="hover:underline">Urdu</a> or <a href="https://fathersheartbible.com/read/pa/" style="color: var(--color-brand);" class="hover:underline">Punjabi</a> free, or see the <a href="/bibles/urdu-bible/" style="color: var(--color-brand);" class="hover:underline">Urdu</a> and <a href="/bibles/punjabi-bible/" style="color: var(--color-brand);" class="hover:underline">Punjabi</a> print editions.` },
+		{ heading: 'Now in Urdu and Punjabi', bodyHtml: `The complete Urdu edition &mdash; the national language, some ${sp('ur')} speakers &mdash; and Punjabi edition &mdash; the most-spoken tongue, some ${sp('pa')} worldwide &mdash; are published: read <a href="https://fathersheartbible.com/read/ur/" style="color: var(--color-brand);" class="hover:underline">Urdu</a> or <a href="https://fathersheartbible.com/read/pa/" style="color: var(--color-brand);" class="hover:underline">Punjabi</a> free, or see the <a href="/bibles/urdu-bible/" style="color: var(--color-brand);" class="hover:underline">Urdu</a> and <a href="/bibles/punjabi-bible/" style="color: var(--color-brand);" class="hover:underline">Punjabi</a> print editions.` },
 	]}
 	globalHeading="Pakistan and the world"
 	globalIntroHtml={`Pakistan&rsquo;s languages reach far beyond its borders &mdash; Urdu across South Asia and a wide diaspora, Punjabi across two nations. To give Pakistan the Father&rsquo;s heart in Urdu and Punjabi is to touch a vast and scattered family.`}
 	globalStats={[
-		{ value: '~231 million', label: 'Urdu speakers worldwide the Urdu edition reaches' },
-		{ value: '~113 million', label: 'Punjabi speakers across Pakistan, India, and the diaspora' },
+		{ value: `${sp('ur')}`, label: 'Urdu speakers worldwide the Urdu edition reaches' },
+		{ value: `${sp('pa')}`, label: 'Punjabi speakers across Pakistan, India, and the diaspora' },
 		{ value: 'a wide diaspora', label: 'millions of Pakistanis live in the UK, the Gulf, and beyond' },
 	]}
 	globalBlocks={[
@@ -176,11 +176,11 @@ const faqs = [
 		{ label: 'Pakistan — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/PK' },
 	]}
 	opportunityHeading="The translation opportunity for Pakistan"
-	opportunityIntroHtml={`Urdu and Punjabi are the heart languages of one of the world&rsquo;s largest nations &mdash; hundreds of millions of people, with a faithful church and a vast searching majority, who long for a Bible that reveals the Father&rsquo;s voice.`}
+	opportunityIntroHtml={`Urdu and Punjabi are the heart languages of one of the world&rsquo;s largest nations &mdash; hundreds of millions of people, with a faithful church and a vast searching majority, now with a Bible that reveals the Father&rsquo;s voice.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'Urdu', speakers: '231 million', code: 'ur' },
-		{ language: 'Punjabi', speakers: '113 million', code: 'pa' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Urdu', code: 'ur' },
+		{ language: 'Punjabi', code: 'pa' },
 		{ language: 'Pashto', speakers: '60 million', status: 'Translation needed' },
 		{ language: 'Sindhi', speakers: '40 million', status: 'Translation needed' },
 	]}

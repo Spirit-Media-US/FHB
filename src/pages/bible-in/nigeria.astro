@@ -4,6 +4,7 @@
 // population and to every searching heart with care; never triumphalist.
 // Nigerian Pidgin (121M, a top-20 world language) is the featured roadmap lang.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -61,8 +62,7 @@ const faqs = [
 	},
 	{
 		question: "Is the Father's Heart Bible available in Nigerian languages?",
-		answer:
-			'Yes. The complete Nigerian Pidgin edition — all 66 books — is free to read at fathersheartbible.com/read/pcm/ and published in print (fathersheartbible.com/bibles/nigerian-pidgin-bible/). Nigerian Pidgin, spoken by some 121 million people, is the heart language of the nation. Yoruba is published too; Hausa and Igbo editions are not yet available.',
+		answer: `Yes. The complete Nigerian Pidgin edition — all 66 books — is free to read at fathersheartbible.com/read/pcm/ and published in print (fathersheartbible.com/bibles/nigerian-pidgin-bible/). Nigerian Pidgin, spoken by some ${sp('pcm')} people, is the heart language of the nation. Yoruba is published too; Hausa and Igbo editions are not yet available.`,
 	},
 ];
 ---
@@ -148,14 +148,14 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father, near and tender', bodyHtml: `In one of the most faithful nations on earth, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; built for the basic smartphones most Nigerians use.` },
-		{ heading: 'Now in Pidgin and Yoruba', bodyHtml: `The complete Nigerian Pidgin edition &mdash; 121 million speakers &mdash; and Yoruba edition are published: read <a href="https://fathersheartbible.com/read/pcm/" style="color: var(--color-brand);" class="hover:underline">Pidgin</a> or <a href="https://fathersheartbible.com/read/yo/" style="color: var(--color-brand);" class="hover:underline">Yoruba</a> free, or see the <a href="/bibles/nigerian-pidgin-bible/" style="color: var(--color-brand);" class="hover:underline">Pidgin</a> and <a href="/bibles/yoruba-bible/" style="color: var(--color-brand);" class="hover:underline">Yoruba</a> print editions.` },
+		{ heading: 'Now in Pidgin and Yoruba', bodyHtml: `The complete Nigerian Pidgin edition &mdash; ${sp('pcm')} speakers &mdash; and Yoruba edition are published: read <a href="https://fathersheartbible.com/read/pcm/" style="color: var(--color-brand);" class="hover:underline">Pidgin</a> or <a href="https://fathersheartbible.com/read/yo/" style="color: var(--color-brand);" class="hover:underline">Yoruba</a> free, or see the <a href="/bibles/nigerian-pidgin-bible/" style="color: var(--color-brand);" class="hover:underline">Pidgin</a> and <a href="/bibles/yoruba-bible/" style="color: var(--color-brand);" class="hover:underline">Yoruba</a> print editions.` },
 	]}
 	globalHeading="Nigeria and the world"
 	globalIntroHtml={`Nigeria is not only a great mission field &mdash; it is fast becoming a great mission <em>force</em>. Its people and its churches are spreading across Africa and the world, carrying a fervent faith with them.`}
 	globalStats={[
 		{ value: '1 in 5', label: 'Africans is Nigerian — its reach shapes a continent' },
 		{ value: 'millions', label: 'of Nigerians live in the US, UK, and across the world' },
-		{ value: '121 million', label: 'Nigerian Pidgin speakers — a top-20 world language' },
+		{ value: `${sp('pcm')}`, label: 'Nigerian Pidgin speakers — a top-20 world language' },
 	]}
 	globalBlocks={[
 		{ heading: 'A mission force, not just a field', bodyHtml: `Nigerian churches now plant congregations across Africa, Europe, and the Americas. As Nigeria receives the Father&rsquo;s Heart Bible&trade;, it is positioned to carry it far beyond its borders.` },
@@ -177,10 +177,10 @@ const faqs = [
 	opportunityHeading="The translation opportunity in Nigeria"
 	opportunityIntroHtml={`English reaches educated Nigerians, but the nation&rsquo;s heart beats in its own tongues &mdash; led by Nigerian Pidgin, the most widely spoken language in the country, and a top-20 language of the world.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'Nigerian Pidgin', speakers: '121 million', code: 'pcm' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Nigerian Pidgin', code: 'pcm' },
 		{ language: 'Hausa', speakers: '63 million', status: 'Translation needed' },
-		{ language: 'Yoruba', speakers: '47 million', code: 'yo' },
+		{ language: 'Yoruba', code: 'yo' },
 		{ language: 'Igbo', speakers: '33 million', status: 'Translation needed' },
 	]}
 	verses={verses}

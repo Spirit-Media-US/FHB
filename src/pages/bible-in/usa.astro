@@ -7,6 +7,7 @@
 // exporting and missionary-sending nation, and English is the global lingua
 // franca that carries the Father's Heart Bible to the world. Photos: Pexels.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -32,7 +33,7 @@ const verses = [
 const stats = [
 	{ label: 'People', value: '335 million' },
 	{ label: 'Christian', value: '~63% of the US' },
-	{ label: 'English readers', value: '~1.5 billion worldwide' },
+	{ label: 'English readers', value: `${sp('en')} worldwide` },
 	{ label: 'Status', value: 'available now' },
 ];
 
@@ -74,8 +75,7 @@ const faqs = [
 	},
 	{
 		question: 'How does the US help reach the rest of the world?',
-		answer:
-			'English is the world’s lingua franca — some 1.5 billion people read it as a first or second language. America is also the largest Bible-publishing and missionary-sending nation on earth. As the US receives the Father’s Heart Bible™, it is positioned to carry it across the world.',
+		answer: `English is the world’s lingua franca — some ${sp('en')} people read it as a first or second language. America is also the largest Bible-publishing and missionary-sending nation on earth. As the US receives the Father’s Heart Bible™, it is positioned to carry it across the world.`,
 	},
 ];
 ---
@@ -110,7 +110,7 @@ const faqs = [
 	knownFor={[
 		{ label: 'A nation of Bibles', text: 'More Bibles are printed, sold, and given away in the US than in any country on earth — most homes own several.' },
 		{ label: 'The world’s sender', text: 'America sends more missionaries and exports more Scripture than any other nation — a hub of global mission.' },
-		{ label: 'The English language', text: 'English, America’s tongue, is the world’s lingua franca — read by some 1.5 billion people worldwide.' },
+		{ label: 'The English language', text: `English, America’s tongue, is the world’s lingua franca — read by some ${sp('en')} people worldwide.` },
 		{ label: 'A land of many peoples', text: 'Nearly every nation, language, and faith on earth is represented somewhere in the United States.' },
 		{ label: 'Vast natural wonders', text: 'From the Grand Canyon to the Rockies to the coasts, the American landscape is among the most varied on earth.' },
 		{ label: 'A Christian heritage', text: 'Founded by many seeking freedom to worship, America’s story is deeply woven with the Bible — though that thread is fraying.' },
@@ -162,17 +162,17 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father, in plain English', bodyHtml: `In a land of many translations, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward &mdash; in fresh, readable English.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; ready for a distracted, hurried nation.` },
-		{ heading: 'Available now — and ready to send', bodyHtml: `English is live today, reaching some 1.5 billion people worldwide. As America receives it, it can carry the Father&rsquo;s heart to the world. See the <a href="/bible-in/usa/#translation-opportunity" style="color: var(--color-brand);" class="hover:underline">reach and the open doors</a>.` },
+		{ heading: 'Available now — and ready to send', bodyHtml: `English is live today, reaching some ${sp('en')} people worldwide. As America receives it, it can carry the Father&rsquo;s heart to the world. See the <a href="/bible-in/usa/#translation-opportunity" style="color: var(--color-brand);" class="hover:underline">reach and the open doors</a>.` },
 	]}
 	globalHeading="America and the world"
 	globalIntroHtml={`No nation is better positioned to carry the Father&rsquo;s heart outward. America speaks the world&rsquo;s language, sends the world&rsquo;s missionaries, and prints the world&rsquo;s Bibles &mdash; &ldquo;as it receives, it sends.&rdquo;`}
 	globalStats={[
-		{ value: '~1.5 billion', label: 'English speakers worldwide the base edition already reaches' },
+		{ value: `${sp('en')}`, label: 'English speakers worldwide the base edition already reaches' },
 		{ value: '#1 sender', label: 'the US sends more missionaries than any nation on earth' },
 		{ value: 'the world’s tongue', label: 'English is the lingua franca of business, science, and the internet' },
 	]}
 	globalBlocks={[
-		{ heading: 'The world already reads English', bodyHtml: `English is the most widely spoken language on earth &mdash; some 1.5 billion first- and second-language readers. The base edition of the Father&rsquo;s Heart Bible&trade; already reaches them all, free.` },
+		{ heading: 'The world already reads English', bodyHtml: `English is the most widely spoken language on earth &mdash; some ${sp('en')} first- and second-language readers. The base edition of the Father&rsquo;s Heart Bible&trade; already reaches them all, free.` },
 		{ heading: 'The great sending nation', bodyHtml: `America sends more missionaries and exports more Scripture than any other country. As it embraces the Father&rsquo;s Heart Bible&trade;, it can place it into hands across the globe.` },
 		{ heading: 'A nation of the nations', bodyHtml: `Almost every people and language on earth lives somewhere in America. To reach the US is, in part, to reach the world that has come to it.` },
 		{ heading: 'A launchpad for every translation', bodyHtml: `From the US, the Father&rsquo;s Heart Bible&trade; carries its growing family of translations &mdash; Spanish, Telugu, Hindi, Tamil, and beyond &mdash; out to the nations.` },
@@ -189,10 +189,10 @@ const faqs = [
 		{ label: 'United States — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/US' },
 	]}
 	opportunityHeading="Reach and the open doors in America"
-	opportunityIntroHtml={`English is live today and already reaches some 1.5 billion people worldwide, and the complete Spanish edition is published &mdash; while other communities within America, the Deaf and the Native nations, still wait for the Father&rsquo;s voice in their own tongue.`}
+	opportunityIntroHtml={`English is live today and already reaches some ${sp('en')} people worldwide, and the complete Spanish edition is published &mdash; while other communities within America, the Deaf and the Native nations, still wait for the Father&rsquo;s voice in their own tongue.`}
 	languages={[
-		{ language: 'English', speakers: '1.5 billion worldwide', status: 'Available' },
-		{ language: 'Spanish', speakers: '550 million', code: 'es' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Spanish', code: 'es' },
 		{ language: 'American Sign Language', speakers: '1 million+ Deaf', status: 'Translation needed' },
 		{ language: 'Navajo (Diné)', speakers: '170,000', status: 'Translation needed' },
 	]}

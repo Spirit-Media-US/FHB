@@ -19,6 +19,7 @@
 // available. Swahili coverage is PARTIAL — never describe it as the whole Bible,
 // and there is NO Swahili audio (src/lib/audio-reader.ts narrates English only).
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -66,8 +67,7 @@ const faqs = [
 	},
 	{
 		question: 'Is the Father\u2019s Heart Bible available in Swahili?',
-		answer:
-			'Yes \u2014 the complete Swahili edition, all 66 books, is free to read online and published in print. Swahili, shaped in Tanzania and Zanzibar, is spoken by some 80 million people across East Africa.',
+		answer: `Yes \u2014 the complete Swahili edition, all 66 books, is free to read online and published in print. Swahili, shaped in Tanzania and Zanzibar, is spoken by some ${sp('sw')} people across East Africa.`,
 	},
 	{
 		question: 'How many Christians are there in Tanzania?',
@@ -168,18 +168,18 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father, near to the suffering', bodyHtml: `In a deeply faithful nation, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/sw/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, on any phone', bodyHtml: `No purchase, no app, no sign-up. <a href="https://fathersheartbible.com/read/sw/" style="color: var(--color-brand);" class="hover:underline">Biblia Takatifu in Swahili</a> opens straight in the browser &mdash; built for the basic smartphones most Tanzanians use. Audio narration is available on the English edition.` },
-		{ heading: 'Swahili is here now', bodyHtml: `Swahili &mdash; born in this land, now spoken by some 80 million across East Africa &mdash; is published complete, all 66 books, and <a href="/bibles/swahili-bible/" style="color: var(--color-brand);" class="hover:underline">in print</a>. See the <a href="/bible-in/tanzania/#translation-opportunity" style="color: var(--color-brand);" class="hover:underline">translation opportunity</a>.` },
+		{ heading: 'Swahili is here now', bodyHtml: `Swahili &mdash; born in this land, now spoken by some ${sp('sw')} across East Africa &mdash; is published complete, all 66 books, and <a href="/bibles/swahili-bible/" style="color: var(--color-brand);" class="hover:underline">in print</a>. See the <a href="/bible-in/tanzania/#translation-opportunity" style="color: var(--color-brand);" class="hover:underline">translation opportunity</a>.` },
 	]}
 	globalHeading="Tanzania and the world"
 	globalIntroHtml={`Tanzania gave East Africa its common tongue. To give Tanzania the Father&rsquo;s heart in Swahili is to open a door to a whole region &mdash; for the language born here is heard far beyond its borders.`}
 	globalStats={[
-		{ value: '~80 million', label: 'Swahili speakers across East Africa the Swahili edition reaches' },
+		{ value: `${sp('sw')}`, label: 'Swahili speakers across East Africa the Swahili edition reaches' },
 		{ value: 'birthplace', label: 'of standard Swahili — the form taught across the region' },
 		{ value: '5+ nations', label: 'speak Swahili — Tanzania, Kenya, Uganda, DR Congo, and more' },
 	]}
 	globalBlocks={[
 		{ heading: 'The cradle of a language', bodyHtml: `Standard Swahili was shaped in Tanzania and Zanzibar. Because the Father&rsquo;s Heart Bible&trade; is published in that standard Swahili, it arrives in the very form the whole region learns.` },
-		{ heading: 'Swahili crosses every border', bodyHtml: `Swahili is the lingua franca of East Africa &mdash; some 80 million speakers across Tanzania, Kenya, Uganda, DR Congo, and beyond. One translation reaches not one nation but a region.` },
+		{ heading: 'Swahili crosses every border', bodyHtml: `Swahili is the lingua franca of East Africa &mdash; some ${sp('sw')} speakers across Tanzania, Kenya, Uganda, DR Congo, and beyond. One translation reaches not one nation but a region.` },
 		{ heading: 'A peaceful sending nation', bodyHtml: `Tanzania&rsquo;s long peace and unity make it a natural place from which the Father&rsquo;s heart can travel outward across the continent.` },
 		{ heading: 'The Tanzanian diaspora', bodyHtml: `Tanzanians abroad &mdash; in the Gulf, the US, the UK, and across Africa &mdash; carry their faith and their language into the world.` },
 	]}
@@ -197,8 +197,8 @@ const faqs = [
 	opportunityHeading="The translation opportunity in Tanzania"
 	opportunityIntroHtml={`Biblia Takatifu is here in Swahili &mdash; all 66 books. Beyond it, Sukuma and dozens more Tanzanian languages are still waiting for a Bible in the Father&rsquo;s voice.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'Swahili (Kiswahili)', speakers: '80 million', code: 'sw' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Swahili (Kiswahili)', code: 'sw' },
 		{ language: 'Sukuma', speakers: '9 million', status: 'Translation needed' },
 		{ language: 'Chagga', speakers: '2 million', status: 'Translation needed' },
 	]}

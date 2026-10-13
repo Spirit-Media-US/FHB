@@ -9,6 +9,8 @@
 // "biggest mission field first." This mirrors the /partner Unlock Map ranking,
 // so the two pages stay consistent. The community /library "Bible Around the
 // World" strip uses the same order.
+import { speakersLabel as sp } from './language-speakers';
+
 export interface Nation {
 	slug: string;
 	country: string; // display name, e.g. "India"
@@ -22,8 +24,7 @@ export const NATIONS: Nation[] = [
 		slug: 'usa',
 		country: 'the USA',
 		title: 'The Bible in the USA',
-		blurb:
-			'A nation of more Bibles than any on earth — where the Father’s Heart Bible™ invites a people who own the book to finally meet the Father in it. English is live now and reaches ~1.5 billion worldwide.',
+		blurb: `A nation of more Bibles than any on earth — where the Father’s Heart Bible™ invites a people who own the book to finally meet the Father in it. English is live now and reaches ${sp('en')} worldwide.`,
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/2658a7764aeef2dbe21f813fa7027e46dd261083-1880x1253.jpg',
 	},
 	{
