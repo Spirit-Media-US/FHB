@@ -206,81 +206,6 @@ const upcoming: [string, string, string][] = [
 			headingBelow
 		/>
 
-		<!-- ═══════════════ REACH HEADLINE + COVER MARQUEES (audience + language editions) ═══════════════ -->
-		<div class="pb-10 lg:pb-14" style="background-color: var(--color-canvas);">
-			<header class="text-center px-6 pt-6">
-				<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
-					Taking Father's Heart Bible™ to every nation, tribe, and tongue
-				</p>
-				<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
-					{LANGUAGE_TOTAL} Languages<br /><span style="color: var(--color-brand);">{WORLD_COVERED ? 'The Whole World Covered' : `Spoken by ${REACH_BILLIONS} Billion People`}</span>
-				</h2>
-			</header>
-			<CoverMarquee showTitle={false} showChips={false} />
-		</div>
-
-		<!-- ═══════════════ REACH MAP — directly under the marquees ═══════════════ -->
-		<div class="relative overflow-hidden" style="background-color: var(--color-canvas);">
-				<div class="relative">
-					<img
-						src="https://assets.spiritmediapublishing.com/FHB/partner/world-reach-map-35.jpg"
-						alt={`World map — where the Father's Heart Bible is read in its ${LANGUAGE_TOTAL} languages`}
-						width="1600" height="1262" loading="lazy" decoding="async"
-						class="block w-full"
-					/>
-					<!-- "Sharing Our Father" title over the top of the map (~1in down) -->
-					<p class="absolute left-1/2 -translate-x-1/2 text-center font-light text-4xl md:text-6xl" style="top: 6%; font-family: var(--font-serif); color: var(--color-ink); text-shadow: 0 1px 12px rgba(255,255,255,0.9), 0 1px 3px rgba(255,255,255,0.9);">Sharing <span style="color: var(--color-brand);">Our</span> Father</p>
-					<!-- key, across the top of Antarctica (matches the brochure) -->
-					<div class="absolute left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-x-6 gap-y-1 px-4 md:px-6 py-2.5 rounded-xl text-[13px] md:text-[15px]"
-						style="bottom: 13%; max-width: 92vw; background: rgba(255,255,255,0.94); border: 1px solid #e6e0e2; box-shadow: 0 2px 10px rgba(0,0,0,0.10); font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">
-						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#ffbed0; border:1px solid #ef96ac;"></span>Where our {LANGUAGE_TOTAL} languages are spoken</span>
-						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#e7e7e3; border:1px solid #d2d2cd;"></span>More to come</span>
-					</div>
-				</div>
-		</div>
-
-		<!-- ═══════════════ THE LANGUAGES — available now, then more to come ═══════════════ -->
-		<Section variant="soft">
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-				<a href="/print/" class="lang-row grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl no-underline" style="border: 1px solid var(--color-hairline); background: #FFE1E8;">
-					<img src="/flags/us.svg" alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" />
-					<span class="min-w-0">
-						<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">English</span>
-						<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">Worldwide</span>
-					</span>
-					<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand-dark, var(--color-brand));">{fmtReach(reachOf('en'))} <span aria-hidden="true">&rarr;</span></span>
-				</a>
-				{languages.map(({ name, flag, region, reach: speakers, href }) => {
-					const Row = href ? 'a' : 'div';
-					return (
-						<Row href={href} class="lang-row grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl no-underline" style="border: 1px solid var(--color-hairline); background: var(--color-surface);">
-							{flag ? <img src={`/flags/${flag}.svg`} alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" /> : <span />}
-							<span class="min-w-0">
-								<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">{name}</span>
-								<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">{region}</span>
-							</span>
-							<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand);">{speakers} {href && <span aria-hidden="true">&rarr;</span>}</span>
-						</Row>
-					);
-				})}
-			</div>
-
-			<!-- More to come — the rest of the 80 -->
-			<h2 class="text-center text-2xl md:text-3xl font-light mt-12 mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">More to Come&hellip;</h2>
-			<p class="text-center -mt-3 mb-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">80 languages in all{ROSTER_COVERS_WORLD ? ' — enough to cover the whole world.' : '.'}</p>
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-				{upcoming.map(([name, flag, region]) => (
-					<div class="grid grid-cols-[28px_1fr] items-center gap-3 px-4 py-2.5 rounded-xl" style="border: 1px solid var(--color-hairline); background: var(--color-surface);">
-						<img src={`/flags/${flag}.svg`} alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" />
-						<span class="min-w-0">
-							<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">{name}</span>
-							<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">{region}</span>
-						</span>
-					</div>
-				))}
-			</div>
-		</Section>
-
 		<!-- ═══════════════ YOU'RE INVITED  |  OUR SHARED LEGACY ═══════════════ -->
 		<Section variant="light">
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-start">
@@ -325,7 +250,7 @@ const upcoming: [string, string, string][] = [
 						<p>He is the greatest desire in your soul and the greatest gift you will ever receive. Nothing else satisfies.</p>
 						<p>Jesus lived for one thing: &ldquo;Zeal for your house will consume me.&rdquo; &mdash; <a href="/read/john/2/" style="color: inherit; text-decoration: underline; text-underline-offset: 3px;">John 2:17 (FHB)</a>. His Father&rsquo;s house is not stone. It is His sons and daughters: &ldquo;Don&rsquo;t you know you are our Father&rsquo;s temple?&rdquo; &mdash; <a href="/read/1-corinthians/3/" style="color: inherit; text-decoration: underline; text-underline-offset: 3px;">1 Corinthians 3:16 (FHB)</a>.</p>
 						<p>&ldquo;What good does it do a person to gain the whole world and forfeit his soul?&rdquo; &mdash; <a href="/read/mark/8/" style="color: inherit; text-decoration: underline; text-underline-offset: 3px;">Mark 8:36 (FHB)</a>. What good is the whole world to someone who does not know his Father?</p>
-						<p style="font-family: var(--font-serif); font-size: 1.3rem; line-height: 1.4; color: var(--color-ink);">If sharing the Father with the world consumes you, this is your invitation.</p>
+						<p style="font-family: var(--font-serif); font-size: 1.3rem; line-height: 1.4; color: var(--color-ink);">If sharing the Father with the world consumes you, we invite you to join us in the Father&rsquo;s heart legacy.</p>
 					</div>
 					<a href="#commitment" class="inline-flex items-center px-6 py-3 text-base font-semibold no-underline" style="margin-top: 1.25rem; font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border: 1px solid #FFD9E0;">Make it your legacy &darr;</a>
 				</div>
@@ -354,38 +279,6 @@ const upcoming: [string, string, string][] = [
 						<button type="submit" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold" style="margin-top: 1rem; width: 100%; background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans); border: none; cursor: pointer;">This is my legacy &rarr;</button>
 						<p class="legacy-sign-status text-sm" style="min-height: 1.25rem; margin-top: 0.75rem; text-align: center; font-family: var(--font-sans); color: var(--color-muted);" aria-live="polite"></p>
 					</form>
-				</div>
-			</div>
-		</Section>
-
-		<!-- ═══════════════ THE FATHER'S VISION (blog card) ═══════════════ -->
-		<Section variant="soft">
-			<div class="max-w-xl mx-auto">
-				<div data-reveal>
-					{visionPost && (
-						<a href={visionPost.slug} class="group block rounded-2xl border overflow-hidden transition-shadow hover:shadow-md" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
-							<div class="overflow-hidden h-40">
-								<img src={visionPost.image} alt={visionPost.title} width="800" height="320" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style="object-position: center top;" />
-							</div>
-							<div class="p-6">
-								<div class="flex flex-wrap gap-1.5 mb-3">
-									{(visionPost.tags || []).slice(0, 2).map((t: string) => (
-										<span class="text-xs font-semibold rounded-full px-2.5 py-0.5" style="color: var(--color-muted); background-color: var(--color-surface-low);">{t}</span>
-									))}
-								</div>
-								<h3 class="text-xl font-bold mb-2 leading-snug" style="font-family: var(--font-serif); color: var(--color-brand);">{visionPost.title}</h3>
-								<p class="text-sm mb-4 leading-relaxed line-clamp-3" style="font-family: var(--font-sans); color: var(--color-muted);">{visionPost.excerpt || ''}</p>
-								<div class="flex items-center justify-between text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
-									<span>{visionPost.author} · {visionDate}</span>
-									<span class="font-semibold group-hover:underline" style="color: var(--color-brand);">Read &rarr;</span>
-								</div>
-							</div>
-						</a>
-					)}
-					<div class="text-center mt-8">
-						<p class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">The Father</p>
-						<p class="text-3xl md:text-4xl font-light leading-tight mt-1" style="font-family: var(--font-serif); color: var(--color-brand);">No greater gift or legacy.</p>
-					</div>
 				</div>
 			</div>
 		</Section>
@@ -435,6 +328,105 @@ const upcoming: [string, string, string][] = [
 			</div>
 		</Section>
 
+		<!-- ═══════════════ REACH HEADLINE + COVER MARQUEES (audience + language editions) ═══════════════ -->
+		<div class="pb-10 lg:pb-14" style="background-color: var(--color-canvas);">
+			<header class="text-center px-6 pt-6">
+				<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
+					Taking Father's Heart Bible™ to every nation, tribe, and tongue
+				</p>
+				<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+					{LANGUAGE_TOTAL} Languages<br /><span style="color: var(--color-brand);">{WORLD_COVERED ? 'The Whole World Covered' : `Spoken by ${REACH_BILLIONS} Billion People`}</span>
+				</h2>
+			</header>
+			<CoverMarquee showTitle={false} showChips={false} />
+		</div>
+
+		<!-- ═══════════════ REACH MAP — directly under the marquees ═══════════════ -->
+		<div class="px-4 pb-10" style="background-color: var(--color-canvas);">
+				<div class="relative overflow-hidden rounded-2xl mx-auto" style="max-width: 56rem;">
+					<img
+						src="https://assets.spiritmediapublishing.com/FHB/partner/world-reach-map-35.jpg"
+						alt={`World map — where the Father's Heart Bible is read in its ${LANGUAGE_TOTAL} languages`}
+						width="1600" height="1262" loading="lazy" decoding="async"
+						class="block w-full"
+					/>
+					<!-- "Sharing Our Father" title over the top of the map (~1in down) -->
+					<p class="absolute left-1/2 -translate-x-1/2 text-center font-light text-2xl md:text-4xl whitespace-nowrap" style="top: 6%; font-family: var(--font-serif); color: var(--color-ink); text-shadow: 0 1px 12px rgba(255,255,255,0.9), 0 1px 3px rgba(255,255,255,0.9);">Sharing <span style="color: var(--color-brand);">Our</span> Father</p>
+					<!-- key, across the top of Antarctica (matches the brochure) -->
+					<div class="absolute left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-x-6 gap-y-1 px-3 md:px-5 py-1.5 rounded-xl text-[11px] md:text-[13px]"
+						style="bottom: 13%; max-width: 92vw; background: rgba(255,255,255,0.94); border: 1px solid #e6e0e2; box-shadow: 0 2px 10px rgba(0,0,0,0.10); font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">
+						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#ffbed0; border:1px solid #ef96ac;"></span>Where our {LANGUAGE_TOTAL} languages are spoken</span>
+						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#e7e7e3; border:1px solid #d2d2cd;"></span>More to come</span>
+					</div>
+				</div>
+		</div>
+
+		<!-- ═══════════════ THE LANGUAGES — compact (Kevin 2026-10-13: effective but too tall) ═══════════════ -->
+		<Section variant="soft">
+			<div class="lang-grid">
+				<a href="/print/" class="lang-chip no-underline" style="background: #FFE1E8;">
+					<img src="/flags/us.svg" alt="" width="22" height="15" loading="lazy" />
+					<span class="lang-name">English</span>
+					<span class="lang-num">{fmtReach(reachOf('en'))}</span>
+				</a>
+				{languages.map(({ name, flag, reach: speakers, href }) => {
+					const Row = href ? 'a' : 'div';
+					return (
+						<Row href={href} class="lang-chip no-underline">
+							{flag ? <img src={`/flags/${flag}.svg`} alt="" width="22" height="15" loading="lazy" /> : <span />}
+							<span class="lang-name">{name}</span>
+							<span class="lang-num">{speakers}</span>
+						</Row>
+					);
+				})}
+			</div>
+
+			<!-- More to come — the rest of the 80, folded -->
+			<details class="lang-more">
+				<summary>{upcoming.length} more to come &mdash; 80 languages in all</summary>
+				<div class="lang-grid" style="margin-top: 1rem;">
+					{upcoming.map(([name, flag]) => (
+						<div class="lang-chip">
+							<img src={`/flags/${flag}.svg`} alt="" width="22" height="15" loading="lazy" />
+							<span class="lang-name">{name}</span>
+						</div>
+					))}
+				</div>
+			</details>
+		</Section>
+
+		<!-- ═══════════════ THE FATHER'S VISION (blog card) ═══════════════ -->
+		<Section variant="light">
+			<div class="max-w-xl mx-auto">
+				<div data-reveal>
+					{visionPost && (
+						<a href={visionPost.slug} class="group block rounded-2xl border overflow-hidden transition-shadow hover:shadow-md" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
+							<div class="overflow-hidden h-40">
+								<img src={visionPost.image} alt={visionPost.title} width="800" height="320" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style="object-position: center top;" />
+							</div>
+							<div class="p-6">
+								<div class="flex flex-wrap gap-1.5 mb-3">
+									{(visionPost.tags || []).slice(0, 2).map((t: string) => (
+										<span class="text-xs font-semibold rounded-full px-2.5 py-0.5" style="color: var(--color-muted); background-color: var(--color-surface-low);">{t}</span>
+									))}
+								</div>
+								<h3 class="text-xl font-bold mb-2 leading-snug" style="font-family: var(--font-serif); color: var(--color-brand);">{visionPost.title}</h3>
+								<p class="text-sm mb-4 leading-relaxed line-clamp-3" style="font-family: var(--font-sans); color: var(--color-muted);">{visionPost.excerpt || ''}</p>
+								<div class="flex items-center justify-between text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+									<span>{visionPost.author} · {visionDate}</span>
+									<span class="font-semibold group-hover:underline" style="color: var(--color-brand);">Read &rarr;</span>
+								</div>
+							</div>
+						</a>
+					)}
+					<div class="text-center mt-8">
+						<p class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">The Father</p>
+						<p class="text-3xl md:text-4xl font-light leading-tight mt-1" style="font-family: var(--font-serif); color: var(--color-brand);">No greater gift or legacy.</p>
+					</div>
+				</div>
+			</div>
+		</Section>
+
 		<!-- ═══════════════ PEOPLE BAND (readers with each edition) ═══════════════ -->
 		<div class="grid grid-cols-1 sm:grid-cols-3">
 			<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-band-plum-v3.webp" alt="A mother and daughter reading the Plum edition of the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
@@ -443,6 +435,24 @@ const upcoming: [string, string, string][] = [
 		</div>
 	</main>
 </Layout>
+
+<style>
+	.lang-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+	@media (min-width: 640px) { .lang-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+	@media (min-width: 900px) { .lang-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+	@media (min-width: 1150px) { .lang-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+	.lang-chip { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 0.6rem; padding: 0.5rem 0.75rem; border: 1px solid var(--color-hairline); border-radius: 0.6rem; background: var(--color-surface); font-family: var(--font-sans); }
+	.lang-chip img { height: 15px; object-fit: cover; border-radius: 2px; box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.18); }
+	.lang-name { font-size: 0.9rem; font-weight: 600; color: var(--color-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.lang-num { font-size: 0.85rem; font-weight: 800; color: var(--color-brand); }
+	a.lang-chip:hover { border-color: var(--color-brand); }
+	.lang-more { margin-top: 1.5rem; text-align: center; }
+	.lang-more summary { cursor: pointer; list-style: none; display: inline-block; padding: 0.6rem 1.25rem; border: 1px solid var(--color-hairline); border-radius: 999px; font-family: var(--font-sans); font-weight: 600; font-size: 0.95rem; color: var(--color-ink); }
+	.lang-more summary::-webkit-details-marker { display: none; }
+	.lang-more summary::after { content: " +"; color: var(--color-gold); }
+	.lang-more[open] summary::after { content: " \2212"; }
+	.lang-more .lang-grid { text-align: left; }
+</style>
 
 <script>
 	for (const form of document.querySelectorAll<HTMLFormElement>('.legacy-sign-form')) {
@@ -470,8 +480,12 @@ const upcoming: [string, string, string][] = [
 					body: JSON.stringify({ name, email, website: String(data.website || '') }),
 				});
 				if (!res.ok) throw new Error(String(res.status));
+				const out = (await res.json()) as { emailed?: boolean };
 				form.reset();
-				if (status) status.textContent = `Thank you, ${name}.`;
+				if (status)
+					status.textContent = out.emailed
+						? `Thank you, ${name}. Your copy is on its way to your inbox.`
+						: `Thank you, ${name}.`;
 			} catch {
 				if (status) status.textContent = 'Something went wrong — please try again in a moment.';
 				if (button) button.disabled = false;

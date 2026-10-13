@@ -67,5 +67,52 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	});
 	if (!tagRes.ok) return json({ error: 'signing failed' }, 502);
 
-	return json({ ok: true });
+	// Their copy by email (Kevin 2026-10-13: the statement, their name, the date, from Kevin
+	// and Shelly). Sent through GHL LC Email on the warmed mail. sender. A failed send never
+	// fails the signing — the name is already recorded.
+	const signedOn = new Date().toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+		timeZone: 'America/New_York',
+	});
+	const esc = (t: string) =>
+		t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	let emailed = false;
+	try {
+		const mailRes = await fetch(`${GHL}/conversations/messages`, {
+			method: 'POST',
+			headers,
+			body: JSON.stringify({
+				type: 'Email',
+				locationId: LOCATION_ID,
+				contactId,
+				emailFrom: 'Kevin and Shelly White <kevin@mail.spiritmediapublishing.com>',
+				subject: 'Sharing the Father is my life legacy',
+				html: legacyEmail(esc(name), signedOn),
+			}),
+		});
+		emailed = mailRes.ok;
+	} catch {
+		emailed = false;
+	}
+
+	return json({ ok: true, emailed });
 };
+
+// The emailed copy. Footer = the SMP silent-DND unsubscribe line, ~144px below the signature.
+const legacyEmail = (
+	name: string,
+	signedOn: string,
+) => `<div style="max-width:560px;margin:0 auto;padding:32px 24px;font-family:Georgia,'Times New Roman',serif;color:#2b2326;">
+<p style="margin:0 0 8px;font-family:Arial,Helvetica,sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#b8005c;">Father&rsquo;s Heart Legacy</p>
+<h1 style="margin:0 0 24px;font-size:28px;line-height:1.25;font-weight:normal;">Sharing the Father is my life legacy.</h1>
+<p style="margin:0 0 14px;font-size:18px;line-height:1.55;">Our Father is the greatest gift I have ever received.</p>
+<p style="margin:0 0 14px;font-size:18px;line-height:1.55;">I live to share His love, and to invite others to open their hearts to Him.</p>
+<p style="margin:0 0 28px;font-size:18px;line-height:1.55;">Sharing the Father is my life legacy.</p>
+<p style="margin:0;font-size:20px;line-height:1.4;border-top:1px solid #e6dfe1;padding-top:18px;">${name}</p>
+<p style="margin:4px 0 32px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#6b5d62;">${signedOn}</p>
+<p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#2b2326;">Welcome home,</p>
+<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#2b2326;">Kevin and Shelly White<br />Father&rsquo;s Heart Bible&trade; &middot; <a href="https://fathersheartbible.com/legacy/" style="color:#b8005c;">fathersheartbible.com/legacy</a></p>
+<p style="margin:144px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5;color:#8a7d82;text-align:center;">Want to change how you receive these emails? You can <a href="{{trigger_link.PmEH5lDUfxquhrEgntGY}}" style="color:#8a7d82;">unsubscribe from this list</a>.</p>
+</div>`;
