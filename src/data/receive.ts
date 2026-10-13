@@ -108,7 +108,7 @@ export const topLanguages = (n: number) =>
 		.slice(0, n)
 		.map((l) => l.english.replace(/\s*\(.*\)/, ''));
 
-// ── Every way to receive it ────────────────────────────────────────────────────────────
+// ── Every way to hear His voice ────────────────────────────────────────────────────────────
 export const AUDIO = {
 	page: '/audio-bible',
 	feed: `${SITE}/audio-bible/feed.xml`,
@@ -177,12 +177,6 @@ export const ways: Way[] = [
 		title: `${LANGUAGE_TOTAL} languages`,
 		note: 'Each in print and free to read online.',
 		links: [{ label: 'Language editions', href: '/print/#language-editions' }],
-	},
-	{
-		key: 'give',
-		title: 'Give',
-		note: 'Carry it to the next language and the next reader.',
-		links: [{ label: 'A Bible for the whole world', href: '/a-bible-for-the-whole-world/' }],
 	},
 ].filter((w) => w.links.length > 0);
 
