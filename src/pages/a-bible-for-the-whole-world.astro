@@ -151,10 +151,60 @@ const partnershipFaq = [
 		link: { href: '/read/', label: 'Read or listen free →' },
 	},
 ];
+
+// ── More to come — the rest of the 80-language roster (projects/fhb-language-cover-colours/roster.json),
+// alphabetical by code: [name, flag iso code, primary region]. A language moves out of this list
+// when its edition lands in the registry.
+const upcoming: [string, string, string][] = [
+	['Afrikaans', 'za', 'South Africa'],
+	['Anaang', 'ng', 'Nigeria'],
+	['Azerbaijani (South)', 'ir', 'Iran'],
+	['Greek', 'gr', 'Greece'],
+	['Gujarati', 'in', 'India'],
+	['Hausa', 'ng', 'Nigeria & West Africa'],
+	['Hiligaynon', 'ph', 'Philippines'],
+	['Haitian Creole', 'ht', 'Haiti'],
+	['Hungarian', 'hu', 'Hungary'],
+	['Igbo', 'ng', 'Nigeria'],
+	['Izon', 'ng', 'Nigeria'],
+	['Ilocano', 'ph', 'Philippines'],
+	['Javanese', 'id', 'Indonesia'],
+	['Gikuyu', 'ke', 'Kenya'],
+	['Kurdish (Kurmanji)', 'tr', 'Türkiye, Syria & Iraq'],
+	['Kannada', 'in', 'India'],
+	['Kituba', 'cd', 'DR Congo & Congo'],
+	['Mangbetu', 'cd', 'DR Congo'],
+	['Malagasy', 'mg', 'Madagascar'],
+	['Malayalam', 'in', 'India'],
+	['Malay', 'my', 'Malaysia'],
+	['Burmese', 'mm', 'Myanmar'],
+	['Nagamese', 'in', 'Northeast India'],
+	['Nepali', 'np', 'Nepal'],
+	['Inpui Naga', 'in', 'Northeast India'],
+	['Dutch', 'nl', 'Netherlands & Belgium'],
+	['Chokri Naga', 'in', 'Northeast India'],
+	['Chichewa', 'mw', 'Malawi'],
+	['Oromo', 'et', 'Ethiopia'],
+	['Odia', 'in', 'India'],
+	['Pashto', 'af', 'Afghanistan & Pakistan'],
+	['Kirundi', 'bi', 'Burundi'],
+	['Kinyarwanda', 'rw', 'Rwanda'],
+	['Sindhi', 'pk', 'Pakistan'],
+	['Sena', 'mz', 'Mozambique'],
+	['Kipsigis', 'ke', 'Kenya'],
+	['Shona', 'zw', 'Zimbabwe'],
+	['Somali', 'so', 'Somalia'],
+	['Sundanese', 'id', 'Indonesia'],
+	['Thai', 'th', 'Thailand'],
+	['Tigrinya', 'er', 'Eritrea & Ethiopia'],
+	['Akan (Twi)', 'gh', 'Ghana'],
+	['Uzbek', 'uz', 'Uzbekistan'],
+	['Xhosa', 'za', 'South Africa'],
+	['Yaka', 'cd', 'DR Congo'],
+].sort((a, b) => a[0].localeCompare(b[0])) as [string, string, string][];
 ---
 
 <Layout
-	youtube
 	title={seoTitle}
 	description={seoDescription}
 	image="https://assets.spiritmediapublishing.com/FHB/share/fhb-og-partner.jpg?v=2"
@@ -185,13 +235,13 @@ const partnershipFaq = [
 			href="#donate"
 			linkLabel="Give to A Bible for the Whole World"
 			heading="A Bible for the Whole World"
-			headingClass="text-xl sm:text-3xl md:text-5xl whitespace-nowrap"
-			contentPad="pb-6 md:pb-10"
+			headingClass="text-3xl md:text-5xl"
+			headingBelow
 		/>
 
 		<!-- ═══════════════ REACH HEADLINE + COVER MARQUEES (audience + language editions) ═══════════════ -->
-		<div style="background-color: var(--color-canvas);">
-			<header class="text-center px-6 pt-12 lg:pt-16">
+		<div class="pb-10 lg:pb-14" style="background-color: var(--color-canvas);">
+			<header class="text-center px-6 pt-6">
 				<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
 					Taking Father's Heart Bible™ to every nation, tribe, and tongue
 				</p>
@@ -199,114 +249,128 @@ const partnershipFaq = [
 					{LANGUAGE_TOTAL} Languages Reaching<br /><span style="color: var(--color-brand);">Over 75% of Humanity</span>
 				</h2>
 			</header>
-			<CoverMarquee showTitle={false} />
+			<CoverMarquee showTitle={false} showChips={false} />
 		</div>
 
-		<!-- ═══════════════ PAGE 1 — title, invitation, timeline, you're invited ═══════════════ -->
-		<Section variant="light">
-			<div class="text-center mb-10" data-reveal>
-				<p class="text-sm md:text-base mb-3" style="font-family: var(--font-sans); color: var(--color-muted);">A portion of every <a href="/print/" style="color: var(--color-brand); text-decoration: underline;">Father&rsquo;s Heart Bible sold</a> helps fund</p>
-				<!-- Testimony video — small, borderless (transparent) lazy YouTube facade; replaces the funding-connection banner image. -->
-				<figure style="margin: 1.5rem 0 0;">
-					<button
-						type="button"
-						id="abw-video-facade"
-						class="group relative block mx-auto w-full overflow-hidden rounded-2xl cursor-pointer"
-						style="aspect-ratio: 16/9; max-width: 26rem; background: transparent; border: 0; padding: 0;"
-						aria-label="Play the A Bible for the Whole World video"
-						data-video-id="XjG6QU_TkPA"
-					>
-						<img
-							src="https://i.ytimg.com/vi/XjG6QU_TkPA/hqdefault.jpg"
-							alt="A Bible for the Whole World"
-							width="480"
-							height="360"
-							loading="lazy"
-							decoding="async"
-							class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-						/>
-						<span aria-hidden="true" class="absolute inset-0" style="background: rgba(36,27,23,0.12);"></span>
-						<span
-							aria-hidden="true"
-							class="absolute left-1/2 flex items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110"
-							style="bottom: 0.75rem; width: 3.25rem; height: 3.25rem; transform: translateX(-50%); background: rgba(255,255,255,0.82); backdrop-filter: blur(2px); border: 2px solid var(--color-brand); box-shadow: 0 2px 10px rgba(0,0,0,0.25);"
-						>
-							<svg width="20" height="20" viewBox="0 0 24 24" fill="var(--color-brand)" style="margin-left: 3px;"><path d="M8 5v14l11-7z"/></svg>
-						</span>
-					</button>
-				</figure>
-				<script is:inline>
-					// Lazy YouTube facade — swap the poster for an autoplaying,
-					// transparent-background iframe only on click. Keeps third-party
-					// JS off the initial load.
-					(() => {
-						const btn = document.getElementById('abw-video-facade');
-						if (!btn) return;
-						btn.addEventListener('click', () => {
-							const id = btn.dataset.videoId;
-							const iframe = document.createElement('iframe');
-							iframe.style.cssText = 'display:block;width:100%;max-width:26rem;margin:1.5rem auto 0;aspect-ratio:16/9;height:auto;border:0;border-radius:1rem;background:transparent;';
-							iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-							iframe.allowFullscreen = true;
-							iframe.title = 'A Bible for the Whole World';
-							iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&wmode=transparent`;
-							btn.parentElement.replaceWith(iframe);
-						}, { once: true });
-					})();
-				</script>
+		<!-- ═══════════════ REACH MAP — directly under the marquees ═══════════════ -->
+		<div class="relative overflow-hidden" style="background-color: var(--color-canvas);">
+				<div class="relative">
+					<img
+						src="https://assets.spiritmediapublishing.com/FHB/partner/world-reach-map.jpg"
+						alt="World map — the nations our first 25 languages reach, about 75% of humanity"
+						width="1600" height="1262" loading="lazy" decoding="async"
+						class="block w-full"
+					/>
+					<!-- "Sharing Our Father" title over the top of the map (~1in down) -->
+					<p class="absolute left-1/2 -translate-x-1/2 text-center font-light text-4xl md:text-6xl" style="top: 6%; font-family: var(--font-serif); color: var(--color-ink); text-shadow: 0 1px 12px rgba(255,255,255,0.9), 0 1px 3px rgba(255,255,255,0.9);">Sharing <span style="color: var(--color-brand);">Our</span> Father</p>
+					<!-- key, across the top of Antarctica (matches the brochure) -->
+					<div class="absolute left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-x-6 gap-y-1 px-4 md:px-6 py-2.5 rounded-xl text-[13px] md:text-[15px]"
+						style="bottom: 13%; max-width: 92vw; background: rgba(255,255,255,0.94); border: 1px solid #e6e0e2; box-shadow: 0 2px 10px rgba(0,0,0,0.10); font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">
+						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#ffbed0; border:1px solid #ef96ac;"></span>Reached by our first 25 languages — ~6.5B people</span>
+						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#e7e7e3; border:1px solid #d2d2cd;"></span>Not yet reached</span>
+					</div>
+				</div>
+		</div>
+
+		<!-- ═══════════════ THE LANGUAGES — available now, then more to come ═══════════════ -->
+		<Section variant="soft">
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+				<a href="/print/" class="lang-row grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl no-underline" style="border: 1px solid var(--color-hairline); background: #FFE1E8;">
+					<img src="/flags/us.svg" alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" />
+					<span class="min-w-0">
+						<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">English</span>
+						<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">Worldwide</span>
+					</span>
+					<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand-dark, var(--color-brand));" aria-hidden="true">&rarr;</span>
+				</a>
+				{languages.map(({ name, flag, region, href }) => {
+					const Row = href ? 'a' : 'div';
+					return (
+						<Row href={href} class="lang-row grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl no-underline" style="border: 1px solid var(--color-hairline); background: var(--color-surface);">
+							{flag ? <img src={`/flags/${flag}.svg`} alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" /> : <span />}
+							<span class="min-w-0">
+								<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">{name}</span>
+								<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">{region}</span>
+							</span>
+							<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand);" aria-hidden="true">{href ? '\u2192' : ''}</span>
+						</Row>
+					);
+				})}
 			</div>
 
-			<!-- You're Invited -->
-			<div class="max-w-2xl mx-auto" data-reveal>
-					<p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">
-						You're Invited
-					</p>
-					<div class="rounded-2xl p-7 md:p-8" style="background: #FFE1E8; border: 1px solid var(--color-hairline);">
-					<img
-						src="https://cdn.sanity.io/images/pmowd8uo/production/3dc19194b19b5c804633ad324a893237ab692da5-1583x2048.png?rect=520,110,760,760&w=400&h=400&fm=webp&q=80"
-						alt="Kevin and Shelly White"
-						width="150" height="150" loading="lazy" decoding="async"
-						class="rounded-full object-cover"
-						style="float: right; width: 150px; height: 150px; margin: 0 0 0.75rem 1.25rem; border: 2px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.16);"
-					/>
-					<div class="space-y-4" style="font-family: var(--font-sans); color: #3F3338;">
-						<p class="leading-relaxed">
-							For most of our lives we knew God as Lord, King, and Savior — all true. But it took us years to know Him the way Jesus did: as <strong style="color: var(--color-ink);">Father</strong>. That one word changes everything.
-						</p>
-						<p class="leading-relaxed">
-							The Father's Heart Bible™ exists so that anyone, in any language, can finally meet the Father in the pages of His own Word — His love letter to His sons and daughters.
-						</p>
-						<p class="leading-relaxed">We're taking it to the nations. We'd love for you to come with us.</p>
+			<!-- More to come — the rest of the 80 -->
+			<h2 class="text-center text-2xl md:text-3xl font-light mt-12 mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">More to Come&hellip;</h2>
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+				{upcoming.map(([name, flag, region]) => (
+					<div class="grid grid-cols-[28px_1fr] items-center gap-3 px-4 py-2.5 rounded-xl" style="border: 1px solid var(--color-hairline); background: var(--color-surface);">
+						<img src={`/flags/${flag}.svg`} alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" />
+						<span class="min-w-0">
+							<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">{name}</span>
+							<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">{region}</span>
+						</span>
 					</div>
-					<div class="mt-5 pt-4" style="border-top: 1px solid var(--color-hairline); clear: both;">
-						<p style="font-family: var(--font-serif); font-weight: 700; color: var(--color-ink);">— Kevin and Shelly White</p>
-						<p class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">Spirit Media Publishing</p>
+				))}
+			</div>
+		</Section>
+
+		<!-- ═══════════════ YOU'RE INVITED  |  PARTNER WITH US (give form) ═══════════════ -->
+		<Section variant="light">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+				<!-- You're Invited -->
+				<div data-reveal>
+						<p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">
+							You're Invited
+						</p>
+						<div class="rounded-2xl p-7 md:p-8" style="background: #FFE1E8; border: 1px solid var(--color-hairline);">
+						<img
+							src="https://cdn.sanity.io/images/rusi1hyi/production/78fe2b8fd627d52d8a2fc6401622e0cead9dbeb3-800x800.jpg?w=400&h=400&fm=webp&q=80"
+							alt="Kevin and Shelly White"
+							width="150" height="150" loading="lazy" decoding="async"
+							class="rounded-full object-cover"
+							style="float: right; width: 150px; height: 150px; margin: 0 0 0.75rem 1.25rem; border: 2px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.16);"
+						/>
+						<div class="space-y-4" style="font-family: var(--font-sans); color: #3F3338;">
+							<p class="leading-relaxed">
+								For most of our lives we knew God as Lord, King, and Savior — all true. But it took us years to know Him the way Jesus did: as <strong style="color: var(--color-ink);">Father</strong>. That one word changes everything.
+							</p>
+							<p class="leading-relaxed">
+								The Father's Heart Bible™ exists so that anyone, in any language, can finally meet the Father in the pages of His own Word — His love letter to His sons and daughters.
+							</p>
+							<p class="leading-relaxed">We're taking it to the nations. We'd love for you to come with us.</p>
+						</div>
+						<div class="mt-5 pt-4" style="border-top: 1px solid var(--color-hairline); clear: both;">
+							<p style="font-family: var(--font-serif); font-weight: 700; color: var(--color-ink);">— Kevin and Shelly White</p>
+							<p class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">Spirit Media Publishing</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Partner With Us + donation form -->
+				<div data-reveal>
+				<div class="text-center mb-8">
+					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
+						Partner With Us
+					</p>
+					<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+						A Bible for the Whole World
+					</h2>
+					<p class="mt-4 leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Come with us. Your gift helps translate, publish, and carry the Father's Heart Bible™ to the nations — give monthly or once; every gift matters.
+					</p>
+				</div>
+					<div id="donate" class="scroll-mt-24">
+						<DonationForm />
 					</div>
 				</div>
 			</div>
-
 		</Section>
 
-		<!-- ═══════════════ MAKE A GIFT ═══════════════ -->
+		<!-- ═══════════════ THE FATHER'S VISION (blog card)  |  PARTNERSHIP FAQ ═══════════════ -->
 		<Section variant="soft">
-			<div class="max-w-2xl mx-auto text-center mb-10" data-reveal>
-				<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
-					Partner With Us
-				</p>
-				<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
-					A Bible for the Whole World
-				</h2>
-				<p class="mt-4 leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-					Come with us. Your gift helps translate, publish, and carry the Father's Heart Bible™ to the nations — give monthly or once; every gift matters.
-				</p>
-			</div>
-
-			<!-- Donation form, then The Father's Vision blog card -->
-			<div id="donate" class="max-w-xl mx-auto scroll-mt-24" data-reveal>
-				<DonationForm />
-					<!-- The Father's Vision blog card (restored) -->
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+				<div data-reveal>
 					{visionPost && (
-						<a href={visionPost.slug} class="group mt-5 block rounded-2xl border overflow-hidden transition-shadow hover:shadow-md" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
+						<a href={visionPost.slug} class="group block rounded-2xl border overflow-hidden transition-shadow hover:shadow-md" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
 							<div class="overflow-hidden h-40">
 								<img src={visionPost.image} alt={visionPost.title} width="800" height="320" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style="object-position: center top;" />
 							</div>
@@ -325,10 +389,14 @@ const partnershipFaq = [
 							</div>
 						</a>
 					)}
-			</div>
+					<div class="text-center mt-8">
+						<p class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">The Father</p>
+						<p class="text-3xl md:text-4xl font-light leading-tight mt-1" style="font-family: var(--font-serif); color: var(--color-brand);">No greater gift or legacy.</p>
+					</div>
+				</div>
 
-			<!-- Partnership FAQ -->
-			<div class="max-w-3xl mx-auto mt-16" data-reveal>
+				<!-- Partnership FAQ -->
+				<div data-reveal>
 				<div class="text-center mb-8">
 					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
 						Partnership FAQ
@@ -353,81 +421,6 @@ const partnershipFaq = [
 						</details>
 					))}
 				</div>
-			</div>
-
-			<!-- Give by check — under the FAQ -->
-			<div class="max-w-md mx-auto mt-10" data-reveal>
-				<div class="rounded-2xl overflow-hidden flex flex-col" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline);">
-					<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-card-check-v2.webp" alt="A family reading the Father's Heart Bible together" width="720" height="281" loading="lazy" decoding="async" class="w-full h-36 object-cover block" />
-					<div class="p-5 flex-1">
-						<p class="text-lg font-semibold mb-2" style="font-family: var(--font-sans); color: var(--color-brand);">Prefer to give by check?</p>
-						<p class="text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-muted);">Make your check payable to <strong style="color: var(--color-ink);">Spirit Media Charities</strong> and mail to:</p>
-						<address class="not-italic text-sm leading-snug mb-2" style="font-family: var(--font-sans); color: var(--color-ink);">Spirit Media Charities &middot; 205 S Academy St #3251 &middot; Cary, NC 27519</address>
-						<p class="text-xs leading-snug" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.8;">Write <strong style="color: var(--color-ink);">&ldquo;FHB&rdquo;</strong> in the memo so your gift supports the Father&rsquo;s Heart Bible&trade;. All gifts are tax-deductible as allowed by the IRS.</p>
-					</div>
-				</div>
-			</div>
-		</Section>
-
-		<!-- ═══════════════ PAGE 2 — reach map ═══════════════ -->
-		<Section variant="light">
-			<div class="max-w-4xl mx-auto">
-
-				<div class="relative" style="width: 100vw; max-width: 100vw; margin-left: calc(50% - 50vw);" data-reveal>
-					<img
-						src="https://assets.spiritmediapublishing.com/FHB/partner/world-reach-map.jpg"
-						alt="World map — the nations our first 25 languages reach, about 75% of humanity"
-						width="1600" height="1262" loading="lazy" decoding="async"
-						class="block w-full"
-					/>
-					<!-- "Sharing Our Father" title over the top of the map (~1in down) -->
-					<p class="absolute left-1/2 -translate-x-1/2 text-center font-light text-4xl md:text-6xl" style="top: 6%; font-family: var(--font-serif); color: var(--color-ink); text-shadow: 0 1px 12px rgba(255,255,255,0.9), 0 1px 3px rgba(255,255,255,0.9);">Sharing <span style="color: var(--color-brand);">Our</span> Father</p>
-					<!-- key, across the top of Antarctica (matches the brochure) -->
-					<div class="absolute left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-x-6 gap-y-1 px-4 md:px-6 py-2.5 rounded-xl text-[13px] md:text-[15px]"
-						style="bottom: 13%; max-width: 92vw; background: rgba(255,255,255,0.94); border: 1px solid #e6e0e2; box-shadow: 0 2px 10px rgba(0,0,0,0.10); font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">
-						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#ffbed0; border:1px solid #ef96ac;"></span>Reached by our first 25 languages — ~6.5B people</span>
-						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#e7e7e3; border:1px solid #d2d2cd;"></span>Not yet reached</span>
-					</div>
-				</div>
-
-				<div class="text-center mt-7" data-reveal>
-					<p class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">The Father</p>
-					<p class="text-3xl md:text-4xl font-light leading-tight mt-1" style="font-family: var(--font-serif); color: var(--color-brand);">No greater gift or legacy.</p>
-				</div>
-			</div>
-		</Section>
-
-		<!-- ═══════════════ PAGE 3 — the 25 languages ═══════════════ -->
-		<Section variant="soft">
-			<div class="max-w-4xl mx-auto">
-				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-					<!-- English featured, full width -->
-					<a href="/print/" class="lang-row sm:col-span-2 grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl no-underline" style="border: 1px solid var(--color-hairline); background: #FFE1E8;">
-						<img src="/flags/us.svg" alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" />
-						<span class="min-w-0">
-							<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">English</span>
-							<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">Worldwide</span>
-						</span>
-						<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand-dark, var(--color-brand));" aria-hidden="true">&rarr;</span>
-					</a>
-					<!-- every language edition, each linking to its own Bible -->
-					{languages.map(({ name, flag, region, href }) => {
-						const Row = href ? 'a' : 'div';
-						return (
-							<Row href={href} class="lang-row grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl no-underline" style="border: 1px solid var(--color-hairline); background: var(--color-surface);">
-								{flag ? <img src={`/flags/${flag}.svg`} alt="" width="28" height="19" loading="lazy" class="rounded-sm" style="box-shadow: 0 0 0 .5px rgba(0,0,0,0.18); object-fit: cover; height: 19px;" /> : <span />}
-								<span class="min-w-0">
-									<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">{name}</span>
-									<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">{region}</span>
-								</span>
-								<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand);" aria-hidden="true">{href ? '\u2192' : ''}</span>
-							</Row>
-						);
-					})}
-				</div>
-				<div class="text-center mt-9" data-reveal>
-					<p class="text-lg md:text-xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">Want to Sponsor a Language?</p>
-					<a href="#" data-e="kevin" data-d="spiritmediapublishing.com" class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A; border-radius: 8px;" aria-label="Email us about sponsoring a language" onclick="event.preventDefault();window.location.href='mailto:'+this.dataset.e+'@'+this.dataset.d+'?subject='+encodeURIComponent('Sponsor a Language')" onmouseover="this.style.opacity='0.92'" onmouseout="this.style.opacity='1'">Email Us</a>
 				</div>
 			</div>
 		</Section>

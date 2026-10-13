@@ -38,6 +38,9 @@ interface Props {
 	href?: string;
 	linkLabel?: string;
 	heading: string;
+	// Image alone, with the h1 on the page below it instead of overlaid
+	// (/a-bible-for-the-whole-world/, Kevin 2026-10-13). Default off: the other splash pages keep the overlay.
+	headingBelow?: boolean;
 	subheading?: string;
 	primaryCtaLabel?: string;
 	primaryCtaHref?: string;
@@ -60,6 +63,7 @@ const {
 	href,
 	linkLabel = "See the Father's Heart Bible print editions",
 	heading,
+	headingBelow = false,
 	subheading,
 	primaryCtaLabel,
 	primaryCtaHref,
@@ -126,6 +130,7 @@ const heroSrcMain = hasW ? imageSrc.replace(/([?&])w=\d+/, '$1w=1280') : imageSr
 	{href && (
 		<a href={href} aria-label={linkLabel} class="absolute inset-0 z-[2]"></a>
 	)}
+	{!headingBelow && (
 	<div class={`relative z-10 text-center px-6 max-w-3xl mx-auto ${stackOnMobile ? `pt-6 ${contentPad} md:pt-0` : contentPad}`}>
 		<h1
 			class={`${headingClass} font-medium leading-snug tracking-tight`}
@@ -134,7 +139,14 @@ const heroSrcMain = hasW ? imageSrc.replace(/([?&])w=\d+/, '$1w=1280') : imageSr
 			{heading}
 		</h1>
 	</div>
+	)}
 </section>
+
+{headingBelow && (
+	<div class="text-center px-6 pt-10 lg:pt-14" style="background-color: var(--color-canvas);">
+		<h1 class={`${headingClass} font-medium leading-snug tracking-tight`} style="font-family: var(--font-headline); color: var(--color-ink);">{heading}</h1>
+	</div>
+)}
 
 {(subheading || primaryCtaLabel) && (
 	<section style="background-color: var(--color-canvas);" class={`px-4 md:px-6 ${hasCta ? 'py-8 md:py-12' : 'pt-8 md:pt-12 pb-0'}`}>

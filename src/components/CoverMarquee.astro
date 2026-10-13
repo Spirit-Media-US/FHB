@@ -114,10 +114,12 @@ const rows = [
 
 // showTitle={false}: the host page supplies its own heading above the strip
 // (/a-bible-for-the-whole-world, Kevin 2026-10-13). The homepage keeps the title.
+// showChips={false} drops the FATHER | SON | SPIRIT chips under the strip (same page, same date).
 interface Props {
 	showTitle?: boolean;
+	showChips?: boolean;
 }
-const { showTitle = true } = Astro.props;
+const { showTitle = true, showChips = true } = Astro.props;
 ---
 
 <section
@@ -164,7 +166,7 @@ const { showTitle = true } = Astro.props;
 		</>
 	))}
 
-	<div class="fhbm-chips"><VoiceChips size="1.25rem" class="mb-0" /></div>
+	{showChips && <div class="fhbm-chips"><VoiceChips size="1.25rem" class="mb-0" /></div>}
 </section>
 
 <style>
