@@ -335,16 +335,19 @@ h6 {
 	display: inline-block;
 }
 
-/* ── A11y: link-in-text-block (WCAG 1.4.1) ──────────────────────────────────
-   Inline body links use `hover:underline` (brand color + underline only on
-   hover), so they're distinguished from surrounding text by color alone — a
-   WCAG fail. Make the underline persistent. Scoped to .hover:underline links,
-   so nav (.chrome-nav-link, text-decoration:none) and CTAs (.no-underline) are
-   untouched. */
+/* ── Inline body links (Kevin 2026-10-13: every link like the Legacy page) ────────────
+   Brand colour, semi-bold, no underline; underline only on hover. The weight is the
+   non-colour cue that sets a link apart from its sentence (WCAG 1.4.1 link-in-text-block),
+   which the persistent underline used to provide. Scoped to .hover:underline links, so nav
+   (.chrome-nav-link) and CTAs (.no-underline) are untouched. */
 a.hover\:underline {
+	color: var(--color-brand);
+	font-weight: 600;
+	text-decoration: none;
+}
+a.hover\:underline:hover {
 	text-decoration: underline;
 	text-underline-offset: 0.15em;
-	text-decoration-thickness: from-font;
 }
 
 /* Telugu companion face (Kevin 2026-07-22) — self-hosted Noto Sans Telugu

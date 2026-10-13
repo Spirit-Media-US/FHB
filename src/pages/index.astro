@@ -93,6 +93,21 @@ const photo2 = 'https://assets.spiritmediapublishing.com/FHB/print/people-d010-1
 const photo3 = 'https://assets.spiritmediapublishing.com/FHB/print/people-ds004-1200.webp';
 const communityUrl = media?.communityUrl || '/join';
 const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
+// "Search for Father's Heart Bible on" (Kevin 2026-10-13). Stores open their own search for the
+// title; Apple, Spotify and YouTube open our channels.
+const searchOn = [
+	{ label: 'Amazon', href: 'https://www.amazon.com/s?k=Father%27s+Heart+Bible' },
+	{ label: 'Apple', href: 'https://podcasts.apple.com/us/podcast/id6818374650' },
+	{ label: 'Barnes & Noble', href: 'https://www.barnesandnoble.com/s/Father%27s+Heart+Bible' },
+	{
+		label: 'Google',
+		href: 'https://play.google.com/store/search?q=Father%27s+Heart+Bible&c=books',
+	},
+	{ label: 'Kobo', href: 'https://www.kobo.com/us/en/search?query=Father%27s+Heart+Bible' },
+	{ label: 'Spotify', href: 'https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY' },
+	{ label: 'Walmart', href: 'https://www.walmart.com/search?q=Father%27s+Heart+Bible' },
+	{ label: 'YouTube', href: 'https://www.youtube.com/@FathersHeartBible' },
+];
 ---
 
 <Layout
@@ -219,7 +234,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				<h2>Open your heart to our Father</h2>
 				<p>You have been longing for Him all along. Our Father placed the desire for Him in you before the creation of the world. He loved you and chose you before He formed you, and He ordained your life.</p>
 				<p>The truth of the Bible is this: He is your Father &mdash; not a distant deity, not a disappointed one &mdash; and you are His beloved son or daughter.</p>
-				<p class="rcv-voice">The greatest gift I will ever give you is me. Receive me as Father.</p>
+				<p class="rcv-voice">I give you me. Receive me as Father.</p>
 				<p class="rcv-verse">&ldquo;Just as he chose us in him before the world&rsquo;s founding, to be holy and blameless before our Father in love.&rdquo; &mdash; <a href="/read/ephesians/1/" style="color: var(--color-brand); text-decoration: none; font-weight: 600;">Ephesians 1:4 (FHB)</a></p>
 				<details>
 					<summary>Pray this to receive Him</summary>
@@ -527,6 +542,29 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		</Section>
 
 		<!-- ═══════════════════════════════════════════════════════════
+		     SEARCH FOR IT — where people already shop and listen (Kevin 2026-10-13).
+		     Each store opens its own search for "Father's Heart Bible"; Apple, Spotify and
+		     YouTube open our channels there.
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="soft">
+			<div class="text-center max-w-4xl mx-auto">
+				<h2 class="text-2xl md:text-3xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Search for Father&rsquo;s Heart Bible on
+				</h2>
+				<ul class="fhb-search-on">
+					{searchOn.map((x) => (
+						<li><a href={x.href} target="_blank" rel="noopener noreferrer">{x.label}</a></li>
+					))}
+				</ul>
+			</div>
+		</Section>
+		<style>
+			.fhb-search-on { list-style: none; margin: 1.5rem 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
+			.fhb-search-on a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1.15rem; border: 1px solid var(--color-hairline); border-radius: 999px; background: var(--color-surface); font-family: var(--font-sans); font-size: 0.95rem; font-weight: 600; color: var(--color-ink); text-decoration: none; }
+			.fhb-search-on a:hover { border-color: var(--color-brand); color: var(--color-brand); }
+		</style>
+
+		<!-- ═══════════════════════════════════════════════════════════
 		     SECTION — WHO THIS BIBLE IS FOR (Kevin 2026-10-13)
 		     One scannable block in place of the six former audience statements: every
 		     audience edition under the phrase people search for ("Bible for men"), linked to its
@@ -554,13 +592,13 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			<ul class="fhb-for-grid max-w-5xl mx-auto" style="font-family: var(--font-sans);">
 				{audienceLinks.map((a) => (
 					<li>
-						<a href={a.href} style="color: var(--color-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px;">{a.label}</a>
+						<a href={a.href} style="color: var(--color-brand); font-weight: 600; text-decoration: none;">{a.label}</a>
 						<span style="color: var(--color-muted);">
 							{a.edition}
 							{a.versesHref && (
 								<>
 									<span aria-hidden="true"> &middot; </span>
-									<a href={a.versesHref} style="color: #4A4A4A; text-decoration: underline; text-underline-offset: 3px;">verses</a>
+									<a href={a.versesHref} style="color: var(--color-brand); font-weight: 600; text-decoration: none;">verses</a>
 								</>
 							)}
 						</span>
@@ -742,7 +780,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				In this passage, the One who loves and gives the Son is the Father. The Father&rsquo;s Heart
 				Bible makes that explicit, helping readers hear this verse not as the action of a distant
 				supreme being, but as the giving love of the Father Himself.
-				<a href="/read/john/3/" style="color: #4A4A4A; font-weight: 600; text-decoration: underline; text-underline-offset: 3px;">Read John 3 &rarr;</a>
+				<a href="/read/john/3/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">Read John 3 &rarr;</a>
 			</p>
 		</Section>
 
