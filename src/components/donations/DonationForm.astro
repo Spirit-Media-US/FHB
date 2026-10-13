@@ -8,7 +8,7 @@
 
 <div id="donation-form-root" class="donation-form" style="background-color: var(--color-surface); border: 1px solid var(--color-outline-variant); border-radius: 16px; padding: 28px;">
 
-	<!-- STEP 1: amount + donor info — the form the donor fills in first -->
+	<!-- STEP 1: frequency + amount — the only thing the donor fills in here -->
 	<div id="donation-step-form">
 		<!-- Monthly / One-time toggle. Monthly is the default; donors can switch
 		     to a one-time gift if they prefer. -->
@@ -45,19 +45,6 @@
 					style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
 			</div>
 		</div>
-
-		<!-- Donor info -->
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-			<input type="text" id="donor-first-name" placeholder="First name" required
-				class="px-4 py-3 rounded-lg border text-base"
-				style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
-			<input type="text" id="donor-last-name" placeholder="Last name" required
-				class="px-4 py-3 rounded-lg border text-base"
-				style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
-		</div>
-		<input type="email" id="donor-email" placeholder="Email" required
-			class="w-full px-4 py-3 rounded-lg border text-base mb-3"
-			style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
 
 		<!-- Cover-fees (default ON — donor sees impact and can opt out) -->
 		<div class="mb-4">
@@ -332,15 +319,6 @@
 			return;
 		}
 
-		const firstName = (document.getElementById('donor-first-name') as HTMLInputElement).value.trim();
-		const lastName = (document.getElementById('donor-last-name') as HTMLInputElement).value.trim();
-		const email = (document.getElementById('donor-email') as HTMLInputElement).value.trim();
-		if (!firstName || !lastName || !email) {
-			errEl.textContent = 'Please fill in your name and email.';
-			errEl.style.display = '';
-			return;
-		}
-
 		const coverFees = (document.getElementById('donor-cover-fees') as HTMLInputElement).checked;
 
 		// If donor opts to cover fees, gross up the amount so net = chosen amount.
@@ -368,8 +346,8 @@
 					campaign: 'fhb',
 					amount_cents: amountCents,
 					is_recurring: frequency === 'recurring',
-					donor_name: `${firstName} ${lastName}`,
-					donor_email: email,
+					// Name and email are collected once, by Stripe Checkout (Kevin 2026-10-13: the
+					// easiest form possible); the webhook reads them back from the session.
 					// No public supporter feed any more (Kevin 2026-10-13) — gifts are never listed.
 					public_name: '',
 					public_message: '',

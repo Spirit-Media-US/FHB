@@ -4,11 +4,30 @@ import DonationForm from '../components/donations/DonationForm.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import { allLanguageEditions, langSlug } from '../data/language-editions';
+import reach from '../data/language-reach.json' with { type: 'json' };
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
 // Language count is English + every language edition in the registry — never typed here.
 const LANGUAGE_TOTAL = allLanguageEditions.length + 1;
+
+// Reach = UNIQUE first-language population, each person counted once (Kevin 2026-09-21), calculated
+// from src/data/language-reach.json — never typed here, never raw reach.
+const firstLanguage = reach.firstLanguage as Record<string, number>;
+const reachOf = (code: string) => firstLanguage[code] ?? 0;
+const fmtReach = (n: number) =>
+	n >= 1e9
+		? `${(n / 1e9).toFixed(1)}B`
+		: n >= 1e7
+			? `${Math.round(n / 1e6)}M`
+			: n >= 1e6
+				? `${(n / 1e6).toFixed(1)}M`
+				: n >= 1e3
+					? `${Math.round(n / 1e3)}K`
+					: '';
+const REACH_TOTAL = reachOf('en') + allLanguageEditions.reduce((t, l) => t + reachOf(l.code), 0);
+const REACH_PCT = Math.round((REACH_TOTAL / reach.WORLD) * 100);
+const ROSTER_PCT = Math.round((reach.rosterTotal / reach.WORLD) * 100);
 
 const pageData = await sanityClient.fetch(`*[_type =="page" && slug =="partner"][0] {
     seoTitle, seoDescription
@@ -18,7 +37,7 @@ const seoTitle =
 	pageData?.seoTitle || "Sharing Our Father — Partner With the Father's Heart Bible™ (FHB)";
 const seoDescription =
 	pageData?.seoDescription ||
-	`Partner with us to take the Father's Heart Bible™ (FHB) to every nation, tribe, and tongue — now in ${LANGUAGE_TOTAL} languages reaching over 75% of humanity. Give monthly or once.`;
+	`Partner with us to take the Father's Heart Bible™ (FHB) to every nation, tribe, and tongue — now in ${LANGUAGE_TOTAL} languages, the first language of ${REACH_PCT}% of humanity. Give monthly or once.`;
 const heroHeading = 'Sharing Our Father';
 
 // Featured blog card ("The Father's Vision") shown under the give-by-check box.
@@ -95,6 +114,7 @@ const languages = allLanguageEditions.map((l) => ({
 	name: l.english,
 	flag: languageMeta[l.code]?.flag,
 	region: languageMeta[l.code]?.region ?? '',
+	reach: fmtReach(reachOf(l.code)),
 	// coming-soon editions have no product page yet
 	href: l.soon ? undefined : `/bibles/${langSlug(l)}-bible/`,
 }));
@@ -246,7 +266,7 @@ const upcoming: [string, string, string][] = [
 					Taking Father's Heart Bible™ to every nation, tribe, and tongue
 				</p>
 				<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
-					{LANGUAGE_TOTAL} Languages Reaching<br /><span style="color: var(--color-brand);">Over 75% of Humanity</span>
+					{LANGUAGE_TOTAL} Languages Reaching<br /><span style="color: var(--color-brand);">{REACH_PCT}% of Humanity</span>
 				</h2>
 			</header>
 			<CoverMarquee showTitle={false} showChips={false} />
@@ -257,7 +277,7 @@ const upcoming: [string, string, string][] = [
 				<div class="relative">
 					<img
 						src="https://assets.spiritmediapublishing.com/FHB/partner/world-reach-map.jpg"
-						alt="World map — the nations our first 25 languages reach, about 75% of humanity"
+						alt={`World map — where the Father's Heart Bible is read in its ${LANGUAGE_TOTAL} languages`}
 						width="1600" height="1262" loading="lazy" decoding="async"
 						class="block w-full"
 					/>
@@ -266,7 +286,7 @@ const upcoming: [string, string, string][] = [
 					<!-- key, across the top of Antarctica (matches the brochure) -->
 					<div class="absolute left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-x-6 gap-y-1 px-4 md:px-6 py-2.5 rounded-xl text-[13px] md:text-[15px]"
 						style="bottom: 13%; max-width: 92vw; background: rgba(255,255,255,0.94); border: 1px solid #e6e0e2; box-shadow: 0 2px 10px rgba(0,0,0,0.10); font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">
-						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#ffbed0; border:1px solid #ef96ac;"></span>Reached by our first 25 languages — ~6.5B people</span>
+						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#ffbed0; border:1px solid #ef96ac;"></span>The first language of {fmtReach(REACH_TOTAL)} people — {LANGUAGE_TOTAL} languages</span>
 						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#e7e7e3; border:1px solid #d2d2cd;"></span>Not yet reached</span>
 					</div>
 				</div>
@@ -281,9 +301,9 @@ const upcoming: [string, string, string][] = [
 						<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">English</span>
 						<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">Worldwide</span>
 					</span>
-					<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand-dark, var(--color-brand));" aria-hidden="true">&rarr;</span>
+					<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand-dark, var(--color-brand));">{fmtReach(reachOf('en'))} <span aria-hidden="true">&rarr;</span></span>
 				</a>
-				{languages.map(({ name, flag, region, href }) => {
+				{languages.map(({ name, flag, region, reach: speakers, href }) => {
 					const Row = href ? 'a' : 'div';
 					return (
 						<Row href={href} class="lang-row grid grid-cols-[28px_1fr_auto] items-center gap-3 px-4 py-2.5 rounded-xl no-underline" style="border: 1px solid var(--color-hairline); background: var(--color-surface);">
@@ -292,14 +312,16 @@ const upcoming: [string, string, string][] = [
 								<span class="block text-[15px] font-semibold leading-tight truncate" style="font-family: var(--font-sans); color: var(--color-ink);">{name}</span>
 								<span class="block text-xs leading-tight" style="font-family: var(--font-sans); color: var(--color-muted);">{region}</span>
 							</span>
-							<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand);" aria-hidden="true">{href ? '\u2192' : ''}</span>
+							<span class="text-[15px] font-extrabold" style="font-family: var(--font-sans); color: var(--color-brand);">{speakers} {href && <span aria-hidden="true">&rarr;</span>}</span>
 						</Row>
 					);
 				})}
 			</div>
+			<p class="text-center mt-4 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);">Figures are first-language speakers, each person counted once (Joshua Project).</p>
 
 			<!-- More to come — the rest of the 80 -->
 			<h2 class="text-center text-2xl md:text-3xl font-light mt-12 mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">More to Come&hellip;</h2>
+			<p class="text-center -mt-3 mb-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">80 languages in all &mdash; the first language of {ROSTER_PCT}% of humanity.</p>
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
 				{upcoming.map(([name, flag, region]) => (
 					<div class="grid grid-cols-[28px_1fr] items-center gap-3 px-4 py-2.5 rounded-xl" style="border: 1px solid var(--color-hairline); background: var(--color-surface);">
