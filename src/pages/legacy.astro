@@ -1,6 +1,5 @@
 ---
 import CoverMarquee from '../components/CoverMarquee.astro';
-import DonationForm from '../components/donations/DonationForm.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import { allLanguageEditions, langSlug } from '../data/language-editions';
@@ -31,15 +30,11 @@ const WORLD_COVERED = REACH_TOTAL >= reach.WORLD;
 const ROSTER_COVERS_WORLD = reach.rosterTotal >= reach.WORLD;
 const REACH_BILLIONS = (REACH_TOTAL / 1e9).toFixed(1);
 
-const pageData = await sanityClient.fetch(`*[_type =="page" && slug =="partner"][0] {
-    seoTitle, seoDescription
-  }`);
-
-const seoTitle =
-	pageData?.seoTitle || "Sharing Our Father — Partner With the Father's Heart Bible™ (FHB)";
-const seoDescription =
-	pageData?.seoDescription ||
-	`Partner with us to take the Father's Heart Bible™ (FHB) to every nation, tribe, and tongue — now in ${LANGUAGE_TOTAL} languages${WORLD_COVERED ? ', covering the world' : ` spoken by ${REACH_BILLIONS} billion people`}. Give monthly or once.`;
+// Legacy page (Kevin 2026-10-13): formerly /a-bible-for-the-whole-world/ (and /partner before
+// that). No giving here — the page gathers people around a shared legacy: sharing our Father
+// to the ends of the earth. Title/description live in code, not the old Sanity partner doc.
+const seoTitle = "Legacy — Sharing Our Father to the Ends of the Earth | Father's Heart Bible™";
+const seoDescription = `Sharing our Father is the greatest legacy you will ever have. Father's Heart Bible™ (FHB) is published in ${LANGUAGE_TOTAL} languages — see every one, and share it.`;
 const heroHeading = 'Sharing Our Father';
 
 // Featured blog card ("The Father's Vision") shown under the give-by-check box.
@@ -131,49 +126,6 @@ const painsVsFather = [
 	{ pain: 'Shame, fear & despair', father: 'Strong, healthy daughters, wives & mothers' },
 ];
 
-// Partnership FAQ — common giving questions, rendered as a compact no-JS accordion.
-const STRIPE_PORTAL_URL = 'https://billing.stripe.com/p/login/bJefZi1aL4yf4Y50gj2Ry00';
-const partnershipFaq = [
-	{
-		q: 'Are donations tax-deductible?',
-		a: 'Yes. Spirit Media Charities is a registered 501(c)(3) nonprofit organization, so your gift is tax-deductible to the fullest extent allowed by law.',
-	},
-	{
-		q: 'Can I give by check?',
-		a: 'Yes. Make your check payable to Spirit Media Charities and mail it to 205 S Academy St #3251, Cary, NC 27519. Please write “FHB” in the memo line so your gift supports the Father’s Heart Bible™.',
-	},
-	{
-		q: 'Will I get a receipt?',
-		a: 'Yes. A receipt is emailed to you automatically as soon as your gift is processed — keep it for your records.',
-	},
-	{
-		q: 'Will I receive an annual giving statement?',
-		a: 'Yes. At the start of each year, Spirit Media Charities sends an annual giving statement summarizing your tax-deductible contributions from the prior year.',
-	},
-	{
-		q: 'How do I update my payment method?',
-		a: 'Monthly partners can update a card or bank account, view past receipts, and change or cancel a recurring gift at any time through our secure SM Gives giving portal. Just enter your email and you’ll receive a one-time secure login link.',
-		link: { href: STRIPE_PORTAL_URL, label: 'Manage your giving →' },
-	},
-	{
-		q: 'Can I designate my gift — for example, pledging to sponsor a specific language?',
-		a: 'While donations to charity are ultimately unrestricted in order to remain tax-deductible, Spirit Media Charities is committed to partnering with each donor to honor the intent of their gift. To discuss sponsoring a language or another designated gift, reach out and we’ll work with you directly.',
-	},
-	{
-		q: 'How is the Father’s Heart Bible™ different from other translations?',
-		a: 'Father’s Heart Bible™: An Intimate Translation is a fresh translation from the original Hebrew, Aramaic, and Greek that lets you hear God as He truly is — not a distant deity, but your Father. That is the Bible your gift helps carry to the nations.',
-		link: {
-			href: '/the-fathers-heart-bible/translation-philosophy/',
-			label: 'Our translation approach →',
-		},
-	},
-	{
-		q: 'The Bible is free to read online — so why give?',
-		a: 'The Father’s Heart Bible™ is free to read or listen to online, and in time it will be free on every major digital Bible platform. But printing, publishing, and translating into new languages carry real costs — and that is what your gift makes possible, putting a physical Father’s Heart Bible into hands that have never held one.',
-		link: { href: '/read/', label: 'Read or listen free →' },
-	},
-];
-
 // ── More to come — the rest of the 80-language roster (projects/fhb-language-cover-colours/roster.json),
 // alphabetical by code: [name, flag iso code, primary region]. A language moves out of this list
 // when its edition lands in the registry.
@@ -235,16 +187,11 @@ const upcoming: [string, string, string][] = [
 	jsonLd={{
 		"@context": "https://schema.org",
 		"@graph": [
-			{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/a-bible-for-the-whole-world/" },
+			{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/legacy/" },
 			{ "@type": "BreadcrumbList", "itemListElement": [
 				{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
-				{ "@type": "ListItem", "position": 2, "name": "Sharing Our Father", "item": "https://fathersheartbible.com/a-bible-for-the-whole-world/" }
-			]},
-			{ "@type": "FAQPage", "mainEntity": partnershipFaq.map((f) => ({
-				"@type": "Question",
-				"name": f.q,
-				"acceptedAnswer": { "@type": "Answer", "text": f.a }
-			})) }
+				{ "@type": "ListItem", "position": 2, "name": "Legacy", "item": "https://fathersheartbible.com/legacy/" }
+			]}
 		]
 	}}
 >
@@ -254,9 +201,7 @@ const upcoming: [string, string, string][] = [
 		<VideoHeroInner
 			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/abw-hero-v2.webp"
 			imagePosition="center 25%"
-			href="#donate"
-			linkLabel="Give to A Bible for the Whole World"
-			heading="A Bible for the Whole World"
+			heading="Sharing Our Father to the Ends of the Earth"
 			headingClass="text-3xl md:text-5xl"
 			headingBelow
 		/>
@@ -336,7 +281,7 @@ const upcoming: [string, string, string][] = [
 			</div>
 		</Section>
 
-		<!-- ═══════════════ YOU'RE INVITED  |  PARTNER WITH US (give form) ═══════════════ -->
+		<!-- ═══════════════ YOU'RE INVITED  |  OUR SHARED LEGACY ═══════════════ -->
 		<Section variant="light">
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-start">
 				<!-- You're Invited -->
@@ -368,29 +313,29 @@ const upcoming: [string, string, string][] = [
 					</div>
 				</div>
 
-				<!-- Partner With Us + donation form -->
+				<!-- Our shared legacy (replaces the give form, Kevin 2026-10-13) -->
 				<div data-reveal>
-				<div class="text-center mb-8">
 					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
-						Partner With Us
+						Our Shared Legacy
 					</p>
 					<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
-						Make a Gift
+						Sharing Him as Father is the greatest legacy you will ever have.
 					</h2>
-					<p class="mt-4 leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-						Your gift helps translate, publish, and carry the Father's Heart Bible™ to the nations — give monthly or once; every gift matters.
+					<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Knowing Him as Father is the greatest gift He can ever give you. Passing Him on &mdash; to your children, your friends, your nation &mdash; is what outlives you.
 					</p>
-				</div>
-					<div id="donate" class="scroll-mt-24">
-						<DonationForm />
-					</div>
+					<ul class="mt-6 space-y-4" style="list-style: none; padding: 0; margin: 0; font-family: var(--font-sans); color: var(--color-muted); line-height: 1.6;">
+						<li><strong style="color: var(--color-ink);">Receive Him first.</strong> <a href="/#receive" style="color: var(--color-brand);" class="hover:underline">Open your heart to our Father &rarr;</a></li>
+						<li><strong style="color: var(--color-ink);">Share His voice.</strong> Send someone a chapter in their own language &mdash; it is <a href="/read/" style="color: var(--color-brand);" class="hover:underline">free to read and hear &rarr;</a></li>
+						<li><strong style="color: var(--color-ink);">Put it in their hands.</strong> There is a <a href="/print/" style="color: var(--color-brand);" class="hover:underline">print edition &rarr;</a> for the people you love.</li>
+					</ul>
 				</div>
 			</div>
 		</Section>
 
-		<!-- ═══════════════ THE FATHER'S VISION (blog card)  |  PARTNERSHIP FAQ ═══════════════ -->
+		<!-- ═══════════════ THE FATHER'S VISION (blog card) ═══════════════ -->
 		<Section variant="soft">
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+			<div class="max-w-xl mx-auto">
 				<div data-reveal>
 					{visionPost && (
 						<a href={visionPost.slug} class="group block rounded-2xl border overflow-hidden transition-shadow hover:shadow-md" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
@@ -417,34 +362,6 @@ const upcoming: [string, string, string][] = [
 						<p class="text-3xl md:text-4xl font-light leading-tight mt-1" style="font-family: var(--font-serif); color: var(--color-brand);">No greater gift or legacy.</p>
 					</div>
 				</div>
-
-				<!-- Partnership FAQ -->
-				<div data-reveal>
-				<div class="text-center mb-8">
-					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
-						Partnership FAQ
-					</p>
-					<h3 class="text-2xl md:text-3xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
-						Common questions about investing
-					</h3>
-				</div>
-				<div class="space-y-3">
-					{partnershipFaq.map(({ q, a, link }) => (
-						<details class="faq-item rounded-2xl" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
-							<summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">
-								<span>{q}</span>
-								<svg class="faq-chev shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
-							</summary>
-							<div class="px-5 pb-5 -mt-1">
-								<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{a}</p>
-								{link && (
-									<a href={link.href} target="_blank" rel="noopener noreferrer" class="inline-flex items-center mt-3 text-sm font-semibold no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand);">{link.label}</a>
-								)}
-							</div>
-						</details>
-					))}
-				</div>
-				</div>
 			</div>
 		</Section>
 
@@ -456,7 +373,7 @@ const upcoming: [string, string, string][] = [
 					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">The Father's Vision</p>
 					<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">When His Sons &amp; Daughters Come Home</h2>
 					<p class="mt-4 leading-relaxed max-w-2xl mx-auto" style="font-family: var(--font-sans); color: var(--color-muted);">
-						This is the return on your investment — what only the Father restores in a world that has experienced Him as God but not yet Father.
+						This is the legacy — what only the Father restores in a world that has experienced Him as God but not yet Father.
 					</p>
 				</header>
 
@@ -499,25 +416,6 @@ const upcoming: [string, string, string][] = [
 			<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-band-charcoal-v3.webp" alt="A father and son reading the Charcoal edition of the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
 			<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-band-white-v3.webp" alt="Three generations reading the White edition of the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
 		</div>
-
-		<!-- Sticky mobile Give button — keeps the ask one tap away on phones -->
-		<a href="#donate" aria-label="Give to A Bible for the Whole World" class="sm:hidden" style="position: fixed; right: 1rem; bottom: 1rem; z-index: 50; background-color: var(--color-brand); color: #fff; font-family: var(--font-sans); font-weight: 700; font-size: 0.95rem; padding: 0.85rem 1.6rem; border-radius: 999px; box-shadow: 0 6px 20px rgba(0,0,0,0.28); text-decoration: none;">Give &rarr;</a>
 	</main>
 </Layout>
 
-<style>
-	/* Partnership FAQ accordion — native <details>, no JS. */
-	.faq-item > summary {
-		cursor: pointer;
-		list-style: none;
-	}
-	.faq-item > summary::-webkit-details-marker {
-		display: none;
-	}
-	.faq-chev {
-		transition: transform 0.2s ease;
-	}
-	.faq-item[open] > summary .faq-chev {
-		transform: rotate(180deg);
-	}
-</style>

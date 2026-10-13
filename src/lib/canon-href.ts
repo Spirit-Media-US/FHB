@@ -10,7 +10,7 @@
 // community app's other routes (/library, /groups, /login, /about …) canonicalize WITHOUT
 // a slash, so they are left untouched. Files (anything with an extension) are untouched.
 const SLASH_ROOTS =
-	/^(https:\/\/fathersheartbible\.com)?(\/(?:read|blog|te\/blog|meaning|verses|guides|bibles|bible-for|bible-in|words|print|review|privacy|terms|family|the-fathers-heart-bible|a-bible-for-the-whole-world)(?:\/[^?#]*)?)([?#].*)?$/;
+	/^(https:\/\/fathersheartbible\.com)?(\/(?:read|blog|te\/blog|meaning|verses|guides|bibles|bible-for|bible-in|words|print|review|privacy|terms|family|the-fathers-heart-bible|a-bible-for-the-whole-world|legacy)(?:\/[^?#]*)?)([?#].*)?$/;
 
 export function canonHref(href: string): string {
 	if (typeof href !== 'string') return href;
