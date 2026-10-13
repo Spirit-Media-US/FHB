@@ -1,5 +1,6 @@
 ---
 import CoverMarquee from '../components/CoverMarquee.astro';
+import HearTheFather, { type VoiceGroup } from '../components/HearTheFather.astro';
 import ImageGrid from '../components/ImageGrid.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
@@ -135,6 +136,78 @@ const searchOn = [
 		href: 'https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY',
 	},
 	{ label: 'YouTube', logo: 'youtube', w: 34, href: 'https://www.youtube.com/@FathersHeartBible' },
+];
+// Home's passages for <HearTheFather /> — different from /print's. Text and coloured spans are
+// the locked FHB text (fatherWords / jesusWords / spiritWords in the canon).
+const homeVoices: VoiceGroup[] = [
+	{
+		key: 'father',
+		label: 'FATHER',
+		verses: [
+			{
+				ref: 'Isaiah 43:1',
+				href: '/read/isaiah/43/#v1',
+				text: 'But now, this is what our Father says—he who created you, Jacob, he who formed you, Israel: Do not be afraid, for I have redeemed you; I have called you by name, you are mine.',
+				father: [
+					'Do not be afraid, for I have redeemed you; I have called you by name, you are mine.',
+				],
+				son: [],
+				spirit: [],
+			},
+			{
+				ref: 'Matthew 3:17',
+				href: '/read/matthew/3/#v17',
+				text: 'Then a voice from heaven said, "This is my Son, the one I love; I delight in him."',
+				father: ['"This is my Son, the one I love; I delight in him."'],
+				son: [],
+				spirit: [],
+			},
+		],
+	},
+	{
+		key: 'son',
+		label: 'SON',
+		verses: [
+			{
+				ref: 'John 10:27',
+				href: '/read/john/10/#v27',
+				text: 'My sheep listen to my voice; I know them, and they follow me.',
+				father: [],
+				son: ['My sheep listen to my voice; I know them, and they follow me.'],
+				spirit: [],
+			},
+			{
+				ref: 'John 15:9',
+				href: '/read/john/15/#v9',
+				text: '"As the Father has loved me, so I have loved you. Remain in my love.',
+				father: [],
+				son: ['"As the Father has loved me, so I have loved you. Remain in my love.'],
+				spirit: [],
+			},
+		],
+	},
+	{
+		key: 'spirit',
+		label: 'SPIRIT',
+		verses: [
+			{
+				ref: 'Acts 13:2',
+				href: '/read/acts/13/#v2',
+				text: 'While they worshiped our Lord Jesus and fasted, the Holy Spirit said, "Set apart for me Barnabas and Saul, for the work I\'ve called them to."',
+				father: [],
+				son: [],
+				spirit: ['"Set apart for me Barnabas and Saul, for the work I\'ve called them to."'],
+			},
+			{
+				ref: 'Revelation 22:17',
+				href: '/read/revelation/22/#v17',
+				text: 'The Holy Spirit and the Bride say, "Come!" Whoever hears, say, "Come!" Whoever is thirsty, come; whoever wishes, take the water of life freely.',
+				father: [],
+				son: [],
+				spirit: ['"Come!"'],
+			},
+		],
+	},
 ];
 ---
 
@@ -722,90 +795,10 @@ const searchOn = [
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 3 — SCRIPTURE FEATURE: JOHN 3:16
+		     HEAR THE FATHER — the same section as /print, with different passages
+		     (Kevin 2026-10-13); replaced "See the Difference / John 3:16".
 		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="scripture">
-			<div class="text-center mb-8">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-3"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					See the Difference
-				</p>
-				<h2
-					class="text-3xl md:text-4xl font-light"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					John 3:16 — Heard in a New Way
-				</h2>
-			</div>
-
-			<div class="relative grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 max-w-4xl mx-auto">
-				<!-- Standard rendering -->
-				<div class="text-center">
-					<p
-						class="text-xs font-semibold tracking-widest uppercase mb-6"
-						style="font-family: var(--font-sans); color: var(--color-muted);"
-					>
-						Traditional
-					</p>
-					<blockquote class="m-0">
-						<p
-							class="text-xl md:text-2xl italic font-light leading-relaxed"
-							style="font-family: var(--font-serif); color: var(--color-muted);"
-						>"For God so loved the world that he gave his one and only Son, that whoever believes
-							in him shall not perish but have eternal life."
-						</p>
-						<footer class="mt-4">
-							<cite
-								class="not-italic text-sm tracking-widest uppercase"
-								style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;"
-							>
-								— John 3:16
-							</cite>
-						</footer>
-					</blockquote>
-				</div>
-
-				<!-- Divider on desktop -->
-				<div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-px" style="background-color: var(--color-hairline);"></div>
-
-				<!-- FHB rendering -->
-				<div class="text-center">
-					<p
-						class="text-xs font-semibold tracking-widest uppercase mb-6"
-						style="font-family: var(--font-sans); color: var(--color-gold);"
-					>
-						Father's Heart Bible™
-					</p>
-					<blockquote class="m-0">
-						<p
-							class="text-xl md:text-2xl italic font-light leading-relaxed"
-							style="font-family: var(--font-serif); color: var(--color-ink);"
-						>"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that he gave his one and only Son, that whoever believes in him will not perish but have eternal life."
-						</p>
-						<footer class="mt-4">
-							<cite
-								class="not-italic text-sm tracking-widest uppercase"
-								style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;"
-							>
-								— John 3:16 · Father's Heart Bible™
-							</cite>
-						</footer>
-					</blockquote>
-				</div>
-			</div>
-
-			<p
-				class="text-center mt-12 text-base leading-relaxed max-w-xl mx-auto"
-				style="font-family: var(--font-sans); color: var(--color-muted);"
-			>
-				In this passage, the One who loves and gives the Son is the Father. The Father&rsquo;s Heart
-				Bible makes that explicit, helping readers hear this verse not as the action of a distant
-				supreme being, but as the giving love of the Father Himself.
-				<a href="/read/john/3/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">Read John 3 &rarr;</a>
-			</p>
-		</Section>
+		<HearTheFather groups={homeVoices} variant="scripture" />
 
 
 		<!-- ═══════════════════════════════════════════════════════════

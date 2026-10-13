@@ -1,0 +1,76 @@
+---
+// HEAR THE FATHER — passages shown exactly as they print, each divine voice in its own colour
+// (blue Father, red Son, purple Spirit). Shared by /print and Home (Kevin 2026-10-13); each page
+// passes its own verses. Every verse and every coloured span is the locked FHB text.
+import Section from './Section.astro';
+
+export interface VoiceVerse {
+	ref: string;
+	href: string;
+	text: string;
+	father: string[];
+	son: string[];
+	spirit: string[];
+}
+export interface VoiceGroup {
+	key: 'father' | 'son' | 'spirit';
+	label: string;
+	verses: VoiceVerse[];
+}
+interface Props {
+	groups: VoiceGroup[];
+	variant?: 'warm' | 'soft' | 'light' | 'scripture';
+}
+const { groups: dvcVerses, variant = 'warm' } = Astro.props;
+const VOICE = { father: '#2563eb', son: '#c8102e', spirit: '#6a3fa0' };
+const READ_URL = '/read/';
+
+// Wrap each voice's spans in its own color. Longest-first so a span that contains
+// another cannot be half-replaced.
+function markVoices(v: {
+	text: string;
+	father: string[];
+	son: string[];
+	spirit: string[];
+}): string {
+	let out = v.text;
+	const spans: { s: string; c: string }[] = [
+		...v.father.map((s) => ({ s, c: VOICE.father })),
+		...v.son.map((s) => ({ s, c: VOICE.son })),
+		...v.spirit.map((s) => ({ s, c: VOICE.spirit })),
+	].sort((a, b) => b.s.length - a.s.length);
+	for (const { s, c } of spans) {
+		if (!s || !out.includes(s)) continue;
+		out = out.replace(s, `<span style="color:${c};font-weight:600;">${s}</span>`);
+	}
+	return out;
+}
+---
+
+<Section variant={variant}>
+			<div class="text-center mb-8">
+				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Hear the Father</p>
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">His voice, from the first page to the last</h2>
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.6; margin: 0.9rem auto 0; max-width: 42rem;">Exactly as these passages appear in print.</p>
+			</div>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+				{dvcVerses.map((g) => (
+					<!-- auto for the voice block, then two equal rows: without this the cards
+					     size to their own text and the shorter SPIRIT passages left that column
+					     visibly short of FATHER and SON. (Kevin 2026-08-24) -->
+					<div class="gap-4" style="display: grid; grid-template-rows: auto 1fr 1fr;">
+						<!-- the same block as the top of the page, over the column it proves -->
+						<div class="text-center">
+							<span style={`display: inline-block; font-family: var(--font-sans); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.06em; color: ${VOICE[g.key]}; background: #fff; border: 2px solid ${VOICE[g.key]}; padding: 0.5rem 1.15rem; border-radius: 6px; line-height: 1;`}>{g.label}</span>
+						</div>
+						{g.verses.map((v) => (
+							<div class="rounded-2xl p-6 flex flex-col" style="background: #fff; border: 1px solid var(--color-hairline);">
+								<p style="font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.7; color: var(--color-ink); margin: 0; flex: 1;" set:html={markVoices(v)}></p>
+								<a href={v.href} style="font-family: var(--font-sans); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.03em; color: var(--color-brand); margin: 1rem 0 0; text-decoration: none;">{v.ref} (FHB)</a>
+							</div>
+						))}
+					</div>
+				))}
+			</div>
+			<p class="text-center mt-8" style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.9rem;">Every verse from the Father’s Heart Bible™ — read the whole Bible free at <a href={READ_URL} style="color: var(--color-brand); font-weight: 600; text-decoration: none;">fathersheartbible.com/read</a>.</p>
+</Section>
