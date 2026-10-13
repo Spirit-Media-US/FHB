@@ -96,17 +96,49 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 // "Search for Father's Heart Bible on" (Kevin 2026-10-13). Stores open their own search for the
 // title; Apple, Spotify and YouTube open our channels.
 const searchOn = [
-	{ label: 'Amazon', href: 'https://www.amazon.com/s?k=Father%27s+Heart+Bible' },
-	{ label: 'Apple', href: 'https://podcasts.apple.com/us/podcast/id6818374650' },
-	{ label: 'Barnes & Noble', href: 'https://www.barnesandnoble.com/s/Father%27s+Heart+Bible' },
+	{
+		label: 'Amazon',
+		logo: 'amazon',
+		w: 92,
+		href: 'https://www.amazon.com/s?k=Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Apple',
+		logo: 'apple',
+		w: 30,
+		href: 'https://podcasts.apple.com/us/podcast/id6818374650',
+	},
+	{
+		label: 'Barnes & Noble',
+		logo: 'barnesandnoble',
+		w: 150,
+		href: 'https://www.barnesandnoble.com/s/Father%27s+Heart+Bible',
+	},
 	{
 		label: 'Google',
+		logo: 'google',
+		w: 30,
 		href: 'https://play.google.com/store/search?q=Father%27s+Heart+Bible&c=books',
 	},
-	{ label: 'Kobo', href: 'https://www.kobo.com/us/en/search?query=Father%27s+Heart+Bible' },
-	{ label: 'Spotify', href: 'https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY' },
-	{ label: 'Walmart', href: 'https://www.walmart.com/search?q=Father%27s+Heart+Bible' },
-	{ label: 'YouTube', href: 'https://www.youtube.com/@FathersHeartBible' },
+	{
+		label: 'Kobo',
+		logo: 'kobo',
+		w: 110,
+		href: 'https://www.kobo.com/us/en/search?query=Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Spotify',
+		logo: 'spotify',
+		w: 30,
+		href: 'https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY',
+	},
+	{
+		label: 'Walmart',
+		logo: 'walmart',
+		w: 30,
+		href: 'https://www.walmart.com/search?q=Father%27s+Heart+Bible',
+	},
+	{ label: 'YouTube', logo: 'youtube', w: 34, href: 'https://www.youtube.com/@FathersHeartBible' },
 ];
 ---
 
@@ -553,15 +585,16 @@ const searchOn = [
 				</h2>
 				<ul class="fhb-search-on">
 					{searchOn.map((x) => (
-						<li><a href={x.href} target="_blank" rel="noopener noreferrer">{x.label}</a></li>
+						<li><a href={x.href} target="_blank" rel="noopener noreferrer" aria-label={`Father's Heart Bible on ${x.label}`}><img src={`/logos/stores/${x.logo}.svg`} alt={x.label} width={x.w} height="30" loading="lazy" decoding="async" /></a></li>
 					))}
 				</ul>
 			</div>
 		</Section>
 		<style>
-			.fhb-search-on { list-style: none; margin: 1.5rem 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
-			.fhb-search-on a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1.15rem; border: 1px solid var(--color-hairline); border-radius: 999px; background: var(--color-surface); font-family: var(--font-sans); font-size: 0.95rem; font-weight: 600; color: var(--color-ink); text-decoration: none; }
-			.fhb-search-on a:hover { border-color: var(--color-brand); color: var(--color-brand); }
+			.fhb-search-on { list-style: none; margin: 2rem 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1.75rem 2.75rem; }
+			.fhb-search-on a { display: inline-flex; align-items: center; min-height: 44px; opacity: 0.72; transition: opacity 0.2s; }
+			.fhb-search-on a:hover { opacity: 1; }
+			.fhb-search-on img { height: 30px; width: auto; filter: brightness(0); }
 		</style>
 
 		<!-- ═══════════════════════════════════════════════════════════
