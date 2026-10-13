@@ -191,6 +191,54 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		</section>
 
 		<!-- ═══════════════════════════════════════════════════════════
+		     OPEN YOUR HEART TO OUR FATHER — the invitation, first thing under the fold
+		     (Kevin 2026-10-13). Condensed from the Bible's own front matter: "Receiving Your
+		     Father", the opening "Abba Father" page and Kevin & Shelly's letter. All layout is
+		     inline (not deferred Tailwind) so nothing shifts under the hero.
+		     ═══════════════════════════════════════════════════════════ -->
+		<style is:inline>
+			#receive { background-color: var(--color-canvas); padding: 3rem 1.5rem 1rem; text-align: center; }
+			#receive .rcv-wrap { max-width: 44rem; margin: 0 auto; }
+			#receive .rcv-eyebrow { font-family: var(--font-sans); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-gold); margin: 0 0 0.75rem; }
+			#receive h2 { font-family: var(--font-serif); font-weight: 300; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; color: var(--color-ink); margin: 0 0 1.25rem; text-wrap: balance; }
+			#receive p { font-family: var(--font-body); font-size: 1.2rem; line-height: 1.65; color: var(--color-muted); margin: 0 0 1rem; }
+			#receive .rcv-voice { font-family: var(--font-serif); font-style: italic; font-size: clamp(1.3rem, 3vw, 1.7rem); line-height: 1.4; color: #2563eb; margin: 1.5rem 0; text-wrap: balance; }
+			#receive .rcv-verse { font-size: 1rem; }
+			#receive details { margin: 1.75rem auto 0; max-width: 36rem; border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline); }
+			#receive summary { cursor: pointer; list-style: none; padding: 1rem 0; font-family: var(--font-sans); font-weight: 600; font-size: 1rem; color: var(--color-ink); }
+			#receive summary::-webkit-details-marker { display: none; }
+			#receive summary::after { content: " +"; color: var(--color-gold); }
+			#receive details[open] summary::after { content: " \2212"; }
+			#receive .rcv-prayer { padding: 0 0 1.25rem; }
+			#receive .rcv-prayer p { font-size: 1.1rem; margin: 0 0 0.5rem; color: var(--color-ink); }
+			@media (min-width: 768px) { #receive { padding-top: 4rem; } }
+		</style>
+		<section id="receive">
+			<div class="rcv-wrap">
+				<p class="rcv-eyebrow">You&rsquo;re Invited</p>
+				<h2>Open your heart to our Father</h2>
+				<p>You have been longing for Him all along. Our Father placed the desire for Him in you before the creation of the world. He loved you and chose you before He formed you, and He ordained your life.</p>
+				<p>The truth of the Bible is this: He is your Father &mdash; not a distant deity, not a disappointed one &mdash; and you are His beloved son or daughter.</p>
+				<p class="rcv-voice">The greatest gift I will ever give you is me. Receive me as Father.</p>
+				<p class="rcv-verse">&ldquo;He chose us in him before the world&rsquo;s founding, to be holy and blameless before our Father in love.&rdquo; &mdash; <a href="/read/ephesians/1/" style="color: inherit; text-decoration: underline; text-underline-offset: 3px;">Ephesians 1:4</a></p>
+				<details>
+					<summary>Pray this to receive Him</summary>
+					<div class="rcv-prayer">
+						<p><strong>Our Father, my Father,</strong></p>
+						<p>You created me, chose me, loved me, and ordained me as your son or daughter even before you formed me.</p>
+						<p>I open my heart to you to be your beloved.</p>
+						<p>I open my eyes to see your eyes of delight.</p>
+						<p>I open my ears to hear your love-filled whisper.</p>
+						<p>I open my soul to receive you as my Father.</p>
+						<p>I open my mouth to love you as you have first loved me.</p>
+						<p>I accept your hands, arms, and embrace as you bless, protect, and provide for me.</p>
+						<p>By the blood and name of Jesus, Amen.</p>
+					</div>
+				</details>
+			</div>
+		</section>
+
+		<!-- ═══════════════════════════════════════════════════════════
 		     COVER MARQUEE — title + scrolling covers + FATHER|SON|SPIRIT + tagline.
 		     Kevin 2026-09-24 placed this DIRECTLY BELOW THE FOLD (not above it), so
 		     the hero above keeps the LCP and the PSI score. First thing on scroll.
@@ -477,38 +525,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		<Section variant="light">
 			<WaysToReceive compact passages />
 		</Section>
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 4 — BIG IDEA (moved directly under the hero)
-		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="soft">
-			<div class="text-center max-w-2xl mx-auto">
-				<h2
-					class="text-4xl md:text-5xl font-light mb-6"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					The destination has always been the Father.
-				</h2>
-				<p
-					class="text-lg leading-relaxed mb-6"
-					style="font-family: var(--font-sans); color: var(--color-muted);"
-				>
-					Many believers have read the Bible faithfully and yet related to God
-					more as a servant to a master than as a beloved son or daughter to a loving Father. That
-					distance is not always obvious at first. It can hide beneath sincere devotion, sound
-					doctrine, years of ministry, and disciplined prayer.
-				</p>
-				<p
-					class="text-lg leading-relaxed"
-					style="font-family: var(--font-sans); color: var(--color-muted);"
-				>
-					The message of Scripture has always been moving toward something deeper. Not merely
-					forgiveness. Not merely heaven. Not merely religious correctness. The destination has
-					always been the Father.
-				</p>
-			</div>
-		</Section>
-
 
 		<!-- ═══════════════════════════════════════════════════════════
 		     SECTION — WHO THIS BIBLE IS FOR (Kevin 2026-10-13)
