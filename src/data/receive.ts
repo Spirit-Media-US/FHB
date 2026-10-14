@@ -12,6 +12,7 @@ import digital from './digital-listings.json' with { type: 'json' };
 import { dvcEditions } from './dvc-editions';
 import { allLanguageEditions, LANGUAGE_EDITION_TOTAL, langSlug } from './language-editions';
 import { hasSpeakers, speakersOf } from './language-speakers';
+import readerLanguages from './reader-languages.json' with { type: 'json' };
 
 const SITE = 'https://fathersheartbible.com';
 
@@ -87,18 +88,44 @@ export function editionForAudiencePage(page: string): AudienceLink | undefined {
 
 export { AUDIENCE_EDITION_TOTAL } from './dvc-editions';
 
-/** English + every language edition in the registry. */
-export const LANGUAGE_TOTAL = LANGUAGE_EDITION_TOTAL + 1;
+// Live in the reader at /read/<code>/ with no print edition yet (Kevin 2026-10-14: count them,
+// so the site says the same number as /read). A language drops out of this list by itself the
+// day its edition lands in the registry.
+// DERIVED, never typed: reader-languages.json is rewritten on every build from the reader's own
+// registry (scripts/gen-sitemap-read.mjs), so a language that goes live in /read is counted and
+// linked here on the next build. Flag and region are optional dressing; a language with no row
+// in READ_ONLY_META still shows, without a flag.
+const READ_ONLY_META: Record<string, { flag: string; region: string }> = {
+	ig: { flag: 'ng', region: 'Nigeria' },
+	ml: { flag: 'in', region: 'India' },
+};
+export const readOnlyLanguages: { code: string; english: string; flag?: string; region: string }[] =
+	readerLanguages.languages
+		.filter((r) => r.code !== 'en' && !allLanguageEditions.some((l) => l.code === r.code))
+		.map((r) => ({ code: r.code, english: r.name, region: '', ...READ_ONLY_META[r.code] }));
+
+/** Languages in print: English + every language edition in the registry. */
+export const PRINT_LANGUAGE_TOTAL = LANGUAGE_EDITION_TOTAL + 1;
+/** Languages the Bible can be read in online: the print languages + the read-online ones. */
+export const LANGUAGE_TOTAL = PRINT_LANGUAGE_TOTAL + readOnlyLanguages.length;
 
 // ── Languages ──────────────────────────────────────────────────────────────────────────
 // Each language is free to read at /read/<code>/ and has a print edition page (coming-soon
 // editions have no product page yet).
-export const languageLinks = allLanguageEditions.map((l) => ({
-	code: l.code,
-	name: l.english,
-	readHref: `/read/${l.code}/`,
-	printHref: l.soon ? undefined : `/bibles/${langSlug(l)}-bible/`,
-}));
+export const languageLinks: { code: string; name: string; readHref: string; printHref?: string }[] =
+	[
+		...allLanguageEditions.map((l) => ({
+			code: l.code,
+			name: l.english,
+			readHref: `/read/${l.code}/`,
+			printHref: l.soon ? undefined : `/bibles/${langSlug(l)}-bible/`,
+		})),
+		...readOnlyLanguages.map((r) => ({
+			code: r.code,
+			name: r.english,
+			readHref: `/read/${r.code}/`,
+		})),
+	].sort((a, b) => a.name.localeCompare(b.name));
 
 /** The n most widely spoken of our languages, by the worldwide figures in language-reach.json. */
 export const topLanguages = (n: number) =>
@@ -175,7 +202,7 @@ export const ways: Way[] = [
 	{
 		key: 'languages',
 		title: `${LANGUAGE_TOTAL} languages`,
-		note: 'Each in print and free to read online.',
+		note: `Free to read online, ${PRINT_LANGUAGE_TOTAL} in print.`,
 		links: [{ label: 'Language editions', href: '/print/#language-editions' }],
 	},
 ].filter((w) => w.links.length > 0);

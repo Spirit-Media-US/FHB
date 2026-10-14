@@ -31,7 +31,12 @@ const langHref = (code?: string) => {
 	return l && !l.soon ? `/bibles/${langSlug(l)}-bible/` : undefined;
 };
 const inPrint = isbns.languages.filter((l) => l.onSale);
-const coming = isbns.languages.filter((l) => !l.onSale);
+// every number on the page, for the total line
+const ISBN_TOTAL =
+	(general.length + isbns.largePrint.length + 1 + isbns.audience.length + isbns.languages.length) *
+		2 +
+	2 +
+	isbns.forthcoming.length;
 
 const groups: Group[] = [
 	{
@@ -82,28 +87,27 @@ const groups: Group[] = [
 	{
 		id: 'language-editions',
 		title: 'Language Editions',
-		note: `${inPrint.length} languages in print`,
+		note: `${isbns.languages.length} languages`,
 		first: 'Language',
-		rows: inPrint.map((l) => ({ name: l.name, href: langHref(l.code), hb: l.hb, pb: l.pb })),
-	},
-	{
-		id: 'languages-in-translation',
-		title: 'Languages in Translation',
-		note: `${coming.length} more languages`,
-		first: 'Language',
-		rows: coming.map((l) => ({ name: l.name, hb: l.hb, pb: l.pb })),
+		rows: isbns.languages.map((l) => ({
+			name: l.name,
+			href: l.onSale ? langHref(l.code) : undefined,
+			hb: l.hb,
+			pb: l.pb,
+		})),
 	},
 ];
 
 const seoTitle = "Father's Heart Bible ISBNs — Every Edition";
-const seoDescription = `Every Father's Heart Bible™ (FHB) ISBN in one place: Regular Print, Large Print, Journaling, ${isbns.audience.length} audience editions and ${inPrint.length} language editions, hardcover and paperback.`;
+const seoDescription = `Every Father's Heart Bible™ (FHB) ISBN in one place: Regular Print, Large Print, Journaling, ${isbns.audience.length} audience editions and ${isbns.languages.length} language editions, hardcover and paperback.`;
 const URL = 'https://fathersheartbible.com/isbn/';
 
 // One Book per ISBN that can be ordered today — what a bookstore or an answer engine looks up.
-const books = groups
-	.filter((g) => g.id !== 'languages-in-translation')
-	.flatMap((g) =>
-		g.rows.flatMap((r) => {
+const orderable = new Set(inPrint.map((l) => l.name));
+const books = groups.flatMap((g) =>
+	g.rows
+		.filter((r) => g.id !== 'language-editions' || orderable.has(r.name))
+		.flatMap((r) => {
 			const name =
 				g.id === 'regular-print'
 					? `Father's Heart Bible™ — ${r.name}`
@@ -117,7 +121,7 @@ const books = groups
 				{ name, isbn: r.pb, format: 'https://schema.org/Paperback' },
 			];
 		}),
-	);
+);
 ---
 
 <Layout
@@ -222,11 +226,17 @@ const books = groups
 							<span class="isbn-name" role="cell">Audiobook</span>
 							<span class="isbn-num" role="cell">{isbns.other.Audiobook}</span>
 						</div>
+						{isbns.forthcoming.map((f) => (
+							<div class="isbn-row isbn-two" role="row">
+								<span class="isbn-name" role="cell">{f.name} <span style="font-weight: 400; color: var(--color-muted);">(forthcoming)</span></span>
+								<span class="isbn-num" role="cell">{f.isbn}</span>
+							</div>
+						))}
 					</div>
 				</section>
 
 				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin: 2.5rem 0 0;">
-					Published by Spirit Media Publishing.
+					{ISBN_TOTAL} ISBNs. Published by Spirit Media Publishing.
 				</p>
 			</div>
 		</Section>

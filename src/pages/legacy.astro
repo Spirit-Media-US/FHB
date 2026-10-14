@@ -4,11 +4,12 @@ import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import { allLanguageEditions, langSlug } from '../data/language-editions';
 import reach from '../data/language-reach.json' with { type: 'json' };
+import { LANGUAGE_TOTAL, readOnlyLanguages } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
-// Language count is English + every language edition in the registry — never typed here.
-const LANGUAGE_TOTAL = allLanguageEditions.length + 1;
+// Language count: English + every edition in the registry + the read-online languages — the
+// same number /read shows (src/data/receive.ts), never typed here.
 
 // Reach = speakers of each language worldwide, first AND second language (Kevin 2026-10-13: "People
 // can have more than one edition"), from src/data/language-reach.json — never typed here. The total
@@ -107,14 +108,24 @@ const languageMeta: Record<string, { flag: string; region: string }> = {
 	yo: { flag: 'ng', region: 'Nigeria & West Africa' },
 	zu: { flag: 'za', region: 'South Africa' },
 };
-const languages = allLanguageEditions.map((l) => ({
-	name: l.english,
-	flag: languageMeta[l.code]?.flag,
-	region: languageMeta[l.code]?.region ?? '',
-	reach: fmtReach(reachOf(l.code)),
-	// coming-soon editions have no product page yet
-	href: l.soon ? undefined : `/bibles/${langSlug(l)}-bible/`,
-}));
+const languages = [
+	...allLanguageEditions.map((l) => ({
+		name: l.english,
+		flag: languageMeta[l.code]?.flag,
+		region: languageMeta[l.code]?.region ?? '',
+		reach: fmtReach(reachOf(l.code)),
+		// coming-soon editions have no product page yet
+		href: l.soon ? undefined : `/bibles/${langSlug(l)}-bible/`,
+	})),
+	// read online today, print edition still to come: the chip opens the reader
+	...readOnlyLanguages.map((r) => ({
+		name: r.english,
+		flag: r.flag,
+		region: r.region,
+		reach: fmtReach(reachOf(r.code)),
+		href: `/read/${r.code}/`,
+	})),
+].sort((a, b) => a.name.localeCompare(b.name));
 
 // ── PAGE 4 — "When His Sons & Daughters Come Home" (pains → what the Father restores) ──
 const painsVsFather = [
@@ -129,7 +140,7 @@ const painsVsFather = [
 // ── More to come — the rest of the 80-language roster (projects/fhb-language-cover-colours/roster.json),
 // alphabetical by code: [name, flag iso code, primary region]. A language moves out of this list
 // when its edition lands in the registry.
-const upcoming: [string, string, string][] = [
+const upcomingAll: [string, string, string][] = [
 	['Afrikaans', 'za', 'South Africa'],
 	['Anaang', 'ng', 'Nigeria'],
 	['Azerbaijani (South)', 'ir', 'Iran'],
@@ -176,6 +187,7 @@ const upcoming: [string, string, string][] = [
 	['Xhosa', 'za', 'South Africa'],
 	['Yaka', 'cd', 'DR Congo'],
 ].sort((a, b) => a[0].localeCompare(b[0])) as [string, string, string][];
+const upcoming = upcomingAll.filter(([name]) => !readOnlyLanguages.some((r) => r.english === name));
 ---
 
 <Layout
