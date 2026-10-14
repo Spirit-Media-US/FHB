@@ -7,6 +7,7 @@
 // from language-editions.ts (the generated registry), speakers from language-speakers.ts and
 // store links from digital-listings.json. What IS typed here is the generic search phrase for
 // each audience edition ("Bible for men") and the audience page that goes with it.
+import { FIRST_ORDER_PCT } from '../lib/order-pricing';
 import digital from './digital-listings.json' with { type: 'json' };
 import { dvcEditions } from './dvc-editions';
 import { allLanguageEditions, LANGUAGE_EDITION_TOTAL, langSlug } from './language-editions';
@@ -152,7 +153,7 @@ export const ways: Way[] = [
 	{
 		key: 'print',
 		title: 'Print',
-		note: 'Hardcover and paperback, in Divine Voice Color.',
+		note: `Hardcover and paperback, in Divine Voice Color. ${FIRST_ORDER_PCT}% off your first order.`,
 		links: [
 			{ label: 'All print editions', href: '/print/' },
 			{ label: 'Large Print Bible', href: '/bibles/lp-set-bible/' },
