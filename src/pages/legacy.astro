@@ -4,11 +4,12 @@ import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import { allLanguageEditions, langSlug } from '../data/language-editions';
 import reach from '../data/language-reach.json' with { type: 'json' };
+import { LANGUAGE_TOTAL, readOnlyLanguages } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
 
-// Language count is English + every language edition in the registry — never typed here.
-const LANGUAGE_TOTAL = allLanguageEditions.length + 1;
+// Language count: English + every edition in the registry + the read-online languages — the
+// same number /read shows (src/data/receive.ts), never typed here.
 
 // Reach = speakers of each language worldwide, first AND second language (Kevin 2026-10-13: "People
 // can have more than one edition"), from src/data/language-reach.json — never typed here. The total
@@ -107,14 +108,24 @@ const languageMeta: Record<string, { flag: string; region: string }> = {
 	yo: { flag: 'ng', region: 'Nigeria & West Africa' },
 	zu: { flag: 'za', region: 'South Africa' },
 };
-const languages = allLanguageEditions.map((l) => ({
-	name: l.english,
-	flag: languageMeta[l.code]?.flag,
-	region: languageMeta[l.code]?.region ?? '',
-	reach: fmtReach(reachOf(l.code)),
-	// coming-soon editions have no product page yet
-	href: l.soon ? undefined : `/bibles/${langSlug(l)}-bible/`,
-}));
+const languages = [
+	...allLanguageEditions.map((l) => ({
+		name: l.english,
+		flag: languageMeta[l.code]?.flag,
+		region: languageMeta[l.code]?.region ?? '',
+		reach: fmtReach(reachOf(l.code)),
+		// coming-soon editions have no product page yet
+		href: l.soon ? undefined : `/bibles/${langSlug(l)}-bible/`,
+	})),
+	// read online today, print edition still to come: the chip opens the reader
+	...readOnlyLanguages.map((r) => ({
+		name: r.english,
+		flag: r.flag,
+		region: r.region,
+		reach: fmtReach(reachOf(r.code)),
+		href: `/read/${r.code}/`,
+	})),
+].sort((a, b) => a.name.localeCompare(b.name));
 
 // ── PAGE 4 — "When His Sons & Daughters Come Home" (pains → what the Father restores) ──
 const painsVsFather = [
@@ -129,7 +140,7 @@ const painsVsFather = [
 // ── More to come — the rest of the 80-language roster (projects/fhb-language-cover-colours/roster.json),
 // alphabetical by code: [name, flag iso code, primary region]. A language moves out of this list
 // when its edition lands in the registry.
-const upcoming: [string, string, string][] = [
+const upcomingAll: [string, string, string][] = [
 	['Afrikaans', 'za', 'South Africa'],
 	['Anaang', 'ng', 'Nigeria'],
 	['Azerbaijani (South)', 'ir', 'Iran'],
@@ -176,6 +187,7 @@ const upcoming: [string, string, string][] = [
 	['Xhosa', 'za', 'South Africa'],
 	['Yaka', 'cd', 'DR Congo'],
 ].sort((a, b) => a[0].localeCompare(b[0])) as [string, string, string][];
+const upcoming = upcomingAll.filter(([name]) => !readOnlyLanguages.some((r) => r.english === name));
 ---
 
 <Layout
@@ -219,8 +231,8 @@ const upcoming: [string, string, string][] = [
 							src="https://cdn.sanity.io/images/rusi1hyi/production/43c44dd84670ea06caeff56f6756ef86ee3705e8-800x800.jpg?w=400&h=400&fm=webp&q=80"
 							alt="Kevin and Shelly White"
 							width="150" height="150" loading="lazy" decoding="async"
-							class="rounded-full object-cover"
-							style="float: right; width: 150px; height: 150px; margin: 0 0 0.75rem 1.25rem; border: 2px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.16);"
+							class="rounded-full object-cover legacy-photo"
+							style="width: 150px; height: 150px; border: 2px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.16);"
 						/>
 						<div class="space-y-4" style="font-family: var(--font-sans); color: #3F3338;">
 								<p class="leading-relaxed">
@@ -442,6 +454,10 @@ const upcoming: [string, string, string][] = [
 </Layout>
 
 <style>
+	/* Letter photo: centred above the text on phones (a float left three words per line), beside it from 640px. */
+	.legacy-photo { display: block; margin: 0 auto 1.25rem; }
+	@media (min-width: 640px) { .legacy-photo { float: right; margin: 0 0 0.75rem 1.25rem; } }
+
 	.lang-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
 	@media (min-width: 640px) { .lang-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 	@media (min-width: 900px) { .lang-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
