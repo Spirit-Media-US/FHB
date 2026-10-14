@@ -1,0 +1,261 @@
+---
+// /isbn/ — every Father's Heart Bible ISBN on one reference page (Kevin 2026-10-14), laid out
+// like the "Editions of the Father's Heart Bible" page printed in each Bible: Regular Print,
+// Large Print, Journaling, Audience Editions, Language Editions. Numbers come from
+// src/data/isbn-list.json, a snapshot of the business master (ISBNS.json) — never typed here.
+import Section from '../components/Section.astro';
+import StoreLogos from '../components/StoreLogos.astro';
+import VideoHeroInner from '../components/VideoHeroInner.astro';
+import isbns from '../data/isbn-list.json' with { type: 'json' };
+import { allLanguageEditions, langSlug } from '../data/language-editions';
+import Layout from '../layouts/Layout.astro';
+
+interface Row {
+	name: string;
+	href?: string;
+	hb: string;
+	pb: string;
+}
+interface Group {
+	id: string;
+	title: string;
+	note: string;
+	first: string;
+	rows: Row[];
+}
+
+const general = isbns.general as { colour: string; hb: string; pb: string }[];
+const langByCode = new Map(allLanguageEditions.map((l) => [l.code, l]));
+const langHref = (code?: string) => {
+	const l = code ? langByCode.get(code) : undefined;
+	return l && !l.soon ? `/bibles/${langSlug(l)}-bible/` : undefined;
+};
+const inPrint = isbns.languages.filter((l) => l.onSale);
+const coming = isbns.languages.filter((l) => !l.onSale);
+
+const groups: Group[] = [
+	{
+		id: 'regular-print',
+		title: 'Regular Print',
+		note: '6 × 9 · Complete Bible',
+		first: 'Cover',
+		rows: general.map((g) => ({ name: g.colour, href: '/print/', hb: g.hb, pb: g.pb })),
+	},
+	{
+		id: 'large-print',
+		title: 'Large Print',
+		note: '6 × 9 · Three-volume set',
+		first: 'Volume · Cover',
+		rows: isbns.largePrint.map((v) => ({
+			name: `Vol. ${v.vol} ${v.range} · ${v.colour}`,
+			href: '/bibles/lp-set-bible/',
+			hb: v.hb,
+			pb: v.pb,
+		})),
+	},
+	{
+		id: 'journaling',
+		title: 'Journaling Edition',
+		note: '8 × 10',
+		first: 'Edition',
+		rows: [
+			{
+				name: isbns.journaling.title,
+				href: '/bibles/journaling-bible/',
+				hb: isbns.journaling.hb,
+				pb: isbns.journaling.pb,
+			},
+		],
+	},
+	{
+		id: 'audience-editions',
+		title: 'Audience Editions',
+		note: '6 × 9',
+		first: 'Edition',
+		rows: isbns.audience.map((a) => ({
+			name: a.title,
+			href: `/bibles/${a.slug}-bible/`,
+			hb: a.hb,
+			pb: a.pb,
+		})),
+	},
+	{
+		id: 'language-editions',
+		title: 'Language Editions',
+		note: `${inPrint.length} languages in print`,
+		first: 'Language',
+		rows: inPrint.map((l) => ({ name: l.name, href: langHref(l.code), hb: l.hb, pb: l.pb })),
+	},
+	{
+		id: 'languages-in-translation',
+		title: 'Languages in Translation',
+		note: `${coming.length} more languages`,
+		first: 'Language',
+		rows: coming.map((l) => ({ name: l.name, hb: l.hb, pb: l.pb })),
+	},
+];
+
+const seoTitle = "Father's Heart Bible ISBNs — Every Edition";
+const seoDescription = `Every Father's Heart Bible™ (FHB) ISBN in one place: Regular Print, Large Print, Journaling, ${isbns.audience.length} audience editions and ${inPrint.length} language editions, hardcover and paperback.`;
+const URL = 'https://fathersheartbible.com/isbn/';
+
+// One Book per ISBN that can be ordered today — what a bookstore or an answer engine looks up.
+const books = groups
+	.filter((g) => g.id !== 'languages-in-translation')
+	.flatMap((g) =>
+		g.rows.flatMap((r) => {
+			const name =
+				g.id === 'regular-print'
+					? `Father's Heart Bible™ — ${r.name}`
+					: g.id === 'large-print'
+						? `Father's Heart Bible™ Large Print — ${r.name}`
+						: g.id === 'language-editions'
+							? `Father's Heart Bible™ — ${r.name}`
+							: r.name;
+			return [
+				{ name, isbn: r.hb, format: 'https://schema.org/Hardcover' },
+				{ name, isbn: r.pb, format: 'https://schema.org/Paperback' },
+			];
+		}),
+	);
+---
+
+<Layout
+	title={seoTitle}
+	description={seoDescription}
+	image="https://assets.spiritmediapublishing.com/FHB/share/fhb-og-print-group.jpg"
+	imageAlt="Father's Heart Bible print editions"
+	darkHero={true}
+	jsonLd={{
+		'@context': 'https://schema.org',
+		'@graph': [
+			{ '@type': 'WebPage', name: seoTitle, description: seoDescription, url: URL },
+			{
+				'@type': 'BreadcrumbList',
+				itemListElement: [
+					{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+					{ '@type': 'ListItem', position: 2, name: 'In Print', item: 'https://fathersheartbible.com/print/' },
+					{ '@type': 'ListItem', position: 3, name: 'ISBNs', item: URL },
+				],
+			},
+			{
+				'@type': 'ItemList',
+				name: "Father's Heart Bible™ ISBNs",
+				numberOfItems: books.length,
+				itemListElement: books.map((b, i) => ({
+					'@type': 'ListItem',
+					position: i + 1,
+					item: {
+						'@type': 'Book',
+						name: b.name,
+						isbn: b.isbn,
+						bookFormat: b.format,
+						publisher: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+					},
+				})),
+			},
+		],
+	}}
+>
+	<main>
+		<VideoHeroInner
+			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/isbn-hero.webp"
+			imageSrcMobile="https://assets.spiritmediapublishing.com/FHB/print/isbn-hero-960.webp"
+			imageWidth={1902}
+			imageHeight={1070}
+			imagePosition="50% 30%"
+			stackOnMobile={true}
+			href="/print/"
+			heading="Father’s Heart Bible ISBNs"
+			headingBelow
+		/>
+		<div style="background-color: var(--color-canvas); padding: 1rem 1rem 2.5rem; text-align: center;">
+			<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.15rem; line-height: 1.7; max-width: 40rem; margin: 0 auto;">
+				Every edition, hardcover and paperback. Give any ISBN to your bookstore, or <a href="/print/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">order in print from us</a>.
+			</p>
+		</div>
+
+		<StoreLogos />
+
+		<Section variant="light">
+			<div class="isbn-wrap">
+				<div class="text-center" style="margin-bottom: 2.5rem;">
+					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Editions of the Father’s Heart Bible</h2>
+					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.95rem; margin: 0.6rem 0 0;">Divine Voice™ Color · Complete Bible · 66 books</p>
+				</div>
+				<nav class="isbn-jump" aria-label="Edition groups">
+					{groups.map((g) => (
+						<a href={`#${g.id}`}>{g.title}</a>
+					))}
+				</nav>
+
+				{groups.map((g) => (
+					<section id={g.id} class="isbn-group">
+						<h3>{g.title} <span>{g.note}</span></h3>
+						<div class="isbn-table" role="table" aria-label={`${g.title} ISBNs`}>
+							<div class="isbn-row isbn-head" role="row">
+								<span role="columnheader">{g.first}</span>
+								<span role="columnheader">Hardcover</span>
+								<span role="columnheader">Paperback</span>
+							</div>
+							{g.rows.map((r) => (
+								<div class="isbn-row" role="row">
+									<span class="isbn-name" role="cell">
+										{r.href ? <a href={r.href}>{r.name}</a> : r.name}
+									</span>
+									<span class="isbn-num" role="cell" data-label="Hardcover">{r.hb}</span>
+									<span class="isbn-num" role="cell" data-label="Paperback">{r.pb}</span>
+								</div>
+							))}
+						</div>
+					</section>
+				))}
+
+				<section id="other-formats" class="isbn-group">
+					<h3>Other Formats <span>English</span></h3>
+					<div class="isbn-table" role="table" aria-label="Other formats ISBNs">
+						<div class="isbn-row isbn-two" role="row">
+							<span class="isbn-name" role="cell"><a href="/print/#ebook">eBook</a></span>
+							<span class="isbn-num" role="cell">{isbns.other.eBook}</span>
+						</div>
+						<div class="isbn-row isbn-two" role="row">
+							<span class="isbn-name" role="cell">Audiobook</span>
+							<span class="isbn-num" role="cell">{isbns.other.Audiobook}</span>
+						</div>
+					</div>
+				</section>
+
+				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin: 2.5rem 0 0;">
+					Published by Spirit Media Publishing.
+				</p>
+			</div>
+		</Section>
+	</main>
+</Layout>
+
+<style>
+	.isbn-wrap { max-width: 52rem; margin: 0 auto; }
+	.isbn-jump { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.25rem; margin: 0 0 2.5rem; font-family: var(--font-sans); font-size: 0.9rem; }
+	.isbn-jump a { color: var(--color-brand); font-weight: 600; text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+	.isbn-jump a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
+	.isbn-group { margin: 0 0 2.75rem; scroll-margin-top: 6rem; }
+	.isbn-group h3 { font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.75rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; }
+	.isbn-group h3 span { font-family: var(--font-sans); font-size: 0.85rem; font-weight: 400; color: var(--color-muted); }
+	.isbn-table { background: #fff; border: 1px solid var(--color-hairline); border-radius: 12px; overflow: hidden; }
+	.isbn-row { display: grid; grid-template-columns: minmax(0, 1fr) 11.5rem 11.5rem; gap: 0 1rem; padding: 0.7rem 1.1rem; border-top: 1px solid var(--color-hairline); font-family: var(--font-sans); font-size: 0.95rem; align-items: center; }
+	.isbn-row:first-child { border-top: 0; }
+	.isbn-row.isbn-two { grid-template-columns: minmax(0, 1fr) 11.5rem; }
+	.isbn-head { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted); background: var(--color-canvas); }
+	.isbn-name { color: var(--color-ink); font-weight: 600; }
+	.isbn-name a { color: var(--color-brand); text-decoration: none; }
+	.isbn-name a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
+	.isbn-num { color: var(--color-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+	@media (max-width: 639px) {
+		.isbn-head { display: none; }
+		.isbn-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.3rem 0.75rem; padding: 0.8rem 0.9rem; }
+		.isbn-row .isbn-name { grid-column: 1 / -1; }
+		.isbn-row.isbn-two { grid-template-columns: minmax(0, 1fr); }
+		.isbn-num { font-size: 0.85rem; }
+		.isbn-num[data-label]::before { content: attr(data-label); display: block; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-muted); }
+	}
+</style>

@@ -1,0 +1,103 @@
+---
+// SEARCH FOR FATHER'S HEART BIBLE ON — the store logo row (Kevin 2026-10-13), shared by Home
+// and /isbn/. Each store opens its own search for "Father's Heart Bible"; Apple, Spotify and
+// YouTube open our channels there. A store is listed only once its listing is confirmed.
+import Section from './Section.astro';
+
+interface Props {
+	variant?: 'warm' | 'soft' | 'light' | 'scripture';
+}
+const { variant = 'soft' } = Astro.props;
+const searchOn: { label: string; logo: string; w: number; h?: number; href: string }[] = [
+	{
+		label: 'AbeBooks',
+		logo: 'abebooks',
+		w: 121,
+		href: 'https://www.abebooks.com/servlet/SearchResults?kn=Father%27s%20Heart%20Bible',
+	},
+	{
+		label: 'Amazon',
+		logo: 'amazon',
+		w: 100,
+		href: 'https://www.amazon.com/s?k=Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Apple',
+		logo: 'apple',
+		w: 82,
+		href: 'https://podcasts.apple.com/us/podcast/id6818374650',
+	},
+	{
+		label: 'Barnes & Noble',
+		logo: 'barnesandnoble',
+		w: 150,
+		href: 'https://www.barnesandnoble.com/s/Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Books-A-Million',
+		logo: 'booksamillion',
+		w: 106,
+		h: 40,
+		href: 'https://www.booksamillion.com/search?query=Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Bookshop.org',
+		logo: 'bookshop',
+		w: 190,
+		href: 'https://bookshop.org/search?keywords=Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Google',
+		logo: 'google',
+		w: 83,
+		href: 'https://play.google.com/store/search?q=Father%27s+Heart+Bible&c=books',
+	},
+	{
+		label: 'Kobo',
+		logo: 'kobo',
+		w: 110,
+		href: 'https://www.kobo.com/us/en/search?query=Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Spotify',
+		logo: 'spotify',
+		w: 93,
+		href: 'https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY',
+	},
+	{
+		label: 'ThriftBooks',
+		logo: 'thriftbooks',
+		w: 142,
+		href: 'https://www.thriftbooks.com/browse/?b.search=Father%27s%20Heart%20Bible',
+	},
+	{
+		label: 'Walmart',
+		logo: 'walmart',
+		w: 127,
+		href: 'https://www.walmart.com/search?q=Father%27s+Heart+Bible',
+	},
+	{ label: 'YouTube', logo: 'youtube', w: 125, href: 'https://www.youtube.com/@FathersHeartBible' },
+];
+---
+
+		<Section variant={variant}>
+			<div class="text-center max-w-6xl mx-auto">
+				<h2 class="text-2xl md:text-3xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Search for Father&rsquo;s Heart Bible on
+				</h2>
+				<ul class="fhb-search-on">
+					{searchOn.map((x) => (
+						<li><a href={x.href} target="_blank" rel="noopener noreferrer" aria-label={`Father's Heart Bible on ${x.label}`}><img src={`/logos/stores/${x.logo}.svg`} alt={x.label} width={x.w} height={x.h ?? 28} style={x.h ? `height: ${x.h}px;` : undefined} loading="lazy" decoding="async" /></a></li>
+					))}
+				</ul>
+				<p class="mt-8 text-base" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Order in print from us: <a href="/print/" class="hover:underline">15% off your first order &rarr;</a>
+				</p>
+			</div>
+		</Section>
+		<style>
+			.fhb-search-on { list-style: none; margin: 2rem 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1.5rem 2.25rem; }
+			.fhb-search-on a { display: inline-flex; align-items: center; min-height: 44px; transition: opacity 0.2s; }
+			.fhb-search-on a:hover { opacity: 0.75; }
+			.fhb-search-on img { height: 28px; width: auto; }
+		</style>
