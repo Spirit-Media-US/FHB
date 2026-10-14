@@ -26,7 +26,9 @@ const fmtReach = (n: number) =>
 				: n >= 1e3
 					? `${Math.round(n / 1e3)}K`
 					: '';
-const REACH_TOTAL = reachOf('en') + allLanguageEditions.reduce((t, l) => t + reachOf(l.code), 0);
+const REACH_TOTAL =
+	reachOf('en') +
+	[...allLanguageEditions, ...readOnlyLanguages].reduce((t, l) => t + reachOf(l.code), 0);
 const WORLD_COVERED = REACH_TOTAL >= reach.WORLD;
 const ROSTER_COVERS_WORLD = reach.rosterTotal >= reach.WORLD;
 const REACH_BILLIONS = (REACH_TOTAL / 1e9).toFixed(1);
