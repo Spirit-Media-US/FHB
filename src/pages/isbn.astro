@@ -6,6 +6,7 @@
 import Section from '../components/Section.astro';
 import StoreLogos from '../components/StoreLogos.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
+import VoiceChips from '../components/VoiceChips.astro';
 import isbns from '../data/isbn-list.json' with { type: 'json' };
 import { allLanguageEditions, langSlug } from '../data/language-editions';
 import Layout from '../layouts/Layout.astro';
@@ -186,6 +187,7 @@ const books = groups.flatMap((g) =>
 				<div class="text-center" style="margin-bottom: 2.5rem;">
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Editions of the Father’s Heart Bible</h2>
 					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.95rem; margin: 0.6rem 0 0;">Divine Voice™ Color · Complete Bible · 66 books</p>
+					<VoiceChips class="mt-5 mb-0" />
 				</div>
 				<nav class="isbn-jump" aria-label="Edition groups">
 					{groups.map((g) => (
