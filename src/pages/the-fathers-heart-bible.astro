@@ -3,6 +3,7 @@ import ImageGrid from '../components/ImageGrid.astro';
 import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
+import VoiceChips from '../components/VoiceChips.astro';
 import WaysToReceive from '../components/WaysToReceive.astro';
 import { LANGUAGE_EDITION_TOTAL } from '../data/language-editions';
 import {
@@ -264,12 +265,19 @@ const formatDate = (dateString: string) => {
 			imagePosition="top"
 			href="/print/"
 			heading={heroHeading}
-			subheading={heroSubheading}
-			primaryCtaLabel={heroPrimaryCtaLabel}
-			primaryCtaHref={heroPrimaryCtaHref}
-			secondaryCtaLabel={heroSecondaryCtaLabel}
-			secondaryCtaHref={heroSecondaryCtaHref}
+			headingBelow
 		/>
+		{/* The h1 and its answer sit below the hero image (Kevin 2026-10-14): each voice named in
+		     its own colour, then the FATHER / SON / SPIRIT blocks. Inline styles: under the hero. */}
+		<section style="background-color: var(--color-canvas); padding: 2rem 1rem 3rem;">
+			<div style="max-width: 42rem; margin: 0 auto; text-align: center;">
+				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.2rem; line-height: 1.7; margin: 0 0 1.75rem;">
+					Father&rsquo;s Heart Bible&trade; (FHB) is the complete Bible in a fresh translation from the original Hebrew, Aramaic, and Greek that reveals God as our Father where Scripture reveals Him. It is the first Bible in print to show which words a divine person spoke &mdash; <span style="color: #2563eb; font-weight: 600;">our Father&rsquo;s in blue</span>, <span style="color: #c8102e; font-weight: 600;">the Son&rsquo;s in red</span>, <span style="color: #6a3fa0; font-weight: 600;">the Spirit&rsquo;s in purple</span>. Free to read and hear online, and in print in {LANGUAGE_TOTAL} languages.
+				</p>
+				<VoiceChips class="mb-8" />
+				<a href={heroPrimaryCtaHref} style="display: inline-flex; align-items: center; padding: 0.875rem 2rem; font-family: var(--font-body); font-size: 1rem; font-weight: 600; text-decoration: none; background: #FFD9E0; color: #4A4A4A;">{heroPrimaryCtaLabel}</a>
+			</div>
+		</section>
 
 
 		<!-- ═══════════════════════════════════════════════════════════
@@ -284,6 +292,12 @@ const formatDate = (dateString: string) => {
 				>
 					The destination was never merely forgiveness or heaven. The destination has always been the Father.
 				</h2>
+				<p class="text-2xl leading-relaxed mb-3" style="font-family: var(--font-serif); color: #c8102e; font-weight: 600;">
+					I am the way, and the truth, and the life. No one comes to the Father except through me.
+				</p>
+				<p class="mb-10" style="font-family: var(--font-sans); font-size: 0.9rem;">
+					<a href="/read/john/14/#v6" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">John 14:6 (FHB)</a>
+				</p>
 				<p
 					class="text-lg leading-relaxed mb-12"
 					style="font-family: var(--font-sans); color: var(--color-muted);"
