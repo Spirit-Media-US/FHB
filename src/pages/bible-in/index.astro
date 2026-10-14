@@ -4,14 +4,15 @@
 // "to the nations" language. Add a country by shipping /bible-in/<slug>.astro
 // and adding a row to src/data/nations.ts. Read-first per the architecture
 // rules in memory/project_fhb_country_pages.md.
-import { LANGUAGE_EDITION_TOTAL } from '../../data/language-editions';
 import { NATIONS } from '../../data/nations';
+import { LANGUAGE_TOTAL } from '../../data/receive';
 import Layout from '../../layouts/Layout.astro';
 
 const PAGE_URL = 'https://fathersheartbible.com/bible-in/';
 const TITLE = "The Bible Around the World — Read Free Online | Father's Heart Bible™ (FHB)";
-// English + every language edition in the registry.
-const LANGUAGE_COUNT = LANGUAGE_EDITION_TOTAL + 1;
+// Every language live in the reader (follows its registry each build, 2026-10-14) — not
+// the print-edition count, which left this page at 35 while 37 were free to read.
+const LANGUAGE_COUNT = LANGUAGE_TOTAL;
 const DESCRIPTION = `Read the Bible free online, country by country. The Father's Heart Bible™ (FHB) reveals God as Father — free to read in ${LANGUAGE_COUNT} languages, with audio.`;
 
 const HERO_BASE =
@@ -71,7 +72,7 @@ const FAQS = [
 	},
 	{
 		q: "Which languages can I read the Father's Heart Bible in?",
-		a: `${LANGUAGE_COUNT} languages, each complete — all 66 books, free: English and ${LANGUAGE_EDITION_TOTAL} more, from Spanish, Hindi, and Chinese to Arabic, Swahili, and Telugu. English has verse-by-verse audio. <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Start reading in any of them</a>, or see each country page above for the languages spoken there.`,
+		a: `${LANGUAGE_COUNT} languages, each complete — all 66 books, free: English and ${LANGUAGE_COUNT - 1} more, from Spanish, Hindi, and Chinese to Arabic, Swahili, and Telugu. English has verse-by-verse audio. <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Start reading in any of them</a>, or see each country page above for the languages spoken there.`,
 	},
 ];
 const faqSchema = {
