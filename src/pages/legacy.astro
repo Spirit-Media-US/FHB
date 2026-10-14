@@ -190,6 +190,8 @@ const upcomingAll: [string, string, string][] = [
 	['Yaka', 'cd', 'DR Congo'],
 ].sort((a, b) => a[0].localeCompare(b[0])) as [string, string, string][];
 const upcoming = upcomingAll.filter(([name]) => !readOnlyLanguages.some((r) => r.english === name));
+// The headline declares the whole commitment (Kevin 2026-10-14: "let's just declare: 80 Languages").
+const ROSTER_TOTAL = LANGUAGE_TOTAL + upcoming.length;
 ---
 
 <Layout
@@ -356,7 +358,7 @@ const upcoming = upcomingAll.filter(([name]) => !readOnlyLanguages.some((r) => r
 					Taking Father's Heart Bible™ to every nation, tribe, and tongue
 				</p>
 				<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
-					{LANGUAGE_TOTAL} Languages<br /><span style="color: var(--color-brand);">{WORLD_COVERED ? 'The Whole World Covered' : `Spoken by ${REACH_BILLIONS} Billion People`}</span>
+					{ROSTER_TOTAL} Languages<br /><span style="color: var(--color-brand);">{ROSTER_COVERS_WORLD ? 'The Whole World Covered' : `Spoken by ${(reach.rosterTotal / 1e9).toFixed(1)} Billion People`}</span>
 				</h2>
 			</header>
 			<CoverMarquee showTitle={false} showChips={false} />
@@ -403,7 +405,7 @@ const upcoming = upcomingAll.filter(([name]) => !readOnlyLanguages.some((r) => r
 			</div>
 
 			<!-- More to come — the rest of the 80 (open: it sits at the bottom of the page now, Kevin 2026-10-13) -->
-			<h2 class="text-center text-xl md:text-2xl font-light" style="margin: 2.5rem 0 1rem; font-family: var(--font-serif); color: var(--color-ink);">{upcoming.length} more to come &mdash; 80 languages in all</h2>
+			<h2 class="text-center text-xl md:text-2xl font-light" style="margin: 2.5rem 0 1rem; font-family: var(--font-serif); color: var(--color-ink);">{upcoming.length} more to come &mdash; {ROSTER_TOTAL} languages in all</h2>
 			<div class="lang-grid">
 				{upcoming.map(([name, flag]) => (
 					<div class="lang-chip">
