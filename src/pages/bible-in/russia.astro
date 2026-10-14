@@ -7,6 +7,7 @@
 // reaches across Central Asia and the Caucasus; wide diaspora. Evergreen, not
 // political. Photos: Pexels.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -32,7 +33,7 @@ const verses = [
 const stats = [
 	{ label: 'People', value: '144 million' },
 	{ label: 'Orthodox heritage', value: '~63% of Russia' },
-	{ label: 'Russian', value: '~258 million worldwide' },
+	{ label: 'Russian', value: `${sp('ru')} worldwide` },
 	{ label: 'A reviving faith', value: 'after a century of atheism' },
 ];
 
@@ -50,12 +51,12 @@ const faqs = [
 	{
 		question: 'Can I read the Bible online free in Russian?',
 		answer:
-			"Yes. The Father's Heart Bible™ is free to read online with audio — no account, no purchase, no app. It is currently in English; a Russian edition is among our priorities, to join the Scriptures already treasured across the Russian-speaking world.",
+			"Yes. The Father's Heart Bible™ is free to read online in Russian — all 66 books, no account, no purchase, no app — at fathersheartbible.com/read/ru/, joining the Scriptures already treasured across the Russian-speaking world. The English edition is free too, with audio.",
 	},
 	{
 		question: 'Is there a free audio Bible I can listen to?',
 		answer:
-			"Yes. Every chapter of the Father's Heart Bible™ comes with free audio, so it can be heard on any phone — a quiet, personal way to receive the Father's words.",
+			"Yes. Every chapter of the English Father's Heart Bible™ comes with free audio, so it can be heard on any phone — a quiet, personal way to receive the Father's words.",
 	},
 	{
 		question: 'What is the most popular Bible translation in Russia?',
@@ -64,8 +65,7 @@ const faqs = [
 	},
 	{
 		question: "Is the Father's Heart Bible available in Russian?",
-		answer:
-			'Not yet — it is currently in English. Russian, spoken by some 258 million people across Russia, the former Soviet states, and a wide diaspora, is among our translation priorities.',
+		answer: `Yes. The complete Russian edition — all 66 books — is free to read at fathersheartbible.com/read/ru/ and published in print (fathersheartbible.com/bibles/russian-bible/). Russian is spoken by some ${sp('ru')} people across Russia, the former Soviet states, and a wide diaspora.`,
 	},
 ];
 ---
@@ -90,7 +90,7 @@ const faqs = [
 	heroSubhead="About 63% of Russians identify as Orthodox Christian, a faith reviving after a century of atheism — and a fresh translation now reveals God as a near and loving Father, a refuge for the weary. Free online, with audio."
 	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/8459e8235bba613ec62bbe31d8da4a81a4d49742-1880x1253.jpg"
 	heroAlt="Saint Basil's Cathedral in Moscow under a bright sky"
-	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; the Bible is free to read online, with audio.</strong> About <strong>63% of Russians identify as Orthodox Christian</strong> &mdash; and the Bible is legal to own and read, though a 2016 law restricts evangelism and missionary activity outside registered churches. The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. It is in English today, and a <em>Russian</em> edition is among our priorities &mdash; for a people whose deep Orthodox faith endured a century of atheism and is reviving, and where a fresh translation can reveal God not as a distant power, but as a near and loving <em>Father</em>.`}
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; the Bible is free to read online, with audio.</strong> About <strong>63% of Russians identify as Orthodox Christian</strong> &mdash; and the Bible is legal to own and read, though a 2016 law restricts evangelism and missionary activity outside registered churches. The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. The complete <a href=\"https://fathersheartbible.com/read/ru/\" style=\"color: var(--color-brand);\" class=\"hover:underline\"><em>Russian</em> edition</a> is free to read today and <a href=\"/bibles/russian-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">published in print</a> &mdash; for a people whose deep Orthodox faith endured a century of atheism and is reviving, and where a fresh translation can reveal God not as a distant power, but as a near and loving <em>Father</em>.`}
 	keyTakeaway="Russia's faith survived a century of state atheism — and the Father's Heart Bible™ (FHB) longs to reveal, in Russian, the Father who runs to meet His returning child."
 	glanceIntroHtml={`Russia is the largest country on earth &mdash; a land of vast forests and frozen lakes, of golden domes and ancient icons. Its Orthodox faith, more than a thousand years old, endured the long Soviet night and is stirring again across a searching people.`}
 	stats={stats}
@@ -151,12 +151,12 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father', bodyHtml: `In a land of deep and reviving faith, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; quiet and personal, on the phone in your hand.` },
-		{ heading: 'Russian among our priorities', bodyHtml: `English is available today, and Russian &mdash; spoken by some 258 million across Russia and beyond &mdash; is among our translation priorities. See the <a href="/bible-in/russia/#translation-opportunity" style="color: var(--color-brand);" class="hover:underline">translation opportunity</a>.` },
+		{ heading: 'Now in Russian', bodyHtml: `The complete Russian edition &mdash; for some ${sp('ru')} speakers across Russia and beyond &mdash; is published: <a href="https://fathersheartbible.com/read/ru/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/russian-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
 	]}
 	globalHeading="Russia and the world"
 	globalIntroHtml={`Russian is far more than the tongue of one nation &mdash; it is the common language of a vast region and a wide diaspora. To give Russia the Father&rsquo;s heart in Russian is to open a door across many lands.`}
 	globalStats={[
-		{ value: '~258 million', label: 'Russian speakers worldwide a Russian edition would reach' },
+		{ value: `${sp('ru')}`, label: 'Russian speakers worldwide the Russian edition reaches' },
 		{ value: 'a regional tongue', label: 'Russian links Central Asia, the Caucasus, and Eastern Europe' },
 		{ value: 'a wide diaspora', label: 'Russian speakers live across Europe, the Americas, and beyond' },
 	]}
@@ -177,10 +177,10 @@ const faqs = [
 		{ label: 'Russia — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/RS' },
 	]}
 	opportunityHeading="The translation opportunity for Russia"
-	opportunityIntroHtml={`Russian is the heart language of a vast region &mdash; some 258 million people who long for a Bible that reveals not a distant tradition, but the Father&rsquo;s voice.`}
+	opportunityIntroHtml={`Russian is the heart language of a vast region &mdash; some ${sp('ru')} people now with a Bible that reveals not a distant tradition, but the Father&rsquo;s voice.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'Russian', speakers: '258 million', status: 'On the roadmap' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Russian', code: 'ru' },
 		{ language: 'Tatar', speakers: '5 million', status: 'Translation needed' },
 		{ language: 'Chechen', speakers: '2 million', status: 'Translation needed' },
 	]}

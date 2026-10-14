@@ -238,7 +238,7 @@ function renderBlogTable(b: any): string {
 		esc(s).replace(
 			/\[([^\]]+)\]\((\/[^)\s]+|https?:\/\/[^)\s]+)\)/g,
 			(_m: string, txt: string, url: string) =>
-				`<a href="${canonHref(url)}" class="underline underline-offset-2">${txt}</a>`,
+				`<a href="${canonHref(url)}" class="hover:underline">${txt}</a>`,
 		);
 	const rows = Array.isArray(b?.rows) ? b.rows : [];
 	if (!rows.length) return '';

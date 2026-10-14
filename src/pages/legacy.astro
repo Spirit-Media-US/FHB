@@ -1,0 +1,501 @@
+---
+import CoverMarquee from '../components/CoverMarquee.astro';
+import Section from '../components/Section.astro';
+import VideoHeroInner from '../components/VideoHeroInner.astro';
+import { allLanguageEditions, langSlug } from '../data/language-editions';
+import reach from '../data/language-reach.json' with { type: 'json' };
+import Layout from '../layouts/Layout.astro';
+import { sanityClient } from '../lib/sanity';
+
+// Language count is English + every language edition in the registry — never typed here.
+const LANGUAGE_TOTAL = allLanguageEditions.length + 1;
+
+// Reach = speakers of each language worldwide, first AND second language (Kevin 2026-10-13: "People
+// can have more than one edition"), from src/data/language-reach.json — never typed here. The total
+// is a plain sum, so it can pass world population; once it does we say the world is covered and stop.
+const speakers = reach.speakers as Record<string, number>;
+const reachOf = (code: string) => speakers[code] ?? 0;
+const fmtReach = (n: number) =>
+	n >= 1e9
+		? `${(n / 1e9).toFixed(1)}B`
+		: n >= 1e7
+			? `${Math.round(n / 1e6)}M`
+			: n >= 1e6
+				? `${(n / 1e6).toFixed(1)}M`
+				: n >= 1e3
+					? `${Math.round(n / 1e3)}K`
+					: '';
+const REACH_TOTAL = reachOf('en') + allLanguageEditions.reduce((t, l) => t + reachOf(l.code), 0);
+const WORLD_COVERED = REACH_TOTAL >= reach.WORLD;
+const ROSTER_COVERS_WORLD = reach.rosterTotal >= reach.WORLD;
+const REACH_BILLIONS = (REACH_TOTAL / 1e9).toFixed(1);
+
+// Legacy page (Kevin 2026-10-13): formerly /a-bible-for-the-whole-world/ (and /partner before
+// that). No giving here — the page gathers people around a shared legacy: sharing our Father
+// to the ends of the earth. Title/description live in code, not the old Sanity partner doc.
+const seoTitle = "Father's Heart Legacy — Sharing Our Father to the Ends of the Earth";
+const seoDescription = `There is no greater legacy than sharing the Father — the greatest desire in every soul. Father's Heart Bible™ (FHB) is published in ${LANGUAGE_TOTAL} languages.`;
+const heroHeading = 'Sharing Our Father';
+
+// Featured blog card ("The Father's Vision") shown under the give-by-check box.
+const visionPost =
+	await sanityClient.fetch(`*[_type == "blogPost" && slug.current == "the-fathers-vision"][0] {
+    "slug": "/blog/" + slug.current + "/",
+    title,
+    excerpt,
+    "image": coalesce(heroImage.asset->url + "?w=800&auto=format", "/fhb-logo.png"),
+    "author": coalesce(author, "Kevin White"),
+    "date": publishDate,
+    tags
+  }`);
+const MONTHS = [
+	'January',
+	'February',
+	'March',
+	'April',
+	'May',
+	'June',
+	'July',
+	'August',
+	'September',
+	'October',
+	'November',
+	'December',
+];
+const visionDate = visionPost?.date
+	? (() => {
+			const d = new Date(visionPost.date);
+			return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+		})()
+	: '';
+
+// ── The languages — English + every edition in the registry (alphabetical, as /print is).
+// Flag iso code and primary region per language code; the edition itself comes from the registry.
+const languageMeta: Record<string, { flag: string; region: string }> = {
+	am: { flag: 'et', region: 'Ethiopia' },
+	ar: { flag: 'eg', region: 'Mideast & N. Africa' },
+	bn: { flag: 'bd', region: 'Bangladesh & India' },
+	yue: { flag: 'hk', region: 'S. China & Hong Kong' },
+	ceb: { flag: 'ph', region: 'Philippines' },
+	fil: { flag: 'ph', region: 'Philippines' },
+	fr: { flag: 'fr', region: 'France & Africa' },
+	de: { flag: 'de', region: 'Germany & C. Europe' },
+	hi: { flag: 'in', region: 'India' },
+	id: { flag: 'id', region: 'Indonesia' },
+	it: { flag: 'it', region: 'Italy' },
+	ja: { flag: 'jp', region: 'Japan' },
+	ko: { flag: 'kr', region: 'Korea' },
+	mr: { flag: 'in', region: 'India' },
+	pcm: { flag: 'ng', region: 'Nigeria' },
+	fa: { flag: 'ir', region: 'Iran & Afghanistan' },
+	pl: { flag: 'pl', region: 'Poland' },
+	pt: { flag: 'br', region: 'Brazil & Portugal' },
+	pa: { flag: 'pk', region: 'Pakistan & India' },
+	ro: { flag: 'ro', region: 'Romania & Moldova' },
+	ru: { flag: 'ru', region: 'Russia & C. Asia' },
+	'zh-hans': { flag: 'cn', region: 'China' },
+	es: { flag: 'mx', region: 'Spain & Latin America' },
+	sw: { flag: 'ke', region: 'East Africa' },
+	ta: { flag: 'in', region: 'India & Sri Lanka' },
+	nmf: { flag: 'in', region: 'Northeast India' },
+	te: { flag: 'in', region: 'India' },
+	'zh-hant': { flag: 'tw', region: 'Taiwan & Hong Kong' },
+	tr: { flag: 'tr', region: 'Türkiye' },
+	uk: { flag: 'ua', region: 'Ukraine' },
+	ur: { flag: 'pk', region: 'Pakistan & India' },
+	vi: { flag: 'vn', region: 'Vietnam' },
+	yo: { flag: 'ng', region: 'Nigeria & West Africa' },
+	zu: { flag: 'za', region: 'South Africa' },
+};
+const languages = allLanguageEditions.map((l) => ({
+	name: l.english,
+	flag: languageMeta[l.code]?.flag,
+	region: languageMeta[l.code]?.region ?? '',
+	reach: fmtReach(reachOf(l.code)),
+	// coming-soon editions have no product page yet
+	href: l.soon ? undefined : `/bibles/${langSlug(l)}-bible/`,
+}));
+
+// ── PAGE 4 — "When His Sons & Daughters Come Home" (pains → what the Father restores) ──
+const painsVsFather = [
+	{ pain: 'Abandonment & fatherlessness', father: 'Comfort · Healing · Deliverance' },
+	{ pain: 'Addiction & escape', father: 'Transformation · Freedom' },
+	{ pain: 'Suicide & violence', father: 'Honor · Intimacy' },
+	{ pain: 'Divorce & broken homes', father: 'Identity · Inheritance' },
+	{ pain: 'Loneliness & isolation', father: 'Strong, healthy sons, husbands & fathers' },
+	{ pain: 'Shame, fear & despair', father: 'Strong, healthy daughters, wives & mothers' },
+];
+
+// ── More to come — the rest of the 80-language roster (projects/fhb-language-cover-colours/roster.json),
+// alphabetical by code: [name, flag iso code, primary region]. A language moves out of this list
+// when its edition lands in the registry.
+const upcoming: [string, string, string][] = [
+	['Afrikaans', 'za', 'South Africa'],
+	['Anaang', 'ng', 'Nigeria'],
+	['Azerbaijani (South)', 'ir', 'Iran'],
+	['Greek', 'gr', 'Greece'],
+	['Gujarati', 'in', 'India'],
+	['Hausa', 'ng', 'Nigeria & West Africa'],
+	['Hiligaynon', 'ph', 'Philippines'],
+	['Haitian Creole', 'ht', 'Haiti'],
+	['Hungarian', 'hu', 'Hungary'],
+	['Igbo', 'ng', 'Nigeria'],
+	['Izon', 'ng', 'Nigeria'],
+	['Ilocano', 'ph', 'Philippines'],
+	['Javanese', 'id', 'Indonesia'],
+	['Gikuyu', 'ke', 'Kenya'],
+	['Kurdish (Kurmanji)', 'tr', 'Türkiye, Syria & Iraq'],
+	['Kannada', 'in', 'India'],
+	['Kituba', 'cd', 'DR Congo & Congo'],
+	['Mangbetu', 'cd', 'DR Congo'],
+	['Malagasy', 'mg', 'Madagascar'],
+	['Malayalam', 'in', 'India'],
+	['Malay', 'my', 'Malaysia'],
+	['Burmese', 'mm', 'Myanmar'],
+	['Nagamese', 'in', 'Northeast India'],
+	['Nepali', 'np', 'Nepal'],
+	['Inpui Naga', 'in', 'Northeast India'],
+	['Dutch', 'nl', 'Netherlands & Belgium'],
+	['Chokri Naga', 'in', 'Northeast India'],
+	['Chichewa', 'mw', 'Malawi'],
+	['Oromo', 'et', 'Ethiopia'],
+	['Odia', 'in', 'India'],
+	['Pashto', 'af', 'Afghanistan & Pakistan'],
+	['Kirundi', 'bi', 'Burundi'],
+	['Kinyarwanda', 'rw', 'Rwanda'],
+	['Sindhi', 'pk', 'Pakistan'],
+	['Sena', 'mz', 'Mozambique'],
+	['Kipsigis', 'ke', 'Kenya'],
+	['Shona', 'zw', 'Zimbabwe'],
+	['Somali', 'so', 'Somalia'],
+	['Sundanese', 'id', 'Indonesia'],
+	['Thai', 'th', 'Thailand'],
+	['Tigrinya', 'er', 'Eritrea & Ethiopia'],
+	['Akan (Twi)', 'gh', 'Ghana'],
+	['Uzbek', 'uz', 'Uzbekistan'],
+	['Xhosa', 'za', 'South Africa'],
+	['Yaka', 'cd', 'DR Congo'],
+].sort((a, b) => a[0].localeCompare(b[0])) as [string, string, string][];
+---
+
+<Layout
+	title={seoTitle}
+	description={seoDescription}
+	image="https://assets.spiritmediapublishing.com/FHB/share/fhb-og-partner.jpg?v=2"
+	imageAlt="Father's Heart Bible — Sharing Our Father"
+	darkHero={true}
+	jsonLd={{
+		"@context": "https://schema.org",
+		"@graph": [
+			{ "@type": "WebPage", "name": seoTitle, "description": seoDescription, "url": "https://fathersheartbible.com/legacy/" },
+			{ "@type": "BreadcrumbList", "itemListElement": [
+				{ "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
+				{ "@type": "ListItem", "position": 2, "name": "Legacy", "item": "https://fathersheartbible.com/legacy/" }
+			]}
+		]
+	}}
+>
+	<main>
+
+		<!-- ═══════════════ HERO ═══════════════ -->
+		<VideoHeroInner
+			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/abw-hero-v2.webp"
+			imagePosition="center 25%"
+			heading="Sharing Our Father to the Ends of the Earth"
+			headingClass="text-3xl md:text-5xl"
+			headingBelow
+		/>
+
+		<!-- ═══════════════ YOU'RE INVITED  |  OUR SHARED LEGACY ═══════════════ -->
+		<Section variant="light">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-stretch">
+				<!-- You're Invited -->
+				<div data-reveal class="legacy-col">
+						<p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">
+							Our Father&rsquo;s love compels us
+						</p>
+						<div class="rounded-2xl p-7 md:p-8 legacy-fill" style="background: #FFE1E8; border: 1px solid var(--color-hairline);">
+						<img
+							src="https://cdn.sanity.io/images/rusi1hyi/production/43c44dd84670ea06caeff56f6756ef86ee3705e8-800x800.jpg?w=400&h=400&fm=webp&q=80"
+							alt="Kevin and Shelly White"
+							width="150" height="150" loading="lazy" decoding="async"
+							class="rounded-full object-cover"
+							style="float: right; width: 150px; height: 150px; margin: 0 0 0.75rem 1.25rem; border: 2px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.16);"
+						/>
+						<div class="space-y-4" style="font-family: var(--font-sans); color: #3F3338;">
+								<p class="leading-relaxed">
+									We knew Him as God. Now we know Him as <strong style="color: var(--color-ink);">Father</strong>. There is no comparison.
+								</p>
+								<p class="leading-relaxed">
+									We have known Jesus and the Holy Spirit since high school, yet nothing has healed, saved, delivered, and transformed us like the Father. Hearing His voice and knowing His heart is for us has made all the difference.
+								</p>
+								<p class="leading-relaxed">
+									We see now that a Father was our greatest desire all along. As much as we love His Word, Jesus, and the Holy Spirit, the gift of Himself as Father is the greatest gift He has ever given us. Nothing satisfies our souls like our Father.
+								</p>
+								<p class="leading-relaxed">
+									We want everyone to know the comfort and abundance of His love. Sharing our Father is now our legacy, and His love compels us to the ends of the earth.
+								</p>
+								<p class="leading-relaxed">We invite you to join us in the Father&rsquo;s heart legacy.</p>
+							</div>
+						<div class="mt-5 pt-4" style="border-top: 1px solid var(--color-hairline); clear: both;">
+							<p style="font-family: var(--font-serif); font-weight: 700; color: var(--color-ink);">— Kevin and Shelly White</p>
+							<p class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">Spirit Media Publishing</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- The Father's legacy — why (Kevin 2026-10-13). Verses are the locked FHB text. -->
+				<div data-reveal class="legacy-col">
+					<p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-gold);">
+						The Father&rsquo;s Legacy
+					</p>
+					<div class="rounded-2xl p-7 md:p-8 legacy-fill legacy-card" style="background: var(--color-surface); border: 1px solid var(--color-hairline);">
+					<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+						There is no greater legacy than sharing the Father.
+					</h2>
+					<div class="space-y-4" style="margin-top: 1.5rem; font-family: var(--font-sans); color: var(--color-muted); line-height: 1.65;">
+						<p>He is the greatest desire in your soul and the greatest gift you will ever receive. Nothing else satisfies.</p>
+						<p>Jesus lived for one thing: &ldquo;Zeal for your house will consume me.&rdquo; &mdash; <a href="/read/john/2/" class="legacy-link">John 2:17 (FHB)</a>. His Father&rsquo;s house is not stone. It is His sons and daughters: &ldquo;Don&rsquo;t you know you are our Father&rsquo;s temple?&rdquo; &mdash; <a href="/read/1-corinthians/3/" class="legacy-link">1 Corinthians 3:16 (FHB)</a>.</p>
+						<p>&ldquo;What good does it do a person to gain the whole world and forfeit his soul?&rdquo; &mdash; <a href="/read/mark/8/" class="legacy-link">Mark 8:36 (FHB)</a>. What good is the whole world to someone who does not know his Father?</p>
+						<p style="font-family: var(--font-serif); font-size: 1.3rem; line-height: 1.4; color: var(--color-ink);">If sharing the Father with the world consumes you, we invite you to join us in the Father&rsquo;s heart legacy.</p>
+					</div>
+					</div>
+				</div>
+			</div>
+		</Section>
+
+		<!-- ═══════════════ FATHER'S HEART LEGACY — align and sign (Kevin 2026-10-13) ═══════════════
+		     An alignment, not an ask: "Sharing the Father is my life legacy." Signing posts to
+		     functions/legacy-sign.ts (contact + tag in GHL). -->
+		<Section variant="soft">
+			<div id="commitment" class="scroll-mt-24 max-w-2xl mx-auto text-center">
+				<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">Father&rsquo;s Heart Legacy</p>
+				<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Sharing the Father is my life legacy.</h2>
+				<div class="rounded-2xl text-left" style="margin-top: 2rem; padding: 2rem; background: var(--color-surface); border: 1px solid var(--color-hairline); border-top: 3px solid var(--color-gold);">
+					<div class="space-y-4" style="font-family: var(--font-serif); font-size: 1.2rem; line-height: 1.55; color: var(--color-ink);">
+						<p>Our Father is the greatest gift I have ever received.</p>
+						<p>I live to share His love, and to invite others to open their hearts to Him.</p>
+						<p>Sharing the Father is my life legacy.</p>
+					</div>
+					<form class="legacy-sign-form" novalidate style="margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid var(--color-hairline);">
+						<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+							<input type="text" name="name" required autocomplete="name" placeholder="Your name" aria-label="Your name" class="w-full px-4 py-3 text-base" style="border: 1px solid var(--color-hairline); background-color: var(--color-canvas); color: var(--color-ink); font-family: var(--font-sans);" />
+							<input type="email" name="email" required autocomplete="email" placeholder="Email address" aria-label="Email address" class="w-full px-4 py-3 text-base" style="border: 1px solid var(--color-hairline); background-color: var(--color-canvas); color: var(--color-ink); font-family: var(--font-sans);" />
+						</div>
+						<input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;width:0;opacity:0;" />
+						<button type="submit" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold" style="margin-top: 1rem; width: 100%; background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans); border: none; cursor: pointer;">This is my legacy &rarr;</button>
+						<p class="legacy-sign-status text-sm" style="min-height: 1.25rem; margin-top: 0.75rem; text-align: center; font-family: var(--font-sans); color: var(--color-muted);" aria-live="polite"></p>
+					</form>
+				</div>
+			</div>
+		</Section>
+
+		<!-- ═══════════════ PAGE 4 — the Father's vision ═══════════════ -->
+		<Section variant="light">
+			<div class="max-w-4xl mx-auto">
+				<!-- The Father's Vision -->
+				<header class="text-center mb-8" data-reveal>
+					<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">The Father's Vision</p>
+					<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">When His Sons &amp; Daughters Come Home</h2>
+					<p class="mt-4 leading-relaxed max-w-2xl mx-auto" style="font-family: var(--font-sans); color: var(--color-muted);">
+						This is the legacy — what only the Father restores in a world that has experienced Him as God but not yet Father.
+					</p>
+				</header>
+
+				<div class="relative grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5" data-reveal>
+					<!-- short arrow pointing right, between the two columns (desktop) -->
+					<div class="hidden md:flex absolute left-1/2 top-1/2 items-center justify-center rounded-full" style="width: 46px; height: 46px; transform: translate(-50%, -50%); background: #fff; box-shadow: 0 3px 12px rgba(0,0,0,0.18); z-index: 3;" aria-hidden="true">
+						<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="18" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+					</div>
+					<!-- Our Pains -->
+					<div class="rounded-2xl p-6" style="background: #41454B;">
+						<p class="font-bold text-lg" style="font-family: var(--font-serif); color: #fff;">Our Pains</p>
+						<p class="text-xs uppercase tracking-wider mb-4" style="font-family: var(--font-sans); color: rgba(255,255,255,0.6);">A world without the Father</p>
+						<ul class="space-y-2.5" style="list-style: none; padding: 0; margin: 0;">
+							{painsVsFather.map(({ pain }) => (
+								<li class="flex gap-2.5 items-start text-sm" style="font-family: var(--font-sans); color: #d6d7d9;">
+									<span class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background:#fff;"></span>{pain}
+								</li>
+							))}
+						</ul>
+					</div>
+					<!-- Our Father -->
+					<div class="rounded-2xl p-6" style="background: #FFE1E8;">
+						<p class="font-bold text-lg" style="font-family: var(--font-serif); color: var(--color-brand-dark, var(--color-brand));">Our Father</p>
+						<p class="text-xs uppercase tracking-wider mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">What His children come home to</p>
+						<ul class="space-y-2.5" style="list-style: none; padding: 0; margin: 0;">
+							{painsVsFather.map(({ father }) => (
+								<li class="flex gap-2.5 items-start text-sm" style="font-family: var(--font-sans); color: #4a3d42;">
+									<span class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background:var(--color-brand);"></span>{father}
+								</li>
+							))}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</Section>
+
+		<!-- ═══════════════ REACH HEADLINE + COVER MARQUEES (audience + language editions) ═══════════════ -->
+		<div class="pb-10 lg:pb-14" style="background-color: var(--color-canvas);">
+			<header class="text-center px-6 pt-6">
+				<p class="text-xs font-semibold tracking-widest uppercase mb-3" style="font-family: var(--font-sans); color: var(--color-gold);">
+					Taking Father's Heart Bible™ to every nation, tribe, and tongue
+				</p>
+				<h2 class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">
+					{LANGUAGE_TOTAL} Languages<br /><span style="color: var(--color-brand);">{WORLD_COVERED ? 'The Whole World Covered' : `Spoken by ${REACH_BILLIONS} Billion People`}</span>
+				</h2>
+			</header>
+			<CoverMarquee showTitle={false} showChips={false} />
+		</div>
+
+		<!-- ═══════════════ REACH MAP — directly under the marquees ═══════════════ -->
+		<div class="px-4 pb-10" style="background-color: var(--color-canvas);">
+				<div class="relative overflow-hidden rounded-2xl mx-auto" style="max-width: 56rem;">
+					<img
+						src="https://assets.spiritmediapublishing.com/FHB/partner/world-reach-map-35.jpg"
+						alt={`World map — where the Father's Heart Bible is read in its ${LANGUAGE_TOTAL} languages`}
+						width="1600" height="1262" loading="lazy" decoding="async"
+						class="block w-full"
+					/>
+					<!-- "Sharing Our Father" title over the top of the map (~1in down) -->
+					<p class="absolute left-1/2 -translate-x-1/2 text-center font-light text-2xl md:text-4xl whitespace-nowrap" style="top: 6%; font-family: var(--font-serif); color: var(--color-ink); text-shadow: 0 1px 12px rgba(255,255,255,0.9), 0 1px 3px rgba(255,255,255,0.9);">Sharing <span style="color: var(--color-brand);">Our</span> Father</p>
+					<!-- key, across the top of Antarctica (matches the brochure) -->
+					<div class="absolute left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-x-6 gap-y-1 px-3 md:px-5 py-1.5 rounded-xl text-[11px] md:text-[13px]"
+						style="bottom: 13%; max-width: 92vw; background: rgba(255,255,255,0.94); border: 1px solid #e6e0e2; box-shadow: 0 2px 10px rgba(0,0,0,0.10); font-family: var(--font-sans); font-weight: 600; color: var(--color-ink);">
+						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#ffbed0; border:1px solid #ef96ac;"></span>Where our {LANGUAGE_TOTAL} languages are spoken</span>
+						<span class="flex items-center gap-2"><span class="inline-block w-3.5 h-3.5 rounded-sm" style="background:#e7e7e3; border:1px solid #d2d2cd;"></span>More to come</span>
+					</div>
+				</div>
+		</div>
+
+		<!-- ═══════════════ THE LANGUAGES — compact (Kevin 2026-10-13: effective but too tall) ═══════════════ -->
+		<Section variant="soft">
+			<div class="lang-grid">
+				<a href="/print/" class="lang-chip no-underline" style="background: #FFE1E8;">
+					<img src="/flags/us.svg" alt="" width="22" height="15" loading="lazy" />
+					<span class="lang-name">English</span>
+					<span class="lang-num">{fmtReach(reachOf('en'))}</span>
+				</a>
+				{languages.map(({ name, flag, reach: speakers, href }) => {
+					const Row = href ? 'a' : 'div';
+					return (
+						<Row href={href} class="lang-chip no-underline">
+							{flag ? <img src={`/flags/${flag}.svg`} alt="" width="22" height="15" loading="lazy" /> : <span />}
+							<span class="lang-name">{name}</span>
+							<span class="lang-num">{speakers}</span>
+						</Row>
+					);
+				})}
+			</div>
+
+			<!-- More to come — the rest of the 80 (open: it sits at the bottom of the page now, Kevin 2026-10-13) -->
+			<h2 class="text-center text-xl md:text-2xl font-light" style="margin: 2.5rem 0 1rem; font-family: var(--font-serif); color: var(--color-ink);">{upcoming.length} more to come &mdash; 80 languages in all</h2>
+			<div class="lang-grid">
+				{upcoming.map(([name, flag]) => (
+					<div class="lang-chip">
+						<img src={`/flags/${flag}.svg`} alt="" width="22" height="15" loading="lazy" />
+						<span class="lang-name">{name}</span>
+					</div>
+				))}
+			</div>
+		</Section>
+
+		<!-- ═══════════════ THE FATHER'S VISION (blog card) ═══════════════ -->
+		<Section variant="light">
+			<div class="max-w-xl mx-auto">
+				<div data-reveal>
+					{visionPost && (
+						<a href={visionPost.slug} class="group block rounded-2xl border overflow-hidden transition-shadow hover:shadow-md" style="background-color: var(--color-surface); border-color: var(--color-hairline);">
+							<div class="overflow-hidden h-40">
+								<img src={visionPost.image} alt={visionPost.title} width="800" height="320" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style="object-position: center top;" />
+							</div>
+							<div class="p-6">
+								<div class="flex flex-wrap gap-1.5 mb-3">
+									{(visionPost.tags || []).slice(0, 2).map((t: string) => (
+										<span class="text-xs font-semibold rounded-full px-2.5 py-0.5" style="color: var(--color-muted); background-color: var(--color-surface-low);">{t}</span>
+									))}
+								</div>
+								<h3 class="text-xl font-bold mb-2 leading-snug" style="font-family: var(--font-serif); color: var(--color-brand);">{visionPost.title}</h3>
+								<p class="text-sm mb-4 leading-relaxed line-clamp-3" style="font-family: var(--font-sans); color: var(--color-muted);">{visionPost.excerpt || ''}</p>
+								<div class="flex items-center justify-between text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+									<span>{visionPost.author} · {visionDate}</span>
+									<span class="font-semibold group-hover:underline" style="color: var(--color-brand);">Read &rarr;</span>
+								</div>
+							</div>
+						</a>
+					)}
+					<div class="text-center mt-8">
+						<p class="text-3xl md:text-4xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">The Father</p>
+						<p class="text-3xl md:text-4xl font-light leading-tight mt-1" style="font-family: var(--font-serif); color: var(--color-brand);">No greater gift or legacy.</p>
+					</div>
+				</div>
+			</div>
+		</Section>
+
+		<!-- ═══════════════ PEOPLE BAND (readers with each edition) ═══════════════ -->
+		<div class="grid grid-cols-1 sm:grid-cols-3">
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-band-plum-v3.webp" alt="A mother and daughter reading the Plum edition of the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-band-charcoal-v3.webp" alt="A father and son reading the Charcoal edition of the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+			<img src="https://assets.spiritmediapublishing.com/FHB/print/abw-band-white-v3.webp" alt="Three generations reading the White edition of the Father's Heart Bible" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover block" />
+		</div>
+	</main>
+</Layout>
+
+<style>
+	.lang-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+	@media (min-width: 640px) { .lang-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+	@media (min-width: 900px) { .lang-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+	@media (min-width: 1150px) { .lang-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+	.lang-chip { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 0.6rem; padding: 0.5rem 0.75rem; border: 1px solid var(--color-hairline); border-radius: 0.6rem; background: var(--color-surface); font-family: var(--font-sans); }
+	.lang-chip img { height: 15px; object-fit: cover; border-radius: 2px; box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.18); }
+	.lang-name { font-size: 0.9rem; font-weight: 600; color: var(--color-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.lang-num { font-size: 0.85rem; font-weight: 800; color: var(--color-brand); }
+	a.lang-chip:hover { border-color: var(--color-brand); }
+	.legacy-link { color: var(--color-brand); text-decoration: none; font-weight: 600; white-space: nowrap; }
+	.legacy-link:hover { text-decoration: underline; }
+	@media (min-width: 1024px) {
+		.legacy-col { display: flex; flex-direction: column; }
+		.legacy-fill { flex: 1; }
+		.legacy-card { display: flex; flex-direction: column; justify-content: center; }
+	}
+</style>
+
+<script>
+	for (const form of document.querySelectorAll<HTMLFormElement>('.legacy-sign-form')) {
+		form.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const status = form.querySelector<HTMLElement>('.legacy-sign-status');
+			const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+			const data = Object.fromEntries(new FormData(form).entries());
+			const name = String(data.name || '').trim();
+			const email = String(data.email || '').trim();
+			if (name.length < 2) {
+				if (status) status.textContent = 'Please sign with your name.';
+				return;
+			}
+			if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+				if (status) status.textContent = 'Please enter a valid email address.';
+				return;
+			}
+			if (button) button.disabled = true;
+			if (status) status.textContent = 'One moment…';
+			try {
+				const res = await fetch('/legacy-sign', {
+					method: 'POST',
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify({ name, email, website: String(data.website || '') }),
+				});
+				if (!res.ok) throw new Error(String(res.status));
+				const out = (await res.json()) as { emailed?: boolean };
+				form.reset();
+				if (status)
+					status.textContent = out.emailed
+						? `Thank you, ${name}. Your copy is on its way to your inbox.`
+						: `Thank you, ${name}.`;
+			} catch {
+				if (status) status.textContent = 'Something went wrong — please try again in a moment.';
+				if (button) button.disabled = false;
+			}
+		});
+	}
+</script>

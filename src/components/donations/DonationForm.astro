@@ -8,19 +8,10 @@
 
 <div id="donation-form-root" class="donation-form" style="background-color: var(--color-surface); border: 1px solid var(--color-outline-variant); border-radius: 16px; padding: 28px;">
 
-	<!-- STEP 1: amount + donor info — the form the donor fills in first -->
+	<!-- STEP 1: frequency + amount — the only thing the donor fills in here -->
 	<div id="donation-step-form">
-		<p class="text-xs font-semibold tracking-widest uppercase mb-2 inline-flex items-center gap-2" style="color: var(--color-brand); font-family: var(--font-sans);">
-			<span aria-hidden="true" style="font-size: 1rem;">💛</span>
-			Make a Gift
-		</p>
-		<h2 class="text-2xl md:text-3xl font-light leading-tight mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">
-			A Bible for the Whole World
-		</h2>
-
-		<!-- Monthly / One-time toggle. Monthly is the campaign-preferred default
-		     (Father's Heart Bible™ First Edition launch); donors can switch to a
-		     one-time gift if they prefer. -->
+		<!-- Monthly / One-time toggle. Monthly is the default; donors can switch
+		     to a one-time gift if they prefer. -->
 		<div class="flex gap-2 mb-5">
 			<button type="button" data-frequency="recurring" data-active="true"
 				class="frequency-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
@@ -34,16 +25,14 @@
 			</button>
 		</div>
 
-		<!-- Suggested amounts — led by # of Bibles ($5 = 1 Bible), dollar shown
-		     beneath. $25 = 5 Bibles · $50 = 10 · $100 = 20 (Founding Supporter) ·
-		     $250 = 50 (Founding Patron) · $1,000 = 200 (Founder). -->
+		<!-- Suggested amounts — plain dollar gifts (Kevin 2026-10-13: not about # of Bibles). -->
 		<div class="grid grid-cols-3 gap-2 mb-3">
-			<button type="button" data-amount="25" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">5 Bibles<span class="block text-xs font-normal opacity-70">$25</span></button>
-			<button type="button" data-amount="50" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">10 Bibles<span class="block text-xs font-normal opacity-70">$50</span></button>
-			<button type="button" data-amount="100" class="amount-btn amount-btn-featured px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">20 Bibles<span class="block text-xs font-normal opacity-70">$100</span><span class="block text-[10px] font-semibold uppercase tracking-wide mt-0.5">+ Free ComfortLeather™</span></button>
-			<button type="button" data-amount="250" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">50 Bibles<span class="block text-xs font-normal opacity-70">$250</span></button>
-			<button type="button" data-amount="1000" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">200 Bibles<span class="block text-xs font-normal opacity-70">$1,000</span></button>
-			<button type="button" data-amount="custom" class="amount-btn px-3 py-2.5 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">Custom</button>
+			<button type="button" data-amount="25" class="amount-btn px-3 py-3 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">$25</button>
+			<button type="button" data-amount="50" class="amount-btn px-3 py-3 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">$50</button>
+			<button type="button" data-amount="100" class="amount-btn px-3 py-3 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">$100</button>
+			<button type="button" data-amount="250" class="amount-btn px-3 py-3 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">$250</button>
+			<button type="button" data-amount="1000" class="amount-btn px-3 py-3 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">$1,000</button>
+			<button type="button" data-amount="custom" class="amount-btn px-3 py-3 rounded-lg text-base font-semibold transition-colors leading-tight" style="font-family: var(--font-sans);">Custom</button>
 		</div>
 
 		<!-- Custom amount input -->
@@ -57,41 +46,8 @@
 			</div>
 		</div>
 
-		<!-- Donor info -->
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-			<input type="text" id="donor-first-name" placeholder="First name" required
-				class="px-4 py-3 rounded-lg border text-base"
-				style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
-			<input type="text" id="donor-last-name" placeholder="Last name" required
-				class="px-4 py-3 rounded-lg border text-base"
-				style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
-		</div>
-		<input type="email" id="donor-email" placeholder="Email" required
-			class="w-full px-4 py-3 rounded-lg border text-base mb-3"
-			style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
-
-		<!-- Optional public message -->
-		<details class="mb-3" style="border-radius: 8px;">
-			<summary class="cursor-pointer text-sm py-2" style="color: var(--color-muted); font-family: var(--font-sans);">
-				Add a public message (optional)
-			</summary>
-			<input type="text" id="donor-public-name" placeholder="Display name (optional)" maxlength="100"
-				class="w-full mt-2 px-4 py-3 rounded-lg border text-sm"
-				style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);" />
-			<p class="mt-1 text-xs" style="color: var(--color-muted); font-family: var(--font-sans); opacity: 0.85;">
-				Publicly we show only your <strong>first name and last initial</strong> (e.g., Jane&nbsp;D.). Enter a display name above to override.
-			</p>
-			<textarea id="donor-public-message" rows="3" placeholder="Why are you giving?" maxlength="500"
-				class="w-full mt-2 px-4 py-3 rounded-lg border text-sm"
-				style="border-color: var(--color-outline-variant); background-color: var(--color-surface-low); color: var(--color-ink); font-family: var(--font-sans);"></textarea>
-		</details>
-
-		<!-- Visibility + cover-fees (cover-fees default ON — donor sees impact and can opt out) -->
-		<div class="space-y-2 mb-4">
-			<label class="flex items-start gap-2 cursor-pointer">
-				<input type="checkbox" id="donor-is-public" checked class="mt-1" />
-				<span class="text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">Show my name + amount + comment publicly</span>
-			</label>
+		<!-- Cover-fees (default ON — donor sees impact and can opt out) -->
+		<div class="mb-4">
 			<label class="flex items-start gap-2 cursor-pointer">
 				<input type="checkbox" id="donor-cover-fees" checked class="mt-1" />
 				<span class="text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">Cover the processing fee so 100% reaches FHB</span>
@@ -165,17 +121,6 @@
 		border: 1px solid var(--color-outline-variant);
 	}
 	.amount-btn[data-active="true"] {
-		background-color: var(--color-brand);
-		color: #ffffff;
-		border-color: var(--color-brand);
-	}
-	/* Featured partner tier ($100 = 20 Bibles + free ComfortLeather) — light pink. */
-	.amount-btn-featured {
-		background-color: #FFD9E0;
-		border-color: #E89DB0;
-		color: #4A4A4A;
-	}
-	.amount-btn-featured[data-active="true"] {
 		background-color: var(--color-brand);
 		color: #ffffff;
 		border-color: var(--color-brand);
@@ -374,21 +319,6 @@
 			return;
 		}
 
-		const firstName = (document.getElementById('donor-first-name') as HTMLInputElement).value.trim();
-		const lastName = (document.getElementById('donor-last-name') as HTMLInputElement).value.trim();
-		const email = (document.getElementById('donor-email') as HTMLInputElement).value.trim();
-		if (!firstName || !lastName || !email) {
-			errEl.textContent = 'Please fill in your name and email.';
-			errEl.style.display = '';
-			return;
-		}
-
-		// Public display defaults to "First L." (first name + last initial) unless
-		// the donor entered a custom display name.
-		const lastInitial = lastName ? `${lastName.charAt(0).toUpperCase()}.` : '';
-		const publicName = (document.getElementById('donor-public-name') as HTMLInputElement).value.trim() || `${firstName} ${lastInitial}`.trim();
-		const publicMessage = (document.getElementById('donor-public-message') as HTMLTextAreaElement).value.trim();
-		const isPublic = (document.getElementById('donor-is-public') as HTMLInputElement).checked;
 		const coverFees = (document.getElementById('donor-cover-fees') as HTMLInputElement).checked;
 
 		// If donor opts to cover fees, gross up the amount so net = chosen amount.
@@ -416,11 +346,12 @@
 					campaign: 'fhb',
 					amount_cents: amountCents,
 					is_recurring: frequency === 'recurring',
-					donor_name: `${firstName} ${lastName}`,
-					donor_email: email,
-					public_name: publicName,
-					public_message: publicMessage,
-					is_public: isPublic,
+					// Name and email are collected once, by Stripe Checkout (Kevin 2026-10-13: the
+					// easiest form possible); the webhook reads them back from the session.
+					// No public supporter feed any more (Kevin 2026-10-13) — gifts are never listed.
+					public_name: '',
+					public_message: '',
+					is_public: false,
 					cover_fees: coverFees,
 					fee_covered_cents: feeCoveredCents,
 				}),

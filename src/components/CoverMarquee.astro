@@ -1,5 +1,6 @@
 ---
 import { cardUrl } from '../data/card-art';
+import { AUDIENCE_EDITION_TOTAL } from '../data/dvc-editions';
 import { LANGUAGE_EDITION_TOTAL, langSlug, languageEditions } from '../data/language-editions';
 // FHB cover marquee — Kevin 2026-09-24.
 //
@@ -98,12 +99,17 @@ const langCovers = [...languageEditions].reverse().map((l) => ({
 // for the 23-cover row of that day: 100/23 s per cover keeps that exact on-screen speed for
 // any count, for both rows.
 const SECONDS_PER_COVER = 100 / 23;
-// Row titles (Kevin 2026-10-03). The audience figure is Kevin's count of targeted audience
-// editions (the row also carries journaling, the general colours and Large Print). The
+// Row titles (Kevin 2026-10-03). The audience figure is AUDIENCE_EDITION_TOTAL (Kevin 2026-10-13):
+// every edition this row carries — targeted, journaling, general and Large Print. The
 // language figure is Kevin's 33 (2026-10-07), counted from the edition list including the
 // coming-soon ones (am zu) that have no built cover yet and so no card — see language-editions.ts.
 const rows = [
-	{ covers, reverse: false, href: '/print/', label: '22 Audience Editions' },
+	{
+		covers,
+		reverse: false,
+		href: '/print/',
+		label: `${AUDIENCE_EDITION_TOTAL} Audience Editions — For Every Son and Daughter`,
+	},
 	{
 		covers: langCovers,
 		reverse: true,
@@ -111,10 +117,23 @@ const rows = [
 		label: `${LANGUAGE_EDITION_TOTAL} Language Editions`,
 	},
 ].filter((r) => r.covers.length > 0);
+
+// showTitle={false}: the host page supplies its own heading above the strip
+// (/legacy, Kevin 2026-10-13). The homepage keeps the title.
+// showChips={false} drops the FATHER | SON | SPIRIT chips under the strip (same page, same date).
+interface Props {
+	showTitle?: boolean;
+	showChips?: boolean;
+}
+const { showTitle = true, showChips = true } = Astro.props;
 ---
 
-<section class="fhbm" aria-labelledby="fhbm-title">
-	<h2 id="fhbm-title" class="fhbm-title">Father&rsquo;s Heart Bible™ + Divine Voice Color™ is Here</h2>
+<section
+	class={showTitle ? 'fhbm' : 'fhbm fhbm--untitled'}
+	aria-labelledby={showTitle ? 'fhbm-title' : undefined}
+	aria-label={showTitle ? undefined : "Father's Heart Bible editions"}
+>
+	{showTitle && <h2 id="fhbm-title" class="fhbm-title">Father&rsquo;s Heart Bible™ + Divine Voice Color™</h2>}
 
 	<!-- The strip. The track holds the covers TWICE and travels exactly -50%, so the
 	     second copy is under the cursor at the moment the first wraps — that is what
@@ -153,7 +172,7 @@ const rows = [
 		</>
 	))}
 
-	<div class="fhbm-chips"><VoiceChips size="1.25rem" class="mb-0" /></div>
+	{showChips && <div class="fhbm-chips"><VoiceChips size="1.25rem" class="mb-0" /></div>}
 </section>
 
 <style>
@@ -165,6 +184,8 @@ const rows = [
 	@media (min-width: 1024px) {
 		.fhbm { padding-top: 4rem; }
 	}
+	/* Under a host page's own heading: just the gap to the first row label. */
+	.fhbm.fhbm--untitled { padding-top: 2rem; }
 	.fhbm-title {
 		font-family: var(--font-headline);
 		color: var(--color-ink, #241b17);

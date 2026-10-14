@@ -4,6 +4,7 @@
 // Christian-majority "our Father" framing. Signature pains: war/displacement
 // (7.3M displaced), child soldiers, orphans. Photos: Pexels.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -47,12 +48,12 @@ const faqs = [
 	{
 		question: 'Can I read the Bible online free in DR Congo?',
 		answer:
-			"Yes. The Father's Heart Bible™ is free to read online with audio — no account, no purchase, no app. It is currently in English; a French edition is our priority, since DR Congo is the largest French-speaking nation on earth, alongside Lingala and Swahili.",
+			"Yes. The Father's Heart Bible™ is free to read and hear online in French — all 66 books, with audio on every chapter, no account, no purchase, no app — at fathersheartbible.com/read/fr/ — DR Congo is the largest French-speaking nation on earth. The Swahili edition is free at fathersheartbible.com/read/sw/. The English edition is free too.",
 	},
 	{
 		question: 'Is there an audio Bible I can listen to?',
 		answer:
-			"Yes. Every chapter of the Father's Heart Bible™ comes with free audio, so you can listen on any phone — a gift in places where reading aloud reaches more people. Globally, audio Scripture is surging, with over 1.3 billion audio-Bible listens in a single year.",
+			"Yes. Every chapter of the Father's Heart Bible™ comes with free audio, in English and French, so you can listen on any phone — a gift in places where reading aloud reaches more people. Globally, audio Scripture is surging, with over 1.3 billion audio-Bible listens in a single year.",
 	},
 	{
 		question: 'What is the most popular Bible translation in DR Congo?',
@@ -61,8 +62,7 @@ const faqs = [
 	},
 	{
 		question: "Is the Father's Heart Bible available in French?",
-		answer:
-			'Not yet — it is currently in English. French, spoken by some 280 million people worldwide and by more Congolese than any other nation, is on our roadmap, alongside Lingala and Swahili.',
+		answer: `Yes. The complete French edition — all 66 books, with audio — is free to read at fathersheartbible.com/read/fr/ and published in print (fathersheartbible.com/bibles/french-bible/). French is spoken by some ${sp('fr')} people worldwide and by more Congolese than any other nation. Swahili is published too; a Lingala edition is not yet available.`,
 	},
 ];
 ---
@@ -88,7 +88,7 @@ const faqs = [
 	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/abdd39b151c6d003131e4502459a5f533d69fe57-1880x1232.jpg"
 	heroAlt="The Congo River at sunset"
 	heroBrightness={22}
-	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in DR Congo right now.</strong> About 95% of Congolese are Christian &mdash; one of the most Christian nations on earth &mdash; and the Bible is freely legal to own, read, and share. The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. It is in English today, with French &mdash; the language of more Congolese than any nation &mdash; among our priorities. In a land of deep faith and deep suffering, the Father&rsquo;s Heart Bible&trade; reveals God as a <em>Father</em> who draws near to His hurting children.`}
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in DR Congo right now.</strong> About 95% of Congolese are Christian &mdash; one of the most Christian nations on earth &mdash; and the Bible is freely legal to own, read, and share. The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. The complete <a href=\"https://fathersheartbible.com/read/fr/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">French edition</a> is free to read and hear today and <a href=\"/bibles/french-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">published in print</a> &mdash; the language of more Congolese than any nation. In a land of deep faith and deep suffering, the Father&rsquo;s Heart Bible&trade; reveals God as a <em>Father</em> who draws near to His hurting children.`}
 	keyTakeaway="DR Congo is one of the most Christian nations on earth — and the Father's Heart Bible™ (FHB) reveals a Father near to the displaced, the orphan, and every weary heart."
 	glanceIntroHtml={`The Democratic Republic of the Congo is the giant heart of Africa &mdash; a vast land of rivers and rainforest, the largest French-speaking nation on earth, and home to one of the most Christian populations anywhere. It is a country of immense wealth, immense beauty, and immense suffering.`}
 	stats={stats}
@@ -149,17 +149,17 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father, near to the broken', bodyHtml: `In one of the most Christian nations on earth, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; and audio reaches even those who cannot read.` },
-		{ heading: 'French leads the way', bodyHtml: `English is available today, and French &mdash; spoken by more Congolese than any nation, some 280 million worldwide &mdash; leads a roadmap that includes Lingala and Swahili. See the <a href="/bible-in/dr-congo/#translation-opportunity" style="color: var(--color-brand);" class="hover:underline">translation opportunity</a>.` },
+		{ heading: 'Now in French', bodyHtml: `The complete French edition &mdash; spoken by more Congolese than any nation, some ${sp('fr')} worldwide &mdash; is published: <a href="https://fathersheartbible.com/read/fr/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/french-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
 	]}
 	globalHeading="DR Congo and the world"
 	globalIntroHtml={`The Congo is the beating heart of Francophone Africa &mdash; and its language, French, reaches a quarter of a billion people across the world. To give the Congo the Father&rsquo;s heart in French is to open a door to many nations.`}
 	globalStats={[
-		{ value: '~280 million', label: 'French speakers worldwide a French edition would reach' },
+		{ value: `${sp('fr')}`, label: 'French speakers worldwide the French edition reaches' },
 		{ value: 'most on earth', label: 'DR Congo has more French speakers than any other country' },
 		{ value: 'the heart of Africa', label: 'bordering nine nations at the continent’s center' },
 	]}
 	globalBlocks={[
-		{ heading: 'The largest Francophone nation', bodyHtml: `More people speak French in the Congo than anywhere on earth &mdash; and French reaches some 280 million people across Africa, Europe, and beyond. A French Father&rsquo;s Heart Bible&trade; reaches far past the Congo.` },
+		{ heading: 'The largest Francophone nation', bodyHtml: `More people speak French in the Congo than anywhere on earth &mdash; and French reaches some ${sp('fr')} people across Africa, Europe, and beyond. A French Father&rsquo;s Heart Bible&trade; reaches far past the Congo.` },
 		{ heading: 'The crossroads of Africa', bodyHtml: `The Congo borders nine nations at the heart of the continent &mdash; a strategic place from which the Father&rsquo;s heart can flow in French, Swahili, and Lingala across central Africa.` },
 		{ heading: 'A church that endures', bodyHtml: `Through war and want, the Congolese church has held its faith and grown &mdash; ready to carry the Father&rsquo;s heart to its neighbors.` },
 		{ heading: 'The Congolese diaspora', bodyHtml: `Congolese communities in France, Belgium, and beyond carry their faith and their music into the heart of Europe.` },
@@ -176,12 +176,12 @@ const faqs = [
 		{ label: 'DR Congo — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/CG' },
 	]}
 	opportunityHeading="The translation opportunity in DR Congo"
-	opportunityIntroHtml={`The Congo&rsquo;s heart speaks French &mdash; more than any nation on earth &mdash; with Lingala, Swahili, and over 200 languages still waiting for a Bible in the Father&rsquo;s voice.`}
+	opportunityIntroHtml={`The Congo&rsquo;s heart speaks French &mdash; more than any nation on earth &mdash; with Lingala and over 200 languages still waiting for a Bible in the Father&rsquo;s voice.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'French', speakers: '280 million', status: 'On the roadmap' },
+		{ language: 'English', code: 'en' },
+		{ language: 'French', code: 'fr' },
 		{ language: 'Lingala', speakers: '40 million', status: 'Translation needed' },
-		{ language: 'Swahili (Kiswahili)', speakers: '80 million', status: 'Translation needed' },
+		{ language: 'Swahili (Kiswahili)', code: 'sw' },
 	]}
 	verses={verses}
 	keepReadingHtml={`Begin with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why the Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> &mdash; including <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start</a> and <a href="/guides/what-is-the-gospel/" style="color: var(--color-brand);" class="hover:underline">what the gospel is</a>. Browse Scripture by theme on our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> pages.`}

@@ -1,0 +1,133 @@
+---
+// EVERY WAY TO RECEIVE IT — one compact, crawlable link block for Home, About and Leadership
+// (Kevin 2026-10-13). Read free, listen free, print, eBook, audiobook, languages: each
+// a plain text link, so a search engine or an answer engine can follow every format from any
+// of the three pages. Everything it renders comes from src/data/receive.ts; nothing is typed
+// here and there are no images or scripts.
+//
+//   compact   — links only, without the one-line note under each heading (Home, which has a
+//               word budget)
+//   passages  — adds the row of well-known chapters in the reader and the hub pages
+//   languages — adds the full language list, each linked to its free online reader
+//               (shown on ONE page only, About, so the list is not repeated across pages)
+import { hubs, LANGUAGE_TOTAL, languageLinks, passages, ways } from '../data/receive';
+
+interface Props {
+	heading?: string;
+	eyebrow?: string;
+	compact?: boolean;
+	passages?: boolean;
+	languages?: boolean;
+}
+const {
+	heading = 'Every way to hear His voice',
+	eyebrow = 'Read · Listen · Print',
+	compact = false,
+	passages: showPassages = false,
+	languages: showLanguages = false,
+} = Astro.props;
+const LINK = 'color: var(--color-brand); font-weight: 600; text-decoration: none;';
+---
+
+<div class="fhb-ways max-w-5xl mx-auto">
+	<div class="text-center mb-8">
+		<p
+			class="text-xs font-semibold tracking-widest uppercase mb-3"
+			style="font-family: var(--font-sans); color: var(--color-gold);"
+		>
+			{eyebrow}
+		</p>
+		<h2 class="text-3xl md:text-4xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
+			{heading}
+		</h2>
+	</div>
+	<dl class="fhb-ways-grid" style="font-family: var(--font-sans); color: var(--color-muted);">
+		{ways.map((w) => (
+			<div class="fhb-way">
+				<dt style="font-family: var(--font-serif); color: var(--color-ink);">{w.title}</dt>
+				<dd>
+					{!compact && <>{w.note} </>}
+					{w.links.map((l, i) => (
+						<>
+							{i > 0 && <span aria-hidden="true"> &middot; </span>}
+							<a
+								href={l.href}
+								style={LINK}
+								target={l.external ? '_blank' : undefined}
+								rel={l.external ? 'noopener' : undefined}
+							>{l.label}</a>
+						</>
+					))}
+				</dd>
+			</div>
+		))}
+	</dl>
+	{showLanguages && (
+		<p class="fhb-ways-line" style="font-family: var(--font-sans); color: var(--color-muted);">
+			<strong style="color: var(--color-ink);">Read the Bible free online in {LANGUAGE_TOTAL} languages:</strong>{' '}
+			<a href="/read/" style={LINK}>English</a>
+			{languageLinks.map((l) => (
+				<>
+					<span aria-hidden="true"> &middot; </span>
+					<a href={l.readHref} style={LINK}>{l.name}</a>
+				</>
+			))}
+		</p>
+	)}
+	{showPassages && (
+		<>
+			<p class="fhb-ways-line" style="font-family: var(--font-sans); color: var(--color-muted);">
+				<strong style="color: var(--color-ink);">Start with a chapter you know:</strong>{' '}
+				{passages.map((l, i) => (
+					<>
+						{i > 0 && <span aria-hidden="true"> &middot; </span>}
+						<a href={l.href} style={LINK}>{l.label}</a>
+					</>
+				))}
+			</p>
+			<p class="fhb-ways-line" style="font-family: var(--font-sans); color: var(--color-muted);">
+				<strong style="color: var(--color-ink);">Or begin here:</strong>{' '}
+				{hubs.map((l, i) => (
+					<>
+						{i > 0 && <span aria-hidden="true"> &middot; </span>}
+						<a href={l.href} style={LINK}>{l.label}</a>
+					</>
+				))}
+			</p>
+		</>
+	)}
+</div>
+
+<style>
+	.fhb-ways-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 1rem 2rem;
+		margin: 0;
+	}
+	@media (min-width: 640px) {
+		.fhb-ways-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	}
+	@media (min-width: 1024px) {
+		.fhb-ways-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	}
+	.fhb-way {
+		padding-top: 0.9rem;
+		border-top: 1px solid var(--color-hairline);
+	}
+	.fhb-way dt {
+		font-size: 1.15rem;
+		font-weight: 600;
+		margin-bottom: 0.25rem;
+	}
+	.fhb-way dd {
+		margin: 0;
+		font-size: 0.95rem;
+		line-height: 1.7;
+	}
+	.fhb-ways-line {
+		margin-top: 1.5rem;
+		font-size: 0.95rem;
+		line-height: 1.9;
+	}
+</style>

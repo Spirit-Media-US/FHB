@@ -1,10 +1,19 @@
 ---
 import CoverMarquee from '../components/CoverMarquee.astro';
+import HearTheFather, { type VoiceGroup } from '../components/HearTheFather.astro';
 import ImageGrid from '../components/ImageGrid.astro';
-import ScriptureBlock from '../components/ScriptureBlock.astro';
 import Section from '../components/Section.astro';
+import WaysToReceive from '../components/WaysToReceive.astro';
 import { cardUrl } from '../data/card-art';
-import { LANGUAGE_EDITION_TOTAL } from '../data/language-editions';
+import { allLanguageEditions, LANGUAGE_EDITION_TOTAL } from '../data/language-editions';
+import {
+	AUDIENCE_EDITION_TOTAL,
+	audienceItemList,
+	audienceLinks,
+	audioSeries,
+	BOOK_ID,
+	LANGUAGE_TOTAL,
+} from '../data/receive';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
 
@@ -12,24 +21,12 @@ import { sanityClient, urlFor } from '../lib/sanity';
 const printBookCard = cardUrl('general-regular-charcoal');
 const printBookCard2x = cardUrl('general-regular-charcoal', 1200);
 
-// Language list for the Organization JSON-LD `knowsLanguage` below — same
-// source as /glossary-review/ so the two can never drift. (The homepage
-// reviewer-invitation band that also rendered it was removed, Kevin 2026-09-24.)
-const glossaryModules = import.meta.glob('../data/glossary-review/*.json', { eager: true });
-const reviewLangs = Object.entries(glossaryModules)
-	.map(([path, m]: [string, any]) => ({
-		code:
-			path
-				.split('/')
-				.pop()
-				?.replace(/\.json$/, '') ?? '',
-		language: (m as any).default?.language ?? '',
-		endonym: (m as any).default?.endonym ?? '',
-	}))
-	.sort((a, b) => a.language.localeCompare(b.language));
+// Language codes for the Organization JSON-LD `knowsLanguage` below: English + every edition in
+// the registry (the published languages), never typed here.
+const publishedLangCodes = ['en', ...allLanguageEditions.map((l) => l.code)];
 
 // Fetch page content + media from Sanity (all values have hardcoded fallbacks)
-const [pageData, media, biblePageData] = await Promise.all([
+const [pageData, media] = await Promise.all([
 	sanityClient.fetch(`*[_type =="page" && slug =="home"][0] {
     seoTitle, seoDescription,
     heroHeading, heroSubheading,
@@ -44,29 +41,17 @@ const [pageData, media, biblePageData] = await Promise.all([
     communityUrl,
     logo
   }`),
-	sanityClient.fetch(`*[_type =="biblePageContent"][0] { audience }`),
 ]);
-
-// "Is This For You?" audience list — shared with /the-fathers-heart-bible,
-// same Sanity source + fallback so both pages stay in sync.
-const audience = biblePageData?.audience ?? [
-	'You have read Scripture for years and sense something is still missing.',
-	'You long for deeper intimacy with God, not just more knowledge about Him.',
-	'You are awakening to your identity as a beloved child of the Father.',
-	'You want to hear His voice — not just His instructions.',
-	'You are hungry for a Bible that feels like an encounter, not a document.',
-	"You want to give someone a Bible that reveals the Father's love clearly.",
-];
 
 // Generic-first per the SEO strategy (Part 3): lead with the high-volume
 // "Read the Bible Free Online with Audio" phrase so the home surfaces for
 // everyday Bible searches, brand second. NOTE: the LIVE value comes from
 // Sanity (pageData.seoTitle) when set — update it there to match.
 const seoTitle =
-	pageData?.seoTitle || "Read the Bible Free Online with Audio — Father's Heart Bible™ (FHB)";
+	pageData?.seoTitle || "Read the Bible Free Online with Audio — Father's Heart Bible™";
 const seoDescription =
 	pageData?.seoDescription ||
-	"Read the Bible free online with verse-by-verse audio — the Father's Heart Bible™ (FHB) reveals God as a loving Father. Now being prepared in 24 world languages. No app, no account.";
+	`Read the Bible free online with audio. Father's Heart Bible™ (FHB) is the complete Bible with our Father's words in blue — in print and in ${LANGUAGE_TOTAL} languages.`;
 // Hero copy retired from the photo 2026-09-24 (Kevin: no title or text on the
 // hero image). heroSubheading still feeds the intro section below.
 const heroSubheading =
@@ -108,6 +93,152 @@ const photo2 = 'https://assets.spiritmediapublishing.com/FHB/print/people-d010-1
 const photo3 = 'https://assets.spiritmediapublishing.com/FHB/print/people-ds004-1200.webp';
 const communityUrl = media?.communityUrl || '/join';
 const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
+// "Search for Father's Heart Bible on" (Kevin 2026-10-13). Stores open their own search for the
+// title; Apple, Spotify and YouTube open our channels. Only stores where our listing has been
+// confirmed belong here (Kevin 2026-10-13: no logo on his word) — Walmart is out until someone
+// confirms it by eye; its site blocks our checks.
+const searchOn: { label: string; logo: string; w: number; h?: number; href: string }[] = [
+	{
+		label: 'AbeBooks',
+		logo: 'abebooks',
+		w: 121,
+		href: 'https://www.abebooks.com/servlet/SearchResults?kn=Father%27s%20Heart%20Bible',
+	},
+	{
+		label: 'Amazon',
+		logo: 'amazon',
+		w: 100,
+		href: 'https://www.amazon.com/s?k=Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Apple',
+		logo: 'apple',
+		w: 82,
+		href: 'https://podcasts.apple.com/us/podcast/id6818374650',
+	},
+	{
+		label: 'Barnes & Noble',
+		logo: 'barnesandnoble',
+		w: 150,
+		href: 'https://www.barnesandnoble.com/s/Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Books-A-Million',
+		logo: 'booksamillion',
+		w: 106,
+		h: 40,
+		href: 'https://www.booksamillion.com/search?query=Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Bookshop.org',
+		logo: 'bookshop',
+		w: 190,
+		href: 'https://bookshop.org/search?keywords=Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Google',
+		logo: 'google',
+		w: 83,
+		href: 'https://play.google.com/store/search?q=Father%27s+Heart+Bible&c=books',
+	},
+	{
+		label: 'Kobo',
+		logo: 'kobo',
+		w: 110,
+		href: 'https://www.kobo.com/us/en/search?query=Father%27s+Heart+Bible',
+	},
+	{
+		label: 'Spotify',
+		logo: 'spotify',
+		w: 93,
+		href: 'https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY',
+	},
+	{
+		label: 'ThriftBooks',
+		logo: 'thriftbooks',
+		w: 142,
+		href: 'https://www.thriftbooks.com/browse/?b.search=Father%27s%20Heart%20Bible',
+	},
+	{
+		label: 'Walmart',
+		logo: 'walmart',
+		w: 127,
+		href: 'https://www.walmart.com/search?q=Father%27s+Heart+Bible',
+	},
+	{ label: 'YouTube', logo: 'youtube', w: 125, href: 'https://www.youtube.com/@FathersHeartBible' },
+];
+// Home's passages for <HearTheFather /> — different from /print's. Text and coloured spans are
+// the locked FHB text (fatherWords / jesusWords / spiritWords in the canon).
+const homeVoices: VoiceGroup[] = [
+	{
+		key: 'father',
+		label: 'FATHER',
+		verses: [
+			{
+				ref: 'Isaiah 43:1',
+				href: '/read/isaiah/43/#v1',
+				text: 'But now, this is what our Father says—he who created you, Jacob, he who formed you, Israel: Do not be afraid, for I have redeemed you; I have called you by name, you are mine.',
+				father: [
+					'Do not be afraid, for I have redeemed you; I have called you by name, you are mine.',
+				],
+				son: [],
+				spirit: [],
+			},
+			{
+				ref: 'Matthew 3:17',
+				href: '/read/matthew/3/#v17',
+				text: 'Then a voice from heaven said, "This is my Son, the one I love; I delight in him."',
+				father: ['"This is my Son, the one I love; I delight in him."'],
+				son: [],
+				spirit: [],
+			},
+		],
+	},
+	{
+		key: 'son',
+		label: 'SON',
+		verses: [
+			{
+				ref: 'John 10:27',
+				href: '/read/john/10/#v27',
+				text: 'My sheep listen to my voice; I know them, and they follow me.',
+				father: [],
+				son: ['My sheep listen to my voice; I know them, and they follow me.'],
+				spirit: [],
+			},
+			{
+				ref: 'John 15:9',
+				href: '/read/john/15/#v9',
+				text: '"As the Father has loved me, so I have loved you. Remain in my love.',
+				father: [],
+				son: ['"As the Father has loved me, so I have loved you. Remain in my love.'],
+				spirit: [],
+			},
+		],
+	},
+	{
+		key: 'spirit',
+		label: 'SPIRIT',
+		verses: [
+			{
+				ref: 'Acts 13:2',
+				href: '/read/acts/13/#v2',
+				text: 'While they worshiped our Lord Jesus and fasted, the Holy Spirit said, "Set apart for me Barnabas and Saul, for the work I\'ve called them to."',
+				father: [],
+				son: [],
+				spirit: ['"Set apart for me Barnabas and Saul, for the work I\'ve called them to."'],
+			},
+			{
+				ref: 'Revelation 22:17',
+				href: '/read/revelation/22/#v17',
+				text: 'The Holy Spirit and the Bride say, "Come!" Whoever hears, say, "Come!" Whoever is thirsty, come; whoever wishes, take the water of life freely.',
+				father: [],
+				son: [],
+				spirit: ['"Come!"'],
+			},
+		],
+	},
+];
 ---
 
 <Layout
@@ -134,8 +265,8 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				// named the parent and carried no @id, creating a second, unlinked publisher
 				// entity on the same page that engines could not merge.
 				"publisher": { "@id": "https://spiritmediapublishing.com/#organization" },
-				"description": "A new Bible translation revealing God as Father where Scripture reveals Him — published in English and being prepared in 24 world languages, from Spanish and Hindi to Swahili and Mandarin.",
-				"knowsLanguage": ["en", ...reviewLangs.map((l) => l.code)]
+				"description": `Father's Heart Bible™ (FHB) is the complete Bible — 66 books, 1,189 chapters, 31,085 verses — in a fresh translation from the original Hebrew, Aramaic, and Greek. Free to read and hear online, in print, and published in ${LANGUAGE_TOTAL} languages.`,
+				"knowsLanguage": publishedLangCodes
 			},
 			{
 				"@type": "WebSite",
@@ -151,8 +282,22 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				"name": seoTitle,
 				"description": seoDescription,
 				"isPartOf": { "@id": "https://fathersheartbible.com/#website" },
-				"about": { "@id": "https://fathersheartbible.com/#organization" }
-			}
+				"about": { "@id": "https://fathersheartbible.com/#organization" },
+				"mainEntity": { "@id": BOOK_ID }
+			},
+			// The translation itself — defined in full on /the-fathers-heart-bible/ under the same @id.
+			{
+				"@type": "Book",
+				"@id": BOOK_ID,
+				"name": "Father's Heart Bible™",
+				"alternateName": ["Father's Heart Bible", "FHB"],
+				"inLanguage": "en",
+				"url": "https://fathersheartbible.com/the-fathers-heart-bible/",
+				"publisher": { "@id": "https://spiritmediapublishing.com/#organization" }
+			},
+			// Mirrors the "Who this Bible is for" block and the listen links below.
+			audienceItemList,
+			audioSeries
 		]
 	}}
 >
@@ -175,7 +320,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 			@media (min-width: 1280px) { #hero-section { padding-top: 75px; } }
 		</style>
 		<section id="hero-section" style="background-color: var(--color-deep); margin-top: -1px; line-height: 0;">
-			<h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Father&rsquo;s Heart Bible&trade; &mdash; Now in Print</h1>
+			<h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Read the Bible free online with audio &mdash; Father&rsquo;s Heart Bible&trade;, in print</h1>
 			<picture>
 				<source media="(min-width: 1024px)" srcset={heroDesktop} width="1920" height="736" />
 				<img
@@ -189,6 +334,54 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					style="display:block;width:100%;height:auto;aspect-ratio:2400/920;"
 				/>
 			</picture>
+		</section>
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     OPEN YOUR HEART TO OUR FATHER — the invitation, first thing under the fold
+		     (Kevin 2026-10-13). Condensed from the Bible's own front matter: "Receiving Your
+		     Father", the opening "Abba Father" page and Kevin & Shelly's letter. All layout is
+		     inline (not deferred Tailwind) so nothing shifts under the hero.
+		     ═══════════════════════════════════════════════════════════ -->
+		<style is:inline>
+			#receive { background-color: var(--color-canvas); padding: 3rem 1.5rem 1rem; text-align: center; }
+			#receive .rcv-wrap { max-width: 44rem; margin: 0 auto; }
+			#receive .rcv-eyebrow { font-family: var(--font-sans); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-gold); margin: 0 0 0.75rem; }
+			#receive h2 { font-family: var(--font-serif); font-weight: 300; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; color: var(--color-ink); margin: 0 0 1.25rem; text-wrap: balance; }
+			#receive p { font-family: var(--font-body); font-size: 1.2rem; line-height: 1.65; color: var(--color-muted); margin: 0 0 1rem; }
+			#receive .rcv-voice { font-family: var(--font-serif); font-style: italic; font-size: clamp(1.3rem, 3vw, 1.7rem); line-height: 1.4; color: #2563eb; margin: 1.5rem 0; text-wrap: balance; }
+			#receive .rcv-verse { font-size: 1rem; }
+			#receive details { margin: 1.75rem auto 0; max-width: 36rem; border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline); }
+			#receive summary { cursor: pointer; list-style: none; padding: 1rem 0; font-family: var(--font-sans); font-weight: 600; font-size: 1rem; color: var(--color-ink); }
+			#receive summary::-webkit-details-marker { display: none; }
+			#receive summary::after { content: " +"; color: var(--color-gold); }
+			#receive details[open] summary::after { content: " \2212"; }
+			#receive .rcv-prayer { padding: 0 0 1.25rem; }
+			#receive .rcv-prayer p { font-size: 1.1rem; margin: 0 0 0.5rem; color: var(--color-ink); }
+			@media (min-width: 768px) { #receive { padding-top: 4rem; } }
+		</style>
+		<section id="receive">
+			<div class="rcv-wrap">
+				<p class="rcv-eyebrow">You&rsquo;re Invited to Your Greatest Desire &ndash; His Greatest Gift</p>
+				<h2>Open your heart to our Father</h2>
+				<p>You have been longing for Him all along. Our Father placed the desire for Him in you before the creation of the world. He loved you and chose you before He formed you, and He ordained your life.</p>
+				<p>The truth of the Bible is this: He is your Father &mdash; not a distant deity, not a disappointed one &mdash; and you are His beloved son or daughter.</p>
+				<p class="rcv-voice">I give you me. Receive me as Father.</p>
+				<p class="rcv-verse">&ldquo;Just as he chose us in him before the world&rsquo;s founding, to be holy and blameless before our Father in love.&rdquo; &mdash; <a href="/read/ephesians/1/" style="color: var(--color-brand); text-decoration: none; font-weight: 600;">Ephesians 1:4 (FHB)</a></p>
+				<details>
+					<summary>Pray this to open your heart to Him</summary>
+					<div class="rcv-prayer">
+						<p><strong>Our Father, my Father,</strong></p>
+						<p>You created me, chose me, loved me, and ordained me as your son or daughter even before you formed me.</p>
+						<p>I open my heart to you to be your beloved.</p>
+						<p>I open my eyes to see your eyes of delight.</p>
+						<p>I open my ears to hear your love-filled whisper.</p>
+						<p>I open my soul to receive you as my Father.</p>
+						<p>I open my mouth to love you as you have first loved me.</p>
+						<p>I accept your hands, arms, and embrace as you bless, protect, and provide for me.</p>
+						<p>By the blood and name of Jesus, Amen.</p>
+					</div>
+				</details>
+			</div>
 		</section>
 
 		<!-- ═══════════════════════════════════════════════════════════
@@ -228,17 +421,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 					onmouseout="this.style.opacity='1'"
 				>Read &amp; Listen Free</a>
 			</div>
-			<!-- Kevin 2026-10-02: the free Audio Bible, linked from the home page (page + Spotify + Apple + YouTube). -->
-			<p class="mt-6 text-base" style="font-family: var(--font-sans); color: var(--color-muted);">
-				Listen free:
-				<a href="/audio-bible" style="color: #4A4A4A; font-weight: 600;">Audio Bible</a>
-				<span aria-hidden="true">&middot;</span>
-				<a href="https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY" target="_blank" rel="noopener" style="color: #4A4A4A;">Spotify</a>
-				<span aria-hidden="true">&middot;</span>
-				<a href="https://podcasts.apple.com/us/podcast/id6818374650" target="_blank" rel="noopener" style="color: #4A4A4A;">Apple Podcasts</a>
-				<span aria-hidden="true">&middot;</span>
-				<a href="https://www.youtube.com/@FathersHeartBible" target="_blank" rel="noopener" style="color: #4A4A4A;">YouTube</a>
-			</p>
 			<p class="fhb-tagline mt-8">Receive the Father. Hear his voice. His heart is for you.</p>
 		</div>
 		</section>
@@ -281,7 +463,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						class="text-3xl font-medium leading-snug tracking-tight mb-4"
 						style="font-family: var(--font-headline); color: var(--color-ink);"
 					>
-						It&rsquo;s here &mdash; the Father&rsquo;s Heart Bible&trade; is live
+						Read the whole Bible free online, with audio &mdash; published in {LANGUAGE_TOTAL} languages
 					</h2>
 					<p
 						class="text-xl leading-relaxed"
@@ -481,68 +663,94 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		</script>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 4 — BIG IDEA (moved directly under the hero)
+		     EVERY WAY TO RECEIVE IT — read, listen, print, eBook, audiobook, languages, give,
+		     plus well-known chapters and the hub pages (Kevin 2026-10-13). One text-only block
+		     from src/data/receive.ts; it replaced the separate "Listen free" and "Also as an
+		     eBook" lines.
+		     ═══════════════════════════════════════════════════════════ -->
+		<Section variant="light">
+			<WaysToReceive passages languages />
+		</Section>
+
+		<!-- ═══════════════════════════════════════════════════════════
+		     SEARCH FOR IT — where people already shop and listen (Kevin 2026-10-13).
+		     Each store opens its own search for "Father's Heart Bible"; Apple, Spotify and
+		     YouTube open our channels there.
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="soft">
-			<div class="text-center max-w-2xl mx-auto">
-				<h2
-					class="text-4xl md:text-5xl font-light mb-6"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					The destination has always been the Father.
+			<div class="text-center max-w-6xl mx-auto">
+				<h2 class="text-2xl md:text-3xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Search for Father&rsquo;s Heart Bible on
 				</h2>
-				<p
-					class="text-lg leading-relaxed mb-6"
-					style="font-family: var(--font-sans); color: var(--color-muted);"
-				>
-					Many believers have read the Bible faithfully and yet related to God
-					more as a servant to a master than as a beloved son or daughter to a loving Father. That
-					distance is not always obvious at first. It can hide beneath sincere devotion, sound
-					doctrine, years of ministry, and disciplined prayer.
-				</p>
-				<p
-					class="text-lg leading-relaxed"
-					style="font-family: var(--font-sans); color: var(--color-muted);"
-				>
-					The message of Scripture has always been moving toward something deeper. Not merely
-					forgiveness. Not merely heaven. Not merely religious correctness. The destination has
-					always been the Father.
+				<ul class="fhb-search-on">
+					{searchOn.map((x) => (
+						<li><a href={x.href} target="_blank" rel="noopener noreferrer" aria-label={`Father's Heart Bible on ${x.label}`}><img src={`/logos/stores/${x.logo}.svg`} alt={x.label} width={x.w} height={x.h ?? 28} style={x.h ? `height: ${x.h}px;` : undefined} loading="lazy" decoding="async" /></a></li>
+					))}
+				</ul>
+				<p class="mt-8 text-base" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Order in print from us: <a href="/print/" class="hover:underline">15% off your first order &rarr;</a>
 				</p>
 			</div>
 		</Section>
-
+		<style>
+			.fhb-search-on { list-style: none; margin: 2rem 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1.5rem 2.25rem; }
+			.fhb-search-on a { display: inline-flex; align-items: center; min-height: 44px; transition: opacity 0.2s; }
+			.fhb-search-on a:hover { opacity: 0.75; }
+			.fhb-search-on img { height: 28px; width: auto; }
+		</style>
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION — WHO THIS IS FOR / IS THIS FOR YOU?
-		     (moved from /the-fathers-heart-bible, sits under the Big Idea)
+		     SECTION — WHO THIS BIBLE IS FOR (Kevin 2026-10-13)
+		     One scannable block in place of the six former audience statements: every
+		     audience edition under the phrase people search for ("Bible for men"), linked to its
+		     edition page, with the free verses page for that audience where one exists.
+		     Data: src/data/receive.ts (editions from dvc-editions.ts). Text only, no images.
 		     ═══════════════════════════════════════════════════════════ -->
 		<Section variant="light">
-			<div class="text-center mb-12">
+			<div class="text-center mb-10">
 				<p
 					class="text-xs font-semibold tracking-widest uppercase mb-3"
 					style="font-family: var(--font-sans); color: var(--color-gold);"
 				>
-					Is This For You?
+					His Heart Is For You
 				</p>
 				<h2
 					class="text-3xl md:text-4xl font-light"
 					style="font-family: var(--font-serif); color: var(--color-ink);"
 				>
-					This Bible was written for you — if you recognize yourself here.
+					Who this Bible is for
 				</h2>
+				<p class="mt-4 text-base leading-relaxed max-w-2xl mx-auto" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Every edition carries the same complete translation.
+				</p>
 			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
-				{audience.map((statement) => (
-					<div
-						class="flex gap-4 items-start p-5"
-						style="background-color: var(--color-soft); border: 1px solid var(--color-hairline);"
-					>
-						<div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color: var(--color-gold);"></div>
-						<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{statement}</p>
-					</div>
+			<ul class="fhb-for-grid max-w-5xl mx-auto" style="font-family: var(--font-sans);">
+				{audienceLinks.map((a) => (
+					<>
+						<li>
+							<a href={a.href} style="color: var(--color-brand); font-weight: 600; text-decoration: none;">{a.label}</a>
+							<span style="color: var(--color-muted);">
+								{a.edition}
+							</span>
+						</li>
+						{a.slug === 'teen' && (
+							<li>
+								<a href="/print/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">Every son and daughter</a>
+								<span style="color: var(--color-muted);">General Edition</span>
+							</li>
+						)}
+					</>
 				))}
-			</div>
+			</ul>
 		</Section>
+		<style>
+			.fhb-for-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.9rem 2rem; }
+			.fhb-for-grid li { display: flex; flex-direction: column; font-size: 0.95rem; line-height: 1.5; padding-top: 0.7rem; border-top: 1px solid var(--color-hairline); }
+			.fhb-for-grid li span { font-size: 0.85rem; }
+			@media (min-width: 480px) { .fhb-for-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+			@media (min-width: 768px) { .fhb-for-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+			@media (min-width: 1024px) { .fhb-for-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+		</style>
 
 
 		<!-- ═══════════════════════════════════════════════════════════
@@ -599,7 +807,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						class="leading-relaxed mb-4"
 						style="font-family: var(--font-sans); color: var(--color-muted);"
 					>
-						The Father&rsquo;s Heart Bible is a new interpretive English translation that seeks to reveal
+						The Father&rsquo;s Heart Bible is a fresh translation from the original Hebrew, Aramaic, and Greek that reveals
 						God as Father where Scripture reveals Him. It is grounded in the conviction that from
 						Genesis to Revelation, the Bible tells one story: a Father creating children in His
 						image, pursuing them when they wander, and restoring them to Himself through His Son by
@@ -628,119 +836,12 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 
 
 		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 3 — SCRIPTURE FEATURE: JOHN 3:16
+		     HEAR THE FATHER — the same section as /print, with different passages
+		     (Kevin 2026-10-13); replaced "See the Difference / John 3:16".
 		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="scripture">
-			<div class="text-center mb-8">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-3"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					See the Difference
-				</p>
-				<h2
-					class="text-3xl md:text-4xl font-light"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					John 3:16 — Heard in a New Way
-				</h2>
-			</div>
-
-			<div class="relative grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 max-w-4xl mx-auto">
-				<!-- Standard rendering -->
-				<div class="text-center">
-					<p
-						class="text-xs font-semibold tracking-widest uppercase mb-6"
-						style="font-family: var(--font-sans); color: var(--color-muted);"
-					>
-						Traditional
-					</p>
-					<blockquote class="m-0">
-						<p
-							class="text-xl md:text-2xl italic font-light leading-relaxed"
-							style="font-family: var(--font-serif); color: var(--color-muted);"
-						>"For God so loved the world that he gave his one and only Son, that whoever believes
-							in him shall not perish but have eternal life."
-						</p>
-						<footer class="mt-4">
-							<cite
-								class="not-italic text-sm tracking-widest uppercase"
-								style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;"
-							>
-								— John 3:16
-							</cite>
-						</footer>
-					</blockquote>
-				</div>
-
-				<!-- Divider on desktop -->
-				<div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-px" style="background-color: var(--color-hairline);"></div>
-
-				<!-- FHB rendering -->
-				<div class="text-center">
-					<p
-						class="text-xs font-semibold tracking-widest uppercase mb-6"
-						style="font-family: var(--font-sans); color: var(--color-gold);"
-					>
-						Father's Heart Bible™
-					</p>
-					<blockquote class="m-0">
-						<p
-							class="text-xl md:text-2xl italic font-light leading-relaxed"
-							style="font-family: var(--font-serif); color: var(--color-ink);"
-						>"For our <strong style="font-style: normal; color: var(--color-brand);">Father</strong> so loved the world that He gave His one and only Son, so that everyone
-							who trusts in Him would not be lost, but would live in the life of the age to come."
-						</p>
-						<footer class="mt-4">
-							<cite
-								class="not-italic text-sm tracking-widest uppercase"
-								style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;"
-							>
-								— John 3:16 · Father's Heart Bible™
-							</cite>
-						</footer>
-					</blockquote>
-				</div>
-			</div>
-
-			<p
-				class="text-center mt-12 text-base leading-relaxed max-w-xl mx-auto"
-				style="font-family: var(--font-sans); color: var(--color-muted);"
-			>
-				In this passage, the One who loves and gives the Son is the Father. The Father&rsquo;s Heart
-				Bible makes that explicit, helping readers hear this verse not as the action of a distant
-				supreme being, but as the giving love of the Father Himself.
-			</p>
-		</Section>
+		<HearTheFather groups={homeVoices} variant="scripture" />
 
 
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 5 — JOEL 2 SCRIPTURE FEATURE
-		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="dark">
-			<div class="max-w-2xl mx-auto space-y-6">
-				<ScriptureBlock
-					text="Tear open your hearts\u2026 return to your Father, for He is gracious and His compassion runs deep, He is slow to anger and overflowing with faithful love."
-					reference="Joel 2:13"
-					translation="Father's Heart Bible™"
-					dark={true}
-				/>
-				<div class="w-px h-8 mx-auto" style="background-color: var(--color-inverse-primary); opacity: 0.3;" data-grow-line></div>
-				<ScriptureBlock
-					text="Then our Father\u2019s heart went out for His land, and He had deep compassion on His children."
-					reference="Joel 2:18"
-					translation="Father's Heart Bible™"
-					dark={true}
-				/>
-				<div class="w-px h-8 mx-auto" style="background-color: var(--color-inverse-primary); opacity: 0.3;" data-grow-line></div>
-				<ScriptureBlock
-					text="I will pour out My Spirit on all My beloved sons and daughters."
-					reference="Joel 2:28"
-					translation="Father's Heart Bible™"
-					dark={true}
-				/>
-			</div>
-		</Section>
 
 
 		<!-- ═══════════════════════════════════════════════════════════
@@ -782,16 +883,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 							Read Online
 						</a>
 					</div>
-					<p class="mt-6 text-base text-center md:text-left" style="font-family: var(--font-sans); color: var(--color-muted);">
-						Listen free:
-						<a href="/audio-bible" style="color: #4A4A4A; font-weight: 600;">Audio Bible</a>
-						<span aria-hidden="true">&middot;</span>
-						<a href="https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY" target="_blank" rel="noopener" style="color: #4A4A4A;">Spotify</a>
-						<span aria-hidden="true">&middot;</span>
-						<a href="https://podcasts.apple.com/us/podcast/id6818374650" target="_blank" rel="noopener" style="color: #4A4A4A;">Apple Podcasts</a>
-						<span aria-hidden="true">&middot;</span>
-						<a href="https://www.youtube.com/@FathersHeartBible" target="_blank" rel="noopener" style="color: #4A4A4A;">YouTube</a>
-					</p>
 				</div>
 				<div class="order-1" data-reveal="slide-left">
 					<img
@@ -819,7 +910,7 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						class="text-xs font-semibold tracking-widest uppercase mb-4"
 						style="font-family: var(--font-sans); color: var(--color-gold);"
 					>
-						Now in Print
+						In Print
 					</p>
 					<h2
 						class="text-3xl md:text-4xl font-light leading-tight mb-4"
@@ -828,7 +919,8 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 						15% off your first order
 					</h2>
 					<p class="leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
-						22 audience editions &middot; {LANGUAGE_EDITION_TOTAL} languages
+						{AUDIENCE_EDITION_TOTAL} audience editions &middot; {LANGUAGE_EDITION_TOTAL} languages
+						<br />Bulk discounts available
 					</p>
 					<div class="flex justify-center md:justify-start">
 						<a
@@ -841,9 +933,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 							See the Print Editions
 						</a>
 					</div>
-					<p class="mt-6 text-base text-center md:text-left" style="font-family: var(--font-sans); color: var(--color-muted);">
-						Also as an <a href="/print/#ebook" style="color: #4A4A4A; font-weight: 600;">eBook</a>
-					</p>
 				</div>
 				<div class="order-1 flex justify-center" data-reveal="slide-left">
 					<a href="/print/" class="block">
@@ -870,14 +959,6 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 		     ═══════════════════════════════════════════════════════════ -->
 		{(photo1 || photo2 || photo3) && (
 			<Section variant="light">
-				<div class="text-center mb-10">
-					<p
-						class="text-lg leading-relaxed max-w-xl mx-auto"
-						style="font-family: var(--font-serif); color: var(--color-muted); font-style: italic;"
-					>
-						This is not only a translation to study — it is a Bible to receive. An invitation to know the Father.
-					</p>
-				</div>
 				<ImageGrid cols={3} gap="md">
 					{photo1 && (
 						<a href="/print/" class="block" style="text-decoration:none">
@@ -918,105 +999,5 @@ const heroLogoUrl = media?.logo ? urlFor(media.logo).width(160).url() : null;
 				</ImageGrid>
 			</Section>
 		)}
-
-		<!-- Photo band placeholder when no media loaded yet -->
-		{!photo1 && !photo2 && !photo3 && (
-			<Section variant="light">
-				<div class="text-center max-w-xl mx-auto">
-					<p
-						class="text-xl italic leading-relaxed"
-						style="font-family: var(--font-serif); color: var(--color-muted);"
-					>
-						This is not only a translation to study — it is a Bible to receive.
-						An invitation to know the Father.
-					</p>
-				</div>
-			</Section>
-		)}
-
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 8 — JOIN THE MOVEMENT
-		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="soft">
-			<div class="text-center max-w-2xl mx-auto">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-4"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					You're Invited
-				</p>
-				<h2
-					class="text-3xl md:text-4xl font-light mb-6"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					Be part of what the Father is doing.
-				</h2>
-				<p
-					class="text-lg leading-relaxed mb-10"
-					style="font-family: var(--font-sans); color: var(--color-muted);"
-				>
-					Around the world, people are awakening to the reality that God is not only to be
-					obeyed&mdash;He is also to be known as Father. Some are coming into this realization after
-					decades of faithful Christianity. Others are receiving it early. Still others are just
-					beginning to search for language around intimacy, identity, sonship, and the Father&rsquo;s
-					heart. The Father&rsquo;s Heart Movement is a place for those people to gather, grow,
-					pray, and participate.
-				</p>
-				<a
-					href="/read/"
-					class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
-					style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A;"
-					onmouseover="this.style.opacity='0.9'"
-					onmouseout="this.style.opacity='1'"
-				>
-					Join the FH Family
-				</a>
-			</div>
-		</Section>
-
-
-		<!-- ═══════════════════════════════════════════════════════════
-		     SECTION 9 — PARTNER
-		     ═══════════════════════════════════════════════════════════ -->
-		<Section variant="light">
-			<div class="text-center max-w-2xl mx-auto">
-				<p
-					class="text-xs font-semibold tracking-widest uppercase mb-4"
-					style="font-family: var(--font-sans); color: var(--color-gold);"
-				>
-					Partner With Us
-				</p>
-				<h2
-					class="text-3xl md:text-4xl font-light mb-6"
-					style="font-family: var(--font-serif); color: var(--color-ink);"
-				>
-					Support what the Father is doing.
-				</h2>
-				<p
-					class="text-lg leading-relaxed mb-10"
-					style="font-family: var(--font-sans); color: var(--color-muted);"
-				>
-					The Father&rsquo;s Heart Bible is moving toward publication. Translation, editing,
-					production, and distribution all require support. If this message resonates with
-					you&mdash;if it feels timely, true, and needed&mdash;you can help bring it to others.
-					This is not support for a project. It is participation in what the Father appears to be
-					unfolding.
-				</p>
-				<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-					<a
-						href="/a-bible-for-the-whole-world/"
-						class="inline-flex items-center px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200"
-						style="font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A;"
-						onmouseover="this.style.opacity='0.9'"
-						onmouseout="this.style.opacity='1'"
-					>
-						Partner With Us
-					</a>
-				</div>
-			</div>
-		</Section>
-
-
 	</main>
 </Layout>

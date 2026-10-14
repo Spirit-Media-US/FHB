@@ -6,6 +6,7 @@
 // (poverty, climate vulnerability + flooding, orphans, the Rohingya refugees in
 // Cox's Bazar). Photos: Pexels.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -31,7 +32,7 @@ const verses = [
 const stats = [
 	{ label: 'People', value: 'about 170 million' },
 	{ label: 'Christians', value: 'a small, faithful minority (~0.3%)' },
-	{ label: 'Bengali (Bangla)', value: '~230 million+ worldwide' },
+	{ label: 'Bengali (Bangla)', value: `${sp('bn')} worldwide` },
 	{ label: 'Rank', value: 'one of earth’s most-spoken tongues' },
 ];
 
@@ -44,17 +45,16 @@ const faqs = [
 	{
 		question: 'Can I read the Bible online free in Bangladesh?',
 		answer:
-			"Yes. The Father's Heart Bible™ is free to read online with audio — no account, no purchase, no app. It is currently in English; a Bengali (Bangla) edition is among our priorities, to join the Scriptures Bangladesh's faithful church already treasures.",
+			"Yes. The Father's Heart Bible™ is free to read online in Bengali (Bangla) — all 66 books, no account, no purchase, no app — at fathersheartbible.com/read/bn/, joining the Scriptures Bangladesh's faithful church already treasures. The English edition is free too, with audio.",
 	},
 	{
 		question: 'What language do they speak in Bangladesh?',
-		answer:
-			'Bengali (Bangla) is the national language, spoken by almost everyone in Bangladesh and by over 230 million people worldwide — one of the most-spoken languages on earth, counting West Bengal in India and a wide diaspora. Sylheti, Chittagonian, and many indigenous languages are also spoken.',
+		answer: `Bengali (Bangla) is the national language, spoken by almost everyone in Bangladesh and by some ${sp('bn')} people worldwide — one of the most-spoken languages on earth, counting West Bengal in India and a wide diaspora. Sylheti, Chittagonian, and many indigenous languages are also spoken.`,
 	},
 	{
 		question: 'Is there a free audio Bible I can listen to?',
 		answer:
-			"Yes. Every chapter of the Father's Heart Bible™ comes with free audio, so it can be heard quietly and personally on any phone — a gift where reading is not always easy.",
+			"Yes. Every chapter of the English Father's Heart Bible™ comes with free audio, so it can be heard quietly and personally on any phone — a gift where reading is not always easy.",
 	},
 	{
 		question: 'What is the most popular Bible translation in Bangladesh?',
@@ -63,8 +63,7 @@ const faqs = [
 	},
 	{
 		question: "Is the Father's Heart Bible available in Bengali?",
-		answer:
-			'Not yet — it is currently in English. Bengali (Bangla), with over 230 million speakers worldwide, is among our translation priorities — a heart language that would reach not only Bangladesh but West Bengal in India and a vast global diaspora.',
+		answer: `Yes. The complete Bengali edition — all 66 books — is free to read at fathersheartbible.com/read/bn/ and published in print (fathersheartbible.com/bibles/bengali-bible/). Bengali (Bangla), with some ${sp('bn')} speakers worldwide, is a heart language that reaches not only Bangladesh but West Bengal in India and a vast global diaspora.`,
 	},
 ];
 ---
@@ -89,7 +88,7 @@ const faqs = [
 	heroSubhead="Christians are a very small minority — about 0.3% — in this Muslim-majority land of rivers, yet the church endures faithfully, and a fresh translation now reveals God as a near and loving Father. Free online, with audio."
 	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/9a83509fd06bda959d391fbcea62027296bae455-1880x1253.jpg"
 	heroAlt="The green hills, river, and country boats of the Bangladeshi countryside"
-	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in Bangladesh right now.</strong> Christians are a very small minority &mdash; about 0.3% of this nation of some 170 million, around 91% Muslim and 8% Hindu. The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. It is in English today, and a <em>Bengali</em> (Bangla) edition &mdash; a heart language for over 230 million people worldwide &mdash; is among our priorities, for a land of deep faith and deep need, where the Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in Bangladesh right now.</strong> Christians are a very small minority &mdash; about 0.3% of this nation of some 170 million, around 91% Muslim and 8% Hindu. The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. The complete <a href=\"https://fathersheartbible.com/read/bn/\" style=\"color: var(--color-brand);\" class=\"hover:underline\"><em>Bengali</em> (Bangla) edition</a> is free to read today and <a href=\"/bibles/bengali-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">published in print</a> &mdash; a heart language for some ${sp('bn')} people worldwide &mdash; for a land of deep faith and deep need, where the Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
 	keyTakeaway="Bangladesh's church has held the faith faithfully in a small minority — and the Father's Heart Bible™ (FHB) longs to reveal, in Bengali, a Father near to the poor, the flood-struck, the refugee, and the orphan."
 	glanceIntroHtml={`Bangladesh is the great delta of the Ganges, Brahmaputra, and Meghna &mdash; a green, river-laced land and one of the most densely populated nations on earth. It is overwhelmingly Muslim, with a Hindu minority and a small, faithful Christian community that has endured to keep the faith.`}
 	stats={stats}
@@ -150,12 +149,12 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father', bodyHtml: `For a faithful church and a searching land, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; a gift where reading is not always easy.` },
-		{ heading: 'Bengali among our priorities', bodyHtml: `English is available today, and Bengali (Bangla) &mdash; the heart language of over 230 million people worldwide &mdash; is among our translation priorities. See the <a href="/bible-in/bangladesh/#translation-opportunity" style="color: var(--color-brand);" class="hover:underline">translation opportunity</a>.` },
+		{ heading: 'Now in Bengali', bodyHtml: `The complete Bengali edition &mdash; the heart language of some ${sp('bn')} people worldwide &mdash; is published: <a href="https://fathersheartbible.com/read/bn/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/bengali-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
 	]}
 	globalHeading="Bangladesh and the world"
 	globalIntroHtml={`Bengali reaches far beyond Bangladesh &mdash; across West Bengal in India and a vast worldwide diaspora. To give Bangladesh the Father&rsquo;s heart in Bengali is to touch one of the largest language families on earth.`}
 	globalStats={[
-		{ value: '~230 million+', label: 'Bengali speakers worldwide a Bengali edition would reach' },
+		{ value: `${sp('bn')}`, label: 'Bengali speakers worldwide the Bengali edition reaches' },
 		{ value: '~7th', label: 'most-spoken language on earth, across Bangladesh and India' },
 		{ value: '~8.7 million', label: 'Bangladeshis live abroad — in the Gulf, the UK, and beyond' },
 	]}
@@ -176,10 +175,10 @@ const faqs = [
 		{ label: 'Bangladesh — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/BG' },
 	]}
 	opportunityHeading="The translation opportunity for Bangladesh"
-	opportunityIntroHtml={`Bengali is the heart language of one of the world&rsquo;s largest language families &mdash; hundreds of millions of people across Bangladesh and India, with a faithful church and a vast searching majority, who long for a Bible that reveals the Father&rsquo;s voice.`}
+	opportunityIntroHtml={`Bengali is the heart language of one of the world&rsquo;s largest language families &mdash; hundreds of millions of people across Bangladesh and India, with a faithful church and a vast searching majority, now with a Bible that reveals the Father&rsquo;s voice.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'Bengali (Bangla)', speakers: '230 million', status: 'On the roadmap' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Bengali (Bangla)', code: 'bn' },
 		{ language: 'Chittagonian', speakers: '13 million', status: 'Translation needed' },
 		{ language: 'Sylheti', speakers: '8.5 million', status: 'Translation needed' },
 		{ language: 'Rohingya', speakers: '1 million', status: 'Translation needed' },

@@ -7,6 +7,7 @@
 // youth leaving + secular drift. Strategic: the heart of Western Christianity.
 // Photos: Pexels.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -32,7 +33,7 @@ const verses = [
 const stats = [
 	{ label: 'People', value: '59 million' },
 	{ label: 'Catholic heritage', value: '~80% of Italy' },
-	{ label: 'Italian', value: '~67 million worldwide' },
+	{ label: 'Italian', value: `${sp('it')} worldwide` },
 	{ label: 'Heart of', value: 'Western Christianity' },
 ];
 
@@ -64,8 +65,7 @@ const faqs = [
 	},
 	{
 		question: "Is the Father's Heart Bible available in Italian?",
-		answer:
-			'Yes. The complete Italian edition — all 66 books and 1,189 chapters — is free to read at fathersheartbible.com/read/it/, for the some 67 million people who speak Italian in Italy, Switzerland, and a worldwide diaspora. Start at fathersheartbible.com/italian-bible/.',
+		answer: `Yes. The complete Italian edition — all 66 books and 1,189 chapters — is free to read at fathersheartbible.com/read/it/, for the some ${sp('it')} people who speak Italian in Italy, Switzerland, and a worldwide diaspora. Start at fathersheartbible.com/italian-bible/.`,
 	},
 ];
 ---
@@ -151,12 +151,12 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father', bodyHtml: `In the heart of Western Christianity, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/it/" style="color: var(--color-brand);" class="hover:underline">read online in Italian</a>, and in English with audio on every chapter &mdash; quiet and personal, on the phone in your hand.` },
-		{ heading: 'Now in Italian', bodyHtml: `The complete Italian edition &mdash; for some 67 million speakers in Italy, Switzerland, and beyond &mdash; is live: <a href="https://fathersheartbible.com/read/it/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or begin at <a href="/italian-bible/" style="color: var(--color-brand);" class="hover:underline">the Bible in Italian</a>.` },
+		{ heading: 'Now in Italian', bodyHtml: `The complete Italian edition &mdash; for some ${sp('it')} speakers in Italy, Switzerland, and beyond &mdash; is live: <a href="https://fathersheartbible.com/read/it/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or begin at <a href="/italian-bible/" style="color: var(--color-brand);" class="hover:underline">the Bible in Italian</a>.` },
 	]}
 	globalHeading="Italy and the world"
 	globalIntroHtml={`From Rome, the faith and the Scriptures spread across the Western world, and Italians have carried their language and devotion to every continent. To give Italy the Father&rsquo;s heart in Italian is to renew a fountainhead of Christian history.`}
 	globalStats={[
-		{ value: '~67 million', label: 'Italian speakers worldwide the Italian edition can now reach' },
+		{ value: `${sp('it')}`, label: 'Italian speakers worldwide the Italian edition can now reach' },
 		{ value: 'a vast diaspora', label: 'tens of millions of Italian descent live across the Americas and beyond' },
 		{ value: 'a fountainhead', label: 'from Rome the faith spread across the Western world' },
 	]}
@@ -177,10 +177,10 @@ const faqs = [
 		{ label: 'Italy — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/IT' },
 	]}
 	opportunityHeading="The translation opportunity for Italy"
-	opportunityIntroHtml={`Italian is the heart language of a nation that reveres the faith &mdash; some 67 million people, many of whom honor a Bible they no longer read, longing for the Father&rsquo;s voice in fresh words.`}
+	opportunityIntroHtml={`Italian is the heart language of a nation that reveres the faith &mdash; some ${sp('it')} people, many of whom honor a Bible they no longer read, longing for the Father&rsquo;s voice in fresh words.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'Italian', speakers: '67 million', status: 'Available', note: 'all 66 books — read free at /read/it/' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Italian', code: 'it' },
 		{ language: 'Sicilian', speakers: '5 million', status: 'Translation needed' },
 		{ language: 'Neapolitan', speakers: '5 million', status: 'Translation needed' },
 	]}

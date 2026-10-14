@@ -4,6 +4,7 @@
 // Father personally in the Bible Mexico already reveres. Strong migration-driven
 // fatherlessness angle (Psalm 68:5). Data cited. Photos: Wikimedia.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -30,7 +31,7 @@ const stats = [
 	{ label: 'People', value: '130 million' },
 	{ label: 'Language', value: 'Spanish (largest)' },
 	{ label: 'Christians', value: '~115 million' },
-	{ label: 'Spanish worldwide', value: '550 million' },
+	{ label: 'Spanish worldwide', value: `${sp('es')}` },
 ];
 
 const faqs = [
@@ -47,12 +48,11 @@ const faqs = [
 	{
 		question: 'Can I read the Bible online free in Mexico?',
 		answer:
-			"Yes. The Father's Heart Bible™ is free to read online with audio — no account, no purchase, no app. It is currently in English; a Spanish edition is our highest translation priority, so all of Mexico can read it in its own language.",
+			"Yes. The Father's Heart Bible™ is free to read and hear online in Spanish — all 66 books, with audio on every chapter, no account, no purchase, no app — at fathersheartbible.com/read/es/, so all of Mexico can read it in its own language. The English edition is free too.",
 	},
 	{
 		question: "Is the Father's Heart Bible available in Spanish?",
-		answer:
-			"Not yet — but Spanish is the very first new language on our roadmap. Mexico is the largest Spanish-speaking nation on earth, and a Spanish Father's Heart Bible™ would reach not only Mexico but some 550 million Spanish speakers worldwide.",
+		answer: `Yes. The complete Spanish edition — all 66 books, with audio — is free to read at fathersheartbible.com/read/es/ and published in print (fathersheartbible.com/bibles/spanish-bible/). Mexico is the largest Spanish-speaking nation on earth, and Spanish is spoken by some ${sp('es')} people worldwide.`,
 	},
 	{
 		question: 'What is the most popular Bible translation in Mexico?',
@@ -87,7 +87,7 @@ const faqs = [
 	heroSubhead="More than 90% of Mexicans are Christian, most of them Catholic — yet a fresh translation now lets you meet God not as a distant figure, but as a Father. Free online, with audio."
 	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/b50f17816ea816a8f110c2ffddb17fc0a6544fc0-3264x2176.jpg"
 	heroAlt="The Metropolitan Cathedral on the Zócalo in Mexico City"
-	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in Mexico right now.</strong> Mexico is one of the world&rsquo;s most Christian nations &mdash; more than 90% of its 130 million people, around 78% of them Roman Catholic &mdash; and the Bible is legal and freely available. The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. Mexico is profoundly Christian &mdash; yet for all its faith, the Father&rsquo;s Heart Bible&trade; offers something many have never known up close: God revealed as a <em>Father</em>, not a distant figure approached through ritual. It is available in English today, and a Spanish edition is our highest priority.`}
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in Mexico right now.</strong> Mexico is one of the world&rsquo;s most Christian nations &mdash; more than 90% of its 130 million people, around 78% of them Roman Catholic &mdash; and the Bible is legal and freely available. The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. Mexico is profoundly Christian &mdash; yet for all its faith, the Father&rsquo;s Heart Bible&trade; offers something many have never known up close: God revealed as a <em>Father</em>, not a distant figure approached through ritual. The complete <a href=\"https://fathersheartbible.com/read/es/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Spanish edition</a> is free to read and hear today and <a href=\"/bibles/spanish-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">published in print</a>.`}
 	keyTakeaway="Mexico is full of faith — but the Father's Heart Bible™ (FHB) invites you to meet the Father personally in the Scripture you already revere."
 	glanceIntroHtml={`Mexico is the heart of the Spanish-speaking world &mdash; the largest Spanish-speaking nation on earth, an ancient civilization, and one of the most devout countries anywhere. It is a land of deep faith, deep beauty, and deep contrasts.`}
 	stats={stats}
@@ -148,11 +148,11 @@ const faqs = [
 	globalIntroHtml={`Mexico is not only a great mission field &mdash; it is the heart of the Spanish-speaking world and a people now woven into the United States. To reach Mexico in Spanish is to open a door to all of Latin America and tens of millions across the border.`}
 	globalStats={[
 		{ value: '~38 million', label: 'people of Mexican origin in the United States — the largest Hispanic group' },
-		{ value: '550 million', label: 'Spanish speakers worldwide a Spanish edition would reach' },
+		{ value: `${sp('es')}`, label: 'Spanish speakers worldwide the Spanish edition reaches' },
 		{ value: '#1', label: 'largest Spanish-speaking nation on earth' },
 	]}
 	globalBlocks={[
-		{ heading: 'The heart of the Spanish-speaking world', bodyHtml: `Spanish is the mother tongue of about <strong>550 million people</strong> across the Americas and Spain &mdash; and Mexico has more native speakers than any nation. A Spanish Father&rsquo;s Heart Bible&trade; reaches a continent, and Mexico is its center of gravity.` },
+		{ heading: 'The heart of the Spanish-speaking world', bodyHtml: `Spanish is spoken by about <strong>${sp('es')} people</strong> across the Americas and Spain &mdash; and Mexico has more native speakers than any nation. A Spanish Father&rsquo;s Heart Bible&trade; reaches a continent, and Mexico is its center of gravity.` },
 		{ heading: 'A people across the border', bodyHtml: `Nearly <strong>38 million people of Mexican origin</strong> live in the United States &mdash; the largest Hispanic community &mdash; and tens of millions more speak Spanish at home. A Bible that speaks to Mexico speaks to families on both sides of the border.` },
 		{ heading: 'A gateway to Latin America', bodyHtml: `From Mexico the Spanish-speaking gospel flows naturally south &mdash; to Central and South America &mdash; making it a strategic launching point for the Father&rsquo;s heart across the hemisphere.` },
 		{ heading: 'As Mexico receives, Mexico sends', bodyHtml: `Mexico&rsquo;s vast and devout church, and its people abroad, are positioned to carry the Father&rsquo;s Heart Bible&trade; across the Americas as it is published in Spanish.` },
@@ -163,7 +163,7 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father, not distance', bodyHtml: `In one of the most faithful nations on earth, the Father&rsquo;s Heart Bible&trade; offers what ritual can dull: God revealed as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; built for a basic smartphone.` },
-		{ heading: 'A Spanish edition is our #1 priority', bodyHtml: `English is available today, and Spanish &mdash; 550 million speakers &mdash; is the very first new language on our <a href="/bible-in/mexico/#translation-opportunity" style="color: var(--color-brand);" class="hover:underline">translation roadmap</a>.` },
+		{ heading: 'Now in Spanish', bodyHtml: `The complete Spanish edition &mdash; for ${sp('es')} speakers &mdash; is published: <a href="https://fathersheartbible.com/read/es/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/spanish-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
 	]}
 	resourcesHeading="Learn more about Mexico"
 	resourcesIntroHtml={`Trusted sources for the facts on this page &mdash; and for going deeper into Mexico&rsquo;s people, faith, and story.`}
@@ -177,8 +177,8 @@ const faqs = [
 	opportunityHeading="The translation opportunity in Mexico"
 	opportunityIntroHtml={`Mexico holds the key to the Spanish-speaking world &mdash; and the first Spanish books are published and readable now, with the rest of the canon following. Beyond Spanish, dozens of indigenous languages still wait for a Bible in the Father&rsquo;s voice.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'Spanish', speakers: '550 million', status: 'First books available', note: 'Genesis, John, and Revelation 7 — read free now' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Spanish', code: 'es' },
 		{ language: 'Nahuatl', speakers: '1.7 million', status: 'Translation needed' },
 		{ language: 'Maya (Yucatec)', speakers: '800,000', status: 'Translation needed' },
 	]}

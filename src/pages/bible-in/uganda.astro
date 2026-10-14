@@ -6,6 +6,7 @@
 // largest refugee population. Luganda featured (~10M+). "Pearl of Africa,"
 // source of the Nile. Photos: Pexels.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -49,7 +50,7 @@ const faqs = [
 	{
 		question: 'Can I read the Bible online free in Uganda?',
 		answer:
-			"Yes. The Father's Heart Bible™ is free to read online with audio — no account, no purchase, no app. It is in English, an official language of Uganda widely used in schools and churches, so it is available today. A Luganda edition is among our highest priorities.",
+			"Yes. The Father's Heart Bible™ is free to read online with audio — no account, no purchase, no app. It is in English, an official language of Uganda widely used in schools and churches, so it is available today. A Luganda edition is not yet available.",
 	},
 	{
 		question: 'Is there an audio Bible I can listen to in Uganda?',
@@ -64,7 +65,7 @@ const faqs = [
 	{
 		question: "Is the Father's Heart Bible available in Luganda?",
 		answer:
-			'Not yet — it is currently in English. Luganda, the most widely spoken language of Uganda with over 10 million speakers, is on our roadmap, alongside Runyankole, Acholi, and other Ugandan languages.',
+			'Not yet. It is published in English, an official language of Uganda, and in Swahili (fathersheartbible.com/read/sw/). Luganda, the most widely spoken language of Uganda with over 10 million speakers, does not have an edition yet.',
 	},
 ];
 ---
@@ -90,7 +91,7 @@ const faqs = [
 	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/c5e5be6f9fcdb72e8ccc12ff70f82a79f0e7e9a7-1880x1253.jpg"
 	heroAlt="Four cheerful Ugandan children smiling together"
 	heroCrop="focalpoint&fp-x=0.5&fp-y=0.42"
-	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in Uganda right now.</strong> The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. Uganda is a deeply Christian nation &mdash; about 85% of its people, roughly 41 million men, women, and children, follow Christ &mdash; and the Bible is freely owned and read. English is an official language of Uganda, so it&rsquo;s available today &mdash; and the Father&rsquo;s Heart Bible&trade; reveals what this fervently Christian nation longs for: God known as a near and loving <em>Father</em>. Luganda and more heart languages are on our roadmap.`}
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in Uganda right now.</strong> The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. Uganda is a deeply Christian nation &mdash; about 85% of its people, roughly 41 million men, women, and children, follow Christ &mdash; and the Bible is freely owned and read. English is an official language of Uganda, so it&rsquo;s available today &mdash; and the Father&rsquo;s Heart Bible&trade; reveals what this fervently Christian nation longs for: God known as a near and loving <em>Father</em>. A Luganda edition is not yet available.`}
 	keyTakeaway="Uganda is one of the most Christian nations on earth — and the Father's Heart Bible™ (FHB) reveals a Father near to the orphan, the displaced, and every searching heart."
 	glanceIntroHtml={`Uganda is the &ldquo;Pearl of Africa&rdquo; &mdash; the green land at the source of the Nile, ringed by Lake Victoria, the Rwenzori mountains, and the misty forests of the mountain gorilla. It is one of the most fervently Christian nations on earth, with a faith forged by the courage of the Uganda Martyrs.`}
 	stats={stats}
@@ -151,7 +152,7 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father, near to the suffering', bodyHtml: `In one of Africa&rsquo;s most faithful nations, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; built for the basic smartphones most Ugandans use.` },
-		{ heading: 'Luganda leads the way', bodyHtml: `English is available today, and Luganda &mdash; Uganda&rsquo;s most widely spoken tongue, over 10 million speakers &mdash; leads a roadmap that includes Runyankole and Acholi. See the <a href="/bible-in/uganda/#translation-opportunity" style="color: var(--color-brand);" class="hover:underline">translation opportunity</a>.` },
+		{ heading: 'In English today', bodyHtml: `The complete English edition is free today. Luganda &mdash; Uganda&rsquo;s most widely spoken tongue, over 10 million speakers &mdash; does not have an edition yet, nor do Runyankole and Acholi. See the <a href="/bible-in/uganda/#translation-opportunity" style="color: var(--color-brand);" class="hover:underline">languages of Uganda</a>.` },
 	]}
 	globalHeading="Uganda and the world"
 	globalIntroHtml={`Uganda is a young, fervent, sending church at the heart of Africa &mdash; and a refuge for the displaced of a whole region. To give Uganda the Father&rsquo;s heart is to strengthen a nation already pouring itself out for others.`}
@@ -180,8 +181,8 @@ const faqs = [
 	opportunityHeading="The translation opportunity in Uganda"
 	opportunityIntroHtml={`English reaches many Ugandans, but the nation&rsquo;s heart beats in Luganda &mdash; with Runyankole, Acholi, and dozens more still waiting for a Bible in the Father&rsquo;s voice.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'Luganda', speakers: '10 million', status: 'On the roadmap' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Luganda', speakers: '10 million', status: 'Not yet available' },
 		{ language: 'Runyankole', speakers: '4 million', status: 'Translation needed' },
 		{ language: 'Acholi', speakers: '1.5 million', status: 'Translation needed' },
 	]}

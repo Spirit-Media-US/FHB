@@ -6,6 +6,7 @@
 // secular emptiness + aging. Strategic: birthplace of the printed and
 // vernacular Bible; gateway to German-speaking Europe. Photos: Pexels.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -31,7 +32,7 @@ const verses = [
 const stats = [
 	{ label: 'People', value: '84 million' },
 	{ label: 'Christian', value: '~47% of Germany' },
-	{ label: 'German', value: '~135 million worldwide' },
+	{ label: 'German', value: `${sp('de')} worldwide` },
 	{ label: 'Home of', value: 'the printed Bible' },
 ];
 
@@ -49,12 +50,12 @@ const faqs = [
 	{
 		question: 'Can I read the Bible online free in Germany?',
 		answer:
-			"Yes. The Father's Heart Bible™ is free to read online with audio — no account, no purchase, no app. It is currently in English, widely spoken in Germany; a German edition is among our priorities, to join the Scriptures Germany has treasured since Luther.",
+			"Yes. The Father's Heart Bible™ is free to read and hear online in German — all 66 books, with audio on every chapter, no account, no purchase, no app — at fathersheartbible.com/read/de/, joining the Scriptures Germany has treasured since Luther. The English edition is free too.",
 	},
 	{
 		question: 'Is there a free audio Bible I can listen to?',
 		answer:
-			"Yes. Every chapter of the Father's Heart Bible™ comes with free audio, so it can be heard on any phone — a quiet, personal way to receive the Father's words.",
+			"Yes. Every chapter of the Father's Heart Bible™ comes with free audio, in English and German, so it can be heard on any phone — a quiet, personal way to receive the Father's words.",
 	},
 	{
 		question: 'What is the most popular Bible translation in Germany?',
@@ -63,8 +64,7 @@ const faqs = [
 	},
 	{
 		question: "Is the Father's Heart Bible available in German?",
-		answer:
-			'Not yet — it is currently in English. German, spoken by some 135 million people across Germany, Austria, and Switzerland, is among our translation priorities.',
+		answer: `Yes. The complete German edition — all 66 books, with audio — is free to read at fathersheartbible.com/read/de/ and published in print (fathersheartbible.com/bibles/german-bible/). German is spoken by some ${sp('de')} people across Germany, Austria, and Switzerland.`,
 	},
 ];
 ---
@@ -89,7 +89,7 @@ const faqs = [
 	heroSubhead="Germany is about half Christian — though church membership is falling fast — and a fresh translation reveals God as a near and loving Father. Free online, with audio."
 	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/e687a7e35fc45726c6ed0695f68102f9c519bd0d-1733x1300.jpg"
 	heroAlt="Neuschwanstein Castle on a forested hillside in Bavaria, Germany"
-	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in Germany right now.</strong> Germany is roughly half Christian &mdash; about 39 million Catholics and Protestants &mdash; and the Bible is legal to own and read here, though church membership is declining sharply. The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. It is in English today, and a <em>German</em> edition is among our priorities &mdash; for the land that first printed the Bible and unchained it for the people, where the Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in Germany right now.</strong> Germany is roughly half Christian &mdash; about 39 million Catholics and Protestants &mdash; and the Bible is legal to own and read here, though church membership is declining sharply. The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. The complete <a href=\"https://fathersheartbible.com/read/de/\" style=\"color: var(--color-brand);\" class=\"hover:underline\"><em>German</em> edition</a> is free to read and hear today and <a href=\"/bibles/german-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">published in print</a> &mdash; for the land that first printed the Bible and unchained it for the people, where the Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
 	keyTakeaway="Germany gave the world the printed Bible — and the Father's Heart Bible™ (FHB) longs to help a drifting nation meet, afresh, the Father in its pages."
 	glanceIntroHtml={`Germany is the land of Gutenberg and Luther &mdash; where the Bible was first printed and first set free in the language of the people. Today it is a nation of cathedrals and castles, of deep history and quiet drift, where faith has faded and a new generation searches for meaning.`}
 	stats={stats}
@@ -150,17 +150,17 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father', bodyHtml: `In the land that first printed Scripture, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; quiet and personal, on the phone in your hand.` },
-		{ heading: 'German among our priorities', bodyHtml: `English is available today, and German &mdash; spoken by some 135 million across Germany, Austria, and Switzerland &mdash; is among our translation priorities. See the <a href="/bible-in/germany/#translation-opportunity" style="color: var(--color-brand);" class="hover:underline">translation opportunity</a>.` },
+		{ heading: 'Now in German', bodyHtml: `The complete German edition &mdash; for some ${sp('de')} speakers across Germany, Austria, and Switzerland &mdash; is published: <a href="https://fathersheartbible.com/read/de/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/german-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
 	]}
 	globalHeading="Germany and the world"
 	globalIntroHtml={`Germany sits at the heart of Europe, and its language and influence reach far. To give Germany the Father&rsquo;s heart in German is to touch the whole German-speaking world &mdash; and to honor the nation that first sent the Bible out to all.`}
 	globalStats={[
-		{ value: '~135 million', label: 'German speakers across central Europe a German edition would reach' },
+		{ value: `${sp('de')}`, label: 'German speakers across central Europe the German edition reaches' },
 		{ value: 'the printed Word', label: 'Germany sent the Bible to the world through the printing press' },
 		{ value: 'the heart of Europe', label: 'Germany anchors the continent’s economy and culture' },
 	]}
 	globalBlocks={[
-		{ heading: 'The language of central Europe', bodyHtml: `German is spoken across Germany, Austria, Switzerland, and beyond &mdash; some 135 million people. A German Father&rsquo;s Heart Bible&trade; reaches them all.` },
+		{ heading: 'The language of central Europe', bodyHtml: `German is spoken across Germany, Austria, Switzerland, and beyond &mdash; some ${sp('de')} people. A German Father&rsquo;s Heart Bible&trade; reaches them all.` },
 		{ heading: 'The nation that sent the Bible out', bodyHtml: `From Gutenberg&rsquo;s press, the printed Bible spread across the earth. Germany&rsquo;s heritage is a Bible-sending one &mdash; and that calling can be renewed.` },
 		{ heading: 'A bridge across a continent', bodyHtml: `At the center of Europe, Germany is a crossroads of peoples and languages &mdash; a place from which the Father&rsquo;s heart can travel far.` },
 		{ heading: 'A wide diaspora', bodyHtml: `German speakers and people of German descent live across the Americas, Europe, and beyond, carrying language and heritage with them.` },
@@ -176,11 +176,11 @@ const faqs = [
 		{ label: 'Germany — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/GM' },
 	]}
 	opportunityHeading="The translation opportunity for Germany"
-	opportunityIntroHtml={`German is the heart language of central Europe &mdash; some 135 million people, many of whom own a Bible they no longer open, longing for the Father&rsquo;s voice in fresh words.`}
+	opportunityIntroHtml={`German is the heart language of central Europe &mdash; some ${sp('de')} people, many of whom own a Bible they no longer open, longing for the Father&rsquo;s voice in fresh words.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'German', speakers: '135 million', status: 'On the roadmap' },
-		{ language: 'Turkish (in Germany)', speakers: '88 million', status: 'Translation needed' },
+		{ language: 'English', code: 'en' },
+		{ language: 'German', code: 'de' },
+		{ language: 'Turkish (in Germany)', code: 'tr' },
 		{ language: 'Low German (Plattdüütsch)', speakers: '5 million', status: 'Translation needed' },
 	]}
 	verses={verses}

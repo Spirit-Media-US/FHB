@@ -6,6 +6,7 @@
 // minority. Honor that profound biblical heritage and the Muslim majority alike.
 // Signature pains: refugees (most in the world) + the 2023 earthquake. Photos: Pexels.
 import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
 
 const verses = [
 	{
@@ -31,7 +32,7 @@ const verses = [
 const stats = [
 	{ label: 'People', value: '85 million' },
 	{ label: 'Christians', value: 'a small minority' },
-	{ label: 'Turkish', value: '~88 million' },
+	{ label: 'Turkish', value: `${sp('tr')}` },
 	{ label: 'Cradle of', value: 'the early church' },
 ];
 
@@ -49,12 +50,12 @@ const faqs = [
 	{
 		question: 'Can I read the Bible online free in Turkey?',
 		answer:
-			"Yes. The Father's Heart Bible™ is free to read online with audio — no account, no purchase, no app. It is currently in English; a Turkish edition is among our priorities, for the very land where the early church was born.",
+			"Yes. The Father's Heart Bible™ is free to read online in Turkish — all 66 books, no account, no purchase, no app — at fathersheartbible.com/read/tr/, for the very land where the early church was born. The English edition is free too, with audio.",
 	},
 	{
 		question: 'Is there a free audio Bible I can listen to?',
 		answer:
-			"Yes. Every chapter of the Father's Heart Bible™ comes with free audio, so it can be heard quietly and personally on any phone.",
+			"Yes. Every chapter of the English Father's Heart Bible™ comes with free audio, so it can be heard quietly and personally on any phone.",
 	},
 	{
 		question: 'What is the most popular Bible translation in Turkey?',
@@ -63,8 +64,7 @@ const faqs = [
 	},
 	{
 		question: "Is the Father's Heart Bible available in Turkish?",
-		answer:
-			'Not yet — it is currently in English. Turkish, spoken by some 88 million people, is among our translation priorities.',
+		answer: `Yes. The complete Turkish edition — all 66 books — is free to read at fathersheartbible.com/read/tr/ and published in print (fathersheartbible.com/bibles/turkish-bible/). Turkish is spoken by some ${sp('tr')} people.`,
 	},
 ];
 ---
@@ -89,7 +89,7 @@ const faqs = [
 	heroSubhead="Christians are a tiny minority — about 0.2% — in this ~99% Muslim land, yet Turkey is the very cradle of the early church. A fresh translation reveals God as a near and loving Father, free online with audio."
 	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/3f849b700a3a0a02c6094ea83abac9de097c5161-1880x993.jpg"
 	heroAlt="Hot air balloons rising over the rock formations of Cappadocia, Turkey"
-	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in Turkey right now.</strong> The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. Christians are a tiny minority &mdash; roughly 0.2% of a nation that is about 99% Muslim &mdash; yet the Bible is legal to own and read, and this is the land of Antioch, Tarsus, and the seven churches of Revelation. It is in English today, and a <em>Turkish</em> edition is among our priorities &mdash; for the land where Paul was born and the disciples were first called Christians, and where the Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">Yes &mdash; you can read the Bible free online in Turkey right now.</strong> The <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. Christians are a tiny minority &mdash; roughly 0.2% of a nation that is about 99% Muslim &mdash; yet the Bible is legal to own and read, and this is the land of Antioch, Tarsus, and the seven churches of Revelation. The complete <a href=\"https://fathersheartbible.com/read/tr/\" style=\"color: var(--color-brand);\" class=\"hover:underline\"><em>Turkish</em> edition</a> is free to read today and <a href=\"/bibles/turkish-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">published in print</a> &mdash; for the land where Paul was born and the disciples were first called Christians, and where the Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
 	keyTakeaway="Turkey is the cradle of the early church — and the Father's Heart Bible™ (FHB) longs to reveal again, in Turkish, the Father whose story began in this very land."
 	glanceIntroHtml={`Turkey bridges Europe and Asia &mdash; a land of ancient cities, soaring mosques, and the rock valleys of Cappadocia. It is also holy ground for the Bible: here Paul was born, the disciples were first called Christians, and the Seven Churches of Revelation once shone.`}
 	stats={stats}
@@ -150,12 +150,12 @@ const faqs = [
 	whyBlocks={[
 		{ heading: 'God revealed as Father', bodyHtml: `In the land where the church was born, the Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
 		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a> with audio on every chapter &mdash; quiet and personal, on the phone in your hand.` },
-		{ heading: 'Turkish among our priorities', bodyHtml: `English is available today, and Turkish &mdash; spoken by some 88 million people &mdash; is among our translation priorities. See the <a href="/bible-in/turkey/#translation-opportunity" style="color: var(--color-brand);" class="hover:underline">translation opportunity</a>.` },
+		{ heading: 'Now in Turkish', bodyHtml: `The complete Turkish edition &mdash; for some ${sp('tr')} speakers &mdash; is published: <a href="https://fathersheartbible.com/read/tr/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/turkish-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
 	]}
 	globalHeading="Turkey and the world"
 	globalIntroHtml={`Turkey stands at the crossroads of continents and faiths, and its language reaches across Central Asia. To give Turkey the Father&rsquo;s heart in Turkish is to reawaken the land where the gospel first went out to the nations.`}
 	globalStats={[
-		{ value: '~88 million', label: 'Turkish speakers a Turkish edition would reach' },
+		{ value: `${sp('tr')}`, label: 'Turkish speakers the Turkish edition reaches' },
 		{ value: 'a Turkic family', label: 'Turkish is kin to languages across Central Asia' },
 		{ value: 'where it began', label: 'the gospel first spread to the nations from Antioch' },
 	]}
@@ -176,10 +176,10 @@ const faqs = [
 		{ label: 'Turkey — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/TU' },
 	]}
 	opportunityHeading="The translation opportunity for Turkey"
-	opportunityIntroHtml={`Turkish is the heart language of a land that was once the cradle of the church &mdash; some 88 million people who have rarely heard, and who deserve a Bible that reveals the Father&rsquo;s voice.`}
+	opportunityIntroHtml={`Turkish is the heart language of a land that was once the cradle of the church &mdash; some ${sp('tr')} people who have rarely heard, and who now have a Bible that reveals the Father&rsquo;s voice.`}
 	languages={[
-		{ language: 'English', speakers: 'available now', status: 'Available' },
-		{ language: 'Turkish', speakers: '88 million', status: 'On the roadmap' },
+		{ language: 'English', code: 'en' },
+		{ language: 'Turkish', code: 'tr' },
 		{ language: 'Kurdish (Kurmanji)', speakers: '16 million', status: 'Translation needed' },
 		{ language: 'Azerbaijani', speakers: '23 million', status: 'Translation needed' },
 	]}

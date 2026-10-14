@@ -1,6 +1,7 @@
 ---
 import BuyControls from '../components/BuyControls.astro';
 import CatalogOrderForm from '../components/CatalogOrderForm.astro';
+import HearTheFather from '../components/HearTheFather.astro';
 import LookInside from '../components/LookInside.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
@@ -13,8 +14,9 @@ import amazonLinks from '../data/amazon-links.json';
 import bnData from '../data/bn-links.json';
 import { cardUrl } from '../data/card-art';
 import digital from '../data/digital-listings.json';
-import { dvcEditions as dvcEditionList } from '../data/dvc-editions';
+import { AUDIENCE_EDITION_TOTAL, dvcEditions as dvcEditionList } from '../data/dvc-editions';
 import {
+	allLanguageEditions,
 	comingSoonEditions,
 	LANG_HB,
 	LANG_PB,
@@ -22,6 +24,7 @@ import {
 	langSlug,
 	languageEditions,
 } from '../data/language-editions';
+import { reachPhrase } from '../data/language-speakers';
 import lookinsideData from '../data/lookinside.json';
 import Layout from '../layouts/Layout.astro';
 
@@ -42,8 +45,9 @@ const DVC_TAIL2 =
 // The audience editions and their spec helpers live in src/data/dvc-editions.ts (shared with /print/order/).
 // Runtime value used in the template below (biome cannot see .astro template use, keep this line).
 const dvcEditions = dvcEditionList;
-// Kevin 2026-10-10 (3b): every card in the section counts, the 8x10 journaling edition included.
-const AUDIENCE_TOTAL = dvcEditionList.length;
+// Kevin 2026-10-13: one audience count site-wide — every card in this section (journaling
+// included) plus the general edition and Large Print, which sit in their own sections below.
+const AUDIENCE_TOTAL = AUDIENCE_EDITION_TOTAL;
 
 // Digital editions. Every eBook / audiobook store link comes from src/data/digital-listings.json —
 // the one master, each entry added only after its store page answered with the right title
@@ -200,10 +204,10 @@ const SAMPLE_LP =
 
 // Print FAQ — rendered as a no-JS <details> accordion + FAQPage JSON-LD (AEO).
 const READ_URL = '/read/';
-const CAMPAIGN_URL = '/a-bible-for-the-whole-world/';
+const CAMPAIGN_URL = '/legacy/';
 // Neutral: the only color between the header and the footer is the three voices and
 // the cover art (Kevin 2026-08-23).
-const LINK = 'color: #3f3f46; text-decoration: underline;';
+const LINK = 'color: var(--color-brand); font-weight: 600; text-decoration: none;';
 // Only link "Full details" where the product page exists. The pages come from a dynamic
 // route (src/pages/bibles/[slug].astro) driven by src/data/editions/<slug>.json, so the
 // presence of the DATA file — not of an .astro file — is what says a page will be built.
@@ -242,6 +246,12 @@ const CONTACT = 'mailto:hello@spiritmediapublishing.com?subject=Father%27s%20Hea
 // c8102e sits at 350deg and 5.9:1, and reads redder in context precisely because it is
 // not fighting the page.
 const VOICE = { father: '#2563eb', son: '#c8102e', spirit: '#6a3fa0' };
+// The languages answer is GENERATED: the count and the list from the edition registry (English
+// first), the reach from language-reach.json via language-speakers.ts. Never typed here.
+const LANGUAGE_COUNT = LANGUAGE_EDITION_TOTAL + 1;
+const LANGUAGE_NAMES = ['English', ...allLanguageEditions.map((l) => l.english)];
+const LANGUAGE_LIST = `${LANGUAGE_NAMES.slice(0, -1).join(', ')} and ${LANGUAGE_NAMES.at(-1)}`;
+const LANGUAGE_REACH = reachPhrase(['en', ...allLanguageEditions.map((l) => l.code)]);
 const printFaq = [
 	{
 		q: 'Are the different editions different Bibles?',
@@ -274,7 +284,7 @@ const printFaq = [
 	},
 	{
 		q: 'Is there a cheaper version?',
-		a: `The whole Bible is already free. Every word of the Father’s Heart Bible™ can be read online at no cost, by anyone, anywhere in the world, in twenty-five languages — with English and Telugu also free to listen to, and more languages being recorded. Nobody has to buy anything to receive our Father’s voice. As for print: the Father’s Heart Bible™ is currently printed on demand on premium white paper, as the industry requires — and with paper costs up about 25% over the last two years and 888 pages to a complete Bible, the cost per copy runs high. More affordable offset-printed editions will be added in the future. Read it all today at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
+		a: `The whole Bible is already free. Every word of the Father’s Heart Bible™ can be read online at no cost, by anyone, anywhere in the world, in ${LANGUAGE_COUNT} languages — with English, Spanish, Portuguese, French, German, Italian and Korean also free to listen to. Nobody has to buy anything to receive our Father’s voice. As for print: the Father’s Heart Bible™ is currently printed on demand on premium white paper, as the industry requires — and with paper costs up about 25% over the last two years and 888 pages to a complete Bible, the cost per copy runs high. More affordable offset-printed editions will be added in the future. Read it all today at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
 	},
 	{
 		q: 'What is Divine Voice Color?',
@@ -298,13 +308,12 @@ const printFaq = [
 	},
 	{
 		q: 'Which languages can I read it in?',
-		a: `Twenty-five, free, right now: English, Spanish, Portuguese, French, German, Russian, Turkish, Arabic, Persian, Urdu, Hindi, Bengali, Punjabi, Marathi, Tamil, Telugu, Indonesian, Filipino, Vietnamese, Japanese, Korean, Mandarin, Cantonese, Swahili and Nigerian Pidgin — reaching roughly three-quarters of humanity. English and Telugu can also be listened to, and more languages are being recorded. Print editions are English for now. Our Bible for the Whole World campaign continues until every one of the 8+ billion souls on earth can hold a Father's Heart Bible in their hands.`,
-		link: { href: CAMPAIGN_URL, label: 'Full details →' },
+		a: `${LANGUAGE_COUNT}, free, right now: ${LANGUAGE_LIST} — ${LANGUAGE_REACH}. English, French, German, Italian, Korean, Portuguese and Spanish can also be listened to. Each language is published in print as well. We will keep publishing until every person on earth can read the Father's Heart Bible in their own language.`,
+		link: { href: CAMPAIGN_URL, label: 'See every language →' },
 	},
 	{
 		q: 'Why are you charging for the Father’s Heart Bible™?',
-		a: `We aren't, for the text itself — it is free to read at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a> and in time will be free on every major digital Bible platform. Print editions are priced only to cover the real costs of printing and distribution, and a portion of every copy sold helps fund our Bible for the Whole World campaign.`,
-		link: { href: CAMPAIGN_URL, label: 'Learn more →' },
+		a: `We aren't, for the text itself — it is free to read at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a> and in time will be free on every major digital Bible platform. Print editions are priced only to cover the real costs of printing and distribution.`,
 	},
 	{
 		q: 'Why is the Father’s Heart Bible™ thicker than other bibles?',
@@ -362,7 +371,7 @@ const breadcrumbSchema = {
 		{
 			'@type': 'ListItem',
 			position: 2,
-			name: 'Now in Print',
+			name: 'In Print',
 			item: 'https://fathersheartbible.com/print/',
 		},
 	],
@@ -449,32 +458,11 @@ const dvcVerses = [
 		],
 	},
 ];
-
-// Wrap each voice's spans in its own color. Longest-first so a span that contains
-// another cannot be half-replaced.
-function markVoices(v: {
-	text: string;
-	father: string[];
-	son: string[];
-	spirit: string[];
-}): string {
-	let out = v.text;
-	const spans: { s: string; c: string }[] = [
-		...v.father.map((s) => ({ s, c: VOICE.father })),
-		...v.son.map((s) => ({ s, c: VOICE.son })),
-		...v.spirit.map((s) => ({ s, c: VOICE.spirit })),
-	].sort((a, b) => b.s.length - a.s.length);
-	for (const { s, c } of spans) {
-		if (!s || !out.includes(s)) continue;
-		out = out.replace(s, `<span style="color:${c};font-weight:600;">${s}</span>`);
-	}
-	return out;
-}
 ---
 
 <Layout
-	title="Now in Print — Father's Heart Bible™ (FHB): An Intimate Translation"
-	description="The Father's Heart Bible™ (FHB) is now in print — a fresh translation that reveals God as your Father. Buy a single copy, or order in bulk for your church."
+	title="Red Letter, Large Print & Journaling Bibles — Father's Heart Bible™"
+	description={`Hardcover and paperback Bibles with our Father's words in blue and the Son's in red — for men, women and teens, in Large Print, journaling and ${LANGUAGE_EDITION_TOTAL} languages.`}
 	image="https://assets.spiritmediapublishing.com/FHB/share/fhb-og-print-group.jpg"
 	imageAlt="Eight friends holding the Father's Heart Bible™ print edition in three colors and two bindings"
 	darkHero={true}
@@ -495,7 +483,7 @@ function markVoices(v: {
 			imagePosition="54% 30%"
 			headingLift="0"
 			contentPad="pt-0! pb-0 md:pb-4 lg:pb-5"
-			heading="Now in Print"
+			heading="Father's Heart Bible™ in Print"
 			headingClass="sr-only"
 		/>
 
@@ -514,8 +502,8 @@ function markVoices(v: {
 			{/* Kevin 2026-10-10: below the title, chips and the two spec lines (his order); same eyebrow + heading as "Language Editions / In N Languages". The
 			    count is every card in the section (Kevin 2026-10-10: 23), computed so it cannot drift. */}
 			<div class="text-center mb-8">
-				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Audience Editions</p>
-				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">For {AUDIENCE_TOTAL} Distinct Audiences</h2>
+				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">{AUDIENCE_TOTAL} Audience Editions</p>
+				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">An Edition for Every Soul on Earth</h2>
 				<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em; margin: 0.9rem 0 0;">{DVC_TAIL}</p>
 			</div>
 
@@ -553,7 +541,7 @@ function markVoices(v: {
 						<div class="flex flex-col gap-2 w-full mt-auto">
 							<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.2rem;">
 								{builtPages.has(`${e.slug}-bible`) && (
-									<a href={`/bibles/${e.slug}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
+									<a href={`/bibles/${e.slug}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
 								)}
 								{builtPages.has(`${e.slug}-bible`) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 								<LookInside slug={e.slug} title={e.title} variant="link" label="Look inside" />
@@ -631,7 +619,7 @@ function markVoices(v: {
 									<>
 										<a
 											href="/bibles/fathers-heart-bible/"
-											style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;"
+											style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;"
 										>Full details</a>
 										<span aria-hidden="true" style="color: #a1a1aa;">·</span>
 									</>
@@ -760,7 +748,7 @@ function markVoices(v: {
 								<>
 									<a
 										href={`/bibles/${v.key}-bible/`}
-										style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;"
+										style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;"
 									>Full details</a>
 									<span aria-hidden="true" style="color: #a1a1aa;">·</span>
 								</>
@@ -823,7 +811,7 @@ function markVoices(v: {
 				     without the missing link rather than link to nothing. */}
 				{builtPages.has('lp-set-bible') && (
 					<p style="font-family: var(--font-sans); font-size: 0.82rem; margin: 0.9rem 0 0;">
-						<a href="/bibles/lp-set-bible/" style="font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
+						<a href="/bibles/lp-set-bible/" style="font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
 					</p>
 				)}
 				{/* NO "a set counts as three books" LINE HERE (Kevin 2026-09-17: "This is NOT
@@ -869,7 +857,7 @@ function markVoices(v: {
 						<div class="flex flex-col gap-2 w-full mt-auto">
 							<div class="lang-links flex items-center justify-center gap-2 flex-nowrap whitespace-nowrap" style="margin: 0 0 0.2rem;">
 								{builtPages.has(`${langSlug(l)}-bible`) && (
-									<a href={`/bibles/${langSlug(l)}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px;">Full details</a>
+									<a href={`/bibles/${langSlug(l)}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
 								)}
 								{builtPages.has(`${langSlug(l)}-bible`) && langHasLi(l) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 								{langHasLi(l) && <LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" />}
@@ -904,34 +892,8 @@ function markVoices(v: {
 			)}
 		</Section>
 
-		<!-- ═══════════════ HIS VOICE — DVC ON THE PAGE ═══════════════ -->
-		<Section variant="warm">
-			<div class="text-center mb-8">
-				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Hear the Father</p>
-				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">His voice, from the first page to the last</h2>
-				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.6; margin: 0.9rem auto 0; max-width: 42rem;">Exactly as these passages appear in print.</p>
-			</div>
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-				{dvcVerses.map((g) => (
-					<!-- auto for the voice block, then two equal rows: without this the cards
-					     size to their own text and the shorter SPIRIT passages left that column
-					     visibly short of FATHER and SON. (Kevin 2026-08-24) -->
-					<div class="gap-4" style="display: grid; grid-template-rows: auto 1fr 1fr;">
-						<!-- the same block as the top of the page, over the column it proves -->
-						<div class="text-center">
-							<span style={`display: inline-block; font-family: var(--font-sans); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.06em; color: ${VOICE[g.key]}; background: #fff; border: 2px solid ${VOICE[g.key]}; padding: 0.5rem 1.15rem; border-radius: 6px; line-height: 1;`}>{g.label}</span>
-						</div>
-						{g.verses.map((v) => (
-							<div class="rounded-2xl p-6 flex flex-col" style="background: #fff; border: 1px solid var(--color-hairline);">
-								<p style="font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.7; color: var(--color-ink); margin: 0; flex: 1;" set:html={markVoices(v)}></p>
-								<a href={v.href} style="font-family: var(--font-sans); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.03em; color: #71717a; margin: 1rem 0 0; text-decoration: underline;">{v.ref} (FHB)</a>
-							</div>
-						))}
-					</div>
-				))}
-			</div>
-			<p class="text-center mt-8" style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.9rem;">Every verse from the Father’s Heart Bible™ — read the whole Bible free at <a href={READ_URL} style="color: #3f3f46; text-decoration: underline;">fathersheartbible.com/read</a>.</p>
-		</Section>
+		<!-- ═══════════════ HIS VOICE — DVC ON THE PAGE (shared component) ═══════════════ -->
+		<HearTheFather groups={dvcVerses} />
 
 		<!-- ═══════════════ CATALOG ORDER FORM ═══════════════ -->
 		<Section variant="soft">

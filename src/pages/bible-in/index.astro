@@ -4,13 +4,15 @@
 // "to the nations" language. Add a country by shipping /bible-in/<slug>.astro
 // and adding a row to src/data/nations.ts. Read-first per the architecture
 // rules in memory/project_fhb_country_pages.md.
+import { LANGUAGE_EDITION_TOTAL } from '../../data/language-editions';
 import { NATIONS } from '../../data/nations';
 import Layout from '../../layouts/Layout.astro';
 
 const PAGE_URL = 'https://fathersheartbible.com/bible-in/';
 const TITLE = "The Bible Around the World — Read Free Online | Father's Heart Bible™ (FHB)";
-const DESCRIPTION =
-	"Read the Bible free online, country by country. The Father's Heart Bible™ (FHB) reveals God as Father — free with audio, in English now, more languages coming.";
+// English + every language edition in the registry.
+const LANGUAGE_COUNT = LANGUAGE_EDITION_TOTAL + 1;
+const DESCRIPTION = `Read the Bible free online, country by country. The Father's Heart Bible™ (FHB) reveals God as Father — free to read in ${LANGUAGE_COUNT} languages, with audio.`;
 
 const HERO_BASE =
 	'https://cdn.sanity.io/images/rusi1hyi/production/9f29bfca381f5c99ffa6ee6cd00f02572f0f7b96-5864x2503.jpg';
@@ -57,7 +59,7 @@ const FAQS = [
 	},
 	{
 		q: "How many people still don't have the Bible in their own language?",
-		a: 'Hundreds of millions. While 795 languages have a complete Bible, more than 1,800 languages have only the New Testament, and over 1,000 languages still have no Scripture at all — together spoken by well over a billion people. Many can read it today in English, and new translations are on the way.',
+		a: `Hundreds of millions. While 795 languages have a complete Bible, more than 1,800 languages have only the New Testament, and over 1,000 languages still have no Scripture at all — together spoken by well over a billion people. The Father's Heart Bible™ is published in ${LANGUAGE_COUNT} languages, free to read online.`,
 	},
 	{
 		q: 'Can I read the Bible free online in my country?',
@@ -69,7 +71,7 @@ const FAQS = [
 	},
 	{
 		q: "Which languages can I read the Father's Heart Bible in?",
-		a: 'English and Telugu are complete — all 66 books, free. English also has verse-by-verse audio. Spanish, Hindi, and Tamil have their first books published and readable now: Genesis, John, and Revelation 7. More languages are in translation. <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Start reading in any of them</a>, or see each country page above for the languages spoken there.',
+		a: `${LANGUAGE_COUNT} languages, each complete — all 66 books, free: English and ${LANGUAGE_EDITION_TOTAL} more, from Spanish, Hindi, and Chinese to Arabic, Swahili, and Telugu. English has verse-by-verse audio. <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Start reading in any of them</a>, or see each country page above for the languages spoken there.`,
 	},
 ];
 const faqSchema = {
