@@ -474,9 +474,22 @@ if (SPLIT) {
 
 // 50,000-URL / 50 MB sitemap limits: at ~2.6k URLs we are far inside both. If a
 // future canon push crosses 45,000 URLs, shard by language here and emit an index.
-if (count > 45000) {
-	console.error(`gen-sitemap-read: ${count} URLs — approaching the 50k limit, shard by language.`);
+// The limit is PER FILE. Split by language, each segment is one file (~1.2k urls), so the
+// guard measures the largest segment, not the total — the total passed 45k at 41 languages
+// (2026-10-15) while every file sat far inside the limit.
+const largestFile = SPLIT ? Math.max(...[...segs.values()].map((e) => e.length)) : count;
+if (largestFile > 45000) {
+	console.error(`gen-sitemap-read: ${largestFile} URLs in one file — approaching the 50k limit, shard further.`);
 	process.exit(1);
+}
+if (SPLIT) {
+	for (const l of segs.keys()) {
+		const f = path.join(path.dirname(OUT), `sitemap-read-${l}.xml`);
+		if (fs.existsSync(f) && fs.statSync(f).size > 45 * 1024 * 1024) {
+			console.error(`gen-sitemap-read: ${f} is over 45 MB — approaching the 50 MB sitemap limit.`);
+			process.exit(1);
+		}
+	}
 }
 
 console.log(
