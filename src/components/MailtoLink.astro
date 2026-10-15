@@ -16,6 +16,10 @@
  *   <MailtoLink email="info@spiritmedia.us" class="text-red hover:underline">
  *     info@spiritmedia.us
  *   </MailtoLink>
+ *
+ * No default aria-label: the visible text names the link. A default "Email <address>" on a
+ * link that READS "Contact" fails Lighthouse label-content-name-mismatch (voice users say
+ * what they see). Pass aria-label only for a link whose slot has no text.
  */
 interface Props {
 	email: string;
@@ -31,7 +35,7 @@ const { email, class: className, 'aria-label': ariaLabel, ...rest } = Astro.prop
   href={`mailto:${email}`}
   class={className}
   data-mailto={email}
-  aria-label={ariaLabel ?? `Email ${email}`}
+  aria-label={ariaLabel}
   {...rest}
 ><slot /></a>
 

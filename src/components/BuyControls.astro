@@ -127,6 +127,16 @@ const LOGOS = {
 	},
 } as const;
 
+const STORE_NAMES = {
+	amazon: 'Amazon',
+	google: 'Google Play Books',
+	kobo: 'Kobo',
+	bn: 'Barnes & Noble',
+	spotify: 'Listen on Spotify',
+	youtube: 'Watch on YouTube',
+	applepodcasts: 'Listen on Apple Podcasts',
+} as const;
+
 const bindings = [
 	{ label: 'Hardback', href: hbHref, price: hbPrice },
 	{ label: 'Paperback', href: pbHref, price: pbPrice },
@@ -186,7 +196,8 @@ const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
 		const inner = (
 			<>
 				{logo && (
-					<img src={logo.src} alt="" width={logo.w} height={logo.h} loading="lazy" decoding="async" class="store-logo" />
+					// A logo-only button (no label text) needs the store's name as its alt, or the link has no name (Lighthouse link-name).
+					<img src={logo.src} alt={st.label || st.price ? '' : STORE_NAMES[st.logo as keyof typeof STORE_NAMES]} width={logo.w} height={logo.h} loading="lazy" decoding="async" class="store-logo" />
 				)}
 				{(st.label || st.price) && <span>{`${logo ? '· ' : ''}${[st.label, st.price].filter(Boolean).join(' ')}`}</span>}
 			</>
