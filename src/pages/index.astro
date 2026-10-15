@@ -68,7 +68,9 @@ const heroVideoSrc =
 // CF Pages via _headers Link: directive. Sanity hero fields ignored here.
 // A03 (Kevin 2026-09-24), 2400x920. Phones/tablets <1024 get 960w, desktop 1920w;
 // 1600/2400 are also on R2. hero-print2-* stay on R2 for a cheap revert.
-const heroMobile = 'https://assets.spiritmediapublishing.com/FHB/hero-a03-960.webp';
+const heroMobile = 'https://assets.spiritmediapublishing.com/FHB/hero-a03-760.webp';
+// Phones: 760w (40 KB) covers a 412px screen at 1.75x; 960w only for denser screens (2026-10-15, was 960w/67 KB for all).
+const heroMobileSrcset = `${heroMobile} 760w, https://assets.spiritmediapublishing.com/FHB/hero-a03-960.webp 960w`;
 const heroDesktop = 'https://assets.spiritmediapublishing.com/FHB/hero-a03-1920.webp';
 
 // Bible cover — prefer Sanity image, fall back to hardcoded (both go through webp transform).
@@ -180,6 +182,7 @@ const homeVoices: VoiceGroup[] = [
 	imageAlt="Father's Heart Bible — Encounter God as Your Father"
 	darkHero={true}
 	preloadImageMobile={heroMobile}
+	preloadImageMobileSrcset={heroMobileSrcset}
 	preloadImageDesktop={heroDesktop}
 	jsonLd={{
 		"@context": "https://schema.org",
@@ -257,6 +260,8 @@ const homeVoices: VoiceGroup[] = [
 				<img
 					id="hero-poster"
 					src={heroMobile}
+					srcset={heroMobileSrcset}
+					sizes="100vw"
 					alt="Thirteen friends outside a stone church, each holding a different edition of the Father’s Heart Bible"
 					width="960"
 					height="368"
@@ -432,8 +437,8 @@ const homeVoices: VoiceGroup[] = [
 							alt="An invitation to read the Father's Heart Bible (FHB)"
 							width="640"
 							height="360"
-							loading="eager"
-							fetchpriority="high"
+							loading="lazy"
+							decoding="async"
 							class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
 						/>
 						<span aria-hidden="true" class="absolute inset-0" style="background: rgba(36,27,23,0.12);"></span>
