@@ -30,6 +30,10 @@ interface Props {
 	// page so AI engines and search crawlers always see the publisher entity.
 	jsonLd?: Record<string, any> | Record<string, any>[];
 	preloadImageMobile?: string;
+	// Pages whose PHONE hero is the LCP (only /print today): add imagesrcset + fetchpriority=high
+	// to the mobile preload. The homepage's phone hero is post-LCP, so it keeps neither.
+	preloadImageMobileSrcset?: string;
+	preloadMobileIsLcp?: boolean;
 	preloadImageDesktop?: string;
 	// Set on any page rendering a YouTube facade — warms the poster CDN
 	// (i.ytimg.com) + the iframe origin so the cross-origin handshake isn't on
@@ -54,6 +58,8 @@ const {
 	darkHero = false,
 	jsonLd,
 	preloadImageMobile,
+	preloadImageMobileSrcset,
+	preloadMobileIsLcp = false,
 	preloadImageDesktop,
 	youtube = false,
 	pageType = 'website',
@@ -191,7 +197,10 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 				rel="preload"
 				as="image"
 				href={preloadImageMobile}
+				imagesrcset={preloadImageMobileSrcset}
+				imagesizes={preloadImageMobileSrcset ? '100vw' : undefined}
 				media="(max-width: 1023px)"
+				fetchpriority={preloadMobileIsLcp ? 'high' : undefined}
 			/>
 		)}
 		{preloadImageDesktop && (

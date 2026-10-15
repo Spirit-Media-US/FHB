@@ -95,7 +95,7 @@ const heroSrcMain = hasW ? imageSrc.replace(/([?&])w=\d+/, '$1w=1280') : imageSr
 >
 	{imageSrc ? (
 		<HeroPicture {...(imageSrcMobile ? { class: 'contents' } : {})}>
-			{imageSrcMobile && <source media="(max-width: 1023px)" srcset={imageSrcMobile} />}
+			{imageSrcMobile && <source media="(max-width: 1023px)" srcset={imageSrcMobile} sizes="100vw" />}
 			<img
 				class={stackOnMobile
 					? 'block w-full h-auto md:absolute md:inset-0 md:h-full md:object-cover'
