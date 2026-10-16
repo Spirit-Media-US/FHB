@@ -62,7 +62,7 @@ Do not write these into a per-edition file — the template supplies them for al
   audience page and the three pillar pages differ — verified by diffing the interiors. Never write
   that an edition has its own notes, summaries or prayers. Write instead about who it was made for.
 - Shared numbers, correct: 66 books · 1,189 chapters · 31,085 verses · 1,355 study notes
-  (1,075 background, 248 revealing the Father, 31 manuscript) · 170 translation rules
+  (1,075 background, 248 revealing the Father, 31 manuscript) · 160+ translation rules
   NEVER write "across 777 chapters". The Bible has 1,189 chapters; 777 was the count of
   chapters that carry at least one note, and stated beside a note total it reads as the
   Bible's own chapter count. It contradicted 1,189 on the same page (Kevin 2026-09-18).
