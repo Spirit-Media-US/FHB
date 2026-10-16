@@ -469,6 +469,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		retail: 7999,
 		img: `${ASSETS}/lang/v1/lang-hi-600.webp`,
 	},
+	'lang-hu-hb': {
+		title: 'Magyar Biblia (Hungarian) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-hu-600.webp`,
+	},
+	'lang-hu-pb': {
+		title: 'Magyar Biblia (Hungarian) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-hu-600.webp`,
+	},
 	'lang-id-hb': {
 		title: 'Alkitab Indonesia (Indonesian) — Hardback',
 		retail: 9999,
@@ -518,6 +528,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		title: 'मराठी बायबल (Marathi) — Paperback',
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-mr-600.webp`,
+	},
+	'lang-el-hb': {
+		title: 'Ελληνική Βίβλος (Modern Greek) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-el-600.webp`,
+	},
+	'lang-el-pb': {
+		title: 'Ελληνική Βίβλος (Modern Greek) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-el-600.webp`,
 	},
 	'lang-pcm-hb': {
 		title: 'Naija Bible (Nigerian Pidgin) — Hardback',
