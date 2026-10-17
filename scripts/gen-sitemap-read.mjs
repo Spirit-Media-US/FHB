@@ -369,11 +369,21 @@ parts.push(
 );
 
 // Reader hubs first (highest-value entry points), then chapters.
-for (const hub of [`${SITE}/read/`, `${SITE}/read/en/`]) {
-	parts.push(
-		`<url><loc>${esc(hub)}</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>`,
-	);
-}
+// EVERY live language's hub /read/<code>/ is listed (indexing audit 2026-10-17: 42 of 44
+// hubs were in no sitemap — only /read/ and /read/en/ were). English owns /read/ + /read/en/;
+// each other language's hub goes in its own segment. A language whose every book the live
+// guard dropped has no chapters here and gets no hub either (never list a page we cannot
+// vouch for).
+const hubEntry = (u) =>
+	`<url><loc>${esc(u)}</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>`;
+const hubsFor = (lang) =>
+	lang === 'en'
+		? [`${SITE}/read/`, `${SITE}/read/en/`]
+		: byLang.get(lang)?.size
+			? [`${SITE}/read/${lang}/`]
+			: [];
+const allHubs = LIVE_LANGS.flatMap(hubsFor);
+for (const hub of allHubs) parts.push(hubEntry(hub));
 
 // Deterministic order: canonical book order would need bible_structure.json; slug
 // A→Z + numeric chapter is stable and adequate (order carries no ranking weight).
@@ -395,16 +405,11 @@ const perLang = Object.fromEntries(LIVE_LANGS.map((l) => [l, 0]));
 const SPLIT_BY_LANGUAGE = true;
 const SPLIT = process.env.SITEMAP_SPLIT ? process.env.SITEMAP_SPLIT === '1' : SPLIT_BY_LANGUAGE;
 const segs = new Map(LIVE_LANGS.map((l) => [l, []]));
-// The reader hubs live in the English segment, so the segments together hold EVERY
-// URL of the combined file (nothing lost when a console reads only the index).
-if (SPLIT && segs.has('en')) {
-	for (const hub of [`${SITE}/read/`, `${SITE}/read/en/`]) {
-		segs
-			.get('en')
-			.push(
-				`<url><loc>${esc(hub)}</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>`,
-			);
-	}
+// Each language's hub lives in its own segment (English: /read/ + /read/en/), so the
+// segments together hold EVERY URL of the combined file (nothing lost when a console reads
+// only the index).
+if (SPLIT) {
+	for (const l of LIVE_LANGS) for (const hub of hubsFor(l)) segs.get(l)?.push(hubEntry(hub));
 }
 for (const key of keys) {
 	const langs = groups.get(key);
@@ -459,15 +464,16 @@ if (SPLIT) {
 	// nothing is lost by the hop.
 	fs.writeFileSync(OUT, indexXml);
 	const segTotal = [...segs.values()].reduce((n, e) => n + e.length, 0);
-	if (segTotal !== count + (segs.get('en') ? 2 : 0)) {
+	if (segTotal !== count + allHubs.length) {
 		console.error(
-			`gen-sitemap-read: SEGMENT TOTAL ${segTotal} != combined ${count + 2} — ` +
+			`gen-sitemap-read: SEGMENT TOTAL ${segTotal} != combined ${count + allHubs.length} — ` +
 				'the index would publish fewer urls than the combined file held. Refusing.',
 		);
 		process.exit(1);
 	}
 	console.log(
-		`gen-sitemap-read: SPLIT — ${index.length} segments holding ${segTotal} urls; ` +
+		`gen-sitemap-read: SPLIT — ${index.length} segments holding ${segTotal} urls ` +
+			`(${allHubs.length} language hubs); ` +
 			'sitemap-read.xml and sitemap-read-index.xml both written as the index',
 	);
 }
@@ -572,5 +578,36 @@ console.log(
 		console.warn(
 			`gen-sitemap-read: llms.txt languages NOT regenerated (${err.message}) — file left unchanged`,
 		);
+	}
+}
+
+// ── llms.txt / llms-full.txt typed language COUNTS (indexing audit 2026-10-17) ───
+// The prose said "published in 35 languages" while the generated table said 44: a typed
+// count goes stale the day a language ships. The print-language figure is now computed
+// with the SAME rule the site pages use (src/data/receive.ts PRINT_LANGUAGE_TOTAL =
+// English + every edition in src/data/edition-registry.json, which fhb-chain.py emits),
+// and written into each "published in N languages" phrase. Fails LOUD (exit 1) if a phrase
+// is missing, so a rewrite of the prose cannot silently orphan the number.
+{
+	const reg = JSON.parse(
+		fs.readFileSync(path.resolve(process.cwd(), 'src/data/edition-registry.json'), 'utf8'),
+	);
+	const printTotal = (reg.editions || []).length + 1;
+	if (printTotal < 2) {
+		console.error('gen-sitemap-read: edition-registry.json has no editions — refusing to write a count');
+		process.exit(1);
+	}
+	for (const name of ['llms.txt', 'llms-full.txt']) {
+		const f = path.resolve(process.cwd(), 'public', name);
+		const cur = fs.readFileSync(f, 'utf8');
+		const re = /published in \d+ languages/g;
+		const hits = cur.match(re) || [];
+		if (hits.length === 0) {
+			console.error(`gen-sitemap-read: ${name} has no "published in N languages" phrase to generate`);
+			process.exit(1);
+		}
+		const next = cur.replace(re, `published in ${printTotal} languages`);
+		if (next !== cur) fs.writeFileSync(f, next);
+		console.log(`gen-sitemap-read: ${name} — ${hits.length} language count(s) set to ${printTotal}`);
 	}
 }
