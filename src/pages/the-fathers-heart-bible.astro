@@ -97,10 +97,12 @@ const shifts = biblePageData?.shifts ?? [
 
 // FAQ — question-and-answer pairs that mirror what people actually search for. The visible
 // section below renders these; the FAQPage JSON-LD mirrors them word for word.
-// The divine-name answers quote the Bible's own "About this Translation" statement (shown in
-// full further up this page) — do not paraphrase it in terms of single Hebrew names.
+// The divine-name answers state the rendering rules exactly as Doc A (the published Translation
+// Rules) does — YHWH is 'our Father' in every context, Adonai of the Father is 'Sovereign', 'Lord' is
+// chiefly Jesus (corrected 2026-10-19, STEP audit items 35-36). Keep this, the About section and
+// llms.txt saying the same thing.
 const DIVINE_NAMES =
-	'Where a word for God stands in a clearly relational or covenantal setting, it is rendered “our Father.” Elsewhere the customary rendering is kept, and Adonai and Kurios are always rendered “Lord.”';
+	'The covenant name YHWH is rendered “our Father” in every context. Where Elohim or Theos refers to the Father, it is rendered as Father too; “God” is kept where Scripture speaks of God as God. Where Adonai refers to the Father, it is rendered “Sovereign,” most often “my Sovereign Father”; “Lord” is used chiefly of Jesus.';
 const faqs = [
 	{
 		q: "What is the Father's Heart Bible™?",
@@ -569,7 +571,7 @@ const formatDate = (dateString: string) => {
 				<details class="fm-item">
 					<summary><span>How it renders the divine names</span><svg class="fm-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
 					<div class="fm-body">
-				<p>Where a word for God stands in a clearly relational or covenantal setting, it is rendered “our Father.” Elsewhere the customary rendering is kept, and Adonai and Kurios are always rendered “Lord.” At Genesis 1:1, “God” (Elohim) is rendered “our Heavenly Father.”</p>
+				<p>The covenant name YHWH is rendered “our Father” in every context. Where Elohim or Theos refers to the Father, it is rendered as Father too; “God” is kept where Scripture speaks of God as God. Where Adonai refers to the Father, it is rendered “Sovereign,” most often “my Sovereign Father”; “Lord” is used chiefly of Jesus. At Genesis 1:1, “God” (Elohim) is rendered “our Heavenly Father.”</p>
 					</div>
 				</details>
 				<details class="fm-item">
