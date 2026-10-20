@@ -50,7 +50,7 @@ const seoDescription =
 	`Father's Heart Bible™ (FHB) is the complete Bible, freshly translated to reveal God as our Father, with His words in blue. Free to read online in ${LANGUAGE_TOTAL} languages, and in print.`;
 const heroHeading = 'What is the Father\u2019s Heart Bible\u2122?';
 // Answer-first: the page's question answered in its opening sentences, in plain text.
-const heroSubheading = `Father\u2019s Heart Bible\u2122 (FHB) is the complete Bible in a fresh translation from the original Hebrew, Aramaic, and Greek that reveals God as our Father where Scripture reveals Him. It is the first Bible in print to show which words a divine person spoke \u2014 our Father\u2019s in blue, the Son\u2019s in red, the Spirit\u2019s in purple. Free to read and hear online in ${LANGUAGE_TOTAL} languages, and in print.`;
+const heroSubheading = `Father\u2019s Heart Bible\u2122 (FHB) is the complete Bible in a fresh translation from the original Hebrew, Aramaic, and Greek that reveals God as our Father where Scripture reveals Him. To our knowledge, it is the first Bible in print to show which words a divine person spoke \u2014 our Father\u2019s in blue, the Son\u2019s in red, the Spirit\u2019s in purple. Free to read and hear online in ${LANGUAGE_TOTAL} languages, and in print.`;
 // Hero CTA: single "Read FHB" (the site's primary CTA). The old "Read Sample
 // Passages" button was removed (2026-06-06, Kevin) since Read FHB sat right
 // beside it — redundant.
@@ -98,15 +98,15 @@ const shifts = biblePageData?.shifts ?? [
 // FAQ — question-and-answer pairs that mirror what people actually search for. The visible
 // section below renders these; the FAQPage JSON-LD mirrors them word for word.
 // The divine-name answers state the rendering rules exactly as Doc A (the published Translation
-// Rules) does — YHWH is 'our Father' in every context, Adonai of the Father is 'Sovereign', 'Lord' is
+// Rules) does — YHWH is 'our Father' by default (outsiders such as Pharaoh keep a title), Adonai of the Father is 'Sovereign', 'Lord' is
 // chiefly Jesus (corrected 2026-10-19, STEP audit items 35-36). Keep this, the About section and
 // llms.txt saying the same thing.
 const DIVINE_NAMES =
-	'The covenant name YHWH is rendered “our Father” in every context. Where Elohim or Theos refers to the Father, it is rendered as Father too; “God” is kept where Scripture speaks of God as God. Where Adonai refers to the Father, it is rendered “Sovereign,” most often “my Sovereign Father”; “Lord” is used chiefly of Jesus.';
+	'The covenant name YHWH is rendered “our Father” by default; on the lips of outsiders, such as Pharaoh, it keeps a title (“the LORD” or “God”). Where Elohim or Theos refers to the Father, it is rendered as Father too; “God” is kept where Scripture speaks of God as God. Where Adonai refers to the Father, it is rendered “Sovereign,” most often “my Sovereign Father”; “Lord” is used chiefly of Jesus.';
 const faqs = [
 	{
 		q: "What is the Father's Heart Bible™?",
-		a: "Father's Heart Bible™ (FHB) is the complete Bible — 66 books, 1,189 chapters, 31,085 verses — in a fresh translation from the original Hebrew, Aramaic, and Greek, governed by 160+ written translation rules. It is the first Bible in print to show which words a divine person spoke, and which person spoke them: our Father's words in blue, the Son's in red, the Spirit's in purple.",
+		a: "Father's Heart Bible™ (FHB) is the complete Bible — 66 books, 1,189 chapters, 31,085 verses — in a fresh translation from the original Hebrew, Aramaic, and Greek, governed by 160+ written translation rules. To our knowledge, it is the first Bible in print to show which words a divine person spoke, and which person spoke them: our Father's words in blue, the Son's in red, the Spirit's in purple.",
 	},
 	{
 		// The abbreviation needs its own QUESTION, not just a mention inside another answer
@@ -274,7 +274,7 @@ const formatDate = (dateString: string) => {
 		<section style="background-color: var(--color-canvas); padding: 2rem 1rem 3rem;">
 			<div style="max-width: 42rem; margin: 0 auto; text-align: center;">
 				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.2rem; line-height: 1.7; margin: 0 0 1.75rem;">
-					Father&rsquo;s Heart Bible&trade; (FHB) is the complete Bible in a fresh translation from the original Hebrew, Aramaic, and Greek that reveals God as our Father where Scripture reveals Him. It is the first Bible in print to show which words a divine person spoke &mdash; <span style="color: #2563eb; font-weight: 600;">our Father&rsquo;s in blue</span>, <span style="color: #c8102e; font-weight: 600;">the Son&rsquo;s in red</span>, <span style="color: #6a3fa0; font-weight: 600;">the Spirit&rsquo;s in purple</span>. Free to read and hear online in {LANGUAGE_TOTAL} languages, and in print.
+					Father&rsquo;s Heart Bible&trade; (FHB) is the complete Bible in a fresh translation from the original Hebrew, Aramaic, and Greek that reveals God as our Father where Scripture reveals Him. To our knowledge, it is the first Bible in print to show which words a divine person spoke &mdash; <span style="color: #2563eb; font-weight: 600;">our Father&rsquo;s in blue</span>, <span style="color: #c8102e; font-weight: 600;">the Son&rsquo;s in red</span>, <span style="color: #6a3fa0; font-weight: 600;">the Spirit&rsquo;s in purple</span>. Free to read and hear online in {LANGUAGE_TOTAL} languages, and in print.
 				</p>
 				<VoiceChips class="mb-8" />
 				<a href={heroPrimaryCtaHref} style="display: inline-flex; align-items: center; padding: 0.875rem 2rem; font-family: var(--font-body); font-size: 1rem; font-weight: 600; text-decoration: none; background: #FFD9E0; color: #4A4A4A;">{heroPrimaryCtaLabel}</a>
@@ -356,7 +356,7 @@ const formatDate = (dateString: string) => {
 						<li><strong style="color: var(--color-ink);">A fresh translation</strong> from the original Hebrew, Aramaic, and Greek, governed by 160+ written translation rules.</li>
 						<li><strong style="color: var(--color-ink);">Complete.</strong> 66 books, 1,189 chapters, 31,085 verses. Not one missing.</li>
 						<li><strong style="color: var(--color-ink);">Interpretive.</strong> It renders the meaning of the original in clear, contemporary English, and makes our Father&rsquo;s identity, presence, and voice explicit where the text already carries them.</li>
-						<li><strong style="color: var(--color-ink);">First of its kind.</strong> The first Bible in print to show you which words a divine person spoke &mdash; and which person spoke them.</li>
+						<li><strong style="color: var(--color-ink);">First of its kind.</strong> To our knowledge, the first Bible in print to show you which words a divine person spoke &mdash; and which person spoke them.</li>
 					</ul>
 				</div>
 				<div class="p-7 md:p-8" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline); border-top: 3px solid var(--color-hairline);">
@@ -398,8 +398,8 @@ const formatDate = (dateString: string) => {
 					<p class="text-xs font-semibold tracking-widest uppercase mb-6 text-center" style="font-family: var(--font-sans); color: var(--color-muted);">Zephaniah 3:17</p>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 						<div class="p-6" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline);">
-							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">Traditional</p>
-							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.05rem;">"The Lord your God is with you, the Mighty Warrior who saves. He will take great delight in you…"
+							<p class="text-xs tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-muted); opacity: 0.6;">The Hebrew, literally</p>
+							<p class="italic leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted); font-size: 1.05rem;">"YHWH your God is in your midst, a warrior who saves. He will rejoice over you with gladness; he will be silent in his love; he will shout over you with a ringing cry."
 							</p>
 						</div>
 						<div class="p-6" style="background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-left: 3px solid var(--color-gold);">
@@ -571,7 +571,7 @@ const formatDate = (dateString: string) => {
 				<details class="fm-item">
 					<summary><span>How it renders the divine names</span><svg class="fm-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
 					<div class="fm-body">
-				<p>The covenant name YHWH is rendered “our Father” in every context. Where Elohim or Theos refers to the Father, it is rendered as Father too; “God” is kept where Scripture speaks of God as God. Where Adonai refers to the Father, it is rendered “Sovereign,” most often “my Sovereign Father”; “Lord” is used chiefly of Jesus. At Genesis 1:1, “God” (Elohim) is rendered “our Heavenly Father.”</p>
+				<p>The covenant name YHWH is rendered “our Father” by default; on the lips of outsiders, such as Pharaoh, it keeps a title (“the LORD” or “God”). Where Elohim or Theos refers to the Father, it is rendered as Father too; “God” is kept where Scripture speaks of God as God. Where Adonai refers to the Father, it is rendered “Sovereign,” most often “my Sovereign Father”; “Lord” is used chiefly of Jesus. At Genesis 1:1, “God” (Elohim) is rendered “our Heavenly Father.”</p>
 					</div>
 				</details>
 				<details class="fm-item">
@@ -589,7 +589,7 @@ const formatDate = (dateString: string) => {
 				<details class="fm-item">
 					<summary><span>How it was made</span><svg class="fm-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
 					<div class="fm-body">
-				<p>Father's Heart Bible™ was produced through a structured, rule-governed translation process built for this work, bringing the consistency and reach of modern language technology to the ancient task of translation. Within that process, AI language tools rendered the text and footnotes directly from the original Hebrew, Aramaic, and Greek, guided by 160+ translation rules; each book was then carried through successive passes, its most difficult readings cross-checked against the Hebrew and independent references, before being reviewed and finalized. The rules and every interpretive decision are the work of Kevin White of Spirit Media Publishing, who led the process; other readers reviewed it and offered feedback.</p>
+				<p>The Father's Heart Bible™ was produced through a structured, rule-governed translation process built for this work, bringing the consistency and reach of modern language technology to the ancient task of translation. Within that process, AI language tools rendered the text and footnotes directly from the original Hebrew, Aramaic, and Greek, guided by a written set of 160 translation rules. Each book was then carried through successive passes, its most difficult readings cross-checked against the Hebrew and Greek and against independent references, before being reviewed and finalized. The rules and every interpretive decision are the work of Kevin White of Spirit Media Publishing, who led the process; other readers reviewed it and offered feedback.</p>
 					</div>
 				</details>
 				<details class="fm-item">
