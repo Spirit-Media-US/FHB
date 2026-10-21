@@ -50,6 +50,13 @@ export const WORD_MEANINGS: WordMeaning[] = [
 		volume: '2,100/mo',
 	},
 	{
+		slug: 'fathers-heart-of-god',
+		title: 'What is the Father’s heart of God?',
+		blurb:
+			'The love at the centre of who He is — from Hosea and Jeremiah to the father who runs in Luke 15.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg',
+	},
+	{
 		slug: 'lords-prayer',
 		title: 'The Lord’s Prayer: the words and what they mean',
 		blurb:

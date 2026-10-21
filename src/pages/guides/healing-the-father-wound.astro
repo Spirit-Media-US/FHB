@@ -1,0 +1,276 @@
+---
+// /guides/healing-the-father-wound — plan W7, AI-answer page 10 (2026-10-21).
+// Target question (aeo-config/fhb.json targetQueries): "how do I heal from a father wound
+// through Scripture". A NEW guide beside the 2026 blog post on the subject (old posts are never
+// rewritten); it links to that post. Measured Google demand for the wording is low
+// ("father wound healing" 20/mo, Ahrefs US, June 2026 study) — this page is built for the AI-answer
+// engines, where the question is asked in full.
+// Locked FHB conventions: Father voice, verbatim FHB quotes from src/content/bible (checked),
+// verse links to our /read, Read-FHB primary CTA, reader links absolute to the prod apex.
+import AuthorBio from '../../components/AuthorBio.astro';
+import FeatureChapter from '../../components/FeatureChapter.astro';
+import ReviewLink from '../../components/ReviewLink.astro';
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/guides/healing-the-father-wound/';
+const TITLE = 'How to Heal From a Father Wound Through Scripture';
+const DESCRIPTION =
+	'How to heal from a father wound through Scripture: tell the truth, let the Bible re-teach what a father is, receive a new identity, and forgive without pretending.';
+const PUBLISHED = '2026-10-21';
+const MODIFIED = '2026-10-21';
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg';
+const HERO_ALT = 'A man reading and reflecting on Scripture';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+const R = (slug: string, ch: number) => `https://fathersheartbible.com/read/${slug}/${ch}/`;
+const link = (slug: string, ch: number, label: string) =>
+	`<a href="${R(slug, ch)}" style="color: var(--color-brand);" class="hover:underline">${label}</a>`;
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: 'Founder & CEO, Spirit Media Publishing',
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+const FAQS = [
+	{
+		question: 'How do I heal from a father wound through Scripture?',
+		answer:
+			'Start by telling our Father the truth about what happened, because “our Father is near to the brokenhearted” (Psalm 34:18). Then let Scripture re-teach you what a father is, from Psalm 103:13 to the father who runs in Luke 15:20. Receive the identity Romans 8:15 gives, a child who cries “Abba! Father!”, and forgive at your own pace without pretending it did not hurt. Do it with people, not alone, and with a counselor when the wound is deep.',
+	},
+	{
+		question: 'What is a father wound?',
+		answer:
+			'A father wound is the lasting hurt left by a father who was absent, harsh, distant, unpredictable or abusive, or who simply could not give the love and blessing a child needed. It often shows up later as fear of rejection, striving to earn approval, difficulty trusting, or a picture of God as distant or angry.',
+	},
+	{
+		question: 'What Bible verses help with a father wound?',
+		answer:
+			'Psalm 27:10 (“Though my father and my mother forsake me, my Father will take me in”), Psalm 68:5, Psalm 147:3, Psalm 103:13, Isaiah 49:15, Luke 15:20, Romans 8:15-16 and 2 Corinthians 6:18 all speak to it. Each is free to read and hear in the Father’s Heart Bible™.',
+	},
+	{
+		question: 'Do I have to forgive my father to heal?',
+		answer:
+			'Scripture calls us to forgive, “just as our Father forgave you through Christ” (Ephesians 4:32), but forgiveness is not pretending, excusing, or putting yourself back in harm’s way. It is releasing the debt to our Father, often slowly and more than once. Reconciliation is a separate question and depends on safety and change.',
+	},
+	{
+		question: 'Can God really be a Father to me if my father hurt me?',
+		answer:
+			'Yes. Psalm 68:5 calls Him “a father to the fatherless,” and Psalm 27:10 promises that even if a father forsakes you, “my Father will take me in.” The FHB footnote on that verse says it plainly: even if the closest human love fails, our Father gathers the abandoned child into his own home.',
+	},
+];
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: 'How to Heal From a Father Wound Through Scripture',
+	description: DESCRIPTION,
+	image: OG_IMG,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: PUBLISHED,
+	dateModified: MODIFIED,
+	inLanguage: 'en-US',
+	articleSection: 'Bible Reading Guides',
+	keywords:
+		'father wound, healing the father wound, father wound bible verses, how to heal from a father wound',
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'Guides',
+			item: 'https://fathersheartbible.com/guides/',
+		},
+		{
+			'@type': 'ListItem',
+			position: 3,
+			name: 'Healing the Father Wound Through Scripture',
+			item: PAGE_URL,
+		},
+	],
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [articleSchema, breadcrumbSchema, faqSchema];
+
+const TOC = [
+	{ id: 'what-it-is', label: 'What a father wound is' },
+	{ id: 'tell-the-truth', label: '1. Tell the truth' },
+	{ id: 'relearn-father', label: '2. Relearn what a father is' },
+	{ id: 'new-identity', label: '3. Receive a new identity' },
+	{ id: 'forgive', label: '4. Forgive without pretending' },
+	{ id: 'not-alone', label: '5. Don’t heal alone' },
+	{ id: 'faq', label: 'FAQ' },
+];
+const P =
+	'class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);"';
+const body = [
+	{
+		id: 'what-it-is',
+		h: 'What a father wound is',
+		html: `<p ${P}>A father wound is the hurt a father leaves when he is absent, harsh, distant, unpredictable or abusive, or when he simply could not give the love and blessing a child needed. It rarely stays in childhood. It shows up later as a fear of being rejected, a drive to earn approval, trouble trusting anyone, or a quiet belief that you are on your own. And it very often shapes how we picture God: if an earthly father was cold or angry, the word <em>Father</em> can feel like a threat instead of a comfort.</p><p ${P}>That is exactly why Scripture is part of the healing. The Bible does not ask you to pretend your father was better than he was. It shows you a different Father, and it never confuses the two.</p>`,
+	},
+	{
+		id: 'tell-the-truth',
+		h: '1. Tell our Father the truth about what happened',
+		html: `<p ${P}>Healing starts with honesty, not with forgiveness and not with a brave face. The Psalms are full of people telling our Father exactly how they feel. &ldquo;Trust in him at all times, people; pour out your hearts before him; our Father is a refuge for us&rdquo; (${link('psalms', 62, 'Psalm 62:8')}). You are allowed to name what was missing, what was said, what was done.</p><p ${P}>He does not stand at a distance while you do. &ldquo;Our Father is near to the brokenhearted; he saves those crushed in spirit&rdquo; (${link('psalms', 34, 'Psalm 34:18')}). And He is the one who heals: &ldquo;He heals the brokenhearted and binds up their wounds&rdquo; (${link('psalms', 147, 'Psalm 147:3')}). Write it down, pray it out loud, or say it to someone you trust. A wound that is named can begin to heal.</p>`,
+	},
+	{
+		id: 'relearn-father',
+		h: '2. Let Scripture re-teach you what a father is',
+		html: `<p ${P}>A father wound teaches a lie about what fathers are like. Scripture tells the truth. &ldquo;As a father&rsquo;s heart goes out to his children, so our Father&rsquo;s heart goes out to those who fear him. For he knows how we are formed; he remembers that we are dust&rdquo; (${link('psalms', 103, 'Psalm 103:13&ndash;14')}). He is patient with weakness instead of contemptuous of it.</p><p ${P}>Jesus gave the clearest picture in the father of the lost son: &ldquo;While he was still far off, his father saw him, and his heart broke with compassion&mdash;he ran, threw his arms around him, and kissed him&rdquo; (${link('luke', 15, 'Luke 15:20')}). Read Luke 15 slowly, more than once, and notice everything this father does that yours did not. Even a mother&rsquo;s love can fail, our Father says, &ldquo;yet I will not forget you&rdquo; (${link('isaiah', 49, 'Isaiah 49:15')}).</p>`,
+	},
+	{
+		id: 'new-identity',
+		h: '3. Receive a new identity: a child, not an orphan',
+		html: `<p ${P}>Many people carrying a father wound live like orphans: guarded, self-reliant, always earning their place. Scripture gives a different name. &ldquo;You did not receive a spirit of slavery, to fall back into fear, but received the Spirit of sonship, by whom we cry, &lsquo;Abba! Father!&rsquo; The Spirit himself bears witness with our spirit that we are children of our Father&rdquo; (${link('romans', 8, 'Romans 8:15&ndash;16')}).</p><p ${P}>The promise is personal: &ldquo;and I will be a Father to you, and you will be sons and daughters to me, says our Father, the Almighty&rdquo; (${link('2-corinthians', 6, '2 Corinthians 6:18')}). And it reaches the child who was left: &ldquo;Though my father and my mother forsake me, my Father will take me in&rdquo; (${link('psalms', 27, 'Psalm 27:10')}). Say these verses over yourself, by name, until they sound less like someone else&rsquo;s story and more like yours.</p>`,
+	},
+	{
+		id: 'forgive',
+		h: '4. Forgive without pretending',
+		html: `<p ${P}>Scripture does call us to forgive: &ldquo;Rid yourselves of all bitterness, rage, anger, shouting, and slander, together with all malice. Be kind to one another, tenderhearted, forgiving one another, just as our Father forgave you through Christ&rdquo; (${link('ephesians', 4, 'Ephesians 4:31&ndash;32')}). But forgiveness is not pretending it did not happen, excusing it, or putting yourself back in harm&rsquo;s way.</p><p ${P}>Forgiveness is handing the debt to our Father instead of carrying it yourself. It is often slow, and it may need to be done again each time the memory returns. Reconciliation is a separate question; it depends on safety and on real change, and Scripture never asks you to stay where you are being harmed. Freedom comes from releasing the debt, not from denying it.</p>`,
+	},
+	{
+		id: 'not-alone',
+		h: '5. Don’t heal alone',
+		html: `<p ${P}>Our Father &ldquo;settles the lonely in a home&rdquo; (${link('psalms', 68, 'Psalm 68:6')}), and much of His healing comes through people: a church family, a mentor who fathers you well, friends who know your story. If the wound involves abuse, trauma, depression or addiction, a licensed counselor is part of the healing, not a sign that faith has failed. In the U.S., if you are ever in crisis, call or text 988, the Suicide &amp; Crisis Lifeline.</p><p ${P}>And keep coming back to the Father Himself. Read a psalm a day with the audio, pray &ldquo;Our Father&rdquo; slowly, and let the words do their quiet work. For a fuller reflection, see our article on <a href="/blog/father-wound-healing-through-scripture/" style="color: var(--color-brand);" class="hover:underline">father wound healing through Scripture</a> and <a href="/meaning/fathers-heart-of-god/" style="color: var(--color-brand);" class="hover:underline">what the Father&rsquo;s heart of God is</a>.</p>`,
+	},
+];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={PUBLISHED}
+	articleSection="Bible Reading Guides"
+	articleTags={["father wound", "healing the father wound", "Bible verses for the father wound"]}
+	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[420px] md:min-h-[65vh]">
+			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} width="1400" height="620" class="absolute inset-0 w-full h-full object-cover" style="object-position: center;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
+		</section>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/guides/" class="hover:underline">Guides</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Healing the Father Wound</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Reading Guide</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">How to Heal From a Father Wound Through Scripture</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; leading the Father&rsquo;s Heart Bible&trade; translation</span>
+					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p id="direct-answer" class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<strong style="color: var(--color-ink);">You heal from a father wound through Scripture by letting the Bible show you the Father your earthly father could not be: tell Him the truth about what happened, let Scripture re-teach you what a father is, receive the identity of a loved child, and forgive at your own pace without pretending it did not hurt.</strong> The Bible never asks you to call a harmful father good. It gives you another Father: &ldquo;Though my father and my mother forsake me, my Father will take me in&rdquo; (Psalm 27:10). The five steps below each come with the verses to read, in the Father&rsquo;s Heart Bible&trade;, and the honest limits of each step. Healing is rarely quick, and it is not meant to happen alone.
+				</p>
+
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
+					<p id="key-takeaway" class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">A father wound heals as you come to know a different Father: honest with Him, re-taught by His word, held as His child, and free to forgive without pretending.</p>
+				</aside>
+
+				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>
+					<ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
+						{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}
+					</ul>
+				</nav>
+
+				{body.map((b) => (
+					<>
+						<h2 id={b.id} class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">{b.h}</h2>
+						<Fragment set:html={b.html} />
+						{b.id === 'new-identity' && <FeatureChapter book="Psalms" slug="psalms" chapter={27} verseLimit={10} />}
+					</>
+				))}
+
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Read Luke 15 today</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Meet the father who runs. Read the Father&rsquo;s Heart Bible&trade; free online, with audio narration so you can read and listen together.</p>
+					<a href="https://fathersheartbible.com/read/luke/15/" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a>
+				</aside>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="space-y-6">
+					{FAQS.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Keep going: <a href="/verses/god-as-father/" style="color: var(--color-brand);" class="hover:underline">Bible verses about God as Father</a>, <a href="/bible-for/fathers/" style="color: var(--color-brand);" class="hover:underline">the Bible for fathers</a>, <a href="/meaning/abba-father/" style="color: var(--color-brand);" class="hover:underline">what &ldquo;Abba, Father&rdquo; means</a>, or the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free with audio</a>. For the Hebrew and Greek behind these verses, see <a href="https://www.blueletterbible.org/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Blue Letter Bible</a>. For crisis support in the U.S., the <a href="https://988lifeline.org/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">988 Suicide &amp; Crisis Lifeline</a>.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read the Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Every verse on this page, in context, with audio &mdash; the whole Bible, free online, in a fresh translation that reveals God as a loving Father.</p>
+				<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<ReviewLink class="mb-10" />
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>
