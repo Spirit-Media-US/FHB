@@ -135,7 +135,7 @@
 
 5. **Contact CTA**
    - "Ready to explore partnership?" → links to contact page or direct email/phone
-   - Kevin White | (919) 332-1990 | kevin@spiritmedia.us
+   - Kevin White | 1-888-800-3744 | kevin@spiritmedia.us
 
 **Content source:** Executive Summary ("The Invitation" section)
 
@@ -153,7 +153,7 @@
 
 2. **Contact Info**
    - Kevin White
-   - (919) 332-1990
+   - 1-888-800-3744
    - kevin@spiritmedia.us
 
 3. **Contact Form** (optional — could be a simple Formspree or similar)
