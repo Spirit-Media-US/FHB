@@ -59,15 +59,11 @@ const heroImageMobile = page?.heroImage
 			.auto('format')
 			.url()
 	: `${FALLBACK_HERO}?w=900&h=620&fit=crop&auto=format`;
-// noindex until the page holds real reviews: its HTML ships "0 Readers 0 Countries … Be the
-// first", a thin page Google would index as such (full-site audit M9/F4, deploy 2026-10-21).
-// The sitemap filter drops it automatically while noindex is set.
 ---
 
 <Layout
 	title={title}
 	description={description}
-	noindex={true}
 	darkHero={true}
 	preloadImageMobile={heroImageMobile}
 	preloadImageDesktop={heroImageDesktop}
