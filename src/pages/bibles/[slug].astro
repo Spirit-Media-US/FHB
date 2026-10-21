@@ -7,6 +7,7 @@ import frontmatter from '../../data/editions/frontmatter.json';
 import shared from '../../data/editions/shared.json';
 import { langSlug, languageEditions } from '../../data/language-editions';
 import { catalogRows } from '../../data/print-catalog';
+import readerEntry from '../../data/reader-entry-links.json';
 // /bibles/<slug>-bible — the PRODUCT page for every Divine Voice Color edition.
 //
 // Why this exists alongside /bible-for/<audience>: those pages answer a PASTORAL search
@@ -120,6 +121,14 @@ const isLang = ed.kind === 'language';
 // page sells "Charcoal, Plum or White". A page with no catalog row FAILS THE BUILD: an edition
 // page that cannot be ordered is the defect this replaced.
 const langEd = isLang ? languageEditions.find((l) => langSlug(l) === ed.slug) : undefined;
+// Chapters of THIS language to read free (full-site audit M6): the page passes its
+// trust to the language's own chapters, and their native book names make each edition
+// page its own text rather than a 53%-shared template (M8). Generated, live-guarded.
+const entryLinks: { href: string; label: string }[] = isLang
+	? ((readerEntry.languages as Record<string, { href: string; label: string }[]>)[
+			(ed.lang ?? '').toLowerCase()
+		] ?? [])
+	: [];
 const orderIds = langEd
 	? [`lang-${langEd.code}`]
 	: ed.slug === 'fathers-heart'
@@ -545,6 +554,16 @@ const faqSchema = {
 				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; margin: 1.75rem 0 0;">
 					Looking for scripture rather than a copy to hold? {ed.relatedGuide && (<Fragment>Read <a href={ed.relatedGuide.href} style="color: var(--color-brand); font-weight: 600; text-decoration: none;">{ed.relatedGuide.label}</a>, or read</Fragment>)}{!ed.relatedGuide && 'Read'} the whole Bible free at <a href={READ_URL} style="color: var(--color-brand); font-weight: 600; text-decoration: none;">fathersheartbible.com/read</a>. See <a href="/print/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">every Divine Voice Color edition</a>.
 				</p>
+				{entryLinks.length > 0 && (
+					<nav aria-label={`Read the ${ed.english} Bible free online`} style="margin: 1.5rem 0 0;">
+						<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 0 0 0.75rem;">Read the {ed.english} Bible free online</h2>
+						<ul lang={ed.lang} dir={ed.dir} style="display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; list-style: none; padding: 0; margin: 0; font-family: var(--font-body); font-size: 1rem;">
+							{entryLinks.map((l) => (
+								<li><a href={l.href} style="color: var(--color-brand); font-weight: 600; text-decoration: none;">{l.label}</a></li>
+							))}
+						</ul>
+					</nav>
+				)}
 			</div>
 		</Section>
 	</main>
