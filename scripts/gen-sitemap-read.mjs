@@ -425,6 +425,26 @@ const hubsFor = (lang) =>
 const allHubs = LIVE_LANGS.flatMap(hubsFor);
 for (const hub of allHubs) parts.push(hubEntry(hub));
 
+// BOOK PAGES (master plan W1, 2026-10-21). /read/<book>/ and /read/<lang>/<book>/ became real
+// pages that day (H1 + a link to every chapter; they used to 302 to chapter 1, ~1,400 Googlebot
+// fetches a week). A page in no sitemap is never sent to IndexNow/Bing (fhb-index-submit reads
+// these files), so each language lists the books the live guard kept for it — the same books
+// whose chapters it lists, so no page is advertised that production does not serve.
+const bookUrl = (lang, key) =>
+	lang === 'en' ? `${SITE}/read/${urlSlug(lang, key)}/` : `${SITE}/read/${lang}/${urlSlug(lang, key)}/`;
+const bookEntry = (u) =>
+	`<url><loc>${esc(u)}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`;
+// Only books holding chapters: English's raw tree also lists the language folders (drafts/<lang>/),
+// which hold no chapter files, so an empty set is never a book.
+const booksFor = (lang) =>
+	[...(byLang.get(lang) ?? [])]
+		.filter(([, ch]) => ch.size > 0)
+		.map(([k]) => k)
+		.sort()
+		.map((k) => bookUrl(lang, k));
+const allBooks = LIVE_LANGS.flatMap(booksFor);
+for (const b of allBooks) parts.push(bookEntry(b));
+
 // Deterministic order: canonical book order would need bible_structure.json; slug
 // A→Z + numeric chapter is stable and adequate (order carries no ranking weight).
 const keys = [...groups.keys()].sort((a, b) => {
@@ -450,6 +470,7 @@ const segs = new Map(LIVE_LANGS.map((l) => [l, []]));
 // only the index).
 if (SPLIT) {
 	for (const l of LIVE_LANGS) for (const hub of hubsFor(l)) segs.get(l)?.push(hubEntry(hub));
+	for (const l of LIVE_LANGS) for (const b of booksFor(l)) segs.get(l)?.push(bookEntry(b));
 }
 for (const key of keys) {
 	const langs = groups.get(key);
@@ -504,16 +525,16 @@ if (SPLIT) {
 	// nothing is lost by the hop.
 	fs.writeFileSync(OUT, indexXml);
 	const segTotal = [...segs.values()].reduce((n, e) => n + e.length, 0);
-	if (segTotal !== count + allHubs.length) {
+	if (segTotal !== count + allHubs.length + allBooks.length) {
 		console.error(
-			`gen-sitemap-read: SEGMENT TOTAL ${segTotal} != combined ${count + allHubs.length} — ` +
+			`gen-sitemap-read: SEGMENT TOTAL ${segTotal} != combined ${count + allHubs.length + allBooks.length} — ` +
 				'the index would publish fewer urls than the combined file held. Refusing.',
 		);
 		process.exit(1);
 	}
 	console.log(
 		`gen-sitemap-read: SPLIT — ${index.length} segments holding ${segTotal} urls ` +
-			`(${allHubs.length} language hubs); ` +
+			`(${allHubs.length} language hubs, ${allBooks.length} book pages); ` +
 			'sitemap-read.xml and sitemap-read-index.xml both written as the index',
 	);
 }
