@@ -19,9 +19,15 @@
 // FHB COLOR SCHEME ONLY — no per-group colors. Links/accents = --color-brand
 // (magenta), dividers = --color-gold, buttons = the homepage #FFD9E0/#4A4A4A.
 import { FAITH_GROUPS, GROUPS, type Group, SECTIONS } from '../data/groups';
+import { catalogRows } from '../data/print-catalog';
 import { editionForAudiencePage } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
 import AuthorBio from './AuthorBio.astro';
+
+// The print offers in this page's Book JSON-LD read the catalog's list price for the general edition
+// (the same row /print and checkout use). They were hardcoded at $39.99/$44.99 on 2026-07-13 and
+// went stale when the edition was repriced to $79.99/$99.99 (found 2026-10-21).
+const GENERAL_PRICE = catalogRows.find((r) => r.category === 'general') ?? { pb: 79.99, hb: 99.99 };
 
 export interface GroupStat {
 	value: string;
@@ -375,7 +381,7 @@ const bookSchema = {
 			url: 'https://fathersheartbible.com/print/',
 			offers: {
 				'@type': 'Offer',
-				price: '39.99',
+				price: GENERAL_PRICE.pb.toFixed(2),
 				priceCurrency: 'USD',
 				availability: 'https://schema.org/InStock',
 				url: 'https://fathersheartbible.com/print/',
@@ -388,7 +394,7 @@ const bookSchema = {
 			url: 'https://fathersheartbible.com/print/',
 			offers: {
 				'@type': 'Offer',
-				price: '44.99',
+				price: GENERAL_PRICE.hb.toFixed(2),
 				priceCurrency: 'USD',
 				availability: 'https://schema.org/InStock',
 				url: 'https://fathersheartbible.com/print/',
