@@ -131,6 +131,11 @@ export interface Props {
 	galleryBottom?: GroupPhoto[];
 	galleryBottomCreditHtml?: string;
 	keepReadingHtml?: string;
+	// "What is the best Bible to give <them>?" — the giver's question, answered first
+	// (full-site audit M11). Optional: renders only on pages that set giveHeading.
+	giveHeading?: string; // the gift query as asked, used as the H2
+	giveAnswer?: string; // 40–60 word direct answer an engine can lift verbatim (plain text)
+	giveSteps?: GroupBlock[]; // numbered specifics a giver needs: edition, binding, delivery, what to say
 	whichBibleHeading?: string;
 	whichBibleIntroHtml?: string;
 	whichBibleRows?: { edition: string; bestFor: string; style: string; access: string }[];
@@ -198,6 +203,9 @@ const {
 	galleryBottom = [],
 	galleryBottomCreditHtml,
 	keepReadingHtml,
+	giveHeading,
+	giveAnswer,
+	giveSteps = [],
 	// "Which Bible for this reader" — honest edition-comparison section (the gift/product
 	// intent AI engines cite publishers on). Rows: { edition, bestFor, style, access }.
 	whichBibleHeading,
@@ -226,6 +234,7 @@ const toc = [
 	offersBlocks.length > 0 && { label: 'What the Father offers', href: '#offers' },
 	{ label: 'What the Father says', href: '#father-says' },
 	{ label: 'A prayer', href: '#prayer' },
+	giveHeading && { label: 'Giving a Bible', href: '#give' },
 	whichBibleRows.length > 0 && { label: 'Which Bible?', href: '#which-bible' },
 	{ label: 'FAQ', href: '#faq' },
 ].filter(Boolean) as { label: string; href: string }[];
@@ -301,7 +310,7 @@ const collectionSchema = {
 	author: KEVIN_WHITE_AUTHOR,
 	speakable: {
 		'@type': 'SpeakableSpecification',
-		cssSelector: ['#direct-answer', '#key-takeaway'],
+		cssSelector: ['#direct-answer', '#key-takeaway', ...(giveAnswer ? ['#give-answer'] : [])],
 	},
 	...(lastUpdatedIso ? { dateModified: lastUpdatedIso } : {}),
 	isPartOf: {
@@ -712,6 +721,29 @@ const relatedGroups: Group[] = _sibSlugs
 								))}
 							</ul>
 						</div>
+					)}
+				</div>
+			</section>
+		)}
+
+		<!-- The giver's question, answered first (gift intent) — only where giveHeading is set -->
+		{giveHeading && giveAnswer && (
+			<section id="give" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-3xl">
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{giveHeading}</h2>
+					<p id="give-answer" class="mt-4 text-base lg:text-lg leading-relaxed font-medium" style="font-family: var(--font-sans); color: var(--color-ink);">{giveAnswer}</p>
+					{giveSteps.length > 0 && (
+						<ol class="mt-7 space-y-5" style="list-style: none; padding: 0; margin-left: 0;">
+							{giveSteps.map((b, i) => (
+								<li class="flex gap-4">
+									<span class="flex-none inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold" style="background-color: var(--color-brand); color: #fff; font-family: var(--font-sans);" aria-hidden="true">{i + 1}</span>
+									<div>
+										<h3 class="text-lg font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{b.heading}</h3>
+										<p class="mt-1.5 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.bodyHtml}></p>
+									</div>
+								</li>
+							))}
+						</ol>
 					)}
 				</div>
 			</section>
