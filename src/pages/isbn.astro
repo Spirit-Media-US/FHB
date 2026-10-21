@@ -37,6 +37,7 @@ const inPrint = isbns.languages.filter((l) => l.onSale);
 interface StoreCell {
 	word: string;
 	url: string | null;
+	id: string | null;
 }
 interface FormatRow {
 	code: string;
@@ -275,7 +276,14 @@ const books = groups.flatMap((g) =>
 											const c = r.stores[st.key];
 											return (
 												<span class={`store-cell${c ? '' : ' store-none'}`} role="cell" data-label={st.name}>
-													{c?.url ? <a href={c.url} rel="noopener">{c.word}</a> : (c?.word ?? '—')}
+													{c ? (
+														<>
+															{c.id && (c.url ? <a href={c.url} rel="noopener">{c.id}</a> : <span class="store-id">{c.id}</span>)}
+															{c.id ? ` · ${c.word}` : c.word}
+														</>
+													) : (
+														'—'
+													)}
 												</span>
 											);
 										})}
@@ -286,12 +294,24 @@ const books = groups.flatMap((g) =>
 						</section>
 					))}
 					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; margin: -1.75rem 0 2.75rem;">
-						Live = for sale · Processing = the store is still preparing it · Error = the store reported a problem · Pending = submitted or being confirmed · — = not on that store.
+						Each ID is the ISBN where one exists, otherwise the store’s own product ID. Live = for sale · Processing = the store is still preparing it · Error = the store reported a problem · Pending = submitted or being confirmed · — = not on that store.
 					</p>
 				</div>
 
+				<section id="totals" class="isbn-group">
+					<h3>Totals</h3>
+					<div class="isbn-table" role="table" aria-label="ISBN and product totals">
+						{(isbns.totals as { label: string; n: number }[]).map((t) => (
+							<div class="isbn-row isbn-two" role="row">
+								<span class="isbn-name" role="cell">{t.label}</span>
+								<span class="isbn-num" role="cell">{t.n}</span>
+							</div>
+						))}
+					</div>
+				</section>
+
 				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin: 2.5rem 0 0;">
-					{ISBN_TOTAL} ISBNs. Published by Spirit Media Publishing.
+					Published by Spirit Media Publishing.
 				</p>
 			</div>
 		</Section>
@@ -315,15 +335,17 @@ const books = groups.flatMap((g) =>
 	.isbn-name a { color: var(--color-brand); text-decoration: none; }
 	.isbn-name a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
 	.isbn-num { color: var(--color-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
-	.store-row { grid-template-columns: minmax(0, 1fr) repeat(5, 5.6rem) 6rem; gap: 0 0.5rem; }
-	.store-cell, .store-status { font-size: 0.88rem; color: var(--color-ink); }
+	#ebooks-audiobooks { width: min(68rem, calc(100vw - 2rem)); margin-left: 50%; transform: translateX(-50%); }
+	.store-row { grid-template-columns: minmax(9rem, 1fr) 13rem 15.5rem 3.5rem 9rem 3.5rem 6rem; gap: 0 0.6rem; }
+	.store-cell, .store-status { font-size: 0.82rem; color: var(--color-ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
 	.store-cell a { color: var(--color-brand); font-weight: 600; text-decoration: none; }
 	.store-cell a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
 	.store-none { color: var(--color-muted); }
 	.store-status { font-weight: 700; }
 	.s-processing, .s-pending { color: var(--color-muted); }
 	@media (max-width: 639px) {
-		.isbn-row.store-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+		.isbn-row.store-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+		.store-cell, .store-status { white-space: normal; overflow-wrap: anywhere; }
 		.store-row .store-none { display: none; }
 		.store-cell[data-label]::before, .store-status[data-label]::before { content: attr(data-label); display: block; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-muted); }
 		.isbn-head { display: none; }
