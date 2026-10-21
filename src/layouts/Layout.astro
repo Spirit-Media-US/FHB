@@ -134,12 +134,26 @@ const ORGANIZATION_SCHEMA = {
 	parentOrganization: { '@type': 'Organization', name: 'Spirit Media Inc.' },
 	url: 'https://spiritmediapublishing.com',
 	logo: 'https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp',
+	// ONE sameAs list, byte-identical to the Organization on spiritmediapublishing.com
+	// (src/pages/index.astro there). Kevin 2026-10-21: handles are "spiritmediapublishing";
+	// only accounts verified to exist are listed.
 	sameAs: [
 		'https://www.youtube.com/channel/UCQh2m97udW1osliFysbWsOA',
-		'https://www.facebook.com/spiritmediaus',
-		'https://www.instagram.com/spiritmediaus',
-		'https://www.linkedin.com/company/spiritmediaus',
+		'https://www.youtube.com/@spiritmediapublishing',
+		'https://www.linkedin.com/company/spiritmediapublishing',
+		'https://www.tiktok.com/@spiritmediapublishing',
+		'https://www.facebook.com/104759452046057',
 	],
+	// Kevin 2026-10-21: this address and this phone ONLY, everywhere.
+	telephone: '+1-888-800-3744',
+	address: {
+		'@type': 'PostalAddress',
+		streetAddress: '205 S Academy Street, Unit 3251',
+		addressLocality: 'Cary',
+		addressRegion: 'NC',
+		postalCode: '27519',
+		addressCountry: 'US',
+	},
 };
 
 // Combine page-specific JSON-LD with the site-wide Organization
