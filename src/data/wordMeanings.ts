@@ -49,4 +49,12 @@ export const WORD_MEANINGS: WordMeaning[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg',
 		volume: '2,100/mo',
 	},
+	{
+		slug: 'lords-prayer',
+		title: 'The Lord’s Prayer: the words and what they mean',
+		blurb:
+			'The prayer Jesus taught, line by line — and why He taught it to begin with “Our Father.”',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+		volume: '76,000/mo',
+	},
 ];
