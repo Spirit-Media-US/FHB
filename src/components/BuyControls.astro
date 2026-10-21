@@ -159,14 +159,13 @@ const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
 				class="buy-btn"
 				style="text-decoration: none;"
 			>
-				{/* alt="Amazon": the button text is only "· Hardback $99.99", so the logo is
-				    the one thing that names the store — without it the link reads as a bare
-				    price. Explicit width/height so it cannot shift layout
+				{/* Empty alt: the button text already says Amazon, so a second announcement is
+				    noise to a screen reader. Explicit width/height so it cannot shift layout
 				    (performance gate, trait 8). Served from OUR asset host — the logo Kevin
 				    supplied was fetched, cleaned and uploaded to R2 rather than hotlinked. */}
 				<img
 					src={AMAZON_LOGO}
-					alt="Amazon"
+					alt=""
 					width="64"
 					height="19"
 					loading="lazy"
@@ -179,7 +178,7 @@ const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
 			<span class="buy-btn buy-btn-off" aria-disabled="true">
 				<img
 					src={AMAZON_LOGO}
-					alt="Amazon"
+					alt=""
 					width="64"
 					height="19"
 					loading="lazy"
