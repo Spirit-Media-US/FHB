@@ -3,6 +3,10 @@
 // Generated from a verified draft (stats cited, verses slug-checked, images & voice
 // headshots sourced/verified by hand).
 import GroupBible from '../../components/GroupBible.astro';
+import { generalListPrice } from '../../data/print-catalog';
+
+// Visible prices read the catalog (stale $39.99/$44.99 text fixed 2026-10-21).
+const PRICE = generalListPrice();
 ---
 
 <GroupBible
@@ -114,7 +118,7 @@ import GroupBible from '../../components/GroupBible.astro';
 	whichBibleHeading={`Which Bible for someone in prison?`}
 	whichBibleIntroHtml={`If you're choosing a Bible for someone who is incarcerated — or for yourself inside — here's an honest comparison, including the one we publish. Any of these can carry the Father's voice through a wall; they differ in reading style, focus, and how they get inside.`}
 	whichBibleRows={[
-		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `Meeting God as a Father who has not forgotten you — identity beyond the label and the sentence`, style: `Fresh translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free online with audio — reachable on many facility tablets and by family outside; paperback from $39.99` },
+		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `Meeting God as a Father who has not forgotten you — identity beyond the label and the sentence`, style: `Fresh translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free online with audio — reachable on many facility tablets and by family outside; paperback from ${PRICE.pb}` },
 		{ edition: `NIrV Free on the Inside Bible (Zondervan)`, bestFor: `Readers who want the simplest possible English — about a 3rd-grade reading level`, style: `NIrV — a simplified edition of the NIV`, access: `Low-cost paperback, widely distributed in prison ministry` },
 		{ edition: `NLT Life Recovery Bible (Tyndale)`, bestFor: `Working a 12-step recovery journey alongside Scripture`, style: `NLT — thought-for-thought, very readable`, access: `Paperback from retailers` },
 		{ edition: `ESV Outreach Bible (Crossway)`, bestFor: `Bulk giveaways by chaplains and ministries`, style: `ESV — essentially literal, more formal English`, access: `Inexpensive paperback in bulk` },

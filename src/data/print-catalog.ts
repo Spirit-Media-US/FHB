@@ -112,3 +112,15 @@ export const catalogPrices = (rows: CatalogRow[] = catalogRows): Record<string, 
 			[`${r.id}-pb`, r.pb],
 		]),
 	);
+
+/**
+ * The general (regular-print) edition's list prices as visible text — "$79.99" —
+ * for copy that quotes a price (the /bible-for comparison tables, 2026-10-21: they
+ * said "paperback from $39.99" long after the repricing). Read from catalogRows, the
+ * row /print and checkout sell, so the words cannot drift from the price again.
+ */
+export const generalListPrice = (): { pb: string; hb: string } => {
+	const r = catalogRows.find((x) => x.category === 'general');
+	if (!r) throw new Error('print-catalog: no general row — cannot quote a price');
+	return { pb: `$${r.pb.toFixed(2)}`, hb: `$${r.hb.toFixed(2)}` };
+};

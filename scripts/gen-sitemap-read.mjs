@@ -294,6 +294,56 @@ async function pruneToLive() {
 }
 await pruneToLive();
 
+// ── BOOK PAGES /read/<book>/ + /read/<lang>/<book>/ (seo-reader-links, 2026-10-21) ──
+// Until community shipped its book page these URLs 302'd to chapter 1; listing a
+// redirect is the thing this sitemap must never do. Community and this app deploy
+// independently, so the SAME ship-order guard as the localized slugs above: probe one
+// book page per language in production (redirect: 'manual') and list that language's
+// book pages ONLY on a 200. FAIL-CLOSED, unlike the chapter guard: a missing book page
+// costs nothing (its chapters stay listed), a listed 302 is a defect. Offline builds
+// (SITEMAP_SKIP_LIVE_CHECK=1) and SITEMAP_BOOK_PAGES=0 list none.
+// SITEMAP_BOOK_PROBE_ORIGIN points the probe at a preview (testing only); the URLs
+// listed are always ${SITE}.
+const bookUrl = (lang, slug) =>
+	lang === 'en' ? `${SITE}/read/${urlSlug(lang, slug)}/` : `${SITE}/read/${lang}/${urlSlug(lang, slug)}/`;
+const BOOK_PAGE_LANGS = new Set();
+if (!SKIP && process.env.SITEMAP_BOOK_PAGES !== '0') {
+	const probeOrigin = process.env.SITEMAP_BOOK_PROBE_ORIGIN || SITE;
+	const QUEUE = [...byLang].filter(([, books]) => books.size);
+	const worker = async () => {
+		while (QUEUE.length) {
+			const [lang, books] = QUEUE.shift();
+			const slug = books.has('john') ? 'john' : [...books.keys()].sort()[0];
+			const url = bookUrl(lang, slug).replace(SITE, probeOrigin);
+			let status = 'error';
+			try {
+				const ac = new AbortController();
+				const t = setTimeout(() => ac.abort(), 15000);
+				const r = await fetch(url, { redirect: 'manual', signal: ac.signal });
+				clearTimeout(t);
+				status = r.status;
+			} catch {
+				/* fail closed */
+			}
+			if (status === 200) BOOK_PAGE_LANGS.add(lang);
+			else console.warn(`[gen-sitemap-read] book pages NOT listed for ${lang}: ${url} -> ${status}`);
+		}
+	};
+	await Promise.all(Array.from({ length: 6 }, worker));
+}
+console.log(
+	`[gen-sitemap-read] book pages: ${BOOK_PAGE_LANGS.size} of ${[...byLang].filter(([, b]) => b.size).length} languages pass the production probe`,
+);
+// slug -> Map(lang -> book url), so each book's alternates are reciprocal.
+const bookGroups = new Map();
+for (const lang of BOOK_PAGE_LANGS) {
+	for (const [slug, chapters] of byLang.get(lang)) {
+		if (!chapters.size) continue;
+		if (!bookGroups.has(slug)) bookGroups.set(slug, new Map());
+		bookGroups.get(slug).set(lang, bookUrl(lang, slug));
+	}
+}
+
 // ── Reader entry links for /bibles/<lang>-bible (full-site audit M6, 2026-10-21) ──
 // Each language's print-edition page linked only to /read/<lang>/, so the pages
 // Google trusts most in that language passed nothing to its chapters, and the 64
@@ -467,6 +517,25 @@ for (const key of keys) {
 		perLang[l]++;
 	}
 }
+let bookCount = 0;
+for (const slug of [...bookGroups.keys()].sort()) {
+	const langs = bookGroups.get(slug);
+	const alts = [...langs.entries()]
+		.map(([l, u]) => `<xhtml:link rel="alternate" hreflang="${l}" href="${esc(u)}"/>`)
+		.join('');
+	const xdefault = langs.has('en')
+		? `<xhtml:link rel="alternate" hreflang="x-default" href="${esc(langs.get('en'))}"/>`
+		: '';
+	for (const [l, u] of langs) {
+		const entry = `<url><loc>${esc(u)}</loc><changefreq>monthly</changefreq><priority>0.85</priority>${alts}${xdefault}</url>`;
+		parts.push(entry);
+		if (SPLIT) segs.get(l).push(entry);
+		count++;
+		perLang[l]++;
+		bookCount++;
+	}
+}
+console.log(`[gen-sitemap-read] book pages listed: ${bookCount}`);
 parts.push('</urlset>');
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true });

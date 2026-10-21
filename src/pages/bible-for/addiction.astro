@@ -3,6 +3,10 @@
 // Generated from a verified draft (stats cited, verses slug-checked, images & voice
 // headshots sourced/verified by hand).
 import GroupBible from '../../components/GroupBible.astro';
+import { generalListPrice } from '../../data/print-catalog';
+
+// Visible prices read the catalog (stale $39.99/$44.99 text fixed 2026-10-21).
+const PRICE = generalListPrice();
 ---
 
 <GroupBible
@@ -114,7 +118,7 @@ import GroupBible from '../../components/GroupBible.astro';
 	whichBibleHeading={`Which Bible for someone in recovery?`}
 	whichBibleIntroHtml={`Choosing a Bible for someone fighting addiction — or for your own recovery? Here's an honest comparison, including the one we publish. Recovery runs on daily rhythm and identity; these editions serve that differently.`}
 	whichBibleRows={[
-		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `Hearing you are a beloved child — not your addiction — and building a daily listening rhythm with free audio`, style: `Fresh translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free online with audio, any device, no account; paperback from $39.99` },
+		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `Hearing you are a beloved child — not your addiction — and building a daily listening rhythm with free audio`, style: `Fresh translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free online with audio, any device, no account; paperback from ${PRICE.pb}` },
 		{ edition: `NLT Life Recovery Bible (Tyndale)`, bestFor: `Working the 12 steps with recovery notes woven through Scripture`, style: `NLT — thought-for-thought, very readable`, access: `Paperback/hardcover from retailers` },
 		{ edition: `NIV Celebrate Recovery Study Bible (Zondervan)`, bestFor: `Companion for a Celebrate Recovery group`, style: `NIV — balanced, widely used`, access: `Paperback from retailers` },
 	]}

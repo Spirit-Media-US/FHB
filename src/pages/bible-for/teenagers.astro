@@ -3,6 +3,10 @@
 // Generated from a verified draft (stats cited, verses slug-checked, images & voice
 // headshots sourced/verified by hand).
 import GroupBible from '../../components/GroupBible.astro';
+import { generalListPrice } from '../../data/print-catalog';
+
+// Visible prices read the catalog (stale $39.99/$44.99 text fixed 2026-10-21).
+const PRICE = generalListPrice();
 ---
 
 <GroupBible
@@ -107,7 +111,7 @@ import GroupBible from '../../components/GroupBible.astro';
 	whichBibleHeading={`Which Bible for a teenager?`}
 	whichBibleIntroHtml={`Choosing a Bible for a teen — as a gift, or for yourself? Here's an honest comparison, including the one we publish. The best Bible for a teenager is the one they'll actually open; these differ in reading style, study help, and cost.`}
 	whichBibleRows={[
-		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `Teens wrestling with identity and belonging — meeting God as a Father who already delights in them`, style: `Fresh translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free on any phone with audio — no app, no account; paperback from $39.99` },
+		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `Teens wrestling with identity and belonging — meeting God as a Father who already delights in them`, style: `Fresh translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free on any phone with audio — no app, no account; paperback from ${PRICE.pb}` },
 		{ edition: `NIV Teen Study Bible (Zondervan)`, bestFor: `Study notes aimed at everyday questions teens actually ask`, style: `NIV — balanced, widely used in youth groups`, access: `Hardcover/paperback from retailers` },
 		{ edition: `NLT Teen Life Application Study Bible (Tyndale)`, bestFor: `Practical "how does this apply to my life" notes`, style: `NLT — thought-for-thought, very readable`, access: `Hardcover/paperback from retailers` },
 		{ edition: `ESV Teen Study Bible (Crossway)`, bestFor: `Teens ready for closer, word-for-word study`, style: `ESV — essentially literal, more formal English`, access: `Hardcover/paperback from retailers` },
