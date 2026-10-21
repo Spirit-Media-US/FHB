@@ -73,4 +73,11 @@ export const GUIDES: GuideEntry[] = [
 			'A curated, honest list of ministries and teachers intentional about our Father’s heart — from the Woods and George LaDu to Fatherheart Ministries.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c42c2fd1d784331411250317010d54a0cfac62cc-5959x3724.jpg',
 	},
+	{
+		slug: 'healing-the-father-wound',
+		title: 'How to Heal From a Father Wound Through Scripture',
+		blurb:
+			'Five honest steps, each with the verses to read: tell the truth, relearn what a father is, receive a new identity, forgive, and don’t heal alone.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
+	},
 ];
