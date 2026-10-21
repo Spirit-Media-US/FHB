@@ -1,0 +1,330 @@
+---
+// /books-of-the-bible — plan W2 (Kevin 2026-10-21, master SEO/AEO plan; milestone 4 Nov).
+// Target: "books of the bible" 63,000/mo KD 20 · "old testament" 26,000 · "new testament"
+// 26,000 (Ahrefs US, June 2026 FINAL strategy study). The searched words lead the title,
+// the H1 and the first paragraph. Old/New Testament VIEWS = the radio toggle below (no JS).
+//
+// Substance, not a template: every book carries its OWN one-line summary, read at build
+// time from the FHB book summaries (tools-api output/book_summaries/en.json — the same
+// file the /read app shows on each book's first chapter). Chapter counts and order come
+// from src/lib/bible_structure.json. Nothing here is typed by hand, so it cannot drift.
+// Each book links into the reader (absolute prod URL, the marketing convention).
+import { readFileSync } from 'node:fs';
+import AuthorBio from '../components/AuthorBio.astro';
+import ReviewLink from '../components/ReviewLink.astro';
+import Layout from '../layouts/Layout.astro';
+import structure from '../lib/bible_structure.json';
+
+const SUMMARIES_PATH =
+	'/home/deploy/bin/tools-api/pipelines/translation/output/book_summaries/en.json';
+const summaries: Record<string, string> = JSON.parse(readFileSync(SUMMARIES_PATH, 'utf8'));
+
+const READ = 'https://fathersheartbible.com/read';
+const slugOf = (b: string) => b.toLowerCase().replace(/\s+/g, '-');
+
+// The traditional groupings most English Bibles print in their contents page.
+const GROUPS: { testament: 'OT' | 'NT'; name: string; first: string; last: string }[] = [
+	{
+		testament: 'OT',
+		name: 'The Law (the Five Books of Moses)',
+		first: 'Genesis',
+		last: 'Deuteronomy',
+	},
+	{ testament: 'OT', name: 'History', first: 'Joshua', last: 'Esther' },
+	{ testament: 'OT', name: 'Poetry and Wisdom', first: 'Job', last: 'Song of Solomon' },
+	{ testament: 'OT', name: 'The Major Prophets', first: 'Isaiah', last: 'Daniel' },
+	{ testament: 'OT', name: 'The Minor Prophets', first: 'Hosea', last: 'Malachi' },
+	{ testament: 'NT', name: 'The Gospels', first: 'Matthew', last: 'John' },
+	{ testament: 'NT', name: 'History', first: 'Acts', last: 'Acts' },
+	{ testament: 'NT', name: 'Paul’s Letters', first: 'Romans', last: 'Philemon' },
+	{ testament: 'NT', name: 'The General Letters', first: 'Hebrews', last: 'Jude' },
+	{ testament: 'NT', name: 'Prophecy', first: 'Revelation', last: 'Revelation' },
+];
+const order: string[] = structure.order;
+const chapters = structure.chapters as Record<string, number>;
+const groups = GROUPS.map((g) => {
+	const books = order.slice(order.indexOf(g.first), order.indexOf(g.last) + 1).map((b) => {
+		const summary = summaries[b];
+		if (!summary)
+			throw new Error(`books-of-the-bible: no FHB summary for ${b} in ${SUMMARIES_PATH}`);
+		return { name: b, slug: slugOf(b), chapters: chapters[b], summary, n: order.indexOf(b) + 1 };
+	});
+	return { ...g, books };
+});
+const OT = groups.filter((g) => g.testament === 'OT');
+const NT = groups.filter((g) => g.testament === 'NT');
+const count = (gs: typeof groups) => gs.reduce((s, g) => s + g.books.length, 0);
+if (count(OT) !== 39 || count(NT) !== 27)
+	throw new Error('books-of-the-bible: grouping does not cover 39 + 27 books');
+const TOTAL_CHAPTERS = order.reduce((s, b) => s + chapters[b], 0);
+
+const PAGE_URL = 'https://fathersheartbible.com/books-of-the-bible/';
+const TITLE = 'Books of the Bible in Order — All 66, Old & New Testament';
+const DESCRIPTION =
+	'All 66 books of the Bible in order: 39 Old Testament and 27 New Testament books, each with a one-line summary. Read every book free online with audio.';
+const PUBLISHED = '2026-10-21';
+const MODIFIED = '2026-10-21';
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/13334b01b91963fa9581ecebb66c4cf6064938d2-6016x4016.jpg';
+const HERO_ALT = 'A couple reading and studying the Bible together at a wooden table';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: 'Founder & CEO, Spirit Media Publishing',
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+const FAQS = [
+	{
+		question: 'How many books are in the Bible?',
+		answer:
+			'The Bible has 66 books: 39 in the Old Testament and 27 in the New Testament. That is the count in Protestant Bibles, including the Father’s Heart Bible™. Catholic Bibles add seven more Old Testament books (the deuterocanonical books, such as Tobit and the Maccabees) for 73, and Orthodox Bibles include a few beyond that.',
+	},
+	{
+		question: 'How many books are in the Old Testament and the New Testament?',
+		answer:
+			'The Old Testament has 39 books, from Genesis to Malachi, written mostly in Hebrew before the time of Jesus. The New Testament has 27 books, from Matthew to Revelation, written in Greek in the first century after His life, death and resurrection.',
+	},
+	{
+		question: 'What are the books of the Bible in order?',
+		answer:
+			'Old Testament: Genesis, Exodus, Leviticus, Numbers, Deuteronomy, Joshua, Judges, Ruth, 1 and 2 Samuel, 1 and 2 Kings, 1 and 2 Chronicles, Ezra, Nehemiah, Esther, Job, Psalms, Proverbs, Ecclesiastes, Song of Solomon, Isaiah, Jeremiah, Lamentations, Ezekiel, Daniel, Hosea, Joel, Amos, Obadiah, Jonah, Micah, Nahum, Habakkuk, Zephaniah, Haggai, Zechariah, Malachi. New Testament: Matthew, Mark, Luke, John, Acts, Romans, 1 and 2 Corinthians, Galatians, Ephesians, Philippians, Colossians, 1 and 2 Thessalonians, 1 and 2 Timothy, Titus, Philemon, Hebrews, James, 1 and 2 Peter, 1, 2 and 3 John, Jude, Revelation.',
+	},
+	{
+		question: 'What is the first book of the Bible, and what is the last?',
+		answer:
+			'Genesis is the first book of the Bible: it opens with our Father creating the heavens and the earth and a family for Himself. Revelation is the last: it closes with a new heaven and a new earth where He lives with His children forever. The whole Bible runs between those two homes.',
+	},
+	{
+		question: 'What is the longest book of the Bible, and the shortest?',
+		answer: `Psalms is the longest book of the Bible, with 150 chapters. The shortest books are a single chapter long: Obadiah in the Old Testament, and Philemon, 2 John, 3 John and Jude in the New Testament. Altogether the 66 books contain ${TOTAL_CHAPTERS.toLocaleString('en-US')} chapters.`,
+	},
+	{
+		question: 'Which book of the Bible should I read first?',
+		answer:
+			'Start with Genesis 1-3 for the foundation, then read the Gospel of John to meet Jesus and, through Him, the Father. After John, read the rest of the New Testament, then go back to the Old Testament story. Every book is free to read online with audio in the Father’s Heart Bible™.',
+	},
+];
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: 'The Books of the Bible in Order: All 66, Old and New Testament',
+	description: DESCRIPTION,
+	image: OG_IMG,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: PUBLISHED,
+	dateModified: MODIFIED,
+	inLanguage: 'en-US',
+	keywords:
+		'books of the bible, books of the bible in order, old testament books, new testament books, how many books are in the bible',
+};
+const itemListSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'ItemList',
+	name: 'The 66 books of the Bible in order',
+	numberOfItems: order.length,
+	itemListOrder: 'https://schema.org/ItemListOrderAscending',
+	itemListElement: order.map((b, i) => ({
+		'@type': 'ListItem',
+		position: i + 1,
+		name: b,
+		url: `${READ}/${slugOf(b)}/`,
+	})),
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{ '@type': 'ListItem', position: 2, name: 'Books of the Bible', item: PAGE_URL },
+	],
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [articleSchema, itemListSchema, breadcrumbSchema, faqSchema];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={PUBLISHED}
+	articleSection="Bible Reading Guides"
+	articleTags={["books of the Bible", "Old Testament", "New Testament"]}
+	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[420px] md:min-h-[65vh]">
+			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} width="1400" height="620" class="absolute inset-0 w-full h-full object-cover" style="object-position: center;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
+		</section>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Books of the Bible</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Reading Guide</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Books of the Bible</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; leading the Father&rsquo;s Heart Bible&trade; translation</span>
+					<span aria-hidden="true">&middot;</span><span>Published {formatDate(PUBLISHED)}</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p id="direct-answer" class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<strong style="color: var(--color-ink);">There are 66 books of the Bible: 39 in the Old Testament and 27 in the New Testament.</strong> They were written over roughly fifteen centuries by about forty authors &mdash; shepherds, kings, prophets, a doctor, fishermen &mdash; in Hebrew, Aramaic and Greek, and together they hold {TOTAL_CHAPTERS.toLocaleString('en-US')} chapters. The Old Testament runs from Genesis to Malachi; the New Testament from Matthew to Revelation. Below is every book of the Bible in order, grouped the way most Bibles print them, each with a one-line summary from the Father&rsquo;s Heart Bible&trade; (FHB) and a link to read it free online, chapter by chapter, with audio.
+				</p>
+
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
+					<p id="key-takeaway" class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">66 books, 39 Old Testament and 27 New Testament, from Genesis to Revelation &mdash; many writers, one story: our Father making a family, losing them, and bringing them home.</p>
+				</aside>
+
+				<div class="books-view">
+					<input type="radio" name="books-view" id="view-all" class="sr-only" checked />
+					<input type="radio" name="books-view" id="view-ot" class="sr-only" />
+					<input type="radio" name="books-view" id="view-nt" class="sr-only" />
+					<div class="books-tabs" role="group" aria-label="Show books">
+						<label for="view-all">All 66 books</label>
+						<label for="view-ot">Old Testament (39)</label>
+						<label for="view-nt">New Testament (27)</label>
+					</div>
+
+					<div class="books-ot">
+						<h2 id="old-testament" class="text-2xl md:text-3xl font-light mt-10 mb-2 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Old Testament books: 39</h2>
+						<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The Old Testament is the story of our Father and the family He chose through Abraham &mdash; creation and fall, the exodus from Egypt, the kings, the exile and the return &mdash; with the songs and prophets that carried His promise of a coming King.</p>
+						{OT.map((g) => (
+							<>
+								<h3 class="text-xl font-medium mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">{g.name} <span class="text-sm font-normal" style="color: var(--color-muted);">&middot; {g.books.length} {g.books.length === 1 ? 'book' : 'books'}</span></h3>
+								<ol class="book-list" start={g.books[0].n}>
+									{g.books.map((b) => (
+										<li>
+											<a href={`${READ}/${b.slug}/`} class="font-semibold hover:underline" style="color: var(--color-brand);">{b.name}</a>
+											<span class="book-ch">{b.chapters} {b.chapters === 1 ? 'chapter' : 'chapters'}</span>
+											<p>{b.summary}</p>
+										</li>
+									))}
+								</ol>
+							</>
+						))}
+					</div>
+
+					<div class="books-nt">
+						<h2 id="new-testament" class="text-2xl md:text-3xl font-light mt-12 mb-2 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">New Testament books: 27</h2>
+						<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The New Testament is the Son coming to bring the family home: four Gospels of His life, death and resurrection, the story of the first believers, the letters that taught them to live as the Father&rsquo;s children, and the vision of the end of the story.</p>
+						{NT.map((g) => (
+							<>
+								<h3 class="text-xl font-medium mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">{g.name} <span class="text-sm font-normal" style="color: var(--color-muted);">&middot; {g.books.length} {g.books.length === 1 ? 'book' : 'books'}</span></h3>
+								<ol class="book-list" start={g.books[0].n - 39}>
+									{g.books.map((b) => (
+										<li>
+											<a href={`${READ}/${b.slug}/`} class="font-semibold hover:underline" style="color: var(--color-brand);">{b.name}</a>
+											<span class="book-ch">{b.chapters} {b.chapters === 1 ? 'chapter' : 'chapters'}</span>
+											<p>{b.summary}</p>
+										</li>
+									))}
+								</ol>
+							</>
+						))}
+					</div>
+				</div>
+
+				<h2 id="how-grouped" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">How the books of the Bible are grouped</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The Bible is a library, not a single book, and its order is by kind more than by date. The Old Testament opens with the five books of the Law, then the History books from Joshua to Esther, then Poetry and Wisdom (Job, Psalms, Proverbs, Ecclesiastes, Song of Solomon), then the Prophets &mdash; &ldquo;major&rdquo; and &ldquo;minor&rdquo; describe the length of the books, not their importance. The New Testament follows the same pattern: the four Gospels, one book of history (Acts), thirteen letters from Paul, eight general letters, and Revelation. Jewish Bibles hold the same Old Testament books in a different order, and Catholic and Orthodox Bibles include additional books, which is why you may see a count of 73 or more.</p>
+
+				<h2 id="where-to-start" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Which book of the Bible to read first</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">You do not have to start on page one. Begin with <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1&ndash;3</a>, where our Father forms His children in His own image, then read <a href="https://fathersheartbible.com/read/john/1/" style="color: var(--color-brand);" class="hover:underline">the Gospel of John</a>, where the Son comes to bring them home. From there, the rest of the New Testament and then the Old Testament story read with fresh eyes. Our guide <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">Where to Start Reading the Bible</a> lays out the order step by step.</p>
+
+				<h2 id="one-story" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Sixty-six books, one story</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">For all its writers and centuries, the Bible tells one story. A Father makes a world and a family for Himself. His children are carried off &mdash; by their own choice and by an enemy who hates them. And He pursues them, through Abraham and Moses, through David and the prophets, until His Son walks into the story to bring the family home. Genesis begins in a garden where the Father walks with His children; Revelation ends in a city where He lives with them forever. The Father&rsquo;s Heart Bible&trade; is translated to let that thread be heard on every page, which is why it reveals God as <em>Father</em> wherever Scripture does. Read any book free, with audio, in the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">online reader</a>.</p>
+
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Start with any book, free</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">All 66 books of the Father&rsquo;s Heart Bible&trade; are free to read online, chapter by chapter, with audio narration so you can read and listen together.</p>
+					<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a>
+				</aside>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="space-y-6">
+					{FAQS.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Keep going: <a href="/guides/how-to-read-the-bible/" style="color: var(--color-brand);" class="hover:underline">How to Read the Bible</a>, <a href="/meaning/lords-prayer/" style="color: var(--color-brand);" class="hover:underline">the Lord&rsquo;s Prayer explained</a>, <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, or learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why the Father&rsquo;s Heart Bible&trade; exists</a>. For the history of how the books were gathered, see the <a href="https://www.britannica.com/topic/biblical-literature" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Encyclopaedia Britannica entry on biblical literature</a>.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<ReviewLink class="mb-10" />
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>
+
+<style>
+	.books-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; font-family: var(--font-sans); }
+	.books-tabs label { cursor: pointer; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--color-hairline); font-size: 14px; font-weight: 600; color: var(--color-muted); }
+	.books-view:has(#view-all:checked) label[for='view-all'],
+	.books-view:has(#view-ot:checked) label[for='view-ot'],
+	.books-view:has(#view-nt:checked) label[for='view-nt'] { background: var(--color-brand); border-color: var(--color-brand); color: var(--color-on-primary, #fff); }
+	.books-view:has(#view-ot:checked) .books-nt,
+	.books-view:has(#view-nt:checked) .books-ot { display: none; }
+	.books-view:has(:focus-visible) .books-tabs { outline: 2px solid var(--color-brand); outline-offset: 4px; border-radius: 12px; }
+	.book-list { list-style: decimal; padding-left: 2.2em; margin: 0; font-family: var(--font-sans); }
+	.book-list li { margin: 0 0 14px; color: var(--color-muted); }
+	.book-list li::marker { color: var(--color-muted); font-size: 14px; }
+	.book-list .book-ch { margin-left: 8px; font-size: 13px; color: var(--color-muted); }
+	.book-list p { margin: 2px 0 0; font-size: 16px; line-height: 1.55; }
+</style>
