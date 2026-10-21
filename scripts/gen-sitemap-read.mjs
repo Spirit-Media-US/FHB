@@ -321,7 +321,7 @@ try {
 			let num = String(n);
 			if (key === 'psalms' && LXX[lang])
 				num = LXX[lang] === 'lxx-first' ? `${n - 1} (${n})` : `${n} (${n - 1})`;
-			links.push({ href: chapterUrl(lang, key, n).replace(SITE, ''), label: `${name} ${num}` });
+			links.push({ href: chapterUrl(lang, key, n).replace(SITE, ''), label: `${name} ${num}`, book: key, ch: n });
 		}
 		if (links.length) entry[lang] = links;
 	}
@@ -545,6 +545,9 @@ console.log(
 			.join(' '),
 );
 
+// Number of languages live on /read, set by the coverage block below and written into the
+// prose "free to read online in N languages" by the counts block after it (W3 2026-10-21).
+let READ_LANGUAGE_TOTAL = 0;
 // ── llms.txt "Languages and coverage" (2026-10-07) ───────────────────────────────
 // That section was hand-written and went stale: on 2026-10-07 it still told AI crawlers
 // Portuguese, Marathi, French, Arabic … Vietnamese were "NOT yet published — their chapter
@@ -610,6 +613,7 @@ console.log(
 		if (a === -1 || b < a) throw new Error('GENERATED:languages markers not found');
 		const next = cur.slice(0, a) + out + cur.slice(b + END.length);
 		if (next !== cur) fs.writeFileSync(LLMS, next);
+		READ_LANGUAGE_TOTAL = rows.length;
 		console.log(
 			`gen-sitemap-read: llms.txt languages — ${rows.length} published, ` +
 				`${unpublished.length} not yet (${unpublished.map((r) => r.code).join(', ') || 'none'})`,
@@ -646,8 +650,20 @@ console.log(
 			console.error(`gen-sitemap-read: ${name} has no "published in N languages" phrase to generate`);
 			process.exit(1);
 		}
-		const next = cur.replace(re, `published in ${printTotal} languages`);
+		let next = cur.replace(re, `published in ${printTotal} languages`);
+		// The print count alone read as "47 live? no, 37" to AI engines (plan W3, 2026-10-21).
+		// The ONLINE count is the coverage table's own row count, written beside it. Fails
+		// loud if the phrase is missing; skipped (file keeps its last good number, with a
+		// warning) only if the coverage block could not run.
+		const reRead = /free to read online in \d+ languages/g;
+		const readHits = next.match(reRead) || [];
+		if (readHits.length === 0) {
+			console.error(`gen-sitemap-read: ${name} has no "free to read online in N languages" phrase to generate`);
+			process.exit(1);
+		}
+		if (READ_LANGUAGE_TOTAL > 0) next = next.replace(reRead, `free to read online in ${READ_LANGUAGE_TOTAL} languages`);
+		else console.warn(`gen-sitemap-read: ${name} — online language count NOT refreshed (coverage block failed)`);
 		if (next !== cur) fs.writeFileSync(f, next);
-		console.log(`gen-sitemap-read: ${name} — ${hits.length} language count(s) set to ${printTotal}`);
+		console.log(`gen-sitemap-read: ${name} — ${hits.length} print count(s) set to ${printTotal}, ${readHits.length} online count(s) set to ${READ_LANGUAGE_TOTAL || 'unchanged'}`);
 	}
 }
