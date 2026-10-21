@@ -32,6 +32,30 @@ const langHref = (code?: string) => {
 	return l && !l.soon ? `/bibles/${langSlug(l)}-bible/` : undefined;
 };
 const inPrint = isbns.languages.filter((l) => l.onSale);
+// eBooks + audiobooks per language (Kevin 2026-10-21): ISBN where Bowker assigned one, otherwise the store's own ID
+const digital = isbns.digital as {
+	code: string;
+	name: string;
+	ebook: string | null;
+	ebookStatus: string | null;
+	audiobook: string | null;
+	audiobookStatus: string | null;
+	kindle: string | null;
+}[];
+const DIGITAL_NOTE: Record<string, string> = {
+	processing: 'processing',
+	internal_error: 'in review',
+};
+const digitalNotes = (r: (typeof digital)[number]) =>
+	[r.ebookStatus, r.audiobookStatus]
+		.filter((s): s is string => !!s && s in DIGITAL_NOTE)
+		.map((s) => DIGITAL_NOTE[s])
+		.concat(r.kindle ? [`Kindle ${r.kindle}`] : [])
+		.join(' · ');
+const STORE_ID_TOTAL = digital.reduce(
+	(n, r) => n + [r.ebook, r.audiobook].filter((v) => v && !v.startsWith('979')).length,
+	0,
+);
 // every number on the page, for the total line
 const ISBN_TOTAL =
 	(general.length + isbns.largePrint.length + 1 + isbns.audience.length + isbns.languages.length) *
@@ -193,6 +217,7 @@ const books = groups.flatMap((g) =>
 					{groups.map((g) => (
 						<a href={`#${g.id}`}>{g.title}</a>
 					))}
+					<a href="#ebooks-audiobooks">eBooks &amp; Audiobooks</a>
 				</nav>
 
 				{groups.map((g) => (
@@ -237,8 +262,32 @@ const books = groups.flatMap((g) =>
 					</div>
 				</section>
 
+				<section id="ebooks-audiobooks" class="isbn-group">
+					<h3>eBooks &amp; Audiobooks <span>{digital.length} languages · ISBN where assigned, otherwise the store’s own ID</span></h3>
+					<div class="isbn-table" role="table" aria-label="eBook and audiobook identifiers">
+						<div class="isbn-row isbn-head" role="row">
+							<span role="columnheader">Language</span>
+							<span role="columnheader">Listening eBook</span>
+							<span role="columnheader">Audiobook</span>
+						</div>
+						{digital.map((r) => (
+							<div class="isbn-row" role="row">
+								<span class="isbn-name" role="cell">
+									{r.name}
+									{digitalNotes(r) && <span style="font-weight: 400; color: var(--color-muted);"> ({digitalNotes(r)})</span>}
+								</span>
+								<span class="isbn-num" role="cell" data-label="Listening eBook">{r.ebook ?? '—'}</span>
+								<span class="isbn-num" role="cell" data-label="Audiobook">{r.audiobook ?? '—'}</span>
+							</div>
+						))}
+					</div>
+					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; margin: 0.75rem 0 0;">
+						GGKEY numbers are Google Play’s own IDs. These editions sell without an ISBN.
+					</p>
+				</section>
+
 				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin: 2.5rem 0 0;">
-					{ISBN_TOTAL} ISBNs. Published by Spirit Media Publishing.
+					{ISBN_TOTAL} ISBNs and {STORE_ID_TOTAL} store IDs. Published by Spirit Media Publishing.
 				</p>
 			</div>
 		</Section>
