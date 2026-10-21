@@ -64,4 +64,12 @@ export const WORD_MEANINGS: WordMeaning[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 		volume: '76,000/mo',
 	},
+	{
+		slug: 'ten-commandments',
+		title: 'The Ten Commandments: the list and what they mean',
+		blurb:
+			'Exodus 20 and Deuteronomy 5 in the FHB — and why the commandments begin “I am your Father, who brought you out of Egypt.”',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
+		volume: '83,000/mo',
+	},
 ];

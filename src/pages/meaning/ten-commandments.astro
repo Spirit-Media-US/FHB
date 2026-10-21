@@ -1,0 +1,154 @@
+---
+// /meaning/ten-commandments — plan W2 (Kevin 2026-10-21, master SEO/AEO plan): "the ten
+// commandments" 83,000/mo, KD 58 (Ahrefs US, June 2026 FINAL strategy study). The searched words
+// lead the title, the H1 and the first paragraph.
+//
+// WEDGE: in the FHB the commandments begin "I am your Father, who brought you out of Egypt's land"
+// (Exodus 20:2) — the relationship comes before the rules. Every quotation of Exodus 20 and
+// Deuteronomy 5 below is VERBATIM from src/content/bible (what /read serves); checked with
+// bin/fhb-scripture-quote-audit.py. The numbering note reflects the three common traditions.
+import WordMeaning from '../../components/WordMeaning.astro';
+
+const ten = [
+	[
+		'Have no other gods before our Father',
+		'Exodus 20:3',
+		'“Do not have any other gods before me.”',
+	],
+	['Make no carved image to worship', 'Exodus 20:4–6', '“Do not make yourself a carved image…”'],
+	[
+		'Do not take our Father’s name in vain',
+		'Exodus 20:7',
+		'“Do not take your Father’s name in vain…”',
+	],
+	[
+		'Remember the Sabbath day, to keep it holy',
+		'Exodus 20:8–11',
+		'“Remember the Sabbath day, to keep it holy.”',
+	],
+	['Honor your father and your mother', 'Exodus 20:12', '“Honor your father and your mother…”'],
+	['Do not murder', 'Exodus 20:13', '“Do not murder.”'],
+	['Do not commit adultery', 'Exodus 20:14', '“Do not commit adultery.”'],
+	['Do not steal', 'Exodus 20:15', '“Do not steal.”'],
+	[
+		'Do not give false testimony',
+		'Exodus 20:16',
+		'“Do not give false testimony against your neighbor.”',
+	],
+	['Do not crave what is your neighbor’s', 'Exodus 20:17', '“Do not crave your neighbor’s house…”'],
+];
+const tenList = `<ol style="padding-left:1.4rem; list-style:decimal;">${ten
+	.map(
+		([n, ref, q]) =>
+			`<li style="margin:0 0 .5rem;"><strong style="color: var(--color-ink);">${n}</strong> &mdash; ${q} <span style="white-space:nowrap;">(${ref})</span></li>`,
+	)
+	.join('')}</ol>`;
+
+const sections = [
+	{
+		id: 'the-list',
+		heading: 'The Ten Commandments, listed',
+		bodyHtml: `<p>Here are the Ten Commandments in the order Exodus 20 gives them, in the words of the Father&rsquo;s Heart Bible&trade;:</p>${tenList}<p>The first four are about our relationship with our Father; the last six are about our relationships with one another. Jesus summed up both halves when He was asked for the greatest commandment: &ldquo;Love your Father with all your heart, with all your soul, and with all your mind&rdquo; and &ldquo;You will love your neighbor as yourself&rdquo; (Matthew 22:37&ndash;39).</p>`,
+	},
+	{
+		id: 'they-begin-with-a-father',
+		heading: 'They begin with who He is, not with a rule',
+		bodyHtml: `<p>The commandments do not open with a demand. Before a single &ldquo;do not,&rdquo; our Father says who He is and what He has already done: &ldquo;I am your Father, who brought you out of Egypt&rsquo;s land, out of the house of slavery&rdquo; (Exodus 20:2). The people had been slaves for generations. He set them free first, and only then told them how free people live.</p><p>That order matters. The Ten Commandments are not a ladder to climb so that God will accept you; they are the way of life for a family that has already been rescued. In Exodus they are not handed down by a messenger either: &ldquo;Then our Father spoke all these words&rdquo; (Exodus 20:1). In the Father&rsquo;s Heart Bible&trade; every one of them is printed in the Divine Voice&trade; colour for the Father, because He spoke them Himself.</p>`,
+	},
+	{
+		id: 'exodus-and-deuteronomy',
+		heading: 'Where the Ten Commandments are in the Bible',
+		bodyHtml: `<p>The Ten Commandments appear twice. <a href="https://fathersheartbible.com/read/exodus/20/" style="color: var(--color-brand);" class="hover:underline">Exodus 20:1&ndash;17</a> records them as our Father spoke them at Mount Sinai. <a href="https://fathersheartbible.com/read/deuteronomy/5/" style="color: var(--color-brand);" class="hover:underline">Deuteronomy 5:6&ndash;21</a> records Moses repeating them forty years later to the next generation, insisting, &ldquo;This covenant our Father made not with our ancestors but with us&mdash;all of us alive here today&rdquo; (Deuteronomy 5:3).</p><p>The two lists match almost word for word, with one striking difference in the Sabbath command. Exodus grounds it in creation: &ldquo;For in six days our Father made the heavens, the earth, the sea, and all in them, then rested the seventh day&rdquo; (Exodus 20:11). Deuteronomy grounds it in rescue: &ldquo;Remember you were a slave in Egypt, and your Father brought you out from there with a strong hand and outstretched arm&rdquo; (Deuteronomy 5:15). Rest is a gift both to creatures and to freed slaves, and Deuteronomy adds, &ldquo;so your male and female servants may rest like you.&rdquo;</p>`,
+	},
+	{
+		id: 'ten-words',
+		heading: 'Why they are also called the “Ten Words”',
+		bodyHtml: `<p>The Bible itself counts them. Exodus 34:28 says Moses &ldquo;wrote the covenant&rsquo;s words&mdash;the Ten Words&mdash;on the tablets,&rdquo; and Deuteronomy 4:13 calls them the same. That is where the old name <em>Decalogue</em> comes from: Greek for <em>ten words</em>. Deuteronomy 10:4 calls them &ldquo;the ten commandments our Father had spoken to you on the mountain.&rdquo;</p><p>Churches number them slightly differently. Most Protestant and Orthodox churches count &ldquo;no other gods&rdquo; and &ldquo;no carved image&rdquo; as two commandments, as listed above. Catholic and Lutheran tradition joins those two and divides the last command into two (not coveting a neighbor&rsquo;s wife, and not coveting a neighbor&rsquo;s goods). The words of Scripture are the same; only the counting differs.</p>`,
+	},
+	{
+		id: 'for-christians-today',
+		heading: 'What the Ten Commandments mean for Christians today',
+		bodyHtml: `<p>Jesus did not set the commandments aside; He went to their heart. In the Sermon on the Mount He showed that &ldquo;do not murder&rdquo; reaches anger and &ldquo;do not commit adultery&rdquo; reaches desire. Paul says the commandments are summed up in one word: &ldquo;Love your neighbor as yourself&rdquo; (Romans 13:9), because &ldquo;love is the fulfillment of the law&rdquo; (Romans 13:10).</p><p>So the Ten Commandments still show what love looks like: loyal to our Father, honest about His name, glad to rest, honouring parents, protecting life, marriage, property and truth, and content instead of craving. They do not earn a place in the family. They describe the family&rsquo;s life, and they were first spoken by a Father who had already brought His children out of slavery.</p>`,
+	},
+];
+
+const renderings = [
+	{
+		ref: 'Exodus 20:2–3',
+		slug: 'exodus',
+		ch: 20,
+		fhb: '“I am your Father, who brought you out of Egypt’s land, out of the house of slavery. “Do not have any other gods before me.',
+		traditional:
+			'“I am the LORD thy God, which have brought thee out of the land of Egypt, out of the house of bondage. Thou shalt have no other gods before me.” (KJV)',
+	},
+	{
+		ref: 'Exodus 20:12–17',
+		slug: 'exodus',
+		ch: 20,
+		fhb: '“Honor your father and your mother, so your days are long in the land your Father is giving you. “Do not murder. “Do not commit adultery. “Do not steal. “Do not give false testimony against your neighbor. “Do not crave your neighbor’s house. Do not crave your neighbor’s wife, his male or female servant, his ox or donkey, or anything that is your neighbor’s.”',
+	},
+	{
+		ref: 'Deuteronomy 5:6–7',
+		slug: 'deuteronomy',
+		ch: 5,
+		fhb: '“I am your Father, who brought you out of Egypt, the house of slavery. “You must have no other gods before me.',
+	},
+	{
+		ref: 'Deuteronomy 5:15',
+		slug: 'deuteronomy',
+		ch: 5,
+		fhb: 'Remember you were a slave in Egypt, and your Father brought you out from there with a strong hand and outstretched arm. So your Father commanded you to keep the Sabbath day.',
+	},
+];
+
+const faqs = [
+	{
+		question: 'What are the Ten Commandments?',
+		answer:
+			'The Ten Commandments are the ten words our Father spoke at Mount Sinai, recorded in Exodus 20:1-17 and Deuteronomy 5:6-21: have no other gods before Him; make no carved image to worship; do not take His name in vain; keep the Sabbath holy; honor your father and mother; do not murder; do not commit adultery; do not steal; do not give false testimony; and do not crave what belongs to your neighbor.',
+	},
+	{
+		question: 'Where are the Ten Commandments in the Bible?',
+		answer:
+			'In Exodus 20:1-17, where our Father speaks them at Mount Sinai, and in Deuteronomy 5:6-21, where Moses repeats them to the next generation. Both chapters are free to read online with audio in the Father’s Heart Bible™.',
+	},
+	{
+		question: 'What is the first commandment?',
+		answer:
+			'“Do not have any other gods before me” (Exodus 20:3). It follows the opening words, “I am your Father, who brought you out of Egypt’s land, out of the house of slavery” (Exodus 20:2): the first commandment rests on a relationship He has already established.',
+	},
+	{
+		question: 'Why are the Ten Commandments numbered differently?',
+		answer:
+			'The Bible gives ten commands but does not number them. Most Protestant and Orthodox churches count “no other gods” and “no carved image” separately; Catholic and Lutheran tradition joins those two and splits the command against coveting into two. The wording of Scripture is the same in every tradition.',
+	},
+	{
+		question: 'Do Christians still follow the Ten Commandments?',
+		answer:
+			'Yes, as the shape of love rather than a way to earn favor. Jesus summed up the law as loving our Father with all our heart and loving our neighbor as ourselves (Matthew 22:37-39), and Paul says the commandments are summed up in “Love your neighbor as yourself” (Romans 13:9).',
+	},
+];
+---
+
+<WordMeaning
+	slug="ten-commandments"
+	eyebrow="The Ten Commandments"
+	title="The Ten Commandments: List and Meaning (Exodus 20)"
+	description="The Ten Commandments listed and explained, from Exodus 20 and Deuteronomy 5 — and why they begin “I am your Father, who brought you out of Egypt.”"
+	h1="The Ten Commandments: the list and what they mean"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg"
+	heroAlt="A man reading and reflecting on Scripture"
+	published="2026-10-21"
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">The Ten Commandments are the ten words our Father spoke at Mount Sinai, recorded in Exodus 20:1&ndash;17 and Deuteronomy 5:6&ndash;21: have no other gods; make no idol; do not take His name in vain; keep the Sabbath holy; honor your father and mother; do not murder; do not commit adultery; do not steal; do not give false testimony; and do not crave what is your neighbor&rsquo;s.</strong> They do not begin with a rule. They begin with a relationship: &ldquo;I am your Father, who brought you out of Egypt&rsquo;s land, out of the house of slavery.&rdquo; Below is the full list, where each appears, why they are called the Ten Words, and what they mean for Christians today. You can <a href=\"https://fathersheartbible.com/read/exodus/20/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read Exodus 20 free</a> and hear it in full.`}
+	keyTakeaway="The Ten Commandments are a rescued family’s way of life: our Father set His people free first, then told them how free people live."
+	sections={sections}
+	renderings={renderings}
+	renderingsHeading="The Ten Commandments in the Father’s Heart Bible™"
+	renderingsIntro="From both places they appear, word for word, with the King James wording beside the first. Each reference links into the full chapter, free, with verse-by-verse audio in English."
+	faqs={faqs}
+	relatedHtml={`Related: <a href=\"/meaning/lords-prayer/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">the Lord&rsquo;s Prayer</a>, <a href=\"/books-of-the-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">the books of the Bible</a>, <a href=\"/meaning/our-father/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">why this Bible says &ldquo;our Father&rdquo;</a>. Read <a href=\"https://fathersheartbible.com/read/exodus/20/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Exodus 20</a>, <a href=\"https://fathersheartbible.com/read/deuteronomy/5/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Deuteronomy 5</a> or the <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">whole Bible free with audio</a>. On the history and numbering, see the <a href=\"https://www.britannica.com/topic/Ten-Commandments\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Encyclopaedia Britannica entry on the Ten Commandments</a>.`}
+	ctaMidHeading="Hear the Ten Commandments in the Father’s own voice"
+	ctaMidBodyHtml="Read Exodus 20 in full &mdash; free online with verse-by-verse audio in English, every word He spoke printed in the Divine Voice&trade; colour."
+	ctaBottomBodyHtml="From Genesis to Revelation, free online with audio &mdash; a fresh English translation that lets your Father&rsquo;s voice be heard on every page."
+	tags={["ten commandments", "the ten commandments", "exodus 20", "deuteronomy 5", "ten commandments list"]}
+/>
