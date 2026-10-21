@@ -11,9 +11,11 @@
 // sepulchre" 1,100, "hallowed fountain mtg" 1,100). The Lord's-Prayer-qualified cluster
 // above is clean, and is what this page targets.
 //
-// WEDGE: the prayer's first word is the whole of FHB's reason for existing. "hallowed"
-// occurs in exactly TWO verses of the FHB canon (Matthew 6:9, Luke 11:2) — both the
-// Lord's Prayer — verified with canon.py. Both are quoted verbatim.
+// WEDGE: the prayer's first word is the whole of FHB's reason for existing. The current
+// FHB text renders the petition "may your name be honored as holy" in both places it
+// occurs (Matthew 6:9, Luke 11:2); the word "hallowed" no longer appears anywhere in the
+// FHB text (re-verified 2026-10-21 against src/content/bible, what /read serves — the
+// page had quoted an earlier "hallowed be your name" wording). Both quoted verbatim.
 import WordMeaning from '../../components/WordMeaning.astro';
 
 const sections = [
@@ -25,17 +27,17 @@ const sections = [
 	{
 		id: 'whose-name',
 		heading: 'Whose name, and why that matters here',
-		bodyHtml: `<p>The petition cannot be separated from the address that comes immediately before it. In the Father&rsquo;s Heart Bible, Matthew 6:9 reads: &ldquo;This, then, is how you should pray: &lsquo;Our Father in heaven, hallowed be your name.&rsquo;&rdquo; Luke&rsquo;s shorter version is starker still: &ldquo;When you pray, say: Father, hallowed be your name.&rdquo;</p><p>The name being hallowed is the name <em>Father</em>. That is the striking thing about the prayer and it is easy to read past. Jesus does not teach His followers to open with a title of power. He gives them the word He Himself used, and then asks that <em>that</em> name &mdash; Father &mdash; be honoured as holy.</p><p>Holiness and intimacy are not in competition in this sentence. The One who is nearest is also the One who is holy, and the prayer holds both in a single breath.</p>`,
+		bodyHtml: `<p>The petition cannot be separated from the address that comes immediately before it. In the Father&rsquo;s Heart Bible, Matthew 6:9 reads: &ldquo;This, then, is how you should pray: &lsquo;Our Father in heaven, may your name be honored as holy,&rsquo;&rdquo; Luke&rsquo;s shorter version is starker still: &ldquo;When you pray, say: Father, may your name be honored as holy.&rdquo;</p><p>The name being hallowed is the name <em>Father</em>. That is the striking thing about the prayer and it is easy to read past. Jesus does not teach His followers to open with a title of power. He gives them the word He Himself used, and then asks that <em>that</em> name &mdash; Father &mdash; be honoured as holy.</p><p>Holiness and intimacy are not in competition in this sentence. The One who is nearest is also the One who is holy, and the prayer holds both in a single breath.</p>`,
 	},
 	{
 		id: 'thy-vs-your',
 		heading: '“Thy” or “your”? Why the wording differs',
-		bodyHtml: `<p>Most people know the line as &ldquo;hallowed be thy name&rdquo; because that is the King James wording, carried into centuries of liturgy and memory. <em>Thy</em> is simply the older English possessive &mdash; the equivalent of <em>your</em>. Nothing in the meaning turns on it.</p><p>What is worth knowing is that <em>thou</em> and <em>thy</em> were the <strong>familiar, intimate</strong> forms in older English, the words used with family and close friends, while <em>you</em> was the formal address for superiors and strangers. So the archaic phrasing that now sounds most distant to us was, in its own day, the most personal wording available.</p><p>The Father&rsquo;s Heart Bible uses &ldquo;your name&rdquo; because that is what a reader today hears as ordinary and close &mdash; the same instinct the original phrasing was serving.</p>`,
+		bodyHtml: `<p>Most people know the line as &ldquo;hallowed be thy name&rdquo; because that is the King James wording, carried into centuries of liturgy and memory. <em>Thy</em> is simply the older English possessive &mdash; the equivalent of <em>your</em>. Nothing in the meaning turns on it.</p><p>What is worth knowing is that <em>thou</em> and <em>thy</em> were the <strong>familiar, intimate</strong> forms in older English, the words used with family and close friends, while <em>you</em> was the formal address for superiors and strangers. So the archaic phrasing that now sounds most distant to us was, in its own day, the most personal wording available.</p><p>The Father&rsquo;s Heart Bible goes one step further. It uses &ldquo;your name&rdquo; because that is what a reader today hears as ordinary and close &mdash; the same instinct the original phrasing was serving &mdash; and it spells out what <em>hallowed</em> means instead of keeping the old word: &ldquo;may your name be honored as holy.&rdquo;</p>`,
 	},
 	{
 		id: 'how-to-pray-it',
 		heading: 'Praying the line as it was meant',
-		bodyHtml: `<p>Because &ldquo;hallowed be your name&rdquo; is a request, it can be prayed rather than only recited. Three things it asks for, in the order the prayer itself suggests:</p><ul><li><strong>That He be known as He actually is</strong> &mdash; not as a distant power or a rule-giver, but as the Father the rest of Scripture reveals.</li><li><strong>That His name be honoured in us</strong> &mdash; that the people who call Him Father do not make that name mean something false to those watching.</li><li><strong>That His name be honoured everywhere</strong> &mdash; which is why the very next line is &ldquo;your kingdom come.&rdquo; The two petitions are one movement.</li></ul><p>Read in full, the prayer moves from who He is, to what He is doing, to what we need &mdash; and it begins by settling the first question before asking anything.</p>`,
+		bodyHtml: `<p>Because &ldquo;hallowed be thy name&rdquo; &mdash; in the Father&rsquo;s Heart Bible, &ldquo;may your name be honored as holy&rdquo; &mdash; is a request, it can be prayed rather than only recited. Three things it asks for, in the order the prayer itself suggests:</p><ul><li><strong>That He be known as He actually is</strong> &mdash; not as a distant power or a rule-giver, but as the Father the rest of Scripture reveals.</li><li><strong>That His name be honoured in us</strong> &mdash; that the people who call Him Father do not make that name mean something false to those watching.</li><li><strong>That His name be honoured everywhere</strong> &mdash; which is why the very next line is &ldquo;your kingdom come.&rdquo; The two petitions are one movement.</li></ul><p>Read in full, the prayer moves from who He is, to what He is doing, to what we need &mdash; and it begins by settling the first question before asking anything.</p>`,
 	},
 ];
 
@@ -44,14 +46,14 @@ const renderings = [
 		ref: 'Matthew 6:9',
 		slug: 'matthew',
 		ch: 6,
-		fhb: 'This, then, is how you should pray: “Our Father in heaven, hallowed be your name,',
+		fhb: 'This, then, is how you should pray: ‘Our Father in heaven, may your name be honored as holy,',
 		traditional: '“Our Father which art in heaven, Hallowed be thy name.” (KJV)',
 	},
 	{
 		ref: 'Luke 11:2',
 		slug: 'luke',
 		ch: 11,
-		fhb: 'He said to them, “When you pray, say: Father, hallowed be your name. Your kingdom come.”',
+		fhb: 'He said to them, “When you pray, say: Father, may your name be honored as holy. Your kingdom come.',
 		traditional: '“When ye pray, say, Our Father which art in heaven, Hallowed be thy name…” (KJV)',
 	},
 ];
@@ -60,7 +62,7 @@ const faqs = [
 	{
 		question: 'What does “hallowed be thy name” mean?',
 		answer:
-			'It means “may your name be treated as holy” — set apart, honoured, held sacred. It is the first petition of the Lord’s Prayer, not a compliment before the requests begin. In the Father’s Heart Bible, Matthew 6:9 reads, “Our Father in heaven, hallowed be your name,” so the name being honoured is the name Father.',
+			'It means “may your name be treated as holy” — set apart, honoured, held sacred. It is the first petition of the Lord’s Prayer, not a compliment before the requests begin. In the Father’s Heart Bible, Matthew 6:9 reads, “Our Father in heaven, may your name be honored as holy,” so the name being honoured is the name Father.',
 	},
 	{
 		question: 'What does “hallowed” mean?',
@@ -70,12 +72,12 @@ const faqs = [
 	{
 		question: 'Why do some Bibles say “thy name” and others “your name”?',
 		answer:
-			'“Thy” is simply the older English possessive, equivalent to “your.” The meaning is identical. In older English, thou and thy were the familiar, intimate forms used with family and close friends, while “you” was formal — so the wording that sounds most distant today was the most personal available then. The Father’s Heart Bible uses “your name.”',
+			'“Thy” is simply the older English possessive, equivalent to “your.” The meaning is identical. In older English, thou and thy were the familiar, intimate forms used with family and close friends, while “you” was formal — so the wording that sounds most distant today was the most personal available then. The Father’s Heart Bible says “your name” and spells out the meaning: “may your name be honored as holy.”',
 	},
 	{
 		question: 'Whose name is being hallowed in the Lord’s Prayer?',
 		answer:
-			'The Father’s. The petition follows straight after the address: “Our Father in heaven, hallowed be your name” (Matthew 6:9). Luke’s shorter form is simply “Father, hallowed be your name” (Luke 11:2). Jesus gave His followers the name He used Himself, then asked that this name be honoured as holy.',
+			'The Father’s. The petition follows straight after the address: “Our Father in heaven, may your name be honored as holy” (Matthew 6:9). Luke’s shorter form is simply “Father, may your name be honored as holy” (Luke 11:2). Jesus gave His followers the name He used Himself, then asked that this name be honoured as holy.',
 	},
 	{
 		question: 'Where is “hallowed be thy name” in the Bible?',
@@ -93,7 +95,8 @@ const faqs = [
 	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg"
 	heroAlt="Hands open in prayer at daybreak"
 	published="2026-08-04"
-	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">&ldquo;Hallowed be thy name&rdquo; means <em>may your name be treated as holy</em> &mdash; set apart, honoured, held sacred. It is the first petition of the Lord&rsquo;s Prayer, a request rather than a compliment paid before the real asking starts.</strong> And the name being hallowed is named in the line before it. In the Father&rsquo;s Heart Bible, Matthew 6:9 reads: &ldquo;Our Father in heaven, hallowed be your name.&rdquo; Jesus gave His followers the word He used Himself &mdash; <em>Father</em> &mdash; and then asked that this name be honoured as what it is. You can <a href=\"https://fathersheartbible.com/read/matthew/6/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read Matthew 6 free</a> and hear it in full.`}
+	modified="2026-10-21"
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">&ldquo;Hallowed be thy name&rdquo; means <em>may your name be treated as holy</em> &mdash; set apart, honoured, held sacred. It is the first petition of the Lord&rsquo;s Prayer, a request rather than a compliment paid before the real asking starts.</strong> And the name being hallowed is named in the line before it. In the Father&rsquo;s Heart Bible, Matthew 6:9 reads: &ldquo;Our Father in heaven, may your name be honored as holy.&rdquo; Jesus gave His followers the word He used Himself &mdash; <em>Father</em> &mdash; and then asked that this name be honoured as what it is. You can <a href=\"https://fathersheartbible.com/read/matthew/6/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read Matthew 6 free</a> and hear it in full.`}
 	keyTakeaway="It is a request, not a formality: let the name Father be known and honoured as holy — which is why the next line is “your kingdom come.”"
 	sections={sections}
 	renderings={renderings}
