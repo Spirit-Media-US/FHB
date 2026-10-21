@@ -418,7 +418,7 @@ const hubEntry = (u) =>
 	`<url><loc>${esc(u)}</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>`;
 const hubsFor = (lang) =>
 	lang === 'en'
-		? [`${SITE}/read/`, `${SITE}/read/en/`]
+		? [`${SITE}/read/`, `${SITE}/read/en/`, `${SITE}/read/verse-of-the-day/`] // VOTD: one page, plan W2 2026-10-21
 		: byLang.get(lang)?.size
 			? [`${SITE}/read/${lang}/`]
 			: [];
