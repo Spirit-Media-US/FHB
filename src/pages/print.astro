@@ -554,6 +554,7 @@ const dvcVerses = [
 								pbHref={amazonLinks[e.slug]?.formats?.paperback}
 								hbPrice={e.hb}
 								pbPrice={e.pb}
+								buyNowHref={builtPages.has(`${e.slug}-bible`) ? `/bibles/${e.slug}-bible/#order` : null}
 								tightDirect={e.slug === 'journaling'}
 								pick={e.slug}
 								bn={bnLinks[e.slug]}
@@ -643,6 +644,7 @@ const dvcVerses = [
 									pbHref={amazonLinks[`general-${l.line}-${c.key}`]?.formats?.paperback}
 									hbPrice={l.hb}
 									pbPrice={l.pb}
+									buyNowHref={builtPages.has('fathers-heart-bible') ? '/bibles/fathers-heart-bible/#order' : null}
 									pick={`general-${l.line}-${c.key}`}
 									bn={bnLinks[`general-${l.line}-${c.key}`]}
 									reserveBn
@@ -776,6 +778,7 @@ const dvcVerses = [
 								pbHref={amazonLinks[v.key]?.formats?.paperback}
 								hbPrice={v.hb}
 								pbPrice={v.pb}
+								buyNowHref={builtPages.has(`${v.key}-bible`) ? `/bibles/${v.key}-bible/#order` : null}
 								pick={v.key}
 								bn={bnLinks[v.key]}
 								reserveBn
@@ -871,6 +874,7 @@ const dvcVerses = [
 								pbHref={l.amazon?.paperback}
 								hbPrice={LANG_HB}
 								pbPrice={LANG_PB}
+								buyNowHref={builtPages.has(`${langSlug(l)}-bible`) ? `/bibles/${langSlug(l)}-bible/#order` : null}
 								pick={`lang-${l.code}`}
 								bn={bnLinks[`lang-${l.code}`]}
 								reserveBn
