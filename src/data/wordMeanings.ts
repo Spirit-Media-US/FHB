@@ -29,7 +29,7 @@ export const WORD_MEANINGS: WordMeaning[] = [
 		slug: 'begotten',
 		title: 'What does “begotten” mean in the Bible?',
 		blurb:
-			'The old English word behind the Greek monogenēs — and why this Bible says “his only Son.”',
+			'The old English word behind the Greek monogenēs — and why this Bible says “his one and only Son.”',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/4f858cae0aaf68469ed3400e047a53d4af7e5900-8256x5504.jpg',
 		volume: '19,000/mo',
 	},
