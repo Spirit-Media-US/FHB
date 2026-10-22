@@ -458,7 +458,7 @@ export const FAITH_GROUPS: Group[] = [
 		group: 'The Jewish People',
 		title: 'For the Jewish People',
 		blurb:
-			'The God of Abraham, Isaac, and Jacob reveals Himself as Father in your own Scriptures. “You, O LORD, are our Father.” He longs to be known not only as Sovereign and Lawgiver, but as a Father of everlasting compassion.',
+			'The God of Abraham, Isaac, and Jacob reveals Himself as Father in your own Scriptures. “You are our Father.” He longs to be known not only as Sovereign and Lawgiver, but as a Father of everlasting compassion.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/15ba9fd33c63facc3baac59714726f7cc7bfeb06-1100x825.jpg',
 	},
 	{
