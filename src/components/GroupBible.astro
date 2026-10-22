@@ -135,6 +135,9 @@ export interface Props {
 	whichBibleIntroHtml?: string;
 	whichBibleRows?: { edition: string; bestFor: string; style: string; access: string }[];
 	whichBibleNoteHtml?: string;
+	/** DEFAULT 'five' (Kevin APPROVED 2026-10-22, "2 a"): 5 core H2 sections (answer, which Bible,
+	 *  verses, a Father for + offers, FAQ) with everything else under one 'More' H2 as H3s. */
+	layout?: 'classic' | 'five';
 	faqs: GroupFaq[];
 	resourcesHeading?: string;
 	resourcesIntroHtml?: string;
@@ -211,7 +214,11 @@ const {
 	ctaVideoId = 'Ld4_H5XxrLk',
 	ctaBottomHeading,
 	ctaBottomBodyHtml,
+	layout = 'five',
 } = Astro.props;
+const five = layout === 'five';
+// Section heading tag for the non-core blocks: H2 classic (byte-identical), H3 under 'More' in five.
+const HM = five ? 'h3' : 'h2';
 
 // The audience edition made for this page's readers, if there is one.
 const audienceEdition = editionForAudiencePage(slug);
@@ -219,7 +226,7 @@ const audienceEdition = editionForAudiencePage(slug);
 const PAGE_URL = `https://fathersheartbible.com/bible-for/${slug}/`;
 
 // Jump-to TOC (Gold milestone) — only list sections that actually render.
-const toc = [
+const tocClassic = [
 	(painsBodyHtml || painStats.length > 0) && { label: 'The pressures', href: '#pressures' },
 	{ label: `A Father for ${groupLower}`, href: '#a-father' },
 	{ label: 'Bible verses', href: '#verses' },
@@ -229,6 +236,14 @@ const toc = [
 	whichBibleRows.length > 0 && { label: 'Which Bible?', href: '#which-bible' },
 	{ label: 'FAQ', href: '#faq' },
 ].filter(Boolean) as { label: string; href: string }[];
+const tocFive = [
+	whichBibleRows.length > 0 && { label: 'Which Bible?', href: '#which-bible' },
+	{ label: 'Bible verses', href: '#verses' },
+	{ label: `A Father for ${groupLower}`, href: '#a-father' },
+	{ label: 'FAQ', href: '#faq' },
+	{ label: 'More', href: '#more' },
+].filter(Boolean) as { label: string; href: string }[];
+const toc = five ? tocFive : tocClassic;
 
 // ItemList schema for the verse section — the page's primary query is a list,
 // so mark it up: rich-result eligible + maximally extractable for AI engines.
@@ -476,247 +491,7 @@ const relatedGroups: Group[] = _sibSlugs
 			</div>
 		</section>
 
-		<!-- The pressures (pain stats) -->
-		{(painsBodyHtml || painStats.length > 0) && (
-			<section id="pressures" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface);">
-				<div class="mx-auto max-w-3xl">
-					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{painsHeading || `The weight ${groupLower} carry`}</h2>
-					{painsIntroHtml && (
-						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={painsIntroHtml}></p>
-					)}
-					{painStats.length > 0 && (
-						<dl class="mt-7 grid grid-cols-2 md:grid-cols-3 gap-5">
-							{painStats.map((s) => (
-								<div class="rounded-2xl p-5" style="background-color: var(--color-surface-low); border: 1px solid rgba(0,0,0,0.06);">
-									<dt class="text-2xl font-medium leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{s.value}</dt>
-									<dd class="mt-2 text-sm leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{s.label}</dd>
-								</div>
-							))}
-						</dl>
-					)}
-					{painsBodyHtml && (
-						<div class="mt-6 space-y-5 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={painsBodyHtml}></div>
-					)}
-					{painsSources.length > 0 && (
-						<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">
-							Sources: {painsSources.map((s, i) => (<>{i > 0 && <span aria-hidden="true"> · </span>}<a href={s.url} target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">{s.label}</a></>))}
-						</p>
-					)}
-				</div>
-			</section>
-		)}
-
-		<!-- Declaration callout (deep band, gold accent) -->
-		{declarationHtml && (
-			<section class="px-6 py-14 lg:px-8 lg:py-16" style="background-color: var(--color-deep);">
-				<div class="mx-auto max-w-3xl text-center">
-					<div class="mx-auto mb-6 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
-					<div class="text-2xl md:text-3xl font-light leading-snug" style="font-family: var(--font-serif); color: #fff;" set:html={declarationHtml}></div>
-				</div>
-			</section>
-		)}
-
-		<!-- A Father for <group> — the heart turn -->
-		<section id="a-father" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface-low);">
-			<div class="mx-auto max-w-3xl">
-				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{aFatherHeading || `A Father for ${groupLower}`}</h2>
-				<div class="mt-5 space-y-5 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={aFatherBodyHtml}></div>
-			</div>
-		</section>
-
-		<!-- Standalone pull-quote (clean, citable) -->
-		{pullQuote && (
-			<section class="px-6 py-10 lg:px-8 lg:py-12" style="background-color: var(--color-surface-low);">
-				<div class="mx-auto max-w-3xl text-center">
-					<div class="mx-auto mb-5 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
-					<p class="text-2xl md:text-3xl font-light leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{pullQuote}</p>
-				</div>
-			</section>
-		)}
-
-		<!-- Top photo gallery -->
-		{gallery.length > 0 && (
-			<section class="px-6 pt-2 pb-10 lg:px-8 lg:pb-14" style="background-color: var(--color-surface-low);">
-				<div class="mx-auto max-w-5xl">
-					<div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-						{gallery.map((p) => (
-							<img src={`${p.src}?w=600&h=420&fit=crop&crop=entropy&fm=webp&q=70`} srcset={`${p.src}?w=400&h=280&fit=crop&crop=entropy&fm=webp&q=68 400w, ${p.src}?w=600&h=420&fit=crop&crop=entropy&fm=webp&q=70 600w`} sizes="(max-width: 767px) 45vw, 23vw" alt={p.alt} width="600" height="420" class="w-full h-36 md:h-48 object-cover rounded-xl" style="border: 1px solid rgba(0,0,0,0.06);" loading="lazy" decoding="async" />
-						))}
-					</div>
-					{galleryCreditHtml && (
-						<p class="mt-3 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={galleryCreditHtml}></p>
-					)}
-				</div>
-			</section>
-		)}
-
-		<!-- The Father's voice for <group> — FHB verses, deep-linked /read -->
-		<section id="verses" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface);">
-			<div class="mx-auto max-w-3xl">
-				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{voiceHeading || `The Father's voice for ${groupLower}`}</h2>
-				{voiceIntroHtml && (
-					<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={voiceIntroHtml}></p>
-				)}
-				<div class="mt-7 space-y-5">
-					{verses.map((v) => (
-						<a href={`https://fathersheartbible.com/read/${v.slug}/${v.ch}/`} class="block rounded-2xl p-5 no-underline transition-opacity hover:opacity-90" style={`background-color: ${TINT_PINK}; border: 1px solid rgba(0,0,0,0.06);`}>
-							<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.text}&rdquo;</p>
-							{v.note && (<p class="mt-2 text-sm leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{v.note}</p>)}
-							<span class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">{v.ref}<span aria-hidden="true">&rarr;</span></span>
-						</a>
-					))}
-				</div>
-			</div>
-		</section>
-
-		<!-- Free PDF gift card (library-style) — under the scriptures, full cover -->
-		{pdf && (
-			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
-				<div class="mx-auto max-w-xs">
-					<p class="text-xs font-semibold uppercase tracking-widest mb-4 text-center" style="color: var(--color-gold); font-family: var(--font-sans);">A free gift for you</p>
-					<article class="overflow-hidden rounded-2xl" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
-						<img src={pdf.coverUrl} alt={`${pdf.title} — front cover`} class="block w-full h-auto" loading="lazy" decoding="async" />
-						<div class="p-6 text-center">
-							<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{pdf.title}</h3>
-							<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{pdf.description}</p>
-							<a href={pdf.fileUrl} target="_blank" rel="noopener" class="inline-flex items-center gap-2 mt-5 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">{pdf.buttonText || 'Download the PDF'}<span aria-hidden="true">&rarr;</span></a>
-						</div>
-					</article>
-				</div>
-			</section>
-		)}
-
-		<!-- What our Father offers <group> -->
-		{offersBlocks.length > 0 && (
-			<section id="offers" class="px-6 pt-6 pb-12 lg:px-8 lg:pt-8 lg:pb-16 scroll-mt-24" style="background-color: var(--color-surface-low);">
-				<div class="mx-auto max-w-3xl">
-					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{offersHeading || `What “our Father” offers ${groupLower}`}</h2>
-					{offersIntroHtml && (
-						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={offersIntroHtml}></p>
-					)}
-					<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
-						{offersBlocks.map((b) => (
-							<div class="rounded-2xl p-5" style="background-color: var(--color-surface); border: 1px solid rgba(0,0,0,0.06); border-left: 4px solid var(--color-gold);">
-								<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{b.heading}</h3>
-								<p class="mt-2 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.bodyHtml}></p>
-							</div>
-						))}
-					</div>
-				</div>
-			</section>
-		)}
-
-		<!-- Why the Father's Heart Bible™ for <group> -->
-		<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${TINT_PINK};`}>
-			<div class="mx-auto max-w-3xl">
-				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{whyHeading || `Why the Father's Heart Bible™ for ${groupLower}`}</h2>
-				<div class="mt-8 space-y-8">
-					{whyBlocks.map((b) => (
-						<div>
-							<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{b.heading}</h3>
-							<p class="mt-3 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.bodyHtml}></p>
-						</div>
-					))}
-				</div>
-			</div>
-		</section>
-
-		<!-- External voices (E-E-A-T): short attributed statements -->
-		{voices.length > 0 && (
-			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
-				<div class="mx-auto max-w-3xl">
-					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{voicesHeading || 'What the great worshipers found'}</h2>
-					{voicesIntroHtml && (
-						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={voicesIntroHtml}></p>
-					)}
-					<div class="mt-8 space-y-5">
-						{voices.map((v) => (
-							<figure class="rounded-2xl p-6 flex items-start gap-5" style="background-color: var(--color-surface-low); border: 1px solid rgba(0,0,0,0.06); border-left: 4px solid var(--color-gold);">
-								{v.photo && (<img src={`${v.photo}?w=200&h=200&fit=crop&crop=top&fm=webp&q=75`} alt={v.name} width="96" height="96" class="rounded-full object-cover shrink-0" style="width: 96px; height: 96px; border: 1px solid var(--color-hairline);" loading="lazy" decoding="async" />)}
-								<div>
-									<blockquote class="text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.quote}&rdquo;</blockquote>
-									<figcaption class="mt-3 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><span class="font-semibold" style="color: var(--color-ink);">{v.name}</span> &mdash; {v.role}</figcaption>
-								</div>
-							</figure>
-						))}
-					</div>
-					{voicesCreditHtml && (
-						<p class="mt-5 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={voicesCreditHtml}></p>
-					)}
-				</div>
-			</section>
-		)}
-
-		<!-- His Word will not return void -->
-		{wordBodyHtml && (
-			<section class="px-6 py-14 lg:px-8 lg:py-20" style="background-color: var(--color-surface-low);">
-				<div class="mx-auto max-w-3xl text-center">
-					<div class="mx-auto mb-6 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
-					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{wordHeading || 'His Word will not return void'}</h2>
-					<div class="mt-5 text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted);" set:html={wordBodyHtml}></div>
-				</div>
-			</section>
-		)}
-
-		<!-- Mid-page read CTA (Gold standard: mid + bottom). Dark band w/ FHB cover. -->
-		<section class="px-6 py-9 lg:px-8 lg:py-10" style="background-color: var(--color-deep);">
-			<div class="mx-auto max-w-4xl">
-				<div class="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-12">
-					<img src="https://cdn.sanity.io/images/rusi1hyi/production/c2069a45b96854a2c5e96bc7e52318234b75d8a6-4881x2688.png?w=560&fm=webp&q=75&auto=format" alt="The Father's Heart Bible™ (FHB) print editions — plum, charcoal, and white" width="280" height="154" class="w-56 md:w-72 shrink-0" style="filter: drop-shadow(0 10px 24px rgba(0,0,0,0.5));" loading="lazy" decoding="async" />
-					<div class="text-center md:text-left">
-						<div class="mx-auto md:mx-0 mb-5 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
-						<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{ctaMidHeading}</h2>
-						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.85);" set:html={ctaMidBodyHtml}></p>
-						<div class="mt-6 flex flex-wrap justify-center md:justify-start gap-3">
-							<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; listen free<span aria-hidden="true">&rarr;</span></a>
-							<a href="/print/" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="border: 1.5px solid rgba(255,255,255,0.7); color: #fff; font-family: var(--font-sans);">In Print</a>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- What our Father says to <group> — first person, from the Father -->
-		<section id="father-says" class="px-6 py-14 lg:px-8 lg:py-20 scroll-mt-24" style="background-color: var(--color-surface-low);">
-			<div class="mx-auto max-w-3xl">
-				<h2 class="text-2xl md:text-3xl font-light leading-tight text-center" style="font-family: var(--font-serif); color: var(--color-ink);">{fatherSaysHeading || `What our Father says to ${groupLower}`}</h2>
-				<div class="mt-7 space-y-5 text-base lg:text-lg leading-relaxed italic" style="font-family: var(--font-serif); color: var(--color-ink);" set:html={fatherSaysHtml}></div>
-			</div>
-		</section>
-
-		<!-- A prayer for <group> — warm parchment tone (FHB cover), distinct from all other sections -->
-		<section id="prayer" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: #F3E7D6;">
-			<div class="mx-auto max-w-2xl">
-				<div class="mx-auto mb-6 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
-				<h2 class="text-2xl md:text-3xl font-light leading-tight text-center" style="font-family: var(--font-serif); color: var(--color-ink);">{prayerHeading || `A prayer for ${groupLower}`}</h2>
-				<div class="mt-6 space-y-4 text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted);" set:html={prayerHtml}></div>
-			</div>
-		</section>
-
-		<!-- Keep reading + related pages in this series (internal cross-links) -->
-		{(keepReadingHtml || relatedGroups.length > 0) && (
-			<section class="px-6 py-12 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
-				<div class="mx-auto max-w-3xl">
-					<h2 class="text-xl md:text-2xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Keep reading</h2>
-					{keepReadingHtml && (
-						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={keepReadingHtml}></p>
-					)}
-					{relatedGroups.length > 0 && (
-						<div class="mt-7">
-							<p class="text-sm font-semibold uppercase tracking-widest mb-3" style="color: var(--color-gold); font-family: var(--font-sans);">More in this series</p>
-							<ul class="flex flex-wrap gap-2.5" style="list-style: none; padding: 0; margin: 0;">
-								{relatedGroups.map((g) => (
-									<li>
-										<a href={`/bible-for/${g.slug}/`} class="inline-flex items-center rounded-full px-3.5 py-1.5 text-sm no-underline transition-opacity hover:opacity-80" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline); color: var(--color-brand); font-family: var(--font-sans);">{g.title}</a>
-									</li>
-								))}
-							</ul>
-						</div>
-					)}
-				</div>
-			</section>
-		)}
-
+		{five && (<>
 		<!-- Which Bible for this reader — honest edition comparison (gift/product intent) -->
 		{whichBibleRows.length > 0 && (
 			<section id="which-bible" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface-low);">
@@ -759,6 +534,161 @@ const relatedGroups: Group[] = _sibSlugs
 			</section>
 		)}
 
+		<!-- The Father's voice for <group> — FHB verses, deep-linked /read -->
+		<section id="verses" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{voiceHeading || `The Father's voice for ${groupLower}`}</h2>
+				{voiceIntroHtml && (
+					<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={voiceIntroHtml}></p>
+				)}
+				<div class="mt-7 space-y-5">
+					{verses.map((v) => (
+						<a href={`https://fathersheartbible.com/read/${v.slug}/${v.ch}/`} class="block rounded-2xl p-5 no-underline transition-opacity hover:opacity-90" style={`background-color: ${TINT_PINK}; border: 1px solid rgba(0,0,0,0.06);`}>
+							<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.text}&rdquo;</p>
+							{v.note && (<p class="mt-2 text-sm leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{v.note}</p>)}
+							<span class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">{v.ref}<span aria-hidden="true">&rarr;</span></span>
+						</a>
+					))}
+				</div>
+			</div>
+		</section>
+
+		</>)}
+		{!five && (<>
+		<!-- The pressures (pain stats) -->
+		{(painsBodyHtml || painStats.length > 0) && (
+			<section id="pressures" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-3xl">
+					<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{painsHeading || `The weight ${groupLower} carry`}</HM>
+					{painsIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={painsIntroHtml}></p>
+					)}
+					{painStats.length > 0 && (
+						<dl class="mt-7 grid grid-cols-2 md:grid-cols-3 gap-5">
+							{painStats.map((s) => (
+								<div class="rounded-2xl p-5" style="background-color: var(--color-surface-low); border: 1px solid rgba(0,0,0,0.06);">
+									<dt class="text-2xl font-medium leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{s.value}</dt>
+									<dd class="mt-2 text-sm leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{s.label}</dd>
+								</div>
+							))}
+						</dl>
+					)}
+					{painsBodyHtml && (
+						<div class="mt-6 space-y-5 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={painsBodyHtml}></div>
+					)}
+					{painsSources.length > 0 && (
+						<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">
+							Sources: {painsSources.map((s, i) => (<>{i > 0 && <span aria-hidden="true"> · </span>}<a href={s.url} target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">{s.label}</a></>))}
+						</p>
+					)}
+				</div>
+			</section>
+		)}
+
+		<!-- Declaration callout (deep band, gold accent) -->
+		{declarationHtml && (
+			<section class="px-6 py-14 lg:px-8 lg:py-16" style="background-color: var(--color-deep);">
+				<div class="mx-auto max-w-3xl text-center">
+					<div class="mx-auto mb-6 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
+					<div class="text-2xl md:text-3xl font-light leading-snug" style="font-family: var(--font-serif); color: #fff;" set:html={declarationHtml}></div>
+				</div>
+			</section>
+		)}
+
+		</>)}
+		<!-- A Father for <group> — the heart turn -->
+		<section id="a-father" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{aFatherHeading || `A Father for ${groupLower}`}</h2>
+				<div class="mt-5 space-y-5 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={aFatherBodyHtml}></div>
+			</div>
+		</section>
+
+		<!-- Standalone pull-quote (clean, citable) -->
+		{pullQuote && (
+			<section class="px-6 py-10 lg:px-8 lg:py-12" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-3xl text-center">
+					<div class="mx-auto mb-5 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
+					<p class="text-2xl md:text-3xl font-light leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{pullQuote}</p>
+				</div>
+			</section>
+		)}
+
+		<!-- Top photo gallery -->
+		{gallery.length > 0 && (
+			<section class="px-6 pt-2 pb-10 lg:px-8 lg:pb-14" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-5xl">
+					<div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+						{gallery.map((p) => (
+							<img src={`${p.src}?w=600&h=420&fit=crop&crop=entropy&fm=webp&q=70`} srcset={`${p.src}?w=400&h=280&fit=crop&crop=entropy&fm=webp&q=68 400w, ${p.src}?w=600&h=420&fit=crop&crop=entropy&fm=webp&q=70 600w`} sizes="(max-width: 767px) 45vw, 23vw" alt={p.alt} width="600" height="420" class="w-full h-36 md:h-48 object-cover rounded-xl" style="border: 1px solid rgba(0,0,0,0.06);" loading="lazy" decoding="async" />
+						))}
+					</div>
+					{galleryCreditHtml && (
+						<p class="mt-3 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={galleryCreditHtml}></p>
+					)}
+				</div>
+			</section>
+		)}
+
+		{!five && (<>
+		<!-- The Father's voice for <group> — FHB verses, deep-linked /read -->
+		<section id="verses" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{voiceHeading || `The Father's voice for ${groupLower}`}</h2>
+				{voiceIntroHtml && (
+					<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={voiceIntroHtml}></p>
+				)}
+				<div class="mt-7 space-y-5">
+					{verses.map((v) => (
+						<a href={`https://fathersheartbible.com/read/${v.slug}/${v.ch}/`} class="block rounded-2xl p-5 no-underline transition-opacity hover:opacity-90" style={`background-color: ${TINT_PINK}; border: 1px solid rgba(0,0,0,0.06);`}>
+							<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.text}&rdquo;</p>
+							{v.note && (<p class="mt-2 text-sm leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{v.note}</p>)}
+							<span class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold" style="color: var(--color-brand); font-family: var(--font-sans);">{v.ref}<span aria-hidden="true">&rarr;</span></span>
+						</a>
+					))}
+				</div>
+			</div>
+		</section>
+
+		</>)}
+		<!-- Free PDF gift card (library-style) — under the scriptures, full cover -->
+		{pdf && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-xs">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-4 text-center" style="color: var(--color-gold); font-family: var(--font-sans);">A free gift for you</p>
+					<article class="overflow-hidden rounded-2xl" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
+						<img src={pdf.coverUrl} alt={`${pdf.title} — front cover`} class="block w-full h-auto" loading="lazy" decoding="async" />
+						<div class="p-6 text-center">
+							<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{pdf.title}</h3>
+							<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{pdf.description}</p>
+							<a href={pdf.fileUrl} target="_blank" rel="noopener" class="inline-flex items-center gap-2 mt-5 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">{pdf.buttonText || 'Download the PDF'}<span aria-hidden="true">&rarr;</span></a>
+						</div>
+					</article>
+				</div>
+			</section>
+		)}
+
+		<!-- What our Father offers <group> -->
+		{offersBlocks.length > 0 && (
+			<section id="offers" class="px-6 pt-6 pb-12 lg:px-8 lg:pt-8 lg:pb-16 scroll-mt-24" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-3xl">
+					<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{offersHeading || `What “our Father” offers ${groupLower}`}</HM>
+					{offersIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={offersIntroHtml}></p>
+					)}
+					<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+						{offersBlocks.map((b) => (
+							<div class="rounded-2xl p-5" style="background-color: var(--color-surface); border: 1px solid rgba(0,0,0,0.06); border-left: 4px solid var(--color-gold);">
+								<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{b.heading}</h3>
+								<p class="mt-2 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.bodyHtml}></p>
+							</div>
+						))}
+					</div>
+				</div>
+			</section>
+		)}
+
+		{five && (<>
 		<!-- FAQ -->
 		<section id="faq" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface);">
 			<div class="mx-auto max-w-3xl">
@@ -774,11 +704,229 @@ const relatedGroups: Group[] = _sibSlugs
 			</div>
 		</section>
 
+		<section id="more" class="px-6 pt-12 pb-2 lg:px-8 scroll-mt-24" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">More for {groupLower}</h2>
+			</div>
+		</section>
+		<!-- The pressures (pain stats) -->
+		{(painsBodyHtml || painStats.length > 0) && (
+			<section id="pressures" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-3xl">
+					<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{painsHeading || `The weight ${groupLower} carry`}</HM>
+					{painsIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={painsIntroHtml}></p>
+					)}
+					{painStats.length > 0 && (
+						<dl class="mt-7 grid grid-cols-2 md:grid-cols-3 gap-5">
+							{painStats.map((s) => (
+								<div class="rounded-2xl p-5" style="background-color: var(--color-surface-low); border: 1px solid rgba(0,0,0,0.06);">
+									<dt class="text-2xl font-medium leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{s.value}</dt>
+									<dd class="mt-2 text-sm leading-snug" style="font-family: var(--font-sans); color: var(--color-muted);">{s.label}</dd>
+								</div>
+							))}
+						</dl>
+					)}
+					{painsBodyHtml && (
+						<div class="mt-6 space-y-5 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={painsBodyHtml}></div>
+					)}
+					{painsSources.length > 0 && (
+						<p class="mt-6 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">
+							Sources: {painsSources.map((s, i) => (<>{i > 0 && <span aria-hidden="true"> · </span>}<a href={s.url} target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">{s.label}</a></>))}
+						</p>
+					)}
+				</div>
+			</section>
+		)}
+
+		<!-- Declaration callout (deep band, gold accent) -->
+		{declarationHtml && (
+			<section class="px-6 py-14 lg:px-8 lg:py-16" style="background-color: var(--color-deep);">
+				<div class="mx-auto max-w-3xl text-center">
+					<div class="mx-auto mb-6 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
+					<div class="text-2xl md:text-3xl font-light leading-snug" style="font-family: var(--font-serif); color: #fff;" set:html={declarationHtml}></div>
+				</div>
+			</section>
+		)}
+
+		</>)}
+		<!-- Why the Father's Heart Bible™ for <group> -->
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${TINT_PINK};`}>
+			<div class="mx-auto max-w-3xl">
+				<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{whyHeading || `Why the Father's Heart Bible™ for ${groupLower}`}</HM>
+				<div class="mt-8 space-y-8">
+					{whyBlocks.map((b) => (
+						<div>
+							<h3 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{b.heading}</h3>
+							<p class="mt-3 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={b.bodyHtml}></p>
+						</div>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<!-- External voices (E-E-A-T): short attributed statements -->
+		{voices.length > 0 && (
+			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
+				<div class="mx-auto max-w-3xl">
+					<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{voicesHeading || 'What the great worshipers found'}</HM>
+					{voicesIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={voicesIntroHtml}></p>
+					)}
+					<div class="mt-8 space-y-5">
+						{voices.map((v) => (
+							<figure class="rounded-2xl p-6 flex items-start gap-5" style="background-color: var(--color-surface-low); border: 1px solid rgba(0,0,0,0.06); border-left: 4px solid var(--color-gold);">
+								{v.photo && (<img src={`${v.photo}?w=200&h=200&fit=crop&crop=top&fm=webp&q=75`} alt={v.name} width="96" height="96" class="rounded-full object-cover shrink-0" style="width: 96px; height: 96px; border: 1px solid var(--color-hairline);" loading="lazy" decoding="async" />)}
+								<div>
+									<blockquote class="text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;{v.quote}&rdquo;</blockquote>
+									<figcaption class="mt-3 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><span class="font-semibold" style="color: var(--color-ink);">{v.name}</span> &mdash; {v.role}</figcaption>
+								</div>
+							</figure>
+						))}
+					</div>
+					{voicesCreditHtml && (
+						<p class="mt-5 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={voicesCreditHtml}></p>
+					)}
+				</div>
+			</section>
+		)}
+
+		<!-- His Word will not return void -->
+		{wordBodyHtml && (
+			<section class="px-6 py-14 lg:px-8 lg:py-20" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-3xl text-center">
+					<div class="mx-auto mb-6 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
+					<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{wordHeading || 'His Word will not return void'}</HM>
+					<div class="mt-5 text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted);" set:html={wordBodyHtml}></div>
+				</div>
+			</section>
+		)}
+
+		<!-- Mid-page read CTA (Gold standard: mid + bottom). Dark band w/ FHB cover. -->
+		<section class="px-6 py-9 lg:px-8 lg:py-10" style="background-color: var(--color-deep);">
+			<div class="mx-auto max-w-4xl">
+				<div class="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-12">
+					<img src="https://cdn.sanity.io/images/rusi1hyi/production/c2069a45b96854a2c5e96bc7e52318234b75d8a6-4881x2688.png?w=560&fm=webp&q=75&auto=format" alt="The Father's Heart Bible™ (FHB) print editions — plum, charcoal, and white" width="280" height="154" class="w-56 md:w-72 shrink-0" style="filter: drop-shadow(0 10px 24px rgba(0,0,0,0.5));" loading="lazy" decoding="async" />
+					<div class="text-center md:text-left">
+						<div class="mx-auto md:mx-0 mb-5 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
+						<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{ctaMidHeading}</HM>
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: rgba(255,255,255,0.85);" set:html={ctaMidBodyHtml}></p>
+						<div class="mt-6 flex flex-wrap justify-center md:justify-start gap-3">
+							<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; listen free<span aria-hidden="true">&rarr;</span></a>
+							<a href="/print/" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold no-underline transition-all duration-200" style="border: 1.5px solid rgba(255,255,255,0.7); color: #fff; font-family: var(--font-sans);">In Print</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- What our Father says to <group> — first person, from the Father -->
+		<section id="father-says" class="px-6 py-14 lg:px-8 lg:py-20 scroll-mt-24" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<HM class="text-2xl md:text-3xl font-light leading-tight text-center" style="font-family: var(--font-serif); color: var(--color-ink);">{fatherSaysHeading || `What our Father says to ${groupLower}`}</HM>
+				<div class="mt-7 space-y-5 text-base lg:text-lg leading-relaxed italic" style="font-family: var(--font-serif); color: var(--color-ink);" set:html={fatherSaysHtml}></div>
+			</div>
+		</section>
+
+		<!-- A prayer for <group> — warm parchment tone (FHB cover), distinct from all other sections -->
+		<section id="prayer" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: #F3E7D6;">
+			<div class="mx-auto max-w-2xl">
+				<div class="mx-auto mb-6 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
+				<HM class="text-2xl md:text-3xl font-light leading-tight text-center" style="font-family: var(--font-serif); color: var(--color-ink);">{prayerHeading || `A prayer for ${groupLower}`}</HM>
+				<div class="mt-6 space-y-4 text-lg lg:text-xl leading-relaxed" style="font-family: var(--font-serif); color: var(--color-muted);" set:html={prayerHtml}></div>
+			</div>
+		</section>
+
+		<!-- Keep reading + related pages in this series (internal cross-links) -->
+		{(keepReadingHtml || relatedGroups.length > 0) && (
+			<section class="px-6 py-12 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-3xl">
+					<HM class="text-xl md:text-2xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Keep reading</HM>
+					{keepReadingHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={keepReadingHtml}></p>
+					)}
+					{relatedGroups.length > 0 && (
+						<div class="mt-7">
+							<p class="text-sm font-semibold uppercase tracking-widest mb-3" style="color: var(--color-gold); font-family: var(--font-sans);">More in this series</p>
+							<ul class="flex flex-wrap gap-2.5" style="list-style: none; padding: 0; margin: 0;">
+								{relatedGroups.map((g) => (
+									<li>
+										<a href={`/bible-for/${g.slug}/`} class="inline-flex items-center rounded-full px-3.5 py-1.5 text-sm no-underline transition-opacity hover:opacity-80" style="background-color: var(--color-surface); border: 1px solid var(--color-hairline); color: var(--color-brand); font-family: var(--font-sans);">{g.title}</a>
+									</li>
+								))}
+							</ul>
+						</div>
+					)}
+				</div>
+			</section>
+		)}
+
+		{!five && (<>
+		<!-- Which Bible for this reader — honest edition comparison (gift/product intent) -->
+		{whichBibleRows.length > 0 && (
+			<section id="which-bible" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface-low);">
+				<div class="mx-auto max-w-4xl">
+					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{whichBibleHeading || `Which Bible for ${groupLower}?`}</h2>
+					{whichBibleIntroHtml && (
+						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={whichBibleIntroHtml}></p>
+					)}
+					<div class="mt-7 overflow-x-auto rounded-2xl" style="border: 1px solid rgba(0,0,0,0.08);">
+						<table class="w-full text-left" style="font-family: var(--font-sans); border-collapse: collapse; min-width: 640px;">
+							<thead>
+								<tr style="background-color: var(--color-surface);">
+									<th scope="col" class="px-4 py-3 text-sm font-semibold" style="color: var(--color-ink);">Edition</th>
+									<th scope="col" class="px-4 py-3 text-sm font-semibold" style="color: var(--color-ink);">Best for</th>
+									<th scope="col" class="px-4 py-3 text-sm font-semibold" style="color: var(--color-ink);">Translation style</th>
+									<th scope="col" class="px-4 py-3 text-sm font-semibold" style="color: var(--color-ink);">Access &amp; cost</th>
+								</tr>
+							</thead>
+							<tbody>
+								{whichBibleRows.map((r, i) => (
+									<tr style={`border-top: 1px solid rgba(0,0,0,0.06); ${i === 0 ? 'background-color: rgba(212,175,55,0.07);' : ''}`}>
+										<td class="px-4 py-3 text-sm font-medium align-top" style="color: var(--color-ink);" set:html={r.edition}></td>
+										<td class="px-4 py-3 text-sm align-top" style="color: var(--color-muted);" set:html={r.bestFor}></td>
+										<td class="px-4 py-3 text-sm align-top" style="color: var(--color-muted);" set:html={r.style}></td>
+										<td class="px-4 py-3 text-sm align-top" style="color: var(--color-muted);" set:html={r.access}></td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+					{whichBibleNoteHtml && (
+						<p class="mt-4 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={whichBibleNoteHtml}></p>
+					)}
+					<div class="mt-6 flex flex-wrap gap-3">
+						<a href="https://fathersheartbible.com/read/" class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="background-color: var(--color-brand); color: #fff; font-family: var(--font-sans);">Read the Father's Heart Bible™ free</a>
+						{/* The print edition made for this audience, where there is one (src/data/receive.ts); else /print. */}
+						<a href={audienceEdition?.href ?? '/print/'} class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="border: 1.5px solid var(--color-brand); color: var(--color-brand); font-family: var(--font-sans);">{audienceEdition ? `Get the ${audienceEdition.edition} in print` : 'Get the print edition'}</a>
+					</div>
+				</div>
+			</section>
+		)}
+
+		</>)}
+		{!five && (<>
+		<!-- FAQ -->
+		<section id="faq" class="px-6 py-12 lg:px-8 lg:py-16 scroll-mt-24" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="mt-7 space-y-4">
+					{faqs.map((f) => (
+						<details class="rounded-2xl px-5 py-4" style={`background-color: ${TINT_PINK}; border: 1px solid rgba(0,0,0,0.06);`}>
+							<summary class="cursor-pointer text-lg font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</summary>
+							<p class="mt-3 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p>
+						</details>
+					))}
+				</div>
+			</div>
+		</section>
+
+		</>)}
 		<!-- Resources (authority links) -->
 		{resources.length > 0 && (
 			<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
 				<div class="mx-auto max-w-3xl">
-					<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{resourcesHeading || `For ${groupLower}: where to turn`}</h2>
+					<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{resourcesHeading || `For ${groupLower}: where to turn`}</HM>
 					{resourcesIntroHtml && (
 						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={resourcesIntroHtml}></p>
 					)}
@@ -815,7 +963,7 @@ const relatedGroups: Group[] = _sibSlugs
 		<!-- Closing CTA — read FHB free, with the film (https://youtu.be/Ld4_H5XxrLk) -->
 		<section class="px-6 py-14 lg:px-8 lg:py-20" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl text-center">
-				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{ctaBottomHeading || 'Read the Father’s Heart Bible™ free'}</h2>
+				<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{ctaBottomHeading || 'Read the Father’s Heart Bible™ free'}</HM>
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaBottomBodyHtml}></p>
 				<div class="mx-auto mt-8 max-w-2xl">
 					<iframe class="lg:hidden block w-full overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);" src={`https://www.youtube-nocookie.com/embed/${ctaVideoId}?rel=0&playsinline=1`} title="The Father's Heart Bible" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
