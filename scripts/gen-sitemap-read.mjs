@@ -543,9 +543,9 @@ if (SPLIT) {
 	// nothing is lost by the hop.
 	fs.writeFileSync(OUT, indexXml);
 	const segTotal = [...segs.values()].reduce((n, e) => n + e.length, 0);
-	if (segTotal !== count + allHubs.length + allBooks.length) {
+	if (segTotal !== count + allHubs.length + allBooks.length + VERSE_ENTRIES.length) {
 		console.error(
-			`gen-sitemap-read: SEGMENT TOTAL ${segTotal} != combined ${count + allHubs.length + allBooks.length} — ` +
+			`gen-sitemap-read: SEGMENT TOTAL ${segTotal} != combined ${count + allHubs.length + allBooks.length + VERSE_ENTRIES.length} — ` +
 				'the index would publish fewer urls than the combined file held. Refusing.',
 		);
 		process.exit(1);
