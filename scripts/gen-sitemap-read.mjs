@@ -425,6 +425,19 @@ const hubsFor = (lang) =>
 const allHubs = LIVE_LANGS.flatMap(hubsFor);
 for (const hub of allHubs) parts.push(hubEntry(hub));
 
+// VERSE PAGES (plan W2 verse pilot, Kevin 2026-10-22 "1 yes"). /read/<book>/<chapter>/<verse>/ exists
+// ONLY for a row in community's src/data/verse-pages.json (each with its own written meaning), so the
+// sitemap lists exactly those rows — never a generated range. Same coupling as the language registry
+// above: community decides what renders, this file mirrors it. A missing/unreadable file lists none.
+try {
+	const vp = JSON.parse(fs.readFileSync('/srv/sites/community/src/data/verse-pages.json', 'utf8'));
+	const keys = Object.keys(vp.pages || {}).filter((k) => /^[a-z0-9-]+\/\d+\/\d+$/.test(k)).sort();
+	for (const k of keys) parts.push(`<url><loc>${esc(`${SITE}/read/${k}/`)}</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>`);
+	console.log(`gen-sitemap-read: ${keys.length} verse pages listed`);
+} catch (e) {
+	console.warn(`gen-sitemap-read: verse pages not listed (${e.message})`);
+}
+
 // BOOK PAGES (master plan W1, 2026-10-21). /read/<book>/ and /read/<lang>/<book>/ became real
 // pages that day (H1 + a link to every chapter; they used to 302 to chapter 1, ~1,400 Googlebot
 // fetches a week). A page in no sitemap is never sent to IndexNow/Bing (fhb-index-submit reads
