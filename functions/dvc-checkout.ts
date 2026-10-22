@@ -429,6 +429,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-ceb-600.webp`,
 	},
+	'lang-nl-hb': {
+		title: 'Nederlandse Bijbel (Dutch) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-nl-600.webp`,
+	},
+	'lang-nl-pb': {
+		title: 'Nederlandse Bijbel (Dutch) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-nl-600.webp`,
+	},
 	'lang-fil-hb': {
 		title: 'Bibliyang Filipino (Filipino) — Hardback',
 		retail: 9999,
