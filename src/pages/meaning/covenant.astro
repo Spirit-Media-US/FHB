@@ -1,0 +1,110 @@
+---
+// /meaning/covenant — plan W2 "what does X mean in the Bible" (approved 2026-10-22, Lane 2 topic list).
+// Demand: "covenant meaning in the bible" scores 42 on Google Trends US (3 months) and is a top query over 12 months (free pytrends pull 2026-10-22). 422 FHB verses.
+// WEDGE: The covenant formula "to be God to you" reads "to be Father to you" in the FHB (Genesis 17:7 footnote: not a contract, but a family), and Jeremiah 31:33 "I will be their Father".
+// Every Scripture quotation is VERBATIM from src/content/bible; checked with
+// bin/fhb-scripture-quote-audit.py before shipping. Verse links go to our /read only.
+import WordMeaning from '../../components/WordMeaning.astro';
+
+const sections = [
+	{
+		id: 'what-covenant-means',
+		heading: 'What covenant means',
+		bodyHtml: `<p>A covenant is <strong>a solemn, binding commitment that makes two parties belong to each other</strong>. In the ancient world covenants were sealed with oaths and signs. In the Bible, our Father is the one who takes the initiative and binds Himself first.</p><p>He calls Himself &ldquo;the faithful One who keeps covenant and faithful love for 1,000 generations&rdquo; (Deuteronomy 7:9), and promises, &ldquo;I will not violate my covenant or alter the word my lips have spoken&rdquo; (Psalm 89:34).</p>`,
+	},
+	{
+		id: 'hebrew-and-greek',
+		heading: 'The Hebrew and Greek words for covenant',
+		bodyHtml: `<p>The Hebrew word is <em>berit</em>, used for agreements between people and, above all, for our Father&rsquo;s bond with His people. Its partner word is <em>hesed</em>, the loyal love that keeps a covenant; the FHB renders <em>hesed</em> &ldquo;covenant love,&rdquo; 129 times.</p><p>The Greek is <em>diath&#275;k&#275;</em>, which can also mean a will or testament. That is why the two halves of the Bible are called the Old and New <em>Testaments</em>: they are the old and new covenants.</p>`,
+	},
+	{
+		id: 'a-family-not-a-contract',
+		heading: 'A family, not a contract',
+		bodyHtml: `<p>The heart of every covenant is a formula repeated across Scripture, often translated &ldquo;I will be your God.&rdquo; The Father&rsquo;s Heart Bible&trade; renders it as what it is. To Abraham: &ldquo;I will establish my covenant between me and you and your descendants after you, for all generations&mdash;an everlasting covenant&mdash;to be Father to you and your descendants after you&rdquo; (Genesis 17:7). The FHB footnote says why: that is the covenant our Father is making, not a contract, but a family.</p><p>The same shape runs through the covenant with David&rsquo;s son, &ldquo;I will be his Father, and he will be my son&rdquo; (2 Samuel 7:14), and the people at Sinai, called His &ldquo;treasured possession out of all peoples&rdquo; (Exodus 19:5).</p>`,
+	},
+	{
+		id: 'the-covenants',
+		heading: 'The great covenants of the Bible',
+		bodyHtml: `<p>Scripture traces a line of covenants. With Noah, sealed by the rainbow: &ldquo;I have put my rainbow in the clouds as the sign of the covenant between me and the earth&rdquo; (Genesis 9:13). With Abraham, the promise of a family and blessing for all nations (Genesis 17). At Sinai, with Israel as a kingdom of priests (Exodus 19:5&ndash;6). With David, a forever throne (2 Samuel 7). Each builds on the last, and each points ahead.</p>`,
+	},
+	{
+		id: 'the-new-covenant',
+		heading: 'The new covenant',
+		bodyHtml: `<p>When the old covenant was broken, our Father promised a new one through Jeremiah: &ldquo;I will put my instruction within them, and I will write it on their hearts. I will be their Father, and they will be my children&rdquo; (Jeremiah 31:33), &ldquo;For I will forgive their wrongdoing, and I will remember their sin no more&rdquo; (31:34).</p><p>Jesus made that promise real on the night before the cross: &ldquo;This cup is the new covenant in my blood, poured out for you&rdquo; (Luke 22:20). Hebrews 8:10 quotes Jeremiah word for word to say it has come. Every time the church shares the cup, it remembers the covenant that made us family.</p>`,
+	},
+];
+
+const renderings = [
+	{
+		ref: 'Genesis 17:7',
+		slug: 'genesis',
+		ch: 17,
+		fhb: 'I will establish my covenant between me and you and your descendants after you, for all generations—an everlasting covenant—to be Father to you and your descendants after you.',
+		traditional: '“…to be a God unto thee, and to thy seed after thee.” (KJV)',
+	},
+	{
+		ref: 'Jeremiah 31:33',
+		slug: 'jeremiah',
+		ch: 31,
+		fhb: '“But this is the covenant I will make with the house of Israel after those days, declares our Father: I will put my instruction within them, and I will write it on their hearts. I will be their Father, and they will be my children.',
+		traditional: '“…and will be their God, and they shall be my people.” (KJV)',
+	},
+	{
+		ref: 'Luke 22:20',
+		slug: 'luke',
+		ch: 22,
+		fhb: 'He did the same with the cup after supper: “This cup is the new covenant in my blood, poured out for you.',
+	},
+	{
+		ref: 'Deuteronomy 7:9',
+		slug: 'deuteronomy',
+		ch: 7,
+		fhb: 'Know: your Father is our Father, the faithful One who keeps covenant and faithful love for 1,000 generations, for those who love him and keep his commands,',
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does covenant mean in the Bible?',
+		answer:
+			'A covenant is a binding promise that creates a relationship. Our Father’s covenants create a family: “I will be their Father, and they will be my children” (Jeremiah 31:33). It is more than a contract; it gives persons to each other.',
+	},
+	{
+		question: 'What is the Hebrew and Greek word for covenant?',
+		answer:
+			'The Hebrew is berit; the Greek is diathēkē, which can also mean a will or testament, which is why we speak of the Old and New Testaments. The loyal love that keeps a covenant is hesed, rendered “covenant love” in the Father’s Heart Bible™.',
+	},
+	{
+		question: 'What are the covenants in the Bible?',
+		answer:
+			'The main covenants are with Noah (Genesis 9), Abraham (Genesis 15, 17), Israel at Sinai (Exodus 19-24), David (2 Samuel 7), and the new covenant promised in Jeremiah 31:31-34 and made by Jesus at the Last Supper (Luke 22:20).',
+	},
+	{
+		question: 'What is the new covenant?',
+		answer:
+			'The new covenant is our Father’s promise to write His instruction on His people’s hearts, forgive their sins and be their Father (Jeremiah 31:31-34). Jesus inaugurated it in His blood: “This cup is the new covenant in my blood” (Luke 22:20).',
+	},
+];
+---
+
+<WordMeaning
+	slug="covenant"
+	title="What Does Covenant Mean in the Bible? Meaning and Verses"
+	description="What does covenant mean in the Bible? A binding promise that makes a family: berit and diathēkē, Abraham, the new covenant, and “I will be their Father.”"
+	h1="What does covenant mean in the Bible?"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg"
+	heroAlt="A child held close by a parent"
+	published="2026-10-22"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">In the Bible, a covenant is a binding promise that creates a relationship, and our Father&rsquo;s covenants create a family: &ldquo;I will be their Father, and they will be my children&rdquo; (Jeremiah 31:33).</strong> It is more than a contract. A contract exchanges goods; a covenant gives persons to each other. The Hebrew word is <em>berit</em> and the Greek <em>diath&#275;k&#275;</em>. With Abraham our Father promised &ldquo;an everlasting covenant&mdash;to be Father to you and your descendants after you&rdquo; (Genesis 17:7), and Jesus said at the Last Supper, &ldquo;This cup is the new covenant in my blood&rdquo; (Luke 22:20). Below: what covenant means, the Hebrew and Greek, the great covenants, and the new covenant. You can <a href="https://fathersheartbible.com/read/jeremiah/31/" style="color: var(--color-brand);" class="hover:underline">read Jeremiah 31 free</a> and hear it in full.`}
+	keyTakeaway="A covenant is our Father binding Himself to His people as family: “I will be their Father, and they will be my children.”"
+	sections={sections}
+	renderings={renderings}
+	renderingsHeading="Covenant in the Father’s Heart Bible™"
+	renderingsIntro="Word for word in the Father’s Heart Bible™, with the King James wording beside some for contrast. Each reference links into the full chapter, free, with verse-by-verse audio in English."
+	faqs={faqs}
+	relatedHtml={`Related: <a href="/meaning/grace/" style="color: var(--color-brand);" class="hover:underline">what grace means</a>, <a href="/meaning/righteousness/" style="color: var(--color-brand);" class="hover:underline">what righteousness means</a>, <a href="/meaning/fathers-heart-of-god/" style="color: var(--color-brand);" class="hover:underline">the Father&rsquo;s heart of God</a>. Read <a href="https://fathersheartbible.com/read/genesis/17/" style="color: var(--color-brand);" class="hover:underline">Genesis 17</a> or <a href="https://fathersheartbible.com/read/jeremiah/31/" style="color: var(--color-brand);" class="hover:underline">Jeremiah 31</a>. For the Hebrew and Greek, see <a href="https://www.blueletterbible.org/lexicon/h1285/kjv/wlc/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">berit (Strong&rsquo;s H1285)</a> and <a href="https://www.blueletterbible.org/lexicon/g1242/kjv/tr/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">diathēkē (Strong&rsquo;s G1242)</a> on Blue Letter Bible.`}
+	ctaMidHeading="Read the new covenant promise"
+	ctaMidBodyHtml="Read Jeremiah 31 &mdash; free online with verse-by-verse audio in English, and footnotes on every distinctive rendering."
+	ctaBottomBodyHtml="From Genesis to Revelation, free online with audio &mdash; a fresh English translation that lets your Father&rsquo;s voice be heard on every page."
+	tags={["what does covenant mean in the bible", "covenant meaning in the bible", "new covenant", "berit", "covenant love"]}
+/>

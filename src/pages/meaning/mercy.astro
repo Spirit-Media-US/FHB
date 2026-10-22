@@ -1,0 +1,111 @@
+---
+// /meaning/mercy — plan W2 "what does X mean in the Bible" (approved 2026-10-22, Lane 2 topic list).
+// Demand: "mercy" is a top related query for "what does … mean in the bible" (Google Trends US, 3 months; free pytrends pull 2026-10-22). 127 FHB verses.
+// WEDGE: Luke 6:36 "your Father is merciful", Psalm 103:13 "a father’s heart goes out", and the Hebrew rachamim (womb-compassion) beside hesed ("covenant love").
+// Every Scripture quotation is VERBATIM from src/content/bible; checked with
+// bin/fhb-scripture-quote-audit.py before shipping. Verse links go to our /read only.
+import WordMeaning from '../../components/WordMeaning.astro';
+
+const sections = [
+	{
+		id: 'what-mercy-means',
+		heading: 'What mercy means in the Bible',
+		bodyHtml: `<p>Mercy is <strong>compassion in action toward someone in need or in the wrong</strong>. It withholds the punishment deserved and moves to help. In Scripture it flows from our Father&rsquo;s own nature: &ldquo;Our Father is compassionate and gracious, slow to anger and abounding in covenant love&rdquo; (Psalm 103:8).</p><p>And it never runs out: &ldquo;The covenant love of our Father never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness&rdquo; (Lamentations 3:22&ndash;23).</p>`,
+	},
+	{
+		id: 'hebrew-and-greek',
+		heading: 'The Hebrew and Greek words for mercy',
+		bodyHtml: `<p>The Hebrew word <em>rachamim</em> comes from <em>rechem</em>, womb. It is the tender, protective love a parent feels for a child, and the Psalms use it of our Father: His heart goes out to His children (Psalm 103:13). Its companion is <em>hesed</em>, loyal love, which the FHB renders &ldquo;covenant love.&rdquo;</p><p>The Greek word is <em>eleos</em>, the root of the church&rsquo;s ancient prayer <em>Kyrie eleison</em>, &ldquo;Lord, have mercy.&rdquo; In Jesus&rsquo; story of the tax collector, the prayer that sends him home justified is, &ldquo;our Father, have mercy on me, a sinner&rdquo; (Luke 18:13).</p>`,
+	},
+	{
+		id: 'rich-in-mercy',
+		heading: 'Rich in mercy',
+		bodyHtml: `<p>Paul describes salvation as mercy first: &ldquo;But our Father, being rich in mercy, because of the great love with which he loved us, though we were dead in our sins, made us alive together with Christ&rdquo; (Ephesians 2:4&ndash;5). &ldquo;He saved us&mdash;not for righteous deeds we did, but by his mercy&rdquo; (Titus 3:5).</p><p>The prophet Micah ends his book marvelling at it: &ldquo;Who is like our Father, who pardons sin and passes over the rebellion of the remnant of his inheritance? He does not hold on to his anger forever, because his heart delights in covenant love&rdquo; (Micah 7:18).</p>`,
+	},
+	{
+		id: 'mercy-and-grace',
+		heading: 'Mercy and grace: the difference',
+		bodyHtml: `<p>Mercy is <em>not</em> receiving the punishment we deserve; grace is receiving the gift we do not deserve. Hebrews joins them in one invitation: &ldquo;Let us then approach the throne of grace boldly, so we may receive mercy and find grace to help us in time of need&rdquo; (Hebrews 4:16). Our Father&rsquo;s throne is a place to receive both.</p>`,
+	},
+	{
+		id: 'living-mercifully',
+		heading: 'Living mercifully',
+		bodyHtml: `<p>Jesus says mercy is a family resemblance: &ldquo;Be merciful, just as your Father is merciful&rdquo; (Luke 6:36), and promises, &ldquo;Blessed are the merciful, for they will receive mercy&rdquo; (Matthew 5:7). People who have received mercy become merciful: slow to condemn, quick to help, ready to forgive.</p><p>Psalm 103 gives the measure to aim for: &ldquo;as far as the east is from the west, so far has our Father removed our sins from us&rdquo; (Psalm 103:12).</p>`,
+	},
+];
+
+const renderings = [
+	{
+		ref: 'Luke 6:36',
+		slug: 'luke',
+		ch: 6,
+		fhb: 'Be merciful, just as your Father is merciful.',
+		traditional: '“Be ye therefore merciful, as your Father also is merciful.” (KJV)',
+	},
+	{
+		ref: 'Lamentations 3:22–23',
+		slug: 'lamentations',
+		ch: 3,
+		fhb: 'The covenant love of our Father never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness.',
+		traditional:
+			'“It is of the LORD’S mercies that we are not consumed, because his compassions fail not. They are new every morning: great is thy faithfulness.” (KJV)',
+	},
+	{
+		ref: 'Psalm 103:13',
+		slug: 'psalms',
+		ch: 103,
+		fhb: 'As a father’s heart goes out to his children, so our Father’s heart goes out to those who fear him.',
+	},
+	{
+		ref: 'Ephesians 2:4',
+		slug: 'ephesians',
+		ch: 2,
+		fhb: 'But our Father, being rich in mercy, because of the great love with which he loved us,',
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does mercy mean in the Bible?',
+		answer:
+			'Mercy means compassion that acts toward people who deserve otherwise. Our Father “does not deal with us according to our sins” (Psalm 103:10), and Jesus says, “Be merciful, just as your Father is merciful” (Luke 6:36).',
+	},
+	{
+		question: 'What is the Hebrew and Greek word for mercy?',
+		answer:
+			'The Hebrew rachamim comes from rechem, womb, a parent’s tender love; hesed, loyal love, is its companion and is rendered “covenant love” in the FHB. The Greek is eleos, as in the prayer “Lord, have mercy.”',
+	},
+	{
+		question: 'What is the difference between mercy and grace?',
+		answer:
+			'Mercy is not receiving the punishment we deserve; grace is receiving the gift we do not deserve. Hebrews 4:16 names both: “so we may receive mercy and find grace to help us in time of need.”',
+	},
+	{
+		question: 'What does “his mercies are new every morning” mean?',
+		answer:
+			'It comes from Lamentations 3:22-23: our Father’s covenant love never ceases and His mercies never end; “they are new every morning.” Each day brings fresh mercy, so yesterday’s failure never exhausts it.',
+	},
+];
+---
+
+<WordMeaning
+	slug="mercy"
+	title="What Does Mercy Mean in the Bible? Meaning and Verses"
+	description="What does mercy mean in the Bible? Our Father’s compassion toward people who deserve otherwise: rachamim, hesed and eleos, and “new every morning.”"
+	h1="What does mercy mean in the Bible?"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg"
+	heroAlt="An open Bible in a quiet church, a place to pray"
+	published="2026-10-22"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">In the Bible, mercy means compassion that acts toward people who deserve otherwise: our Father not dealing with us as our sins deserve, and moving toward us in our need.</strong> &ldquo;He does not deal with us according to our sins, nor repay us according to our wrongdoing&rdquo; (Psalm 103:10), because &ldquo;as a father&rsquo;s heart goes out to his children, so our Father&rsquo;s heart goes out to those who fear him&rdquo; (Psalm 103:13). The Hebrew <em>rachamim</em> comes from the word for womb, a parent&rsquo;s tender love; the Greek is <em>eleos</em>. Jesus makes it family likeness: &ldquo;Be merciful, just as your Father is merciful&rdquo; (Luke 6:36). Below: what mercy means, the Hebrew and Greek, mercy and grace, and living mercifully. You can <a href="https://fathersheartbible.com/read/psalms/103/" style="color: var(--color-brand);" class="hover:underline">read Psalm 103 free</a> and hear it in full.`}
+	keyTakeaway="Mercy is a Father’s heart going out to children who deserve otherwise, new every morning, and meant to be passed on."
+	sections={sections}
+	renderings={renderings}
+	renderingsHeading="Mercy in the Father’s Heart Bible™"
+	renderingsIntro="Word for word in the Father’s Heart Bible™, with the King James wording beside some for contrast. Each reference links into the full chapter, free, with verse-by-verse audio in English."
+	faqs={faqs}
+	relatedHtml={`Related: <a href="/meaning/grace/" style="color: var(--color-brand);" class="hover:underline">what grace means</a>, <a href="/meaning/righteousness/" style="color: var(--color-brand);" class="hover:underline">what righteousness means</a>, <a href="/meaning/fathers-heart-of-god/" style="color: var(--color-brand);" class="hover:underline">the Father&rsquo;s heart of God</a>. Read <a href="https://fathersheartbible.com/read/psalms/103/" style="color: var(--color-brand);" class="hover:underline">Psalm 103</a> or <a href="https://fathersheartbible.com/read/lamentations/3/" style="color: var(--color-brand);" class="hover:underline">Lamentations 3</a>. For the Hebrew and Greek, see <a href="https://www.blueletterbible.org/lexicon/h7356/kjv/wlc/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">rachamim (Strong&rsquo;s H7356)</a> and <a href="https://www.blueletterbible.org/lexicon/g1656/kjv/tr/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">eleos (Strong&rsquo;s G1656)</a> on Blue Letter Bible.`}
+	ctaMidHeading="Read Psalm 103 in full"
+	ctaMidBodyHtml="Read Psalm 103 &mdash; free online with verse-by-verse audio in English, and footnotes on every distinctive rendering."
+	ctaBottomBodyHtml="From Genesis to Revelation, free online with audio &mdash; a fresh English translation that lets your Father&rsquo;s voice be heard on every page."
+	tags={["what does mercy mean in the bible", "mercy meaning in the bible", "rachamim", "eleos", "new every morning"]}
+/>

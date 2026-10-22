@@ -1,0 +1,109 @@
+---
+// /meaning/love — plan W2 "what does X mean in the Bible" (approved 2026-10-22, Lane 2 topic list).
+// Demand: "love meaning in the bible" is the #1 related query for "meaning in the bible" (Google Trends US, 3 months, score 100; free pytrends pull 2026-10-22). 686 FHB verses carry the word.
+// WEDGE: 1 John 4:8 "God is love" reads "our Father is love" in the FHB, and its footnote says why: love is His identity as Father.
+// Every Scripture quotation is VERBATIM from src/content/bible; checked with
+// bin/fhb-scripture-quote-audit.py before shipping. Verse links go to our /read only.
+import WordMeaning from '../../components/WordMeaning.astro';
+
+const sections = [
+	{
+		id: 'what-love-means',
+		heading: 'What love means in the Bible',
+		bodyHtml: `<p>Biblical love is <strong>steady, self-giving goodwill</strong>. It is not only a warm feeling, though it includes feeling, and not only duty, though it includes commitment. It is a Father who keeps choosing His children&rsquo;s good. &ldquo;This is love: not that we loved our Father, but that he loved us and sent his Son as the atoning sacrifice for our sins&rdquo; (1 John 4:10).</p><p>That order matters. We do not earn love by loving well; we learn to love because we have been loved. &ldquo;Beloved, let us love one another, for love is from our Father, and all who love are born of him and know him&rdquo; (1 John 4:7).</p>`,
+	},
+	{
+		id: 'hebrew-and-greek',
+		heading: 'The Hebrew and Greek words for love',
+		bodyHtml: `<p>The New Testament uses several Greek words. <em>Agap&#275;</em> (verb <em>agapa&#333;</em>) is the self-giving love of 1 John 4 and 1 Corinthians 13. <em>Phile&#333;</em> is the warm love of friends; Jesus uses that family of words when He calls His disciples friends.</p><p>In the Old Testament the everyday word is the verb <em>ahav</em> (noun <em>ahavah</em>), as in &ldquo;Love your Father with all your heart, with all your soul, and with all your strength&rdquo; (Deuteronomy 6:5). But the word that carries our Father&rsquo;s own love is <em>hesed</em>: loyal, covenant-keeping love that will not let go. The FHB renders it &ldquo;covenant love,&rdquo; and our Father uses its sister word when He says, &ldquo;I have loved you with everlasting love; so I have drawn you to myself with faithful love&rdquo; (Jeremiah 31:3).</p>`,
+	},
+	{
+		id: 'our-father-is-love',
+		heading: '“Our Father is love”',
+		bodyHtml: `<p>Where many Bibles read &ldquo;God is love,&rdquo; the Father&rsquo;s Heart Bible&trade; reads &ldquo;our Father is love&rdquo; (1 John 4:8, 16). Its footnote explains: love is not an attribute he wears but his very identity as Father. The love that gave the Son, John 3:16 says, is the Father&rsquo;s love: &ldquo;For our Father so loved the world that he gave his one and only Son.&rdquo;</p><p>That love does not stay outside us. &ldquo;Our Father&rsquo;s love has been poured into our hearts through the Holy Spirit given to us&rdquo; (Romans 5:5). And John&rsquo;s promise is that we can live inside it: &ldquo;Our Father is love, and whoever remains in love remains in him, and he in them&rdquo; (1 John 4:16).</p>`,
+	},
+	{
+		id: 'love-chapter',
+		heading: 'The love chapter: 1 Corinthians 13',
+		bodyHtml: `<p>Paul&rsquo;s famous description shows what this love looks like in practice: &ldquo;Love is patient, love is kind. It does not envy, it does not boast, it is not proud. It isn&rsquo;t rude, doesn&rsquo;t seek its own, isn&rsquo;t provoked, keeps no record of wrongs&rdquo; (1 Corinthians 13:4&ndash;5). &ldquo;It always protects, always trusts, always hopes, always perseveres. Love never fails&rdquo; (13:7&ndash;8).</p><p>Read it slowly and it becomes a portrait of our Father before it becomes a standard for us. The chapter ends: &ldquo;And now these three remain: faith, hope, and love. But the greatest of these is love&rdquo; (13:13). You can <a href="https://fathersheartbible.com/read/1-corinthians/13/" style="color: var(--color-brand);" class="hover:underline">read 1 Corinthians 13 free</a>.</p>`,
+	},
+	{
+		id: 'loving-like-him',
+		heading: 'How to love like our Father',
+		bodyHtml: `<p>Jesus made love the mark of His family: &ldquo;I give you a new command: love one another. As I have loved you, so you must love one another. By this everyone will know that you are my disciples, if you love one another&rdquo; (John 13:34&ndash;35). And He showed its measure: &ldquo;No one has greater love than this: to lay down one&rsquo;s life for one&rsquo;s friends&rdquo; (John 15:13).</p><p>Loving like Him starts with receiving His love, then giving it away in ordinary ways: patience in the kitchen, kindness to a difficult neighbour, keeping no record of wrongs. Children who know they are loved learn to love.</p>`,
+	},
+];
+
+const renderings = [
+	{
+		ref: '1 John 4:8',
+		slug: '1-john',
+		ch: 4,
+		fhb: 'Whoever does not love does not know our Father, because our Father is love.',
+		traditional: '“He that loveth not knoweth not God; for God is love.” (KJV)',
+	},
+	{
+		ref: '1 Corinthians 13:4',
+		slug: '1-corinthians',
+		ch: 13,
+		fhb: 'Love is patient, love is kind. It does not envy, it does not boast, it is not proud.',
+	},
+	{
+		ref: 'Jeremiah 31:3',
+		slug: 'jeremiah',
+		ch: 31,
+		fhb: 'From far away our Father appeared to me: “I have loved you with everlasting love; so I have drawn you to myself with faithful love.”',
+	},
+	{
+		ref: 'John 15:13',
+		slug: 'john',
+		ch: 15,
+		fhb: 'No one has greater love than this: to lay down one’s life for one’s friends.',
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does love mean in the Bible?',
+		answer:
+			'Love in the Bible means steady, self-giving goodwill, and it begins with our Father: “our Father is love” (1 John 4:8). He showed it by sending His Son, and we love because He first loved us. It is described in 1 Corinthians 13 as patient, kind, and keeping no record of wrongs.',
+	},
+	{
+		question: 'What is the Greek word for love in the Bible?',
+		answer:
+			'The main New Testament word is agapē, self-giving love; phileō is the love of friends. In the Old Testament, ahavah is the everyday word and hesed is loyal covenant love, which the Father’s Heart Bible™ renders “covenant love.”',
+	},
+	{
+		question: 'What does “God is love” mean?',
+		answer:
+			'It means love is not just something God does but who He is. The Father’s Heart Bible™ reads 1 John 4:8 as “our Father is love,” because the love John describes is the Father’s love that sent His Son (1 John 4:9-10).',
+	},
+	{
+		question: 'What is the greatest commandment about love?',
+		answer:
+			'Jesus named two: love our Father with all your heart, soul and mind, and love your neighbor as yourself (Matthew 22:37-39), drawn from Deuteronomy 6:5. He also gave a new command: “love one another. As I have loved you” (John 13:34).',
+	},
+];
+---
+
+<WordMeaning
+	slug="love"
+	title="What Does Love Mean in the Bible? Meaning and Verses"
+	description="What does love mean in the Bible? Our Father’s own nature: agapē and hesed, 1 Corinthians 13, and why the FHB reads “our Father is love.”"
+	h1="What does love mean in the Bible?"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg"
+	heroAlt="A father and child together outdoors"
+	published="2026-10-22"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">In the Bible, love means choosing another&rsquo;s good at your own cost, and it begins with our Father: &ldquo;Whoever does not love does not know our Father, because our Father is love&rdquo; (1 John 4:8).</strong> Love is not first something we feel or do; it is who He is, shown when He &ldquo;sent his one and only Son into the world so we might live through him&rdquo; (1 John 4:9). The New Testament&rsquo;s main word is the Greek <em>agap&#275;</em>; the Old Testament&rsquo;s deepest is the Hebrew <em>hesed</em>, which the Father&rsquo;s Heart Bible&trade; renders &ldquo;covenant love.&rdquo; Below: what love means, the Hebrew and Greek words, the love chapter, and how to love like Him. You can <a href="https://fathersheartbible.com/read/1-john/4/" style="color: var(--color-brand);" class="hover:underline">read 1 John 4 free</a> and hear it in full.`}
+	keyTakeaway="Love in the Bible starts with a Father who loved first; everything we call love is learning to love like Him."
+	sections={sections}
+	renderings={renderings}
+	renderingsHeading="Love in the Father’s Heart Bible™"
+	renderingsIntro="Word for word in the Father’s Heart Bible™, with the King James wording beside some for contrast. Each reference links into the full chapter, free, with verse-by-verse audio in English."
+	faqs={faqs}
+	relatedHtml={`Related: <a href="/meaning/grace/" style="color: var(--color-brand);" class="hover:underline">what grace means</a>, <a href="/meaning/righteousness/" style="color: var(--color-brand);" class="hover:underline">what righteousness means</a>, <a href="/meaning/fathers-heart-of-god/" style="color: var(--color-brand);" class="hover:underline">the Father&rsquo;s heart of God</a>. Read <a href="https://fathersheartbible.com/read/1-john/4/" style="color: var(--color-brand);" class="hover:underline">1 John 4</a> or <a href="https://fathersheartbible.com/read/1-corinthians/13/" style="color: var(--color-brand);" class="hover:underline">1 Corinthians 13</a>. For the Greek and Hebrew, see <a href="https://www.blueletterbible.org/lexicon/g26/kjv/tr/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">agapē (Strong&rsquo;s G26)</a> and <a href="https://www.blueletterbible.org/lexicon/h2617/kjv/wlc/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">hesed (Strong&rsquo;s H2617)</a> on Blue Letter Bible.`}
+	ctaMidHeading="Read 1 John 4 in full"
+	ctaMidBodyHtml="Read 1 John 4 &mdash; free online with verse-by-verse audio in English, and footnotes on every distinctive rendering."
+	ctaBottomBodyHtml="From Genesis to Revelation, free online with audio &mdash; a fresh English translation that lets your Father&rsquo;s voice be heard on every page."
+	tags={["what does love mean in the bible", "love meaning in the bible", "agape", "1 corinthians 13", "god is love"]}
+/>
