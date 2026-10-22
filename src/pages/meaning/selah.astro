@@ -1,0 +1,115 @@
+---
+// /meaning/selah — plan W2 "what does X mean in the Bible" (approved 2026-10-22, Lane 2 topic list).
+// Demand: "what does selah mean in the bible" is a top related query for "what does … mean in the bible" (Google Trends US, 3 and 12 months; free pytrends pull 2026-10-22).
+// WEDGE: The FHB does not print "Selah" in the running text (it is a cue, not a word to read aloud); it records each place Selah stands and footnotes it at its first appearance (Psalm 3:2).
+// Every Scripture quotation is VERBATIM from src/content/bible; checked with
+// bin/fhb-scripture-quote-audit.py before shipping. Verse links go to our /read only.
+import WordMeaning from '../../components/WordMeaning.astro';
+
+const sections = [
+	{
+		id: 'what-selah-means',
+		heading: 'What Selah likely means',
+		bodyHtml: `<p><em>Selah</em> (Hebrew <em>selah</em>) is <strong>a cue to pause</strong>. It appears at the end of a line or section in the Psalms, usually after something weighty has been said, as if to say: stop here; let that land.</p><p>Scholars are honest that its precise meaning is uncertain. The leading suggestions are a musical direction (an interlude, a lift in volume or pitch) or a liturgical cue for the congregation to respond. Either way, it marks a moment to stop and take in what our Father has said or done.</p>`,
+	},
+	{
+		id: 'where-it-appears',
+		heading: 'Where Selah appears',
+		bodyHtml: `<p>Selah appears 71 times in 39 psalms and three times in the prayer of Habakkuk 3. It often follows a confession of trust. In Psalm 3, David writes that many are saying there is no salvation for him; Selah follows, and then: &ldquo;But you, my Father, are a shield around me, my glory and the one who lifts my head&rdquo; (Psalm 3:3).</p><p>In Psalm 46 it comes three times, after the earth quakes, after &ldquo;The Father of heaven&rsquo;s armies is with us; the God of Jacob is our fortress&rdquo; (Psalm 46:7), and at the end of the psalm.</p>`,
+	},
+	{
+		id: 'how-the-fhb-handles-it',
+		heading: 'How the Father’s Heart Bible™ handles Selah',
+		bodyHtml: `<p>Many English Bibles print &ldquo;Selah&rdquo; in the text, where it can read like part of the sentence. The Father&rsquo;s Heart Bible&trade; treats it as what it is, a cue rather than a word to be read aloud. It does not appear in the running text or the narration; instead the FHB records each place it stands in the Hebrew and explains it once, in the footnote on Psalm 3:2: Selah is a musical or reflective marker scattered through the Psalms, likely a cue to pause and consider what was just said.</p>`,
+	},
+	{
+		id: 'selah-and-be-still',
+		heading: 'Selah and “be still”',
+		bodyHtml: `<p>The spirit of Selah is close to our Father&rsquo;s own words in the same psalm: &ldquo;Be still, and know that I am the Father&rdquo; (Psalm 46:10). Selah is a built-in stillness. Before the psalm moves on, it gives room to know who He is.</p>`,
+	},
+	{
+		id: 'praying-with-selah',
+		heading: 'How to pray with Selah',
+		bodyHtml: `<p>When you read a psalm, treat each Selah as an invitation. Stop reading. Breathe. Say back to our Father what the verse just said: &ldquo;You are my shield. You are with me. You are my fortress.&rdquo; Then go on.</p><p>Read Psalm 46 or Psalm 3 this way, pausing at each Selah, and the psalm becomes a conversation rather than a recital.</p>`,
+	},
+];
+
+const renderings = [
+	{
+		ref: 'Psalm 3:2',
+		slug: 'psalms',
+		ch: 3,
+		fhb: 'Many are saying of me, “There is no salvation for him in God.”',
+		traditional:
+			'“Many there be which say of my soul, There is no help for him in God. Selah.” (KJV)',
+	},
+	{
+		ref: 'Psalm 46:3',
+		slug: 'psalms',
+		ch: 46,
+		fhb: 'though its waters roar and foam, though the mountains quake at its surging.',
+		traditional:
+			'“Though the waters thereof roar and be troubled, though the mountains shake with the swelling thereof. Selah.” (KJV)',
+	},
+	{
+		ref: 'Psalm 46:7',
+		slug: 'psalms',
+		ch: 46,
+		fhb: 'The Father of heaven’s armies is with us; the God of Jacob is our fortress.',
+		traditional: '“The LORD of hosts is with us; the God of Jacob is our refuge. Selah.” (KJV)',
+	},
+	{
+		ref: 'Habakkuk 3:3',
+		slug: 'habakkuk',
+		ch: 3,
+		fhb: 'Our Father came from Teman, the Holy One from Mount Paran. His splendor covered the heavens, and the earth was full of his praise.',
+		traditional:
+			'“God came from Teman, and the Holy One from mount Paran. Selah. His glory covered the heavens, and the earth was full of his praise.” (KJV)',
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does Selah mean in the Bible?',
+		answer:
+			'Selah most likely means “pause”: a musical or reflective cue to stop and consider what was just said. It appears 71 times in the Psalms and three times in Habakkuk. Its exact meaning is uncertain; it may come from a root meaning “to lift up.”',
+	},
+	{
+		question: 'Where is Selah found in the Bible?',
+		answer:
+			'In 39 psalms (71 times) and in Habakkuk 3 (three times). It often follows a statement of trust, as in Psalm 3 and Psalm 46.',
+	},
+	{
+		question: 'Should Selah be read out loud?',
+		answer:
+			'It is a cue rather than part of the sentence, so many readers pause instead of saying it. The Father’s Heart Bible™ does not print it in the running text or the narration; it records where it stands and explains it in a footnote on Psalm 3:2.',
+	},
+	{
+		question: 'How can I use Selah when I pray?',
+		answer:
+			'Treat each Selah as a moment to stop, breathe and say the verse back to our Father in your own words before reading on. It echoes “Be still, and know that I am the Father” (Psalm 46:10).',
+	},
+];
+---
+
+<WordMeaning
+	slug="selah"
+	title="What Does Selah Mean in the Bible? Meaning and Verses"
+	description="What does Selah mean in the Bible? A Hebrew cue to pause, found in the Psalms and Habakkuk. What it likely means, where it appears, and how to use it in prayer."
+	h1="What does Selah mean in the Bible?"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg"
+	heroAlt="An open Bible with morning light across its pages"
+	published="2026-10-22"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Selah is a Hebrew word found 71 times in the Psalms and three times in Habakkuk, and it most likely means &ldquo;pause&rdquo;: a musical or reflective cue to stop and consider what was just said.</strong> Its exact meaning is not certain; it may come from a root meaning &ldquo;to lift up,&rdquo; marking a lifted voice or an instrumental interlude. The Father&rsquo;s Heart Bible&trade; footnotes it at its first appearance: Selah is a musical or reflective marker scattered through the Psalms, likely a cue to pause and consider what was just said. Because it is a cue rather than a word to read aloud, the FHB does not print it in the running text; it records where it stands. Below: what Selah likely means, where it appears, and how to pray with it. You can <a href="https://fathersheartbible.com/read/psalms/46/" style="color: var(--color-brand);" class="hover:underline">read Psalm 46 free</a> and hear it in full.`}
+	keyTakeaway="Selah is a pause in the music of Scripture: stop, breathe, and let what our Father just said sink in."
+	sections={sections}
+	renderings={renderings}
+	renderingsHeading="Selah places in the Father’s Heart Bible™"
+	renderingsIntro="Four places Selah stands, word for word in the Father’s Heart Bible™ (which marks the pause rather than printing the word), with the King James wording, Selah included. Each reference links into the full chapter, free, with verse-by-verse audio in English."
+	faqs={faqs}
+	relatedHtml={`Related: <a href="/meaning/grace/" style="color: var(--color-brand);" class="hover:underline">what grace means</a>, <a href="/meaning/love/" style="color: var(--color-brand);" class="hover:underline">what love means</a>, <a href="/meaning/mercy/" style="color: var(--color-brand);" class="hover:underline">what mercy means</a>. Read <a href="https://fathersheartbible.com/read/psalms/46/" style="color: var(--color-brand);" class="hover:underline">Psalm 46</a> or <a href="https://fathersheartbible.com/read/psalms/3/" style="color: var(--color-brand);" class="hover:underline">Psalm 3</a>. For the Hebrew, see <a href="https://www.blueletterbible.org/lexicon/h5542/kjv/wlc/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">selah (Strong&rsquo;s H5542)</a> on Blue Letter Bible.`}
+	ctaMidHeading="Read Psalm 46 in full"
+	ctaMidBodyHtml="Read Psalm 46 &mdash; free online with verse-by-verse audio in English, and pause where the Hebrew says Selah."
+	ctaBottomBodyHtml="From Genesis to Revelation, free online with audio &mdash; a fresh English translation that lets your Father&rsquo;s voice be heard on every page."
+	tags={["what does selah mean in the bible", "selah meaning", "selah", "psalms", "pause and reflect"]}
+/>

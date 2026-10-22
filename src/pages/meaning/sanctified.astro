@@ -1,0 +1,113 @@
+---
+// /meaning/sanctified — plan W2 "what does X mean in the Bible" (approved 2026-10-22, Lane 2 topic list).
+// Demand: "sanctified meaning in the bible" is rising on Google Trends US (3 months, +40%; "what does sanctified mean in the bible" +50%; free pytrends pull 2026-10-22).
+// WEDGE: The FHB mostly renders hagiazō as "made holy" (Hebrews 10:10, 1 Corinthians 6:11): sanctification as our Father setting His children apart as His own (Leviticus 20:26).
+// Every Scripture quotation is VERBATIM from src/content/bible; checked with
+// bin/fhb-scripture-quote-audit.py before shipping. Verse links go to our /read only.
+import WordMeaning from '../../components/WordMeaning.astro';
+
+const sections = [
+	{
+		id: 'what-sanctified-means',
+		heading: 'What sanctified means',
+		bodyHtml: `<p>To be sanctified is <strong>to be made holy and set apart as belonging to our Father</strong>. In the Old Testament, objects were sanctified for His use; people were set apart to be His. Our Father says it of His people: &ldquo;Be holy to me, for I, your Father, am holy, and I have set you apart from the peoples to be mine&rdquo; (Leviticus 20:26).</p><p>Holiness, then, is not first a list of rules. It is belonging. A child is set apart by being part of a family.</p>`,
+	},
+	{
+		id: 'hebrew-and-greek',
+		heading: 'The Hebrew and Greek words',
+		bodyHtml: `<p>The Hebrew verb is <em>qadash</em>, to be set apart or consecrated; <em>qadosh</em> means holy. The Greek verb is <em>hagiaz&#333;</em>, and the noun <em>hagiasmos</em> is &ldquo;sanctification.&rdquo; They share a root with &ldquo;saint,&rdquo; one who has been set apart.</p><p>The Father&rsquo;s Heart Bible&trade; uses the plain phrase &ldquo;made holy&rdquo; in most places, keeping &ldquo;sanctification&rdquo; where Paul uses the noun: &ldquo;For this is our Father&rsquo;s will: your sanctification&rdquo; (1 Thessalonians 4:3).</p>`,
+	},
+	{
+		id: 'once-for-all',
+		heading: 'Sanctified once for all',
+		bodyHtml: `<p>The New Testament speaks of sanctification first as something already done in Christ. &ldquo;By this will, we have been made holy through the offering of Jesus Christ&rsquo;s body, once for all&rdquo; (Hebrews 10:10). To the Corinthians, with all their failures, Paul writes: &ldquo;But you were washed, but made holy, but set right in the Lord Jesus Christ&rsquo;s name and by the Spirit of our Father&rdquo; (1 Corinthians 6:11).</p><p>Hebrews holds both sides together in one sentence: &ldquo;For by one offering he has perfected for all time those who are being made holy&rdquo; (Hebrews 10:14).</p>`,
+	},
+	{
+		id: 'growing-in-holiness',
+		heading: 'Growing in holiness',
+		bodyHtml: `<p>Sanctification is also a life of growing to look like our Father. &ldquo;But just as the one who called you is holy, so be holy in all you do; for it is written: &lsquo;Be holy, because I am holy&rsquo;&rdquo; (1 Peter 1:15&ndash;16). Paul says the fruit of belonging to Him &ldquo;leads to holiness, and the end, eternal life&rdquo; (Romans 6:22).</p><p>And it is His work in us: &ldquo;May our Father of peace himself make you completely holy&rdquo; (1 Thessalonians 5:23).</p>`,
+	},
+	{
+		id: 'how-it-happens',
+		heading: 'How sanctification happens',
+		bodyHtml: `<p>Jesus prayed for it on the night before the cross: &ldquo;Make them holy by truth; your word is truth&rdquo; (John 17:17). Our Father makes His children holy through His word, His Spirit, and the life of His family, as we keep turning toward Him. It is not achieved by willpower alone, and it is never earned; it is a Father shaping children who already belong to Him.</p>`,
+	},
+];
+
+const renderings = [
+	{
+		ref: 'Hebrews 10:10',
+		slug: 'hebrews',
+		ch: 10,
+		fhb: 'By this will, we have been made holy through the offering of Jesus Christ’s body, once for all.',
+		traditional:
+			'“By the which will we are sanctified through the offering of the body of Jesus Christ once for all.” (KJV)',
+	},
+	{
+		ref: '1 Corinthians 6:11',
+		slug: '1-corinthians',
+		ch: 6,
+		fhb: 'Such were some of you. But you were washed, but made holy, but set right in the Lord Jesus Christ’s name and by the Spirit of our Father.',
+		traditional:
+			'“…but ye are sanctified, but ye are justified in the name of the Lord Jesus…” (KJV)',
+	},
+	{
+		ref: 'John 17:17',
+		slug: 'john',
+		ch: 17,
+		fhb: 'Make them holy by truth; your word is truth.',
+		traditional: '“Sanctify them through thy truth: thy word is truth.” (KJV)',
+	},
+	{
+		ref: 'Leviticus 20:26',
+		slug: 'leviticus',
+		ch: 20,
+		fhb: 'Be holy to me, for I, your Father, am holy, and I have set you apart from the peoples to be mine.',
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does sanctified mean in the Bible?',
+		answer:
+			'Sanctified means made holy and set apart as belonging to our Father. “By this will, we have been made holy through the offering of Jesus Christ’s body, once for all” (Hebrews 10:10). It is both a gift already given in Christ and a life of growing holiness.',
+	},
+	{
+		question: 'What is the Greek and Hebrew word for sanctified?',
+		answer:
+			'The Greek is hagiazō (noun hagiasmos, “sanctification”); the Hebrew is qadash, to set apart, with qadosh meaning holy. Both share the idea behind the word “saint”: one set apart for our Father.',
+	},
+	{
+		question: 'What is the difference between justification and sanctification?',
+		answer:
+			'Justification is being set right with our Father, a once-for-all verdict. Sanctification is being made holy: given once in Christ (Hebrews 10:10) and worked out over a lifetime (Hebrews 10:14). 1 Corinthians 6:11 names both: “made holy, but set right.”',
+	},
+	{
+		question: 'How are we sanctified?',
+		answer:
+			'By our Father’s work in Christ and through His word and Spirit. Jesus prayed, “Make them holy by truth; your word is truth” (John 17:17), and Paul prays, “May our Father of peace himself make you completely holy” (1 Thessalonians 5:23).',
+	},
+];
+---
+
+<WordMeaning
+	slug="sanctified"
+	title="What Does Sanctified Mean in the Bible? Meaning and Verses"
+	description="What does sanctified mean in the Bible? Made holy and set apart as our Father’s own: hagiazō and qadash, sanctified once for all, and growing in holiness."
+	h1="What does sanctified mean in the Bible?"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg"
+	heroAlt="Hands open in prayer at daybreak"
+	published="2026-10-22"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">In the Bible, sanctified means made holy: set apart by our Father as His own. &ldquo;By this will, we have been made holy through the offering of Jesus Christ&rsquo;s body, once for all&rdquo; (Hebrews 10:10).</strong> The Greek word is <em>hagiaz&#333;</em> and the Hebrew <em>qadash</em>, both meaning to set apart for a holy purpose. Sanctification is both a gift already given and a life being shaped: we are made holy in Christ, and we are &ldquo;being made holy&rdquo; (Hebrews 10:14). The Father&rsquo;s Heart Bible&trade; usually renders the word plainly as &ldquo;made holy.&rdquo; Below: what sanctified means, the Hebrew and Greek, the once-for-all gift, and growing in holiness. You can <a href="https://fathersheartbible.com/read/hebrews/10/" style="color: var(--color-brand);" class="hover:underline">read Hebrews 10 free</a> and hear it in full.`}
+	keyTakeaway="To be sanctified is to be made holy: set apart by our Father as His own, once for all in Christ, and growing to look like Him."
+	sections={sections}
+	renderings={renderings}
+	renderingsHeading="Sanctified in the Father’s Heart Bible™"
+	renderingsIntro="Word for word in the Father’s Heart Bible™, with the King James wording beside some for contrast. Each reference links into the full chapter, free, with verse-by-verse audio in English."
+	faqs={faqs}
+	relatedHtml={`Related: <a href="/meaning/grace/" style="color: var(--color-brand);" class="hover:underline">what grace means</a>, <a href="/meaning/love/" style="color: var(--color-brand);" class="hover:underline">what love means</a>, <a href="/meaning/mercy/" style="color: var(--color-brand);" class="hover:underline">what mercy means</a>. Read <a href="https://fathersheartbible.com/read/hebrews/10/" style="color: var(--color-brand);" class="hover:underline">Hebrews 10</a> or <a href="https://fathersheartbible.com/read/1-thessalonians/5/" style="color: var(--color-brand);" class="hover:underline">1 Thessalonians 5</a>. For the Greek and Hebrew, see <a href="https://www.blueletterbible.org/lexicon/g37/kjv/tr/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">hagiazō (Strong&rsquo;s G37)</a> and <a href="https://www.blueletterbible.org/lexicon/h6942/kjv/wlc/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">qadash (Strong&rsquo;s H6942)</a> on Blue Letter Bible.`}
+	ctaMidHeading="Read Hebrews 10 in full"
+	ctaMidBodyHtml="Read Hebrews 10 &mdash; free online with verse-by-verse audio in English."
+	ctaBottomBodyHtml="From Genesis to Revelation, free online with audio &mdash; a fresh English translation that lets your Father&rsquo;s voice be heard on every page."
+	tags={["what does sanctified mean in the bible", "sanctified meaning", "sanctification", "made holy", "hagiazo"]}
+/>
