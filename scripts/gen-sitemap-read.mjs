@@ -429,10 +429,14 @@ for (const hub of allHubs) parts.push(hubEntry(hub));
 // ONLY for a row in community's src/data/verse-pages.json (each with its own written meaning), so the
 // sitemap lists exactly those rows — never a generated range. Same coupling as the language registry
 // above: community decides what renders, this file mirrors it. A missing/unreadable file lists none.
+// Collected once: the combined file gets them here, the English segment below (SPLIT mode,
+// which is what ships — a first version pushed them only to the combined file, so 0 reached the site).
+const VERSE_ENTRIES = [];
 try {
 	const vp = JSON.parse(fs.readFileSync('/srv/sites/community/src/data/verse-pages.json', 'utf8'));
 	const keys = Object.keys(vp.pages || {}).filter((k) => /^[a-z0-9-]+\/\d+\/\d+$/.test(k)).sort();
-	for (const k of keys) parts.push(`<url><loc>${esc(`${SITE}/read/${k}/`)}</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>`);
+	for (const k of keys) VERSE_ENTRIES.push(`<url><loc>${esc(`${SITE}/read/${k}/`)}</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>`);
+	parts.push(...VERSE_ENTRIES);
 	console.log(`gen-sitemap-read: ${keys.length} verse pages listed`);
 } catch (e) {
 	console.warn(`gen-sitemap-read: verse pages not listed (${e.message})`);
@@ -484,6 +488,7 @@ const segs = new Map(LIVE_LANGS.map((l) => [l, []]));
 if (SPLIT) {
 	for (const l of LIVE_LANGS) for (const hub of hubsFor(l)) segs.get(l)?.push(hubEntry(hub));
 	for (const l of LIVE_LANGS) for (const b of booksFor(l)) segs.get(l)?.push(bookEntry(b));
+	segs.get('en')?.push(...VERSE_ENTRIES);
 }
 for (const key of keys) {
 	const langs = groups.get(key);
