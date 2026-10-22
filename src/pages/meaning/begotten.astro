@@ -9,10 +9,11 @@
 // a 1989 experimental film. Everything else is Bible intent — "begotten" survives in
 // English almost entirely because of Bible translation.
 //
-// WEDGE, verified against the canon with canon.py: "only begotten" appears ZERO times in
-// the FHB English canon; "only Son" / "one and only Son" appear 12 times. "begotten"
-// itself survives in exactly ONE verse (Psalm 2:7). That is a real, checkable translation
-// decision, which is what makes this page ours rather than the 51st dictionary entry.
+// WEDGE, re-verified 2026-10-21 against src/content/bible (what /read serves): "begotten" appears
+// ZERO times in the FHB English text — monogenēs is "one and only" (John 1:14, 1:18, 3:16, 1 John
+// 4:9), and Psalm 2:7 now reads "today I have become your Father" (its footnote: "the Son begotten
+// of the Father"). The page earlier claimed Psalm 2:7 kept "begotten"; corrected. A real,
+// checkable translation decision, which is what makes this page ours rather than a dictionary entry.
 import WordMeaning from '../../components/WordMeaning.astro';
 
 const sections = [
@@ -29,12 +30,12 @@ const sections = [
 	{
 		id: 'fhb-choice',
 		heading: 'What the Father’s Heart Bible does with it',
-		bodyHtml: `<p>The Father&rsquo;s Heart Bible does not use the phrase &ldquo;only begotten&rdquo; anywhere. It renders <em>monogenēs</em> as <strong>&ldquo;his only Son&rdquo;</strong> or <strong>&ldquo;the one and only Son,&rdquo;</strong> keeping the uniqueness the Greek is pressing and dropping a word that now obscures more than it reveals.</p><p>There is one deliberate exception. In Psalm 2:7 the word is kept, because there the point is precisely the Father&rsquo;s eternal declaration over His Son: &ldquo;I will proclaim the decree of our Father: he said to me, &lsquo;You are my Son &mdash; Jesus &mdash; today I have begotten you.&rsquo;&rdquo; The New Testament quotes that verse of Jesus in Acts 13:33 and Hebrews 1:5 and 5:5, and the footnote in the text says so.</p><p>So the pattern is consistent rather than mechanical: plain English where &ldquo;begotten&rdquo; would confuse, and the older word retained in the one place where the Father-Son declaration is the whole subject.</p>`,
+		bodyHtml: `<p>The Father&rsquo;s Heart Bible does not use the phrase &ldquo;only begotten&rdquo; anywhere. It renders <em>monogenēs</em> as <strong>&ldquo;one and only&rdquo;</strong> &mdash; &ldquo;his one and only Son&rdquo; in John 3:16, &ldquo;the one and only Son&rdquo; in John 1:14 &mdash; keeping the uniqueness the Greek is pressing and dropping a word that now obscures more than it reveals.</p><p>The one Old Testament verse where older Bibles use the word is Psalm 2:7, &ldquo;today I have begotten thee&rdquo; in the King James. The Father&rsquo;s Heart Bible says what the word means: &ldquo;I will proclaim the decree of our Father: he said to me, &lsquo;You are my Son; today I have become your Father.&rsquo;&rdquo; The New Testament applies that verse to Jesus in Acts 13:33 and Hebrews 1:5 and 5:5, and the footnote in the text says so, calling Him &ldquo;the Son begotten of the Father.&rdquo;</p><p>So the pattern is consistent: plain English where &ldquo;begotten&rdquo; would confuse, with the old word&rsquo;s meaning, a Father and His Son, spelled out instead of hidden.</p>`,
 	},
 	{
 		id: 'why-it-matters',
 		heading: 'Why the choice matters for what you hear',
-		bodyHtml: `<p>Read the two versions of John 3:16 side by side and the difference is not decorative. &ldquo;For God so loved the world, that he gave his only begotten Son&rdquo; puts two pieces of unfamiliar vocabulary between the reader and the sentence &mdash; a category word for the One who loves, and an archaic word for the One given.</p><p>The Father&rsquo;s Heart Bible reads: &ldquo;For our Father so loved the world that he gave his only Son.&rdquo; The relationship is now audible in both halves. A Father gave His own Son. That is what the verse has always said; the wording simply stops muffling it.</p><p>None of this is a claim that older translations are wrong. &ldquo;Only begotten&rdquo; was good English once. Language moved, and a translation made now has to serve the ear that is actually reading.</p>`,
+		bodyHtml: `<p>Read the two versions of John 3:16 side by side and the difference is not decorative. &ldquo;For God so loved the world, that he gave his only begotten Son&rdquo; puts two pieces of unfamiliar vocabulary between the reader and the sentence &mdash; a category word for the One who loves, and an archaic word for the One given.</p><p>The Father&rsquo;s Heart Bible reads: &ldquo;For our Father so loved the world that he gave his one and only Son.&rdquo; The relationship is now audible in both halves. A Father gave His own Son. That is what the verse has always said; the wording simply stops muffling it.</p><p>None of this is a claim that older translations are wrong. &ldquo;Only begotten&rdquo; was good English once. Language moved, and a translation made now has to serve the ear that is actually reading.</p>`,
 	},
 ];
 
@@ -43,7 +44,7 @@ const renderings = [
 		ref: 'John 3:16',
 		slug: 'john',
 		ch: 3,
-		fhb: 'For our Father so loved the world that he gave his only Son, that whoever believes in him will not perish but have eternal life.',
+		fhb: 'For our Father so loved the world that he gave his one and only Son, that whoever believes in him will not perish but have eternal life.',
 		traditional: '“For God so loved the world, that he gave his only begotten Son…” (KJV)',
 	},
 	{
@@ -57,7 +58,7 @@ const renderings = [
 		ref: 'John 1:18',
 		slug: 'john',
 		ch: 1,
-		fhb: 'No one has ever seen our Father; the only Son, close beside the Father, has made him known.',
+		fhb: 'No one has ever seen our Father; the one and only God, close beside the Father, has made him known.',
 		traditional: '“…the only begotten Son, which is in the bosom of the Father…” (KJV)',
 	},
 	{
@@ -71,9 +72,9 @@ const renderings = [
 		ref: 'Psalms 2:7',
 		slug: 'psalms',
 		ch: 2,
-		fhb: 'I will proclaim the decree of our Father: he said to me, “You are my Son — Jesus — today I have begotten you.”',
+		fhb: 'I will proclaim the decree of our Father: he said to me, “You are my Son; today I have become your Father.',
 		traditional:
-			'The one place the Father’s Heart Bible keeps “begotten” — the Father’s eternal decree over the Son.',
+			'Where older Bibles say “begotten,” the Father’s Heart Bible says what it means — the Father’s eternal decree over the Son.',
 	},
 ];
 
@@ -91,7 +92,7 @@ const faqs = [
 	{
 		question: 'Does the Father’s Heart Bible use the phrase “only begotten”?',
 		answer:
-			'No. The Father’s Heart Bible renders monogenēs as “his only Son” or “the one and only Son,” so John 3:16 reads, “For our Father so loved the world that he gave his only Son.” The word “begotten” is kept in exactly one verse, Psalm 2:7, where the Father’s eternal declaration over His Son is the subject — and the text footnotes why.',
+			'No. The Father’s Heart Bible renders monogenēs as “one and only,” so John 3:16 reads, “For our Father so loved the world that he gave his one and only Son.” The word “begotten” does not appear in the text at all: in Psalm 2:7, where older Bibles say “today I have begotten you,” it reads “today I have become your Father,” and the footnote explains why.',
 	},
 	{
 		question: 'Why do modern Bibles drop “only begotten”?',
@@ -109,12 +110,13 @@ const faqs = [
 <WordMeaning
 	slug="begotten"
 	title="What Does “Begotten” Mean in the Bible?"
-	description="“Begotten” means fathered — the old English word behind the Greek monogenēs, “one of a kind.” What it means in John 3:16, and why this Bible says “his only Son.”"
+	description="“Begotten” means fathered — the old English word behind the Greek monogenēs, “one of a kind.” What it means in John 3:16, and why this Bible says “his one and only Son.”"
 	h1="What does “begotten” mean in the Bible?"
 	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/4f858cae0aaf68469ed3400e047a53d4af7e5900-8256x5504.jpg"
 	heroAlt="Open Bible pages in warm light"
 	published="2026-08-04"
-	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">&ldquo;Begotten&rdquo; is the old past participle of &ldquo;beget,&rdquo; meaning to father a child. In the King James Version it translates the Greek word <em>monogen&#275;s</em>, used of Jesus five times in John&rsquo;s writings &mdash; and it points to relationship, not to a moment when the Son began.</strong> Most modern scholarship reads <em>monogen&#275;s</em> as &ldquo;only&rdquo; or &ldquo;one of a kind,&rdquo; stressing that this Son is the Father&rsquo;s own, uniquely His. That is why the Father&rsquo;s Heart Bible renders John 3:16 as &ldquo;For our Father so loved the world that he gave his only Son&rdquo; rather than &ldquo;his only begotten Son.&rdquo; You can <a href=\"https://fathersheartbible.com/read/john/3/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read John 3 free</a> and compare.`}
+	modified="2026-10-21"
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">&ldquo;Begotten&rdquo; is the old past participle of &ldquo;beget,&rdquo; meaning to father a child. In the King James Version it translates the Greek word <em>monogen&#275;s</em>, used of Jesus five times in John&rsquo;s writings &mdash; and it points to relationship, not to a moment when the Son began.</strong> Most modern scholarship reads <em>monogen&#275;s</em> as &ldquo;only&rdquo; or &ldquo;one of a kind,&rdquo; stressing that this Son is the Father&rsquo;s own, uniquely His. That is why the Father&rsquo;s Heart Bible renders John 3:16 as &ldquo;For our Father so loved the world that he gave his one and only Son&rdquo; rather than &ldquo;his only begotten Son.&rdquo; You can <a href=\"https://fathersheartbible.com/read/john/3/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read John 3 free</a> and compare.`}
 	keyTakeaway="“Begotten” means fathered — and in John it marks Jesus as the Father’s one-of-a-kind Son, not a Son who came into being."
 	sections={sections}
 	renderings={renderings}
