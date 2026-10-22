@@ -28,6 +28,11 @@ import { execSync } from 'node:child_process';
  *      regular figures are the server's price and order-pricing.ts's FIRST_ORDER_PCT rule.
  *   9. ONE volume ladder: dvc-checkout.ts TIERS, src/data/print-tiers.ts and the tiers every
  *      built order form embeds are the same tiers.
+ *  11. MERCHANT DATA (Kevin 2026-10-22, Google free listings): every SKU an edition page's form
+ *      sells has its own Product + Offer in the page's JSON-LD, at the server's price, USD, in
+ *      stock, url = that page, free shipping to the US, and a valid ISBN-13 as gtin13 (the
+ *      Large Print set has no ISBN of its own, so it alone may omit it). A schema price that
+ *      differs from the charge is the same defect as a displayed one.
  *
  * Self-check: run with --selftest to confirm each assertion actually FAILS when broken. A
  * gate that has never rejected anything is unproven.
@@ -431,6 +436,67 @@ for (const e of formsAgree(
 ))
 	check(false, e);
 
+// ── 11. merchant data on edition pages ──────────────────────────────────────────────
+const isbn13ok = (g) => {
+	if (!/^97[89]\d{10}$/.test(g ?? '')) return false;
+	const d = g.split('').map(Number);
+	const sum = d.slice(0, 12).reduce((s, n, i) => s + n * (i % 2 ? 3 : 1), 0);
+	return (10 - (sum % 10)) % 10 === d[12];
+};
+function ldNodes(html) {
+	const out = [];
+	const walk = (n) => {
+		if (Array.isArray(n)) return n.forEach(walk);
+		if (!n || typeof n !== 'object') return;
+		if (n['@graph']) walk(n['@graph']);
+		out.push(n);
+		for (const [k, v] of Object.entries(n)) if (k !== '@graph' && typeof v === 'object') walk(v);
+	};
+	for (const m of html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {
+		try {
+			walk(JSON.parse(m[1]));
+		} catch {
+			out.push({ __parseError: true });
+		}
+	}
+	return out;
+}
+function merchantErrs(pages, srv) {
+	const errs = [];
+	for (const [f, html] of Object.entries(pages)) {
+		const pageUrl = `https://fathersheartbible.com/${f.replace(/^dist\//, '').replace(/index\.html$/, '')}`;
+		const nodes = ldNodes(html);
+		if (nodes.some((n) => n.__parseError)) errs.push(`${f}: JSON-LD does not parse`);
+		const products = nodes.filter((n) => [].concat(n['@type'] ?? []).includes('Product') && n.offers);
+		const seen = new Set();
+		for (const p of products) {
+			const o = p.offers;
+			const tag = `${f} ${o?.sku ?? '?'}`;
+			if (!o || o['@type'] !== 'Offer') {
+				errs.push(`${tag}: Product without a single Offer`);
+				continue;
+			}
+			seen.add(o.sku);
+			const sv = srv[o.sku];
+			if (!sv) errs.push(`${tag}: schema offers a SKU the server does not sell`);
+			else if (cents(o.price) !== sv.cents) errs.push(`${tag}: schema price ${o.price}, server charges ${usd(sv.cents)}`);
+			if (o.priceCurrency !== 'USD') errs.push(`${tag}: priceCurrency ${o.priceCurrency}`);
+			if (o.availability !== 'https://schema.org/InStock') errs.push(`${tag}: availability ${o.availability}`);
+			if (o.url !== pageUrl) errs.push(`${tag}: offer url ${o.url} is not this page (${pageUrl})`);
+			const sh = o.shippingDetails;
+			if (sh?.shippingRate?.value !== '0' || sh?.shippingDestination?.addressCountry !== 'US')
+				errs.push(`${tag}: shipping must be free and to the US (shippingRate 0 + shippingDestination US)`);
+			if (!p.name || !p.image) errs.push(`${tag}: Product needs name and image`);
+			const g = o.gtin13 ?? p.gtin13;
+			if (!/^lp-set-/.test(o.sku ?? '') && !isbn13ok(g)) errs.push(`${tag}: gtin13 ${g} is not a valid ISBN-13`);
+		}
+		const formSkus = Object.keys(forms[f]?.[0]?.prices ?? parseForms(html)[0]?.prices ?? {});
+		for (const sku of formSkus) if (!seen.has(sku)) errs.push(`${f}: the form sells ${sku} but no Product/Offer describes it`);
+	}
+	return errs;
+}
+for (const e of merchantErrs(editionPages, server)) check(false, e);
+
 // ── self-test: prove each assertion can actually fail ───────────────────────────────
 if (process.argv.includes('--selftest')) {
 	const cases = [
@@ -528,6 +594,45 @@ if (process.argv.includes('--selftest')) {
 		],
 		['retired ISBN detected', () => /89307-294-5/.test('isbn 979-8-89307-294-5')],
 		[
+			'merchant: schema price differs from the charge',
+			() => {
+				const f = Object.keys(editionPages).find((k) => k.includes('/moms-bible/'));
+				if (!f || merchantErrs({ [f]: editionPages[f] }, server).length) return false;
+				const broken = editionPages[f].replace(/"price":"99\.99"/, '"price":"89.99"');
+				return broken !== editionPages[f] && merchantErrs({ [f]: broken }, server).length > 0;
+			},
+		],
+		[
+			'merchant: shipping destination missing',
+			() => {
+				const f = Object.keys(editionPages).find((k) => k.includes('/moms-bible/'));
+				if (!f) return false;
+				const broken = editionPages[f].replace(/"DefinedRegion","addressCountry":"US"/, '"DefinedRegion","addressCountry":"CA"');
+				return broken !== editionPages[f] && merchantErrs({ [f]: broken }, server).length > 0;
+			},
+		],
+		[
+			'merchant: a bad ISBN-13 as gtin13',
+			() => {
+				const f = Object.keys(editionPages).find((k) => k.includes('/moms-bible/'));
+				if (!f) return false;
+				const g = /"gtin13":"(\d{13})"/.exec(editionPages[f])?.[1];
+				if (!g) return false;
+				const bad = `${g.slice(0, 12)}${(Number(g[12]) + 1) % 10}`;
+				const broken = editionPages[f].replaceAll(`"gtin13":"${g}"`, `"gtin13":"${bad}"`);
+				return broken !== editionPages[f] && merchantErrs({ [f]: broken }, server).length > 0;
+			},
+		],
+		[
+			'merchant: a binding sold with no Product',
+			() => {
+				const f = Object.keys(editionPages).find((k) => k.includes('/moms-bible/'));
+				if (!f) return false;
+				const broken = editionPages[f].replace(/"sku":"moms-pb"/g, '"sku":"moms-hb"');
+				return broken !== editionPages[f] && merchantErrs({ [f]: broken }, server).length > 0;
+			},
+		],
+		[
 			'targeted binding price drift',
 			() => {
 				const broken = parseCheckout(
@@ -569,5 +674,5 @@ if (fail.length) {
 	process.exit(1);
 }
 console.log(
-	`✓ pricing-verify: ${Object.keys(server).length} SKUs agree across ${CHECKOUT}, ${Object.keys(forms).length} built order forms (${Object.keys(editionPages).length} edition pages, price lines checked)${haveIsbns ? ' and ISBNS.json' : ''}; one volume ladder; Large Print set is a saving in both bindings; no retired ISBN in src/ or functions/`,
+	`✓ pricing-verify: ${Object.keys(server).length} SKUs agree across ${CHECKOUT}, ${Object.keys(forms).length} built order forms (${Object.keys(editionPages).length} edition pages, price lines + merchant Product/Offer data checked)${haveIsbns ? ' and ISBNS.json' : ''}; one volume ladder; Large Print set is a saving in both bindings; no retired ISBN in src/ or functions/`,
 );
