@@ -1,0 +1,119 @@
+---
+// /meaning/meek — plan W2 "what does X mean in the Bible". The June 2026 FINAL strategy study saw
+// "what does MEEK mean in the bible" as a big rising cluster (Google Trends, LAST WEEK window).
+// Volume for that wording is not in our cache; no paid call made (2026-10-22). Measured neighbour
+// (US, cached): "humility and meekness" 320/mo.
+//
+// WEDGE: the FHB keeps "meek" in the Beatitude (Matthew 5:5) and its footnote on Psalm 37:11 ties
+// Jesus' promise to the psalm it quotes, where the Hebrew anav is rendered "humble". The same
+// Greek word (praus) is "gentle" in Jesus' own self-description (Matthew 11:29). Every quotation
+// VERBATIM from src/content/bible; checked with fhb-scripture-quote-audit.py before shipping.
+import WordMeaning from '../../components/WordMeaning.astro';
+
+const sections = [
+	{
+		id: 'what-meek-means',
+		heading: 'What “meek” means',
+		bodyHtml: `<p><em>Meek</em> means <strong>gentle and humble because you trust our Father, not because you are weak</strong>. A meek person does not grab, force or retaliate; they have strength and choose to keep it under His control. In modern English &ldquo;meek&rdquo; can sound timid. In the Bible it is the opposite of timid: it is the settled confidence of someone who does not need to fight for their place, because their Father has already given it.</p><p>Jesus made it a promise: &ldquo;Blessed are the meek, for they will inherit the earth&rdquo; (Matthew 5:5). The meek do not seize the earth. They are given it.</p>`,
+	},
+	{
+		id: 'hebrew-and-greek',
+		heading: 'The Hebrew and Greek words behind “meek”',
+		bodyHtml: `<p>The Greek word in Matthew 5:5 is <em>praus</em> (the noun is <em>praut&#275;s</em>, &ldquo;meekness&rdquo;). Outside the Bible it was used of a strong horse that had been trained to the bridle: all of its power, none of its wildness. Paul uses the noun of Jesus Himself: &ldquo;I, Paul, myself appeal to you by the meekness and gentleness of Christ&rdquo; (2 Corinthians 10:1).</p><p>Behind the Beatitude stands the Hebrew <em>anav</em>, the humble or lowly person who depends on our Father. Jesus is quoting Psalm 37:11, which the Father&rsquo;s Heart Bible&trade; renders, &ldquo;But the humble will inherit the land and delight in abundant peace,&rdquo; and the FHB footnote on that verse makes the link: Jesus draws this promise into his Beatitudes.</p>`,
+	},
+	{
+		id: 'meek-not-weak',
+		heading: 'Meek is not weak: Moses and Jesus',
+		bodyHtml: `<p>The two people Scripture most clearly calls meek are its strongest leaders. Of Moses, who stood before Pharaoh and led a nation through the sea, it says: &ldquo;Now the man Moses was very humble, more than anyone else on the face of the earth&rdquo; (Numbers 12:3). The Hebrew word there is the same <em>anav</em>.</p><p>And Jesus describes Himself with the Greek word: &ldquo;Put my yoke on you and learn from me, since I&rsquo;m gentle and humble in heart, and you&rsquo;ll find rest for your souls&rdquo; (Matthew 11:29). The One who calmed storms and drove out demons called Himself gentle. Meekness is power that serves rather than dominates.</p>`,
+	},
+	{
+		id: 'why-the-meek-inherit',
+		heading: 'Why the meek inherit the earth',
+		bodyHtml: `<p>An inheritance is given to children by a father. The meek inherit because they are the Father&rsquo;s children who have stopped fighting for what He has promised to give. Isaiah pictures the coming King defending them: &ldquo;with righteousness he will judge the poor, and decide with equity for the meek of the earth&rdquo; (Isaiah 11:4).</p><p>That is why meekness can rest instead of strive. &ldquo;Seek our Father, all you humble of the land,&rdquo; says Zephaniah (2:3). The meek are not the forgotten; they are the ones their Father has promised to remember.</p>`,
+	},
+	{
+		id: 'growing-in-meekness',
+		heading: 'How to grow in meekness',
+		bodyHtml: `<p>Meekness is not a personality type; it is fruit our Father&rsquo;s Spirit grows: &ldquo;love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, self-control&rdquo; (Galatians 5:22&ndash;23). It shows up in how we treat people: &ldquo;with all humility and gentleness, with patience, bearing with one another in love&rdquo; (Ephesians 4:2).</p><p>Peter describes it as a beauty no one can take away: &ldquo;the undying beauty of a gentle, quiet spirit, precious in our Father&rsquo;s sight&rdquo; (1 Peter 3:4). It grows as we learn from Jesus, the one who is gentle and humble in heart.</p>`,
+	},
+];
+
+const renderings = [
+	{
+		ref: 'Matthew 5:5',
+		slug: 'matthew',
+		ch: 5,
+		fhb: 'Blessed are the meek, for they will inherit the earth.',
+		traditional: '“Blessed are the meek: for they shall inherit the earth.” (KJV)',
+	},
+	{
+		ref: 'Psalm 37:11',
+		slug: 'psalms',
+		ch: 37,
+		fhb: 'But the humble will inherit the land and delight in abundant peace.',
+		traditional:
+			'“But the meek shall inherit the earth; and shall delight themselves in the abundance of peace.” (KJV)',
+	},
+	{
+		ref: 'Numbers 12:3',
+		slug: 'numbers',
+		ch: 12,
+		fhb: 'Now the man Moses was very humble, more than anyone else on the face of the earth.',
+		traditional:
+			'“(Now the man Moses was very meek, above all the men which were upon the face of the earth.)” (KJV)',
+	},
+	{
+		ref: 'Matthew 11:29',
+		slug: 'matthew',
+		ch: 11,
+		fhb: 'Put my yoke on you and learn from me, since I’m gentle and humble in heart, and you’ll find rest for your souls.',
+		traditional:
+			'“…for I am meek and lowly in heart: and ye shall find rest unto your souls.” (KJV)',
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does meek mean in the Bible?',
+		answer:
+			'Meek means gentle and humble because you trust our Father, not because you are weak. A meek person has strength and keeps it under His control instead of grabbing, forcing or retaliating. Jesus said, “Blessed are the meek, for they will inherit the earth” (Matthew 5:5).',
+	},
+	{
+		question: 'What is the Greek and Hebrew word for meek?',
+		answer:
+			'The Greek is praus (noun prautēs), used of strength under control, like a strong horse trained to the bridle. The Hebrew behind Matthew 5:5 is anav, the humble person who depends on our Father; Psalm 37:11, which Jesus quotes, reads in the FHB, “But the humble will inherit the land.”',
+	},
+	{
+		question: 'Does meek mean weak?',
+		answer:
+			'No. Scripture calls Moses “very humble, more than anyone else on the face of the earth” (Numbers 12:3), using the same Hebrew word, and Jesus calls Himself “gentle and humble in heart” (Matthew 11:29). Meekness is power that serves rather than dominates.',
+	},
+	{
+		question: 'What does “the meek shall inherit the earth” mean?',
+		answer:
+			'It means our Father gives the earth to His humble, trusting children rather than to those who seize it. Jesus draws the promise from Psalm 37:11, and an inheritance is something a father gives his children, not something they win by force.',
+	},
+];
+---
+
+<WordMeaning
+	slug="meek"
+	title="What Does Meek Mean in the Bible? Meaning and Verses"
+	description="What does meek mean in the Bible? Gentle strength that trusts our Father: the Greek praus, the Hebrew anav, and why “the meek will inherit the earth.”"
+	h1="What does meek mean in the Bible?"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg"
+	heroAlt="A father and child together outdoors"
+	published="2026-10-22"
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">In the Bible, meek means gentle and humble because you trust our Father, not because you are weak: strength kept under His control, that does not grab, force or retaliate.</strong> The Greek word is <em>praus</em>, used of a strong horse trained to the bridle, and behind it stands the Hebrew <em>anav</em>, the humble person who depends on our Father. Jesus made it a promise: &ldquo;Blessed are the meek, for they will inherit the earth&rdquo; (Matthew 5:5), and He called Himself &ldquo;gentle and humble in heart&rdquo; (Matthew 11:29). Below: what meek means, the Hebrew and Greek, why meek is not weak, and why the meek inherit the earth. You can <a href=\"https://fathersheartbible.com/read/matthew/5/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read Matthew 5 free</a> and hear it in full.`}
+	keyTakeaway="The meek are not the weak; they are the Father’s children who keep their strength in His hands, and He gives them the earth."
+	sections={sections}
+	renderings={renderings}
+	renderingsHeading="Meek in the Father’s Heart Bible™"
+	renderingsIntro="Where older Bibles say “meek,” word for word in the FHB with the King James beside each. Each reference links into the full chapter, free, with verse-by-verse audio in English."
+	faqs={faqs}
+	relatedHtml={`Related: <a href=\"/meaning/grace/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">what grace means</a>, <a href=\"/meaning/righteousness/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">what righteousness means</a>, <a href=\"/meaning/lords-prayer/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">the Lord&rsquo;s Prayer</a> (also from the Sermon on the Mount). For the Greek and Hebrew, see <a href=\"https://www.blueletterbible.org/lexicon/g4239/kjv/tr/0-1/\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: var(--color-brand);\" class=\"hover:underline\">praus (Strong&rsquo;s G4239)</a> and <a href=\"https://www.blueletterbible.org/lexicon/h6035/kjv/wlc/0-1/\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: var(--color-brand);\" class=\"hover:underline\">anav (Strong&rsquo;s H6035)</a> on Blue Letter Bible.`}
+	ctaMidHeading="Read the Beatitudes in full"
+	ctaMidBodyHtml="Read Matthew 5 &mdash; free online with verse-by-verse audio in English, and footnotes on every distinctive rendering."
+	ctaBottomBodyHtml="From Genesis to Revelation, free online with audio &mdash; a fresh English translation that lets your Father&rsquo;s voice be heard on every page."
+	tags={["what does meek mean in the bible", "meek meaning", "blessed are the meek", "praus", "meekness"]}
+/>

@@ -86,4 +86,11 @@ export const WORD_MEANINGS: WordMeaning[] = [
 			'Being made right with our Father — tsedaqah and dikaiosynē, and why the FHB reads “the righteousness of our Father.”',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
 	},
+	{
+		slug: 'meek',
+		title: 'What does meek mean in the Bible?',
+		blurb:
+			'Gentle strength that trusts our Father — praus and anav, Moses and Jesus, and why the meek inherit the earth.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg',
+	},
 ];
