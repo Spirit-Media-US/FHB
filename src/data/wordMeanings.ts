@@ -128,4 +128,39 @@ export const WORD_MEANINGS: WordMeaning[] = [
 			'Our Father’s compassion toward people who deserve otherwise — rachamim, hesed and eleos.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
+	{
+		slug: 'propitiation',
+		title: 'What does propitiation mean in the Bible?',
+		blurb:
+			'The atoning sacrifice our Father provides — hilastērion, the mercy seat, and 1 John 4:10.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'abide',
+		title: 'What does abide mean in the Bible?',
+		blurb:
+			'To remain in Christ like a branch in the vine — menō, John 15, and remaining in the Father’s love.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg',
+	},
+	{
+		slug: 'selah',
+		title: 'What does Selah mean in the Bible?',
+		blurb:
+			'A Hebrew cue to pause, 71 times in the Psalms — what it likely means and how to pray with it.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
+	},
+	{
+		slug: 'sanctified',
+		title: 'What does sanctified mean in the Bible?',
+		blurb:
+			'Made holy and set apart as our Father’s own — hagiazō and qadash, once for all and growing.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
+	},
+	{
+		slug: 'conviction',
+		title: 'What does conviction mean in the Bible?',
+		blurb:
+			'The Spirit showing us the truth so we can come home — elenchō, and conviction vs condemnation.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
+	},
 ];
