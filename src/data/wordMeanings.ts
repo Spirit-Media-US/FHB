@@ -72,4 +72,11 @@ export const WORD_MEANINGS: WordMeaning[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
 		volume: '83,000/mo',
 	},
+	{
+		slug: 'grace',
+		title: 'What does grace mean in the Bible?',
+		blurb:
+			'A gift you did not earn, given in love — the Greek charis, and the Hebrew hesed the FHB renders “covenant love.”',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
+	},
 ];
