@@ -93,4 +93,39 @@ export const WORD_MEANINGS: WordMeaning[] = [
 			'Gentle strength that trusts our Father — praus and anav, Moses and Jesus, and why the meek inherit the earth.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg',
 	},
+	{
+		slug: 'love',
+		title: 'What does love mean in the Bible?',
+		blurb:
+			'Our Father’s own nature — agapē and hesed, 1 Corinthians 13, and why the FHB reads “our Father is love.”',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg',
+	},
+	{
+		slug: 'faith',
+		title: 'What does faith mean in the Bible?',
+		blurb:
+			'Trusting our Father and His promise — pistis and emunah, Abraham, Hebrews 11, and faith with works.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
+	},
+	{
+		slug: 'covenant',
+		title: 'What does covenant mean in the Bible?',
+		blurb:
+			'A binding promise that makes a family — berit and diathēkē, and “I will be their Father.”',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg',
+	},
+	{
+		slug: 'wisdom',
+		title: 'What does wisdom mean in the Bible?',
+		blurb:
+			'Living skilfully in our Father’s world — chokmah and sophia, Proverbs, and Christ our wisdom.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c42c2fd1d784331411250317010d54a0cfac62cc-5959x3724.jpg',
+	},
+	{
+		slug: 'mercy',
+		title: 'What does mercy mean in the Bible?',
+		blurb:
+			'Our Father’s compassion toward people who deserve otherwise — rachamim, hesed and eleos.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
 ];

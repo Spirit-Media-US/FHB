@@ -1,0 +1,110 @@
+---
+// /meaning/faith — plan W2 "what does X mean in the Bible" (approved 2026-10-22, Lane 2 topic list).
+// Demand: "faith meaning in the bible" is the #2 related query for "meaning in the bible" (Google Trends US, 3 months, score 67; free pytrends pull 2026-10-22). 242 FHB verses.
+// WEDGE: Faith as a child trusting a Father’s promise: Hebrews 11:6 "whoever approaches our Father must believe…", and the FHB footnote on Habakkuk 2:4.
+// Every Scripture quotation is VERBATIM from src/content/bible; checked with
+// bin/fhb-scripture-quote-audit.py before shipping. Verse links go to our /read only.
+import WordMeaning from '../../components/WordMeaning.astro';
+
+const sections = [
+	{
+		id: 'what-faith-means',
+		heading: 'What faith means in the Bible',
+		bodyHtml: `<p>Faith is <strong>trust that leans its weight on someone</strong>. In the Bible its object is always our Father and what He has said. Hebrews defines it by its direction: &ldquo;Now faith is the assurance of things hoped for, the conviction of things not seen&rdquo; (Hebrews 11:1). Faith treats our Father&rsquo;s promise as solid ground, even while the promise is still on its way.</p><p>It is also how we are saved: &ldquo;For by grace you have been saved through faith&mdash;not your own doing; it is the gift of our Father&rdquo; (Ephesians 2:8). Faith does not earn the gift; it receives it.</p>`,
+	},
+	{
+		id: 'hebrew-and-greek',
+		heading: 'The Hebrew and Greek words for faith',
+		bodyHtml: `<p>The Greek noun is <em>pistis</em> and the verb <em>pisteu&#333;</em>, &ldquo;to believe&rdquo; or &ldquo;to trust.&rdquo; The same word can mean faithfulness, because trust and loyalty belong together.</p><p>The Hebrew <em>emunah</em> comes from <em>aman</em>, to be firm or reliable, the root of our word &ldquo;amen.&rdquo; Habakkuk&rsquo;s famous line uses it: &ldquo;the righteous will live by his faith&rdquo; (Habakkuk 2:4). The FHB footnote notes that Paul cites that verse three times to anchor the gospel, describing the one who trusts our Father&rsquo;s promise even when the vision tarries.</p>`,
+	},
+	{
+		id: 'abraham',
+		heading: 'Abraham: faith in a Father’s promise',
+		bodyHtml: `<p>The Bible&rsquo;s model of faith is Abraham, promised a son long after it was possible. Paul writes: &ldquo;He did not doubt our Father&rsquo;s promise in lack of faith, but was strengthened in faith, giving glory to our Father, fully convinced that what our Father had promised he was also able to do&rdquo; (Romans 4:20&ndash;21).</p><p>Faith, then, looks less at the size of the problem than at the faithfulness of the One who promised. That is why even small faith matters: &ldquo;with faith like a mustard seed, you will tell this mountain, &lsquo;Move from here to there,&rsquo; and it will move&rdquo; (Matthew 17:20).</p>`,
+	},
+	{
+		id: 'faith-and-doubt',
+		heading: 'Faith and doubt',
+		bodyHtml: `<p>Faith is not the absence of struggle. A father once brought his son to Jesus and said the most honest prayer in the Gospels: &ldquo;I believe; help my unbelief!&rdquo; (Mark 9:24). Jesus did not send him away; He healed the boy. Faith can be small, shaky and still real.</p><p>It also grows: &ldquo;So faith comes from hearing, and hearing through the word about Christ&rdquo; (Romans 10:17). Reading and hearing Scripture is how trust gets stronger.</p>`,
+	},
+	{
+		id: 'faith-and-works',
+		heading: 'Faith and works',
+		bodyHtml: `<p>James and Paul are not at odds. Paul says we are saved by grace through faith, not by works. James says real faith shows itself: &ldquo;In the same way, faith by itself, if it is not accompanied by works, is dead&rdquo; (James 2:17). Living faith acts.</p><p>Paul describes the same life from the inside: &ldquo;The life I live now in the body, I live by faith in the Son of our Father, who loved me and gave himself for me&rdquo; (Galatians 2:20). Faith rests on being loved, and then it walks.</p>`,
+	},
+];
+
+const renderings = [
+	{
+		ref: 'Hebrews 11:1',
+		slug: 'hebrews',
+		ch: 11,
+		fhb: 'Now faith is the assurance of things hoped for, the conviction of things not seen.',
+		traditional:
+			'“Now faith is the substance of things hoped for, the evidence of things not seen.” (KJV)',
+	},
+	{
+		ref: 'Hebrews 11:6',
+		slug: 'hebrews',
+		ch: 11,
+		fhb: 'Without faith it’s impossible to please him: whoever approaches our Father must believe he exists and rewards those who sincerely seek him.',
+	},
+	{
+		ref: 'Habakkuk 2:4',
+		slug: 'habakkuk',
+		ch: 2,
+		fhb: 'Look—the proud man is not right in heart—but the righteous will live by his faith.',
+	},
+	{
+		ref: 'Mark 9:24',
+		slug: 'mark',
+		ch: 9,
+		fhb: 'Immediately the boy’s father cried, “I believe; help my unbelief!”',
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does faith mean in the Bible?',
+		answer:
+			'Faith means trusting our Father and His promise enough to rely on it before you see it. Hebrews 11:1 says, “Now faith is the assurance of things hoped for, the conviction of things not seen.” It receives salvation as a gift (Ephesians 2:8).',
+	},
+	{
+		question: 'What is the Greek and Hebrew word for faith?',
+		answer:
+			'The Greek is pistis (verb pisteuō), meaning trust or faithfulness. The Hebrew is emunah, from aman, to be firm, the root of “amen,” as in Habakkuk 2:4: “the righteous will live by his faith.”',
+	},
+	{
+		question: 'How do I get more faith?',
+		answer:
+			'“Faith comes from hearing, and hearing through the word about Christ” (Romans 10:17). Faith grows as you hear and read Scripture and pray honestly, even as the father in Mark 9:24 did: “I believe; help my unbelief!”',
+	},
+	{
+		question: 'Is faith without works dead?',
+		answer:
+			'James 2:17 says faith “if it is not accompanied by works, is dead.” This does not mean works earn salvation; it means real faith acts. Paul agrees: salvation is by grace through faith, and that faith lives itself out (Galatians 2:20).',
+	},
+];
+---
+
+<WordMeaning
+	slug="faith"
+	title="What Does Faith Mean in the Bible? Meaning and Verses"
+	description="What does faith mean in the Bible? Trusting our Father and His promise: the Greek pistis, the Hebrew emunah, Hebrews 11, and faith with works."
+	h1="What does faith mean in the Bible?"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg"
+	heroAlt="A man reading and reflecting on Scripture"
+	published="2026-10-22"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">In the Bible, faith means trusting our Father and His promise enough to rely on it before you can see it: &ldquo;Now faith is the assurance of things hoped for, the conviction of things not seen&rdquo; (Hebrews 11:1).</strong> It is not wishful thinking and not a feeling you must manufacture. It is a child&rsquo;s confidence in a Father who keeps His word. The Greek word is <em>pistis</em>, trust or faithfulness; the Hebrew <em>emunah</em> means firmness, the root of &ldquo;amen.&rdquo; &ldquo;Whoever approaches our Father must believe he exists and rewards those who sincerely seek him&rdquo; (Hebrews 11:6). Below: what faith means, the Hebrew and Greek words, Abraham&rsquo;s example, and how faith and works fit together. You can <a href="https://fathersheartbible.com/read/hebrews/11/" style="color: var(--color-brand);" class="hover:underline">read Hebrews 11 free</a> and hear it in full.`}
+	keyTakeaway="Faith is a child’s trust in a Father’s word, strong enough to act on before you can see."
+	sections={sections}
+	renderings={renderings}
+	renderingsHeading="Faith in the Father’s Heart Bible™"
+	renderingsIntro="Word for word in the Father’s Heart Bible™, with the King James wording beside some for contrast. Each reference links into the full chapter, free, with verse-by-verse audio in English."
+	faqs={faqs}
+	relatedHtml={`Related: <a href="/meaning/grace/" style="color: var(--color-brand);" class="hover:underline">what grace means</a>, <a href="/meaning/righteousness/" style="color: var(--color-brand);" class="hover:underline">what righteousness means</a>, <a href="/meaning/fathers-heart-of-god/" style="color: var(--color-brand);" class="hover:underline">the Father&rsquo;s heart of God</a>. Read <a href="https://fathersheartbible.com/read/hebrews/11/" style="color: var(--color-brand);" class="hover:underline">Hebrews 11</a> or <a href="https://fathersheartbible.com/read/romans/4/" style="color: var(--color-brand);" class="hover:underline">Romans 4</a>. For the Greek and Hebrew, see <a href="https://www.blueletterbible.org/lexicon/g4102/kjv/tr/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">pistis (Strong&rsquo;s G4102)</a> and <a href="https://www.blueletterbible.org/lexicon/h530/kjv/wlc/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">emunah (Strong&rsquo;s H530)</a> on Blue Letter Bible.`}
+	ctaMidHeading="Read Hebrews 11 in full"
+	ctaMidBodyHtml="Read the great chapter on faith &mdash; free online with verse-by-verse audio in English."
+	ctaBottomBodyHtml="From Genesis to Revelation, free online with audio &mdash; a fresh English translation that lets your Father&rsquo;s voice be heard on every page."
+	tags={["what does faith mean in the bible", "faith meaning in the bible", "hebrews 11:1", "pistis", "biblical faith"]}
+/>
