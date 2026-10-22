@@ -5,6 +5,7 @@ import Section from '../../components/Section.astro';
 import { cardUrl } from '../../data/card-art';
 import frontmatter from '../../data/editions/frontmatter.json';
 import shared from '../../data/editions/shared.json';
+import isbnList from '../../data/isbn-list.json';
 import { langSlug, languageEditions } from '../../data/language-editions';
 import { catalogRows } from '../../data/print-catalog';
 import readerEntry from '../../data/reader-entry-links.json';
@@ -255,9 +256,75 @@ if (pillars.length) {
 }
 
 const url = `${SITE}/bibles/${ed.slug}-bible/`;
+
+// ONE PRODUCT PER BINDING, for Google's free merchant listings (Kevin 2026-10-22, master plan W5).
+// Each binding is its own book with its own ISBN and price, so each gets its own Product +
+// Offer: the price is the catalog row's (the same row this page's order form sells and
+// pricing-verify checks against dvc-checkout.ts), the GTIN is that binding's ISBN from
+// src/data/isbn-list.json (generated from the ISBN master), and the offer points at THIS page,
+// where the buyer orders it. Shipping: free, United States only — what /print says and what the
+// checkout collects (allowed_countries US). NO return policy is declared: the site's only
+// wording is "reach out and we'll make it right", which states no window or method, and a
+// policy is never invented to fill a schema field.
+type IsbnPair = { hb?: string; pb?: string; colour?: string };
+const il = isbnList as unknown as Record<string, IsbnPair | IsbnPair[]>;
+const isbnPairs: IsbnPair[] = [
+	'general',
+	'audience',
+	'journaling',
+	'largePrint',
+	'languages',
+].flatMap((k) => {
+	const v = il[k];
+	return Array.isArray(v) ? v : v ? [v] : [];
+});
+const pairFor = (rowId: string): IsbnPair | undefined => {
+	const colour = /^general-[a-z]+-([a-z]+)$/.exec(rowId)?.[1];
+	if (colour)
+		return ((il.general as IsbnPair[]) ?? []).find((p) => p.colour?.toLowerCase() === colour);
+	return ed.isbn ? isbnPairs.find((p) => p.hb === ed.isbn || p.pb === ed.isbn) : undefined;
+};
+const BIND = {
+	hb: { label: 'Hardcover', format: 'https://schema.org/Hardcover' },
+	pb: { label: 'Paperback', format: 'https://schema.org/Paperback' },
+} as const;
+const variants = orderRows.flatMap((r) => {
+	const pair = pairFor(r.id);
+	return (['hb', 'pb'] as const).map((b) => ({
+		sku: `${r.id}-${b}`,
+		binding: b,
+		price: b === 'hb' ? r.hb : r.pb,
+		isbn: pair?.[b],
+		title: orderRows.length > 1 ? r.title : schemaName,
+	}));
+});
+const offerFor = (v: (typeof variants)[number]) => ({
+	'@type': 'Offer',
+	price: v.price.toFixed(2),
+	priceCurrency: 'USD',
+	availability: 'https://schema.org/InStock',
+	itemCondition: 'https://schema.org/NewCondition',
+	url,
+	sku: v.sku,
+	...(v.isbn ? { gtin13: v.isbn.replace(/-/g, '') } : {}),
+	seller: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	shippingDetails: {
+		'@type': 'OfferShippingDetails',
+		shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'USD' },
+		shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'US' },
+	},
+});
+// The page's own Book node is the binding its ISBN names (hardback for every edition today);
+// the other binding(s) hang off it as workExample editions, each a Product with its own offer.
+const mainVariant = variants.find((v) => v.isbn && v.isbn === ed.isbn) ?? variants[0];
+const otherVariants = variants.filter((v) => v !== mainVariant);
 const productSchema = {
 	'@context': 'https://schema.org',
-	'@type': 'Book',
+	'@type': ['Book', 'Product'],
 	'@id': `${url}#book`,
 	name: schemaName,
 	// FHB has no established search demand the way NIV or ESV does, so the abbreviation has
@@ -265,8 +332,11 @@ const productSchema = {
 	// abbreviation as alternate names (Kevin approved 2026-09-18). Other pages already do
 	// this; the 22 edition pages — the ones carrying the SKUs — did not.
 	alternateName: [ed.name, 'FHB'],
-	bookFormat: 'https://schema.org/Hardcover',
+	bookFormat: BIND[mainVariant.binding].format,
 	...(pages ? { numberOfPages: pages } : {}),
+	...(mainVariant.isbn ? { gtin13: mainVariant.isbn.replace(/-/g, '') } : {}),
+	sku: mainVariant.sku,
+	brand: { '@type': 'Brand', name: "Father's Heart Bible" },
 	// The Large Print SET carries no ISBN of its own — Kevin assigned numbers per volume, as
 	// lp-set.json's _isbnNote records. An empty string is not an ISBN, so the property is
 	// omitted rather than emitted blank, which is invalid structured data.
@@ -282,18 +352,19 @@ const productSchema = {
 	translator: { '@type': 'Organization', name: 'Spirit Media Publishing' },
 	translationOfWork: { '@type': 'Book', name: 'The Holy Bible' },
 	keywords: (ed.listing.keywordsSchema ?? ed.listing.keywords).join(', '),
-	offers: {
-		'@type': 'Offer',
-		price: ed.price.toFixed(2),
-		priceCurrency: 'USD',
-		availability: 'https://schema.org/InStock',
-		url: `${SITE}/print/`,
-		seller: { '@type': 'Organization', name: 'Spirit Media Publishing' },
-		shippingDetails: {
-			'@type': 'OfferShippingDetails',
-			shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'USD' },
-		},
-	},
+	offers: offerFor(mainVariant),
+	// The other binding(s): each its own book, ISBN and offer (Google: one product per GTIN).
+	workExample: otherVariants.map((v) => ({
+		'@type': ['Book', 'Product'],
+		name: `${v.title} (${BIND[v.binding].label})`,
+		bookFormat: BIND[v.binding].format,
+		...(v.isbn ? { isbn: v.isbn, gtin13: v.isbn.replace(/-/g, '') } : {}),
+		sku: v.sku,
+		image: coverUrl,
+		inLanguage: ed.lang ?? 'en',
+		brand: { '@type': 'Brand', name: "Father's Heart Bible" },
+		offers: offerFor(v),
+	})),
 };
 const breadcrumbSchema = {
 	'@context': 'https://schema.org',
