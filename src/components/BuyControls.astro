@@ -72,6 +72,10 @@ interface Props {
 	/** Keep an invisible B&N-sized slot when this card has no verified B&N listing, so the
 	 *  Buy Direct line still lines up across the row. */
 	reserveBn?: boolean;
+	/** "Buy now" (Kevin 2026-10-22): this edition's OWN order form, /bibles/<slug>-bible/#order
+	 *  (EditionOrder.astro). `null` = the card has no edition page yet: an invisible slot of the
+	 *  same size keeps the row lined up. Omitted = no Buy now on this card at all. */
+	buyNowHref?: string | null;
 }
 const {
 	hbHref,
@@ -87,6 +91,7 @@ const {
 	reserveSlots = 0,
 	bn,
 	reserveBn = false,
+	buyNowHref,
 } = Astro.props;
 const bnLinks = [
 	{ label: 'Hardback', href: bn?.hardback },
@@ -149,6 +154,19 @@ const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
     the existing brand token --color-primary-fixed rather than a new colour invented for this
     page. Ink on light pink is a strong contrast; the disabled placeholder drops to a muted
     pink with grey text so it reads as unavailable without becoming pink-on-pink. */}
+{
+	buyNowHref ? (
+		<a href={buyNowHref} class="buy-btn buy-now" style="text-decoration: none;" data-buy-now>
+			<span>Buy now · free shipping</span>
+		</a>
+	) : (
+		buyNowHref === null && (
+			<span class="buy-btn buy-btn-slot" aria-hidden="true">
+				<span>&nbsp;</span>
+			</span>
+		)
+	)
+}
 {
 	bindings.map((b) =>
 		b.href ? (
@@ -326,6 +344,11 @@ const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
 	/* A reserved, invisible slot: same box as a button, so every card's controls line up. */
 	.buy-btn-slot {
 		visibility: hidden;
+	}
+	/* Buy now: the one filled pill on the card, so the direct order reads as the primary action. */
+	.buy-now {
+		background: var(--color-primary, #b60057);
+		color: #fff;
 	}
 	.buy-btn-off {
 		background: #fdeef3;
