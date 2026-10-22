@@ -79,4 +79,11 @@ export const WORD_MEANINGS: WordMeaning[] = [
 			'A gift you did not earn, given in love — the Greek charis, and the Hebrew hesed the FHB renders “covenant love.”',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
 	},
+	{
+		slug: 'righteousness',
+		title: 'What does righteousness mean in the Bible?',
+		blurb:
+			'Being made right with our Father — tsedaqah and dikaiosynē, and why the FHB reads “the righteousness of our Father.”',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
+	},
 ];
