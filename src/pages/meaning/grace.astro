@@ -1,0 +1,116 @@
+---
+// /meaning/grace — plan W2 "what does X mean in the Bible" (June 2026 FINAL strategy study:
+// the "what does <word> mean in the Bible" shape trends in every Google Trends window).
+// Measured volume for this exact wording is not in our cache and no paid call was made
+// (2026-10-22); neighbouring measured terms: "saved by grace" 4,400/mo (US, cached).
+//
+// WEDGE: the Hebrew word most often behind "grace and mercy" in the Old Testament, hesed,
+// is rendered "covenant love" in the FHB (129 verses) — grace as a Father's bound-for-life
+// love, not a mood. Every quotation is VERBATIM from src/content/bible; checked with
+// bin/fhb-scripture-quote-audit.py before shipping.
+import WordMeaning from '../../components/WordMeaning.astro';
+
+const sections = [
+	{
+		id: 'what-grace-means',
+		heading: 'What grace means',
+		bodyHtml: `<p><em>Grace</em> means <strong>a gift you did not earn, given because of the giver&rsquo;s love</strong>. In the Bible it is our Father&rsquo;s favour toward people who could never repay Him, and His power at work in them. It is not a reward for good behaviour and not a loophole for bad behaviour. It is the Father giving Himself.</p><p>Paul puts it at the centre of the gospel: &ldquo;For by grace you have been saved through faith&mdash;not your own doing; it is the gift of our Father. Not from works, so that no one may boast&rdquo; (Ephesians 2:8&ndash;9). Grace is the &ldquo;gift&rdquo; in that sentence, and the giver is named.</p>`,
+	},
+	{
+		id: 'hebrew-and-greek',
+		heading: 'The Hebrew and Greek words behind “grace”',
+		bodyHtml: `<p>The New Testament word is the Greek <em>charis</em>, the ordinary word for a favour freely given or a gift that delights. Our word <em>charity</em> and the Greek word for &ldquo;gift,&rdquo; <em>charisma</em>, come from the same root.</p><p>In the Old Testament two Hebrew words carry the idea. <em>Chen</em> is favour, as when someone &ldquo;finds favour&rdquo; in another&rsquo;s eyes. And <em>hesed</em> is the great covenant word: loyal, steadfast, never-letting-go love. The Father&rsquo;s Heart Bible&trade; renders <em>hesed</em> as &ldquo;covenant love.&rdquo; When our Father describes Himself to Moses He uses both ideas at once: &ldquo;your Father&mdash;compassionate and gracious, slow to anger, and overflowing with covenant love and faithfulness&rdquo; (Exodus 34:6).</p>`,
+	},
+	{
+		id: 'grace-in-jesus',
+		heading: 'Grace came in a person',
+		bodyHtml: `<p>John says that in Jesus we saw &ldquo;the glory of the one and only Son from the Father, full of grace and truth&rdquo; (John 1:14), and &ldquo;from his fullness we have all received, grace upon grace&rdquo; (John 1:16). Grace is not first an idea; it is the Son, given by the Father.</p><p>Paul describes what that cost: &ldquo;You know our Lord Jesus Christ&rsquo;s grace: though rich, he became poor for you, so his poverty could make you rich&rdquo; (2 Corinthians 8:9). And he explains what it does: all &ldquo;fall short of the glory of our Father, and are justified freely by his grace through the redemption that is in Christ Jesus&rdquo; (Romans 3:23&ndash;24).</p>`,
+	},
+	{
+		id: 'grace-for-today',
+		heading: 'Grace for weakness, every day',
+		bodyHtml: `<p>Grace is not only how the story begins. When Paul begged to be rid of a weakness, the answer was, &ldquo;My grace is enough for you, for my power is perfected in weakness&rdquo; (2 Corinthians 12:9). Grace meets us where we are not strong.</p><p>It also changes how we live. &ldquo;For the grace of our Father has appeared, bringing salvation to all people, teaching us to reject wickedness and worldly desires&rdquo; (Titus 2:11&ndash;12). That is why the letter to the Hebrews can say, &ldquo;Let us then approach the throne of grace boldly, so we may receive mercy and find grace to help us in time of need&rdquo; (Hebrews 4:16). Children do not approach a Father&rsquo;s throne afraid.</p>`,
+	},
+	{
+		id: 'grace-and-mercy',
+		heading: 'Grace and mercy: the difference',
+		bodyHtml: `<p>A simple way to hold the two together: <strong>mercy</strong> is not receiving the punishment we deserve; <strong>grace</strong> is receiving the gift we do not deserve. Hebrews 4:16 names both in one breath, &ldquo;receive mercy and find grace.&rdquo; Our Father does both, because He is &ldquo;compassionate and gracious, slow to anger and abounding in covenant love&rdquo; (Psalm 103:8).</p>`,
+	},
+];
+
+const renderings = [
+	{
+		ref: 'Ephesians 2:8–9',
+		slug: 'ephesians',
+		ch: 2,
+		fhb: 'For by grace you have been saved through faith—not your own doing; it is the gift of our Father. Not from works, so that no one may boast.',
+		traditional:
+			'“For by grace are ye saved through faith; and that not of yourselves: it is the gift of God: Not of works, lest any man should boast.” (KJV)',
+	},
+	{
+		ref: 'Exodus 34:6',
+		slug: 'exodus',
+		ch: 34,
+		fhb: 'Our Father passed before him, proclaiming, “your Father—compassionate and gracious, slow to anger, and overflowing with covenant love and faithfulness,',
+		traditional:
+			'“The LORD, The LORD God, merciful and gracious, longsuffering, and abundant in goodness and truth.” (KJV)',
+	},
+	{
+		ref: 'John 1:16',
+		slug: 'john',
+		ch: 1,
+		fhb: 'For from his fullness we have all received, grace upon grace.',
+	},
+	{
+		ref: '2 Corinthians 12:9',
+		slug: '2-corinthians',
+		ch: 12,
+		fhb: 'But he told me, “My grace is enough for you, for my power is perfected in weakness.” So I’ll gladly boast all the more in my weaknesses, so Christ’s power may rest on me.',
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does grace mean in the Bible?',
+		answer:
+			'Grace means a gift you did not earn, given because of the giver’s love. In the Bible it is our Father’s favour toward people who could never repay Him, and His power at work in them. Ephesians 2:8 says, “For by grace you have been saved through faith—not your own doing; it is the gift of our Father.”',
+	},
+	{
+		question: 'What is the Greek and Hebrew word for grace?',
+		answer:
+			'In the New Testament it is the Greek charis, a favour freely given. In the Old Testament the ideas are carried by chen (favour) and hesed, the covenant word for loyal, never-letting-go love, which the Father’s Heart Bible™ renders “covenant love.”',
+	},
+	{
+		question: 'What is the difference between grace and mercy?',
+		answer:
+			'Mercy is not receiving the punishment we deserve; grace is receiving the gift we do not deserve. Hebrews 4:16 names both: “so we may receive mercy and find grace to help us in time of need.”',
+	},
+	{
+		question: 'Is grace a license to keep sinning?',
+		answer:
+			'No. Paul says grace frees us from sin’s mastery: “sin will not have mastery over you, because you are not under law but under grace” (Romans 6:14), and Titus 2:11-12 says the grace of our Father teaches us to reject wickedness.',
+	},
+];
+---
+
+<WordMeaning
+	slug="grace"
+	title="What Does Grace Mean in the Bible? Meaning and Verses"
+	description="What does grace mean in the Bible? A gift you did not earn, given in love: the Greek charis, the Hebrew hesed (“covenant love”), and the verses that show it."
+	h1="What does grace mean in the Bible?"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg"
+	heroAlt="Hands open in prayer at daybreak"
+	published="2026-10-22"
+	directAnswerHtml={`<strong style=\"color: var(--color-ink);\">In the Bible, grace means a gift you did not earn, given because of the giver&rsquo;s love: our Father&rsquo;s favour toward people who could never repay Him, and His power at work in them.</strong> The New Testament word is the Greek <em>charis</em>, a favour freely given; in the Old Testament the idea lives in <em>hesed</em>, which the Father&rsquo;s Heart Bible&trade; renders &ldquo;covenant love.&rdquo; Paul sums it up: &ldquo;For by grace you have been saved through faith&mdash;not your own doing; it is the gift of our Father&rdquo; (Ephesians 2:8). Below: what grace means, the Hebrew and Greek words, how grace came in Jesus, and how it meets us in weakness. You can <a href=\"https://fathersheartbible.com/read/ephesians/2/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read Ephesians 2 free</a> and hear it in full.`}
+	keyTakeaway="Grace is a Father’s gift, not a wage: undeserved favour, given in Jesus, and strength for every weakness."
+	sections={sections}
+	renderings={renderings}
+	renderingsHeading="Grace in the Father’s Heart Bible™"
+	renderingsIntro="The verses at the heart of the word, word for word, with the King James wording beside the first two. Each reference links into the full chapter, free, with verse-by-verse audio in English."
+	faqs={faqs}
+	relatedHtml={`Related: <a href=\"/meaning/fathers-heart-of-god/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">the Father&rsquo;s heart of God</a>, <a href=\"/meaning/our-father/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">why this Bible says &ldquo;our Father&rdquo;</a>. For the Greek and Hebrew words, see <a href=\"https://www.blueletterbible.org/lexicon/g5485/kjv/tr/0-1/\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: var(--color-brand);\" class=\"hover:underline\">charis (Strong&rsquo;s G5485)</a> and <a href=\"https://www.blueletterbible.org/lexicon/h2617/kjv/wlc/0-1/\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: var(--color-brand);\" class=\"hover:underline\">hesed (Strong&rsquo;s H2617)</a> on Blue Letter Bible.`}
+	ctaMidHeading="Read grace in context"
+	ctaMidBodyHtml="Read Ephesians 2 in full &mdash; free online with verse-by-verse audio in English, and footnotes on every distinctive rendering."
+	ctaBottomBodyHtml="From Genesis to Revelation, free online with audio &mdash; a fresh English translation that lets your Father&rsquo;s voice be heard on every page."
+	tags={["what does grace mean in the bible", "grace meaning", "biblical grace", "charis", "hesed"]}
+/>
