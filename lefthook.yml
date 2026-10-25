@@ -13,6 +13,15 @@ pre-commit:
       skip:
         - merge
         - rebase
+    edition-reach:
+      # No edition is listed without a worldwide speakers figure: /print and the hub throw at
+      # BUILD on a registry code missing from language-reach.json (nl, ne, su, uz broke the
+      # production build that way, 2026-10-25). Checks THIS checkout's files, so worktrees too.
+      glob: "src/data/{edition-registry,language-reach}.json"
+      run: FHB_CHAIN_ED_FHB=. python3 /home/deploy/bin/fhb-chain.py edition-reach-check --registry src/data/edition-registry.json
+      skip:
+        - merge
+        - rebase
     perf-traits-doc:
       run: /home/deploy/bin/perf-traits-audit.sh --commit-hook
       stage_fixed: true
