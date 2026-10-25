@@ -549,6 +549,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-el-600.webp`,
 	},
+	'lang-ne-hb': {
+		title: 'नेपाली बाइबल (Nepali) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-ne-600.webp`,
+	},
+	'lang-ne-pb': {
+		title: 'नेपाली बाइबल (Nepali) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-ne-600.webp`,
+	},
 	'lang-pcm-hb': {
 		title: 'Naija Bible (Nigerian Pidgin) — Hardback',
 		retail: 9999,
@@ -638,6 +648,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		title: 'Biblia Española (Spanish) — Paperback',
 		retail: 7999,
 		img: `${ASSETS}/lang/v1/lang-es-600.webp`,
+	},
+	'lang-su-hb': {
+		title: 'Kitab Suci Sunda (Sundanese) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-su-600.webp`,
+	},
+	'lang-su-pb': {
+		title: 'Kitab Suci Sunda (Sundanese) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-su-600.webp`,
 	},
 	'lang-sw-hb': {
 		title: 'Biblia ya Kiswahili (Swahili) — Hardback',
