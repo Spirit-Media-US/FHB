@@ -568,8 +568,15 @@ const P = 'text-lg leading-relaxed mb-4';
 
 				<h2 id="questions" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">Questions scholars have asked</h2>
 				<p class={P}>These are questions scholars and church leaders have asked us, with our answers. We add to this section as new questions come, so that every reader can see what others have asked.</p>
-				<div class="space-y-6 mb-4">
-					{QUESTIONS.map(([q, a]) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{q}</h3><p class="text-lg leading-relaxed" set:html={refs(a)} /></div>))}
+				{/* Compact accordion (Kevin D123 18:0xZ) — the About page's fm-item pattern; answers stay in the HTML,
+				    and the FAQPage JSON-LD above maps the same QUESTIONS, so the two cannot drift. */}
+				<div class="faq mb-4">
+					{QUESTIONS.map(([q, a]) => (
+						<details class="fm-item">
+							<summary><span>{q}</span><svg class="fm-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+							<div class="fm-body"><p class="text-lg leading-relaxed" set:html={refs(a)} /></div>
+						</details>
+					))}
 				</div>
 
 				<aside id="review" class="my-14 px-6 py-8 lg:px-10 rounded-2xl scroll-mt-28" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
@@ -591,6 +598,13 @@ const P = 'text-lg leading-relaxed mb-4';
 </Layout>
 
 <style>
+	.fm-item { border-top: 1px solid var(--color-hairline); }
+	.faq .fm-item:last-child { border-bottom: 1px solid var(--color-hairline); }
+	.fm-item > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.85rem 0; font-family: var(--font-serif); font-size: 1.125rem; font-weight: 600; color: var(--color-ink); }
+	.fm-item > summary::-webkit-details-marker { display: none; }
+	.fm-chev { flex-shrink: 0; transition: transform 0.2s ease; }
+	.fm-item[open] > summary .fm-chev { transform: rotate(180deg); }
+	.fm-body { padding-bottom: 1.25rem; }
 	.scholars :global(a.sref) { color: var(--color-brand); text-decoration: none; }
 	.scholars :global(a.sref:hover) { text-decoration: underline; }
 	.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
