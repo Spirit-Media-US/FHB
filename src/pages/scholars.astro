@@ -1,5 +1,8 @@
 ---
+import ImageGrid from '../components/ImageGrid.astro';
 import MailtoLink from '../components/MailtoLink.astro';
+import Section from '../components/Section.astro';
+import VideoHeroInner from '../components/VideoHeroInner.astro';
 // /scholars — the Scholar's Packet as a web page (Kevin 2026-10-22: "2 Yes 3A" = share by link, plan Doc
 // 1VqrO4JWS0Crvwjql1AIVliZs8HJ7lmfRf3bcOd9COAE W1). The text below is the packet's OWN wording
 // (Doc 1xwdIBGQPGWfmJQzpCx8vghhEWoca08fTqujwVWPkaFs, Kevin: "we state same everywhere"), not a rewrite.
@@ -380,15 +383,24 @@ const H2 = 'text-2xl md:text-3xl font-light mt-14 mb-5 scroll-mt-28';
 const P = 'text-lg leading-relaxed mb-4';
 ---
 <Layout title={TITLE} description={DESCRIPTION} jsonLd={jsonLd}>
-	<main id="main-content" class="scholars" style="margin-top: 80px;">
-		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+	<main id="main-content" class="scholars">
+		{/* Shared marketing hero (Kevin D123 item 9, "1 and 2 yes add images"): an existing FHB photo, pre-sized
+		    WebP + mobile file + explicit dims (perf gate). The h1 sits below the image, as on About. */}
+		<VideoHeroInner
+			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/about-hero.webp"
+			imageSrcMobile="https://assets.spiritmediapublishing.com/FHB/print/about-hero-960.webp"
+			imageWidth={1536}
+			imageHeight={864}
+			heading="An Invitation to Bible Scholars"
+			headingBelow
+		/>
+		<section class="px-6 pt-2 pb-2 lg:px-8" style="background-color: var(--color-surface);">
 			<div class="mx-auto max-w-3xl">
-				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+				<nav aria-label="Breadcrumb" class="mb-3 text-sm text-center" style="color: var(--color-muted); font-family: var(--font-sans);">
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
 					<span style="color: var(--color-ink);">An Invitation to Bible Scholars</span>
 				</nav>
-				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">An Invitation to Bible Scholars</h1>
-				<p class="mt-5 pb-8 text-sm border-b" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+				<p class="pb-6 text-sm text-center border-b" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
 					The Father&rsquo;s Heart Bible&trade; in Divine Voice&trade; Color &middot; Text Edition {EDITION} &middot; Updated {formatDate(UPDATED)}
 				</p>
 			</div>
@@ -466,7 +478,7 @@ const P = 'text-lg leading-relaxed mb-4';
 				<p class={P}>It is printed in Divine Voice&trade; Color: our Father&rsquo;s words in blue, the Son&rsquo;s in red, the Spirit&rsquo;s in purple. To our knowledge, it is the first complete Bible printed with the words of the Father, the Son, and the Holy Spirit each in their own color.</p>
 				<p class={P}>It is not a paraphrase, and it is not an adaptation of any existing English Bible. It is not a study Bible: its notes are written for general readers, and its method is documented for scholars in the companion documents. It is not abridged.</p>
 				<p class={P}>The Father&rsquo;s Heart Bible&trade; was produced through a structured, rule-governed translation process built for this work, bringing the consistency and reach of modern language technology to the ancient task of translation. Within that process, AI language tools rendered the text and footnotes directly from the original Hebrew, Aramaic, and Greek, guided by a written set of 160 translation rules. Each book was then carried through successive passes, its most difficult readings cross-checked against the Hebrew and Greek and against independent references, before being reviewed and finalized.</p>
-				<p class={P}>The rules and every interpretive decision are the work of Spirit Media Publishing led by Kevin White, Editor. Spirit Media Publishing is the translator of record; Kevin White is the editor.</p>
+				<p class={P}>The rules and every interpretive decision are the work of Spirit Media Publishing led by Kevin White, Editor.</p>
 				<p class={P}>On ordinary lexical and textual questions, we follow the settled consensus of the major modern translations and of the standard base texts, as most new translations do. Our own contribution is focused and stated: how the Persons of the Trinity are named, and whose voice is speaking. The rules that govern both are published in full in A-2. The Complete Translation Rules.</p>
 				<h3 class="text-xl font-medium mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">How it is reviewed</h3>
 				<p class={P}><strong style="color: var(--color-ink);">Independent scholarly review is ongoing, with Bible scholars and global United Bible Societies members in India, Nepal, UK, USA, and other countries. We welcome more.</strong> Scholars who would like to review any book of the Father&rsquo;s Heart Bible&trade; against the Hebrew, Aramaic, or Greek are warmly invited to do so. Every reviewer&rsquo;s findings are read by the editor, and corrections are published with each new edition. <MailtoLink email={REVIEW_EMAIL} style="color: var(--color-brand);">Share your review</MailtoLink>.</p>
@@ -568,8 +580,15 @@ const P = 'text-lg leading-relaxed mb-4';
 
 				<h2 id="questions" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">Questions scholars have asked</h2>
 				<p class={P}>These are questions scholars and church leaders have asked us, with our answers. We add to this section as new questions come, so that every reader can see what others have asked.</p>
-				<div class="space-y-6 mb-4">
-					{QUESTIONS.map(([q, a]) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{q}</h3><p class="text-lg leading-relaxed" set:html={refs(a)} /></div>))}
+				{/* Compact accordion (Kevin D123 18:0xZ) — the About page's fm-item pattern; answers stay in the HTML,
+				    and the FAQPage JSON-LD above maps the same QUESTIONS, so the two cannot drift. */}
+				<div class="faq mb-4">
+					{QUESTIONS.map(([q, a]) => (
+						<details class="fm-item">
+							<summary><span>{q}</span><svg class="fm-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
+							<div class="fm-body"><p class="text-lg leading-relaxed" set:html={refs(a)} /></div>
+						</details>
+					))}
 				</div>
 
 				<aside id="review" class="my-14 px-6 py-8 lg:px-10 rounded-2xl scroll-mt-28" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
@@ -587,10 +606,29 @@ const P = 'text-lg leading-relaxed mb-4';
 				<p class={P}>Spirit Media Publishing, the imprint of Spirit Media Inc. &middot; 205 S Academy Street, Unit 3251, Cary, NC 27519 &middot; 1-888-800-3744</p>
 			</div>
 		</section>
+
+		{/* The same 3-photo section the About page closes with (Kevin D123 item 9). */}
+		<Section variant="light">
+			<ImageGrid cols={3} gap="md">
+				<a href="/print/" class="block" style="text-decoration:none">
+						<img src="https://assets.spiritmediapublishing.com/FHB/print/about-people-1-v3.webp" alt="A young man reading the Divine Voice™ Color edition of the Father's Heart Bible™ in a cafe" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover" /></a>
+				<a href="/print/" class="block" style="text-decoration:none">
+						<img src="https://assets.spiritmediapublishing.com/FHB/print/about-people-2-v2.webp" alt="A woman studying the Divine Voice™ Color edition of the Father's Heart Bible™ with her notes" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover" /></a>
+				<a href="/print/" class="block" style="text-decoration:none">
+						<img src="https://assets.spiritmediapublishing.com/FHB/print/about-people-3-v2.webp" alt="A woman reading the Divine Voice™ Color edition of the Father's Heart Bible™ on a beach at sunset" width="800" height="800" loading="lazy" decoding="async" class="w-full aspect-square object-cover" /></a>
+			</ImageGrid>
+		</Section>
 	</main>
 </Layout>
 
 <style>
+	.fm-item { border-top: 1px solid var(--color-hairline); }
+	.faq .fm-item:last-child { border-bottom: 1px solid var(--color-hairline); }
+	.fm-item > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.85rem 0; font-family: var(--font-serif); font-size: 1.125rem; font-weight: 600; color: var(--color-ink); }
+	.fm-item > summary::-webkit-details-marker { display: none; }
+	.fm-chev { flex-shrink: 0; transition: transform 0.2s ease; }
+	.fm-item[open] > summary .fm-chev { transform: rotate(180deg); }
+	.fm-body { padding-bottom: 1.25rem; }
 	.scholars :global(a.sref) { color: var(--color-brand); text-decoration: none; }
 	.scholars :global(a.sref:hover) { text-decoration: underline; }
 	.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
