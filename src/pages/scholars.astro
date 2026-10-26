@@ -1,4 +1,5 @@
 ---
+import MailtoLink from '../components/MailtoLink.astro';
 // /scholars — the Scholar's Packet as a web page (Kevin 2026-10-22: "2 Yes 3A" = share by link, plan Doc
 // 1VqrO4JWS0Crvwjql1AIVliZs8HJ7lmfRf3bcOd9COAE W1). The text below is the packet's OWN wording
 // (Doc 1xwdIBGQPGWfmJQzpCx8vghhEWoca08fTqujwVWPkaFs, Kevin: "we state same everywhere"), not a rewrite.
@@ -8,7 +9,7 @@
 import Layout from '../layouts/Layout.astro';
 
 const PAGE_URL = 'https://fathersheartbible.com/scholars/';
-const TITLE = "For Bible Scholars — The Father's Heart Bible™ Scholar's Packet";
+const TITLE = "An Invitation to Bible Scholars — The Father's Heart Bible™";
 const DESCRIPTION =
 	"The Father's Heart Bible™ in Divine Voice™ Color for Bible scholars: what we confess, how it was translated from the Hebrew, Aramaic and Greek, the base texts, how it names God, and how to review it.";
 const UPDATED = '2026-10-22';
@@ -309,7 +310,6 @@ const TOC = [
 	['language-editions', 'Language editions'],
 	['questions', 'Questions'],
 	['review', 'How to review'],
-	['editor', 'The editor'],
 	['notices', 'Notices'],
 ];
 
@@ -319,12 +319,6 @@ const KEVIN = {
 	name: 'Kevin White',
 	url: 'https://fathersheartbible.com/the-fathers-heart-bible/leadership/',
 	jobTitle: "Editor, Father's Heart Bible™",
-	alumniOf: { '@type': 'CollegeOrUniversity', name: 'Southern Wesleyan University' },
-	hasCredential: {
-		'@type': 'EducationalOccupationalCredential',
-		credentialCategory: 'degree',
-		name: 'B.A. in Religion',
-	},
 };
 const jsonLd = [
 	{
@@ -371,7 +365,7 @@ const jsonLd = [
 		'@type': 'BreadcrumbList',
 		itemListElement: [
 			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
-			{ '@type': 'ListItem', position: 2, name: 'For Bible Scholars', item: PAGE_URL },
+			{ '@type': 'ListItem', position: 2, name: 'An Invitation to Bible Scholars', item: PAGE_URL },
 		],
 	},
 ];
@@ -391,18 +385,26 @@ const P = 'text-lg leading-relaxed mb-4';
 			<div class="mx-auto max-w-3xl">
 				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
-					<span style="color: var(--color-ink);">For Bible Scholars</span>
+					<span style="color: var(--color-ink);">An Invitation to Bible Scholars</span>
 				</nav>
-				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-gold); font-family: var(--font-sans);">For Bible scholars</p>
-				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">The Father&rsquo;s Heart Bible&trade; in Divine Voice&trade; Color: A Packet for Bible Scholars</h1>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">An Invitation to Bible Scholars</h1>
 				<p class="mt-5 pb-8 text-sm border-b" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
-					<a href="#editor" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a>, Editor &middot; Text Edition {EDITION} &middot; Updated {formatDate(UPDATED)}
+					The Father&rsquo;s Heart Bible&trade; in Divine Voice&trade; Color &middot; Text Edition {EDITION} &middot; Updated {formatDate(UPDATED)}
 				</p>
 			</div>
 		</section>
 
 		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
 			<div class="mx-auto max-w-3xl" style="font-family: var(--font-sans); color: var(--color-muted);">
+
+				{/* D123 (Kevin 2026-10-26): the invitation comes first, then the documents. Email only behind a button. */}
+				<p class={P}>The Father&rsquo;s Heart Bible&trade; is a faithful translation from the original Hebrew, Aramaic and Greek. We welcome it being examined by all people who know the original languages and love the Scriptures, and we invite you to read it closely and tell us where it can be better.</p>
+				<p class={P}>Independent scholarly review is ongoing, with Bible scholars and United Bible Societies members in India, Nepal, the UK, the USA and other countries. We welcome more.</p>
+				<p class={P}>This page offers our full process for all readers and scholars. Every reader is welcome to suggest an improvement, and every suggestion is read.</p>
+				<p class="mb-4">
+					<MailtoLink email={REVIEW_EMAIL} class="inline-flex items-center px-6 py-3 rounded-full text-sm font-semibold no-underline" style="background-color: var(--color-brand); color: var(--color-on-primary);">Share your review</MailtoLink>
+				</p>
+				<p class="text-lg italic mb-10" style="font-family: var(--font-serif); color: var(--color-ink);">Kevin White, Editor</p>
 
 				<nav aria-label="On this page" class="toc mb-10 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
 					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted);">On this page</p>
@@ -436,7 +438,7 @@ const P = 'text-lg leading-relaxed mb-4';
 				<p class={P}>Dear friend,</p>
 				<p class={P}>Thank you for taking the time to look at the Father&rsquo;s Heart Bible&trade; in Divine Voice&trade; Color. A new translation deserves to be examined closely, and it is examined best by people who know the original languages and love the Scriptures. We have already been helped by scholars who read carefully and wrote to us frankly, and we hope you will do the same.</p>
 				<p class={P}>This packet gathers in one place what scholars and church leaders have asked us. It sets out what we confess, how the translation was made and the texts behind it, how it names God, how the Divine Voice&trade; Color is decided, one verse worked through word by word, the language editions, the questions we have been asked so far, and the notices every edition carries. Two longer documents accompany it: A. Translation Principles and A-2. The Complete Translation Rules.</p>
-				<p class={P} set:html={refs('When a scholar shows us an error, we correct it: Isaiah 6:13 was corrected the same day a reader pointed it out. We weigh every suggestion honestly against the text and the method. Whatever you find, I would be grateful to hear it at <a href="mailto:kevin@spiritmediapublishing.com" style="color: var(--color-brand);">kevin@spiritmediapublishing.com</a>.')} />
+				<p class={P} set:html={refs('When a scholar shows us an error, we correct it: Isaiah 6:13 was corrected the same day a reader pointed it out. We weigh every suggestion honestly against the text and the method. Whatever you find, I would be grateful to hear it: <a href="mailto:kevin@spiritmediapublishing.com" style="color: var(--color-brand);">Share your review</a>.')} />
 				<p class={P} style="color: var(--color-ink);">With gratitude,<br /><strong>Kevin White</strong><br />Editor, Father&rsquo;s Heart Bible&trade;<br />Spirit Media Publishing</p>
 
 				<h2 id="confession" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">What we confess</h2>
@@ -466,7 +468,7 @@ const P = 'text-lg leading-relaxed mb-4';
 				<p class={P}>The rules and every interpretive decision are the work of Kevin White of Spirit Media Publishing, who led the process. Spirit Media Publishing is the translator of record; Kevin White is the editor.</p>
 				<p class={P}>On ordinary lexical and textual questions, we follow the settled consensus of the major modern translations and of the standard base texts, as most new translations do. Our own contribution is focused and stated: how the Persons of the Trinity are named, and whose voice is speaking. The rules that govern both are published in full in A-2. The Complete Translation Rules.</p>
 				<h3 class="text-xl font-medium mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">How it is reviewed</h3>
-				<p class={P}>The text is reviewed by its editor, Kevin White. <strong style="color: var(--color-ink);">Independent scholarly review is ongoing, with Bible scholars and global United Bible Societies members in India, Nepal, UK, USA, and other countries. We welcome more.</strong> Scholars who would like to review any book of the Father&rsquo;s Heart Bible&trade; against the Hebrew, Aramaic, or Greek are warmly invited to do so. Every reviewer&rsquo;s findings are read by the editor, and corrections are published with each new edition. Write to <a href={`mailto:${REVIEW_EMAIL}`} style="color: var(--color-brand);">{REVIEW_EMAIL}</a>.</p>
+				<p class={P}>The text is reviewed by its editor, Kevin White. <strong style="color: var(--color-ink);">Independent scholarly review is ongoing, with Bible scholars and global United Bible Societies members in India, Nepal, UK, USA, and other countries. We welcome more.</strong> Scholars who would like to review any book of the Father&rsquo;s Heart Bible&trade; against the Hebrew, Aramaic, or Greek are warmly invited to do so. Every reviewer&rsquo;s findings are read by the editor, and corrections are published with each new edition. <MailtoLink email={REVIEW_EMAIL} style="color: var(--color-brand);">Share your review</MailtoLink>.</p>
 				<p class={P}>Every book passed through the review stages described above before release. Readers took part as well, and they still do: readers in every language tell us what they find at <a href="/read/" style="color: var(--color-brand);">fathersheartbible.com/read</a>, and every correction they report is reviewed. Each edition carries a version number; this printing is Text Edition {EDITION}.</p>
 
 				<h2 id="base-texts" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">The base texts</h2>
@@ -573,14 +575,10 @@ const P = 'text-lg leading-relaxed mb-4';
 					<h2 class="text-2xl md:text-3xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">How to review</h2>
 					<ol class="list-decimal pl-6 space-y-2 text-lg leading-relaxed">
 						<li>Pick any book, and read it against the Hebrew, Aramaic or Greek. The whole Bible is free at <a href="/read/" style="color: var(--color-brand);">fathersheartbible.com/read</a>.</li>
-						<li>Send what you find to <a href={`mailto:${REVIEW_EMAIL}`} style="color: var(--color-brand);">{REVIEW_EMAIL}</a>. Every finding is read by the editor, and corrections are published with each new edition.</li>
+						<li>Send what you find with <MailtoLink email={REVIEW_EMAIL} style="color: var(--color-brand);">Share your review</MailtoLink>. Every finding is read by the editor, and corrections are published with each new edition.</li>
 					</ol>
 					<p class="mt-4 text-base leading-relaxed">Reviewers are never named without written permission. Review is not endorsement.</p>
 				</aside>
-
-				<h2 id="editor" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">The editor</h2>
-				<p class={P}><strong style="color: var(--color-ink);">Kevin White</strong> is the editor of the Father&rsquo;s Heart Bible&trade;; Spirit Media Publishing is its translator of record. Kevin White holds a B.A. in Religion from Southern Wesleyan University, which included two years of concentrated New Testament Greek under Rev. Dr. Herbert H. Dongell. This training also included Greek and Hebrew exegesis, and Old Testament and New Testament studies under Dr. James Bross and Dr. Bob Black. This was followed by a lifetime of over 40 years of full-time ministry focused on studying and applying the Bible.</p>
-				<p class={P}>Since 1998 he has traveled to India 55 times, taken more than 1,000 people on short-term mission trips, and, with his wife Shelly, leads Spirit Media Publishing, publisher of more than 300 titles. <a href="/the-fathers-heart-bible/leadership/" style="color: var(--color-brand);">Meet Kevin and Shelly White &rarr;</a></p>
 
 				<h2 id="notices" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">Copyright and notices</h2>
 				<p class={P}>Holy Bible, Father&rsquo;s Heart Bible&trade;, copyright &copy; 2026 by Spirit Media Publishing, the imprint of Spirit Media Inc. All rights reserved. Father&rsquo;s Heart Bible&trade; &middot; Text Edition {EDITION}. Translator: Spirit Media Publishing. Editor: Kevin White.</p>
