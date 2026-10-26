@@ -297,8 +297,8 @@ const QUESTIONS = [
 	],
 ];
 const TOC = [
-	['documents', 'Documents'],
 	['welcome', 'Welcome'],
+	['documents', 'Documents'],
 	['confession', 'What we confess'],
 	['how-it-was-made', 'How it was made'],
 	['base-texts', 'Base texts'],
@@ -413,7 +413,14 @@ const P = 'text-lg leading-relaxed mb-4';
 					</ul>
 				</nav>
 
-				<h2 id="documents" class={H2} style="font-family: var(--font-serif); color: var(--color-ink); margin-top: 0;">The documents</h2>
+				<h2 id="welcome" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">A Welcome to Bible Scholars</h2>
+				<p class={P}>Dear friend,</p>
+				<p class={P}>Thank you for taking the time to look at the Father&rsquo;s Heart Bible&trade; in Divine Voice&trade; Color. A translation deserves to be examined closely, and it is examined best by people who know the original languages and love the Scriptures. We have already been helped by scholars who read carefully and wrote to us frankly, and we hope you will do the same.</p>
+				<p class={P}>This packet gathers in one place what scholars and church leaders have asked us. It sets out what we confess, how the translation was made and the texts behind it, how it names God, how the Divine Voice&trade; Color is decided, one verse worked through word by word, the language editions, the questions we have been asked so far, and the notices every edition carries. Two longer documents accompany it: A. Translation Principles and A-2. The Complete Translation Rules.</p>
+				<p class={P} set:html={refs('When a scholar shows us an error, we correct it: Isaiah 6:13 was corrected the same day a reader pointed it out. We weigh every suggestion honestly against the text and the method. Whatever you find, I would be grateful to hear it: <a href="mailto:kevin@spiritmediapublishing.com" style="color: var(--color-brand);">Share your review</a>.')} />
+				<p class={P} style="color: var(--color-ink);">With gratitude,<br /><strong>Kevin White</strong>, Editor</p>
+
+				<h2 id="documents" class={H2} style="font-family: var(--font-serif); color: var(--color-ink); ">The documents</h2>
 				<p class={P}>Three documents, the same text as this page and more. Open one to read it in your browser, or download it.</p>
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-4">
 					{DOCS.map((d) => (
@@ -434,12 +441,6 @@ const P = 'text-lg leading-relaxed mb-4';
 					))}
 				</div>
 
-				<h2 id="welcome" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">A Welcome to Bible Scholars</h2>
-				<p class={P}>Dear friend,</p>
-				<p class={P}>Thank you for taking the time to look at the Father&rsquo;s Heart Bible&trade; in Divine Voice&trade; Color. A new translation deserves to be examined closely, and it is examined best by people who know the original languages and love the Scriptures. We have already been helped by scholars who read carefully and wrote to us frankly, and we hope you will do the same.</p>
-				<p class={P}>This packet gathers in one place what scholars and church leaders have asked us. It sets out what we confess, how the translation was made and the texts behind it, how it names God, how the Divine Voice&trade; Color is decided, one verse worked through word by word, the language editions, the questions we have been asked so far, and the notices every edition carries. Two longer documents accompany it: A. Translation Principles and A-2. The Complete Translation Rules.</p>
-				<p class={P} set:html={refs('When a scholar shows us an error, we correct it: Isaiah 6:13 was corrected the same day a reader pointed it out. We weigh every suggestion honestly against the text and the method. Whatever you find, I would be grateful to hear it: <a href="mailto:kevin@spiritmediapublishing.com" style="color: var(--color-brand);">Share your review</a>.')} />
-				<p class={P} style="color: var(--color-ink);">With gratitude,<br /><strong>Kevin White</strong><br />Editor, Father&rsquo;s Heart Bible&trade;<br />Spirit Media Publishing</p>
 
 				<h2 id="confession" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">What we confess</h2>
 				<ol class="list-decimal pl-6 space-y-2 mb-6 text-lg leading-relaxed">
@@ -465,10 +466,10 @@ const P = 'text-lg leading-relaxed mb-4';
 				<p class={P}>It is printed in Divine Voice&trade; Color: our Father&rsquo;s words in blue, the Son&rsquo;s in red, the Spirit&rsquo;s in purple. To our knowledge, it is the first complete Bible printed with the words of the Father, the Son, and the Holy Spirit each in their own color.</p>
 				<p class={P}>It is not a paraphrase, and it is not an adaptation of any existing English Bible. It is not a study Bible: its notes are written for general readers, and its method is documented for scholars in the companion documents. It is not abridged.</p>
 				<p class={P}>The Father&rsquo;s Heart Bible&trade; was produced through a structured, rule-governed translation process built for this work, bringing the consistency and reach of modern language technology to the ancient task of translation. Within that process, AI language tools rendered the text and footnotes directly from the original Hebrew, Aramaic, and Greek, guided by a written set of 160 translation rules. Each book was then carried through successive passes, its most difficult readings cross-checked against the Hebrew and Greek and against independent references, before being reviewed and finalized.</p>
-				<p class={P}>The rules and every interpretive decision are the work of Kevin White of Spirit Media Publishing, who led the process. Spirit Media Publishing is the translator of record; Kevin White is the editor.</p>
+				<p class={P}>The rules and every interpretive decision are the work of Spirit Media Publishing led by Kevin White, Editor. Spirit Media Publishing is the translator of record; Kevin White is the editor.</p>
 				<p class={P}>On ordinary lexical and textual questions, we follow the settled consensus of the major modern translations and of the standard base texts, as most new translations do. Our own contribution is focused and stated: how the Persons of the Trinity are named, and whose voice is speaking. The rules that govern both are published in full in A-2. The Complete Translation Rules.</p>
 				<h3 class="text-xl font-medium mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">How it is reviewed</h3>
-				<p class={P}>The text is reviewed by its editor, Kevin White. <strong style="color: var(--color-ink);">Independent scholarly review is ongoing, with Bible scholars and global United Bible Societies members in India, Nepal, UK, USA, and other countries. We welcome more.</strong> Scholars who would like to review any book of the Father&rsquo;s Heart Bible&trade; against the Hebrew, Aramaic, or Greek are warmly invited to do so. Every reviewer&rsquo;s findings are read by the editor, and corrections are published with each new edition. <MailtoLink email={REVIEW_EMAIL} style="color: var(--color-brand);">Share your review</MailtoLink>.</p>
+				<p class={P}><strong style="color: var(--color-ink);">Independent scholarly review is ongoing, with Bible scholars and global United Bible Societies members in India, Nepal, UK, USA, and other countries. We welcome more.</strong> Scholars who would like to review any book of the Father&rsquo;s Heart Bible&trade; against the Hebrew, Aramaic, or Greek are warmly invited to do so. Every reviewer&rsquo;s findings are read by the editor, and corrections are published with each new edition. <MailtoLink email={REVIEW_EMAIL} style="color: var(--color-brand);">Share your review</MailtoLink>.</p>
 				<p class={P}>Every book passed through the review stages described above before release. Readers took part as well, and they still do: readers in every language tell us what they find at <a href="/read/" style="color: var(--color-brand);">fathersheartbible.com/read</a>, and every correction they report is reviewed. Each edition carries a version number; this printing is Text Edition {EDITION}.</p>
 
 				<h2 id="base-texts" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">The base texts</h2>
