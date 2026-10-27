@@ -3,7 +3,7 @@
 // /meaning/ and its CollectionPage JSON-LD are both generated from this list.
 //
 // Selection rule (do NOT relax it): a word earns a page only where measured
-// demand meets a genuine FHB wedge — i.e. the Father's Heart Bible's own
+// demand meets a genuine FHB wedge — i.e. Father's Heart Bible's own
 // rendering is part of the answer. Words we render identically to everyone else
 // would produce the "one of fifty identical pages" this section exists to avoid.
 

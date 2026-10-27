@@ -201,8 +201,8 @@ export const ways: Way[] = [
 	},
 	{
 		key: 'languages',
-		title: `${LANGUAGE_TOTAL} languages`,
-		note: `Free to read online, ${PRINT_LANGUAGE_TOTAL} in print.`,
+		title: `80 languages`,
+		note: `Soon in 80 languages, free to read online and in print.`,
 		links: [{ label: 'Language editions', href: '/print/#language-editions' }],
 	},
 ].filter((w) => w.links.length > 0);
