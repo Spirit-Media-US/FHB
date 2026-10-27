@@ -180,7 +180,7 @@ export const ways: Way[] = [
 	{
 		key: 'print',
 		title: 'Print',
-		note: `Hardcover and paperback, in Divine Voice Color. ${FIRST_ORDER_PCT}% off your first order.`,
+		note: `Hardcover and paperback, in Divine Voice™ Color. ${FIRST_ORDER_PCT}% off your first order.`,
 		links: [
 			{ label: 'All print editions', href: '/print/' },
 			{ label: 'Large Print Bible', href: '/bibles/lp-set-bible/' },
@@ -201,8 +201,8 @@ export const ways: Way[] = [
 	},
 	{
 		key: 'languages',
-		title: `${LANGUAGE_TOTAL} languages`,
-		note: `Free to read online, ${PRINT_LANGUAGE_TOTAL} in print.`,
+		title: `80 languages`,
+		note: `Soon in 80 languages, free to read online and in print.`,
 		links: [{ label: 'Language editions', href: '/print/#language-editions' }],
 	},
 ].filter((w) => w.links.length > 0);

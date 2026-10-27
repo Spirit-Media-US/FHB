@@ -11,7 +11,7 @@
 //   DECLARATION callout (you are a beloved son/daughter — not a slave, servant,
 //   tool, or performer) → "A Father for <group>" → "The Father's voice for
 //   <group>" (FHB verses, deep-linked /read) → "What our Father offers <group>"
-//   → "Why the Father's Heart Bible™ for <group>" → "His Word will not return
+//   → "Why Father's Heart Bible™ for <group>" → "His Word will not return
 //   void" → "What our Father says to <group>" (first-person, from the Father) →
 //   "A prayer for <group>" (pastoral, no name, to Our Father, ends in Jesus'
 //   name) → keep reading → FAQ → resources → read-FHB CTA with the video.
@@ -99,7 +99,7 @@ export interface Props {
 	offersBlocks?: GroupBlock[];
 	// Standalone pull-quote (AEO: a clean, self-contained, citable sentence)
 	pullQuote?: string;
-	// "Why the Father's Heart Bible™ for <group>"
+	// "Why Father's Heart Bible™ for <group>"
 	whyHeading?: string;
 	whyBlocks: GroupBlock[];
 	// External voices (E-E-A-T) — short attributed statements from notable figures
@@ -193,7 +193,7 @@ const {
 	wordHeading,
 	wordBodyHtml,
 	ctaMidHeading = 'Be loved first',
-	ctaMidBodyHtml = 'Open the Father&rsquo;s Heart Bible&trade; free, with audio, on any phone &mdash; and soak in the love you were made for.',
+	ctaMidBodyHtml = 'Open Father&rsquo;s Heart Bible&trade; free, with audio, on any phone &mdash; and soak in the love you were made for.',
 	fatherSaysHeading,
 	fatherSaysHtml,
 	prayerHeading,
@@ -339,9 +339,9 @@ const faqSchema = {
 const filmSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'VideoObject',
-	name: "The Father's Heart Bible — Introduction",
+	name: "Father's Heart Bible — Introduction",
 	description:
-		"An introduction to the Father's Heart Bible — a fresh English translation that reveals God as a loving Father throughout Scripture.",
+		"An introduction to Father's Heart Bible — an English translation that reveals God as a loving Father throughout Scripture.",
 	thumbnailUrl: `https://i.ytimg.com/vi/${ctaVideoId}/hqdefault.jpg`,
 	uploadDate: '2026-06-11',
 	contentUrl: `https://youtu.be/${ctaVideoId}`,
@@ -359,9 +359,9 @@ const bookSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'Book',
 	'@id': 'https://fathersheartbible.com/#book',
-	name: "The Father's Heart Bible: An Intimate Translation",
+	name: "Father's Heart Bible: An Intimate Translation",
 	description:
-		'A fresh English Bible translation from the original Hebrew, Aramaic, and Greek that reveals God as a loving Father wherever Scripture reveals Him — free to read and listen to online, with print editions available.',
+		'An English Bible translation from the original Hebrew, Aramaic, and Greek that reveals God as a loving Father wherever Scripture reveals Him — free to read and listen to online, with print editions available.',
 	inLanguage: 'en',
 	url: 'https://fathersheartbible.com/',
 	publisher: {
@@ -379,7 +379,7 @@ const bookSchema = {
 		{
 			'@type': 'Book',
 			bookFormat: 'https://schema.org/EBook',
-			name: "The Father's Heart Bible — Free Online (with audio)",
+			name: "Father's Heart Bible — Free Online (with audio)",
 			url: 'https://fathersheartbible.com/read/',
 			offers: {
 				'@type': 'Offer',
@@ -392,7 +392,7 @@ const bookSchema = {
 		{
 			'@type': 'Book',
 			bookFormat: 'https://schema.org/Paperback',
-			name: "The Father's Heart Bible — Paperback",
+			name: "Father's Heart Bible — Paperback",
 			url: 'https://fathersheartbible.com/print/',
 			offers: {
 				'@type': 'Offer',
@@ -405,7 +405,7 @@ const bookSchema = {
 		{
 			'@type': 'Book',
 			bookFormat: 'https://schema.org/Hardcover',
-			name: "The Father's Heart Bible — Hardback",
+			name: "Father's Heart Bible — Hardback",
 			url: 'https://fathersheartbible.com/print/',
 			offers: {
 				'@type': 'Offer',
@@ -526,7 +526,7 @@ const relatedGroups: Group[] = _sibSlugs
 						<p class="mt-4 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={whichBibleNoteHtml}></p>
 					)}
 					<div class="mt-6 flex flex-wrap gap-3">
-						<a href="https://fathersheartbible.com/read/" class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="background-color: var(--color-brand); color: #fff; font-family: var(--font-sans);">Read the Father's Heart Bible™ free</a>
+						<a href="https://fathersheartbible.com/read/" class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="background-color: var(--color-brand); color: #fff; font-family: var(--font-sans);">Read Father's Heart Bible™ free</a>
 						{/* The print edition made for this audience, where there is one (src/data/receive.ts); else /print. */}
 						<a href={audienceEdition?.href ?? '/print/'} class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="border: 1.5px solid var(--color-brand); color: var(--color-brand); font-family: var(--font-sans);">{audienceEdition ? `Get the ${audienceEdition.edition} in print` : 'Get the print edition'}</a>
 					</div>
@@ -750,10 +750,10 @@ const relatedGroups: Group[] = _sibSlugs
 		)}
 
 		</>)}
-		<!-- Why the Father's Heart Bible™ for <group> -->
+		<!-- Why Father's Heart Bible™ for <group> -->
 		<section class="px-6 py-12 lg:px-8 lg:py-16" style={`background-color: ${TINT_PINK};`}>
 			<div class="mx-auto max-w-3xl">
-				<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{whyHeading || `Why the Father's Heart Bible™ for ${groupLower}`}</HM>
+				<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{whyHeading || `Why Father's Heart Bible™ for ${groupLower}`}</HM>
 				<div class="mt-8 space-y-8">
 					{whyBlocks.map((b) => (
 						<div>
@@ -806,7 +806,7 @@ const relatedGroups: Group[] = _sibSlugs
 		<section class="px-6 py-9 lg:px-8 lg:py-10" style="background-color: var(--color-deep);">
 			<div class="mx-auto max-w-4xl">
 				<div class="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-12">
-					<img src="https://cdn.sanity.io/images/rusi1hyi/production/c2069a45b96854a2c5e96bc7e52318234b75d8a6-4881x2688.png?w=560&fm=webp&q=75&auto=format" alt="The Father's Heart Bible™ (FHB) print editions — plum, charcoal, and white" width="280" height="154" class="w-56 md:w-72 shrink-0" style="filter: drop-shadow(0 10px 24px rgba(0,0,0,0.5));" loading="lazy" decoding="async" />
+					<img src="https://cdn.sanity.io/images/rusi1hyi/production/c2069a45b96854a2c5e96bc7e52318234b75d8a6-4881x2688.png?w=560&fm=webp&q=75&auto=format" alt="Father's Heart Bible™ (FHB) print editions — plum, charcoal, and white" width="280" height="154" class="w-56 md:w-72 shrink-0" style="filter: drop-shadow(0 10px 24px rgba(0,0,0,0.5));" loading="lazy" decoding="async" />
 					<div class="text-center md:text-left">
 						<div class="mx-auto md:mx-0 mb-5 h-1 w-16 rounded-full" style="background-color: var(--color-gold);" aria-hidden="true"></div>
 						<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: #fff;">{ctaMidHeading}</HM>
@@ -896,7 +896,7 @@ const relatedGroups: Group[] = _sibSlugs
 						<p class="mt-4 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={whichBibleNoteHtml}></p>
 					)}
 					<div class="mt-6 flex flex-wrap gap-3">
-						<a href="https://fathersheartbible.com/read/" class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="background-color: var(--color-brand); color: #fff; font-family: var(--font-sans);">Read the Father's Heart Bible™ free</a>
+						<a href="https://fathersheartbible.com/read/" class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="background-color: var(--color-brand); color: #fff; font-family: var(--font-sans);">Read Father's Heart Bible™ free</a>
 						{/* The print edition made for this audience, where there is one (src/data/receive.ts); else /print. */}
 						<a href={audienceEdition?.href ?? '/print/'} class="inline-block rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-90" style="border: 1.5px solid var(--color-brand); color: var(--color-brand); font-family: var(--font-sans);">{audienceEdition ? `Get the ${audienceEdition.edition} in print` : 'Get the print edition'}</a>
 					</div>
@@ -963,12 +963,12 @@ const relatedGroups: Group[] = _sibSlugs
 		<!-- Closing CTA — read FHB free, with the film (https://youtu.be/Ld4_H5XxrLk) -->
 		<section class="px-6 py-14 lg:px-8 lg:py-20" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl text-center">
-				<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{ctaBottomHeading || 'Read the Father’s Heart Bible™ free'}</HM>
+				<HM class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{ctaBottomHeading || 'Read Father’s Heart Bible™ free'}</HM>
 				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={ctaBottomBodyHtml}></p>
 				<div class="mx-auto mt-8 max-w-2xl">
-					<iframe class="lg:hidden block w-full overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);" src={`https://www.youtube-nocookie.com/embed/${ctaVideoId}?rel=0&playsinline=1`} title="The Father's Heart Bible" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-					<button type="button" id="cta-video-facade" class="group relative hidden lg:block w-full overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);" aria-label="Play the Father's Heart Bible film" data-video-id={ctaVideoId}>
-						<img src={`https://i.ytimg.com/vi/${ctaVideoId}/hqdefault.jpg`} alt="Watch: the Father's Heart Bible (FHB)" width="480" height="360" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+					<iframe class="lg:hidden block w-full overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);" src={`https://www.youtube-nocookie.com/embed/${ctaVideoId}?rel=0&playsinline=1`} title="Father's Heart Bible" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+					<button type="button" id="cta-video-facade" class="group relative hidden lg:block w-full overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);" aria-label="Play Father's Heart Bible film" data-video-id={ctaVideoId}>
+						<img src={`https://i.ytimg.com/vi/${ctaVideoId}/hqdefault.jpg`} alt="Watch: Father's Heart Bible (FHB)" width="480" height="360" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
 						<span aria-hidden="true" class="absolute inset-0" style="background: rgba(36,27,23,0.12);"></span>
 						<span aria-hidden="true" class="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110" style="width: 4.5rem; height: 4.5rem; transform: translate(-50%,-50%); background: rgba(255,255,255,0.92); border: 2px solid #FFFFFF; box-shadow: 0 4px 18px rgba(0,0,0,0.4);">
 							<svg width="26" height="26" viewBox="0 0 24 24" fill="var(--color-brand)" style="margin-left: 3px;"><path d="M8 5v14l11-7z"></path></svg>
@@ -991,7 +991,7 @@ const relatedGroups: Group[] = _sibSlugs
 					iframe.style.cssText = 'display:block;width:100%;aspect-ratio:16/9;height:auto;border:0;border-radius:0.75rem;';
 					iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
 					iframe.allowFullscreen = true;
-					iframe.title = "The Father's Heart Bible";
+					iframe.title = "Father's Heart Bible";
 					iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
 					btn.replaceWith(iframe);
 				});
