@@ -4,6 +4,7 @@ import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import { allLanguageEditions, langSlug } from '../data/language-editions';
 import reach from '../data/language-reach.json' with { type: 'json' };
+import { ROSTER_TOTAL, upcomingLanguages } from '../data/language-roster';
 import { LANGUAGE_TOTAL, readOnlyLanguages } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
@@ -139,59 +140,8 @@ const painsVsFather = [
 	{ pain: 'Shame, fear & despair', father: 'Strong, healthy daughters, wives & mothers' },
 ];
 
-// ── More to come — the rest of the 80-language roster (projects/fhb-language-cover-colours/roster.json),
-// alphabetical by code: [name, flag iso code, primary region]. A language moves out of this list
-// when its edition lands in the registry.
-const upcomingAll: [string, string, string][] = [
-	['Afrikaans', 'za', 'South Africa'],
-	['Anaang', 'ng', 'Nigeria'],
-	['Azerbaijani (South)', 'ir', 'Iran'],
-	['Greek', 'gr', 'Greece'],
-	['Gujarati', 'in', 'India'],
-	['Hausa', 'ng', 'Nigeria & West Africa'],
-	['Hiligaynon', 'ph', 'Philippines'],
-	['Haitian Creole', 'ht', 'Haiti'],
-	['Hungarian', 'hu', 'Hungary'],
-	['Igbo', 'ng', 'Nigeria'],
-	['Izon', 'ng', 'Nigeria'],
-	['Ilocano', 'ph', 'Philippines'],
-	['Javanese', 'id', 'Indonesia'],
-	['Gikuyu', 'ke', 'Kenya'],
-	['Kurdish (Kurmanji)', 'tr', 'Türkiye, Syria & Iraq'],
-	['Kannada', 'in', 'India'],
-	['Kituba', 'cd', 'DR Congo & Congo'],
-	['Mangbetu', 'cd', 'DR Congo'],
-	['Malagasy', 'mg', 'Madagascar'],
-	['Malayalam', 'in', 'India'],
-	['Malay', 'my', 'Malaysia'],
-	['Burmese', 'mm', 'Myanmar'],
-	['Nagamese', 'in', 'Northeast India'],
-	['Nepali', 'np', 'Nepal'],
-	['Inpui Naga', 'in', 'Northeast India'],
-	['Dutch', 'nl', 'Netherlands & Belgium'],
-	['Chokri Naga', 'in', 'Northeast India'],
-	['Chichewa', 'mw', 'Malawi'],
-	['Oromo', 'et', 'Ethiopia'],
-	['Odia', 'in', 'India'],
-	['Pashto', 'af', 'Afghanistan & Pakistan'],
-	['Kirundi', 'bi', 'Burundi'],
-	['Kinyarwanda', 'rw', 'Rwanda'],
-	['Sindhi', 'pk', 'Pakistan'],
-	['Sena', 'mz', 'Mozambique'],
-	['Kipsigis', 'ke', 'Kenya'],
-	['Shona', 'zw', 'Zimbabwe'],
-	['Somali', 'so', 'Somalia'],
-	['Sundanese', 'id', 'Indonesia'],
-	['Thai', 'th', 'Thailand'],
-	['Tigrinya', 'er', 'Eritrea & Ethiopia'],
-	['Akan (Twi)', 'gh', 'Ghana'],
-	['Uzbek', 'uz', 'Uzbekistan'],
-	['Xhosa', 'za', 'South Africa'],
-	['Yaka', 'cd', 'DR Congo'],
-].sort((a, b) => a[0].localeCompare(b[0])) as [string, string, string][];
-const upcoming = upcomingAll.filter(([name]) => !readOnlyLanguages.some((r) => r.english === name));
-// The headline declares the whole commitment (Kevin 2026-10-14: "let's just declare: 80 Languages").
-const ROSTER_TOTAL = LANGUAGE_TOTAL + upcoming.length;
+// The rest of the 80-language roster lives in src/data/language-roster.ts (deduplicated by language).
+const upcoming = upcomingLanguages;
 ---
 
 <Layout
