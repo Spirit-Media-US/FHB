@@ -3,7 +3,7 @@ import ImageGrid from '../components/ImageGrid.astro';
 import MailtoLink from '../components/MailtoLink.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
-// /scholars — the Scholar's Packet as a web page (Kevin 2026-10-22: "2 Yes 3A" = share by link, plan Doc
+// /overview (formerly the scholars page; 301 in public/_redirects, Kevin 2026-10-27) — the Scholar's Packet as a web page (Kevin 2026-10-22: "2 Yes 3A" = share by link, plan Doc
 // 1VqrO4JWS0Crvwjql1AIVliZs8HJ7lmfRf3bcOd9COAE W1). The text below is the packet's OWN wording
 // (Doc 1xwdIBGQPGWfmJQzpCx8vghhEWoca08fTqujwVWPkaFs, Kevin: "we state same everywhere"), not a rewrite.
 // The three documents are packet + A + A-2 (Kevin 10-22: no separate Welcome letter, no C). PDFs live on
@@ -11,8 +11,8 @@ import VideoHeroInner from '../components/VideoHeroInner.astro';
 // same bytes served with Content-Disposition: attachment. Trademark form: "Divine Voice™ Color" ONLY.
 import Layout from '../layouts/Layout.astro';
 
-const PAGE_URL = 'https://fathersheartbible.com/scholars/';
-const TITLE = "An Invitation to Bible Scholars — The Father's Heart Bible™";
+const PAGE_URL = 'https://fathersheartbible.com/overview/';
+const TITLE = "The Father's Heart Bible™ — An Overview for Scholars and Partners";
 const DESCRIPTION =
 	"The Father's Heart Bible™ in Divine Voice™ Color for Bible scholars: what we confess, how it was translated from the Hebrew, Aramaic and Greek, the base texts, how it names God, and how to review it.";
 const UPDATED = '2026-10-22';
@@ -300,7 +300,6 @@ const QUESTIONS = [
 	],
 ];
 const TOC = [
-	['welcome', 'Welcome'],
 	['documents', 'Documents'],
 	['confession', 'What we confess'],
 	['how-it-was-made', 'How it was made'],
@@ -311,8 +310,9 @@ const TOC = [
 	['isaiah-6', 'Isaiah 6'],
 	['zephaniah-3-17', 'Zephaniah 3:17'],
 	['language-editions', 'Language editions'],
+	['jehovahs-witnesses', 'Jehovah’s Witnesses'],
 	['questions', 'Questions'],
-	['review', 'How to review'],
+	['contact', 'Contact'],
 	['notices', 'Notices'],
 ];
 
@@ -368,7 +368,12 @@ const jsonLd = [
 		'@type': 'BreadcrumbList',
 		itemListElement: [
 			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
-			{ '@type': 'ListItem', position: 2, name: 'An Invitation to Bible Scholars', item: PAGE_URL },
+			{
+				'@type': 'ListItem',
+				position: 2,
+				name: "The Father's Heart Bible™ — An Overview for Scholars and Partners",
+				item: PAGE_URL,
+			},
 		],
 	},
 ];
@@ -391,14 +396,14 @@ const P = 'text-lg leading-relaxed mb-4';
 			imageSrcMobile="https://assets.spiritmediapublishing.com/FHB/print/about-hero-960.webp"
 			imageWidth={1536}
 			imageHeight={864}
-			heading="An Invitation to Bible Scholars"
+			heading="The Father's Heart Bible™ — An Overview for Scholars and Partners"
 			headingBelow
 		/>
 		<section class="px-6 pt-2 pb-2 lg:px-8" style="background-color: var(--color-surface);">
 			<div class="mx-auto max-w-3xl">
 				<nav aria-label="Breadcrumb" class="mb-3 text-sm text-center" style="color: var(--color-muted); font-family: var(--font-sans);">
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
-					<span style="color: var(--color-ink);">An Invitation to Bible Scholars</span>
+					<span style="color: var(--color-ink);">The Father&rsquo;s Heart Bible&trade; &mdash; An Overview for Scholars and Partners</span>
 				</nav>
 				<p class="pb-6 text-sm text-center border-b" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
 					The Father&rsquo;s Heart Bible&trade; in Divine Voice&trade; Color &middot; Text Edition {EDITION}
@@ -409,11 +414,14 @@ const P = 'text-lg leading-relaxed mb-4';
 		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
 			<div class="mx-auto max-w-3xl" style="font-family: var(--font-sans); color: var(--color-muted);">
 
-				{/* D123 (Kevin 2026-10-26): the invitation comes first, then the documents. Email only behind a button. */}
-				<p class={P}>The Father&rsquo;s Heart Bible&trade; is translated from the original Hebrew, Aramaic and Greek. Independent scholarly review is ongoing in India, Nepal, the UK, the USA and other countries. This page sets out our full process, and we welcome suggested revisions from every scholar and reader.</p>
+				{/* Kevin 2026-10-27: ONE welcome/intro, a confident introduction (approved text, overview-reframe brief C). */}
+				<p class={P}>The Father&rsquo;s Heart Bible&trade; is a complete translation of the Bible, 66 books and 31,085 verses, from the original Hebrew, Aramaic and Greek. It follows the Masoretic text, as preserved in the Westminster Leningrad Codex, and the SBL Greek New Testament. It is printed in Divine Voice&trade; Color: the words of the Father, the Son and the Holy Spirit each in their own color.</p>
+				<p class={P}>It is published in 50 of 80 languages, free to read at <a href="/read/" style="color: var(--color-brand);">fathersheartbible.com/read</a> and on other Bible platforms worldwide through Digital Bible Library partners around the world.</p>
+				<p class={P}>Every rendering follows a published rule, applied the same way through all 66 books. This overview sets out what we confess, how the translation was made, the texts behind it, how it names God, and how the Divine Voice&trade; Color is decided. The full translation principles and all 160 translation rules follow below.</p>
 				<p class="mb-4">
-					<MailtoLink email={REVIEW_EMAIL} class="inline-flex items-center px-6 py-3 rounded-full text-sm font-semibold no-underline" style="background-color: var(--color-brand); color: var(--color-on-primary);">Share your review</MailtoLink>
+					<MailtoLink email={REVIEW_EMAIL} class="inline-flex items-center px-6 py-3 rounded-full text-sm font-semibold no-underline" style="background-color: var(--color-brand); color: var(--color-on-primary);">Contact the Editor</MailtoLink>
 				</p>
+				<p class="text-lg italic mb-10" style="font-family: var(--font-serif); color: var(--color-ink);">Kevin White, Editor</p>
 
 				<nav aria-label="On this page" class="toc mb-10 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
 					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted);">On this page</p>
@@ -421,13 +429,6 @@ const P = 'text-lg leading-relaxed mb-4';
 						{TOC.map(([id, label]) => (<li><a href={`#${id}`} class="hover:underline" style="color: var(--color-brand);">{label}</a></li>))}
 					</ul>
 				</nav>
-
-				<h2 id="welcome" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">A Welcome to Bible Scholars</h2>
-				<p class={P}>Dear friend,</p>
-				<p class={P}>Thank you for taking the time to look at the Father&rsquo;s Heart Bible&trade; in Divine Voice&trade; Color. A translation deserves to be examined closely, and it is examined best by people who know the original languages and love the Scriptures. We have already been helped by scholars who read carefully and wrote to us frankly.</p>
-				<p class={P}>This packet gathers in one place what scholars and church leaders have asked us. It sets out what we confess, how the translation was made and the texts behind it, how it names God, how the Divine Voice&trade; Color is decided, one verse worked through word by word, the language editions, the questions we have been asked so far, and the notices every edition carries. Two longer documents accompany it: A. Translation Principles and A-2. The Complete Translation Rules.</p>
-				<p class={P} set:html={refs('When a scholar shows us an error, we revise the text: Isaiah 6:13 was revised the same day a reader pointed it out. We weigh every suggested revision honestly against the text and the method.')} />
-				<p class={P} style="color: var(--color-ink);">With gratitude,<br /><strong>Kevin White</strong>, Editor</p>
 
 				<h2 id="documents" class={H2} style="font-family: var(--font-serif); color: var(--color-ink); ">The documents</h2>
 				<p class={P}>Three documents, the same text as this page and more. Open one to read it in your browser, or download it.</p>
@@ -461,32 +462,22 @@ const P = 'text-lg leading-relaxed mb-4';
 					{ON_THE_PAGE.map(([r, t]) => (<li set:html={`${refs(r)} — ${t}`} />))}
 				</ul>
 				<p class={P} set:html={refs('Where the New Testament tells us that the Lord of an Old Testament passage is Jesus, the Father’s Heart Bible™ names him, in the text or in a note. At Isaiah 6:5 the prophet says, “my eyes have seen the King, Jesus, the Lord of all heaven’s armies” (John 12:41). At Joel 2:32 our text reads “everyone who calls on the name of the Lord will be saved,” and the note there names Jesus, as Paul does in Romans 10:13.')} />
-				<h3 class="text-xl font-medium mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">The Jehovah&rsquo;s Witnesses&rsquo; New World Translation</h3>
-				<p class={P}>Because the Father&rsquo;s Heart Bible&trade; renders the divine names in a new way and speaks often of the Father, readers sometimes ask whether it is connected with the Jehovah&rsquo;s Witnesses. It is not, in any way. The two translations stand on opposite sides of the verses above. Against the Father&rsquo;s Heart Bible&trade; readings already given, the Witnesses&rsquo; New World Translation (2013 revision) reads:</p>
-				<ul class="space-y-1 mb-5 text-lg leading-relaxed list-none pl-0">
-					{NWT.map(([r, t]) => (<li set:html={`${refs(r)} — ${t}`} />))}
-				</ul>
-				<p class={P}>The difference runs through the divine name as well. The New World Translation prints &ldquo;Jehovah&rdquo; thousands of times, including in the New Testament, where no Greek manuscript has the divine name. The Father&rsquo;s Heart Bible&trade; never prints the name in the Bible text (two footnotes mention &ldquo;YHWH&rdquo; when explaining a verse): it renders YHWH by the Person it refers to, and where the New Testament identifies that Person as Jesus, it names Jesus.</p>
-				<p class={P}>Both speak of the Father, but for opposite reasons. The New World Translation exalts the Father in a way that makes the Son less than God. The Father&rsquo;s Heart Bible&trade; names the Father in order to reveal the Son and the Holy Spirit beside him, one God in three Persons.</p>
-				<p class={P} set:html={refs('The Scriptures reveal a Father who restores his children to himself through the blood of his own Son (Ephesians 1:7). No one comes to the Father except through Jesus (John 14:6). That is the faith the Father’s Heart Bible™ was made to proclaim: not a new revelation, not a new prophet, not salvation by works, but the Father, the Son and the Holy Spirit, and the blood of Jesus.')} />
-
 				<h2 id="how-it-was-made" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">How it was made</h2>
-				<p class={P}>The Father&rsquo;s Heart Bible&trade; (FHB) is the complete Bible, 66 books, 1,189 chapters and 31,085 verses, in a fresh translation from the original Hebrew, Aramaic, and Greek. On the familiar spectrum from word-for-word to thought-for-thought, it is a meaning-based translation: it renders the original in clear, contemporary English, and it makes the Father&rsquo;s identity, presence, and voice explicit where the text already carries them.</p>
+				<p class={P}>The Father&rsquo;s Heart Bible&trade; (FHB) is the complete Bible, 66 books, 1,189 chapters and 31,085 verses, in a translation from the original Hebrew, Aramaic, and Greek. On the familiar spectrum from word-for-word to thought-for-thought, it is a meaning-based translation: it renders the original in clear, contemporary English, and it makes the Father&rsquo;s identity, presence, and voice explicit where the text already carries them.</p>
 				<p class={P}>It is printed in Divine Voice&trade; Color: our Father&rsquo;s words in blue, the Son&rsquo;s in red, the Spirit&rsquo;s in purple. To our knowledge, it is the first complete Bible printed with the words of the Father, the Son, and the Holy Spirit each in their own color.</p>
 				<p class={P}>It is not a paraphrase, and it is not an adaptation of any existing English Bible. It is not a study Bible: its notes are written for general readers, and its method is documented for scholars in the companion documents. It is not abridged.</p>
 				<p class={P}>The Father&rsquo;s Heart Bible&trade; was produced through a structured, rule-governed translation process built for this work, bringing the consistency and reach of modern language technology to the ancient task of translation. Within that process, AI language tools rendered the text and footnotes directly from the original Hebrew, Aramaic, and Greek, guided by a written set of 160 translation rules. Each book was then carried through successive passes, its most difficult readings cross-checked against the Hebrew and Greek and against independent references, before being reviewed and finalized.</p>
 				<p class={P}>The rules and every interpretive decision are the work of Spirit Media Publishing led by Kevin White, Editor.</p>
 				<p class={P}>On ordinary lexical and textual questions, we follow the settled consensus of the major modern translations and of the standard base texts, as most new translations do. Our own contribution is focused and stated: how the Persons of the Trinity are named, and whose voice is speaking. The rules that govern both are published in full in A-2. The Complete Translation Rules.</p>
-				<h3 class="text-xl font-medium mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">How it is reviewed</h3>
-				<p class={P}>Every reviewer&rsquo;s findings are read by the editor, and revisions are published with each new edition. <MailtoLink email={REVIEW_EMAIL} style="color: var(--color-brand);">Share your review</MailtoLink>.</p>
-				<p class={P}>Every book passed through the review stages described above before release. Readers took part as well, and they still do: readers in every language tell us what they find at <a href="/read/" style="color: var(--color-brand);">fathersheartbible.com/read</a>, and every revision they suggest is reviewed. Each edition carries a version number; this printing is Text Edition {EDITION}.</p>
+				<h3 class="text-xl font-medium mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">How it was reviewed</h3>
+				<p class={P}>Independent scholars in India, Nepal, the UK, the USA and other countries reviewed the text before release, and every book passed through the review stages described above. Each edition carries a version number; this printing is Text Edition {EDITION}. We never stop reviewing, and improvements are always welcome.</p>
 
 				<h2 id="base-texts" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">The base texts</h2>
 				<p class={P}>The Father&rsquo;s Heart Bible&trade; is translated from the original languages, not from an English predecessor. The Old Testament follows the Masoretic Hebrew and Aramaic text, as preserved in the Leningrad Codex (AD 1008), the oldest complete manuscript of the Hebrew Bible. The edition it is checked against is the Westminster Leningrad Codex, the standard digital edition of that manuscript. The Aramaic portions (Daniel 2:4b&ndash;7:28, Ezra 4:8&ndash;6:18 and 7:12&ndash;26, and Jeremiah 10:11) are translated from the Aramaic.</p>
 				<p class={P}>The New Testament follows the modern critical Greek text. The edition it is checked against is the SBL Greek New Testament, published by the Society of Biblical Literature. Where the manuscripts differ, it keeps company with the consensus of the modern critical editions. Standard Hebrew and Greek reference works are gratefully acknowledged; the English text, notes, and headings are our own.</p>
 				<h3 class="text-xl font-medium mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">How the text was produced and checked</h3>
 				<p class={P}>In practice, each chapter was translated whole, and the AI tools were never given an English translation as a source. They were required to cite the written rule behind every decision and to flag any decision no rule governs. They worked from their own command of the original-language text rather than from a supplied file of a printed edition, which is why the text is checked against the two editions named above.</p>
-				<p class={P}>That check against the source text has two parts, and we describe exactly what each covers. First, the verses in which &ldquo;Father&rdquo; appears two or more times are set beside the Westminster Leningrad Codex or the SBL Greek New Testament, so that each &ldquo;Father&rdquo; in them can be confirmed as the rendering of a divine name or title in the Hebrew or Greek; each flag is confirmed by reading the source before anything is changed. Second, a sample of revised verses is checked against the Hebrew and Greek, and no finding counts unless it cites the source word. Not every verse has been checked against the source in this way.</p>
+				<p class={P}>That check against the source text has two parts, and we describe exactly what each covers. First, the verses in which &ldquo;Father&rdquo; appears two or more times are set beside the Westminster Leningrad Codex or the SBL Greek New Testament, so that each &ldquo;Father&rdquo; in them can be confirmed as the rendering of a divine name or title in the Hebrew or Greek; each flag is confirmed by reading the source before anything is changed. Second, a sample of revised verses is checked against the Hebrew and Greek, and no finding counts unless it cites the source word.</p>
 				<p class={P}>Consistency checks run on every chapter before it is published. They check every divine utterance against the rule and confirm that every edition carries its required statements.</p>
 
 				<h2 id="every-verse" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">What &ldquo;every verse&rdquo; means</h2>
@@ -545,7 +536,7 @@ const P = 'text-lg leading-relaxed mb-4';
 				<p class={P}>Each throne is identified by what Scripture itself says about it.</p>
 
 				<h2 id="zephaniah-3-17" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">Zephaniah 3:17 word by word</h2>
-				<p class={P}>Our page offers <a href="/read/zephaniah/3/#v17" class="sref">Zephaniah 3:17</a> as an example of the translation. The observation has been made that the result reads like other English translations with &ldquo;Father&rdquo; put in place of &ldquo;the LORD your God.&rdquo; It is a fair question to ask of any translation that presents itself as fresh work, and it deserves a word-by-word answer from the Hebrew.</p>
+				<p class={P}><a href="/read/zephaniah/3/#v17" class="sref">Zephaniah 3:17</a> shows the method at work, word by word from the Hebrew.</p>
 				<blockquote class="my-6 px-6 py-5 rounded-2xl text-lg leading-relaxed" style="background-color: #fdf2f5; border: 1px solid #f9d6e0; font-family: var(--font-serif); color: #2563eb;">&ldquo;Your Father is in your midst, a mighty warrior who saves. He will rejoice over you with gladness; he will quiet you by his love; he will exult over you with loud singing.&rdquo;</blockquote>
 				<p class={P}>Besides the divine name, the verse has five short clauses of ordinary Hebrew. On a verse like this there is very little room between one literal rendering and another, so our English reads much as the more literal English translations do, and where we judged an existing reading right we kept it rather than changing it for the sake of sounding different. That is what any two careful translations of the same Hebrew will do.</p>
 				<p class={P}><em>Hebrew — YHWH elohayik beqirbek, gibbor yoshia; yasis alayik besimchah, yacharish be&rsquo;ahavato, yagil alayik berinnah.</em></p>
@@ -558,14 +549,14 @@ const P = 'text-lg leading-relaxed mb-4';
 					</table>
 				</div>
 				<p class={P}>The fourth clause is where the printed English translations divide. The Masoretic text reads <em>yacharish be&rsquo;ahavato</em>, from <em>charash</em>, &ldquo;to be silent.&rdquo; Some English translations follow a proposed emendation, <em>yechaddesh</em>, &ldquo;he will renew,&rdquo; and print a renewing in love; others keep the Masoretic verb and read its silence as the withholding of reproach. We follow the Masoretic reading, &ldquo;he will quiet you by his love,&rdquo; and we do not adopt the emendation.</p>
-				<p class={P}>The honest description is not that this verse is fresh English. It is that this verse is a close rendering of five short Hebrew clauses, agreeing with the more literal of the printed translations where we judged it right, differing where the Hebrew gives a reason, and carrying the single rendering that this translation exists to make &mdash; the naming of the One who speaks as our Father.</p>
+				<p class={P}>The verse is a close rendering of five short Hebrew clauses, with the single rendering this translation exists to make: the naming of the One who speaks as our Father.</p>
 
 				<h2 id="language-editions" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">The language editions</h2>
 				<p class={P}>Every language edition of the Father&rsquo;s Heart Bible&trade; is translated from the English Father&rsquo;s Heart Bible&trade; with AI assistance, and every edition carries the same statement of provenance and translator credit, word for word in its own language.</p>
 				<p class={P}>Our newer editions follow a written profile of the language&rsquo;s own grammar and word order. The English gives the meaning; the language gives the form. A verb-final language keeps its verb at the end, a language that splits a quotation in two may do so, and the result is meant to read as that language is actually spoken, not as English with foreign words.</p>
 				<p class={P}>Each edition carries the whole Bible: 66 books and 1,189 chapters, with the footnotes, the book names and the reader interface in its own language. Each carries the Divine Voice&trade; Color: the words of the Father, the Son and the Holy Spirit marked to follow the English, so that a reader in any language hears who is speaking.</p>
 				<p class={P}>Before an edition is first published, it must pass the same set of checks: every chapter of every book present and complete; the Divine Voice&trade; Color matching the English, verse by verse; every quotation closed; the language&rsquo;s own script rendered correctly throughout; the statement of provenance and the translator credit present. An edition that fails a check is not published until it is fixed.</p>
-				<p class={P}>The checks above prove the form of an edition. Only a native speaker can judge its language. We invite native-speaking scholars and translators to review the edition in their own language, the Scripture and the reader interface together. A reviewer&rsquo;s revisions are published with that language&rsquo;s next edition. We weigh each one honestly against the English text and the method, and we are grateful for each.</p>
+				<p class={P}>The checks above prove the form of an edition. Native-speaker review is part of each edition&rsquo;s ongoing care.</p>
 				<p class={P}>Forty-seven editions are complete and published, English among them:</p>
 				<ul class="list-disc pl-6 space-y-2 mb-5 text-lg leading-relaxed">
 					<li><strong>Languages of India and South Asia:</strong> Bengali, Hindi, Kannada, Malayalam, Marathi, Nepali, Punjabi, Tamil, Tangkhul, Telugu, Urdu.</li>
@@ -574,6 +565,16 @@ const P = 'text-lg leading-relaxed mb-4';
 					<li><strong>The Middle East and Central Asia:</strong> Arabic, Persian, Turkish.</li>
 					<li><strong>Europe and the Americas:</strong> Dutch, English, French, German, Greek, Haitian Creole, Hungarian, Italian, Polish, Portuguese, Romanian, Russian, Spanish, Ukrainian.</li>
 				</ul>
+
+				{/* Kevin 2026-10-27 07:3xZ: "Don't lead with Jehovah Witnesses. Keep it" — moved here word for word. */}
+				<h2 id="jehovahs-witnesses" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">The Jehovah&rsquo;s Witnesses&rsquo; New World Translation</h2>
+				<p class={P}>Because the Father&rsquo;s Heart Bible&trade; renders the divine names in a new way and speaks often of the Father, readers sometimes ask whether it is connected with the Jehovah&rsquo;s Witnesses. It is not, in any way. The two translations stand on opposite sides of the verses above. Against the Father&rsquo;s Heart Bible&trade; readings already given, the Witnesses&rsquo; New World Translation (2013 revision) reads:</p>
+				<ul class="space-y-1 mb-5 text-lg leading-relaxed list-none pl-0">
+					{NWT.map(([r, t]) => (<li set:html={`${refs(r)} — ${t}`} />))}
+				</ul>
+				<p class={P}>The difference runs through the divine name as well. The New World Translation prints &ldquo;Jehovah&rdquo; thousands of times, including in the New Testament, where no Greek manuscript has the divine name. The Father&rsquo;s Heart Bible&trade; never prints the name in the Bible text (two footnotes mention &ldquo;YHWH&rdquo; when explaining a verse): it renders YHWH by the Person it refers to, and where the New Testament identifies that Person as Jesus, it names Jesus.</p>
+				<p class={P}>Both speak of the Father, but for opposite reasons. The New World Translation exalts the Father in a way that makes the Son less than God. The Father&rsquo;s Heart Bible&trade; names the Father in order to reveal the Son and the Holy Spirit beside him, one God in three Persons.</p>
+				<p class={P} set:html={refs('The Scriptures reveal a Father who restores his children to himself through the blood of his own Son (Ephesians 1:7). No one comes to the Father except through Jesus (John 14:6). That is the faith the Father’s Heart Bible™ was made to proclaim: not a new revelation, not a new prophet, not salvation by works, but the Father, the Son and the Holy Spirit, and the blood of Jesus.')} />
 
 				<h2 id="questions" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">Questions scholars have asked</h2>
 				<p class={P}>These are questions scholars and church leaders have asked us, with our answers. We add to this section as new questions come, so that every reader can see what others have asked.</p>
@@ -588,13 +589,10 @@ const P = 'text-lg leading-relaxed mb-4';
 					))}
 				</div>
 
-				<aside id="review" class="my-14 px-6 py-8 lg:px-10 rounded-2xl scroll-mt-28" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
-					<h2 class="text-2xl md:text-3xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">How to review</h2>
-					<ol class="list-decimal pl-6 space-y-2 text-lg leading-relaxed">
-						<li>Pick any book, and read it against the Hebrew, Aramaic or Greek. The whole Bible is free at <a href="/read/" style="color: var(--color-brand);">fathersheartbible.com/read</a>.</li>
-						<li>Send what you find with <MailtoLink email={REVIEW_EMAIL} style="color: var(--color-brand);">Share your review</MailtoLink>. Every finding is read by the editor, and revisions are published with each new edition.</li>
-					</ol>
-					<p class="mt-4 text-base leading-relaxed">Reviewers are never named without written permission. Review is not endorsement.</p>
+				<aside id="contact" class="my-14 px-6 py-8 lg:px-10 rounded-2xl scroll-mt-28" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<h2 class="text-2xl md:text-3xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">Contact</h2>
+					<p class="text-lg leading-relaxed mb-5">The whole Bible is free at <a href="/read/" style="color: var(--color-brand);">fathersheartbible.com/read</a>.</p>
+					<MailtoLink email={REVIEW_EMAIL} class="inline-flex items-center px-6 py-3 rounded-full text-sm font-semibold no-underline" style="background-color: var(--color-brand); color: var(--color-on-primary);">Contact the Editor</MailtoLink>
 				</aside>
 
 				<h2 id="notices" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">Copyright and notices</h2>
