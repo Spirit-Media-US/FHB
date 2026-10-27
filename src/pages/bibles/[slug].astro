@@ -316,6 +316,13 @@ const offerFor = (v: (typeof variants)[number]) => ({
 		'@type': 'OfferShippingDetails',
 		shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'USD' },
 		shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'US' },
+		// /print promises "most orders arrive in 7–10 days"; Google wants it split into handling +
+		// transit. 2–3 + 5–7 business days sums to that promise (PM ruling 2026-10-27).
+		deliveryTime: {
+			'@type': 'ShippingDeliveryTime',
+			handlingTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 3, unitCode: 'DAY' },
+			transitTime: { '@type': 'QuantitativeValue', minValue: 5, maxValue: 7, unitCode: 'DAY' },
+		},
 	},
 });
 // The page's own Book node is the binding its ISBN names (hardback for every edition today);
