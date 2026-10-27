@@ -739,6 +739,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-ur-600.webp`,
 	},
+	'lang-uz-hb': {
+		title: 'Oʻzbekcha Muqaddas Kitob (Uzbek) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-uz-600.webp`,
+	},
+	'lang-uz-pb': {
+		title: 'Oʻzbekcha Muqaddas Kitob (Uzbek) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-uz-600.webp`,
+	},
 	'lang-vi-hb': {
 		title: 'Kinh Thánh Tiếng Việt (Vietnamese) — Hardback',
 		retail: 9999,
