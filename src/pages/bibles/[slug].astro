@@ -322,6 +322,9 @@ const offerFor = (v: (typeof variants)[number]) => ({
 // the other binding(s) hang off it as workExample editions, each a Product with its own offer.
 const mainVariant = variants.find((v) => v.isbn && v.isbn === ed.isbn) ?? variants[0];
 const otherVariants = variants.filter((v) => v !== mainVariant);
+// Every binding carries the same description: Google's merchant listings flag a Product with none
+// (Search Console 2026-10-27, "Missing field description" on the workExample bindings).
+const productDescription = `${ed.sub}. The complete Bible in Divine Voice Color — our Father's words in blue, the Son's in red, the Spirit's in purple.`;
 const productSchema = {
 	'@context': 'https://schema.org',
 	'@type': ['Book', 'Product'],
@@ -343,7 +346,7 @@ const productSchema = {
 	...(ed.isbn ? { isbn: ed.isbn } : {}),
 	inLanguage: ed.lang ?? 'en',
 	datePublished,
-	description: `${ed.sub}. The complete Bible in Divine Voice Color — our Father's words in blue, the Son's in red, the Spirit's in purple.`,
+	description: productDescription,
 	image: coverUrl,
 	url,
 	publisher: { '@type': 'Organization', name: 'Spirit Media Publishing' },
@@ -360,6 +363,7 @@ const productSchema = {
 		bookFormat: BIND[v.binding].format,
 		...(v.isbn ? { isbn: v.isbn, gtin13: v.isbn.replace(/-/g, '') } : {}),
 		sku: v.sku,
+		description: productDescription,
 		image: coverUrl,
 		inLanguage: ed.lang ?? 'en',
 		brand: { '@type': 'Brand', name: "Father's Heart Bible" },
