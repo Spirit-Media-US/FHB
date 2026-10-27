@@ -7,7 +7,7 @@ import VoiceChips from '../components/VoiceChips.astro';
 // /overview (formerly the scholars page; 301 in public/_redirects, Kevin 2026-10-27) — the Scholar's Packet as a web page (Kevin 2026-10-22: "2 Yes 3A" = share by link, plan Doc
 // 1VqrO4JWS0Crvwjql1AIVliZs8HJ7lmfRf3bcOd9COAE W1). The text below is the packet's OWN wording
 // (Doc 1xwdIBGQPGWfmJQzpCx8vghhEWoca08fTqujwVWPkaFs, Kevin: "we state same everywhere"), not a rewrite.
-// The three documents are packet + A + A-2 (Kevin 10-22: no separate Welcome letter, no C). PDFs live on
+// The two documents are the packet (= this page as a PDF) + the complete rules (Kevin 10-27: A retired; earlier 10-22: no Welcome letter, no C). PDFs live on
 // R2 under FHB/scholars/ (dated names — a new edition is a NEW file, never a rename); download/ holds the
 // same bytes served with Content-Disposition: attachment. Trademark form: "Divine Voice™ Color" ONLY.
 import Layout from '../layouts/Layout.astro';
@@ -23,21 +23,14 @@ const REVIEW_EMAIL = 'kevin@spiritmediapublishing.com';
 
 const DOCS = [
 	{
-		slug: 'fhb-scholars-packet-2026-10-27',
-		title: "The Scholar's Packet",
-		blurb:
-			'The overview, the confession, the method and base texts, how it names God, the Divine Voice™ Color, Zephaniah 3:17 word by word, the 80 languages, questions asked, and the notices.',
+		slug: 'fhb-overview-scholars-partners-2026-10-27',
+		title: 'An Overview for Scholars and Partners',
+		blurb: 'This page as a PDF, to print and share with your team.',
 		pages: 17,
 	},
 	{
-		slug: 'fhb-a-translation-principles-2026-10-27',
-		title: 'A. Translation Principles',
-		blurb: 'The principles behind the translation, in summary.',
-		pages: 10,
-	},
-	{
 		slug: 'fhb-a2-complete-translation-rules-2026-10-27',
-		title: 'A-2. The Complete Translation Rules',
+		title: 'The Complete Translation Rules',
 		blurb: 'Every rule the translation follows, in full.',
 		pages: 116,
 	},
@@ -487,7 +480,7 @@ const P = 'text-lg leading-relaxed mb-4';
 				{/* Kevin 2026-10-27 (addendum V): the homepage FATHER / SON / SPIRIT blocks, same component and palette. */}
 				<VoiceChips size="1.25rem" class="mb-6" />
 				<p class={P}>It is published in 25 audience editions, soon in 80 languages, free to read at <a href="/read/" style="color: var(--color-brand);">fathersheartbible.com/read</a> and on other Bible platforms worldwide through Digital Bible Library partners, and in print worldwide.</p>
-				<p class={P}>This overview sets out what we confess, how the translation was made, the texts behind it, how it names God, and how the Divine Voice&trade; Color is decided. The translation principles and all 160 rules are in the documents below.</p>
+				<p class={P}>This overview sets out what we confess, how the translation was made, the texts behind it, how it names God, and how the Divine Voice&trade; Color is decided. All 160 translation rules are in the documents below.</p>
 
 				{/* Kevin 2026-10-27 08:0xZ (addendum M2): "My 3 points lead and need to be combined with your 9 points"; 08:1xZ (N) verbatim; R: sections below follow the list; T 08:4xZ: new item 2 (tag line), 9 items; V: one paragraph, tag line inline italic. */}
 				<h2 id="what-makes-it-different" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">What makes Father&rsquo;s Heart Bible&trade; different</h2>
@@ -512,7 +505,7 @@ const P = 'text-lg leading-relaxed mb-4';
 				</nav>
 
 				<h2 id="documents" class={H2} style="font-family: var(--font-serif); color: var(--color-ink); ">The documents</h2>
-				<p class={P}>Three documents, the same text as this page and more. Open one to read it in your browser, or download it.</p>
+				<p class={P}>Two documents, the same text as this page and more. Open one to read it in your browser, or download it.</p>
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-4">
 					{DOCS.map((d) => (
 						<div class="doc-card flex flex-col rounded-xl overflow-hidden" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
@@ -573,7 +566,7 @@ const P = 'text-lg leading-relaxed mb-4';
 					<li><strong>Narration is never colored.</strong> The narrator&rsquo;s frame, such as &ldquo;Then our Father said,&rdquo; is not itself divine speech and stays black. A formula such as &ldquo;declares our Father&rdquo; spoken inside His own words is part of His utterance and carries His color (principle 2).</li>
 					<li><strong>Words never spoken are never colored.</strong> Description of a divine person, address to Him, and report about Him are not His speech. Only what was said receives the color.</li>
 				</ol>
-				<p class={P}>These are not private conventions. The governing rule and its corollaries are written into our translation rule set, published in <a href="#documents" style="color: var(--color-brand);">A-2. The Complete Translation Rules</a>, and every chapter is checked against them before publication.</p>
+				<p class={P}>These are not private conventions. The governing rule and its corollaries are written into our translation rule set, published in <a href="#documents" style="color: var(--color-brand);">The Complete Translation Rules</a>, and every chapter is checked against them before publication.</p>
 
 				<h2 id="isaiah-6" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">Isaiah 5 and Isaiah 6: why &ldquo;the Lord of Hosts&rdquo; is not always the same Person</h2>
 				<p class={P}>The title is rendered differently in these two chapters, and the difference is deliberate.</p>
@@ -590,7 +583,7 @@ const P = 'text-lg leading-relaxed mb-4';
 				<p class={P}>It is not a paraphrase, and it is not an adaptation of any existing English Bible. It is not a study Bible: its notes are written for general readers, and its method is documented for scholars in the <a href="#documents" style="color: var(--color-brand);">companion documents</a>. It is not abridged.</p>
 				<p class={P}>Father&rsquo;s Heart Bible&trade; was produced through a structured, rule-governed translation process built for this work, bringing the consistency and reach of modern language technology to the ancient task of translation. Within that process, AI language tools rendered the text and footnotes directly from the original Hebrew, Aramaic, and Greek, guided by a written set of 160 translation rules.</p>
 				<p class={P}>The rules and every interpretive decision are the work of Spirit Media Publishing led by Kevin White, Editor.</p>
-				<p class={P}>On ordinary lexical and textual questions, our renderings agree with the settled consensus of the major modern translations and of the standard base texts, as most modern translations do. Our own contribution is focused and stated: how the Persons of the Trinity are named, and whose voice is speaking. The rules that govern both are published in full in <a href="#documents" style="color: var(--color-brand);">A-2. The Complete Translation Rules</a>.</p>
+				<p class={P}>On ordinary lexical and textual questions, our renderings agree with the settled consensus of the major modern translations and of the standard base texts, as most modern translations do. Our own contribution is focused and stated: how the Persons of the Trinity are named, and whose voice is speaking. The rules that govern both are published in full in <a href="#documents" style="color: var(--color-brand);">The Complete Translation Rules</a>.</p>
 
 				<h2 id="base-texts" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">The base texts</h2>
 				<p class={P}>Father&rsquo;s Heart Bible&trade; is translated from the original languages, not from an English predecessor. The Old Testament follows the Masoretic Text of the Leningrad Codex as printed in Biblia Hebraica Stuttgartensia, and the New Testament follows the modern critical text of Nestle-Aland 28 and the UBS fifth edition; our checks against the source are made with the Westminster Leningrad Codex, the digital edition of the same Hebrew manuscript, and the SBL Greek New Testament. The Aramaic portions (Daniel 2:4b&ndash;7:28, Ezra 4:8&ndash;6:18 and 7:12&ndash;26, and Jeremiah 10:11) are translated from the Aramaic.</p>
