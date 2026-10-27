@@ -1,4 +1,4 @@
-// THE DIVINE VOICE COLOR AUDIENCE EDITIONS — moved here from src/pages/print.astro
+// THE DIVINE VOICE™ COLOR AUDIENCE EDITIONS — moved here from src/pages/print.astro
 // (2026-10-03) so /print and the catalog order form /print/order/ read ONE list. Prices are
 // ISBNS.json's; scripts/pricing-verify.mjs asserts every order form's prices against
 // functions/dvc-checkout.ts on the BUILT pages.

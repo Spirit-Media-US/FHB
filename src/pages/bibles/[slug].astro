@@ -9,7 +9,7 @@ import isbnList from '../../data/isbn-list.json';
 import { langSlug, languageEditions } from '../../data/language-editions';
 import { catalogRows } from '../../data/print-catalog';
 import readerEntry from '../../data/reader-entry-links.json';
-// /bibles/<slug>-bible — the PRODUCT page for every Divine Voice Color edition.
+// /bibles/<slug>-bible — the PRODUCT page for every Divine Voice™ Color edition.
 //
 // Why this exists alongside /bible-for/<audience>: those pages answer a PASTORAL search
 // ("bible verses for teenagers") and this one answers a PURCHASE search ("teen bible",
@@ -324,7 +324,7 @@ const mainVariant = variants.find((v) => v.isbn && v.isbn === ed.isbn) ?? varian
 const otherVariants = variants.filter((v) => v !== mainVariant);
 // Every binding carries the same description: Google's merchant listings flag a Product with none
 // (Search Console 2026-10-27, "Missing field description" on the workExample bindings).
-const productDescription = `${ed.sub}. The complete Bible in Divine Voice Color — our Father's words in blue, the Son's in red, the Spirit's in purple.`;
+const productDescription = `${ed.sub}. The complete Bible in Divine Voice™ Color — our Father's words in blue, the Son's in red, the Spirit's in purple.`;
 const productSchema = {
 	'@context': 'https://schema.org',
 	'@type': ['Book', 'Product'],
@@ -392,9 +392,9 @@ const faqSchema = {
 
 <Layout
 	title={ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`}
-	description={ed.seo?.description ?? `The ${ed.name} — the complete Bible in Divine Voice Color. Hardcover, ${pages} pages.`}
+	description={ed.seo?.description ?? `The ${ed.name} — the complete Bible in Divine Voice™ Color. Hardcover, ${pages} pages.`}
 	image={coverUrl}
-	imageAlt={`${ed.name} — Father's Heart Bible in Divine Voice Color`}
+	imageAlt={`${ed.name} — Father's Heart Bible in Divine Voice™ Color`}
 >
 	<script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
 	<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
@@ -408,11 +408,11 @@ const faqSchema = {
 				     on a phone, where most of this traffic lands. -->
 				<div class="flex flex-col items-center">
 					<div style="max-width: 340px; width: 100%;">
-						<img id="cover-main" src={coverUrl} alt={ed.name.startsWith('Father') ? `${ed.name} in Divine Voice Color` : `${ed.name} — Father's Heart Bible (FHB) in Divine Voice Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
+						<img id="cover-main" src={coverUrl} alt={ed.name.startsWith('Father') ? `${ed.name} in Divine Voice™ Color` : `${ed.name} — Father's Heart Bible (FHB) in Divine Voice™ Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
 					</div>
 				</div>
 				<div>
-					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">{isLang ? `${ed.english} edition · Divine Voice Color` : 'Divine Voice Color'}</p>
+					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">{isLang ? `${ed.english} edition · Divine Voice™ Color` : 'Divine Voice™ Color'}</p>
 					<h1 lang={isLang ? ed.lang : undefined} dir={isLang ? ed.dir : undefined} style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2.4rem; font-weight: 600; margin: 0 0 0.6rem;">{ed.name}</h1>
 					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.55; margin: 0 0 1.2rem;">{ed.sub}</p>
 					<div class="flex flex-wrap items-center gap-2 mb-5">
@@ -627,7 +627,7 @@ const faqSchema = {
 					))}
 				</div>
 				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.95rem; margin: 1.75rem 0 0;">
-					Looking for scripture rather than a copy to hold? {ed.relatedGuide && (<Fragment>Read <a href={ed.relatedGuide.href} style="color: var(--color-brand); font-weight: 600; text-decoration: none;">{ed.relatedGuide.label}</a>, or read</Fragment>)}{!ed.relatedGuide && 'Read'} the whole Bible free at <a href={READ_URL} style="color: var(--color-brand); font-weight: 600; text-decoration: none;">fathersheartbible.com/read</a>. See <a href="/print/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">every Divine Voice Color edition</a>.
+					Looking for scripture rather than a copy to hold? {ed.relatedGuide && (<Fragment>Read <a href={ed.relatedGuide.href} style="color: var(--color-brand); font-weight: 600; text-decoration: none;">{ed.relatedGuide.label}</a>, or read</Fragment>)}{!ed.relatedGuide && 'Read'} the whole Bible free at <a href={READ_URL} style="color: var(--color-brand); font-weight: 600; text-decoration: none;">fathersheartbible.com/read</a>. See <a href="/print/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">every Divine Voice™ Color edition</a>.
 				</p>
 				{entryLinks.length > 0 && (
 					<nav aria-label={`Read the ${ed.english} Bible free online`} style="margin: 1.5rem 0 0;">
