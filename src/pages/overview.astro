@@ -335,13 +335,35 @@ const MOVED_QUESTIONS: [string, string][] = [
 			`<p class="text-lg leading-relaxed mb-4">${refs('The Scriptures reveal a Father who restores His children to Himself through the blood of His own Son (Ephesians 1:7). No one comes to the Father except through Jesus (John 14:6). That is the faith Father’s Heart Bible™ was made to proclaim: not a new revelation, not a new prophet, not salvation by works, but the Father, the Son and the Holy Spirit, and the blood of Jesus.')}</p>`,
 	],
 ];
-const FAQ: [string, string][] = [
+const FAQ_ALL: [string, string][] = [
 	...QUESTIONS.map(([q, a]): [string, string] => [
 		q,
 		`<p class="text-lg leading-relaxed">${refs(a)}</p>`,
 	]),
 	...MOVED_QUESTIONS,
 ];
+// Kevin 2026-10-27 (addendum AS): "order FAQ from most important/interest to least". A missing
+// question fails the build rather than silently dropping out of the list.
+const FAQ_ORDER = [
+	"Why Father's Heart Bible?",
+	'Does Father’s Heart Bible simply put “Father” where other Bibles say “the LORD”?',
+	'Where does the emphasis on “Father” come from?',
+	'Is it aligned to a doctrinal system?',
+	'Is Father’s Heart Bible connected with the Jehovah’s Witnesses?',
+	'Why are some verses missing?',
+	'Does the Holy Spirit speak in the Bible?',
+	'Why “Sovereign”?',
+	'How are disputed passages such as Mark 16:9–20 handled?',
+	'Who appeared to Abraham, Jacob and Moses?',
+	'Who is on the throne in Ezekiel 1 and Revelation 4?',
+];
+const FAQ: [string, string][] = FAQ_ORDER.map((q) => {
+	const hit = FAQ_ALL.find(([text]) => text === q);
+	if (!hit) throw new Error(`overview FAQ_ORDER: no question "${q}"`);
+	return hit;
+});
+if (FAQ.length !== FAQ_ALL.length)
+	throw new Error('overview FAQ_ORDER: a question is missing from the order');
 const plainText = (h: string) =>
 	h
 		.replace(/<table[\s\S]*?<\/table>/g, ' ')
