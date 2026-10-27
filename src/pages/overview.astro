@@ -3,6 +3,7 @@ import ImageGrid from '../components/ImageGrid.astro';
 import MailtoLink from '../components/MailtoLink.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
+import VoiceChips from '../components/VoiceChips.astro';
 // /overview (formerly the scholars page; 301 in public/_redirects, Kevin 2026-10-27) — the Scholar's Packet as a web page (Kevin 2026-10-22: "2 Yes 3A" = share by link, plan Doc
 // 1VqrO4JWS0Crvwjql1AIVliZs8HJ7lmfRf3bcOd9COAE W1). The text below is the packet's OWN wording
 // (Doc 1xwdIBGQPGWfmJQzpCx8vghhEWoca08fTqujwVWPkaFs, Kevin: "we state same everywhere"), not a rewrite.
@@ -417,7 +418,9 @@ const P = 'text-lg leading-relaxed mb-4';
 			<div class="mx-auto max-w-3xl" style="font-family: var(--font-sans); color: var(--color-muted);">
 
 				{/* Kevin 2026-10-27: ONE welcome/intro, a confident introduction (approved text, overview-reframe brief C). */}
-				<p class={P}>Father&rsquo;s Heart Bible&trade; is a complete translation of the Bible, 66 books and 31,085 verses, from the original Hebrew, Aramaic and Greek. It follows the Masoretic text, as preserved in the Westminster Leningrad Codex, and the SBL Greek New Testament. It is printed in Divine Voice&trade; Color: Father&rsquo;s words in blue, Son&rsquo;s words in red, and Spirit&rsquo;s words in purple.</p>
+				<p class={P}>Father&rsquo;s Heart Bible&trade; is a complete translation of the Bible, 66 books and 31,085 verses, from the original Hebrew, Aramaic and Greek. It follows the Masoretic text, as preserved in the Westminster Leningrad Codex, and the SBL Greek New Testament. It is printed in Divine Voice&trade; Color: <strong style="color:#2563eb">Father&rsquo;s words in blue</strong>, <strong style="color:#c8102e">Son&rsquo;s words in red</strong>, and <strong style="color:#6a3fa0">Spirit&rsquo;s words in purple</strong>.</p>
+				{/* Kevin 2026-10-27 (addendum V): the homepage FATHER / SON / SPIRIT blocks, same component and palette. */}
+				<VoiceChips size="1.25rem" class="mb-6" />
 				<p class={P}>It is published in 25 audience editions, soon in 80 languages, free to read at <a href="/read/" style="color: var(--color-brand);">fathersheartbible.com/read</a> and on other Bible platforms worldwide through Digital Bible Library partners.</p>
 				<p class={P}>This overview sets out what we confess, how the translation was made, the texts behind it, how it names God, and how the Divine Voice&trade; Color is decided. The full translation principles and all 160 translation rules follow below.</p>
 				<p class="mb-4">
@@ -425,11 +428,11 @@ const P = 'text-lg leading-relaxed mb-4';
 				</p>
 				<p class="text-lg italic mb-10" style="font-family: var(--font-serif); color: var(--color-ink);">Kevin White, Editor</p>
 
-				{/* Kevin 2026-10-27 08:0xZ (addendum M2): "My 3 points lead and need to be combined with your 9 points"; 08:1xZ (N) verbatim; R: sections below follow the list; T 08:4xZ: new item 2 (tag line), 9 items. */}
+				{/* Kevin 2026-10-27 08:0xZ (addendum M2): "My 3 points lead and need to be combined with your 9 points"; 08:1xZ (N) verbatim; R: sections below follow the list; T 08:4xZ: new item 2 (tag line), 9 items; V: one paragraph, tag line inline italic. */}
 				<h2 id="what-makes-it-different" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">What makes Father&rsquo;s Heart Bible&trade; different</h2>
 				<ol class="list-decimal pl-6 space-y-3 mb-10 text-lg leading-relaxed">
 					<li set:html={refs('<strong style="color: var(--color-ink);">A Father-first Bible.</strong> Father, Heart, Bible: its name is its order. It reveals our Father, His heart, and His greatest gifts to us: His Son, His Holy Spirit and His written Word.')} />
-					<li set:html={refs('<strong style="color: var(--color-ink);">Receiving over reading.</strong> Our tag line reveals our Father&rsquo;s heart:<span class="block my-2 text-xl italic" style="font-family: var(--font-serif); color: var(--color-ink);">Receive the Father. Hear His Voice. His Heart is For You.</span>It profits no one to carry a Bible and not know our Father.')} />
+					<li set:html={refs('<strong style="color: var(--color-ink);">Receiving over reading.</strong> Our tag line reveals our Father&rsquo;s heart: <em>Receive the Father. Hear His Voice. His Heart is For You.</em> It profits no one to carry a Bible and not know our Father.')} />
 					<li set:html={refs('<strong style="color: var(--color-ink);">Our Father, named from Genesis 1:1.</strong> &ldquo;In the beginning, our Heavenly Father created the heavens and the earth.&rdquo; Where other Bibles use &ldquo;God&rdquo; and &ldquo;Lord&rdquo; to say what He is, Father&rsquo;s Heart Bible&trade; says who He is.')} />
 					<li set:html={refs('<strong style="color: var(--color-ink);">His voice in Divine Voice&trade; Color.</strong> The words of the Father (in blue), His Son (in red) and His Holy Spirit (in purple) are each printed in their own color, equipping and empowering readers to hear His voice.')} />
 					<li set:html={refs('<strong style="color: var(--color-ink);">Written to carry the Father&rsquo;s heart.</strong> Where the original allows it, the wording carries His personal warmth: His heart goes out to His people, He calls them His children, and the Bible is His story of restoring His beloved sons and daughters to Himself.')} />
