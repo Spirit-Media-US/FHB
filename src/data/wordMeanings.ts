@@ -201,8 +201,14 @@ export const WORD_MEANINGS: WordMeaning[] = [
 	{
 		slug: 'psalm-91',
 		title: 'What does Psalm 91 mean?',
+		blurb: 'The shelter of the Most High, the angels, and our Father’s own voice in verses 14-16.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
+	},
+	{
+		slug: 'reproof',
+		title: 'What does reproof mean in the Bible?',
 		blurb:
-			'The shelter of the Most High, the angels, and our Father’s own voice in verses 14-16.',
+			'Loving correction — towkechah and elenchos, 2 Timothy 3:16, and why our Father disciplines the one He loves.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
 	},
 ];

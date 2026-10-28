@@ -1,0 +1,176 @@
+---
+// /verses/gratitude: unit 6bc, ranked by Bing GetKeywordStats 2026-10-28 (Bing 317; aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+ {
+  "id": "a-grateful-heart",
+  "heading": "A grateful heart",
+  "intro": "Thanks as the posture of a whole life, not a single prayer.",
+  "verses": [
+   {
+    "ref": "Psalm 103:1–2",
+    "slug": "psalms",
+    "ch": 103,
+    "text": "Bless our Father, my soul; and all that is within me, bless his holy name! Bless our Father, my soul, and forget none of his kindnesses,"
+   },
+   {
+    "ref": "Colossians 2:6–7",
+    "slug": "colossians",
+    "ch": 2,
+    "text": "Therefore, as you received Christ Jesus the Lord, walk in him, rooted and built up in him, firm in the faith as taught, overflowing with thanks."
+   },
+   {
+    "ref": "Colossians 4:2",
+    "slug": "colossians",
+    "ch": 4,
+    "text": "Devote yourselves to prayer, staying alert in it with thanksgiving."
+   },
+   {
+    "ref": "Psalm 138:1",
+    "slug": "psalms",
+    "ch": 138,
+    "text": "I will praise you with all my heart; before the gods I will sing your praise."
+   }
+  ]
+ },
+ {
+  "id": "remember-his-goodness",
+  "heading": "Remember his goodness",
+  "intro": "Gratitude grows where we stop and count what he has done.",
+  "verses": [
+   {
+    "ref": "Lamentations 3:22–23",
+    "slug": "lamentations",
+    "ch": 3,
+    "text": "The covenant love of our Father never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness."
+   },
+   {
+    "ref": "Psalm 118:1",
+    "slug": "psalms",
+    "ch": 118,
+    "text": "Give thanks to our Father, for he is good; his covenant love endures forever."
+   },
+   {
+    "ref": "Psalm 34:8",
+    "slug": "psalms",
+    "ch": 34,
+    "text": "Taste and see that our Father is good; blessed is the one who takes refuge in him."
+   },
+   {
+    "ref": "Psalm 77:11",
+    "slug": "psalms",
+    "ch": 77,
+    "text": "I will remember the deeds of our Father; yes, I will remember your wonders of old."
+   }
+  ]
+ },
+ {
+  "id": "content-with-what-he-gives",
+  "heading": "Content with what he gives",
+  "intro": "Thankfulness and contentment are the same road.",
+  "verses": [
+   {
+    "ref": "Philippians 4:11–12",
+    "slug": "philippians",
+    "ch": 4,
+    "text": "Not that I speak from need—I've learned to be content in any circumstance. I know how to be brought low, and I know how to overflow. In any and every circumstance I've learned the secret: full and hungry, overflowing and lacking."
+   },
+   {
+    "ref": "1 Timothy 6:6–8",
+    "slug": "1-timothy",
+    "ch": 6,
+    "text": "Now godliness with contentment is great gain, for we brought nothing into the world, and we can take nothing out of it. But if we have food and clothing, with these we will be content."
+   },
+   {
+    "ref": "Hebrews 13:5",
+    "slug": "hebrews",
+    "ch": 13,
+    "text": "Keep your life free from the love of money; be content with what you have, for our Father himself has said, \"I will never leave you, never abandon you.\""
+   },
+   {
+    "ref": "Psalm 16:5–6",
+    "slug": "psalms",
+    "ch": 16,
+    "text": "My Father is my chosen portion and my cup; you hold my lot secure. The boundary lines have fallen for me in pleasant places; surely I have a beautiful inheritance."
+   }
+  ]
+ },
+ {
+  "id": "thanks-in-practice",
+  "heading": "Thanks put into practice",
+  "intro": "The one who came back, and the habit of the morning and the night.",
+  "verses": [
+   {
+    "ref": "Luke 17:15–16",
+    "slug": "luke",
+    "ch": 17,
+    "text": "One of them, seeing he was healed, turned back, praising our Father loudly, and he fell on his face at Jesus' feet, giving him thanks. Now he was a Samaritan."
+   },
+   {
+    "ref": "Psalm 92:1–2",
+    "slug": "psalms",
+    "ch": 92,
+    "text": "It is good to give thanks to our Father, to sing praises to your name, Most High, to declare your covenant love in the morning, and your faithfulness through the nights,"
+   },
+   {
+    "ref": "Philippians 1:3",
+    "slug": "philippians",
+    "ch": 1,
+    "text": "I thank my Father every time I remember you,"
+   },
+   {
+    "ref": "Colossians 3:15",
+    "slug": "colossians",
+    "ch": 3,
+    "text": "Let Christ's peace rule your hearts—you were called to it as one body. Be thankful."
+   }
+  ]
+ }
+];
+
+const faqs = [
+ {
+  "question": "What is the best Bible verse about gratitude?",
+  "answer": "Psalm 103:1–2 says, “Bless our Father, my soul; and all that is within me, bless his holy name! Bless our Father, my soul, and forget none of his kindnesses,”"
+ },
+ {
+  "question": "What does the Bible say about being grateful?",
+  "answer": "Colossians 2:6–7 says, “Therefore, as you received Christ Jesus the Lord, walk in him, rooted and built up in him, firm in the faith as taught, overflowing with thanks.”"
+ },
+ {
+  "question": "What does the Bible say about gratitude and contentment?",
+  "answer": "1 Timothy 6:6–8 says, “Now godliness with contentment is great gain, for we brought nothing into the world, and we can take nothing out of it. But if we have food and clothing, with these we will be content.”"
+ },
+ {
+  "question": "How can I remember to be thankful?",
+  "answer": "Lamentations 3:22–23 says, “The covenant love of our Father never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness.”"
+ },
+ {
+  "question": "Is there a Bible story about gratitude?",
+  "answer": "Luke 17:15–16 says, “One of them, seeing he was healed, turned back, praising our Father loudly, and he fell on his face at Jesus' feet, giving him thanks. Now he was a Samaritan.”"
+ }
+];
+---
+
+<VerseCollection
+	slug="gratitude"
+	topic="Gratitude"
+	title="Bible Verses About Gratitude (with Audio) | Father's Heart Bible™"
+	description="Bible verses about gratitude in Father's Heart Bible™: a grateful heart, remembering his goodness, contentment, and thanks that becomes a daily habit. Free to read online with audio."
+	h1="Bible Verses About Gratitude"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg"
+	heroAlt="People gathered together around a table"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about gratitude is Psalm 103:2: &ldquo;Bless our Father, my soul, and forget none of his kindnesses.&rdquo;</strong> Gratitude in Scripture is remembering what our Father has done, being content with what he gives, and saying thank you as a daily habit, not only on one day of the year. For the verses written for the holiday itself, see <a href="/verses/thanksgiving/" style="color: var(--color-brand);" class="hover:underline">Thanksgiving Bible verses</a>. Below, word for word in Father&rsquo;s Heart Bible&trade;, are the verses on a grateful heart, linked into the chapter so you can <a href="https://fathersheartbible.com/read/psalms/103/" style="color: var(--color-brand);" class="hover:underline">read Psalm 103 free</a> and hear it.`}
+	keyTakeaway="Gratitude in the Bible begins with remembering: a grateful heart looks back at what our Father has done and finds it enough."
+	themes={themes}
+	featured={{"book": "Psalm", "slug": "psalms", "chapter": 103, "verseLimit": 8, "heading": "Do not forget his kindnesses: Psalm 103", "intro": "Psalm 103 is Scripture\u2019s great remembering psalm. Read or hear it below, then follow it to the full chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/psalms/136/" style="color: var(--color-brand);" class="hover:underline">Psalm 136</a> or <a href="https://fathersheartbible.com/read/colossians/3/" style="color: var(--color-brand);" class="hover:underline">Colossians 3</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/thanksgiving/" style="color: var(--color-brand);" class="hover:underline">Thanksgiving verses</a>, the <a href="/verses/joy/" style="color: var(--color-brand);" class="hover:underline">verses on joy</a> or the <a href="/verses/family/" style="color: var(--color-brand);" class="hover:underline">verses on family</a>.`}
+	ctaMidHeading="Hear Psalm 103 in full"
+	ctaMidBodyHtml="Read and listen to the psalm that tells us not to forget his kindnesses &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a Father worth thanking."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about gratitude", "gratitude", "Psalm 103:2", "Colossians 2:7"]}
+/>

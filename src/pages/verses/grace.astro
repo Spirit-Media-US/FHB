@@ -1,0 +1,217 @@
+---
+// /verses/grace: unit 6bq, ranked by Bing GetKeywordStats 2026-10-28 (aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+	{
+		id: 'saved-by-grace',
+		heading: 'Saved by grace',
+		intro: 'A gift we receive, not a wage we earn.',
+		verses: [
+			{
+				ref: 'Ephesians 2:8-9',
+				slug: 'ephesians',
+				ch: 2,
+				text: 'For by grace you have been saved through faith—not your own doing; it is the gift of our Father. Not from works, so that no one may boast.',
+			},
+			{
+				ref: 'Ephesians 1:7',
+				slug: 'ephesians',
+				ch: 1,
+				text: "In him, through his blood, we have redemption—forgiveness of our sins—by the riches of our Father's grace,",
+			},
+			{
+				ref: 'Romans 3:24',
+				slug: 'romans',
+				ch: 3,
+				text: 'and are justified freely by his grace through the redemption that is in Christ Jesus.',
+			},
+			{
+				ref: 'Romans 5:2',
+				slug: 'romans',
+				ch: 5,
+				text: "Through whom we've gained access by faith into this grace we stand in, and we rejoice in hope of our Father's glory.",
+			},
+		],
+	},
+	{
+		id: 'grace-in-weakness',
+		heading: 'Grace when we are weak',
+		intro: 'Enough for today, and given again tomorrow.',
+		verses: [
+			{
+				ref: '2 Corinthians 12:9',
+				slug: '2-corinthians',
+				ch: 12,
+				text: 'But he told me, "My grace is enough for you, for my power is perfected in weakness." So I\'ll gladly boast all the more in my weaknesses, so Christ\'s power may rest on me.',
+			},
+			{
+				ref: 'Hebrews 4:16',
+				slug: 'hebrews',
+				ch: 4,
+				text: 'Let us then approach the throne of grace boldly, so we may receive mercy and find grace to help us in time of need.',
+			},
+			{
+				ref: '1 Peter 5:10',
+				slug: '1-peter',
+				ch: 5,
+				text: 'And our Father of all grace, who called you to his eternal glory in Christ, will himself restore, support, strengthen, and ground you after brief suffering.',
+			},
+			{
+				ref: 'Psalm 84:11',
+				slug: 'psalms',
+				ch: 84,
+				text: 'For our Father is a sun and shield; our Father bestows grace and glory; he withholds no good thing from those who walk uprightly.',
+			},
+		],
+	},
+	{
+		id: 'grace-and-truth',
+		heading: 'Grace came with Jesus',
+		intro: "Grace has a face, and it is the Son's.",
+		verses: [
+			{
+				ref: 'John 1:14',
+				slug: 'john',
+				ch: 1,
+				text: 'The Word became flesh and lived among us. We saw his glory, the glory of the one and only Son from the Father, full of grace and truth.',
+			},
+			{
+				ref: 'John 1:16-17',
+				slug: 'john',
+				ch: 1,
+				text: 'For from his fullness we have all received, grace upon grace. For the law was given through Moses; grace and truth came through Jesus Christ.',
+			},
+			{
+				ref: '2 Corinthians 8:9',
+				slug: '2-corinthians',
+				ch: 8,
+				text: "You know our Lord Jesus Christ's grace: though rich, he became poor for you, so his poverty could make you rich.",
+			},
+			{
+				ref: 'Titus 3:4-7',
+				slug: 'titus',
+				ch: 3,
+				text: 'But when the goodness and loving kindness of our Father, our Savior, appeared, he saved us—not for righteous deeds we did, but by his mercy, through washing of new birth and renewal by the Holy Spirit, whom he poured out on us richly through Jesus Christ our Savior, so that, justified by his grace, we might become heirs in the hope of eternal life.',
+			},
+		],
+	},
+	{
+		id: 'grace-to-live',
+		heading: 'Grace that changes how we live',
+		intro: 'Grace does not excuse us; it teaches and frees us.',
+		verses: [
+			{
+				ref: 'Romans 6:14',
+				slug: 'romans',
+				ch: 6,
+				text: 'For sin will not have mastery over you, because you are not under law but under grace.',
+			},
+			{
+				ref: 'Titus 2:11-12',
+				slug: 'titus',
+				ch: 2,
+				text: 'For the grace of our Father has appeared, bringing salvation to all people, teaching us to reject wickedness and worldly desires, and live self-controlled, upright, and godly lives in this present age,',
+			},
+			{
+				ref: '1 Peter 4:10',
+				slug: '1-peter',
+				ch: 4,
+				text: "Each of you, use whatever gift you've received to serve others, as good stewards of our Father's varied grace.",
+			},
+			{
+				ref: 'Colossians 4:6',
+				slug: 'colossians',
+				ch: 4,
+				text: 'Always speak with grace, seasoned with salt, knowing how to answer each one.',
+			},
+		],
+	},
+	{
+		id: 'grace-abundant',
+		heading: 'More grace than our failures',
+		intro: 'Where we fell short, there is more.',
+		verses: [
+			{
+				ref: 'Romans 5:20-21',
+				slug: 'romans',
+				ch: 5,
+				text: 'Now the law came in so that the trespass might increase, but where sin increased, grace abounded all the more, so that as sin reigned in death, grace might reign through righteousness to eternal life, through Jesus Christ our Lord.',
+			},
+			{
+				ref: '2 Corinthians 9:8',
+				slug: '2-corinthians',
+				ch: 9,
+				text: 'Our Father can make all grace overflow to you, so that always having all you need in everything, you overflow in every good work.',
+			},
+			{
+				ref: 'James 4:6',
+				slug: 'james',
+				ch: 4,
+				text: 'But he gives more grace. That is why Scripture says, "Our Father opposes the proud but gives grace to the humble."',
+			},
+			{
+				ref: 'Acts 20:24',
+				slug: 'acts',
+				ch: 20,
+				text: "But I place no value on my life, nor treasure it for myself, only that I finish my course and the ministry I received from our Lord Jesus, testifying to the gospel of our Father's grace.",
+			},
+		],
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does the Bible say about grace?',
+		answer:
+			'Ephesians 2:8–9 says, “For by grace you have been saved through faith—not your own doing; it is the gift of our Father. Not from works, so that no one may boast.”',
+	},
+	{
+		question: 'What does it mean to be saved by grace?',
+		answer:
+			'Romans 3:24 says, “and are justified freely by his grace through the redemption that is in Christ Jesus.”',
+	},
+	{
+		question: 'Is our Father’s grace enough when I am weak?',
+		answer:
+			'2 Corinthians 12:9 says, “But he told me, "My grace is enough for you, for my power is perfected in weakness." So I\'ll gladly boast all the more in my weaknesses, so Christ\'s power may rest on me.”',
+	},
+	{
+		question: 'How do I come to our Father for grace?',
+		answer:
+			'Hebrews 4:16 says, “Let us then approach the throne of grace boldly, so we may receive mercy and find grace to help us in time of need.”',
+	},
+	{
+		question: 'Does grace give us a license to sin?',
+		answer:
+			'Romans 6:14 says, “For sin will not have mastery over you, because you are not under law but under grace.”',
+	},
+	{
+		question: 'Who brought grace and truth?',
+		answer:
+			'John 1:16–17 says, “For from his fullness we have all received, grace upon grace. For the law was given through Moses; grace and truth came through Jesus Christ.”',
+	},
+];
+---
+
+<VerseCollection
+	slug="grace"
+	topic="Grace"
+	title="Bible Verses About Grace (with Audio) | Father's Heart Bible™"
+	description="Bible verses about grace in Father's Heart Bible™: saved by grace, grace in weakness, grace in Jesus, and grace to live. Read them free online with audio."
+	h1="Bible Verses About Grace"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/4f858cae0aaf68469ed3400e047a53d4af7e5900-8256x5504.jpg"
+	heroAlt="A young woman sitting quietly with a book"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about grace is Ephesians 2:8&ndash;9: &ldquo;For by grace you have been saved through faith&mdash;not your own doing; it is the gift of our Father.&rdquo;</strong> Scripture speaks to grace in five ways: being saved by it, finding it in weakness, seeing it in Jesus, living by it, and finding more of it than our failures. Below, word for word in Father&rsquo;s Heart Bible&trade;, are the verses on each, linked into the chapter so you can <a href="https://fathersheartbible.com/read/ephesians/2/" style="color: var(--color-brand);" class="hover:underline">read Ephesians 2 free</a> and hear it.`}
+	keyTakeaway="Grace is a gift from our Father, never a wage. We receive it, and it begins to change us."
+	themes={themes}
+	featured={{"book": "Ephesians", "slug": "ephesians", "chapter": 2, "verseLimit": 10, "heading": "Saved by grace: Ephesians 2", "intro": "Ephesians 2 is the clearest chapter on grace in the New Testament. Read or hear it below, then follow it to the full chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/ephesians/2/" style="color: var(--color-brand);" class="hover:underline">Ephesians 2</a> or <a href="https://fathersheartbible.com/read/romans/5/" style="color: var(--color-brand);" class="hover:underline">Romans 5</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/forgiveness/" style="color: var(--color-brand);" class="hover:underline">verses on forgiveness</a>, or read <a href="/meaning/grace/" style="color: var(--color-brand);" class="hover:underline">what grace means in the Bible</a> for the Hebrew and Greek words behind it. For the cost of that grace, see <a href="/meaning/propitiation/" style="color: var(--color-brand);" class="hover:underline">what propitiation means in the Bible</a>.`}
+	ctaMidHeading="Hear Ephesians 2 in full"
+	ctaMidBodyHtml="Read and listen to the chapter on being saved by grace &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a Father who gives it freely."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about grace", "grace", "Ephesians 2:8-9", "2 Corinthians 12:9"]}
+/>

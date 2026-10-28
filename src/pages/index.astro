@@ -19,6 +19,7 @@ import {
 } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
+import { fitDescription, fitTitle } from '../lib/seoFit';
 
 // Now in Print's book thumbnail: /print's General Edition card (600 and 1200 exist on R2).
 const printBookCard = cardUrl('general-regular-charcoal');
@@ -178,8 +179,8 @@ const homeVoices: VoiceGroup[] = [
 
 <Layout
 	youtube
-	title={seoTitle}
-	description={seoDescription}
+	title={fitTitle(seoTitle)}
+	description={fitDescription(seoDescription)}
 	image="https://assets.spiritmediapublishing.com/FHB/share/v3/fhb-og-home.jpg"
 	imageAlt="Father's Heart Bible — Encounter God as Your Father"
 	darkHero={true}
@@ -317,6 +318,8 @@ const homeVoices: VoiceGroup[] = [
 				<p>You have been longing for Him all along. Our Father placed the desire for Him in you before the creation of the world. He loved you and chose you before He formed you, and He ordained your life.</p>
 				<p>The truth of the Bible is this: He is your Father &mdash; not a distant deity, not a disappointed one &mdash; and you are His beloved son or daughter.</p>
 				<p class="rcv-voice">I give you me. Receive me as Father.</p>
+				<p class="rcv-verse">Come back each morning for the <a href="https://fathersheartbible.com/read/verse-of-the-day/" style="color: var(--color-brand); text-decoration: none; font-weight: 600;">Bible verse of the day</a>, a fresh word from our Father.</p>
+				<p class="rcv-verse">In November, read along with <a href="/global-bible-month/" style="color: var(--color-brand); text-decoration: none; font-weight: 600;">Global Bible Month</a>: one language each day.</p>
 				<p class="rcv-verse">&ldquo;Just as he chose us in him before the world&rsquo;s founding, to be holy and blameless before our Father in love.&rdquo; &mdash; <a href="/read/ephesians/1/" style="color: var(--color-brand); text-decoration: none; font-weight: 600;">Ephesians 1:4 (FHB)</a></p>
 				<details>
 					<summary>Pray this to open your heart to Him</summary>

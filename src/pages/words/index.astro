@@ -3,6 +3,7 @@ import ShareBar from '../../components/ShareBar.astro';
 import WordsJoin from '../../components/WordsJoin.astro';
 import Layout from '../../layouts/Layout.astro';
 import { sanityClient } from '../../lib/sanity';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 // Messages from the Father — the evergreen hub. Standalone (not part of the
 // blog or any guide cluster); grows indefinitely as new words are published.
@@ -28,7 +29,7 @@ const jsonLd = [
 		url: 'https://fathersheartbible.com/words/',
 		description:
 			'Prophetic words received in prayer, tested against Scripture, and written down — each one a message from the Father to a specific community of His sons and daughters.',
-		publisher: { '@id': 'https://fathersheartbible.com/#organization' },
+		publisher: { '@id': 'https://spiritmediapublishing.com/#organization' },
 		hasPart: msgs.map((m: any) => ({
 			'@type': 'BlogPosting',
 			headline: m.title,
@@ -53,8 +54,8 @@ const jsonLd = [
 ---
 
 <Layout
-	title="Messages from the Father | Prophetic Words from God's Heart"
-	description="Prophetic words received in prayer and tested against Scripture — each a message from the Father to a specific community of His sons and daughters. New words added as they come."
+	title={fitTitle("Messages from the Father | Prophetic Words from God's Heart")}
+	description={fitDescription("Prophetic words received in prayer and tested against Scripture — each a message from the Father to a specific community of His sons and daughters. New words added as they come.")}
 	ogDescription="Our Father wants His children to hear His voice. Read the messages, and receive each new one by email."
 	jsonLd={jsonLd}
 >

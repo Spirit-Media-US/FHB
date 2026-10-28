@@ -8,13 +8,20 @@ import ReadInYourLanguage from '../../components/ReadInYourLanguage.astro';
 import { NATIONS } from '../../data/nations';
 import { LANGUAGE_TOTAL } from '../../data/receive';
 import Layout from '../../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const PAGE_URL = 'https://fathersheartbible.com/bible-in/';
-const TITLE = "The Bible Around the World — Read Free Online | Father's Heart Bible™ (FHB)";
+// Lead terms follow the measured language demand behind each country page (fhb-target-queries.json:
+// "bible in hindi" 9,300/mo IN, "bible in tamil" 6,300 IN, "bible in urdu" 2,200 PK, "bible tagalog" 2,100 PH).
+const TITLE = fitTitle(
+	"Bible in India, Pakistan, Philippines & More — Read Free | Father's Heart Bible™ (FHB)",
+);
 // Every language live in the reader (follows its registry each build, 2026-10-14) — not
 // the print-edition count, which left this page at 35 while 37 were free to read.
 const LANGUAGE_COUNT = LANGUAGE_TOTAL;
-const DESCRIPTION = `Read the Bible free online, country by country. Father's Heart Bible™ (FHB) reveals God as Father — free to read with audio, soon in 80 languages.`;
+const DESCRIPTION = fitDescription(
+	`Bible in India, Pakistan, the Philippines, Nigeria and ${NATIONS.length - 4} more countries: read the Bible free online in Father's Heart Bible™ (FHB), with audio.`,
+);
 
 const HERO_BASE =
 	'https://cdn.sanity.io/images/rusi1hyi/production/9f29bfca381f5c99ffa6ee6cd00f02572f0f7b96-5864x2503.jpg';
@@ -37,6 +44,7 @@ const collectionSchema = {
 	},
 	mainEntity: {
 		'@type': 'ItemList',
+		numberOfItems: NATIONS.length,
 		itemListElement: NATIONS.map((n, i) => ({
 			'@type': 'ListItem',
 			position: i + 1,
@@ -111,9 +119,13 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				</nav>
 				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">The Bible Around the World</p>
 				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">The Bible, nation by nation</h1>
-				<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+				<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);">
+					Read the Bible free online in {NATIONS.length} countries &mdash; including India, Pakistan, the Philippines, and Nigeria &mdash; in the {LANGUAGE_COUNT} languages now live in Father&rsquo;s Heart Bible&trade;, with no account and no app.
+				</p>
+				<p class="mt-4 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
 					The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and hear online &mdash; a translation that reveals God as a loving Father. Explore what Scripture looks like country by country, who&rsquo;s reading it, and how to begin wherever you are.
 				</p>
+				<p class="mt-3 text-base" style="font-family: var(--font-sans); color: var(--color-muted);">In November, follow <a href="/global-bible-month/" style="color: var(--color-brand);" class="hover:underline">Global Bible Month</a>: one language each day.</p>
 			</div>
 		</section>
 

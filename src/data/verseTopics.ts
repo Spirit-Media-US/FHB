@@ -125,4 +125,74 @@ export const VERSE_TOPICS: VerseTopic[] = [
 			'Our Father who comforts, near to the brokenhearted, comfort in hard times, and comforting one another.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg',
 	},
+	{
+		slug: 'fear',
+		title: 'Bible Verses About Fear',
+		blurb:
+			'Do not fear, our Father with us in the dark valley, perfect love that casts out fear, and Jesus saying do not be afraid.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg',
+	},
+	{
+		slug: 'gratitude',
+		title: 'Bible Verses About Gratitude',
+		blurb:
+			'A grateful heart, remembering our Father\u2019s goodness, contentment, and thanks that becomes a daily habit.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
+	},
+	{
+		slug: 'courage',
+		title: 'Bible Verses About Courage',
+		blurb:
+			'Be strong and courageous, courage because our Father is with us, standing firm, and Jesus saying take courage.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg',
+	},
+	{
+		slug: 'encouragement',
+		title: 'Bible Verses About Encouragement',
+		blurb:
+			'Encouraging one another, our Father who encourages us, words that lift, and not giving up.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg',
+	},
+	{
+		slug: 'death',
+		title: 'Bible Verses About Death',
+		blurb:
+			'Our Father near in the valley, comfort for those who grieve, his love that death cannot sever, and the hope of resurrection.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg',
+	},
+	{
+		slug: 'money',
+		title: 'Bible Verses About Money',
+		blurb:
+			'The love of money, being content, our Father who provides, and wisdom and generosity with what we have.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg',
+	},
+	{
+		slug: 'wisdom',
+		title: 'Bible Verses About Wisdom',
+		blurb:
+			'Where wisdom starts, asking our Father for it, why it is worth more than gold, and wisdom for daily choices.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
+	},
+	{
+		slug: 'grace',
+		title: 'Bible Verses About Grace',
+		blurb:
+			'Saved by grace, grace when we are weak, grace that came with Jesus, and grace that changes how we live.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/4f858cae0aaf68469ed3400e047a53d4af7e5900-8256x5504.jpg',
+	},
+	{
+		slug: 'salvation',
+		title: 'Bible Verses About Salvation',
+		blurb:
+			'Saved by believing, our Father who wants all people saved, Jesus who came to save, and knowing it is ours.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg',
+	},
+	{
+		slug: 'trust',
+		title: 'Bible Verses About Trust',
+		blurb:
+			'Trusting our Father with all your heart, when you are afraid, when life shakes, and not in people.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg',
+	},
 ];
