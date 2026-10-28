@@ -5,7 +5,7 @@ import { GLOBAL_BIBLE_MONTH } from '../data/globalBibleMonth';
 // Global Bible Month is YouVersion's November 30-Day Bible Challenge with partners; FHB is NOT an
 // official partner and nothing here implies it. The 30-day list renders from
 // src/data/globalBibleMonth.ts (generated from claude-config/jobs/state/dbl-nov-30in30.json):
-// a language links to its /read/<code>/ hub ONLY when status is 'live'. Never "new" for FHB.
+// a language links to its /read/<code>/ hub ONLY when status is 'readable'. Never "new" for FHB.
 import Layout from '../layouts/Layout.astro';
 import { fitDescription, fitTitle } from '../lib/seoFit';
 
@@ -24,7 +24,7 @@ const fmt = (iso: string) =>
 		timeZone: 'UTC',
 	});
 const ROWS = GLOBAL_BIBLE_MONTH;
-const liveCount = ROWS.filter((r) => r.status === 'live').length;
+const liveCount = ROWS.filter((r) => r.status === 'readable').length;
 
 const FAQS = [
 	{
@@ -37,7 +37,7 @@ const FAQS = [
 	},
 	{
 		q: 'Which languages are coming?',
-		a: 'One language each day of November, 30 in all, beginning with Hausa on November 1 and ending with Kurdish (Kurmanji) on November 30. The full list with dates is above. Each language is marked scheduled until it is ready to read; when it is, its name becomes a link to its reading page.',
+		a: 'One language each day of November, 30 in all, beginning with Hausa on November 1 and ending with Kurdish (Kurmanji) on November 30. The full list with dates is above. Hausa is open to read now. Each date marks the day a language joins Father’s Heart Bible on the Digital Bible Library and opens for reading; once it is open, its name becomes a link to its reading page.',
 	},
 	{
 		q: 'Where can I read Father’s Heart Bible today?',
@@ -71,7 +71,7 @@ const itemListSchema = {
 		'@type': 'ListItem',
 		position: i + 1,
 		name: `${fmt(r.date)}: ${r.name}`,
-		...(r.status === 'live' && r.code
+		...(r.status === 'readable' && r.code
 			? { url: `https://fathersheartbible.com/read/${r.code}/` }
 			: {}),
 	})),
@@ -119,20 +119,20 @@ const LINK = 'color: var(--color-brand);';
 
 				<h2 id="plan" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">One language each day of November</h2>
 				<p class="text-lg leading-relaxed mb-5" style={P}>
-					Our Father speaks every language. Each day of the month we share Father&rsquo;s Heart Bible in one more of them. {liveCount === 0 ? 'Every language below is scheduled; none is open for reading yet.' : `${liveCount} of 30 are open for reading now.`} A language becomes a link to its reading page only on the day it is ready.
+					Our Father speaks every language. Each day of the month we share Father&rsquo;s Heart Bible in one more of them. {liveCount === 0 ? 'Each date marks the day a language joins the Digital Bible Library and opens for reading.' : `Hausa is open to read now; each date marks the day a language joins Father’s Heart Bible on the Digital Bible Library and opens for reading.`} A language becomes a link to its reading page once it is open.
 				</p>
 				<ol class="list-none m-0 p-0 divide-y" style="border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline);">
 					{ROWS.map((r) => (
 						<li class="flex items-baseline justify-between gap-4 py-3 text-lg" style="border-color: var(--color-hairline); font-family: var(--font-sans);">
 							<span style="color: var(--color-muted); min-width: 9.5rem;">{fmt(r.date)}</span>
 							<span class="flex-1" style="color: var(--color-ink);">
-								{r.status === 'live' && r.code ? (
+								{r.status === 'readable' && r.code ? (
 									<a href={`/read/${r.code}/`} style={LINK} class="font-semibold hover:underline">{r.name}</a>
 								) : (
 									r.name
 								)}
 							</span>
-							<span class="text-sm" style="color: var(--color-muted);">{r.status === 'live' ? 'Live' : 'Scheduled'}</span>
+							<span class="text-sm" style="color: var(--color-muted);">{r.status === 'readable' ? 'Open to read' : 'Scheduled'}</span>
 						</li>
 					))}
 				</ol>

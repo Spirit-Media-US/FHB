@@ -2,10 +2,10 @@
 // GENERATED from claude-config/jobs/state/dbl-nov-30in30.json (public_day, name, code). Names are
 // the state file's, exactly. `code` is null where the state file's code is unconfirmed ('?') —
 // such a row is never linked and its code is never shown. `status` is "scheduled" until the
-// language is live in the reader: flip a row to "live" ONLY when its /read/<code>/ hub returns 200
-// (and it is on the Digital Bible Library). A row links to /read/<code>/ only when status is live
+// language is readable in the reader: flip a row to "readable" ONLY when its /read/<code>/ hub returns 200
+// (and it is on the Digital Bible Library). A row links to /read/<code>/ only when status is readable
 // AND a confirmed code exists. Never present a language as live before it is.
-export type GbmStatus = 'scheduled' | 'live';
+export type GbmStatus = 'scheduled' | 'readable';
 export interface GbmRow {
 	date: string;
 	name: string;
@@ -17,7 +17,7 @@ export const GLOBAL_BIBLE_MONTH: GbmRow[] = [
 		date: '2026-11-01',
 		name: 'Hausa',
 		code: 'ha',
-		status: 'scheduled',
+		status: 'readable',
 	},
 	{
 		date: '2026-11-02',
