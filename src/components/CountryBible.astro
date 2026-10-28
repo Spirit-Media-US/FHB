@@ -72,6 +72,7 @@ export interface Props {
 	flagImg?: string; // flag image URL (e.g. flagcdn) for national-pride display
 	countryWikipedia?: string; // Wikipedia URL → schema sameAs for the Country node (AEO entity binding)
 	lastUpdated?: string; // human display, e.g. "June 2026" (freshness signal)
+	publishedIso?: string; // ISO date the page first went live → schema datePublished (omit if unknown)
 	lastUpdatedIso?: string; // ISO date, e.g. "2026-06-13" → schema dateModified
 	colorPrimary: string; // hex, e.g. "#FF9933" (saffron)
 	colorSecondary: string; // hex, e.g. "#138808" (green)
@@ -148,6 +149,7 @@ const {
 	flagImg,
 	countryWikipedia,
 	lastUpdated,
+	publishedIso,
 	lastUpdatedIso,
 	colorPrimary,
 	colorSecondary,
@@ -209,6 +211,26 @@ const {
 	ctaMidBodyHtml,
 	ctaBottomBodyHtml,
 } = Astro.props;
+
+// W7 recipe (unit 6au): <title> <= 60 chars, meta description <= 160 chars, applied centrally so
+// no page can ship an over-length SERP snippet. Searched words stay first; only the tail is trimmed.
+const fitTitle = (t: string, max = 60): string => {
+	let s = t.replace(/ \(FHB\)$/, '').replace(' (with Audio)', '');
+	if (s.length > max) s = s.replace(/^The /, '');
+	if (s.length > max) s = s.replace(/ — [^|]*?( \| )/, '$1');
+	return s;
+};
+const fitDescription = (d: string, max = 160): string => {
+	const s = d.replace("Father's Heart Bible™ (FHB)", "Father's Heart Bible™");
+	if (s.length <= max) return s;
+	const sentences = s.match(/[^.!?]+[.!?]+(\s|$)/g);
+	while (sentences && sentences.length > 1 && sentences.join('').trim().length > max) sentences.pop();
+	if (sentences && sentences.join('').trim().length <= max && sentences.join('').trim().length >= 110) return sentences.join('').trim();
+	return `${s.slice(0, max - 1).replace(/\s+\S*$/, '').replace(/[,;:\s—-]+$/, '')}.`;
+};
+const metaTitle = fitTitle(title);
+const metaDescription = fitDescription(description);
+
 
 // Previews: explicit prop wins; otherwise auto-derive from this country's language list.
 const _autoPreviews = previewsForLanguages((languages || []).map((l) => l.language));
@@ -355,7 +377,14 @@ const collectionSchema = {
 		'@type': 'SpeakableSpecification',
 		cssSelector: ['#direct-answer', '#key-takeaway'],
 	},
+	...(publishedIso ? { datePublished: publishedIso } : {}),
 	...(lastUpdatedIso ? { dateModified: lastUpdatedIso } : {}),
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
 	about: countryNode,
 	spatialCoverage: countryNode,
 	isPartOf: {
@@ -379,8 +408,8 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 
 <Layout
 	youtube
-	title={title}
-	description={description}
+	title={metaTitle}
+	description={metaDescription}
 	image={OG_IMG}
 	imageAlt={heroAlt}
 	darkHero={true}
