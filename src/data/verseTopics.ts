@@ -94,4 +94,16 @@ export const VERSE_TOPICS: VerseTopic[] = [
 		blurb: 'Waiting on our Father, patience with others, patience that perseveres, and his patience with us.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg',
 	},
+	{
+		slug: 'friendship',
+		title: 'Bible Verses About Friendship',
+		blurb: 'A friend who loves at all times, better together, friends in the Bible, and Jesus calling us friends.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
+	},
+	{
+		slug: 'family',
+		title: 'Bible Verses About Family',
+		blurb: 'A home that serves our Father, raising children, honoring one another, and his own family.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg',
+	},
 ];
