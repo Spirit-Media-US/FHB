@@ -46,4 +46,16 @@ export const VERSE_TOPICS: VerseTopic[] = [
 		blurb: 'He names Himself your Father, Jesus revealed Him, and in Christ you are His child.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg',
 	},
+	{
+		slug: 'thanksgiving',
+		title: 'Thanksgiving Bible Verses',
+		blurb: 'Give thanks, for our Father is good: verses for the table, every season and worship.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
+	},
+	{
+		slug: 'advent',
+		title: 'Advent Scripture Readings',
+		blurb: 'The light, the promise and the coming of our Father near, from Isaiah 9 to Luke 2.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
+	},
 ];
