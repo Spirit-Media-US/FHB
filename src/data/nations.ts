@@ -241,6 +241,24 @@ export const NATIONS: Nation[] = [
 		imgDirect: true,
 	},
 	{
+		slug: 'greece',
+		country: 'Greece',
+		title: 'The Bible in Greece',
+		blurb:
+			'The home of the language of the New Testament, and overwhelmingly Orthodox by self-identification — where Father’s Heart Bible™ invites a faithful people to meet the Father personally in Scripture. Now in Greek.',
+		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Meteora_landscape.jpg/960px-Meteora_landscape.jpg',
+		imgDirect: true,
+	},
+	{
+		slug: 'hungary',
+		country: 'Hungary',
+		title: 'The Bible in Hungary',
+		blurb:
+			'A nation that has had the whole Bible in Hungarian since 1590, with Catholic and Reformed churches at its heart — where Father’s Heart Bible™ invites a faithful people to meet the Father personally in Scripture. Now in Hungarian.',
+		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg/960px-20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg',
+		imgDirect: true,
+	},
+	{
 		slug: 'thailand',
 		country: 'Thailand',
 		title: 'The Bible in Thailand',
