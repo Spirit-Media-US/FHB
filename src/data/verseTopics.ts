@@ -167,4 +167,18 @@ export const VERSE_TOPICS: VerseTopic[] = [
 			'The love of money, being content, our Father who provides, and wisdom and generosity with what we have.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg',
 	},
+	{
+		slug: 'wisdom',
+		title: 'Bible Verses About Wisdom',
+		blurb:
+			'Where wisdom starts, asking our Father for it, why it is worth more than gold, and wisdom for daily choices.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
+	},
+	{
+		slug: 'grace',
+		title: 'Bible Verses About Grace',
+		blurb:
+			'Saved by grace, grace when we are weak, grace that came with Jesus, and grace that changes how we live.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/4f858cae0aaf68469ed3400e047a53d4af7e5900-8256x5504.jpg',
+	},
 ];

@@ -1,0 +1,217 @@
+---
+// /verses/wisdom: unit 6bq, ranked by Bing GetKeywordStats 2026-10-28 (aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+	{
+		id: 'beginning-of-wisdom',
+		heading: 'Where wisdom starts',
+		intro: 'Reverence for our Father is the starting line.',
+		verses: [
+			{
+				ref: 'Proverbs 9:10',
+				slug: 'proverbs',
+				ch: 9,
+				text: 'The fear of our Father is the beginning of wisdom, and the knowledge of the Holy One is insight.',
+			},
+			{
+				ref: 'Proverbs 1:7',
+				slug: 'proverbs',
+				ch: 1,
+				text: 'The fear of our Father is the beginning of knowledge; fools despise wisdom and instruction.',
+			},
+			{
+				ref: 'Psalm 111:10',
+				slug: 'psalms',
+				ch: 111,
+				text: 'The fear of our Father is the beginning of wisdom; all who practice it gain good understanding. His praise endures forever.',
+			},
+			{
+				ref: 'Proverbs 15:33',
+				slug: 'proverbs',
+				ch: 15,
+				text: 'The fear of our Father is the instruction of wisdom, and humility comes before honor.',
+			},
+		],
+	},
+	{
+		id: 'ask-and-receive',
+		heading: 'Asking our Father for wisdom',
+		intro: 'Solomon asked, and James says we may.',
+		verses: [
+			{
+				ref: 'James 1:5',
+				slug: 'james',
+				ch: 1,
+				text: 'If any of you lacks wisdom, ask our Father, who gives freely to all without criticizing, and it will be given you.',
+			},
+			{
+				ref: 'Colossians 1:9',
+				slug: 'colossians',
+				ch: 1,
+				text: "So, since the day we heard, we haven't stopped praying for you, asking that you be filled with knowledge of his will in all spiritual wisdom and understanding,",
+			},
+			{
+				ref: 'Proverbs 2:6',
+				slug: 'proverbs',
+				ch: 2,
+				text: 'For our Father gives wisdom; from his mouth come knowledge and understanding.',
+			},
+			{
+				ref: 'Ephesians 1:17',
+				slug: 'ephesians',
+				ch: 1,
+				text: 'that the Father of our Lord Jesus Christ, the Father of glory, may give you the Spirit of wisdom and revelation, so you may know our Father more fully,',
+			},
+		],
+	},
+	{
+		id: 'worth-more',
+		heading: 'Better than silver and gold',
+		intro: 'Wisdom is called more precious than anything we could gain.',
+		verses: [
+			{
+				ref: 'Proverbs 3:13-14',
+				slug: 'proverbs',
+				ch: 3,
+				text: 'Blessed is the one who finds wisdom, and the one who gains understanding, for the gain from her is better than gain from silver, and her profit better than gold.',
+			},
+			{
+				ref: 'Proverbs 4:7',
+				slug: 'proverbs',
+				ch: 4,
+				text: 'The beginning of wisdom is this: get wisdom; and with all you acquire, get understanding.',
+			},
+			{
+				ref: 'Proverbs 16:16',
+				slug: 'proverbs',
+				ch: 16,
+				text: 'How much better to get wisdom than gold! Getting understanding is worth more than silver.',
+			},
+			{
+				ref: 'Proverbs 8:11',
+				slug: 'proverbs',
+				ch: 8,
+				text: 'for wisdom is better than jewels, and nothing you desire can compare with her.',
+			},
+		],
+	},
+	{
+		id: 'wise-living',
+		heading: 'Wise in daily choices',
+		intro: 'Counsel, friends and a teachable heart.',
+		verses: [
+			{
+				ref: 'Proverbs 19:20',
+				slug: 'proverbs',
+				ch: 19,
+				text: 'Listen to counsel and accept discipline, that you may gain wisdom in the days to come.',
+			},
+			{
+				ref: 'Proverbs 13:20',
+				slug: 'proverbs',
+				ch: 13,
+				text: 'Whoever walks with the wise grows wise, but the companion of fools suffers harm.',
+			},
+			{
+				ref: 'Proverbs 12:15',
+				slug: 'proverbs',
+				ch: 12,
+				text: 'The way of a fool seems right in his own eyes, but the wise listen to advice.',
+			},
+			{
+				ref: 'Proverbs 11:2',
+				slug: 'proverbs',
+				ch: 11,
+				text: 'When pride comes, then comes disgrace, but wisdom comes with the humble.',
+			},
+		],
+	},
+	{
+		id: 'wisdom-in-jesus',
+		heading: 'Wisdom with a face',
+		intro: 'Where the wisdom of our Father is found.',
+		verses: [
+			{
+				ref: '1 Corinthians 1:24',
+				slug: '1-corinthians',
+				ch: 1,
+				text: 'but to those called, both Jews and Greeks, Christ is the power of our Father and the wisdom of our Father.',
+			},
+			{
+				ref: 'Colossians 2:3',
+				slug: 'colossians',
+				ch: 2,
+				text: 'in whom are hidden all the treasures of wisdom and knowledge.',
+			},
+			{
+				ref: 'James 3:17',
+				slug: 'james',
+				ch: 3,
+				text: 'Wisdom from above: pure first, then peace-loving, gentle, reasonable, full of mercy and good fruit, unbiased, sincere.',
+			},
+			{
+				ref: '1 Corinthians 1:25',
+				slug: '1-corinthians',
+				ch: 1,
+				text: 'For the foolishness of our Father is wiser than men, and the weakness of our Father, stronger than men.',
+			},
+		],
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does the Bible say about wisdom?',
+		answer:
+			'James 1:5 says, “If any of you lacks wisdom, ask our Father, who gives freely to all without criticizing, and it will be given you.”',
+	},
+	{
+		question: 'Where does wisdom begin?',
+		answer:
+			'Proverbs 9:10 says, “The fear of our Father is the beginning of wisdom, and the knowledge of the Holy One is insight.”',
+	},
+	{
+		question: 'How do I ask our Father for wisdom?',
+		answer:
+			'Proverbs 2:6 says, “For our Father gives wisdom; from his mouth come knowledge and understanding.”',
+	},
+	{
+		question: 'Is wisdom worth more than money?',
+		answer:
+			'Proverbs 16:16 says, “How much better to get wisdom than gold! Getting understanding is worth more than silver.”',
+	},
+	{
+		question: 'What does the Bible say about listening to advice?',
+		answer:
+			'Proverbs 12:15 says, “The way of a fool seems right in his own eyes, but the wise listen to advice.”',
+	},
+	{
+		question: 'Who is the wisdom of our Father?',
+		answer:
+			'1 Corinthians 1:24 says, “but to those called, both Jews and Greeks, Christ is the power of our Father and the wisdom of our Father.”',
+	},
+];
+---
+
+<VerseCollection
+	slug="wisdom"
+	topic="Wisdom"
+	title="Bible Verses About Wisdom (with Audio) | Father's Heart Bible™"
+	description="Bible verses about wisdom in Father's Heart Bible™: where wisdom starts, asking our Father for it, its worth, wise choices, and Christ. Read free with audio."
+	h1="Bible Verses About Wisdom"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg"
+	heroAlt="An open Bible with morning light across its pages"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about wisdom is James 1:5: &ldquo;If any of you lacks wisdom, ask our Father, who gives freely to all without criticizing, and it will be given you.&rdquo;</strong> Scripture speaks to wisdom in five ways: where it begins, asking for it, its worth, wise choices day to day, and Christ as the wisdom of our Father. Below, word for word in Father&rsquo;s Heart Bible&trade;, are the verses on each, linked into the chapter so you can <a href="https://fathersheartbible.com/read/proverbs/2/" style="color: var(--color-brand);" class="hover:underline">read Proverbs 2 free</a> and hear it.`}
+	keyTakeaway="Wisdom is not reserved for the clever. Our Father gives it freely to any child who asks."
+	themes={themes}
+	featured={{"book": "Proverbs", "slug": "proverbs", "chapter": 2, "verseLimit": 10, "heading": "Proverbs 2: our Father gives wisdom", "intro": "Proverbs 2 is a father urging his child to seek wisdom like hidden treasure. Read or hear it below, then follow it to the full chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/proverbs/3/" style="color: var(--color-brand);" class="hover:underline">Proverbs 3</a> or <a href="https://fathersheartbible.com/read/james/1/" style="color: var(--color-brand);" class="hover:underline">James 1</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, or see <a href="/meaning/wisdom/" style="color: var(--color-brand);" class="hover:underline">what wisdom means in the Bible</a> for the Hebrew and Greek words behind it.`}
+	ctaMidHeading="Hear Proverbs in full"
+	ctaMidBodyHtml="Read and listen to the book of Proverbs &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a Father who gives wisdom."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about wisdom", "wisdom", "James 1:5", "Proverbs 9:10"]}
+/>

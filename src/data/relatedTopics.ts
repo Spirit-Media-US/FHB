@@ -4,9 +4,10 @@
 // Keys and values are "v:<slug>" (/verses), "m:<slug>" (/meaning), "b:<slug>" (/bible-for).
 // Rules: 2-4 links per page, only where the topics truly overlap, no link farms.
 // Anchor text comes from each target's own registry title (verseTopics, wordMeanings, groups).
+
+import { FAITH_GROUPS, GROUPS } from './groups';
 import { VERSE_TOPICS } from './verseTopics';
 import { WORD_MEANINGS } from './wordMeanings';
-import { GROUPS, FAITH_GROUPS } from './groups';
 
 export const RELATED: Record<string, string[]> = {
 	// /verses
@@ -22,13 +23,20 @@ export const RELATED: Record<string, string[]> = {
 	'v:family': ['b:fathers', 'b:mothers', 'b:marriage', 'v:thanksgiving'],
 	'v:forgiveness': ['m:grace', 'm:mercy', 'b:divorce', 'm:lords-prayer'],
 	'v:friendship': ['b:singles', 'b:college-students'],
-	'v:god-as-father': ['m:our-father', 'm:abba-father', 'm:fathers-heart-of-god', 'b:spiritually-curious'],
+	'v:god-as-father': [
+		'm:our-father',
+		'm:abba-father',
+		'm:fathers-heart-of-god',
+		'b:spiritually-curious',
+	],
 	'v:gratitude': ['v:money', 'v:thanksgiving', 'v:joy', 'v:family'],
 	'v:healing': ['b:cancer', 'b:addiction', 'b:family-caregivers'],
 	'v:hope': ['v:death', 'b:grief', 'b:addiction', 'v:comfort'],
 	'v:joy': ['v:thanksgiving', 'v:peace', 'b:worship-leaders'],
 	'v:money': ['v:gratitude', 'v:anxiety', 'b:financial-hardship'],
+	'v:grace': ['m:grace', 'v:forgiveness', 'v:strength', 'm:mercy'],
 	'v:love': ['m:love', 'm:covenant', 'b:marriage'],
+	'v:wisdom': ['m:wisdom', 'v:prayer', 'v:strength', 'm:folly'],
 	'v:patience': ['b:new-parents', 'b:family-caregivers', 'm:meek'],
 	'v:peace': ['v:anxiety', 'v:comfort', 'b:veterans'],
 	'v:prayer': ['m:lords-prayer', 'm:our-father', 'm:hallowed-be-thy-name'],
@@ -46,7 +54,7 @@ export const RELATED: Record<string, string[]> = {
 	'm:fathers-heart-of-god': ['m:our-father', 'm:abba-father', 'v:god-as-father', 'b:fathers'],
 	'm:folly': ['m:wisdom', 'b:leaders'],
 	'm:forsake': ['v:comfort', 'b:grief', 'v:god-as-father'],
-	'm:grace': ['v:forgiveness', 'm:mercy', 'm:faith', 'm:covenant'],
+	'm:grace': ['v:grace', 'v:forgiveness', 'm:mercy', 'm:faith', 'm:covenant'],
 	'm:hallowed-be-thy-name': ['m:lords-prayer', 'm:our-father', 'v:prayer', 'm:consecrate'],
 	'm:lords-prayer': ['m:hallowed-be-thy-name', 'm:our-father', 'v:prayer', 'v:forgiveness'],
 	'm:love': ['v:love', 'm:covenant', 'm:mercy', 'b:marriage'],
@@ -61,7 +69,7 @@ export const RELATED: Record<string, string[]> = {
 	'm:psalm-91': ['m:psalm-23', 'v:peace', 'v:comfort', 'm:forsake'],
 	'm:sheol': ['b:grief', 'v:hope', 'v:comfort'],
 	'm:ten-commandments': ['m:covenant', 'm:righteousness', 'v:family', 'b:jews'],
-	'm:wisdom': ['m:folly', 'b:leaders', 'b:teachers'],
+	'm:wisdom': ['v:wisdom', 'm:folly', 'b:leaders', 'b:teachers'],
 
 	// /bible-for
 	'b:addiction': ['v:healing', 'v:hope', 'v:strength'],
@@ -129,7 +137,9 @@ function resolve(key: string): RelatedLink | null {
 		return w ? { href: `/meaning/${slug}/`, label: w.title } : null;
 	}
 	const g = ALL_GROUPS.find((x) => x.slug === slug);
-	return g ? { href: `/bible-for/${slug}/`, label: `Bible verses for ${g.group.toLowerCase()}` } : null;
+	return g
+		? { href: `/bible-for/${slug}/`, label: `Bible verses for ${g.group.toLowerCase()}` }
+		: null;
 }
 
 /** Related links for a page. kind: 'v' | 'm' | 'b'. Missing targets are skipped, never emitted broken. */
