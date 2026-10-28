@@ -22,7 +22,6 @@ import { FAITH_GROUPS, GROUPS, type Group, SECTIONS } from '../data/groups';
 import { catalogRows } from '../data/print-catalog';
 import { editionForAudiencePage } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
-import { merchantReturnPolicy } from '../lib/merchantReturnPolicy';
 import AuthorBio from './AuthorBio.astro';
 import RelatedTopics from './RelatedTopics.astro';
 
@@ -439,7 +438,6 @@ const bookSchema = {
 			url: 'https://fathersheartbible.com/print/',
 			offers: {
 				'@type': 'Offer',
-				hasMerchantReturnPolicy: merchantReturnPolicy,
 				price: GENERAL_PRICE.pb.toFixed(2),
 				priceCurrency: 'USD',
 				availability: 'https://schema.org/InStock',
@@ -453,7 +451,6 @@ const bookSchema = {
 			url: 'https://fathersheartbible.com/print/',
 			offers: {
 				'@type': 'Offer',
-				hasMerchantReturnPolicy: merchantReturnPolicy,
 				price: GENERAL_PRICE.hb.toFixed(2),
 				priceCurrency: 'USD',
 				availability: 'https://schema.org/InStock',
