@@ -70,4 +70,16 @@ export const VERSE_TOPICS: VerseTopic[] = [
 		blurb: 'Hope in hard times, hope that anchors the soul, and waiting on a Father who keeps his word.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg',
 	},
+	{
+		slug: 'prayer',
+		title: 'Bible Verses About Prayer',
+		blurb: 'How Jesus taught us to pray to our Father, asking and seeking, and prayer in worry.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg',
+	},
+	{
+		slug: 'forgiveness',
+		title: 'Bible Verses About Forgiveness',
+		blurb: 'Forgiven by our Father, forgiving others as we were forgiven, and a clean heart.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg',
+	},
 ];
