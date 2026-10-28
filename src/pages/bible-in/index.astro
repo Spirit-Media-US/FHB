@@ -122,7 +122,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					{NATIONS.map((n) => (
 						<a href={`/bible-in/${n.slug}/`} class="block rounded-2xl overflow-hidden no-underline transition-all hover:opacity-95" style="background-color: var(--color-surface-lowest); border: 1px solid var(--color-hairline);">
-							<img src={`${n.img}?w=800&h=460&fit=crop&crop=entropy&fm=webp&q=70`} alt={n.title} width="800" height="460" class="w-full h-44 object-cover" loading="lazy" decoding="async" />
+							<img src={n.imgDirect ? n.img : `${n.img}?w=800&h=460&fit=crop&crop=entropy&fm=webp&q=70`} alt={n.title} width="800" height="460" class="w-full h-44 object-cover" loading="lazy" decoding="async" />
 							<div class="p-5">
 								<h2 class="text-xl font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{n.title}</h2>
 								<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{n.blurb}</p>
