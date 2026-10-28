@@ -22,6 +22,7 @@ import { FAITH_GROUPS, GROUPS, type Group, SECTIONS } from '../data/groups';
 import { catalogRows } from '../data/print-catalog';
 import { editionForAudiencePage } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
+import { merchantReturnPolicy } from '../lib/merchantReturnPolicy';
 import AuthorBio from './AuthorBio.astro';
 import RelatedTopics from './RelatedTopics.astro';
 
@@ -299,12 +300,22 @@ const fitDescription = (d: string, max = 160): string => {
 	const s = d.replace("Father's Heart Bible\u2122 (FHB)", "Father's Heart Bible\u2122");
 	if (s.length <= max) return s;
 	const sentences = s.match(/[^.!?]+[.!?]+(\s|$)/g);
-	while (sentences && sentences.length > 1 && sentences.join('').trim().length > max) sentences.pop();
-	if (sentences && sentences.join('').trim().length <= max && sentences.join('').trim().length >= 110) return sentences.join('').trim();
-	return `${s.slice(0, max - 1).replace(/\s+\S*$/, '').replace(/[,;:\s—-]+$/, '')}.`;
+	while (sentences && sentences.length > 1 && sentences.join('').trim().length > max)
+		sentences.pop();
+	if (
+		sentences &&
+		sentences.join('').trim().length <= max &&
+		sentences.join('').trim().length >= 110
+	)
+		return sentences.join('').trim();
+	return `${s
+		.slice(0, max - 1)
+		.replace(/\s+\S*$/, '')
+		.replace(/[,;:\s—-]+$/, '')}.`;
 };
 // dateModified can never precede datePublished.
-const modifiedIso = lastUpdatedIso && publishedIso && lastUpdatedIso < publishedIso ? publishedIso : lastUpdatedIso;
+const modifiedIso =
+	lastUpdatedIso && publishedIso && lastUpdatedIso < publishedIso ? publishedIso : lastUpdatedIso;
 const metaTitle = fitTitle(title);
 const metaDescription = fitDescription(description);
 
@@ -428,6 +439,7 @@ const bookSchema = {
 			url: 'https://fathersheartbible.com/print/',
 			offers: {
 				'@type': 'Offer',
+				hasMerchantReturnPolicy: merchantReturnPolicy,
 				price: GENERAL_PRICE.pb.toFixed(2),
 				priceCurrency: 'USD',
 				availability: 'https://schema.org/InStock',
@@ -441,6 +453,7 @@ const bookSchema = {
 			url: 'https://fathersheartbible.com/print/',
 			offers: {
 				'@type': 'Offer',
+				hasMerchantReturnPolicy: merchantReturnPolicy,
 				price: GENERAL_PRICE.hb.toFixed(2),
 				priceCurrency: 'USD',
 				availability: 'https://schema.org/InStock',

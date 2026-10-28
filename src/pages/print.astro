@@ -27,6 +27,7 @@ import {
 import { reachPhrase } from '../data/language-speakers';
 import lookinsideData from '../data/lookinside.json';
 import Layout from '../layouts/Layout.astro';
+import { merchantReturnPolicy } from '../lib/merchantReturnPolicy';
 import { fitDescription, fitTitle } from '../lib/seoFit';
 
 // THE DIVINE VOICE™ COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
@@ -356,6 +357,7 @@ const bookSchema = {
 	image: 'https://assets.spiritmediapublishing.com/FHB/share/fhb-og-print-group.jpg',
 	offers: {
 		'@type': 'AggregateOffer',
+		hasMerchantReturnPolicy: merchantReturnPolicy,
 		priceCurrency: 'USD',
 		lowPrice: '7.49',
 		highPrice: '124.99',
