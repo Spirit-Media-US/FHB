@@ -23,6 +23,7 @@ import { catalogRows } from '../data/print-catalog';
 import { editionForAudiencePage } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
 import AuthorBio from './AuthorBio.astro';
+import RelatedTopics from './RelatedTopics.astro';
 
 // The print offers in this page's Book JSON-LD read the catalog's list price for the general edition
 // (the same row /print and checkout use). They were hardcoded at $39.99/$44.99 on 2026-07-13 and
@@ -845,6 +846,7 @@ const relatedGroups: Group[] = _sibSlugs
 					{keepReadingHtml && (
 						<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={keepReadingHtml}></p>
 					)}
+					<RelatedTopics kind="b" slug={slug} />
 					{relatedGroups.length > 0 && (
 						<div class="mt-7">
 							<p class="text-sm font-semibold uppercase tracking-widest mb-3" style="color: var(--color-gold); font-family: var(--font-sans);">More in this series</p>

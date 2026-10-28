@@ -18,6 +18,7 @@ import Layout from '../layouts/Layout.astro';
 //   - No request for money anywhere. Audio may be claimed for ENGLISH only.
 //   - Never say "Locked" or "Reading Edition" — the canon lock is internal.
 import AuthorBio from './AuthorBio.astro';
+import RelatedTopics from './RelatedTopics.astro';
 import ReviewLink from './ReviewLink.astro';
 
 interface Rendering {
@@ -277,6 +278,7 @@ const TOC = [
 
 				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
 					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={relatedHtml} />
+					<RelatedTopics kind="m" slug={slug} />
 				</div>
 			</div>
 		</section>

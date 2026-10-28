@@ -7,6 +7,7 @@ import Layout from '../layouts/Layout.astro';
 // direct-answer + key-takeaway, FHB framing, FeatureChapter anchor + audio,
 // Article+ItemList+BreadcrumbList+FAQPage JSON-LD, Read-FHB CTA, absolute reader links.
 import AuthorBio from './AuthorBio.astro';
+import RelatedTopics from './RelatedTopics.astro';
 import FeatureChapter from './FeatureChapter.astro';
 import ReviewLink from './ReviewLink.astro';
 
@@ -259,6 +260,7 @@ const TOC = [
 
 				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
 					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={relatedHtml} />
+					<RelatedTopics kind="v" slug={slug} />
 				</div>
 			</div>
 		</section>
