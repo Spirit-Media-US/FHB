@@ -29,7 +29,6 @@ import readerEntry from '../../data/reader-entry-links.json';
 //   src/data/editions/frontmatter.json — extracted from the shipping interiors: the audience
 //                                     page and the three pillar pages. Read, never retyped.
 import Layout from '../../layouts/Layout.astro';
-import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
 import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
@@ -308,7 +307,6 @@ const offerFor = (v: (typeof variants)[number]) => ({
 	itemCondition: 'https://schema.org/NewCondition',
 	url,
 	sku: v.sku,
-	hasMerchantReturnPolicy: merchantReturnPolicy,
 	...(v.isbn ? { gtin13: v.isbn.replace(/-/g, '') } : {}),
 	seller: {
 		'@type': 'Organization',
