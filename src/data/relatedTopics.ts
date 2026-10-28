@@ -51,6 +51,8 @@ export const RELATED: Record<string, string[]> = {
 	'm:righteousness': ['m:faith', 'm:grace', 'm:conviction'],
 	'm:sanctified': ['m:consecrate', 'm:hallowed-be-thy-name', 'm:righteousness'],
 	'm:selah': ['v:prayer', 'v:peace', 'b:jews'],
+	'm:psalm-23': ['m:psalm-91', 'v:comfort', 'v:peace', 'm:our-father'],
+	'm:psalm-91': ['m:psalm-23', 'v:peace', 'v:comfort', 'm:forsake'],
 	'm:sheol': ['b:grief', 'v:hope', 'v:comfort'],
 	'm:ten-commandments': ['m:covenant', 'm:righteousness', 'v:family', 'b:jews'],
 	'm:wisdom': ['m:folly', 'b:leaders', 'b:teachers'],
