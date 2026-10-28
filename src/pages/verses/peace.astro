@@ -1,0 +1,176 @@
+---
+// /verses/peace: unit 6af, ranked by Bing GetKeywordStats 2026-10-28 (aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+ {
+  "id": "peace-the-lord-gives",
+  "heading": "The peace our Father gives",
+  "intro": "Peace in Scripture is a gift before it is a feeling. It is given by Jesus and kept by our Father, and it guards the heart when circumstances do not.",
+  "verses": [
+   {
+    "ref": "John 14:27",
+    "slug": "john",
+    "ch": 14,
+    "text": "Peace I leave you; my own peace I give you. Not as the world gives, I give it. Don't let your hearts be troubled or afraid."
+   },
+   {
+    "ref": "Philippians 4:6–7",
+    "slug": "philippians",
+    "ch": 4,
+    "text": "Worry about nothing; instead, in everything, through prayer and petition with thanksgiving, make your requests known to our Father. The peace of our Father, beyond all understanding, will guard your hearts and your minds in Christ Jesus."
+   },
+   {
+    "ref": "Isaiah 26:3",
+    "slug": "isaiah",
+    "ch": 26,
+    "text": "You keep him in perfect peace whose mind is fixed on you, because he trusts in you."
+   },
+   {
+    "ref": "Colossians 3:15",
+    "slug": "colossians",
+    "ch": 3,
+    "text": "Let Christ's peace rule your hearts—you were called to it as one body. Be thankful."
+   }
+  ]
+ },
+ {
+  "id": "peace-with-our-father",
+  "heading": "Peace with our Father",
+  "intro": "The deepest peace is not the absence of trouble but a settled relationship: we are received, not held at a distance.",
+  "verses": [
+   {
+    "ref": "Romans 5:1",
+    "slug": "romans",
+    "ch": 5,
+    "text": "So, since we are made right by faith, we have peace with our Father through our Lord Jesus Christ."
+   },
+   {
+    "ref": "Ephesians 2:14",
+    "slug": "ephesians",
+    "ch": 2,
+    "text": "For he himself is our peace, who made the two one, tearing down in his flesh the dividing wall of hostility,"
+   },
+   {
+    "ref": "Isaiah 9:6",
+    "slug": "isaiah",
+    "ch": 9,
+    "text": "For to us a child is born, to us a son is given; and the government will be upon his shoulder. And his name will be called Wonderful Counselor, Mighty God, Everlasting Father, Prince of Peace."
+   },
+   {
+    "ref": "Psalm 85:8",
+    "slug": "psalms",
+    "ch": 85,
+    "text": "Let me hear what our Father will say, for he will speak peace to his people, to his faithful ones; but let them not turn back to their foolish ways."
+   }
+  ]
+ },
+ {
+  "id": "peace-in-the-night",
+  "heading": "Peace for the anxious night",
+  "intro": "These verses are for the sleepless hour and the long wait, when peace has to come from outside ourselves.",
+  "verses": [
+   {
+    "ref": "Psalm 4:8",
+    "slug": "psalms",
+    "ch": 4,
+    "text": "In peace I will lie down and sleep, for you alone, O my Father, make me live in safety."
+   },
+   {
+    "ref": "Psalm 119:165",
+    "slug": "psalms",
+    "ch": 119,
+    "text": "Those who love your instruction have great peace; nothing can make them stumble."
+   },
+   {
+    "ref": "Psalm 29:11",
+    "slug": "psalms",
+    "ch": 29,
+    "text": "May our Father give strength to his people! May our Father bless his people with peace!"
+   },
+   {
+    "ref": "2 Thessalonians 3:16",
+    "slug": "2-thessalonians",
+    "ch": 3,
+    "text": "May the Lord of peace himself give you peace always, in every way. The Lord be with you all."
+   }
+  ]
+ },
+ {
+  "id": "peace-to-pursue",
+  "heading": "Peace to pursue with others",
+  "intro": "Our Father’s peace is meant to be lived out. Scripture asks us to seek it, work for it and be known by it.",
+  "verses": [
+   {
+    "ref": "Psalm 34:14",
+    "slug": "psalms",
+    "ch": 34,
+    "text": "Turn from evil and do good; seek peace and pursue it."
+   },
+   {
+    "ref": "Romans 12:18",
+    "slug": "romans",
+    "ch": 12,
+    "text": "If possible, so far as it depends on you, live at peace with everyone."
+   },
+   {
+    "ref": "Matthew 5:9",
+    "slug": "matthew",
+    "ch": 5,
+    "text": "Blessed are the peacemakers, for they will be called children of our Father."
+   },
+   {
+    "ref": "Romans 15:13",
+    "slug": "romans",
+    "ch": 15,
+    "text": "May our Father, the source of hope, fill you with all joy and peace through faith, so by the Holy Spirit's power you overflow with hope."
+   }
+  ]
+ }
+];
+
+const faqs = [
+ {
+  "question": "What is the best Bible verse about peace?",
+  "answer": "John 14:27 is the most quoted: “Peace I leave you; my own peace I give you. Not as the world gives, I give it. Don't let your hearts be troubled or afraid.” For worry, most people turn to the next passage, because it says where the peace comes from. Philippians 4:7 says: “The peace of our Father, beyond all understanding, will guard your hearts and your minds in Christ Jesus.”"
+ },
+ {
+  "question": "What does the Bible say about finding peace?",
+  "answer": "It points to a person, not a technique. Peace comes from Jesus (John 14:27), from keeping the mind fixed on our Father (Isaiah 26:3) and from being made right with him by faith: “So, since we are made right by faith, we have peace with our Father through our Lord Jesus Christ.”"
+ },
+ {
+  "question": "What is a Bible verse for peace of mind?",
+  "answer": "Isaiah 26:3: “You keep him in perfect peace whose mind is fixed on you, because he trusts in you.” It pairs well with the verses on worry and prayer in the first section below."
+ },
+ {
+  "question": "What does “peace that surpasses understanding” mean?",
+  "answer": "In Father’s Heart Bible™ Philippians 4:7 reads, “The peace of our Father, beyond all understanding, will guard your hearts and your minds in Christ Jesus.” It describes peace that does not depend on circumstances making sense, because our Father himself guards the heart."
+ },
+ {
+  "question": "Which Bible verse helps with sleep and a restless mind?",
+  "answer": "Psalm 4:8 is the classic: “In peace I will lie down and sleep, for you alone, O my Father, make me live in safety.” It is one sentence you can say aloud at bedtime."
+ }
+];
+---
+
+<VerseCollection
+	slug="peace"
+	topic="Peace"
+	title="Bible Verses About Peace (with Audio) | Father's Heart Bible™"
+	description="Bible verses about peace in Father's Heart Bible™: the peace Jesus gives, peace in worry, peace with our Father and living as peacemakers. Free to read online with audio."
+	h1="Bible Verses About Peace"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/4f858cae0aaf68469ed3400e047a53d4af7e5900-8256x5504.jpg"
+	heroAlt="A young woman sitting quietly with a book"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">The best-known Bible verse about peace is John 14:27: &ldquo;Peace I leave you; my own peace I give you. Not as the world gives, I give it. Don&rsquo;t let your hearts be troubled or afraid.&rdquo;</strong> Scripture treats peace as a gift from our Father through Jesus, one that guards the heart in worry, steadies the mind that trusts him and is the settled peace of being his child. Below are the verses for the anxious night, for peace with our Father and for living at peace with others, each word for word in Father&rsquo;s Heart Bible&trade; and linked into the chapter so you can <a href="https://fathersheartbible.com/read/philippians/4/" style="color: var(--color-brand);" class="hover:underline">read Philippians 4 free</a> and hear it.`}
+	keyTakeaway="Biblical peace is a gift from our Father, given through Jesus, that guards the heart in worry and ends the distance between us and him."
+	themes={themes}
+	featured={{"book": "Philippians", "slug": "philippians", "chapter": 4, "verseLimit": 9, "heading": "Peace that guards the heart: Philippians 4", "intro": "Philippians 4 holds the best-known promise of peace in the New Testament. Read or hear the opening verses below, then read the whole chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/john/14/" style="color: var(--color-brand);" class="hover:underline">John 14</a> or <a href="https://fathersheartbible.com/read/isaiah/26/" style="color: var(--color-brand);" class="hover:underline">Isaiah 26</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/anxiety/" style="color: var(--color-brand);" class="hover:underline">verses on anxiety</a> for worry, or the <a href="/guides/how-to-pray/" style="color: var(--color-brand);" class="hover:underline">guide to prayer</a>.`}
+	ctaMidHeading="Hear Philippians 4 in full"
+	ctaMidBodyHtml="Read and listen to the chapter on peace &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a child at rest with a good Father."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about peace", "peace", "John 14:27", "Philippians 4"]}
+/>

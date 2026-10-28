@@ -177,4 +177,18 @@ export const WORD_MEANINGS: WordMeaning[] = [
 			'Foolishness, the way of the one who refuses wisdom — the fool in Proverbs, the woman Folly, and the cross.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
 	},
+	{
+		slug: 'consecrate',
+		title: 'What does consecrate mean in the Bible?',
+		blurb:
+			'To set apart for a holy purpose — qadash and hagiazo, priests and people, and Jesus consecrating himself in John 17.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
+	},
+	{
+		slug: 'sheol',
+		title: 'What is Sheol in the Bible?',
+		blurb:
+			'The realm of the dead — she’ol and hades, Psalm 16:10 and Acts 2:27, and why even there our Father is present.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
+	},
 ];

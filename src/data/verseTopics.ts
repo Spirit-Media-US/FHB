@@ -58,4 +58,16 @@ export const VERSE_TOPICS: VerseTopic[] = [
 		blurb: 'The light, the promise and the coming of our Father near, from Isaiah 9 to Luke 2.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
 	},
+	{
+		slug: 'peace',
+		title: 'Bible Verses About Peace',
+		blurb: 'The peace Jesus gives, peace that guards the heart in worry, and peace with our Father.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/4f858cae0aaf68469ed3400e047a53d4af7e5900-8256x5504.jpg',
+	},
+	{
+		slug: 'hope',
+		title: 'Bible Verses About Hope',
+		blurb: 'Hope in hard times, hope that anchors the soul, and waiting on a Father who keeps his word.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg',
+	},
 ];
