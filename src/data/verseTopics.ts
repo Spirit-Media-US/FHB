@@ -82,4 +82,16 @@ export const VERSE_TOPICS: VerseTopic[] = [
 		blurb: 'Forgiven by our Father, forgiving others as we were forgiven, and a clean heart.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg',
 	},
+	{
+		slug: 'joy',
+		title: 'Bible Verses About Joy',
+		blurb: 'Joy in our Father’s presence, joy in hard times, rejoicing today, and joy restored.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
+	},
+	{
+		slug: 'patience',
+		title: 'Bible Verses About Patience',
+		blurb: 'Waiting on our Father, patience with others, patience that perseveres, and his patience with us.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg',
+	},
 ];
