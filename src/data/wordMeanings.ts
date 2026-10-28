@@ -163,4 +163,18 @@ export const WORD_MEANINGS: WordMeaning[] = [
 			'The Spirit showing us the truth so we can come home — elenchō, and conviction vs condemnation.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
 	},
+	{
+		slug: 'forsake',
+		title: 'What does forsake mean in the Bible?',
+		blurb:
+			'To leave behind or abandon — azab and egkataleipo, and our Father’s promise never to leave you nor forsake you.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'folly',
+		title: 'What does folly mean in the Bible?',
+		blurb:
+			'Foolishness, the way of the one who refuses wisdom — the fool in Proverbs, the woman Folly, and the cross.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
+	},
 ];
