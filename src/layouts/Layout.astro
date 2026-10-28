@@ -139,7 +139,8 @@ const ORGANIZATION_SCHEMA = {
 	'@id': 'https://spiritmediapublishing.com/#organization',
 	name: 'Spirit Media Publishing',
 	alternateName: 'SMP',
-	parentOrganization: { '@type': 'Organization', name: 'Spirit Media Inc.' },
+	// Spirit Media Inc. = the LEGAL company; Spirit Media Publishing is its imprint (Kevin 2026-07-13/10-25).
+	parentOrganization: { '@type': 'Organization', '@id': 'https://spiritmediapublishing.com/#parent-organization', name: 'Spirit Media Inc.', legalName: 'Spirit Media Inc.' },
 	url: 'https://spiritmediapublishing.com',
 	logo: 'https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp',
 	// ONE sameAs list, byte-identical to the Organization on spiritmediapublishing.com
