@@ -7,8 +7,8 @@ import Layout from '../layouts/Layout.astro';
 // direct-answer + key-takeaway, FHB framing, FeatureChapter anchor + audio,
 // Article+ItemList+BreadcrumbList+FAQPage JSON-LD, Read-FHB CTA, absolute reader links.
 import AuthorBio from './AuthorBio.astro';
-import RelatedTopics from './RelatedTopics.astro';
 import FeatureChapter from './FeatureChapter.astro';
+import RelatedTopics from './RelatedTopics.astro';
 import ReviewLink from './ReviewLink.astro';
 
 interface Verse {
@@ -91,15 +91,23 @@ const fitDescription = (d: string, max = 160): string => {
 	const s = d.replace("Father's Heart Bible™ (FHB)", "Father's Heart Bible™");
 	if (s.length <= max) return s;
 	const sentences = s.match(/[^.!?]+[.!?]+(\s|$)/g);
-	while (sentences && sentences.length > 1 && sentences.join('').trim().length > max) sentences.pop();
-	if (sentences && sentences.join('').trim().length <= max && sentences.join('').trim().length >= 110) return sentences.join('').trim();
-	return `${s.slice(0, max - 1).replace(/\s+\S*$/, '').replace(/[,;:\s—-]+$/, '')}.`;
+	while (sentences && sentences.length > 1 && sentences.join('').trim().length > max)
+		sentences.pop();
+	if (
+		sentences &&
+		sentences.join('').trim().length <= max &&
+		sentences.join('').trim().length >= 110
+	)
+		return sentences.join('').trim();
+	return `${s
+		.slice(0, max - 1)
+		.replace(/\s+\S*$/, '')
+		.replace(/[,;:\s—-]+$/, '')}.`;
 };
 // dateModified can never precede datePublished (12 pages shipped modified 2026-06-06 vs published 2026-10-28).
 const modified = modifiedProp && modifiedProp >= published ? modifiedProp : published;
 const metaTitle = fitTitle(title);
 const metaDescription = fitDescription(description);
-
 
 const PAGE_URL = `https://fathersheartbible.com/verses/${slug}/`;
 const HERO_IMG = `${heroBase}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
@@ -282,6 +290,7 @@ const TOC = [
 
 				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
 					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={relatedHtml} />
+					<p class="mt-4 text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Want a new verse every day? Read the <a href="https://fathersheartbible.com/read/verse-of-the-day/" style="color: var(--color-brand);" class="hover:underline">Bible verse of the day</a>.</p>
 					<RelatedTopics kind="v" slug={slug} />
 				</div>
 			</div>
