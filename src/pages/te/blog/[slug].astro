@@ -171,6 +171,26 @@ const publishDate = new Date(post.publishDate).toLocaleDateString('te-IN', {
 	day: 'numeric',
 });
 
+// W3 recipe (unit 6ax, same helpers as 6au/6aw): <title> and meta description fitted at a boundary,
+// never reworded. Telugu glyphs are wide (measured 2026-10-28, Playwright 20px Arial + Noto Sans Telugu,
+// unit 5d method: ~8.4px/char), so ~70 chars is the ~600px SERP cut. Over that, the brand suffix goes
+// (the searched words lead the title and stay). Description: whole sentences up to 160 chars, else the
+// last whole word before 160.
+const fitTitle = (t: string, max = 70): string => {
+	if (t.length <= max) return t;
+	const cut = t.replace(/\s*\|\s*[^|]*$/, '');
+	return cut.length >= 20 ? cut : t;
+};
+const fitDescription = (d: string | undefined, max = 160): string | undefined => {
+	if (!d || d.length <= max) return d;
+	const sentences = d.match(/[^.!?]+[.!?]+(\s|$)/g);
+	while (sentences && sentences.length > 1 && sentences.join('').trim().length > max) sentences.pop();
+	if (sentences && sentences.join('').trim().length <= max && sentences.join('').trim().length >= 120) return sentences.join('').trim();
+	return `${d.slice(0, max - 1).replace(/\s+\S*$/, '').replace(/[,;:\s—-]+$/, '')}…`;
+};
+const metaTitle = fitTitle(te.seoTitle ?? post.seoTitle ?? title);
+const metaDescription = fitDescription(te.seoDescription ?? post.seoDescription);
+
 const enUrl = `https://fathersheartbible.com/blog/${slug}/`;
 const teUrl = `https://fathersheartbible.com/te/blog/${slug}/`;
 
@@ -184,7 +204,7 @@ const jsonLd = [
 		'@context': 'https://schema.org',
 		'@type': 'BlogPosting',
 		headline: title,
-		description: te.seoDescription ?? post.seoDescription,
+		description: metaDescription,
 		image: heroImage,
 		author: {
 			'@type': 'Person',
@@ -192,7 +212,13 @@ const jsonLd = [
 			name: 'Kevin White',
 			url: 'https://kevinwhite.us',
 		},
-		publisher: { '@id': 'https://fathersheartbible.com/#organization' },
+		publisher: {
+			'@type': 'Organization',
+			'@id': 'https://fathersheartbible.com/#organization',
+			name: "Father's Heart Bible",
+			url: 'https://fathersheartbible.com',
+			logo: { '@type': 'ImageObject', url: 'https://fathersheartbible.com/fhb-logo.png' },
+		},
 		url: teUrl,
 		mainEntityOfPage: { '@type': 'WebPage', '@id': teUrl },
 		datePublished: post.publishDate,
@@ -215,8 +241,8 @@ const jsonLd = [
 ---
 
 <Layout
-	title={te.seoTitle ?? post.seoTitle ?? title}
-	description={te.seoDescription ?? post.seoDescription}
+	title={metaTitle}
+	description={metaDescription}
 	ogDescription={te.ogDescription ?? post.ogDescription}
 	image={heroImage}
 	imageAlt={te.heroAlt ?? post.heroImage?.alt}
