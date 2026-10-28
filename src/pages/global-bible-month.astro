@@ -1,0 +1,161 @@
+---
+import { GLOBAL_BIBLE_MONTH } from '../data/globalBibleMonth';
+// /global-bible-month — answer page for the exact phrase "global bible month" (research
+// 2026-10-28: demand is a short November spike; GSC had zero such queries). Truthful framing only:
+// Global Bible Month is YouVersion's November 30-Day Bible Challenge with partners; FHB is NOT an
+// official partner and nothing here implies it. The 30-day list renders from
+// src/data/globalBibleMonth.ts (generated from claude-config/jobs/state/dbl-nov-30in30.json):
+// a language links to its /read/<code>/ hub ONLY when status is 'live'. Never "new" for FHB.
+import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+
+const PAGE_URL = 'https://fathersheartbible.com/global-bible-month/';
+const TITLE = fitTitle("Global Bible Month 2026: Father's Heart Bible, 30 Languages");
+const DESCRIPTION = fitDescription(
+	"Global Bible Month is November. Father's Heart Bible shares one language each day, 30 in 30 days, on the Digital Bible Library. See the schedule and read free.",
+);
+const PUBLISHED = '2026-10-28';
+
+const fmt = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		weekday: 'short',
+		month: 'long',
+		day: 'numeric',
+		timeZone: 'UTC',
+	});
+const ROWS = GLOBAL_BIBLE_MONTH;
+const liveCount = ROWS.filter((r) => r.status === 'live').length;
+
+const FAQS = [
+	{
+		q: 'What is Global Bible Month?',
+		a: 'Global Bible Month is November, a month when people around the world read Scripture together. It is organised by YouVersion with partners, and centres on a 30-Day Bible Challenge from November 1 to November 30. You can learn more or join at globalbiblemonth.com. Father’s Heart Bible is not an official partner of Global Bible Month.',
+	},
+	{
+		q: 'How can I take part with Father’s Heart Bible?',
+		a: 'Read a little each day. Father’s Heart Bible is free to read online at fathersheartbible.com/read/, with no account and no app, and English has verse-by-verse audio. You can follow the 30-Day Bible Challenge in any Bible you like, and use ours beside it to hear our Father’s heart in the same chapters. Each day of November we also share one language from the schedule on this page.',
+	},
+	{
+		q: 'Which languages are coming?',
+		a: 'One language each day of November, 30 in all, beginning with Hausa on November 1 and ending with Kurdish (Kurmanji) on November 30. The full list with dates is above. Each language is marked scheduled until it is ready to read; when it is, its name becomes a link to its reading page.',
+	},
+	{
+		q: 'Where can I read Father’s Heart Bible today?',
+		a: 'At fathersheartbible.com/read/, free, in every language already open for reading. The Bible is also on the Digital Bible Library, which carries it to other Bible apps and platforms, in 50 of 80 languages today. Print editions are listed at fathersheartbible.com/bibles/fathers-heart-bible/.',
+	},
+];
+
+const webPageSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'WebPage',
+	name: TITLE,
+	description: DESCRIPTION,
+	url: PAGE_URL,
+	inLanguage: 'en',
+	datePublished: PUBLISHED,
+	dateModified: PUBLISHED,
+	isPartOf: {
+		'@type': 'WebSite',
+		name: "Father's Heart Bible™",
+		alternateName: 'FHB',
+		url: 'https://fathersheartbible.com/',
+	},
+	publisher: { '@id': 'https://spiritmediapublishing.com/#organization' },
+};
+const itemListSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'ItemList',
+	name: 'Father’s Heart Bible: one language each day of November 2026',
+	numberOfItems: ROWS.length,
+	itemListElement: ROWS.map((r, i) => ({
+		'@type': 'ListItem',
+		position: i + 1,
+		name: `${fmt(r.date)}: ${r.name}`,
+		...(r.status === 'live' && r.code
+			? { url: `https://fathersheartbible.com/read/${r.code}/` }
+			: {}),
+	})),
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.q,
+		acceptedAnswer: { '@type': 'Answer', text: f.a },
+	})),
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{ '@type': 'ListItem', position: 2, name: 'Global Bible Month 2026', item: PAGE_URL },
+	],
+};
+const jsonLd = [webPageSchema, itemListSchema, faqSchema, breadcrumbSchema];
+const P = 'font-family: var(--font-sans); color: var(--color-muted);';
+const LINK = 'color: var(--color-brand);';
+---
+
+<Layout title={TITLE} description={DESCRIPTION} jsonLd={jsonLd}>
+	<main id="main-content">
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style={P}>
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Global Bible Month 2026</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">November 1&ndash;30, 2026</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Global Bible Month 2026: Father&rsquo;s Heart Bible in 30 Languages</h1>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style={P}>
+					<strong style="color: var(--color-ink);">Global Bible Month is November: a month of reading Scripture together, built around YouVersion&rsquo;s 30-Day Bible Challenge with its partners, November 1 to 30.</strong> You can join the challenge at <a href="https://globalbiblemonth.com" target="_blank" rel="noopener noreferrer" style={LINK} class="hover:underline">globalbiblemonth.com</a>. Father&rsquo;s Heart Bible is not an official partner of Global Bible Month; we simply read along. Our part is one language each day of November, 30 languages in 30 days, starting with Hausa on November 1. Father&rsquo;s Heart Bible is on the Digital Bible Library in 50 of 80 languages today, and it is free to <a href="/read/" style={LINK} class="hover:underline">read online</a>.
+				</p>
+
+				<h2 id="plan" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">One language each day of November</h2>
+				<p class="text-lg leading-relaxed mb-5" style={P}>
+					Our Father speaks every language. Each day of the month we share Father&rsquo;s Heart Bible in one more of them. {liveCount === 0 ? 'Every language below is scheduled; none is open for reading yet.' : `${liveCount} of 30 are open for reading now.`} A language becomes a link to its reading page only on the day it is ready.
+				</p>
+				<ol class="list-none m-0 p-0 divide-y" style="border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline);">
+					{ROWS.map((r) => (
+						<li class="flex items-baseline justify-between gap-4 py-3 text-lg" style="border-color: var(--color-hairline); font-family: var(--font-sans);">
+							<span style="color: var(--color-muted); min-width: 9.5rem;">{fmt(r.date)}</span>
+							<span class="flex-1" style="color: var(--color-ink);">
+								{r.status === 'live' && r.code ? (
+									<a href={`/read/${r.code}/`} style={LINK} class="font-semibold hover:underline">{r.name}</a>
+								) : (
+									r.name
+								)}
+							</span>
+							<span class="text-sm" style="color: var(--color-muted);">{r.status === 'live' ? 'Live' : 'Scheduled'}</span>
+						</li>
+					))}
+				</ol>
+
+				<h2 id="read-today" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Read Father&rsquo;s Heart Bible today</h2>
+				<p class="text-lg leading-relaxed mb-4" style={P}>
+					You do not have to wait for a date. The whole Bible is open at <a href="/read/" style={LINK} class="hover:underline">fathersheartbible.com/read</a>, free, with no account and no app, and English has verse-by-verse audio. If you are following the 30-Day Bible Challenge in another Bible, keep it, and open ours beside it. Read the same chapter and ask one question: what is this showing me about my Father? The editions in print are on the <a href="/bibles/fathers-heart-bible/" style={LINK} class="hover:underline">Father&rsquo;s Heart Bible edition page</a>.
+				</p>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<dl class="space-y-6">
+					{FAQS.map((f) => (
+						<div>
+							<dt class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.q}</dt>
+							<dd class="text-lg leading-relaxed" style={P}>{f.a}</dd>
+						</div>
+					))}
+				</dl>
+
+				<p class="mt-10 text-sm leading-relaxed" style={P}>
+					Global Bible Month is organised by YouVersion and its partners. Details are from <a href="https://globalbiblemonth.com" target="_blank" rel="noopener noreferrer" style={LINK} class="hover:underline">globalbiblemonth.com</a>. Father&rsquo;s Heart Bible is not an official partner.
+				</p>
+			</div>
+		</section>
+	</main>
+</Layout>
