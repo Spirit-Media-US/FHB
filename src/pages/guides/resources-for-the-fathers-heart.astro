@@ -6,6 +6,7 @@
 import AuthorBio from '../../components/AuthorBio.astro';
 import BlogAudioPlayer from '../../components/BlogAudioPlayer.astro';
 import ReviewLink from '../../components/ReviewLink.astro';
+import { filmSchema } from '../../data/film-schema';
 import Layout from '../../layouts/Layout.astro';
 
 const PAGE_URL = 'https://fathersheartbible.com/guides/resources-for-the-fathers-heart/';
@@ -268,7 +269,8 @@ const faqSchema = {
 		acceptedAnswer: { '@type': 'Answer', text: f.answer },
 	})),
 };
-const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema];
+// The film iframe renders in the 'watch' group below, so the VideoObject matches the page.
+const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema, filmSchema];
 const TOC = [
 	{ id: 'read', label: 'Read & listen' },
 	{ id: 'learn', label: 'Learn' },

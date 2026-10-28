@@ -1,0 +1,185 @@
+---
+// /verses/thanksgiving — plan W2 weekly Trends harvest 2026-10-28 (Lane 2). Demand: Google Trends US 3-month top related query for 'thanksgiving bible verse' = 'thanksgiving bible verses' (index 100; relative, not volume: unmeasured). Seasonal: US Thanksgiving 26 Nov 2026.
+// Verses are VERBATIM from src/content/bible (generated from the locked canon, not typed).
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+	{
+		id: 'give-thanks-he-is-good',
+		heading: 'Give thanks, for our Father is good',
+		intro:
+			'The most repeated call to thanksgiving in Scripture comes with its reason attached: he is good, and his love does not run out.',
+		verses: [
+			{
+				ref: 'Psalm 107:1',
+				slug: 'psalms',
+				ch: 107,
+				text: 'Give thanks to our Father, for he is good; his covenant love endures forever.',
+			},
+			{
+				ref: 'Psalm 136:1',
+				slug: 'psalms',
+				ch: 136,
+				text: 'Give thanks to our Father, for he is good; for his faithful love endures forever.',
+			},
+			{
+				ref: '1 Chronicles 16:34',
+				slug: '1-chronicles',
+				ch: 16,
+				text: 'Give thanks to our Father, for he is good; for his covenant love endures forever!',
+			},
+			{
+				ref: 'Psalm 100:4–5',
+				slug: 'psalms',
+				ch: 100,
+				text: 'Enter his gates with thanksgiving, and his courts with praise; give thanks to him, bless his name. For our Father is good; his covenant love endures forever, and his faithfulness to all generations.',
+			},
+		],
+	},
+	{
+		id: 'thanks-at-the-table',
+		heading: 'Thanks for the harvest and the table',
+		intro:
+			'Thanksgiving Day began as a harvest meal. Scripture ties a full table to the Giver behind it.',
+		verses: [
+			{
+				ref: 'Deuteronomy 8:10',
+				slug: 'deuteronomy',
+				ch: 8,
+				text: 'When you have eaten and are full, you are to bless your Father for the good land he gave you.',
+			},
+			{
+				ref: 'James 1:17',
+				slug: 'james',
+				ch: 1,
+				text: 'Every good and perfect gift is from above, coming down from the Father of lights, who never changes or casts a shifting shadow.',
+			},
+			{
+				ref: 'Psalm 116:12–13',
+				slug: 'psalms',
+				ch: 116,
+				text: 'What can I give back to my Father for all his goodness to me? I will lift up the cup of salvation and call on the name of my Father.',
+			},
+			{
+				ref: '2 Corinthians 9:15',
+				slug: '2-corinthians',
+				ch: 9,
+				text: 'Thanks be to our Father for his indescribable gift!',
+			},
+		],
+	},
+	{
+		id: 'thanks-in-every-season',
+		heading: 'Thanks in every season',
+		intro:
+			'Gratitude is not only for the good year. These verses place thanksgiving inside worry, work and ordinary days.',
+		verses: [
+			{
+				ref: '1 Thessalonians 5:18',
+				slug: '1-thessalonians',
+				ch: 5,
+				text: 'give thanks in everything; for this is the will of our Father in Christ Jesus for you.',
+			},
+			{
+				ref: 'Philippians 4:6',
+				slug: 'philippians',
+				ch: 4,
+				text: 'Worry about nothing; instead, in everything, through prayer and petition with thanksgiving, make your requests known to our Father.',
+			},
+			{
+				ref: 'Colossians 3:15–17',
+				slug: 'colossians',
+				ch: 3,
+				text: "Let Christ's peace rule your hearts—you were called to it as one body. Be thankful. Let the word of Christ dwell in you richly, teaching and correcting each other with all wisdom, singing psalms, hymns, and songs from the Spirit, with gratitude in your hearts to our Father. Whatever you do, in word or deed, do it all in the name of the Lord Jesus, thanking our Father through him.",
+			},
+			{
+				ref: 'Ephesians 5:20',
+				slug: 'ephesians',
+				ch: 5,
+				text: 'giving thanks always and for everything to our Father in the name of our Lord Jesus Christ,',
+			},
+		],
+	},
+	{
+		id: 'thanks-as-worship',
+		heading: 'Thanksgiving as worship',
+		intro:
+			'Giving thanks is how the psalmists come into his presence, and it is where a grateful heart ends up.',
+		verses: [
+			{
+				ref: 'Psalm 95:2',
+				slug: 'psalms',
+				ch: 95,
+				text: 'Let us come before him with thanksgiving; let us shout to him joyfully with songs of praise.',
+			},
+			{
+				ref: 'Psalm 9:1',
+				slug: 'psalms',
+				ch: 9,
+				text: 'I will give thanks to you, my Father, with all my heart; I will recount all your wonderful deeds.',
+			},
+			{
+				ref: 'Psalm 30:12',
+				slug: 'psalms',
+				ch: 30,
+				text: 'that my heart may sing your praise and not be silent. My Father, I will give you thanks forever.',
+			},
+			{
+				ref: 'Hebrews 13:15',
+				slug: 'hebrews',
+				ch: 13,
+				text: 'Through him, then, let us always offer our Father a sacrifice of praise—the fruit of lips confessing his name.',
+			},
+		],
+	},
+];
+
+const faqs = [
+	{
+		question: 'What is a good Bible verse for Thanksgiving?',
+		answer:
+			'Psalm 107:1 is the classic: “Give thanks to our Father, for he is good; his covenant love endures forever.” For the table, Deuteronomy 8:10 says, “When you have eaten and are full, you are to bless your Father for the good land he gave you.” Both are in Father’s Heart Bible™ below.',
+	},
+	{
+		question: 'What does the Bible say about being thankful?',
+		answer:
+			'It commands thanks and gives the reason. Our Father is good and his love endures (Psalm 136:1), every good gift comes from him (James 1:17), and gratitude is the shape of life with him: “give thanks in everything; for this is the will of our Father in Christ Jesus for you” (1 Thessalonians 5:18).',
+	},
+	{
+		question: 'Is Thanksgiving in the Bible?',
+		answer:
+			'The American holiday is not, but its heart is. Scripture repeatedly calls God’s people to thank him for harvest and provision, from the grateful meal in Deuteronomy 8 to the thank offerings of the Psalms. This page gathers those verses.',
+	},
+	{
+		question: 'Which Bible verse is best to read before a meal?',
+		answer:
+			'Many families read Psalm 107:1 or Psalm 136:1 because each is one sentence and says everything needed: give thanks, because he is good. Deuteronomy 8:10 is the verse that speaks directly of eating and being full.',
+	},
+	{
+		question: 'Which psalm is for giving thanks?',
+		answer:
+			'Psalm 100. Its heading in Father’s Heart Bible™ reads “A psalm for giving thanks,” and it moves from shouting for joy to entering his gates with thanksgiving. It is featured on this page with audio.',
+	},
+];
+---
+
+<VerseCollection
+	slug="thanksgiving"
+	topic="Thanksgiving"
+	title="Thanksgiving Bible Verses (with Audio) | Father's Heart Bible™"
+	description="Thanksgiving Bible verses in Father's Heart Bible™: give thanks, the harvest table, thanks in every season, and Psalm 100. Free to read online with audio."
+	h1="Thanksgiving Bible Verses"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg"
+	heroAlt="People gathered together around a table"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">The best Thanksgiving Bible verse is Psalm 107:1: &ldquo;Give thanks to our Father, for he is good; his covenant love endures forever.&rdquo;</strong> Scripture never asks for thanks without giving the reason: our Father is good, every good gift comes from him, and his love does not run out. Below are the verses for the day itself, for the table, for hard seasons and for worship, each word for word in Father&rsquo;s Heart Bible&trade; and linked into the chapter so you can <a href="https://fathersheartbible.com/read/psalms/100/" style="color: var(--color-brand);" class="hover:underline">read Psalm 100 free</a> and hear it. Thanksgiving in the United States falls on Thursday, 26 November 2026.`}
+	keyTakeaway="Thanksgiving in Scripture is a response to a Father who is good: thank him for the table, for every gift, and in every season."
+	themes={themes}
+	featured={{ book: 'Psalm', slug: 'psalms', chapter: 100, verseLimit: 5, heading: 'A psalm for giving thanks: Psalm 100', intro: 'Psalm 100 is Scripture’s own Thanksgiving psalm, only five verses long. Read or hear it below, then read it aloud around the table.' }}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/psalms/136/" style="color: var(--color-brand);" class="hover:underline">Psalm 136</a> or <a href="https://fathersheartbible.com/read/psalms/107/" style="color: var(--color-brand);" class="hover:underline">Psalm 107</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/guides/how-to-pray/" style="color: var(--color-brand);" class="hover:underline">guide to prayer</a>, or read the <a href="/verses/strength/" style="color: var(--color-brand);" class="hover:underline">verses on strength</a> for the harder seasons. For the Hebrew word for thanks, see <a href="https://www.blueletterbible.org/lexicon/h3034/kjv/wlc/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">yadah (Strong&rsquo;s H3034)</a> on Blue Letter Bible.`}
+	ctaMidHeading="Hear Psalm 100 in full"
+	ctaMidBodyHtml="Read and listen to the Thanksgiving psalm &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a grateful child speak to a good Father."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["thanksgiving bible verses", "thanksgiving", "gratitude", "Psalm 100"]}
+/>

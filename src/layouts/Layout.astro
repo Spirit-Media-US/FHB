@@ -41,7 +41,10 @@ interface Props {
 	youtube?: boolean;
 	// Open Graph article metadata — set pageType="article" on blog post pages
 	// to emit og:type=article + article:* meta. Other pages use og:type=website.
-	pageType?: 'website' | 'article';
+	pageType?: 'website' | 'article' | 'book';
+	// og:type=book single-edition pages: book:isbn / book:release_date (Open Graph book).
+	bookIsbn?: string;
+	bookReleaseDate?: string;
 	articleAuthor?: string;
 	articlePublishedTime?: string;
 	articleSection?: string;
@@ -67,6 +70,8 @@ const {
 	articlePublishedTime,
 	articleSection,
 	articleTags = [],
+	bookIsbn,
+	bookReleaseDate,
 	lang = 'en',
 	alternates = [],
 } = Astro.props;
@@ -351,6 +356,8 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 				/>
 			))}
 
+		{pageType === 'book' && bookIsbn && <meta property="book:isbn" content={bookIsbn} />}
+		{pageType === 'book' && bookReleaseDate && <meta property="book:release_date" content={bookReleaseDate} />}
 		{pageType === 'article' && articleAuthor && (
 			<meta property="article:author" content={articleAuthor} />
 		)}

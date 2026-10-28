@@ -1,0 +1,166 @@
+---
+// /bible-in/ukraine — Ukrainian (~39M worldwide). A majority-Christian nation at war; one of the oldest Scripture traditions in Eastern Europe. Compassionate, never triumphal framing. Hero: Wikimedia Commons (credited in sources).
+// Facts: every figure on this page is cited in the sources lists below (fetched 2026-10-28).
+// Hero photo: Saint Sophia Cathedral, Kyiv, by Maxim75, CC BY-SA 4.0 (Wikimedia Commons) — hotlinked thumbnails until a Sanity asset can be uploaded (Sanity quota 2026-10-28).
+import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
+
+const verses = [
+	{
+		ref: 'Psalm 34:18',
+		slug: 'psalms',
+		ch: 34,
+		text: 'Our Father is near to the brokenhearted; he saves those crushed in spirit.',
+	},
+	{
+		ref: 'Isaiah 41:10',
+		slug: 'isaiah',
+		ch: 41,
+		text: 'Fear not, for I am with you; do not be dismayed, for I am your Father.',
+	},
+	{
+		ref: 'John 14:18',
+		slug: 'john',
+		ch: 14,
+		text: 'I will not leave you as orphans; I will come to you.',
+	},
+];
+
+const stats = [
+	{ label: 'People', value: 'about 32 million' },
+	{ label: 'Orthodox', value: '58% of adults (2025 survey)' },
+	{ label: 'Ukrainian', value: `${sp('uk')} worldwide` },
+	{ label: 'Home of', value: 'the Ostrog Bible, 1581' },
+];
+
+const faqs = [
+	{
+		question: 'How many Christians are there in Ukraine?',
+		answer:
+			'Most Ukrainians are Christian. In the Razumkov Centre\'s November 2025 survey of 2,009 adults in government-controlled areas, 58% said they are Orthodox, about 12% Greek Catholic, 3% Protestant, 1% Roman Catholic and 10% simply "Christian" — roughly 84% together — while 15.5% said they have no religion. The survey could not cover areas of active hostilities. You can read the Scriptures they treasure free at fathersheartbible.com/read.',
+	},
+	{
+		question: 'Can I read the Bible online free in Ukrainian?',
+		answer:
+			"Yes. Father's Heart Bible™ is free to read and hear online in Ukrainian — all 66 books, no account, no purchase, no app — at fathersheartbible.com/read/uk/. The English edition is free too.",
+	},
+	{
+		question: 'What was the first Bible printed in Ukraine?',
+		answer:
+			'The Ostrog Bible, printed by Ivan Fedorov at Ostrog in 1580-1581, was the first complete printed Bible in Church Slavonic and the first Bible printed in Cyrillic type. It was not in modern Ukrainian: the first complete Bible in modern Ukrainian, begun by Panteleimon Kulish and finished by Ivan Puluj and Ivan Nechuy-Levytsky, was published in Vienna in 1903.',
+	},
+	{
+		question: 'What is the Peresopnytsia Gospel?',
+		answer:
+			"It is a manuscript of the Gospels written between 1556 and 1561 in Ruthenian, the earliest known translation of the canonical Scriptures into the language of the people. UNESCO inscribed it in Memory of the World in 2005, and Ukraine's presidents have taken their oath of office on it since 1991.",
+	},
+	{
+		question: 'Which Ukrainian Bible translations are most used?',
+		answer:
+			"Several are in use. Ivan Ohiienko's translation (completed 1940, published 1962) is widely used among Orthodox and Protestant readers, and the Ukrainian Bible Society commissioned a newer translation by Rafail Turkoniak, worked on from 1997 to 2007. The older Kulish text, from 1903, is written in a dialect that many modern readers find hard.",
+	},
+	{
+		question: "Is Father's Heart Bible available in Ukrainian?",
+		answer: `Yes. The complete Ukrainian edition — all 66 books, free — is at fathersheartbible.com/read/uk/ and in print at fathersheartbible.com/bibles/ukrainian-bible/. Ukrainian is spoken by some ${sp('uk')} people worldwide.`,
+	},
+];
+---
+
+<CountryBible
+	slug="ukraine"
+	country="Ukraine"
+	flag="🇺🇦"
+	flagImg="/flags/ua.svg"
+	countryWikipedia="https://en.wikipedia.org/wiki/Ukraine"
+	lastUpdated="October 2026"
+	lastUpdatedIso="2026-10-28"
+	colorPrimary="#0057B7"
+	colorSecondary="#C9A227"
+	colorAccent="#003B80"
+	tintWarm="#FFF8DD"
+	tintCool="#E8F1FB"
+	tintBlue="#EEF4FB"
+	title="The Bible in Ukraine — Christianity | Father's Heart Bible™ (FHB)"
+	description="How many Christians live in Ukraine, and where did the Ukrainian Bible come from? Read the Bible free online in Ukrainian with audio — Father's Heart Bible™ (FHB)."
+	h1="The Bible in Ukraine"
+	heroSubhead="Ukraine is a majority-Christian nation with one of the oldest Scripture traditions in Eastern Europe — and Father's Heart Bible offers a near and loving Father to a people in a time of war. Free online, in Ukrainian."
+	heroBase=""
+	heroSrc={{ desktop: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/2019-07-21_Saint_Sophia_Cathedral_in_Kyiv%2C_Ukraine.jpg/1280px-2019-07-21_Saint_Sophia_Cathedral_in_Kyiv%2C_Ukraine.jpg", mobile: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/2019-07-21_Saint_Sophia_Cathedral_in_Kyiv%2C_Ukraine.jpg/960px-2019-07-21_Saint_Sophia_Cathedral_in_Kyiv%2C_Ukraine.jpg", og: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/2019-07-21_Saint_Sophia_Cathedral_in_Kyiv%2C_Ukraine.jpg/1280px-2019-07-21_Saint_Sophia_Cathedral_in_Kyiv%2C_Ukraine.jpg" }}
+	heroAlt="Golden domes and green roofs of Saint Sophia Cathedral in Kyiv, Ukraine, under a blue sky"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Yes &mdash; you can read the Bible free online in Ukraine right now.</strong> Ukraine is a majority-Christian nation: in a November 2025 Razumkov Centre survey, 58% of adults called themselves Orthodox, about 12% Greek Catholic, and 70% said they are believers. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. The complete <a href="https://fathersheartbible.com/read/uk/" style="color: var(--color-brand);" class="hover:underline"><em>Ukrainian</em> edition</a> is free to read and hear today and <a href="/bibles/ukrainian-bible/" style="color: var(--color-brand);" class="hover:underline">published in print</a> &mdash; so that in a country at war, a reader can hear, in their own language, our Father who is near to the brokenhearted.`}
+	keyTakeaway="Ukraine has treasured Scripture for nearly five centuries in its own tongue — and Father's Heart Bible™ (FHB) now offers it, free, as the Word of a Father who is near to the brokenhearted."
+	glanceIntroHtml={`Ukraine is a land of golden domes and wide fields, whose written Scripture reaches back to the 1500s &mdash; and today a nation holding on through war, where prayer and the Bible are close at hand for millions.`}
+	stats={stats}
+	knownForHeading="What Ukraine is known for"
+	knownForIntroHtml={`Few nations carry a richer Scripture story &mdash; written, printed, and translated again and again, often under pressure.`}
+	knownFor={[
+		{ label: "The Peresopnytsia Gospel", text: "Written between 1556 and 1561 in Ruthenian, the earliest known translation of the Gospels in the language of the people; UNESCO inscribed it in Memory of the World in 2005." },
+		{ label: "A book for the presidents", text: "Every Ukrainian president since 1991 has taken the oath of office on the Peresopnytsia Gospel." },
+		{ label: "The Ostrog Bible", text: "Printed by Ivan Fedorov at Ostrog in 1580–1581, it is the first complete printed Bible in Church Slavonic and the first Bible printed in Cyrillic type." },
+		{ label: "The first Bible in modern Ukrainian", text: "Begun by Panteleimon Kulish and finished after his death in 1897 by Ivan Puluj and Ivan Nechuy-Levytsky, it was published in Vienna in 1903 by the British and Foreign Bible Society." },
+		{ label: "Metropolitan Ilarion (Ivan Ohiienko)", text: "He completed his Ukrainian Bible translation in 1940; it was published in London in 1962 and is still in wide use among Orthodox and Protestant readers." },
+		{ label: "A translation for today", text: "The interconfessional Ukrainian Bible Society commissioned a new translation by Rafail Turkoniak, worked on from 1997 to 2007." },
+	]}
+	faithHeading="Faith and the Bible in Ukraine"
+	faithBodyHtml={`<p>Ukraine&rsquo;s Christian story is long and public. The Razumkov Centre&rsquo;s November 2025 survey (2,009 adults, face to face, in government-controlled areas) found <strong>58% Orthodox</strong>, about 12% Greek Catholic, 3% Protestant, 1% Roman Catholic and 10% who call themselves simply &ldquo;Christian&rdquo; &mdash; roughly 84% in all &mdash; with 15.5% non-religious and 70% saying they are believers.</p><p>The Bible has never been far from that story. The Peresopnytsia Gospel (1556&ndash;1561) and the Ostrog Bible (1580&ndash;1581) were written and printed on Ukrainian soil; the first complete Bible in modern Ukrainian reached readers in 1903, and Ivan Ohiienko&rsquo;s translation followed in 1962.</p><p>What many Ukrainians now ask is not whether the Bible is theirs &mdash; it is how to hear, in plain and living words, a Father who is near. That is the quiet gift of Father&rsquo;s Heart Bible&trade; in Ukrainian.</p>`}
+	sources={[
+		{ label: "Razumkov Centre — Religiosity and confessional affiliation, Nov 2025", url: "https://razumkov.org.ua/en/research-areas/surveys/religiosity-confessional-affiliation-and-inter-church-relations-in-ukrainian-society-november-2025" },
+		{ label: "Peresopnytsia Gospel — Wikipedia (cites UNESCO Memory of the World)", url: "https://en.wikipedia.org/wiki/Peresopnytsia_Gospel" },
+		{ label: "Ostrog Bible — Wikipedia", url: "https://en.wikipedia.org/wiki/Ostrog_Bible" },
+		{ label: "Kulish's Bible — Wikipedia", url: "https://en.wikipedia.org/wiki/Kulish%27s_Bible" },
+		{ label: "Ilarion Ohienko — Wikipedia", url: "https://en.wikipedia.org/wiki/Ilarion_Ohienko" },
+		{ label: "Bible translations into Ukrainian — Wikipedia", url: "https://en.wikipedia.org/wiki/Bible_translations_into_Ukrainian" },
+	]}
+	painsHeading="What pains Ukraine"
+	painsIntroHtml={`Behind the courage that has won the world&rsquo;s respect, there are wounds that no headline measures &mdash; and it is into exactly these that the Father&rsquo;s heart speaks.`}
+	painStats={[
+		{ value: "a country at war", label: "the Razumkov survey itself could be taken only in areas free of hostilities" },
+		{ value: "grief and loss", label: "families bereaved and homes destroyed" },
+		{ value: "separated families", label: "fathers at the front, mothers and children far from home" },
+		{ value: "displacement", label: "many have had to leave their homes, within Ukraine and beyond" },
+		{ value: "a searching faith", label: "about one in six adults now says they have no religion" },
+		{ value: "a longing for peace", label: "for safety, and for a Father who stays" },
+	]}
+	painsBodyHtml={`<p>This page cannot count what war has cost, and it does not try to. What it can say is what the Bible says plainly: &ldquo;Our Father is near to the brokenhearted.&rdquo; The same Scripture that sustained Ukrainian readers in the 1500s is still read in shelters, trains and borrowed rooms today.</p><p>In Father&rsquo;s Heart Bible&trade; they can read and hear it free, in Ukrainian, on the phone already in their pocket.</p>`}
+	painsSources={[
+		{ label: "Razumkov Centre — fieldwork notes, Nov 2025", url: "https://razumkov.org.ua/en/research-areas/surveys/religiosity-confessional-affiliation-and-inter-church-relations-in-ukrainian-society-november-2025" },
+		{ label: "Ukraine — Wikipedia", url: "https://en.wikipedia.org/wiki/Ukraine" },
+	]}
+	faithsHeading="What “our Father” offers Ukraine"
+	faithsIntroHtml={`Father&rsquo;s Heart Bible&trade; does not bring a new religion to Ukraine. It lets a people who already love the Scriptures hear, in clear Ukrainian, the Father they reveal.`}
+	faithsBlocks={[
+		{ heading: "For the brokenhearted", bodyHtml: "In the language of loss, Scripture says <a href=\"https://fathersheartbible.com/read/psalms/34/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;Our Father is near to the brokenhearted&rdquo;</a> &mdash; not far off, not slow, near." },
+		{ heading: "For the afraid", bodyHtml: "<a href=\"https://fathersheartbible.com/read/isaiah/41/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;Do not be dismayed, for I am your Father&rdquo;</a> &mdash; a promise to read slowly, and aloud." },
+		{ heading: "For the one who feels alone", bodyHtml: "<a href=\"https://fathersheartbible.com/read/john/14/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;I will not leave you as orphans&rdquo;</a> &mdash; spoken by Jesus to those who feared being left behind." },
+		{ heading: "For the one who has questions", bodyHtml: "About one in six Ukrainian adults says they have no religion. The Bible has room for honest questions: begin anywhere, with no account and no cost." },
+	]}
+	whyHeading="Why Father's Heart Bible™ for Ukraine"
+	whyBlocks={[
+		{ heading: "God revealed as Father", bodyHtml: "Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href=\"https://fathersheartbible.com/read/genesis/1/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Genesis 1:1</a> onward." },
+		{ heading: "Free, with audio, on any phone", bodyHtml: "No purchase, no app, no sign-up. The whole Bible is free to <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read online</a>, with audio, on the phone in your hand ." },
+		{ heading: "Now in Ukrainian", bodyHtml: "The complete Ukrainian edition is published: <a href=\"https://fathersheartbible.com/read/uk/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read it free</a>, or see the <a href=\"/bibles/ukrainian-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">print edition</a>." },
+	]}
+	wordHeading="His Word will not return void"
+	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do &mdash; and in a land that has carried that Word through centuries of pressure, it will not return empty.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;&hellip;so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
+	resourcesHeading="Learn more about Ukraine"
+	resourcesIntroHtml={`Trusted sources for the facts on this page &mdash; and for going deeper into Ukraine&rsquo;s people, faith, and story.`}
+	resources={[
+		{ label: "Ukraine — Wikipedia", url: "https://en.wikipedia.org/wiki/Ukraine" },
+		{ label: "Religion in Ukraine — Wikipedia", url: "https://en.wikipedia.org/wiki/Religion_in_Ukraine" },
+		{ label: "Razumkov Centre — religion surveys", url: "https://razumkov.org.ua/en/research-areas/surveys/religiosity-confessional-affiliation-and-inter-church-relations-in-ukrainian-society-november-2025" },
+		{ label: "Ukraine — Joshua Project (people groups)", url: "https://joshuaproject.net/countries/UP" },
+	]}
+	opportunityHeading="The translation opportunity for Ukraine"
+	opportunityIntroHtml={`Ukrainian is the heart language of some ${sp('uk')} people worldwide, and Russian is understood by many &mdash; both complete editions are free to read in Father&rsquo;s Heart Bible&trade;.`}
+	languages={[
+		{ language: "English", code: "en" },
+		{ language: "Ukrainian", code: "uk" },
+		{ language: "Russian", code: "ru" },
+	]}
+	verses={verses}
+	keepReadingHtml={`Begin with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> &mdash; including <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start</a> and <a href="/guides/what-is-the-gospel/" style="color: var(--color-brand);" class="hover:underline">what the gospel is</a>. Browse Scripture by theme on our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> pages.`}
+	faqs={faqs}
+	ctaMidHeading="A Father who is near"
+	ctaMidBodyHtml={`Ukraine has held on to the Scriptures for nearly five centuries in its own tongue. Read them now in a Father&rsquo;s voice &mdash; free, with audio, on any phone.`}
+	ctaBottomBodyHtml={`From Genesis to Revelation, free online with audio &mdash; a translation that reveals God as a loving Father to every beloved son and daughter, in Ukraine and wherever Ukrainians have gone.`}
+/>

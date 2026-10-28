@@ -1,0 +1,125 @@
+---
+// /meaning/folly — plan W2 "what does X mean" (approved 2026-10-21), unit 6c, built 2026-10-28. Pairs with /meaning/wisdom.
+// Demand: Bing Webmaster 13-week US impressions, 2026-10-28: "folly meaning" 1,012 (Bing-network, rank-only, not Google volume); Google Trends "folly" top related for "meaning in the bible".
+// WEDGE: checked against src/content/bible 2026-10-28: the English word "folly" occurs in FHB verse text once, Proverbs 9:13 ("The woman Folly"), and in one chapter heading
+// ("Wisdom Against Folly", Ecclesiastes 2). The Hebrew idea is carried by "fool" and "foolishness", and the page says so. Wisdom is the Father's gift (Proverbs 9:10, 1 Corinthians 1:24-25).
+// Every Scripture quotation is generated VERBATIM from the locked canon (never typed) and checked with bin/fhb-scripture-quote-audit.py. Verse links go to our /read only.
+import WordMeaning from '../../components/WordMeaning.astro';
+
+const sections = [
+	{
+		id: 'plain-meaning',
+		heading: 'What “folly” means',
+		bodyHtml: `<p>Folly is <strong>foolishness: a lack of good sense that shows up in how you live</strong>. In the Bible it is rarely about intelligence. A fool in Proverbs can be clever. What marks him is that he will not be taught, he trusts his own judgement over our Father&rsquo;s, and so he keeps choosing the road that ends badly. Folly is the opposite of <a href="/meaning/wisdom/" style="color: var(--color-brand);" class="hover:underline">wisdom</a>, which the Bible treats as a skill and a gift.</p><p>A small note on the English. Father&rsquo;s Heart Bible uses the word &ldquo;folly&rdquo; itself once in verse text, as the name of a person in Proverbs 9:13. Everywhere else the same idea is said with the plainer words &ldquo;fool&rdquo; and &ldquo;foolishness,&rdquo; which is how you will meet it in the verses below.</p>`,
+	},
+	{
+		id: 'hebrew-and-greek',
+		heading: 'The Hebrew and Greek words',
+		bodyHtml: `<p>Proverbs has several Hebrew words for fools, and they are not interchangeable. The <em>kesil</em> is the dull, self-satisfied fool who will not listen. The <em>nabal</em> is the fool in a moral sense, the one who lives as if there were no accountability. The <em>peti</em> is the &ldquo;simple one,&rdquo; naive and not yet set in his ways, and so still reachable. The noun <em>&lsquo;ivveleth</em> is the foolishness itself, the thing our English Bibles usually call folly.</p><p>In the New Testament the Greek <em>mori&#225;</em> is foolishness, and <em>mor&#243;s</em> and <em>aphr&#333;n</em> are the fool. Paul uses <em>mori&#225;</em> in his famous line about the cross, and Jesus uses <em>aphr&#333;n</em> for the man who stores up wealth and ignores our Father.</p>`,
+	},
+	{
+		id: 'the-fool-in-proverbs',
+		heading: 'The fool and the wise in Proverbs',
+		bodyHtml: `<p>Proverbs introduces the fool in its motto: &ldquo;The fear of our Father is the beginning of knowledge; fools despise wisdom and instruction.&rdquo; (Proverbs 1:7). The rest of the book fills in the portrait. The fool &ldquo;takes no pleasure in understanding, but only in airing his own opinions.&rdquo; &ldquo;The way of a fool seems right in his own eyes, but the wise listen to advice.&rdquo; And the most sobering line of all: &ldquo;Do you see someone wise in his own eyes? There is more hope for a fool than for him.&rdquo; Someone who thinks he has nothing to learn is further gone than a plain fool.</p><p>The remedy is just as clear. &ldquo;Whoever walks with the wise grows wise, but the companion of fools suffers harm.&rdquo; Folly spreads by company, and so does wisdom.</p>`,
+	},
+	{
+		id: 'woman-folly',
+		heading: 'Two invitations: Wisdom and Folly',
+		bodyHtml: `<p>Proverbs 9 stages the choice as two women calling from two houses. &ldquo;Wisdom has built her house; she has hewn out her seven pillars.&rdquo; She invites the simple one in: &ldquo;Leave your simple ways, and live; walk in the way of insight.&rsquo;&rdquo; Then comes the rival: &ldquo;The woman Folly is loud; she is naive and knows nothing.&rdquo; She sits at her door and calls to the same passers-by, &ldquo;&lsquo;Stolen water is sweet, and bread eaten in secret is pleasant.&rsquo;&rdquo; and the chapter closes with the cost: &ldquo;But he does not know that the dead are there, that her guests are in the depths of the grave.&rdquo;</p><p>Folly&rsquo;s invitation always sounds sweeter. That is what makes it folly: the pleasure is real, and the bill arrives later.</p>`,
+	},
+	{
+		id: 'foolishness-of-the-cross',
+		heading: 'The “foolishness” of the cross',
+		bodyHtml: `<p>Paul turns the whole idea around. &ldquo;The message of the cross is foolishness to those who are perishing, but to us being saved it is our Father&rsquo;s power.&rdquo; (1 Corinthians 1:18). &ldquo;but we proclaim Christ crucified&mdash;a stumbling block to Jews and foolishness to Gentiles,&rdquo; Yet the cross is where our Father&rsquo;s wisdom was hiding in plain sight: &ldquo;For the foolishness of our Father is wiser than men, and the weakness of our Father, stronger than men.&rdquo;</p><p>So the Bible has two kinds of foolishness. One is the fool who despises wisdom and instruction. The other is the message that looks foolish to the world and is, in fact, &ldquo;the power of our Father and the wisdom of our Father.&rdquo; Folly is not being out of step with the world. It is being out of step with our Father.</p>`,
+	},
+	{
+		id: 'avoiding-folly',
+		heading: 'How to turn from folly',
+		bodyHtml: `<p>The Bible&rsquo;s advice is short. Trust before you reason: &ldquo;Trust in our Father with all your heart, and do not lean on your own understanding.&rdquo; Distrust your own cleverness: &ldquo;Do not be wise in your own eyes; fear our Father, and turn away from evil.&rdquo; Build on what you hear and do: Jesus says the one who does his words is &ldquo;like a wise man whose house was built on the rock,&rdquo; while the one who does not is &ldquo;like a foolish man who built his house on sand.&rdquo; And ask. &ldquo;If any of you lacks wisdom, ask our Father, who gives freely to all without criticizing, and it will be given you.&rdquo;</p><p>Folly is not a life sentence. The &ldquo;simple one&rdquo; is invited in again and again, and the wisdom of our Father is given freely to any child who asks.</p>`,
+	},
+];
+
+const renderings = [
+	{
+		ref: 'Proverbs 1:7',
+		slug: 'proverbs',
+		ch: 1,
+		fhb: `The fear of our Father is the beginning of knowledge; fools despise wisdom and instruction.`,
+	},
+	{
+		ref: 'Proverbs 9:13',
+		slug: 'proverbs',
+		ch: 9,
+		fhb: `The woman Folly is loud; she is naive and knows nothing.`,
+	},
+	{
+		ref: 'Proverbs 26:12',
+		slug: 'proverbs',
+		ch: 26,
+		fhb: `Do you see someone wise in his own eyes? There is more hope for a fool than for him.`,
+	},
+	{
+		ref: '1 Corinthians 1:18',
+		slug: '1-corinthians',
+		ch: 1,
+		fhb: `The message of the cross is foolishness to those who are perishing, but to us being saved it is our Father's power.`,
+	},
+	{
+		ref: '1 Corinthians 1:25',
+		slug: '1-corinthians',
+		ch: 1,
+		fhb: `For the foolishness of our Father is wiser than men, and the weakness of our Father, stronger than men.`,
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does folly mean in the Bible?',
+		answer:
+			'Folly means foolishness: a lack of good sense that shows in how a person lives. In Proverbs it is not low intelligence but refusing to be taught and trusting your own judgement over our Father’s. It is the opposite of wisdom.',
+	},
+	{
+		question: 'What is the biblical definition of a fool?',
+		answer:
+			'Someone who rejects wisdom and correction. Proverbs says: “fools despise wisdom and instruction.” The fool is also pictured as sure of himself: “The way of a fool seems right in his own eyes, but the wise listen to advice.”',
+	},
+	{
+		question: 'What does “the foolishness of the cross” mean?',
+		answer:
+			'In 1 Corinthians 1:18 Paul says the message of the cross sounds foolish to those who are perishing but is our Father’s power to those being saved. It looks weak and foolish by the world’s standards and is, in fact, “wiser than men.”',
+	},
+	{
+		question: 'What is the difference between folly and wisdom?',
+		answer:
+			'Wisdom is the skill of living well in our Father’s world and it begins with reverence for Him (Proverbs 9:10). Folly is the opposite road: it despises instruction, trusts itself, and follows whatever looks sweet today. Proverbs 9 pictures them as two women inviting the same people to two different houses.',
+	},
+	{
+		question: 'Who is the woman Folly in Proverbs 9?',
+		answer:
+			'A personification, like Lady Wisdom, who stands for the way of foolishness. Proverbs 9:13 says: “The woman Folly is loud; she is naive and knows nothing.” She calls to the simple, offers stolen pleasures, and her guests, the chapter says, end in the grave.',
+	},
+];
+---
+
+<WordMeaning
+	slug="folly"
+	title="Folly Meaning in the Bible | Father’s Heart Bible"
+	description="Folly meaning in the Bible: foolishness, the way of the fool who refuses wisdom. Proverbs’ fool and the wise, the woman Folly, and the foolishness of the cross."
+	h1="What does “folly” mean in the Bible?"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg"
+	heroAlt="An open Bible resting on a wooden table"
+	published="2026-10-28"
+	modified="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Folly is foolishness: a lack of good sense that shows in how a person lives, most often by refusing instruction and trusting his own judgement over our Father&rsquo;s.</strong> In Proverbs the fool is not the unintelligent but the unteachable: &ldquo;fools despise wisdom and instruction&rdquo; (Proverbs 1:7). The Hebrew words include <em>kesil</em>, <em>nabal</em> and <em>&lsquo;ivveleth</em>; the Greek is <em>mori&#225;</em>. Folly is the opposite of <a href="/meaning/wisdom/" style="color: var(--color-brand);" class="hover:underline">wisdom</a>, and Paul adds a twist: the cross looks like foolishness to the world and is our Father&rsquo;s wisdom (1 Corinthians 1:25). You can <a href="https://fathersheartbible.com/read/proverbs/9/" style="color: var(--color-brand);" class="hover:underline">read Proverbs 9 free</a> and hear it read aloud.`}
+	keyTakeaway="Folly is refusing wisdom and trusting yourself, and the cure is the fear of our Father, which is where wisdom begins."
+	sections={sections}
+	renderings={renderings}
+	renderingsHeading="Folly in Father’s Heart Bible™"
+	renderingsIntro="Word for word in Father’s Heart Bible™. Where English Bibles often say “folly,” this one usually says “fool” or “foolishness.” Each reference links into the full chapter, free, with verse-by-verse audio in English."
+	faqs={faqs}
+	relatedHtml={`Related: <a href="/meaning/wisdom/" style="color: var(--color-brand);" class="hover:underline">what wisdom means</a>, <a href="/meaning/righteousness/" style="color: var(--color-brand);" class="hover:underline">what righteousness means</a>, <a href="/meaning/forsake/" style="color: var(--color-brand);" class="hover:underline">what forsake means</a> and <a href="/meaning/fathers-heart-of-god/" style="color: var(--color-brand);" class="hover:underline">the Father&rsquo;s heart</a>. Read <a href="https://fathersheartbible.com/read/proverbs/1/" style="color: var(--color-brand);" class="hover:underline">Proverbs 1</a>, <a href="https://fathersheartbible.com/read/1-corinthians/1/" style="color: var(--color-brand);" class="hover:underline">1 Corinthians 1</a> or the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free with audio</a>. For the original words, see <a href="https://www.blueletterbible.org/lexicon/h3684/kjv/wlc/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">kesil (Strong&rsquo;s H3684)</a> and <a href="https://www.blueletterbible.org/lexicon/g3472/kjv/tr/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">moria (Strong&rsquo;s G3472)</a> on Blue Letter Bible.`}
+	ctaMidHeading="Read Proverbs 9 in full"
+	ctaMidBodyHtml="Read the two invitations of Proverbs 9 &mdash; free online with verse-by-verse audio in English."
+	ctaBottomBodyHtml="From Genesis to Revelation, free online with audio &mdash; an English translation that lets your Father&rsquo;s voice be heard on every page."
+	tags={["folly meaning", "what does folly mean in the bible", "biblical fool", "foolishness of the cross", "proverbs 9:13"]}
+/>
