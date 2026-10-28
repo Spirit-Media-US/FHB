@@ -102,6 +102,7 @@ export interface Props {
 	knownForIntroHtml?: string;
 	knownFor?: CountryKnownFor[];
 	gallery?: CountryPhoto[];
+	heroCreditHtml?: string; // visible photo credit under the hero (e.g. CC BY-SA attribution)
 	galleryCreditHtml?: string;
 	galleryBottom?: CountryPhoto[];
 	galleryBottomCreditHtml?: string;
@@ -171,6 +172,7 @@ const {
 	knownForIntroHtml,
 	knownFor = [],
 	gallery = [],
+	heroCreditHtml,
 	galleryCreditHtml,
 	galleryBottom = [],
 	galleryBottomCreditHtml,
@@ -399,6 +401,9 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 		<!-- Breadcrumb + direct answer -->
 		<section class="px-6 pt-9 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">
+				{heroCreditHtml && (
+					<p class="mb-5 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={heroCreditHtml}></p>
+				)}
 				<nav aria-label="Breadcrumb" class="mb-6 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
 					<a href="/bible-in/" class="hover:underline">The Bible Around the World</a><span class="px-1.5" aria-hidden="true">/</span>
