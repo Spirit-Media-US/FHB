@@ -153,4 +153,18 @@ export const VERSE_TOPICS: VerseTopic[] = [
 			'Encouraging one another, our Father who encourages us, words that lift, and not giving up.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg',
 	},
+	{
+		slug: 'death',
+		title: 'Bible Verses About Death',
+		blurb:
+			'Our Father near in the valley, comfort for those who grieve, his love that death cannot sever, and the hope of resurrection.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg',
+	},
+	{
+		slug: 'money',
+		title: 'Bible Verses About Money',
+		blurb:
+			'The love of money, being content, our Father who provides, and wisdom and generosity with what we have.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg',
+	},
 ];
