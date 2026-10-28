@@ -8,11 +8,17 @@ import { WORD_MEANINGS } from '../../data/wordMeanings';
 // when a new /meaning/<word> page ships.
 import Layout from '../../layouts/Layout.astro';
 import { fitDescription, fitTitle } from '../../lib/seoFit';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const PAGE_URL = 'https://fathersheartbible.com/meaning/';
-const TITLE = "Bible Word Meanings — What Words Mean | Father's Heart Bible™ (FHB)";
-const DESCRIPTION =
-	"What Bible words actually mean — begotten, hallowed, Abba — with the original language, the verses, and how Father's Heart Bible™ (FHB) renders each one.";
+// Word order in title/description follows measured demand (Bing Webmaster, US, 13 weeks,
+// aeo-state/keywords/bing-20261028.json): folly 1,012, begotten 759, forsake 686.
+const TITLE = fitTitle(
+	"Bible Word Meanings — Folly, Begotten, Forsake & More | Father's Heart Bible™ (FHB)",
+);
+const DESCRIPTION = fitDescription(
+	"Bible word meanings: what folly, begotten, forsake, and hallowed mean, with the original Hebrew or Greek, the verses, and the Father's Heart Bible™ (FHB) wording.",
+);
 
 const HERO_BASE =
 	'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg';
@@ -34,6 +40,7 @@ const collectionSchema = {
 	},
 	mainEntity: {
 		'@type': 'ItemList',
+		numberOfItems: WORD_MEANINGS.length,
 		itemListElement: WORD_MEANINGS.map((w, i) => ({
 			'@type': 'ListItem',
 			position: i + 1,
@@ -103,7 +110,10 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				</nav>
 				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Word Meanings</p>
 				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Bible Word Meanings</h1>
-				<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+				<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);">
+					Bible word meanings: {WORD_MEANINGS.length} words and phrases explained in plain English &mdash; including folly, begotten, forsake, and hallowed &mdash; each with the original Hebrew, Greek, or Aramaic and the verses where it appears.
+				</p>
+				<p class="mt-4 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
 					What does that word actually mean? Each page below takes one question and answers it plainly &mdash; the everyday sense, the Hebrew, Greek, or Aramaic behind it, the verses where it appears, and how the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible</a> renders it, quoted word for word and linked into the chapter so you can read and listen free.
 				</p>
 			</div>
