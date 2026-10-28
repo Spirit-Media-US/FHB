@@ -706,3 +706,11 @@ let READ_LANGUAGE_TOTAL = 0;
 		console.log(`gen-sitemap-read: ${name} — ${hits.length} print count(s) set to ${printTotal}, ${readHits.length} online count(s) set to ${READ_LANGUAGE_TOTAL || 'unchanged'}`);
 	}
 }
+
+// ── llms.txt / llms-full.txt answer-page index (unit 6ae, 2026-10-28) ────────────
+// Derived from src/pages so a new /meaning, /verses, /bible-in ... page is listed on the next
+// build with no hand edit. Test: scripts/llms-answer-pages.test.mjs.
+{
+	const { generate } = await import('./llms-answer-pages.mjs');
+	console.log('gen-sitemap-read: llms answer pages', JSON.stringify(generate()));
+}
