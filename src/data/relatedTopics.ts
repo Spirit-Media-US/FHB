@@ -12,13 +12,15 @@ export const RELATED: Record<string, string[]> = {
 	// /verses
 	'v:advent': ['m:begotten', 'v:hope'],
 	'v:anger': ['m:meek', 'v:patience', 'v:forgiveness', 'b:men'],
-	'v:anxiety': ['v:peace', 'b:financial-hardship', 'b:cancer'],
+	'v:anxiety': ['v:fear', 'v:peace', 'b:financial-hardship', 'b:cancer'],
 	'v:comfort': ['b:grief', 'b:widows', 'b:cancer', 'm:forsake'],
 	'v:faith': ['m:faith', 'v:hope'],
+	'v:fear': ['v:anxiety', 'v:peace', 'v:comfort', 'b:cancer'],
 	'v:family': ['b:fathers', 'b:mothers', 'b:marriage', 'v:thanksgiving'],
 	'v:forgiveness': ['m:grace', 'm:mercy', 'b:divorce', 'm:lords-prayer'],
 	'v:friendship': ['b:singles', 'b:college-students'],
 	'v:god-as-father': ['m:our-father', 'm:abba-father', 'm:fathers-heart-of-god', 'b:spiritually-curious'],
+	'v:gratitude': ['v:thanksgiving', 'v:joy', 'v:family'],
 	'v:healing': ['b:cancer', 'b:addiction', 'b:family-caregivers'],
 	'v:hope': ['b:grief', 'b:addiction', 'v:comfort'],
 	'v:joy': ['v:thanksgiving', 'v:peace', 'b:worship-leaders'],
@@ -27,7 +29,7 @@ export const RELATED: Record<string, string[]> = {
 	'v:peace': ['v:anxiety', 'v:comfort', 'b:veterans'],
 	'v:prayer': ['m:lords-prayer', 'm:our-father', 'm:hallowed-be-thy-name'],
 	'v:strength': ['b:athletes', 'b:military', 'b:family-caregivers'],
-	'v:thanksgiving': ['v:joy', 'v:family', 'b:worship-leaders'],
+	'v:thanksgiving': ['v:gratitude', 'v:joy', 'v:family', 'b:worship-leaders'],
 
 	// /meaning
 	'm:abba-father': ['m:our-father', 'v:god-as-father', 'v:prayer'],

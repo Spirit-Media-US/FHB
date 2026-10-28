@@ -125,4 +125,18 @@ export const VERSE_TOPICS: VerseTopic[] = [
 			'Our Father who comforts, near to the brokenhearted, comfort in hard times, and comforting one another.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg',
 	},
+	{
+		slug: 'fear',
+		title: 'Bible Verses About Fear',
+		blurb:
+			'Do not fear, our Father with us in the dark valley, perfect love that casts out fear, and Jesus saying do not be afraid.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg',
+	},
+	{
+		slug: 'gratitude',
+		title: 'Bible Verses About Gratitude',
+		blurb:
+			'A grateful heart, remembering our Father\u2019s goodness, contentment, and thanks that becomes a daily habit.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
+	},
 ];

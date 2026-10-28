@@ -1,0 +1,176 @@
+---
+// /verses/fear: unit 6bc, ranked by Bing GetKeywordStats 2026-10-28 (Bing 594; aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+ {
+  "id": "do-not-fear",
+  "heading": "Do not fear, I am with you",
+  "intro": "The command always comes with a promise attached.",
+  "verses": [
+   {
+    "ref": "Isaiah 41:10",
+    "slug": "isaiah",
+    "ch": 41,
+    "text": "\"Fear not, for I am with you; do not be dismayed, for I am your Father. I will strengthen you, I will help you, I will uphold you with my righteous right hand."
+   },
+   {
+    "ref": "Joshua 1:9",
+    "slug": "joshua",
+    "ch": 1,
+    "text": "Have I not commanded you? Be strong and courageous. Do not fear or be discouraged, for I, your Father, am with you wherever you go.\""
+   },
+   {
+    "ref": "Deuteronomy 31:6",
+    "slug": "deuteronomy",
+    "ch": 31,
+    "text": "Be strong and courageous. Don't fear or dread them, for your Father goes with you; he will never leave you nor forsake you.\""
+   },
+   {
+    "ref": "Isaiah 43:1–2",
+    "slug": "isaiah",
+    "ch": 43,
+    "text": "But now, this is what our Father says—he who created you, Jacob, he who formed you, Israel: Do not be afraid, for I have redeemed you; I have called you by name, you are mine. When you pass through the waters, I will be with you; and through the rivers, they will not overwhelm you. When you walk through fire, you will not be burned, and the flame will not consume you."
+   }
+  ]
+ },
+ {
+  "id": "our-father-is-with-me",
+  "heading": "Our Father is with me",
+  "intro": "Not the absence of danger, but the presence of the Father in it.",
+  "verses": [
+   {
+    "ref": "Psalm 23:4",
+    "slug": "psalms",
+    "ch": 23,
+    "text": "Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me; your rod and your staff comfort me."
+   },
+   {
+    "ref": "Psalm 27:1",
+    "slug": "psalms",
+    "ch": 27,
+    "text": "My Father is my light and my salvation—whom should I fear? My Father is the stronghold of my life—of whom should I be afraid?"
+   },
+   {
+    "ref": "Psalm 118:6",
+    "slug": "psalms",
+    "ch": 118,
+    "text": "My Father is with me; I will not fear. What can anyone do to me?"
+   },
+   {
+    "ref": "Psalm 56:3–4",
+    "slug": "psalms",
+    "ch": 56,
+    "text": "When I am afraid, I put my trust in you. In my Father, whose word I praise—in my Father I trust; I will not be afraid. What can mere mortals do to me?"
+   }
+  ]
+ },
+ {
+  "id": "perfect-love",
+  "heading": "Perfect love casts out fear",
+  "intro": "Fear loses its grip on a child who knows the Father loves them.",
+  "verses": [
+   {
+    "ref": "1 John 4:18",
+    "slug": "1-john",
+    "ch": 4,
+    "text": "In love there is no fear; perfect love drives out fear, since fear involves punishment, and whoever fears is not complete in love."
+   },
+   {
+    "ref": "2 Timothy 1:7",
+    "slug": "2-timothy",
+    "ch": 1,
+    "text": "For our Father gave us no spirit of fear, but the Spirit of power, love, and self-control."
+   },
+   {
+    "ref": "Romans 8:15",
+    "slug": "romans",
+    "ch": 8,
+    "text": "You did not receive a spirit of slavery, to fall back into fear, but received the Spirit of sonship, by whom we cry, \"Abba! Father!\""
+   },
+   {
+    "ref": "Romans 8:38–39",
+    "slug": "romans",
+    "ch": 8,
+    "text": "For I am convinced neither death nor life, neither angels nor rulers, neither present nor future, nor powers, neither height nor depth, nor anything else in all creation, can separate us from the love of our Father in Christ Jesus our Lord."
+   }
+  ]
+ },
+ {
+  "id": "jesus-do-not-be-afraid",
+  "heading": "Jesus says, do not be afraid",
+  "intro": "His words to frightened friends, in the boat and on the road.",
+  "verses": [
+   {
+    "ref": "Matthew 14:27",
+    "slug": "matthew",
+    "ch": 14,
+    "text": "But Jesus spoke to them at once: \"Take courage! It is I; do not be afraid.\""
+   },
+   {
+    "ref": "Luke 12:32",
+    "slug": "luke",
+    "ch": 12,
+    "text": "\"Do not be afraid, little flock, for your Father has been pleased to give you the kingdom."
+   },
+   {
+    "ref": "Matthew 10:29–31",
+    "slug": "matthew",
+    "ch": 10,
+    "text": "Aren't two sparrows sold for a penny? Yet not one falls to the ground without your Father. And even the very hairs of your head are all numbered. So do not be afraid; you are worth more than many sparrows."
+   },
+   {
+    "ref": "Psalm 34:4",
+    "slug": "psalms",
+    "ch": 34,
+    "text": "I sought our Father, and he answered me; he delivered me from all my fears."
+   }
+  ]
+ }
+];
+
+const faqs = [
+ {
+  "question": "What is the best Bible verse about fear?",
+  "answer": "Isaiah 41:10 says, “\"Fear not, for I am with you; do not be dismayed, for I am your Father. I will strengthen you, I will help you, I will uphold you with my righteous right hand.”"
+ },
+ {
+  "question": "What does the Bible say about overcoming fear?",
+  "answer": "1 John 4:18 says, “In love there is no fear; perfect love drives out fear, since fear involves punishment, and whoever fears is not complete in love.”"
+ },
+ {
+  "question": "Is it a sin to be afraid?",
+  "answer": "Psalm 56:3–4 says, “When I am afraid, I put my trust in you. In my Father, whose word I praise—in my Father I trust; I will not be afraid. What can mere mortals do to me?”"
+ },
+ {
+  "question": "What does the Bible say about fear of death or the dark?",
+  "answer": "Psalm 23:4 says, “Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me; your rod and your staff comfort me.”"
+ },
+ {
+  "question": "How many times does the Bible say do not fear?",
+  "answer": "Joshua 1:9 says, “Have I not commanded you? Be strong and courageous. Do not fear or be discouraged, for I, your Father, am with you wherever you go.\"”"
+ }
+];
+---
+
+<VerseCollection
+	slug="fear"
+	topic="Fear"
+	title="Bible Verses About Fear (with Audio) | Father's Heart Bible™"
+	description="Bible verses about fear in Father's Heart Bible™: do not fear, our Father with us in the dark valley, perfect love, and Jesus saying do not be afraid. Free to read online with audio."
+	h1="Bible Verses About Fear"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg"
+	heroAlt="A man praying quietly"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">The most quoted Bible verse about fear is Isaiah 41:10: &ldquo;Fear not, for I am with you.&rdquo;</strong> Scripture speaks to fear again and again, and always gives the reason: our Father is with us, he loves us, and he holds us. Below are the verses on each of these, word for word in Father&rsquo;s Heart Bible&trade;, linked into the chapter so you can <a href="https://fathersheartbible.com/read/psalms/27/" style="color: var(--color-brand);" class="hover:underline">read Psalm 27 free</a> and hear it.`}
+	keyTakeaway="The Bible does not tell us to feel nothing; it tells us who is with us. Our Father is near in the dark valley, and his perfect love casts out fear."
+	themes={themes}
+	featured={{"book": "Psalm", "slug": "psalms", "chapter": 27, "verseLimit": 6, "heading": "Whom shall I fear? Psalm 27", "intro": "Psalm 27 opens with the plainest question about fear in Scripture. Read or hear it below, then follow it to the full chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/psalms/23/" style="color: var(--color-brand);" class="hover:underline">Psalm 23</a> or <a href="https://fathersheartbible.com/read/isaiah/41/" style="color: var(--color-brand);" class="hover:underline">Isaiah 41</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/anxiety/" style="color: var(--color-brand);" class="hover:underline">verses on anxiety</a>, the <a href="/verses/peace/" style="color: var(--color-brand);" class="hover:underline">verses on peace</a> or the <a href="/verses/comfort/" style="color: var(--color-brand);" class="hover:underline">verses for comfort</a>.`}
+	ctaMidHeading="Hear Psalm 27 in full"
+	ctaMidBodyHtml="Read and listen to the psalm that asks whom shall I fear &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a Father who is with you."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about fear", "fear", "Isaiah 41:10", "Psalm 27:1"]}
+/>
