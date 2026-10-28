@@ -13,7 +13,7 @@ test('covered types are non-empty and include the named 6ae pages', () => {
 	for (const g of groups) assert.ok(g.entries.length > 0, `type "${g.label}" has no pages`);
 	for (const u of ['/meaning/forsake/', '/meaning/folly/', '/meaning/consecrate/', '/meaning/sheol/',
 		'/verses/thanksgiving/', '/verses/advent/', '/bible-in/ukraine/', '/bible-in/poland/',
-		'/bible-in/romania/', '/old-testament/', '/new-testament/', '/books-of-the-bible/'])
+		'/bible-in/romania/', '/old-testament/', '/new-testament/', '/books-of-the-bible/', '/global-bible-month/'])
 		assert.ok(all.some((e) => e.url === u), `${u} not discovered`);
 });
 
