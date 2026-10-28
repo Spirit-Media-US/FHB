@@ -9,54 +9,10 @@
 // file the /read app shows on each book's first chapter). Chapter counts and order come
 // from src/lib/bible_structure.json. Nothing here is typed by hand, so it cannot drift.
 // Each book links into the reader (absolute prod URL, the marketing convention).
-import { readFileSync } from 'node:fs';
 import AuthorBio from '../components/AuthorBio.astro';
 import ReviewLink from '../components/ReviewLink.astro';
 import Layout from '../layouts/Layout.astro';
-import structure from '../lib/bible_structure.json';
-
-const SUMMARIES_PATH =
-	'/home/deploy/bin/tools-api/pipelines/translation/output/book_summaries/en.json';
-const summaries: Record<string, string> = JSON.parse(readFileSync(SUMMARIES_PATH, 'utf8'));
-
-const READ = 'https://fathersheartbible.com/read';
-const slugOf = (b: string) => b.toLowerCase().replace(/\s+/g, '-');
-
-// The traditional groupings most English Bibles print in their contents page.
-const GROUPS: { testament: 'OT' | 'NT'; name: string; first: string; last: string }[] = [
-	{
-		testament: 'OT',
-		name: 'The Law (the Five Books of Moses)',
-		first: 'Genesis',
-		last: 'Deuteronomy',
-	},
-	{ testament: 'OT', name: 'History', first: 'Joshua', last: 'Esther' },
-	{ testament: 'OT', name: 'Poetry and Wisdom', first: 'Job', last: 'Song of Solomon' },
-	{ testament: 'OT', name: 'The Major Prophets', first: 'Isaiah', last: 'Daniel' },
-	{ testament: 'OT', name: 'The Minor Prophets', first: 'Hosea', last: 'Malachi' },
-	{ testament: 'NT', name: 'The Gospels', first: 'Matthew', last: 'John' },
-	{ testament: 'NT', name: 'History', first: 'Acts', last: 'Acts' },
-	{ testament: 'NT', name: 'Paul’s Letters', first: 'Romans', last: 'Philemon' },
-	{ testament: 'NT', name: 'The General Letters', first: 'Hebrews', last: 'Jude' },
-	{ testament: 'NT', name: 'Prophecy', first: 'Revelation', last: 'Revelation' },
-];
-const order: string[] = structure.order;
-const chapters = structure.chapters as Record<string, number>;
-const groups = GROUPS.map((g) => {
-	const books = order.slice(order.indexOf(g.first), order.indexOf(g.last) + 1).map((b) => {
-		const summary = summaries[b];
-		if (!summary)
-			throw new Error(`books-of-the-bible: no FHB summary for ${b} in ${SUMMARIES_PATH}`);
-		return { name: b, slug: slugOf(b), chapters: chapters[b], summary, n: order.indexOf(b) + 1 };
-	});
-	return { ...g, books };
-});
-const OT = groups.filter((g) => g.testament === 'OT');
-const NT = groups.filter((g) => g.testament === 'NT');
-const count = (gs: typeof groups) => gs.reduce((s, g) => s + g.books.length, 0);
-if (count(OT) !== 39 || count(NT) !== 27)
-	throw new Error('books-of-the-bible: grouping does not cover 39 + 27 books');
-const TOTAL_CHAPTERS = order.reduce((s, b) => s + chapters[b], 0);
+import { NT, OT, order, READ, slugOf, TOTAL_CHAPTERS } from '../lib/book-data';
 
 const PAGE_URL = 'https://fathersheartbible.com/books-of-the-bible/';
 const TITLE = 'Books of the Bible in Order — All 66, Old & New Testament';
@@ -242,7 +198,7 @@ const jsonLd = [articleSchema, itemListSchema, breadcrumbSchema, faqSchema];
 
 					<div class="books-ot">
 						<h2 id="old-testament" class="text-2xl md:text-3xl font-light mt-10 mb-2 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Old Testament books: 39</h2>
-						<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The Old Testament is the story of our Father and the family He chose through Abraham &mdash; creation and fall, the exodus from Egypt, the kings, the exile and the return &mdash; with the songs and prophets that carried His promise of a coming King.</p>
+						<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The Old Testament is the story of our Father and the family He chose through Abraham &mdash; creation and fall, the exodus from Egypt, the kings, the exile and the return &mdash; with the songs and prophets that carried His promise of a coming King. <a href="/old-testament/" style="color: var(--color-brand);" class="hover:underline">See the Old Testament on its own page</a>.</p>
 						{OT.map((g) => (
 							<>
 								<h3 class="text-xl font-medium mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">{g.name} <span class="text-sm font-normal" style="color: var(--color-muted);">&middot; {g.books.length} {g.books.length === 1 ? 'book' : 'books'}</span></h3>
@@ -261,7 +217,7 @@ const jsonLd = [articleSchema, itemListSchema, breadcrumbSchema, faqSchema];
 
 					<div class="books-nt">
 						<h2 id="new-testament" class="text-2xl md:text-3xl font-light mt-12 mb-2 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">New Testament books: 27</h2>
-						<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The New Testament is the Son coming to bring the family home: four Gospels of His life, death and resurrection, the story of the first believers, the letters that taught them to live as the Father&rsquo;s children, and the vision of the end of the story.</p>
+						<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The New Testament is the Son coming to bring the family home: four Gospels of His life, death and resurrection, the story of the first believers, the letters that taught them to live as the Father&rsquo;s children, and the vision of the end of the story. <a href="/new-testament/" style="color: var(--color-brand);" class="hover:underline">See the New Testament on its own page</a>.</p>
 						{NT.map((g) => (
 							<>
 								<h3 class="text-xl font-medium mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">{g.name} <span class="text-sm font-normal" style="color: var(--color-muted);">&middot; {g.books.length} {g.books.length === 1 ? 'book' : 'books'}</span></h3>

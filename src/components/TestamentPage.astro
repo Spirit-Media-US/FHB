@@ -1,0 +1,361 @@
+---
+// Shared body for /old-testament/ and /new-testament/ (plan W2 "Old/New Testament views",
+// Kevin 2026-10-21; Ahrefs US June 2026: "old testament" 26k, "new testament" 26k /mo).
+// Book lists, summaries and chapter counts come from src/lib/book-data.ts (same source as
+// /books-of-the-bible/); Scripture quotes are read verbatim from the locked FHB canon at
+// build time via fhbVerse() — nothing is typed by hand. Everything testament-specific
+// (prose, FAQ, quotes) lives in `copy` below so each page carries its own substance.
+import AuthorBio from '../components/AuthorBio.astro';
+import ReviewLink from '../components/ReviewLink.astro';
+import Layout from '../layouts/Layout.astro';
+import { fhbVerse, NT, OT, READ, slugOf } from '../lib/book-data';
+
+interface Props {
+	testament: 'OT' | 'NT';
+}
+const { testament } = Astro.props;
+const isOT = testament === 'OT';
+const groups = isOT ? OT : NT;
+const total = groups.reduce((s, g) => s + g.books.length, 0);
+const totalChapters = groups.reduce((s, g) => s + g.books.reduce((a, b) => a + b.chapters, 0), 0);
+const otherPath = isOT ? '/new-testament/' : '/old-testament/';
+const otherName = isOT ? 'New Testament' : 'Old Testament';
+const name = isOT ? 'Old Testament' : 'New Testament';
+const path = isOT ? '/old-testament/' : '/new-testament/';
+const PAGE_URL = `https://fathersheartbible.com${path}`;
+const PUBLISHED = '2026-10-28';
+const MODIFIED = '2026-10-28';
+
+const QUOTES: [string, number, number][] = isOT
+	? [
+			['Psalms', 103, 13],
+			['Isaiah', 64, 8],
+			['Malachi', 2, 10],
+		]
+	: [
+			['John', 1, 18],
+			['Galatians', 4, 6],
+			['Hebrews', 1, 3],
+		];
+const allBooks = groups.flatMap((g) => g.books);
+const bookOf = (n: string) => allBooks.find((b) => b.name === n)!;
+const STARTS: string[] = isOT ? ['Genesis', 'Psalms', 'Isaiah'] : ['John', 'Romans', 'Revelation'];
+const starts = STARTS.map(bookOf);
+const maxCh = Math.max(...allBooks.map((b) => b.chapters));
+const longest = allBooks.filter((b) => b.chapters === maxCh).map((b) => b.name);
+const longestText =
+	longest.length === 1
+		? `the longest book is ${longest[0]}, at ${maxCh} chapters`
+		: `the longest books, ${longest.join(' and ')}, have ${maxCh} chapters each`;
+const groupNote = isOT
+	? ' Counted as one division, the Major and Minor Prophets make the seventeen Prophets.'
+	: ' Counted as one division, Paul’s Letters and the General Letters make the twenty-one Letters.';
+const quotes = QUOTES.map(([book, ch, v]) => ({
+	ref: `${book === 'Psalms' ? 'Psalm' : book} ${ch}:${v}`,
+	href: `${READ}/${slugOf(book)}/${ch}/`,
+	text: fhbVerse(book, ch, v),
+}));
+
+const copy = isOT
+	? {
+			title: 'Old Testament: All 39 Books in Order | Father’s Heart Bible',
+			description:
+				'The Old Testament has 39 books, from Genesis to Malachi. See all 39 in order by division (Law, History, Poetry and Wisdom, Prophets) and read each free online.',
+			h1: 'The Old Testament: All 39 Books in Order',
+			lead: 'The Old Testament is the first part of the Bible: 39 books, from Genesis to Malachi, written mostly in Hebrew over roughly a thousand years before Jesus was born.',
+			rest: `It falls into four divisions: the Law (five books of Moses), History (twelve books), Poetry and Wisdom (five books) and the Prophets (seventeen books, counting the major and minor prophets together). Together they hold ${totalChapters.toLocaleString('en-US')} chapters. Below is every Old Testament book in order, each with a one-line summary from Father’s Heart Bible™ and a link to read it free online with audio.`,
+			takeaway:
+				'39 books in four divisions — Law, History, Poetry and Wisdom, Prophets — telling how our Father made a family, kept His promise through every failure, and pointed ahead to His Son.',
+			pointsH: 'How the Old Testament points to our Father',
+			points: [
+				'The Old Testament is often read as a book of law and judgment, but its deepest note is a Father’s heart. Genesis opens with Him forming human beings to live with Him, and every book after it is the story of a family He refuses to give up on: Israel in Egypt, in the wilderness, under kings, in exile, and in the long return.',
+				'The prophets say it most plainly. They do not only warn; they plead, with the voice of a Father whose children have wandered. And the songs of Israel give that same Father a face:',
+			],
+			after:
+				'These are only three of many places where the Old Testament says what the New Testament will make unmistakable: the God of Israel is a Father. When Jesus later teaches His followers to pray “Our Father,” He is not introducing a new idea but fulfilling the oldest promise in the book.',
+			faqs: [
+				{
+					question: 'How many books are in the Old Testament?',
+					answer:
+						'The Old Testament has 39 books in Protestant Bibles, including Father’s Heart Bible™, from Genesis to Malachi. Catholic Bibles include several more (the deuterocanonical books), and Orthodox Bibles a few beyond that. The Jewish Bible holds the same writings as the 39, counted and ordered differently as 24 books.',
+				},
+				{
+					question: 'What are the divisions of the Old Testament?',
+					answer:
+						'Most Bibles group the 39 books into the Law (Genesis to Deuteronomy, 5 books), History (Joshua to Esther, 12 books), Poetry and Wisdom (Job to Song of Solomon, 5 books) and the Prophets (Isaiah to Malachi, 17 books: 5 major and 12 minor).',
+				},
+				{
+					question: 'What is the first book of the Old Testament, and what is the last?',
+					answer:
+						'Genesis is the first book of the Old Testament and of the whole Bible. Malachi is the last. About four centuries of silence follow Malachi before the New Testament begins with the Gospel of Matthew.',
+				},
+				{
+					question: 'Why is it called the “Old” Testament?',
+					answer:
+						'“Testament” means covenant, an agreement. The Old Testament records the first covenant, our Father’s promises to Abraham and to Israel at Sinai. The New Testament records the new covenant promised by the prophets and sealed by Jesus. “Old” does not mean outdated: Jesus and the apostles read these books as Scripture and as pointing to Him.',
+				},
+				{
+					question: 'Should I read the Old Testament before the New Testament?',
+					answer:
+						'You do not have to. Many readers start with the Gospel of John, then read the rest of the New Testament, and then return to the Old Testament, which reads with fresh eyes once you have met the Son. Every book is free to read online in Father’s Heart Bible™.',
+				},
+			],
+		}
+	: {
+			title: 'New Testament: All 27 Books in Order | Father’s Heart Bible',
+			description:
+				'The New Testament has 27 books, from Matthew to Revelation. See all 27 in order by division (Gospels, Acts, Letters, Revelation) and read each free online.',
+			h1: 'The New Testament: All 27 Books in Order',
+			lead: 'The New Testament is the second part of the Bible: 27 books, from Matthew to Revelation, written in Greek in the first century after the life, death and resurrection of Jesus.',
+			rest: `It falls into four divisions: the four Gospels, one book of history (Acts), the Letters (thirteen from Paul and eight general letters) and Revelation. Together they hold ${totalChapters.toLocaleString('en-US')} chapters. Below is every New Testament book in order, each with a one-line summary from Father’s Heart Bible™ and a link to read it free online with audio.`,
+			takeaway:
+				'27 books in four divisions — Gospels, Acts, Letters, Revelation — telling how the Son came to show us our Father and bring His family home.',
+			pointsH: 'The Father revealed in the Son',
+			points: [
+				'Everything in the New Testament turns on one person. Jesus does not only teach about God; He shows us our Father. In the Gospels He prays to the Father, obeys the Father and keeps pointing the people around Him back to the Father. The letters then explain what that means for everyone who follows Him.',
+				'Three passages say it better than any summary:',
+			],
+			after:
+				'This is why Father’s Heart Bible™ is translated the way it is: the Son came to make the Father known, and the New Testament should let you hear that on every page, from Matthew’s opening genealogy to the new heaven and new earth at the end of Revelation.',
+			faqs: [
+				{
+					question: 'How many books are in the New Testament?',
+					answer:
+						'The New Testament has 27 books, from Matthew to Revelation. It is the same 27 in Protestant, Catholic and Orthodox Bibles, including Father’s Heart Bible™.',
+				},
+				{
+					question: 'What are the divisions of the New Testament?',
+					answer:
+						'The 27 books fall into the four Gospels (Matthew, Mark, Luke, John), one book of history (Acts), twenty-one letters (thirteen by Paul and eight general letters from Hebrews to Jude) and one book of prophecy, Revelation.',
+				},
+				{
+					question: 'What is the first book of the New Testament, and what is the last?',
+					answer:
+						'Matthew is the first book of the New Testament, and Revelation is the last. The Gospel of Matthew opens with the family line of Jesus; Revelation ends with our Father living with His children in a new heaven and a new earth.',
+				},
+				{
+					question: 'Who wrote the New Testament?',
+					answer:
+						'About nine or ten authors wrote the 27 books, including Matthew and John (two of Jesus’ twelve), Mark and Luke (companions of the apostles), Paul (the author of thirteen letters), Peter, James and Jude. The writing took place within roughly sixty years of the resurrection.',
+				},
+				{
+					question: 'Which New Testament book should I read first?',
+					answer:
+						'Start with the Gospel of John. It was written so that readers would believe in Jesus and, through Him, know the Father. Then read Mark or Luke, then Acts, and then the letters. Every book is free to read online with audio in Father’s Heart Bible™.',
+				},
+			],
+		};
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/13334b01b91963fa9581ecebb66c4cf6064938d2-6016x4016.jpg';
+const HERO_ALT = 'A couple reading and studying the Bible together at a wooden table';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+const AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: 'Founder & CEO, Spirit Media Publishing',
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'Article',
+		headline: copy.h1,
+		description: copy.description,
+		image: OG_IMG,
+		author: AUTHOR,
+		publisher: {
+			'@type': 'Organization',
+			'@id': 'https://spiritmediapublishing.com/#organization',
+			name: 'Spirit Media Publishing',
+			url: 'https://spiritmediapublishing.com',
+		},
+		url: PAGE_URL,
+		mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+		datePublished: PUBLISHED,
+		dateModified: MODIFIED,
+		inLanguage: 'en-US',
+		keywords: `${name.toLowerCase()}, ${name.toLowerCase()} books, books of the ${name.toLowerCase()}, how many books in the ${name.toLowerCase()}`,
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'ItemList',
+		name: `The ${total} books of the ${name} in order`,
+		numberOfItems: total,
+		itemListOrder: 'https://schema.org/ItemListOrderAscending',
+		itemListElement: groups
+			.flatMap((g) => g.books)
+			.map((b, i) => ({
+				'@type': 'ListItem',
+				position: i + 1,
+				name: b.name,
+				url: `${READ}/${b.slug}/`,
+			})),
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{
+				'@type': 'ListItem',
+				position: 2,
+				name: 'Books of the Bible',
+				item: 'https://fathersheartbible.com/books-of-the-bible/',
+			},
+			{ '@type': 'ListItem', position: 3, name, item: PAGE_URL },
+		],
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: copy.faqs.map((f) => ({
+			'@type': 'Question',
+			name: f.question,
+			acceptedAnswer: { '@type': 'Answer', text: f.answer },
+		})),
+	},
+];
+---
+
+<Layout
+	title={copy.title}
+	description={copy.description}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={PUBLISHED}
+	articleSection="Bible Reading Guides"
+	articleTags={[name, 'books of the Bible']}
+	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[420px] md:min-h-[65vh]">
+			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} width="1400" height="620" class="absolute inset-0 w-full h-full object-cover" style="object-position: center;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
+		</section>
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span><a href="/books-of-the-bible/" class="hover:underline">Books of the Bible</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">{name}</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Reading Guide</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{copy.h1}</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; Editor, Father&rsquo;s Heart Bible&trade;</span>
+					<span aria-hidden="true">&middot;</span><span>Updated <time datetime={MODIFIED}>{formatDate(MODIFIED)}</time></span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p id="direct-answer" class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<strong style="color: var(--color-ink);">{copy.lead}</strong> {copy.rest}
+				</p>
+
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
+					<p id="key-takeaway" class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">{copy.takeaway}</p>
+				</aside>
+
+				<h2 id="divisions" class="text-2xl md:text-3xl font-light mt-10 mb-3 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The divisions of the {name} at a glance</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The {total} books of the {name} fall into {groups.length} groups, the way most Bibles print their contents page. Each count below is read from the book list on this page.{groupNote}</p>
+				<ul class="mb-4 space-y-2" style="font-family: var(--font-sans); color: var(--color-muted); list-style: disc; padding-left: 1.4em;">
+					{groups.map((g) => (
+						<li class="text-lg leading-relaxed"><strong style="color: var(--color-ink);">{g.name}</strong>: {g.books.length} {g.books.length === 1 ? 'book' : 'books'}, {g.books[0].name}{g.books.length > 1 ? ` to ${g.books[g.books.length - 1].name}` : ''}, {g.books.reduce((a, b) => a + b.chapters, 0)} chapters.</li>
+					))}
+				</ul>
+
+				<h2 id="books" class="text-2xl md:text-3xl font-light mt-10 mb-2 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The {total} books of the {name} in order</h2>
+				{groups.map((g) => (
+					<>
+						<h3 class="text-xl font-medium mt-8 mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">{g.name} <span class="text-sm font-normal" style="color: var(--color-muted);">&middot; {g.books.length} {g.books.length === 1 ? 'book' : 'books'}</span></h3>
+						<ol class="book-list" start={g.books[0].n - (isOT ? 0 : 39)}>
+							{g.books.map((b) => (
+								<li>
+									<a href={`${READ}/${b.slug}/`} class="font-semibold hover:underline" style="color: var(--color-brand);">{b.name}</a>
+									<span class="book-ch">{b.chapters} {b.chapters === 1 ? 'chapter' : 'chapters'}</span>
+									<p>{b.summary}</p>
+								</li>
+							))}
+						</ol>
+					</>
+				))}
+
+				<h2 id="the-father" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">{copy.pointsH}</h2>
+				{copy.points.map((p) => (<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">{p}</p>))}
+				{quotes.map((q) => (
+					<figure class="my-5 px-6 py-4 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+						<blockquote class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">“{q.text}”</blockquote>
+						<figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">&mdash; <a href={q.href} class="hover:underline" style="color: var(--color-brand);">{q.ref}</a>, Father&rsquo;s Heart Bible&trade;</figcaption>
+					</figure>
+				))}
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">{copy.after}</p>
+
+				<h2 id="how-to-read" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">How to read the {name} on Father&rsquo;s Heart Bible&trade;</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Every one of the {total} books is free to read online, one chapter at a time, with audio narration so you can read and listen together. The {name} runs to {totalChapters.toLocaleString('en-US')} chapters; {longestText}. Good places to begin:</p>
+				<ul class="mb-4 space-y-2" style="font-family: var(--font-sans); color: var(--color-muted); list-style: disc; padding-left: 1.4em;">
+					{starts.map((b) => (
+						<li class="text-lg leading-relaxed"><a href={`${READ}/${b.slug}/1/`} style="color: var(--color-brand);" class="font-semibold hover:underline">{b.name} 1</a> &mdash; {b.summary}</li>
+					))}
+				</ul>
+
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Read the {name} free</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">All {total} books are free to read online, chapter by chapter, with audio narration so you can read and listen together.</p>
+					<a href={`${READ}/${groups[0].books[0].slug}/1/`} class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Start with {groups[0].books[0].name}<span aria-hidden="true">&rarr;</span></a>
+				</aside>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="space-y-6">
+					{copy.faqs.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Keep going: the <a href={otherPath} style="color: var(--color-brand);" class="hover:underline">{otherName}</a>, all <a href="/books-of-the-bible/" style="color: var(--color-brand);" class="hover:underline">66 books of the Bible in order</a>, <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start reading the Bible</a>, or <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father&rsquo;s Heart Bible&trade; exists</a>.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<ReviewLink class="mb-10" />
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>
+
+<style>
+	.book-list { list-style: decimal; padding-left: 2.2em; margin: 0; font-family: var(--font-sans); }
+	.book-list li { margin: 0 0 14px; color: var(--color-muted); }
+	.book-list li::marker { color: var(--color-muted); font-size: 14px; }
+	.book-list .book-ch { margin-left: 8px; font-size: 13px; color: var(--color-muted); }
+	.book-list p { margin: 2px 0 0; font-size: 16px; line-height: 1.55; }
+</style>

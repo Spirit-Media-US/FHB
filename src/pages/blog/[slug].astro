@@ -13,6 +13,7 @@ import ShareBar from '../../components/ShareBar.astro';
 import Layout from '../../layouts/Layout.astro';
 import { canonHref } from '../../lib/canon-href';
 import { sanityClient, urlFor } from '../../lib/sanity';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 export async function getStaticPaths() {
 	const posts = await sanityClient.fetch(`*[_type == "blogPost"] { "slug": slug.current }`);
@@ -447,8 +448,8 @@ const alternates = hasTe
 ---
 
 <Layout
-  title={post.seoTitle || `${post.title} | Father's Heart Bible™ (FHB) Blog`}
-  description={post.seoDescription || post.excerpt || "Read this article on Father's Heart Bible™ (FHB) blog."}
+  title={fitTitle(post.seoTitle || `${post.title} | Father's Heart Bible™ (FHB) Blog`)}
+  description={fitDescription(post.seoDescription || post.excerpt || "Read this article on Father's Heart Bible™ (FHB) blog.")}
   ogDescription={post.ogDescription || post.excerpt}
   image={post.ogImage || heroImage}
   imageAlt={post.ogImageAlt || post.heroImage?.alt}

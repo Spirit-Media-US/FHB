@@ -7,6 +7,7 @@ import Section from '../components/Section.astro';
 import StoreLogos from '../components/StoreLogos.astro';
 import WaysToReceive from '../components/WaysToReceive.astro';
 import { cardUrl } from '../data/card-art';
+import { filmNode } from '../data/film-schema';
 import { allLanguageEditions, LANGUAGE_EDITION_TOTAL } from '../data/language-editions';
 import {
 	AUDIENCE_EDITION_TOTAL,
@@ -18,6 +19,7 @@ import {
 } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
+import { fitDescription, fitTitle } from '../lib/seoFit';
 
 // Now in Print's book thumbnail: /print's General Edition card (600 and 1200 exist on R2).
 const printBookCard = cardUrl('general-regular-charcoal');
@@ -53,11 +55,11 @@ const seoTitle =
 	pageData?.seoTitle || "Read the Bible Free Online with Audio — Father's Heart Bible™";
 const seoDescription =
 	pageData?.seoDescription ||
-	`Read the Bible free online with audio. Father's Heart Bible™ (FHB) is the complete Bible with our Father's words in blue — in print and soon in 80 languages.`;
+	`Read the Bible free online with audio. Father's Heart Bible™ (FHB) is the complete Bible, showing our Father's heart, with His words in blue — in print and soon in 80 languages.`;
 // Hero copy retired from the photo 2026-09-24 (Kevin: no title or text on the
 // hero image). heroSubheading still feeds the intro section below.
 const heroSubheading =
-	'The complete Father\u2019s Heart Bible\u2122 \u2014 Genesis to Revelation \u2014 is free to read online, with verse-by-verse audio.';
+	'The complete Father\u2019s Heart Bible\u2122 \u2014 Genesis to Revelation \u2014 is free to read online, with verse-by-verse audio \u2014 our Father\u2019s heart, Genesis to Revelation.';
 // The hero/section "Read FHB →" CTAs were removed (2026-06-02) — the nav now
 // carries the Read FHB entry point. The Join/Partner CTAs remain.
 const heroVideoSrc =
@@ -177,8 +179,8 @@ const homeVoices: VoiceGroup[] = [
 
 <Layout
 	youtube
-	title={seoTitle}
-	description={seoDescription}
+	title={fitTitle(seoTitle)}
+	description={fitDescription(seoDescription)}
 	image="https://assets.spiritmediapublishing.com/FHB/share/v3/fhb-og-home.jpg"
 	imageAlt="Father's Heart Bible — Encounter God as Your Father"
 	darkHero={true}
@@ -192,8 +194,10 @@ const homeVoices: VoiceGroup[] = [
 				"@type": "Organization",
 				"@id": "https://fathersheartbible.com/#organization",
 				"name": "Father's Heart Bible",
+				"alternateName": ["Father's Heart Bible™", "FHB"],
 				"url": "https://fathersheartbible.com",
 				"logo": "https://fathersheartbible.com/fhb-logo.png",
+				"parentOrganization": { "@id": "https://spiritmediapublishing.com/#organization" },
 				// Publisher/imprint is Spirit Media Publishing; Spirit Media Inc. is its PARENT
 				// (Metadata & Messaging Guidelines, Publication facts). Reference the canonical
 				// @id that Layout.astro already emits on this page — the previous inline copy
@@ -241,7 +245,9 @@ const homeVoices: VoiceGroup[] = [
 			},
 			// Mirrors the "Who this Bible is for" block and the listen links below.
 			audienceItemList,
-			audioSeries
+			audioSeries,
+			// The invitation film in the hero facade (same YouTube video, visible on the page).
+			filmNode
 		]
 	}}
 >
@@ -312,6 +318,8 @@ const homeVoices: VoiceGroup[] = [
 				<p>You have been longing for Him all along. Our Father placed the desire for Him in you before the creation of the world. He loved you and chose you before He formed you, and He ordained your life.</p>
 				<p>The truth of the Bible is this: He is your Father &mdash; not a distant deity, not a disappointed one &mdash; and you are His beloved son or daughter.</p>
 				<p class="rcv-voice">I give you me. Receive me as Father.</p>
+				<p class="rcv-verse">Come back each morning for the <a href="https://fathersheartbible.com/read/verse-of-the-day/" style="color: var(--color-brand); text-decoration: none; font-weight: 600;">Bible verse of the day</a>, a fresh word from our Father.</p>
+				<p class="rcv-verse">This November, Father&rsquo;s Heart Bible completes 80 languages during <a href="/global-bible-month/" style="color: var(--color-brand); text-decoration: none; font-weight: 600;">Global Bible Month</a>.</p>
 				<p class="rcv-verse">&ldquo;Just as he chose us in him before the world&rsquo;s founding, to be holy and blameless before our Father in love.&rdquo; &mdash; <a href="/read/ephesians/1/" style="color: var(--color-brand); text-decoration: none; font-weight: 600;">Ephesians 1:4 (FHB)</a></p>
 				<details>
 					<summary>Pray this to open your heart to Him</summary>

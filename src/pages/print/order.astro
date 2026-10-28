@@ -15,6 +15,7 @@
  */
 import CatalogOrderForm from '../../components/CatalogOrderForm.astro';
 import Layout from '../../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const breadcrumb = {
 	'@context': 'https://schema.org',
@@ -37,8 +38,8 @@ const breadcrumb = {
 };
 ---
 <Layout
-	title="Catalog Order Form — Father's Heart Bible™ Print Editions"
-	description="Order any Father's Heart Bible™ print edition in hardback or paperback: general, audience, large print and language editions, with volume pricing for churches and groups."
+	title={fitTitle("Catalog Order Form — Father's Heart Bible™ Print Editions")}
+	description={fitDescription("Order any Father's Heart Bible™ print edition in hardback or paperback: general, audience, large print and language editions, with volume pricing for churches and groups.")}
 	jsonLd={breadcrumb}
 >
 	<main id="main-content" class="cat" style="margin-top: 80px;">

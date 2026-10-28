@@ -1,0 +1,180 @@
+---
+// /verses/advent — plan W2 weekly Trends harvest 2026-10-28 (Lane 2). Demand: Google Trends US 3-month related query for 'advent scripture' = 'advent scripture readings' (breakout; relative, not volume: unmeasured). Seasonal: Advent begins 29 Nov 2026.
+// WEDGE: FHB renders Immanuel as 'our Father with us' (Matthew 1:23) and keeps 'Everlasting Father' (Isaiah 9:6).
+// Verses are VERBATIM from src/content/bible (generated from the locked canon, not typed).
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+	{
+		id: 'light-in-the-darkness',
+		heading: 'A light in the darkness',
+		intro:
+			'Advent begins in the dark. These verses name the darkness honestly and promise the light that breaks into it.',
+		verses: [
+			{
+				ref: 'Isaiah 9:2',
+				slug: 'isaiah',
+				ch: 9,
+				text: 'The people walking in darkness have seen a great light; on those who lived in a land of deep darkness, a light has shone.',
+			},
+			{
+				ref: 'Isaiah 9:6',
+				slug: 'isaiah',
+				ch: 9,
+				text: 'For to us a child is born, to us a son is given; and the government will be upon his shoulder. And his name will be called Wonderful Counselor, Mighty God, Everlasting Father, Prince of Peace.',
+			},
+			{
+				ref: 'Luke 1:78–79',
+				slug: 'luke',
+				ch: 1,
+				text: 'because of the tender mercy of our Father, by which the sunrise from on high will visit us, to give light to those who sit in darkness and in the shadow of death, to guide our feet into the way of peace."',
+			},
+		],
+	},
+	{
+		id: 'the-promise',
+		heading: 'The promise made long before',
+		intro:
+			'Centuries before Bethlehem, the prophets said where, how and from whom. Advent is the season of promises kept.',
+		verses: [
+			{
+				ref: 'Isaiah 7:14',
+				slug: 'isaiah',
+				ch: 7,
+				text: 'So the Sovereign Father himself will give you a sign: Look, the virgin will conceive, bear a son, and name him Immanuel.',
+			},
+			{
+				ref: 'Micah 5:2',
+				slug: 'micah',
+				ch: 5,
+				text: 'But you, Bethlehem Ephrathah, though you are small among the clans of Judah, from you will come forth for me one who will be ruler over Israel, whose origins are from ancient times, from the days of eternity.',
+			},
+			{
+				ref: 'Isaiah 11:1–2',
+				slug: 'isaiah',
+				ch: 11,
+				text: 'A shoot will come up from the stump of Jesse; from his roots a Branch will bear fruit. The Spirit of our Father will rest on him—the Spirit of wisdom and understanding, the Spirit of counsel and might, the Spirit of knowledge and the fear of our Father,',
+			},
+			{
+				ref: 'Jeremiah 33:14–15',
+				slug: 'jeremiah',
+				ch: 33,
+				text: 'Look, the days are coming, declares our Father, when I will fulfill the good promise I made to the house of Israel and the house of Judah. In those days and at that time I will make a righteous Branch sprout up for David, and he will administer justice and righteousness in the land.',
+			},
+		],
+	},
+	{
+		id: 'prepare-the-way',
+		heading: 'Prepare the way and keep watch',
+		intro:
+			'Advent also looks forward. The same Scripture that tells of his first coming tells us to wake, watch and make room.',
+		verses: [
+			{
+				ref: 'Isaiah 40:3–5',
+				slug: 'isaiah',
+				ch: 40,
+				text: 'A voice is calling out: In the wilderness, prepare the way of our Father; make a straight highway through the desert for our Father. Every valley will be lifted up, and every mountain and hill made low; the uneven ground will become level, and the rough places will become a plain. And the glory of our Father will be revealed, and all people will see it together, for the mouth of our Father has spoken.',
+			},
+			{
+				ref: 'Romans 13:11–12',
+				slug: 'romans',
+				ch: 13,
+				text: "Do this, knowing the time: the hour has already come for you to wake from sleep—salvation is nearer now than when we first believed. Night is nearly gone, day is near. So let's shed the deeds of darkness and put on the armor of light.",
+			},
+			{
+				ref: 'Matthew 24:42',
+				slug: 'matthew',
+				ch: 24,
+				text: 'Therefore keep watch, because you do not know on what day your Lord will come.',
+			},
+		],
+	},
+	{
+		id: 'he-came',
+		heading: 'He came',
+		intro:
+			'The Gospels tell the arrival plainly: an angel, a young woman, a child, and our Father come near.',
+		verses: [
+			{
+				ref: 'Luke 1:30–33',
+				slug: 'luke',
+				ch: 1,
+				text: 'The angel said to her, "Don\'t be afraid, Mary, for you have found favor with our Father. You will conceive in your womb and bear a son, and you will call his name Jesus. He will be great and called Son of the Most High, and our Father will give him the throne of his father David, and he will reign over Jacob\'s house forever; his kingdom will never end."',
+			},
+			{
+				ref: 'Matthew 1:23',
+				slug: 'matthew',
+				ch: 1,
+				text: '"Look, the virgin will conceive and give birth to a son, and they will call him Immanuel" (which means, "our Father with us").',
+			},
+			{
+				ref: 'Luke 2:10–11',
+				slug: 'luke',
+				ch: 2,
+				text: 'The angel told them, "Don\'t be afraid—I bring good news of great joy for everyone: Today in the city of David, a Savior was born to you—Christ the Lord.',
+			},
+			{
+				ref: 'Galatians 4:4–5',
+				slug: 'galatians',
+				ch: 4,
+				text: 'When the time had fully come, our Father sent his Son, born of a woman, born under the law, to redeem those under the law, that we might be received as sons.',
+			},
+			{
+				ref: 'John 1:14',
+				slug: 'john',
+				ch: 1,
+				text: 'The Word became flesh and lived among us. We saw his glory, the glory of the one and only Son from the Father, full of grace and truth.',
+			},
+		],
+	},
+];
+
+const faqs = [
+	{
+		question: 'What is Advent in the Bible?',
+		answer:
+			'Advent is not a word in Scripture, but its themes are: waiting for the promised Savior, preparing the way, and watching for his return. The word comes from the Latin for “coming.” Isaiah 40:3 (“prepare the way of our Father”) and Luke 1–2 are its core readings.',
+	},
+	{
+		question: 'What Scripture is read during Advent?',
+		answer:
+			'Churches commonly read Isaiah 9, Isaiah 11, Isaiah 40, Micah 5, Luke 1–2, Matthew 1 and John 1, with Romans 13 and Matthew 24 on the waiting theme. Each has verses on this page, word for word in Father’s Heart Bible™.',
+	},
+	{
+		question: 'When does Advent 2026 start?',
+		answer:
+			'Advent begins on Sunday, 29 November 2026, the fourth Sunday before Christmas, and runs through Christmas Eve.',
+	},
+	{
+		question: 'What does Immanuel mean?',
+		answer:
+			'Isaiah 7:14 promised a sign named Immanuel, and Matthew 1:23 gives the meaning: “our Father with us.” Matthew says it was fulfilled in Jesus. That is the heart of Advent: our Father does not stay far off; he comes to us.',
+	},
+	{
+		question: 'What Bible verse is best for the first week of Advent?',
+		answer:
+			'Isaiah 9:2 fits the start of the season: “The people walking in darkness have seen a great light; on those who lived in a land of deep darkness, a light has shone.” It names the darkness and the promise in one sentence.',
+	},
+];
+---
+
+<VerseCollection
+	slug="advent"
+	topic="Advent"
+	title="Advent Scripture Readings and Verses (with Audio) | Father's Heart Bible™"
+	description="Advent Scripture readings in Father's Heart Bible™: Isaiah 9, Micah 5, Isaiah 40, Luke 1 and 2, and Immanuel as our Father with us. Free to read with audio."
+	h1="Advent Scripture Readings and Bible Verses"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg"
+	heroAlt="An open Bible with morning light across its pages"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Advent Scripture is the set of promises and arrivals that lead to Christmas: Isaiah 9, Isaiah 11, Isaiah 40, Micah 5, Luke 1&ndash;2, Matthew 1 and John 1.</strong> Advent 2026 begins on Sunday, 29 November. In Father&rsquo;s Heart Bible&trade; these readings carry a detail other translations soften: Immanuel means &ldquo;our Father with us&rdquo; (Matthew 1:23), and the child of Isaiah 9:6 is named &ldquo;Everlasting Father.&rdquo; Below are the verses in four movements (light in the dark, the promise, prepare the way, he came), each linked into the chapter so you can <a href="https://fathersheartbible.com/read/isaiah/9/" style="color: var(--color-brand);" class="hover:underline">read Isaiah 9 free</a> and hear it.`}
+	keyTakeaway="Advent is the season of our Father coming near: promised through the prophets, born in Bethlehem, and still expected."
+	themes={themes}
+	featured={{ book: 'Isaiah', slug: 'isaiah', chapter: 9, verseLimit: 5, heading: 'The great light: Isaiah 9:1–5', intro: 'Isaiah 9 is the reading most often heard in Advent and at Christmas. Read or hear the first five verses below, then continue into the whole chapter.' }}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/luke/2/" style="color: var(--color-brand);" class="hover:underline">Luke 2</a> or <a href="https://fathersheartbible.com/read/isaiah/40/" style="color: var(--color-brand);" class="hover:underline">Isaiah 40</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, read <a href="/verses/god-as-father/" style="color: var(--color-brand);" class="hover:underline">Bible verses about God as Father</a>, or see <a href="/meaning/our-father/" style="color: var(--color-brand);" class="hover:underline">what &ldquo;Our Father&rdquo; means</a>. For the word itself, see <a href="https://www.blueletterbible.org/lexicon/h6005/kjv/wlc/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Immanuel (Strong&rsquo;s H6005)</a> on Blue Letter Bible.`}
+	ctaMidHeading="Hear Isaiah 9 in full"
+	ctaMidBodyHtml="Read and listen to the great light passage &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear our Father coming near."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["advent scripture readings", "advent", "Isaiah 9", "Immanuel", "Luke 2"]}
+/>

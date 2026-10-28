@@ -1,0 +1,181 @@
+---
+// /bible-in/greece — sourced country page; facts cited in the sources lists below (fetched 2026-10-28).
+// Hero photo: Wikimedia Commons, CC BY-SA 4.0 (file page credited visibly) — hotlinked thumbnails like the other /bible-in heroes.
+import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
+
+const verses = [
+	{
+		ref: 'Psalm 68:5',
+		slug: 'psalms',
+		ch: 68,
+		text: 'A father to the fatherless and defender of widows is our Father in his holy dwelling.',
+	},
+	{
+		ref: 'Romans 8:15',
+		slug: 'romans',
+		ch: 8,
+		text: 'You did not receive a spirit of slavery, to fall back into fear, but received the Spirit of sonship, by whom we cry, "Abba! Father!"',
+	},
+	{
+		ref: '1 John 3:1',
+		slug: '1-john',
+		ch: 3,
+		text: 'See what kind of love our Father has given us, that we should be called children of our Father! And we are.',
+	},
+];
+
+const stats = [
+	{ label: 'Orthodox Christian', value: '90% of adults (Pew Research Center, 2015–16)' },
+	{ label: 'Orthodoxy important to being “truly Greek”', value: '76% (Pew Research Center)' },
+	{
+		label: 'First modern Greek New Testament in print',
+		value: '1638 (Maximos of Gallipoli, Geneva)',
+	},
+	{ label: 'Vamvas Bible', value: 'New Testament 1833, Old Testament 1850' },
+];
+
+const faqs = [
+	{
+		question: 'How many Christians are there in Greece?',
+		answer:
+			"In Pew Research Center's 2015–16 survey, 90% of Greek adults identified as Orthodox Christians, and 76% said being Orthodox is important to being truly Greek. You can read the Scriptures free at fathersheartbible.com/read.",
+	},
+	{
+		question: 'When was the New Testament first translated into modern Greek?',
+		answer:
+			"Maximos of Gallipoli's translation, begun in 1629 at the initiative of Patriarch Cyril Lucaris, was the first translation of the New Testament into modern Greek. It was printed at Geneva in 1638, after Maximos's death.",
+	},
+	{
+		question: 'What is the Vamvas Bible?',
+		answer:
+			'Neophytos Vamvas published a modern Greek New Testament in 1833 and the Old Testament in 1850. The Ecumenical Patriarchate condemned vernacular translations in an 1836 encyclical, and the translation was finally allowed in 1924.',
+	},
+	{
+		question: 'Can I read the Bible online free in Greek?',
+		answer:
+			"Yes. Father's Heart Bible™ is free to read and hear online in Greek — no account, no purchase, no app — at fathersheartbible.com/read/el/. The English edition is free too.",
+	},
+	{
+		question: "Is Father's Heart Bible available in Greek?",
+		answer:
+			"Yes. The Greek edition is at fathersheartbible.com/read/el/. Father's Heart Bible is now in 50 of 80 languages.",
+	},
+];
+---
+
+<CountryBible
+	slug="greece"
+	country="Greece"
+	flag="🇬🇷"
+	flagImg="/flags/gr.svg"
+	countryWikipedia="https://en.wikipedia.org/wiki/Greece"
+	lastUpdated="October 2026"
+	publishedIso="2026-10-28"
+	lastUpdatedIso="2026-10-28"
+	colorPrimary="#0D5EAF"
+	colorSecondary="#1E3A8A"
+	colorAccent="#C9A227"
+	tintWarm="#E6F0FA"
+	tintCool="#EAF0FB"
+	tintBlue="#FBF5DE"
+	title="The Bible in Greece — Orthodox Faith | Father's Heart Bible™ (FHB)"
+	description="How Orthodox is Greece, and what is the story of the Bible in Greek, from Maximos 1638 to Vamvas 1850? Read the Bible free online in Greek with audio — Father's Heart Bible™ (FHB)."
+	h1="The Bible in Greece"
+	heroSubhead="Greece is overwhelmingly Orthodox by self-identification, and Greek is the language of the New Testament itself — Father's Heart Bible offers a near and loving Father in Greek. Free online, with audio."
+	heroBase=""
+	heroSrc={{ desktop: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Meteora_landscape.jpg/1280px-Meteora_landscape.jpg", mobile: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Meteora_landscape.jpg/960px-Meteora_landscape.jpg", og: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Meteora_landscape.jpg/1280px-Meteora_landscape.jpg" }}
+	heroCreditHtml={`Hero photo: <a href="https://commons.wikimedia.org/wiki/File:Meteora_landscape.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Meteora landscape</a> by Sofia Bressan, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 4.0</a>, via Wikimedia Commons.`}
+	heroAlt="Rock pillars of Meteora in Thessaly, Greece, rising over the plain at dawn"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Yes &mdash; you can read the Bible free online in Greece right now.</strong> In Pew Research Center&rsquo;s 2015&ndash;16 survey, 90% of Greek adults identified as Orthodox Christians. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. The <a href="https://fathersheartbible.com/read/el/" style="color: var(--color-brand);" class="hover:underline"><em>Greek</em> edition</a> is free to read and hear today &mdash; for the people whose language the New Testament was first written in, where Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	keyTakeaway="Greece is the home of the language of the New Testament — and Father's Heart Bible™ (FHB) invites an Orthodox people to hear in modern Greek the voice of a Father."
+	glanceIntroHtml={`Greece is a land of islands, mountains and ancient cities &mdash; where Orthodox faith is woven into the calendar, the family and the national story.`}
+	stats={stats}
+	knownForHeading="What Greece is known for"
+	knownForIntroHtml={`The Bible in Greek has two stories: the original New Testament, and the long road to a Bible in the language Greeks speak today.`}
+	knownFor={[
+	{
+		"label": "The language of the New Testament",
+		"text": "The New Testament was written in Greek, so every Bible reader everywhere depends on it."
+	},
+	{
+		"label": "Maximos of Gallipoli, 1638",
+		"text": "Begun in 1629 at the initiative of Patriarch Cyril Lucaris, Maximos&rsquo;s was the first translation of the New Testament into modern Greek; it was printed at Geneva in 1638 after his death."
+	},
+	{
+		"label": "The Vamvas Bible",
+		"text": "Neophytos Vamvas published a modern Greek New Testament in 1833 and the Old Testament in 1850. The Patriarchate of Constantinople condemned vernacular Bible translation in 1836; the Vamvas translation was finally allowed in 1924."
+	},
+	{
+		"label": "An Orthodox people",
+		"text": "90% of Greek adults identified as Orthodox in Pew&rsquo;s 2015&ndash;16 survey, and 76% said being Orthodox is important to being &ldquo;truly Greek.&rdquo;"
+	}
+]}
+	faithHeading="Faith and the Bible in Greece"
+	faithBodyHtml={`<p>Pew Research Center&rsquo;s 2015&ndash;16 survey of Central and Eastern Europe found that <strong>90%</strong> of Greek adults identify as Orthodox Christians, and that <strong>76%</strong> say being Orthodox is important to being &ldquo;truly Greek.&rdquo; Greece is an Orthodox-majority country in a region where, Pew notes, many people believe and belong more than they attend.</p><p>The Bible in the Greek everyday language has a history of struggle. Maximos of Gallipoli&rsquo;s New Testament, begun in 1629, was printed at Geneva in 1638; Neophytos Vamvas published the New Testament in 1833 and the Old Testament in 1850, and a translation of his was not formally allowed until 1924.</p><p>The invitation of Father&rsquo;s Heart Bible&trade; is a personal one: read the same Word in clear modern Greek, and meet in it a Father.</p>`}
+	sources={[
+	{
+		"label": "Pew Research Center — Religious affiliation (Religious Belief and National Belonging in Central and Eastern Europe, 2017; surveys June 2015–July 2016)",
+		"url": "https://www.pewresearch.org/religion/2017/05/10/religious-affiliation/"
+	},
+	{
+		"label": "Pew Research Center — Religious Belief and National Belonging in Central and Eastern Europe (76% say being Orthodox is important to being truly Greek)",
+		"url": "https://www.pewresearch.org/religion/2017/05/10/religious-belief-and-national-belonging-in-central-and-eastern-europe/"
+	},
+	{
+		"label": "Maximos of Gallipoli — Wikipedia (translation begun 1629, Cyril Lucaris, printed Geneva 1638; citing Angold, Eastern Christianity, 2006)",
+		"url": "https://en.wikipedia.org/wiki/Maximos_of_Gallipoli"
+	},
+	{
+		"label": "Neophytos Vamvas — Wikipedia (New Testament 1833, Old Testament 1850, 1836 encyclical, allowed 1924)",
+		"url": "https://en.wikipedia.org/wiki/Neophytos_Vamvas"
+	}
+]}
+	faithsHeading="What “our Father” offers Greece"
+	faithsIntroHtml={`Father&rsquo;s Heart Bible&trade; does not ask Greece to leave the Scriptures it treasures. It lets a faithful people hear, in clear modern Greek, the Father whom its own Bible reveals.`}
+	faithsBlocks={[
+		{ heading: "For the one who prays", bodyHtml: "Greeks pray <a href=\"https://fathersheartbible.com/read/matthew/6/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;Our Father in heaven&rdquo;</a> from childhood &mdash; and can read it again, as the words of One who knows them by name." },
+		{ heading: "For the one left behind", bodyHtml: "To those who feel overlooked, Scripture promises <a href=\"https://fathersheartbible.com/read/psalms/68/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;a father to the fatherless&rdquo;</a> &mdash; a Father who stays." },
+		{ heading: "For the child of our Father", bodyHtml: "<a href=\"https://fathersheartbible.com/read/romans/8/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;&hellip;received the Spirit of sonship, by whom we cry, &lsquo;Abba! Father!&rsquo;&rdquo;</a> &mdash; not a slave&rsquo;s fear, but a child&rsquo;s trust." },
+	]}
+	whyHeading="Why Father's Heart Bible™ for Greece"
+	whyBlocks={[
+		{ heading: "God revealed as Father", bodyHtml: "Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href=\"https://fathersheartbible.com/read/genesis/1/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Genesis 1:1</a> onward." },
+		{ heading: "Free, with audio, on any phone", bodyHtml: "No purchase, no app, no sign-up. The whole Bible is free to <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read online</a>, with audio, on the phone in your hand." },
+		{ heading: "Now in Greek", bodyHtml: "The Greek edition is published: <a href=\"https://fathersheartbible.com/read/el/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read it free</a>. Father&rsquo;s Heart Bible&trade; is in 50 of 80 languages." },
+	]}
+	wordHeading="His Word will not return void"
+	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do. In the land of the New Testament&rsquo;s own language, it will not return empty.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;&hellip;so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
+	resourcesHeading="Learn more about Greece"
+	resourcesIntroHtml={`Trusted sources for the facts on this page &mdash; and for going deeper into Greece&rsquo;s people, faith, and story.`}
+	resources={[
+	{
+		"label": "Greece — Wikipedia",
+		"url": "https://en.wikipedia.org/wiki/Greece"
+	},
+	{
+		"label": "Religion in Greece — Wikipedia",
+		"url": "https://en.wikipedia.org/wiki/Religion_in_Greece"
+	},
+	{
+		"label": "Bible translations into Greek — Wikipedia",
+		"url": "https://en.wikipedia.org/wiki/Bible_translations_into_Greek"
+	},
+	{
+		"label": "Greece — Joshua Project (people groups)",
+		"url": "https://joshuaproject.net/countries/GR"
+	}
+]}
+	opportunityHeading="The translation opportunity for Greece"
+	opportunityIntroHtml={`Greek is the heart language of some ${sp('el')} people worldwide &mdash; and the Greek edition is free to read in Father&rsquo;s Heart Bible&trade;.`}
+	languages={[
+		{ language: "Greek", code: "el" },
+		{ language: "English", code: "en" },
+	]}
+	verses={verses}
+	keepReadingHtml={`Begin with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> &mdash; including <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start</a> and <a href="/guides/what-is-the-gospel/" style="color: var(--color-brand);" class="hover:underline">what the gospel is</a>. Browse Scripture by theme on our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> pages.`}
+	faqs={faqs}
+	ctaMidHeading="Hear the Father in Greek"
+	ctaMidBodyHtml={`Now hear it in a Father&rsquo;s own voice &mdash; free, with audio, on any phone.`}
+	ctaBottomBodyHtml={`From Genesis to Revelation, free online with audio &mdash; a translation that reveals God as a loving Father to every beloved son and daughter, in Greece and wherever Greek speakers have gone.`}
+/>

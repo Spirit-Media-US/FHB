@@ -1,0 +1,181 @@
+---
+// /verses/anger: unit 6aj, ranked by Bing GetKeywordStats 2026-10-28 (aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+	{
+		id: 'slow-to-anger',
+		heading: 'Answer gently and be patient',
+		intro: 'A calm answer and a patient spirit.',
+		verses: [
+			{
+				ref: 'Proverbs 15:1',
+				slug: 'proverbs',
+				ch: 15,
+				text: 'A gentle answer turns away wrath, but a harsh word stirs up anger.',
+			},
+			{
+				ref: 'James 1:19–20',
+				slug: 'james',
+				ch: 1,
+				text: 'Know this, my dear brothers and sisters: everyone should be quick to listen, slow to speak, slow to anger, because human anger does not produce the righteousness of our Father.',
+			},
+			{
+				ref: 'Proverbs 14:29',
+				slug: 'proverbs',
+				ch: 14,
+				text: 'Whoever is slow to anger has great understanding, but a hot temper exalts foolishness.',
+			},
+			{
+				ref: 'Proverbs 16:32',
+				slug: 'proverbs',
+				ch: 16,
+				text: 'Better a patient person than a mighty one, and one who rules his spirit than one who takes a city.',
+			},
+		],
+	},
+	{
+		id: 'do-not-sin',
+		heading: 'In your anger, do not sin',
+		intro: 'Anger handled before it hardens into bitterness.',
+		verses: [
+			{
+				ref: 'Ephesians 4:26–27',
+				slug: 'ephesians',
+				ch: 4,
+				text: 'Be angry and do not sin; do not let the sun go down on your anger, and give no opportunity to the devil.',
+			},
+			{
+				ref: 'Psalm 4:4',
+				slug: 'psalms',
+				ch: 4,
+				text: 'Tremble, and do not sin; search your hearts on your beds, and be still.',
+			},
+			{
+				ref: 'Ephesians 4:31–32',
+				slug: 'ephesians',
+				ch: 4,
+				text: 'Rid yourselves of all bitterness, rage, anger, shouting, and slander, together with all malice. Be kind to one another, tenderhearted, forgiving one another, just as our Father forgave you through Christ.',
+			},
+			{
+				ref: 'Colossians 3:8',
+				slug: 'colossians',
+				ch: 3,
+				text: 'Now get rid of all these: anger, rage, malice, slander, obscene talk from your mouth.',
+			},
+		],
+	},
+	{
+		id: 'leave-it-with-our-father',
+		heading: 'Leave it with our Father',
+		intro: 'Not repaying wrong for wrong.',
+		verses: [
+			{
+				ref: 'Romans 12:19',
+				slug: 'romans',
+				ch: 12,
+				text: "Beloved, don't avenge yourselves; leave room for our Father's wrath. As it's written: Vengeance is mine, I will repay, says our Father.",
+			},
+			{
+				ref: 'Romans 12:21',
+				slug: 'romans',
+				ch: 12,
+				text: 'Do not be overcome by evil, but overcome evil with good.',
+			},
+			{
+				ref: 'Proverbs 19:11',
+				slug: 'proverbs',
+				ch: 19,
+				text: 'The good sense of a person makes him slow to anger, and it is his glory to overlook an offense.',
+			},
+			{
+				ref: 'Proverbs 29:11',
+				slug: 'proverbs',
+				ch: 29,
+				text: 'A fool vents all his anger, but a wise man holds it back and keeps himself calm.',
+			},
+		],
+	},
+	{
+		id: 'our-fathers-patience',
+		heading: 'Our Father is slow to anger',
+		intro: 'His own patience toward us.',
+		verses: [
+			{
+				ref: 'Psalm 103:8',
+				slug: 'psalms',
+				ch: 103,
+				text: 'Our Father is compassionate and gracious, slow to anger and abounding in covenant love.',
+			},
+			{
+				ref: 'Psalm 86:15',
+				slug: 'psalms',
+				ch: 86,
+				text: 'But you, my Sovereign Father, are a compassionate and gracious Father, slow to anger and abounding in covenant love and faithfulness.',
+			},
+			{
+				ref: 'Psalm 145:8',
+				slug: 'psalms',
+				ch: 145,
+				text: 'Our Father is gracious and full of compassion, slow to anger and great in covenant love.',
+			},
+			{
+				ref: 'Joel 2:13',
+				slug: 'joel',
+				ch: 2,
+				text: '"Tear your hearts, not your garments. Return to your Father, for he is gracious and compassionate, slow to anger and abounding in covenant love, and he relents from sending disaster.',
+			},
+		],
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does the Bible say about anger?',
+		answer:
+			'Ephesians 4:26–27 says, “Be angry and do not sin; do not let the sun go down on your anger, and give no opportunity to the devil.”',
+	},
+	{
+		question: 'How does the Bible say to answer an angry person?',
+		answer:
+			'Proverbs 15:1 says, “A gentle answer turns away wrath, but a harsh word stirs up anger.”',
+	},
+	{
+		question: 'Is it a sin to be angry?',
+		answer:
+			'Ephesians 4:26–27 says, “Be angry and do not sin; do not let the sun go down on your anger, and give no opportunity to the devil.”',
+	},
+	{
+		question: 'How should I handle being wronged?',
+		answer:
+			"Romans 12:19 says, “Beloved, don't avenge yourselves; leave room for our Father's wrath. As it's written: Vengeance is mine, I will repay, says our Father.”",
+	},
+	{
+		question: 'Is our Father angry with me?',
+		answer:
+			'Psalm 103:8 says, “Our Father is compassionate and gracious, slow to anger and abounding in covenant love.”',
+	},
+];
+---
+
+<VerseCollection
+	slug="anger"
+	topic="Anger"
+	title="Bible Verses About Anger (with Audio) | Father's Heart Bible™"
+	description="Bible verses about anger in Father's Heart Bible™: slow to anger, not sinning in anger, answering with gentleness and our Father's own patience. Free to read online with audio."
+	h1="Bible Verses About Anger"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg"
+	heroAlt="A man praying quietly"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about anger is Ephesians 4:26: &ldquo;Be angry and do not sin.&rdquo;</strong> Scripture does not pretend anger never comes. It teaches us to be slow to anger, to answer with gentleness, to leave justice with our Father and to put bitterness away. Below are the verses on each of these, word for word in Father&rsquo;s Heart Bible&trade;, linked into the chapter so you can <a href="https://fathersheartbible.com/read/james/1/" style="color: var(--color-brand);" class="hover:underline">read James 1 free</a> and hear it.`}
+	keyTakeaway="The Bible does not shame anger; it shows how to be slow to it, to keep it from becoming sin and to trust our Father, who is himself slow to anger."
+	themes={themes}
+	featured={{"book": "James", "slug": "james", "chapter": 1, "verseLimit": 27, "heading": "Read the whole chapter on anger", "intro": "James 1 holds the plainest line on anger: be quick to listen, slow to speak and slow to anger. Read or hear the chapter below, then follow it to the full chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/ephesians/4/" style="color: var(--color-brand);" class="hover:underline">Ephesians 4</a> or <a href="https://fathersheartbible.com/read/proverbs/15/" style="color: var(--color-brand);" class="hover:underline">Proverbs 15</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/forgiveness/" style="color: var(--color-brand);" class="hover:underline">verses on forgiveness</a>, the <a href="/verses/patience/" style="color: var(--color-brand);" class="hover:underline">verses on patience</a> or the <a href="/verses/peace/" style="color: var(--color-brand);" class="hover:underline">verses on peace</a>.`}
+	ctaMidHeading="Hear James 1 in full"
+	ctaMidBodyHtml="Read and listen to the chapter that tells us to be slow to anger &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a Father who is patient with us."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about anger", "anger", "Ephesians 4:26", "Proverbs 15:1"]}
+/>

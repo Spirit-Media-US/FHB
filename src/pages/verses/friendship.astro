@@ -1,0 +1,176 @@
+---
+// /verses/friendship: unit 6ai, ranked by Bing GetKeywordStats 2026-10-28 (aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+ {
+  "id": "a-friend-loves",
+  "heading": "A friend loves at all times",
+  "intro": "Scripture prizes the friend who stays.",
+  "verses": [
+   {
+    "ref": "Proverbs 17:17",
+    "slug": "proverbs",
+    "ch": 17,
+    "text": "A friend loves at all times, and a brother is born for a time of trouble."
+   },
+   {
+    "ref": "Proverbs 18:24",
+    "slug": "proverbs",
+    "ch": 18,
+    "text": "A man of many companions may come to ruin, but there is a friend who sticks closer than a brother."
+   },
+   {
+    "ref": "Proverbs 27:6",
+    "slug": "proverbs",
+    "ch": 27,
+    "text": "A friend's wounds are faithful, but an enemy's kisses are deceitful."
+   },
+   {
+    "ref": "Proverbs 27:17",
+    "slug": "proverbs",
+    "ch": 27,
+    "text": "Iron sharpens iron, and one person sharpens another."
+   }
+  ]
+ },
+ {
+  "id": "better-together",
+  "heading": "Better together",
+  "intro": "We were made for company, and good friends carry us.",
+  "verses": [
+   {
+    "ref": "Ecclesiastes 4:9–10",
+    "slug": "ecclesiastes",
+    "ch": 4,
+    "text": "Two are better than one, because they have a good return for their labor: If one falls, the other lifts him up. But pity the one who falls alone, with no one to help him up."
+   },
+   {
+    "ref": "Ecclesiastes 4:12",
+    "slug": "ecclesiastes",
+    "ch": 4,
+    "text": "One alone can be overpowered; two can resist. A cord of three strands is not quickly broken."
+   },
+   {
+    "ref": "Galatians 6:2",
+    "slug": "galatians",
+    "ch": 6,
+    "text": "Carry one another's burdens, and in this way you will fulfill the law of Christ."
+   },
+   {
+    "ref": "1 Thessalonians 5:11",
+    "slug": "1-thessalonians",
+    "ch": 5,
+    "text": "Therefore encourage one another and build one another up, just as you are doing."
+   }
+  ]
+ },
+ {
+  "id": "friends-in-the-bible",
+  "heading": "Friends in the Bible",
+  "intro": "David and Jonathan show loyalty that lasts.",
+  "verses": [
+   {
+    "ref": "1 Samuel 18:1",
+    "slug": "1-samuel",
+    "ch": 18,
+    "text": "When David finished speaking with Saul, Jonathan's soul was tied to David's, and Jonathan loved him as his own soul."
+   },
+   {
+    "ref": "1 Samuel 18:3",
+    "slug": "1-samuel",
+    "ch": 18,
+    "text": "Then Jonathan made a covenant with David, because he loved him as his own soul."
+   },
+   {
+    "ref": "Proverbs 27:9",
+    "slug": "proverbs",
+    "ch": 27,
+    "text": "Oil and incense gladden the heart, and the sweetness of a friend comes from heartfelt counsel."
+   },
+   {
+    "ref": "Proverbs 13:20",
+    "slug": "proverbs",
+    "ch": 13,
+    "text": "Whoever walks with the wise grows wise, but the companion of fools suffers harm."
+   }
+  ]
+ },
+ {
+  "id": "jesus-calls-us-friends",
+  "heading": "Jesus calls us friends",
+  "intro": "The Son has made us friends of our Father.",
+  "verses": [
+   {
+    "ref": "John 15:13",
+    "slug": "john",
+    "ch": 15,
+    "text": "No one has greater love than this: to lay down one's life for one's friends."
+   },
+   {
+    "ref": "John 15:15",
+    "slug": "john",
+    "ch": 15,
+    "text": "I no longer call you servants—a servant doesn't know what his master does. I call you friends, since I've made known to you everything I heard from my Father."
+   },
+   {
+    "ref": "Hebrews 10:24–25",
+    "slug": "hebrews",
+    "ch": 10,
+    "text": "And let us consider how to spur one another on to love and good works, not giving up meeting together, as some habitually do, but encouraging each other—even more as you see the Day approaching."
+   },
+   {
+    "ref": "Romans 12:10",
+    "slug": "romans",
+    "ch": 12,
+    "text": "Love one another with brotherly affection. Outdo one another in showing honor."
+   }
+  ]
+ }
+];
+
+const faqs = [
+ {
+  "question": "What is the best Bible verse about friendship?",
+  "answer": "Proverbs 17:17 says, “A friend loves at all times, and a brother is born for a time of trouble.”"
+ },
+ {
+  "question": "What does the Bible say about true friends?",
+  "answer": "Proverbs 18:24 says, “A man of many companions may come to ruin, but there is a friend who sticks closer than a brother.” A true friend is measured by staying close, not by how many there are."
+ },
+ {
+  "question": "Why are two people better than one?",
+  "answer": "Ecclesiastes 4:9–10 says, “Two are better than one, because they have a good return for their labor: If one falls, the other lifts him up. But pity the one who falls alone, with no one to help him up.”"
+ },
+ {
+  "question": "Does Jesus call us friends?",
+  "answer": "Yes. In John 15:15 he says, “I no longer call you servants—a servant doesn't know what his master does. I call you friends, since I've made known to you everything I heard from my Father.”"
+ },
+ {
+  "question": "How does the Bible say friends should treat each other?",
+  "answer": "Galatians 6:2 says, “Carry one another's burdens, and in this way you will fulfill the law of Christ.”"
+ }
+];
+---
+
+<VerseCollection
+	slug="friendship"
+	topic="Friendship"
+	title="Bible Verses About Friendship (with Audio) | Father's Heart Bible™"
+	description="Bible verses about friendship in Father's Heart Bible™: a friend who loves at all times, better together, friends in the Bible and Jesus calling us friends. Free to read online with audio."
+	h1="Bible Verses About Friendship"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg"
+	heroAlt="People gathered together around a table"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about friendship is Proverbs 17:17: &ldquo;A friend loves at all times, and a brother is born for a time of trouble.&rdquo;</strong> Scripture honors loyal friends, shows two people stronger than one, remembers David and Jonathan, and records Jesus calling his followers friends. Below are the verses on faithful friends, on being better together, on friends in the Bible and on friendship with Jesus, each word for word in Father&rsquo;s Heart Bible&trade; and linked into the chapter so you can <a href="https://fathersheartbible.com/read/proverbs/17/" style="color: var(--color-brand);" class="hover:underline">read Proverbs 17 free</a> and hear it.`}
+	keyTakeaway="Biblical friendship is steady love: staying near in trouble, lifting each other up and honoring one another, as Jesus first called us friends."
+	themes={themes}
+	featured={{"book": "Proverbs", "slug": "proverbs", "chapter": 17, "verseLimit": 17, "heading": "A friend loves at all times: Proverbs 17", "intro": "Proverbs 17 holds the best-known line on friendship. Read or hear the chapter below, then follow it to the full chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/ecclesiastes/4/" style="color: var(--color-brand);" class="hover:underline">Ecclesiastes 4</a> or <a href="https://fathersheartbible.com/read/john/15/" style="color: var(--color-brand);" class="hover:underline">John 15</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/love/" style="color: var(--color-brand);" class="hover:underline">verses on love</a>, the <a href="/verses/family/" style="color: var(--color-brand);" class="hover:underline">verses on family</a> or the <a href="/verses/forgiveness/" style="color: var(--color-brand);" class="hover:underline">verses on forgiveness</a>.`}
+	ctaMidHeading="Hear Proverbs 17 in full"
+	ctaMidBodyHtml="Read and listen to the chapter that says a friend loves at all times &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a Father who calls you friend."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about friendship", "friendship", "Proverbs 17:17", "John 15:15"]}
+/>

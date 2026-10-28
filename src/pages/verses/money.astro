@@ -1,0 +1,215 @@
+---
+// /verses/money: unit 6bp, ranked by Bing GetKeywordStats 2026-10-28 (aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+  {
+   "id": "love-of-money",
+   "heading": "The love of money, and what it costs",
+   "intro": "Scripture warns about the love of money, not about having it.",
+   "verses": [
+    {
+     "ref": "1 Timothy 6:10",
+     "slug": "1-timothy",
+     "ch": 6,
+     "text": "Love of money is a root of all kinds of evil; craving it, some have strayed from the faith and pierced themselves with many pains."
+    },
+    {
+     "ref": "Ecclesiastes 5:10",
+     "slug": "ecclesiastes",
+     "ch": 5,
+     "text": "Whoever loves money never has enough; whoever loves wealth never has enough income. This too is fleeting."
+    },
+    {
+     "ref": "Luke 12:15",
+     "slug": "luke",
+     "ch": 12,
+     "text": "He said to them, \"Watch out! Guard against every kind of greed, because life isn't made up of possessions, however many.\""
+    },
+    {
+     "ref": "Proverbs 11:28",
+     "slug": "proverbs",
+     "ch": 11,
+     "text": "Whoever trusts in his riches will fall, but the righteous will flourish like green leaves."
+    }
+   ]
+  },
+  {
+   "id": "content",
+   "heading": "Content with what we have",
+   "intro": "Enough is a gift, and it is learned.",
+   "verses": [
+    {
+     "ref": "1 Timothy 6:6-8",
+     "slug": "1-timothy",
+     "ch": 6,
+     "text": "Now godliness with contentment is great gain, for we brought nothing into the world, and we can take nothing out of it. But if we have food and clothing, with these we will be content."
+    },
+    {
+     "ref": "Hebrews 13:5",
+     "slug": "hebrews",
+     "ch": 13,
+     "text": "Keep your life free from the love of money; be content with what you have, for our Father himself has said, \"I will never leave you, never abandon you.\""
+    },
+    {
+     "ref": "Philippians 4:11-13",
+     "slug": "philippians",
+     "ch": 4,
+     "text": "Not that I speak from need—I've learned to be content in any circumstance. I know how to be brought low, and I know how to overflow. In any and every circumstance I've learned the secret: full and hungry, overflowing and lacking. I can do all things through Christ who strengthens me."
+    },
+    {
+     "ref": "Proverbs 15:16",
+     "slug": "proverbs",
+     "ch": 15,
+     "text": "Better a little with the fear of our Father than great treasure and trouble with it."
+    }
+   ]
+  },
+  {
+   "id": "our-father-provides",
+   "heading": "Our Father provides",
+   "intro": "For anyone worried about how the bills will be paid.",
+   "verses": [
+    {
+     "ref": "Matthew 6:33",
+     "slug": "matthew",
+     "ch": 6,
+     "text": "But seek first our Father's kingdom and his righteousness, and all these will be added to you."
+    },
+    {
+     "ref": "Philippians 4:19",
+     "slug": "philippians",
+     "ch": 4,
+     "text": "And my Father will supply all your needs according to his riches in glory in Christ Jesus."
+    },
+    {
+     "ref": "Deuteronomy 8:18",
+     "slug": "deuteronomy",
+     "ch": 8,
+     "text": "Remember your Father, for he gives you power to gain wealth, to confirm his covenant that he swore to your ancestors, as it is today."
+    },
+    {
+     "ref": "Proverbs 3:9-10",
+     "slug": "proverbs",
+     "ch": 3,
+     "text": "Honor our Father with your wealth and with the firstfruits of all your produce, then your barns will be filled with plenty, and your vats will overflow with new wine."
+    }
+   ]
+  },
+  {
+   "id": "wise-with-money",
+   "heading": "Wise with what we have",
+   "intro": "Plain, practical Scripture on diligence and debt.",
+   "verses": [
+    {
+     "ref": "Proverbs 21:5",
+     "slug": "proverbs",
+     "ch": 21,
+     "text": "The plans of the diligent lead surely to abundance, but all who are hasty end up in poverty."
+    },
+    {
+     "ref": "Proverbs 13:11",
+     "slug": "proverbs",
+     "ch": 13,
+     "text": "Wealth gained by fraud dwindles away, but whoever gathers little by little makes it grow."
+    },
+    {
+     "ref": "Proverbs 22:7",
+     "slug": "proverbs",
+     "ch": 22,
+     "text": "The rich rules over the poor, and the borrower is slave to the lender."
+    },
+    {
+     "ref": "Romans 13:8",
+     "slug": "romans",
+     "ch": 13,
+     "text": "Owe no one anything except to love one another, for loving another fulfills the law."
+    }
+   ]
+  },
+  {
+   "id": "generous",
+   "heading": "Generous with what we have",
+   "intro": "Giving as an act of trust.",
+   "verses": [
+    {
+     "ref": "2 Corinthians 9:7",
+     "slug": "2-corinthians",
+     "ch": 9,
+     "text": "Each should give as he has decided in his heart, not reluctantly or under compulsion, for our Father loves a cheerful giver."
+    },
+    {
+     "ref": "Proverbs 19:17",
+     "slug": "proverbs",
+     "ch": 19,
+     "text": "Whoever is generous to the poor lends to our Father, and our Father will repay him for his deed."
+    },
+    {
+     "ref": "Proverbs 11:25",
+     "slug": "proverbs",
+     "ch": 11,
+     "text": "A generous soul will be enriched, and whoever refreshes others will himself be refreshed."
+    },
+    {
+     "ref": "Luke 12:33-34",
+     "slug": "luke",
+     "ch": 12,
+     "text": "Sell your possessions and give to the poor. Make yourselves purses that don't wear out—an unfailing treasure in the heavens, where no thief comes near and no moth destroys. For where your treasure is, there your heart will be also."
+    }
+   ]
+  }
+ ];
+
+const faqs = [
+  {
+   "question": "What does the Bible say about money?",
+   "answer": "Hebrews 13:5 says, “Keep your life free from the love of money; be content with what you have, for our Father himself has said, \"I will never leave you, never abandon you.\"”"
+  },
+  {
+   "question": "Is money the root of all evil?",
+   "answer": "1 Timothy 6:10 says, “Love of money is a root of all kinds of evil; craving it, some have strayed from the faith and pierced themselves with many pains.”"
+  },
+  {
+   "question": "What does the Bible say about worrying about money?",
+   "answer": "Matthew 6:33 says, “But seek first our Father's kingdom and his righteousness, and all these will be added to you.”"
+  },
+  {
+   "question": "Will our Father provide for my needs?",
+   "answer": "Philippians 4:19 says, “And my Father will supply all your needs according to his riches in glory in Christ Jesus.”"
+  },
+  {
+   "question": "What does the Bible say about being content with what you have?",
+   "answer": "1 Timothy 6:6–8 says, “Now godliness with contentment is great gain, for we brought nothing into the world, and we can take nothing out of it. But if we have food and clothing, with these we will be content.”"
+  },
+  {
+   "question": "What does the Bible say about giving?",
+   "answer": "2 Corinthians 9:7 says, “Each should give as he has decided in his heart, not reluctantly or under compulsion, for our Father loves a cheerful giver.”"
+  },
+  {
+   "question": "What does the Bible say about debt?",
+   "answer": "Proverbs 22:7 says, “The rich rules over the poor, and the borrower is slave to the lender.”"
+  }
+ ];
+---
+
+<VerseCollection
+	slug="money"
+	topic="Money"
+	title="Bible Verses About Money (with Audio) | Father's Heart Bible™"
+	description="Bible verses about money in Father's Heart Bible™: the love of money, contentment, our Father who provides, and generosity. Free to read online with audio."
+	h1="Bible Verses About Money"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg"
+	heroAlt="An older man reading Scripture in a quiet room"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about money is 1 Timothy 6:10: &ldquo;Love of money is a root of all kinds of evil.&rdquo;</strong> The verse is about loving money, not about having it. Scripture speaks to money in four ways: a warning about loving it, contentment with what we have, our Father who provides, and wisdom and generosity in using it. Below, word for word in Father&rsquo;s Heart Bible&trade;, are the verses on each, linked into the chapter so you can <a href="https://fathersheartbible.com/read/1-timothy/6/" style="color: var(--color-brand);" class="hover:underline">read 1 Timothy 6 free</a> and hear it.`}
+	keyTakeaway="The Bible does not call money evil. It warns against loving it, and points us to a Father who knows what we need."
+	themes={themes}
+	featured={{"book": "1 Timothy", "slug": "1-timothy", "chapter": 6, "verseLimit": 10, "heading": "Godliness with contentment: 1 Timothy 6", "intro": "1 Timothy 6 gathers Paul's plainest words on money. Read or hear it below, then follow it to the full chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/matthew/6/" style="color: var(--color-brand);" class="hover:underline">Matthew 6</a> or <a href="https://fathersheartbible.com/read/hebrews/13/" style="color: var(--color-brand);" class="hover:underline">Hebrews 13</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/gratitude/" style="color: var(--color-brand);" class="hover:underline">verses on gratitude</a>, the <a href="/verses/anxiety/" style="color: var(--color-brand);" class="hover:underline">verses on anxiety</a> or the <a href="/bible-for/financial-hardship/" style="color: var(--color-brand);" class="hover:underline">Bible for financial hardship</a>.`}
+	ctaMidHeading="Hear 1 Timothy 6 in full"
+	ctaMidBodyHtml="Read and listen to the chapter on contentment and the love of money &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a Father who provides."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about money", "money", "1 Timothy 6:10", "Hebrews 13:5"]}
+/>

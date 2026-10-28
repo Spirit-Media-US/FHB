@@ -85,10 +85,10 @@ try {
 	const src = fs.readFileSync('/srv/sites/community/src/lib/languages.ts', 'utf8');
 	const rows = [];
 	for (const m of src.matchAll(
-		/code:\s*"([a-z-]+)",\s*name:\s*"([^"]+)"[\s\S]{0,120}?live:\s*(true|false)/g,
+		/code:\s*"([a-z-]+)",\s*name:\s*"([^"]+)",\s*endonym:\s*"([^"]+)"[\s\S]{0,120}?live:\s*(true|false)/g,
 	)) {
-		if (m[3] === 'true' && !rows.some((r) => r.code === m[1]))
-			rows.push({ code: m[1], name: m[2] });
+		if (m[4] === 'true' && !rows.some((r) => r.code === m[1]))
+			rows.push({ code: m[1], name: m[2], endonym: m[3] });
 	}
 	const missing = LIVE_LANGS.filter((c) => !rows.some((r) => r.code === c));
 	if (rows.length === 0 || missing.length > 0) {
@@ -705,4 +705,12 @@ let READ_LANGUAGE_TOTAL = 0;
 		if (next !== cur) fs.writeFileSync(f, next);
 		console.log(`gen-sitemap-read: ${name} — ${hits.length} print count(s) set to ${printTotal}, ${readHits.length} online count(s) set to ${READ_LANGUAGE_TOTAL || 'unchanged'}`);
 	}
+}
+
+// ── llms.txt / llms-full.txt answer-page index (unit 6ae, 2026-10-28) ────────────
+// Derived from src/pages so a new /meaning, /verses, /bible-in ... page is listed on the next
+// build with no hand edit. Test: scripts/llms-answer-pages.test.mjs.
+{
+	const { generate } = await import('./llms-answer-pages.mjs');
+	console.log('gen-sitemap-read: llms answer pages', JSON.stringify(generate()));
 }

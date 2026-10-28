@@ -1,0 +1,171 @@
+---
+// /bible-in/hungary — sourced country page; facts cited in the sources lists below (fetched 2026-10-28).
+// Hero photo: Wikimedia Commons, CC BY-SA 4.0 (file page credited visibly) — hotlinked thumbnails like the other /bible-in heroes.
+import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
+
+const verses = [
+	{
+		ref: 'Psalm 68:5',
+		slug: 'psalms',
+		ch: 68,
+		text: 'A father to the fatherless and defender of widows is our Father in his holy dwelling.',
+	},
+	{
+		ref: 'Romans 8:15',
+		slug: 'romans',
+		ch: 8,
+		text: 'You did not receive a spirit of slavery, to fall back into fear, but received the Spirit of sonship, by whom we cry, "Abba! Father!"',
+	},
+	{
+		ref: '1 John 3:1',
+		slug: '1-john',
+		ch: 3,
+		text: 'See what kind of love our Father has given us, that we should be called children of our Father! And we are.',
+	},
+];
+
+const stats = [
+	{ label: 'People', value: '9,603,634 (Census, 1 October 2022)' },
+	{ label: 'Answered the religion question', value: '60% (it was voluntary)' },
+	{ label: 'Catholic', value: '50% of those who answered (about 2.9 million)' },
+	{ label: 'Reformed', value: '16% of those who answered' },
+	{ label: 'First complete Hungarian Bible', value: '1590 (Vizsoly, Gáspár Károli)' },
+];
+
+const faqs = [
+	{
+		question: 'How many Christians are there in Hungary?',
+		answer:
+			'The 2022 census religion question was voluntary and 60% of residents answered it. Of those who answered, 50% (about 2.9 million) were Catholic, 16% Reformed and 3.1% Lutheran, and 27% said they are not religious (Hungarian Central Statistical Office, KSH). You can read the Scriptures free at fathersheartbible.com/read.',
+	},
+	{
+		question: 'When was the Bible first translated into Hungarian?',
+		answer:
+			"János Sylvester's New Testament, printed at Sárvár in 1541, is the first surviving complete Hungarian New Testament. The first surviving complete Bible in Hungarian is the Vizsoly Bible of 1590, translated by the Calvinist pastor Gáspár Károli.",
+	},
+	{
+		question: 'Which Hungarian Bible translations are used today?',
+		answer:
+			'The Károli translation, whose 1908 edition was widely adopted, and the Catholic Káldi Bible of 1626, most recently revised in 1997.',
+	},
+	{
+		question: 'Can I read the Bible online free in Hungarian?',
+		answer:
+			"Yes. Father's Heart Bible™ is free to read and hear online in Hungarian — no account, no purchase, no app — at fathersheartbible.com/read/hu/. The English edition is free too.",
+	},
+	{
+		question: "Is Father's Heart Bible available in Hungarian?",
+		answer:
+			"Yes. The Hungarian edition is at fathersheartbible.com/read/hu/. Father's Heart Bible is now in 50 of 80 languages.",
+	},
+];
+---
+
+<CountryBible
+	slug="hungary"
+	country="Hungary"
+	flag="🇭🇺"
+	flagImg="/flags/hu.svg"
+	countryWikipedia="https://en.wikipedia.org/wiki/Hungary"
+	lastUpdated="October 2026"
+	publishedIso="2026-10-28"
+	lastUpdatedIso="2026-10-28"
+	colorPrimary="#436F4D"
+	colorSecondary="#CD2A3E"
+	colorAccent="#2A4B7C"
+	tintWarm="#E9F2EA"
+	tintCool="#FBECEE"
+	tintBlue="#E8EEF7"
+	title="The Bible in Hungary — Christianity | Father's Heart Bible™ (FHB)"
+	description="How many Hungarians are Catholic or Reformed, and what is the story of the Károli Bible of 1590? Read the Bible free online in Hungarian with audio — Father's Heart Bible™ (FHB)."
+	h1="The Bible in Hungary"
+	heroSubhead="Hungary has had the whole Bible in Hungarian since 1590, and its 2022 census shows a nation of Catholics and Reformed — Father's Heart Bible offers a near and loving Father in Hungarian. Free online, with audio."
+	heroBase=""
+	heroSrc={{ desktop: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg/1280px-20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg", mobile: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg/960px-20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg", og: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg/1280px-20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg" }}
+	heroCreditHtml={`Hero photo: <a href="https://commons.wikimedia.org/wiki/File:20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Hungarian Parliament Building seen from Fisherman’s Bastion</a> by <a href="https://commons.wikimedia.org/wiki/User:Jakubhal" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Jakub Hałun</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 4.0</a>, via Wikimedia Commons.`}
+	heroAlt="The Hungarian Parliament Building on the bank of the Danube in Budapest, seen from Fisherman’s Bastion"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Yes &mdash; you can read the Bible free online in Hungary right now.</strong> In the 2022 census, 60% of residents answered the optional religion question; half of those who answered were Catholic and 16% Reformed. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. The <a href="https://fathersheartbible.com/read/hu/" style="color: var(--color-brand);" class="hover:underline"><em>Hungarian</em> edition</a> is free to read and hear today &mdash; for a people who have had the whole Bible in Hungarian since the Vizsoly Bible of 1590, where Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	keyTakeaway="Hungary has had the whole Bible in Hungarian since 1590 — and Father's Heart Bible™ (FHB) invites a Catholic and Reformed nation to hear, clearly, the voice of a Father."
+	glanceIntroHtml={`Hungary is a land of the Danube, thermal baths and old cities &mdash; home to 9.6 million people, where Catholic and Reformed churches have shaped the national story for centuries.`}
+	stats={stats}
+	knownForHeading="What Hungary is known for"
+	knownForIntroHtml={`Hungary&rsquo;s Bible story runs from the first printed New Testament to the Károli Bible still read today.`}
+	knownFor={[
+	{
+		"label": "The first printed New Testament, 1541",
+		"text": "János Sylvester&rsquo;s New Testament, printed at Sárvár in 1541, is the first surviving complete Hungarian New Testament and the first book printed in Hungarian in Hungary."
+	},
+	{
+		"label": "The Vizsoly Bible, 1590",
+		"text": "Translated by the Calvinist pastor Gáspár Károli, it is the first surviving complete Bible in Hungarian; its 1908 edition was widely adopted."
+	},
+	{
+		"label": "The Káldi Bible, 1626",
+		"text": "György Káldi&rsquo;s translation, printed in Vienna, was the first complete Catholic Bible in Hungarian; it was most recently revised in 1997."
+	},
+	{
+		"label": "A mostly Christian answer",
+		"text": "Of the 60% who answered the 2022 census religion question, 50% were Catholic (2.6 million Roman Catholic, 165,000 Greek Catholic), 16% Reformed and 3.1% Lutheran; 27% said they are not religious."
+	}
+]}
+	faithHeading="Faith and the Bible in Hungary"
+	faithBodyHtml={`<p>The 2022 census counted <strong>9,603,634 people</strong> on 1 October 2022. The religion question was voluntary and <strong>60%</strong> answered it. Of those who answered, <strong>50%</strong> (2.9 million) were Catholic, <strong>16%</strong> Reformed and <strong>3.1%</strong> Lutheran, while <strong>27%</strong> said they are not religious (Hungarian Central Statistical Office, KSH).</p><p>The Hungarian Bible is old here. The first complete New Testament was printed in 1541, the Calvinist Károli Bible followed at Vizsoly in 1590, and the Catholic Káldi Bible in 1626; the Károli translation&rsquo;s 1908 edition was widely adopted.</p><p>The invitation of Father&rsquo;s Heart Bible&trade; is a personal one: read the same Word in clear Hungarian, and meet in it a Father.</p>`}
+	sources={[
+	{
+		"label": "Hungarian Central Statistical Office (KSH) — 2022 Census, final data (population 9,603,634 on 1 October 2022; religion: 60% answered, 50% Catholic, 16% Reformed, 3.1% Lutheran, 27% not religious)",
+		"url": "https://nepszamlalas2022.ksh.hu/eredmenyek/vegleges-adatok/kiadvany/assets/nepszamlalas2022-vegleges-adatok.pdf"
+	},
+	{
+		"label": "Bible translations into Hungarian — Wikipedia (Sylvester 1541, Károli 1590 and 1908 edition, Káldi 1626 and 1997 revision; citing biblia.hu)",
+		"url": "https://en.wikipedia.org/wiki/Bible_translations_into_Hungarian"
+	}
+]}
+	faithsHeading="What “our Father” offers Hungary"
+	faithsIntroHtml={`Father&rsquo;s Heart Bible&trade; does not ask Hungary to leave the Scriptures it treasures. It lets a faithful people hear, in clear Hungarian, the Father whom its own Bible reveals.`}
+	faithsBlocks={[
+		{ heading: "For the one who prays", bodyHtml: "Hungarians pray <a href=\"https://fathersheartbible.com/read/matthew/6/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;Our Father in heaven&rdquo;</a> from childhood &mdash; and can read it again, as the words of One who knows them by name." },
+		{ heading: "For the one left behind", bodyHtml: "To those who feel overlooked, Scripture promises <a href=\"https://fathersheartbible.com/read/psalms/68/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;a father to the fatherless&rdquo;</a> &mdash; a Father who stays." },
+		{ heading: "For the child of our Father", bodyHtml: "<a href=\"https://fathersheartbible.com/read/romans/8/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;&hellip;received the Spirit of sonship, by whom we cry, &lsquo;Abba! Father!&rsquo;&rdquo;</a> &mdash; not a slave&rsquo;s fear, but a child&rsquo;s trust." },
+	]}
+	whyHeading="Why Father's Heart Bible™ for Hungary"
+	whyBlocks={[
+		{ heading: "God revealed as Father", bodyHtml: "Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href=\"https://fathersheartbible.com/read/genesis/1/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Genesis 1:1</a> onward." },
+		{ heading: "Free, with audio, on any phone", bodyHtml: "No purchase, no app, no sign-up. The whole Bible is free to <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read online</a>, with audio, on the phone in your hand." },
+		{ heading: "Now in Hungarian", bodyHtml: "The Hungarian edition is published: <a href=\"https://fathersheartbible.com/read/hu/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read it free</a>. Father&rsquo;s Heart Bible&trade; is in 50 of 80 languages." },
+	]}
+	wordHeading="His Word will not return void"
+	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do. In a land that has had it in Hungarian since 1590, it will not return empty.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;&hellip;so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
+	resourcesHeading="Learn more about Hungary"
+	resourcesIntroHtml={`Trusted sources for the facts on this page &mdash; and for going deeper into Hungary&rsquo;s people, faith, and story.`}
+	resources={[
+	{
+		"label": "Hungary — Wikipedia",
+		"url": "https://en.wikipedia.org/wiki/Hungary"
+	},
+	{
+		"label": "Religion in Hungary — Wikipedia",
+		"url": "https://en.wikipedia.org/wiki/Religion_in_Hungary"
+	},
+	{
+		"label": "Hungarian Central Statistical Office — Census 2022",
+		"url": "https://nepszamlalas2022.ksh.hu/"
+	},
+	{
+		"label": "Hungary — Joshua Project (people groups)",
+		"url": "https://joshuaproject.net/countries/HU"
+	}
+]}
+	opportunityHeading="The translation opportunity for Hungary"
+	opportunityIntroHtml={`Hungarian is the heart language of some ${sp('hu')} people worldwide &mdash; and the Hungarian edition is free to read in Father&rsquo;s Heart Bible&trade;.`}
+	languages={[
+		{ language: "Hungarian", code: "hu" },
+		{ language: "English", code: "en" },
+	]}
+	verses={verses}
+	keepReadingHtml={`Begin with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> &mdash; including <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start</a> and <a href="/guides/what-is-the-gospel/" style="color: var(--color-brand);" class="hover:underline">what the gospel is</a>. Browse Scripture by theme on our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> pages.`}
+	faqs={faqs}
+	ctaMidHeading="Hear the Father in Hungarian"
+	ctaMidBodyHtml={`Now hear it in a Father&rsquo;s own voice &mdash; free, with audio, on any phone.`}
+	ctaBottomBodyHtml={`From Genesis to Revelation, free online with audio &mdash; a translation that reveals God as a loving Father to every beloved son and daughter, in Hungary and wherever Hungarian speakers have gone.`}
+/>

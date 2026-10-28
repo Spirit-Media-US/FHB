@@ -13,7 +13,7 @@ import Layout from '../../layouts/Layout.astro';
 const PAGE_URL = 'https://fathersheartbible.com/guides/best-books-on-the-fathers-heart/';
 const TITLE = 'Best Books on the Father Heart of God';
 const DESCRIPTION =
-	'The best books on the father heart of God — the revelation of God as our loving Father: Floyd McClung’s classic, Brennan Manning, Henri Nouwen, Jack Frost, James Jordan — and the one Bible translation devoted to the theme.';
+	'The best books on the father heart of God: Floyd McClung, Brennan Manning, Henri Nouwen, Jack Frost, James Jordan — and the one Bible translation devoted to it.';
 const PUBLISHED = '2026-07-13';
 const MODIFIED = '2026-07-16';
 
@@ -287,7 +287,7 @@ const listSchema = {
 			name: b.title,
 			author:
 				b.id === 'fhb'
-					? { '@type': 'Organization', name: 'Spirit Media Publishing' }
+					? { '@type': 'Organization', '@id': 'https://spiritmediapublishing.com/#organization', name: 'Spirit Media Publishing' }
 					: { '@type': 'Person', name: b.author.replace(/ —.*$/, '').trim() },
 			url: `${PAGE_URL}#${b.id}`,
 			...(BUY[b.id] ? { sameAs: BUY[b.id] } : {}),

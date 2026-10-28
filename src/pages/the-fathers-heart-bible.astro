@@ -16,6 +16,7 @@ import {
 } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
+import { fitDescription, fitTitle } from '../lib/seoFit';
 
 const [pageData, media, biblePageData, latestPosts] = await Promise.all([
 	sanityClient.fetch(`*[_type =="page" && slug =="the-fathers-heart-bible"][0] {
@@ -48,10 +49,10 @@ const seoTitle =
 	pageData?.seoTitle || "What Is Father's Heart Bible™ (FHB)? The 2026 Bible Translation";
 const seoDescription =
 	pageData?.seoDescription ||
-	`Father's Heart Bible™ (FHB) is the complete Bible, freshly translated to reveal God as our Father, with His words in blue. Free to read online and in print, soon in 80 languages.`;
+	`Father's Heart Bible™ (FHB): the complete Bible, translated to show our Father's heart, with His words in blue. Free to read online and in print, soon in 80 languages.`;
 const heroHeading = 'What is Father\u2019s Heart Bible\u2122?';
 // Answer-first: the page's question answered in its opening sentences, in plain text.
-const heroSubheading = `Father\u2019s Heart Bible\u2122 (FHB) is the complete Bible in a translation from the original Hebrew, Aramaic, and Greek that reveals God as our Father where Scripture reveals Him. To our knowledge, it is the first Bible in print to show which words a divine person spoke \u2014 our Father\u2019s in blue, the Son\u2019s in red, the Spirit\u2019s in purple. Free to read and hear online and in print, soon in 80 languages.`;
+const heroSubheading = `Father\u2019s Heart Bible\u2122 (FHB) is the complete Bible in a translation from the original Hebrew, Aramaic, and Greek that reveals God as our Father where Scripture reveals Him. To our knowledge, it is the first Bible in print to show which words a divine person spoke \u2014 our Father\u2019s in blue, the Son\u2019s in red, the Spirit\u2019s in purple. It is a Bible about our Father\u2019s heart. Free to read and hear online and in print, soon in 80 languages.`;
 // Hero CTA: single "Read FHB" (the site's primary CTA). The old "Read Sample
 // Passages" button was removed (2026-06-06, Kevin) since Read FHB sat right
 // beside it — redundant.
@@ -166,8 +167,8 @@ const formatDate = (dateString: string) => {
 ---
 
 <Layout
-	title={seoTitle}
-	description={seoDescription}
+	title={fitTitle(seoTitle)}
+	description={fitDescription(seoDescription)}
 	image="https://assets.spiritmediapublishing.com/FHB/share/fhb-og-bible.jpg?v=2"
 	imageAlt={'Father\'s Heart Bible™ — "I will be your Father" (Revelation 21:7)'}
 	darkHero={true}
@@ -231,7 +232,7 @@ const formatDate = (dateString: string) => {
 				"name": "Spirit Media Publishing",
 				"url": "https://spiritmediapublishing.com"
 			},
-			"copyrightHolder": { "@type": "Organization", "name": "Spirit Media Inc." },
+			"copyrightHolder": { "@type": "Organization", "@id": "https://spiritmediapublishing.com/#parent-organization", "name": "Spirit Media Inc.", "legalName": "Spirit Media Inc." },
 			"copyrightYear": 2026,
 			"datePublished": "2026-06-21",
 			"about": [

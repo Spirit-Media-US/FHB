@@ -1,0 +1,176 @@
+---
+// /verses/family: unit 6ai, ranked by Bing GetKeywordStats 2026-10-28 (aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+ {
+  "id": "a-home-that-serves",
+  "heading": "A home that serves our Father",
+  "intro": "Households are where faith is first lived out.",
+  "verses": [
+   {
+    "ref": "Joshua 24:15",
+    "slug": "joshua",
+    "ch": 24,
+    "text": "But if serving our Father seems wrong to you, choose for yourselves today whom you will serve—the gods your ancestors served beyond the River, or the gods of the Amorites in whose land you live. As for me and my household, we will serve our Father.\""
+   },
+   {
+    "ref": "Psalm 127:3",
+    "slug": "psalms",
+    "ch": 127,
+    "text": "Children are a heritage from our Father, the fruit of the womb a reward."
+   },
+   {
+    "ref": "Psalm 127:1",
+    "slug": "psalms",
+    "ch": 127,
+    "text": "Unless our Father builds the house, its builders labor in vain. Unless our Father watches over the city, the watchman stays awake in vain."
+   },
+   {
+    "ref": "Psalm 133:1",
+    "slug": "psalms",
+    "ch": 133,
+    "text": "Look how good and how pleasant it is when brothers live together in unity!"
+   }
+  ]
+ },
+ {
+  "id": "raising-children",
+  "heading": "Raising children",
+  "intro": "Instruction, example and gentleness at home.",
+  "verses": [
+   {
+    "ref": "Deuteronomy 6:6–7",
+    "slug": "deuteronomy",
+    "ch": 6,
+    "text": "And these words that I command you today are to be on your heart. Teach them diligently to your children, and talk about them when you sit in your house and when you walk along the road, when you lie down and when you get up."
+   },
+   {
+    "ref": "Proverbs 22:6",
+    "slug": "proverbs",
+    "ch": 22,
+    "text": "Train up a child in the way he should go, and even when he is old he will not depart from it."
+   },
+   {
+    "ref": "Ephesians 6:4",
+    "slug": "ephesians",
+    "ch": 6,
+    "text": "Fathers, don't provoke your children to anger; raise them in the Lord's discipline and instruction."
+   },
+   {
+    "ref": "Psalm 128:3",
+    "slug": "psalms",
+    "ch": 128,
+    "text": "Your wife will be like a fruitful vine within your house; your children like olive shoots around your table."
+   }
+  ]
+ },
+ {
+  "id": "honoring-one-another",
+  "heading": "Honoring one another",
+  "intro": "Children, parents and spouses each have a part.",
+  "verses": [
+   {
+    "ref": "Ephesians 6:1–3",
+    "slug": "ephesians",
+    "ch": 6,
+    "text": "Children, obey your parents in the Lord, for this is right. \"Honor your father and mother\" (this is the first commandment with a promise), \"that it may go well with you and that you may live long in the land.\""
+   },
+   {
+    "ref": "Colossians 3:18–19",
+    "slug": "colossians",
+    "ch": 3,
+    "text": "Wives, submit yourselves to your husbands, as is fitting in the Lord. Husbands, love your wives and do not be harsh with them."
+   },
+   {
+    "ref": "Genesis 2:24",
+    "slug": "genesis",
+    "ch": 2,
+    "text": "So a man leaves his father and mother, joins his wife, and they become one flesh."
+   },
+   {
+    "ref": "Colossians 3:13–14",
+    "slug": "colossians",
+    "ch": 3,
+    "text": "Put up with one another, forgiving whatever complaints you have against each other. Forgive as the Lord forgave you. And over all these virtues put on love, which binds them all together in perfect unity."
+   }
+  ]
+ },
+ {
+  "id": "our-fathers-family",
+  "heading": "Our Father's family",
+  "intro": "He places the lonely in families and welcomes us as his children.",
+  "verses": [
+   {
+    "ref": "Psalm 68:6",
+    "slug": "psalms",
+    "ch": 68,
+    "text": "Our Father settles the lonely in a home; he leads out the prisoners to prosperity, but the rebellious dwell in a parched land."
+   },
+   {
+    "ref": "Ephesians 1:5",
+    "slug": "ephesians",
+    "ch": 1,
+    "text": "He predestined us to be his own sons through Jesus Christ, according to the good pleasure of his will."
+   },
+   {
+    "ref": "Galatians 3:26",
+    "slug": "galatians",
+    "ch": 3,
+    "text": "For in Christ Jesus you are all children of our Father through faith."
+   },
+   {
+    "ref": "1 John 3:1",
+    "slug": "1-john",
+    "ch": 3,
+    "text": "See what kind of love our Father has given us, that we should be called children of our Father! And we are. The world doesn't know us because it didn't know him."
+   }
+  ]
+ }
+];
+
+const faqs = [
+ {
+  "question": "What is the best Bible verse about family?",
+  "answer": "Joshua 24:15 ends, “As for me and my household, we will serve our Father.”"
+ },
+ {
+  "question": "What does the Bible say about raising children?",
+  "answer": "Deuteronomy 6:6–7 says, “And these words that I command you today are to be on your heart. Teach them diligently to your children, and talk about them when you sit in your house and when you walk along the road, when you lie down and when you get up.”"
+ },
+ {
+  "question": "What does the Bible say about the home?",
+  "answer": "Psalm 127:1 says, “Unless our Father builds the house, its builders labor in vain. Unless our Father watches over the city, the watchman stays awake in vain.”"
+ },
+ {
+  "question": "How should parents treat their children?",
+  "answer": "Ephesians 6:4 says, “Fathers, don't provoke your children to anger; raise them in the Lord's discipline and instruction.”"
+ },
+ {
+  "question": "Does our Father care about people who feel alone?",
+  "answer": "Yes. Psalm 68:6 says, “Our Father settles the lonely in a home; he leads out the prisoners to prosperity, but the rebellious dwell in a parched land.”"
+ }
+];
+---
+
+<VerseCollection
+	slug="family"
+	topic="Family"
+	title="Bible Verses About Family (with Audio) | Father's Heart Bible™"
+	description="Bible verses about family in Father's Heart Bible™: a home that serves our Father, raising children, honoring one another and our Father's own family. Free to read online with audio."
+	h1="Bible Verses About Family"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg"
+	heroAlt="A family together outdoors"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about family is Joshua 24:15: &ldquo;As for me and my household, we will serve our Father.&rdquo;</strong> Scripture treats the home as the first place faith is lived, teaches parents to raise children with gentleness, calls every member to honor the others, and says our Father settles the lonely in a home. Below are the verses on the home, on raising children, on honoring one another and on our Father&rsquo;s own family, each word for word in Father&rsquo;s Heart Bible&trade; and linked into the chapter so you can <a href="https://fathersheartbible.com/read/psalms/127/" style="color: var(--color-brand);" class="hover:underline">read Psalm 127 free</a> and hear it.`}
+	keyTakeaway="A Bible family begins with a household that serves our Father, grows through gentle teaching and honor, and rests in being his children."
+	themes={themes}
+	featured={{"book": "Psalm", "slug": "psalms", "chapter": 127, "verseLimit": 5, "heading": "Unless our Father builds the house: Psalm 127", "intro": "Psalm 127 is the short psalm of the home. Read or hear the chapter below, then follow it to the full psalm."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/deuteronomy/6/" style="color: var(--color-brand);" class="hover:underline">Deuteronomy 6</a> or <a href="https://fathersheartbible.com/read/ephesians/6/" style="color: var(--color-brand);" class="hover:underline">Ephesians 6</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/friendship/" style="color: var(--color-brand);" class="hover:underline">verses on friendship</a>, the <a href="/verses/love/" style="color: var(--color-brand);" class="hover:underline">verses on love</a> or the <a href="/bible-for/marriage/" style="color: var(--color-brand);" class="hover:underline">Bible verses about marriage</a>.`}
+	ctaMidHeading="Hear Psalm 127 in full"
+	ctaMidBodyHtml="Read and listen to the psalm that begins with our Father building the house &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a Father who gathers his family."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about family", "family", "Joshua 24:15", "Psalm 127:3"]}
+/>

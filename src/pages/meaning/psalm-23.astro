@@ -1,0 +1,98 @@
+---
+// /meaning/psalm-23 — plan W2/W9 unit 6ar, built 2026-10-28.
+// Intent: "psalm 23 meaning" (explain), distinct from the /read/psalms/23 chapter (read). Canonical self.
+// Demand (INFERRED, Bing throttled 2026-10-28): bare "psalm 23" Bing 13-week US impressions 38,315 (aeo-state/keywords/bing-20261028.json), the top chapter query we do not already answer with a meaning page; GSC shows "psalm 23 3 meaning" 1 impression. No measured "psalm 23 meaning" volume.
+// WEDGE: this Bible opens "My Father is my shepherd" and ends "the house of my Father forever" — the psalm is about being fathered.
+// Every Scripture quotation is copied VERBATIM from the locked canon (/srv/sites/community/src/content/bible) and checked with bin/fhb-scripture-quote-audit.py. Verse links go to our /read only.
+// Word facts: Blue Letter Bible lexicon (Strong's H7462 ra'ah, H2617 chesed, H7291 radaph).
+import WordMeaning from '../../components/WordMeaning.astro';
+
+const sections = [
+	{
+		id: 'verse-1',
+		heading: 'Verse 1: “My Father is my shepherd”',
+		bodyHtml: `<p>The psalm is a song of David, and David knew sheep. He opens with the whole claim in one line: &ldquo;My Father is my shepherd; I lack nothing.&rdquo; (Psalm 23:1). The Hebrew verb <em>r&#257;&lsquo;&#257;h</em> (Strong&rsquo;s H7462) means to tend a flock, and to pasture it, feed it and keep it. A shepherd does not stand over sheep at a distance. He is with them, and everything they have comes from his care.</p><p>That is why &ldquo;I lack nothing&rdquo; is not a boast about having plenty. It is a statement about whose flock he belongs to. Father&rsquo;s Heart Bible lets the line say what the Hebrew pictures: the Shepherd is the Father, and the one who sings is a child of His.</p>`,
+	},
+	{
+		id: 'verses-2-3',
+		heading: 'Verses 2-3: rest, water and a restored soul',
+		bodyHtml: `<p>&ldquo;In green pastures he lets me lie down; beside quiet waters he leads me.&rdquo; (Psalm 23:2). Sheep only lie down when they are unafraid and fed, so the picture is a flock at rest, led to the water instead of driven to it. Then: &ldquo;He restores my soul; he guides me in paths of righteousness for the sake of his name.&rdquo; (Psalm 23:3).</p><p>Two things are said at once. Our Father restores the weary, and He guides them along right paths. And the reason He does it is His own name: He leads this way because of who He is, not because the sheep have earned it. Compare Ezekiel 34:15, where our Father says, &ldquo;I myself will tend my flock and have them lie down, declares the Sovereign Father.&rdquo; The psalm and the prophet describe the same Shepherd.</p>`,
+	},
+	{
+		id: 'verse-4',
+		heading: 'Verse 4: the valley of the shadow of death',
+		bodyHtml: `<p>The mood turns in the middle of the psalm, and so does the pronoun. Until now David spoke <em>about</em> the Shepherd (&ldquo;he leads me&rdquo;); here he speaks <em>to</em> Him: &ldquo;Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me; your rod and your staff comfort me.&rdquo; (Psalm 23:4). The fear is not removed by the valley being easy. It is removed by the one who is walking beside him.</p><p>The Hebrew behind &ldquo;shadow of death&rdquo; is <em>tsalm&#257;wet</em>, which many scholars read as &ldquo;deep darkness.&rdquo; Either way the valley is real, and the verse says you walk <em>through</em> it, not into it and stop. The rod defends the flock and the staff guides it, which is why both bring comfort. Jesus uses the same shepherd picture of Himself: &ldquo;My sheep listen to my voice; I know them, and they follow me.&rdquo; (John 10:27).</p>`,
+	},
+	{
+		id: 'verse-5',
+		heading: 'Verse 5: a table in front of my enemies',
+		bodyHtml: `<p>&ldquo;You prepare a table before me in the presence of my enemies; you anoint my head with oil; my cup overflows.&rdquo; (Psalm 23:5). The scene changes from field to feast. The enemies have not gone away; they are in the room and can only watch. Anointing the head with oil was what a host did for an honored guest, and an overflowing cup means more than enough.</p><p>So the verse is not a promise of a life without enemies. It is a promise that our Father sets the table, and that His guest is safe at it.</p>`,
+	},
+	{
+		id: 'verse-6',
+		heading: 'Verse 6: goodness pursues me, and I live in my Father’s house',
+		bodyHtml: `<p>&ldquo;Surely goodness and unfailing love will pursue me all the days of my life, and I will live in the house of my Father forever.&rdquo; (Psalm 23:6). &ldquo;Unfailing love&rdquo; is the Hebrew <em>chesed</em> (H2617), His covenant faithfulness, and &ldquo;pursue&rdquo; is <em>r&#257;daph</em> (H7291), the word used for chasing someone down. David pictures goodness and love running after him, not him struggling to keep up with them.</p><p>The psalm ends where it was heading all along: home. In this Bible the last words are &ldquo;the house of my Father forever,&rdquo; and Jesus carries the same hope into the upper room: &ldquo;In my Father&rsquo;s house are many rooms.&rdquo; (John 14:2).</p>`,
+	},
+];
+
+const renderings = [
+	{ ref: 'Psalms 23:1', slug: 'psalms', ch: 23, fhb: `My Father is my shepherd; I lack nothing.` },
+	{ ref: 'Psalms 23:2', slug: 'psalms', ch: 23, fhb: `In green pastures he lets me lie down; beside quiet waters he leads me.` },
+	{ ref: 'Psalms 23:3', slug: 'psalms', ch: 23, fhb: `He restores my soul; he guides me in paths of righteousness for the sake of his name.` },
+	{ ref: 'Psalms 23:4', slug: 'psalms', ch: 23, fhb: `Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me; your rod and your staff comfort me.` },
+	{ ref: 'Psalms 23:5', slug: 'psalms', ch: 23, fhb: `You prepare a table before me in the presence of my enemies; you anoint my head with oil; my cup overflows.` },
+	{ ref: 'Psalms 23:6', slug: 'psalms', ch: 23, fhb: `Surely goodness and unfailing love will pursue me all the days of my life, and I will live in the house of my Father forever.` },
+];
+
+const faqs = [
+	{
+		question: 'What does Psalm 23 mean?',
+		answer:
+			'Psalm 23 is David’s song of being cared for by our Father as a shepherd cares for his flock: fed, led, restored, kept safe in the darkest valley, welcomed at His table and finally at home. Father’s Heart Bible opens it: “My Father is my shepherd; I lack nothing.”',
+	},
+	{
+		question: 'What does “the valley of the shadow of death” mean in Psalm 23?',
+		answer:
+			'It is any dark, dangerous place, and the Hebrew can be read “deep darkness,” not only death. The point is not the valley but who is in it with you: “for you are with me; your rod and your staff comfort me.”',
+	},
+	{
+		question: 'What does “my cup overflows” mean?',
+		answer:
+			'It means more than enough, the picture of a host who keeps pouring for an honored guest. The verse reads: “You prepare a table before me in the presence of my enemies; you anoint my head with oil; my cup overflows.”',
+	},
+	{
+		question: 'Who wrote Psalm 23 and who is the shepherd?',
+		answer:
+			'The heading in Father’s Heart Bible gives it as “A psalm of David.” David was a shepherd himself, and the Shepherd he sings of is our Father, who restores his soul in verse 3.',
+	},
+	{
+		question: 'Is Psalm 23 only for funerals?',
+		answer:
+			'No. It is for every day, since verse 6 says, “Surely goodness and unfailing love will pursue me all the days of my life.” It is read at funerals because verse 4 meets death, and the psalm answers it with presence, not escape.',
+	},
+];
+---
+
+<WordMeaning
+	slug="psalm-23"
+	eyebrow="Bible Passage Meanings"
+	title="Psalm 23 Meaning, Verse by Verse | Father’s Heart Bible"
+	description="What does Psalm 23 mean? A verse-by-verse reading of “My Father is my shepherd”: the valley, the table, and the house of our Father, with the full text free."
+	h1="What does Psalm 23 mean?"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg"
+	heroAlt="Reading Scripture in a quiet setting"
+	published="2026-10-28"
+	modified="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Psalm 23 is David&rsquo;s song of being shepherded by our Father: He feeds, rests, restores and guides His child, stays with him in the darkest valley, sets a table before his enemies, and finally brings him home.</strong> In Father&rsquo;s Heart Bible it opens, &ldquo;My Father is my shepherd; I lack nothing,&rdquo; and it closes with &ldquo;the house of my Father forever.&rdquo; Below: the meaning verse by verse, the Hebrew words behind it, and the full psalm. You can <a href="https://fathersheartbible.com/read/psalms/23/" style="color: var(--color-brand);" class="hover:underline">read Psalm 23 free</a> and hear it read aloud.`}
+	keyTakeaway="Psalm 23 says that our Father is the Shepherd, present in the valley and waiting at home."
+	sections={sections}
+	renderings={renderings}
+	renderingsHeading="Psalm 23 in Father’s Heart Bible™"
+	renderingsIntro="The whole psalm, word for word in Father’s Heart Bible™. The reference links into the full chapter, free, with verse-by-verse audio in English."
+	faqs={faqs}
+	relatedHtml={`Related: <a href="/meaning/psalm-91/" style="color: var(--color-brand);" class="hover:underline">what Psalm 91 means</a>, <a href="/meaning/our-father/" style="color: var(--color-brand);" class="hover:underline">why this Bible says &ldquo;our Father&rdquo;</a>, <a href="/meaning/forsake/" style="color: var(--color-brand);" class="hover:underline">what forsake means</a> and <a href="/meaning/sheol/" style="color: var(--color-brand);" class="hover:underline">what Sheol is</a>. Read <a href="https://fathersheartbible.com/read/psalms/23/" style="color: var(--color-brand);" class="hover:underline">Psalm 23</a>, <a href="https://fathersheartbible.com/read/john/10/" style="color: var(--color-brand);" class="hover:underline">John 10</a> or the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free with audio</a>. For the original words, see <a href="https://www.blueletterbible.org/lexicon/h7462/kjv/wlc/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">r&#257;&lsquo;&#257;h (Strong&rsquo;s H7462)</a> and <a href="https://www.blueletterbible.org/lexicon/h2617/kjv/wlc/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">chesed (Strong&rsquo;s H2617)</a> on Blue Letter Bible.`}
+	ctaMidHeading="Read Psalm 23 in the Father’s voice"
+	ctaMidBodyHtml="Read it in its chapter &mdash; free online with verse-by-verse audio in English."
+	ctaBottomBodyHtml="From Genesis to Revelation, free online with audio &mdash; an English translation that lets your Father&rsquo;s voice be heard on every page."
+	tags={["psalm 23 meaning", "what does psalm 23 mean", "psalm 23", "the lord is my shepherd", "valley of the shadow of death"]}
+/>

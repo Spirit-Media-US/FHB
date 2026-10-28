@@ -13,6 +13,7 @@ import Layout from '../layouts/Layout.astro';
 // CTAs. Architecture rules (read-first CTA, English-first) live in
 // memory/project_fhb_country_pages.md. Mirror the /verses + /guides patterns.
 import AuthorBio from './AuthorBio.astro';
+import ReadInYourLanguage from './ReadInYourLanguage.astro';
 import TranslationPreview from './TranslationPreview.astro';
 
 export interface CountryStat {
@@ -71,6 +72,7 @@ export interface Props {
 	flagImg?: string; // flag image URL (e.g. flagcdn) for national-pride display
 	countryWikipedia?: string; // Wikipedia URL → schema sameAs for the Country node (AEO entity binding)
 	lastUpdated?: string; // human display, e.g. "June 2026" (freshness signal)
+	publishedIso?: string; // ISO date the page first went live → schema datePublished (omit if unknown)
 	lastUpdatedIso?: string; // ISO date, e.g. "2026-06-13" → schema dateModified
 	colorPrimary: string; // hex, e.g. "#FF9933" (saffron)
 	colorSecondary: string; // hex, e.g. "#138808" (green)
@@ -83,6 +85,9 @@ export interface Props {
 	h1: string;
 	heroSubhead: string;
 	heroBase: string; // Sanity CDN base
+	// Optional non-Sanity hero (e.g. Wikimedia Commons thumbnails) used only while no Sanity asset exists.
+	// When set, heroBase is ignored for the hero/OG. Swap to a Sanity heroBase once uploaded.
+	heroSrc?: { desktop: string; mobile: string; og: string };
 	heroAlt: string;
 	// Sanity crop mode for the hero (default 'entropy'). Use a focal point when
 	// entropy picks the wrong region, e.g. 'focalpoint&fp-x=0.49&fp-y=0.3'.
@@ -98,6 +103,7 @@ export interface Props {
 	knownForIntroHtml?: string;
 	knownFor?: CountryKnownFor[];
 	gallery?: CountryPhoto[];
+	heroCreditHtml?: string; // visible photo credit under the hero (e.g. CC BY-SA attribution)
 	galleryCreditHtml?: string;
 	galleryBottom?: CountryPhoto[];
 	galleryBottomCreditHtml?: string;
@@ -143,6 +149,7 @@ const {
 	flagImg,
 	countryWikipedia,
 	lastUpdated,
+	publishedIso,
 	lastUpdatedIso,
 	colorPrimary,
 	colorSecondary,
@@ -155,6 +162,7 @@ const {
 	h1,
 	heroSubhead,
 	heroBase,
+	heroSrc,
 	heroAlt,
 	heroCrop = 'entropy',
 	heroBrightness,
@@ -166,6 +174,7 @@ const {
 	knownForIntroHtml,
 	knownFor = [],
 	gallery = [],
+	heroCreditHtml,
 	galleryCreditHtml,
 	galleryBottom = [],
 	galleryBottomCreditHtml,
@@ -203,6 +212,34 @@ const {
 	ctaBottomBodyHtml,
 } = Astro.props;
 
+// W7 recipe (unit 6au): <title> <= 60 chars, meta description <= 160 chars, applied centrally so
+// no page can ship an over-length SERP snippet. Searched words stay first; only the tail is trimmed.
+const fitTitle = (t: string, max = 60): string => {
+	let s = t.replace(/ \(FHB\)$/, '').replace(' (with Audio)', '');
+	if (s.length > max) s = s.replace(/^The /, '');
+	if (s.length > max) s = s.replace(/ — [^|]*?( \| )/, '$1');
+	return s;
+};
+const fitDescription = (d: string, max = 160): string => {
+	const s = d.replace("Father's Heart Bible™ (FHB)", "Father's Heart Bible™");
+	if (s.length <= max) return s;
+	const sentences = s.match(/[^.!?]+[.!?]+(\s|$)/g);
+	while (sentences && sentences.length > 1 && sentences.join('').trim().length > max)
+		sentences.pop();
+	if (
+		sentences &&
+		sentences.join('').trim().length <= max &&
+		sentences.join('').trim().length >= 110
+	)
+		return sentences.join('').trim();
+	return `${s
+		.slice(0, max - 1)
+		.replace(/\s+\S*$/, '')
+		.replace(/[,;:\s—-]+$/, '')}.`;
+};
+const metaTitle = fitTitle(title);
+const metaDescription = fitDescription(description);
+
 // Previews: explicit prop wins; otherwise auto-derive from this country's language list.
 const _autoPreviews = previewsForLanguages((languages || []).map((l) => l.language));
 const _previews =
@@ -216,6 +253,11 @@ const EN_ENTRY: Record<string, { href: string; label: string }> = {
 	'psalms/23': { href: '/read/psalms/23/', label: 'Psalm 23' },
 	'genesis/1': { href: '/read/genesis/1/', label: 'Genesis 1' },
 };
+// Near-index-floor languages (2d, 2026-10-28): Google has indexed under ~75% of these
+// editions' chapters, so their country-page row carries five more of the same
+// generated, live-guarded entry chapters (a plain crawl path, nothing new to maintain).
+const NEAR_FLOOR_LANGS = new Set(['ko', 'el', 'hu', 'uk', 'tr', 'ur', 'zh-hans']);
+const NEAR_FLOOR_EXTRA = ['psalms/91', 'matthew/5', 'luke/15', 'romans/8', 'isaiah/53'];
 function entryLinksFor(code: string): { href: string; label: string }[] {
 	if (code === 'en') return ENTRY_PICK.map((k) => EN_ENTRY[k]);
 	if (!READER_LIVE.has(code)) return [];
@@ -226,9 +268,10 @@ function entryLinksFor(code: string): { href: string; label: string }[] {
 				{ href: string; label: string; book?: string; ch?: number }[]
 			>
 		)[code] || [];
-	return ENTRY_PICK.map((k) => rows.find((r) => `${r.book}/${r.ch}` === k)).filter(
-		(r): r is { href: string; label: string } => !!r,
-	);
+	const picks = NEAR_FLOOR_LANGS.has(code) ? [...ENTRY_PICK, ...NEAR_FLOOR_EXTRA] : ENTRY_PICK;
+	return picks
+		.map((k) => rows.find((r) => `${r.book}/${r.ch}` === k))
+		.filter((r): r is { href: string; label: string } => !!r);
 }
 
 // Published editions: one lookup, one wording, for every country page.
@@ -271,8 +314,13 @@ const PAGE_URL = `https://fathersheartbible.com/bible-in/${slug}/`;
 // a sponsorship ask, a dollar figure, or a donate link here. The honest CTA on
 // these pages is to READ the editions that are already published and free.
 const HERO_BRI = heroBrightness != null ? `&bri=${heroBrightness}` : '';
-const HERO_IMG = `${heroBase}?w=1400&h=560&fit=crop&crop=${heroCrop}${HERO_BRI}&fm=webp&q=72`;
-const OG_IMG = `${heroBase}?w=1200&h=630&fit=crop&crop=${heroCrop}&fm=jpg&q=80`;
+const HERO_IMG = heroSrc
+	? heroSrc.desktop
+	: `${heroBase}?w=1400&h=560&fit=crop&crop=${heroCrop}${HERO_BRI}&fm=webp&q=72`;
+const HERO_IMG_MOBILE = heroSrc ? heroSrc.mobile : HERO_IMG.replace('w=1400', 'w=640');
+const OG_IMG = heroSrc
+	? heroSrc.og
+	: `${heroBase}?w=1200&h=630&fit=crop&crop=${heroCrop}&fm=jpg&q=80`;
 
 const breadcrumbSchema = {
 	'@context': 'https://schema.org',
@@ -343,7 +391,14 @@ const collectionSchema = {
 		'@type': 'SpeakableSpecification',
 		cssSelector: ['#direct-answer', '#key-takeaway'],
 	},
+	...(publishedIso ? { datePublished: publishedIso } : {}),
 	...(lastUpdatedIso ? { dateModified: lastUpdatedIso } : {}),
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
 	about: countryNode,
 	spatialCoverage: countryNode,
 	isPartOf: {
@@ -367,13 +422,13 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 
 <Layout
 	youtube
-	title={title}
-	description={description}
+	title={metaTitle}
+	description={metaDescription}
 	image={OG_IMG}
 	imageAlt={heroAlt}
 	darkHero={true}
 	jsonLd={jsonLd}
-	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageMobile={HERO_IMG_MOBILE}
 	preloadImageDesktop={HERO_IMG}
 >
 	<main id="main-content">
@@ -381,7 +436,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 		     the title block lives in the section below, like /guides/* and
 		     /bible-for/*. -->
 		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
-			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={heroAlt} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<img src={HERO_IMG} srcset={`${HERO_IMG_MOBILE} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={heroAlt} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
 			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
 			<div class="absolute inset-x-0 bottom-0 z-30 h-1.5" style={`background: linear-gradient(to right, ${colorPrimary} 0%, ${colorPrimary} 50%, ${colorSecondary} 50%, ${colorSecondary} 100%);`} aria-hidden="true"></div>
 		</section>
@@ -389,6 +444,9 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 		<!-- Breadcrumb + direct answer -->
 		<section class="px-6 pt-9 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">
+				{heroCreditHtml && (
+					<p class="mb-5 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={heroCreditHtml}></p>
+				)}
 				<nav aria-label="Breadcrumb" class="mb-6 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
 					<a href="/bible-in/" class="hover:underline">The Bible Around the World</a><span class="px-1.5" aria-hidden="true">/</span>
@@ -586,6 +644,9 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 				</div>
 			</section>
 		)}
+
+		<!-- Every live reader language, this country's languages first (W3) -->
+		<ReadInYourLanguage first={(languages || []).map((l) => l.code).filter((c): c is string => !!c)} bg={tintWarm} />
 
 		<!-- Country and the world (diaspora + language spread + strategic role +
 		     how this nation carries FHB out). Shows global/strategic significance. -->

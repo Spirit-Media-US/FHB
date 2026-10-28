@@ -1,0 +1,176 @@
+---
+// /verses/prayer: unit 6ag, ranked by Bing GetKeywordStats 2026-10-28 (aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+ {
+  "id": "prayer-to-our-father",
+  "heading": "Praying to our Father",
+  "intro": "Prayer is not a performance. Jesus taught us to come as children to a Father who already knows what we need.",
+  "verses": [
+   {
+    "ref": "Matthew 6:6",
+    "slug": "matthew",
+    "ch": 6,
+    "text": "But when you pray, go into your room, shut the door, and pray to your Father in secret. Your Father who sees in secret will reward you."
+   },
+   {
+    "ref": "Matthew 6:9–13",
+    "slug": "matthew",
+    "ch": 6,
+    "text": "This, then, is how you should pray: 'Our Father in heaven, may your name be honored as holy, your kingdom come, your will be done, on earth as it is in heaven. Give us today our daily bread. And forgive us our debts, as we also have forgiven our debtors. And lead us not into temptation, but deliver us from the evil one.'"
+   },
+   {
+    "ref": "Romans 8:15",
+    "slug": "romans",
+    "ch": 8,
+    "text": "You did not receive a spirit of slavery, to fall back into fear, but received the Spirit of sonship, by whom we cry, \"Abba! Father!\""
+   },
+   {
+    "ref": "Hebrews 4:16",
+    "slug": "hebrews",
+    "ch": 4,
+    "text": "Let us then approach the throne of grace boldly, so we may receive mercy and find grace to help us in time of need."
+   }
+  ]
+ },
+ {
+  "id": "ask-seek-knock",
+  "heading": "Ask, seek, knock",
+  "intro": "Our Father invites asking, and Scripture promises he hears.",
+  "verses": [
+   {
+    "ref": "Matthew 7:7–8",
+    "slug": "matthew",
+    "ch": 7,
+    "text": "Ask, and you'll receive it; seek, and you'll find; knock, and it'll open for you. For everyone who asks receives, whoever seeks finds, and whoever knocks, it will be opened."
+   },
+   {
+    "ref": "Jeremiah 29:12–13",
+    "slug": "jeremiah",
+    "ch": 29,
+    "text": "Then you will call on me, come, and pray to me, and I will listen to you. You will seek me and find me, when you search for me with all your heart."
+   },
+   {
+    "ref": "1 John 5:14",
+    "slug": "1-john",
+    "ch": 5,
+    "text": "This is our confidence before him: whatever we ask according to his will, he hears us."
+   },
+   {
+    "ref": "Psalm 145:18",
+    "slug": "psalms",
+    "ch": 145,
+    "text": "Our Father is near to all who call on him, to all who call on him in truth."
+   }
+  ]
+ },
+ {
+  "id": "prayer-instead-of-worry",
+  "heading": "Prayer in worry and thanks",
+  "intro": "When the mind races, these verses turn worry into a conversation with our Father.",
+  "verses": [
+   {
+    "ref": "Philippians 4:6",
+    "slug": "philippians",
+    "ch": 4,
+    "text": "Worry about nothing; instead, in everything, through prayer and petition with thanksgiving, make your requests known to our Father."
+   },
+   {
+    "ref": "1 Thessalonians 5:16–18",
+    "slug": "1-thessalonians",
+    "ch": 5,
+    "text": "Rejoice always, pray without ceasing, give thanks in everything; for this is the will of our Father in Christ Jesus for you."
+   },
+   {
+    "ref": "1 Peter 5:7",
+    "slug": "1-peter",
+    "ch": 5,
+    "text": "casting all your anxiety on our Father, because he cares for you."
+   },
+   {
+    "ref": "Psalm 55:22",
+    "slug": "psalms",
+    "ch": 55,
+    "text": "Cast your burden on our Father, and he will sustain you; he will never let the righteous be shaken."
+   }
+  ]
+ },
+ {
+  "id": "praying-without-giving-up",
+  "heading": "Praying for others and not giving up",
+  "intro": "Prayer is also persistence and love for others, a habit more than an event.",
+  "verses": [
+   {
+    "ref": "James 5:16",
+    "slug": "james",
+    "ch": 5,
+    "text": "So confess your sins to each other and pray for each other, that you may be healed. A righteous person's prayer is powerful and effective."
+   },
+   {
+    "ref": "Colossians 4:2",
+    "slug": "colossians",
+    "ch": 4,
+    "text": "Devote yourselves to prayer, staying alert in it with thanksgiving."
+   },
+   {
+    "ref": "Luke 18:1",
+    "slug": "luke",
+    "ch": 18,
+    "text": "Then Jesus told them a parable about the need to always pray and never lose heart."
+   },
+   {
+    "ref": "Ephesians 6:18",
+    "slug": "ephesians",
+    "ch": 6,
+    "text": "Pray in the Spirit at all times, with every prayer and request. Stay alert to this with all perseverance, interceding for all the saints,"
+   }
+  ]
+ }
+];
+
+const faqs = [
+ {
+  "question": "What is the best Bible verse about prayer?",
+  "answer": "Philippians 4:6 is among the most quoted: “Worry about nothing; instead, in everything, through prayer and petition with thanksgiving, make your requests known to our Father.” The verses on how to pray, on asking and on persistence are gathered below."
+ },
+ {
+  "question": "How should I pray according to the Bible?",
+  "answer": "Jesus gave the pattern. In Father’s Heart Bible™ Matthew 6:9–13 opens: “Our Father in heaven, may your name be honored as holy, your kingdom come, your will be done, on earth as it is in heaven.” Prayer begins by speaking to our Father, not by impressing him."
+ },
+ {
+  "question": "Does the Bible say our Father answers prayer?",
+  "answer": "Yes. 1 John 5:14 says, “This is our confidence before him: whatever we ask according to his will, he hears us.” Jesus also invited asking, and the verses below on ask, seek and knock gather his promise."
+ },
+ {
+  "question": "What does it mean to pray without ceasing?",
+  "answer": "In 1 Thessalonians 5:16–18 the words are “Rejoice always, pray without ceasing, give thanks in everything.” It describes a steady habit of turning to our Father through the day, not nonstop speech."
+ },
+ {
+  "question": "What Bible verse helps when prayer feels hard because of anxiety?",
+  "answer": "1 Peter 5:7 says, “casting all your anxiety on our Father, because he cares for you.” Prayer is the place to hand the worry over to someone who cares."
+ }
+];
+---
+
+<VerseCollection
+	slug="prayer"
+	topic="Prayer"
+	title="Bible Verses About Prayer (with Audio) | Father's Heart Bible™"
+	description="Bible verses about prayer in Father's Heart Bible™: how Jesus taught us to pray to our Father, ask and seek, prayer in worry and praying for others. Free to read online with audio."
+	h1="Bible Verses About Prayer"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg"
+	heroAlt="A man praying"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about prayer is Philippians 4:6: &ldquo;Worry about nothing; instead, in everything, through prayer and petition with thanksgiving, make your requests known to our Father.&rdquo;</strong> Scripture treats prayer as a child talking with a Father who is near, who hears and who cares. Below are the verses on how Jesus taught us to pray, on asking and seeking, on prayer in worry and on praying for others, each word for word in Father&rsquo;s Heart Bible&trade; and linked into the chapter so you can <a href="https://fathersheartbible.com/read/matthew/6/" style="color: var(--color-brand);" class="hover:underline">read Matthew 6 free</a> and hear it.`}
+	keyTakeaway="Biblical prayer is a child speaking with a near and listening Father: simple, honest, thankful and persistent."
+	themes={themes}
+	featured={{"book": "Matthew", "slug": "matthew", "chapter": 6, "verseLimit": 15, "heading": "How Jesus taught us to pray: Matthew 6", "intro": "Matthew 6 holds the prayer that begins Our Father. Read or hear the opening verses below, then read the whole chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/psalms/145/" style="color: var(--color-brand);" class="hover:underline">Psalm 145</a> or <a href="https://fathersheartbible.com/read/luke/11/" style="color: var(--color-brand);" class="hover:underline">Luke 11</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/peace/" style="color: var(--color-brand);" class="hover:underline">verses on peace</a>, the <a href="/verses/anxiety/" style="color: var(--color-brand);" class="hover:underline">verses on anxiety</a> or the <a href="/guides/how-to-pray/" style="color: var(--color-brand);" class="hover:underline">guide to prayer</a>.`}
+	ctaMidHeading="Hear Matthew 6 in full"
+	ctaMidBodyHtml="Read and listen to the chapter where Jesus teaches us to pray &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a child speaking with a listening Father."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about prayer", "prayer", "Matthew 6:9", "Philippians 4:6"]}
+/>

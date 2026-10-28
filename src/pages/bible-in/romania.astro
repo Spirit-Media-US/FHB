@@ -1,0 +1,167 @@
+---
+// /bible-in/romania — Romanian (~23M worldwide). An Orthodox-majority nation with a growing Evangelical minority; Bible history from the Bucharest Bible (1688) to Cornilescu (1921). Respectful of the Orthodox tradition.
+// Facts: every figure on this page is cited in the sources lists below (fetched 2026-10-28).
+// Hero photo: Peleș Castle, Sinaia (Wikimedia Commons, CC BY-SA 3.0; file page credited in sources) — hotlinked thumbnails until a Sanity asset can be uploaded (Sanity quota 2026-10-28).
+import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
+
+const verses = [
+	{
+		ref: 'Psalm 68:5',
+		slug: 'psalms',
+		ch: 68,
+		text: 'A father to the fatherless and defender of widows is our Father in his holy dwelling.',
+	},
+	{
+		ref: 'Romans 8:15',
+		slug: 'romans',
+		ch: 8,
+		text: 'You did not receive a spirit of slavery, to fall back into fear, but received the Spirit of sonship, by whom we cry, "Abba! Father!"',
+	},
+	{
+		ref: '1 John 3:1',
+		slug: '1-john',
+		ch: 3,
+		text: 'See what kind of love our Father has given us, that we should be called children of our Father! And we are.',
+	},
+];
+
+const stats = [
+	{ label: 'People', value: '19.05 million (2021 census)' },
+	{ label: 'Orthodox', value: '85.3% of those declaring a religion' },
+	{ label: 'Romanian', value: `${sp('ro')} worldwide` },
+	{ label: 'First full Romanian Bible', value: '1688' },
+];
+
+const faqs = [
+	{
+		question: 'How many Christians are there in Romania?',
+		answer:
+			'Romania is overwhelmingly Christian. In the 2021 census, 85.3% of those who stated a religion were Orthodox, 4.5% Roman Catholic and 2.5% Pentecostal (INS provisional results as reported in January 2023); about 15% of the population did not declare a religion. Romania counted 19,053,815 residents. You can read the Scriptures they treasure free at fathersheartbible.com/read.',
+	},
+	{
+		question: 'Is Christianity declining in Romania?',
+		answer:
+			'The census counted just under 14 million Orthodox in 2021, down from over 16.3 million in 2011, and the Orthodox share of those declaring fell from 86.5% to 85.3%. Pentecostals were the only church to grow, from about 362,000 to 404,000.',
+	},
+	{
+		question: 'What was the first complete Bible in Romanian?',
+		answer:
+			'The Bucharest Bible of 1688, sponsored by Prince Șerban Cantacuzino of Wallachia, is described as the first complete translation of the Bible into Romanian.',
+	},
+	{
+		question: 'What is the Cornilescu Bible?',
+		answer:
+			"Dumitru Cornilescu's Romanian Bible was published in full in 1921, after his Psalms (1920) and New Testament. It became the standard Protestant version in Romania, and the British and Foreign Bible Society adopted it as its Romanian text in 1924.",
+	},
+	{
+		question: 'Can I read the Bible online free in Romanian?',
+		answer:
+			"Yes. Father's Heart Bible™ is free to read and hear online in Romanian — all 66 books, no account, no purchase, no app — at fathersheartbible.com/read/ro/. The English edition is free too.",
+	},
+	{
+		question: "Is Father's Heart Bible available in Romanian?",
+		answer: `Yes. The complete Romanian edition — all 66 books, free — is at fathersheartbible.com/read/ro/ and in print at fathersheartbible.com/bibles/romanian-bible/. Romanian is spoken by some ${sp('ro')} people worldwide.`,
+	},
+];
+---
+
+<CountryBible
+	slug="romania"
+	country="Romania"
+	flag="🇷🇴"
+	flagImg="/flags/ro.svg"
+	countryWikipedia="https://en.wikipedia.org/wiki/Romania"
+	lastUpdated="October 2026"
+	publishedIso="2026-10-28"
+	lastUpdatedIso="2026-10-28"
+	colorPrimary="#002B7F"
+	colorSecondary="#CE1126"
+	colorAccent="#C9A227"
+	tintWarm="#EEF1FA"
+	tintCool="#FBEDEF"
+	tintBlue="#FBF5DD"
+	title="The Bible in Romania — Christianity | Father's Heart Bible™ (FHB)"
+	description="How many Christians live in Romania, and what is the story of the Romanian Bible? Read the Bible free online in Romanian with audio — Father's Heart Bible™ (FHB)."
+	h1="The Bible in Romania"
+	heroSubhead="Romania is one of Europe's most Orthodox nations, with a small, growing Evangelical church — and Father's Heart Bible offers a near and loving Father in Romanian. Free online, with audio."
+	heroBase=""
+	heroSrc={{ desktop: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Castelul_Peles%2C_Sinaia_-_Vedere_panoramica.jpg/1280px-Castelul_Peles%2C_Sinaia_-_Vedere_panoramica.jpg", mobile: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Castelul_Peles%2C_Sinaia_-_Vedere_panoramica.jpg/960px-Castelul_Peles%2C_Sinaia_-_Vedere_panoramica.jpg", og: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Castelul_Peles%2C_Sinaia_-_Vedere_panoramica.jpg/1280px-Castelul_Peles%2C_Sinaia_-_Vedere_panoramica.jpg" }}
+	heroCreditHtml={`Hero photo: <a href="https://commons.wikimedia.org/wiki/File:Castelul_Peles,_Sinaia_-_Vedere_panoramica.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Peleș Castle, Sinaia</a> by <a href="https://commons.wikimedia.org/wiki/User:TiberiuSahlean" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">TiberiuSahlean</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/ro/deed.en" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 3.0 RO</a>, via Wikimedia Commons.`}
+	heroAlt="Peleș Castle among autumn trees and mountains near Sinaia, Romania"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Yes &mdash; you can read the Bible free online in Romania right now.</strong> In the 2021 census, 85.3% of Romanians who stated a religion were Orthodox, and the Bible is free to own and read here. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. The complete <a href="https://fathersheartbible.com/read/ro/" style="color: var(--color-brand);" class="hover:underline"><em>Romanian</em> edition</a> is free to read and hear today and <a href="/bibles/romanian-bible/" style="color: var(--color-brand);" class="hover:underline">published in print</a> &mdash; for a people who have had the whole Bible in Romanian since 1688, where Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	keyTakeaway="Romania has had the whole Bible in Romanian since 1688 — and Father's Heart Bible™ (FHB) invites a deeply Orthodox nation to hear in it, clearly, the voice of a Father."
+	glanceIntroHtml={`Romania is a land of painted monasteries, Carpathian villages and Transylvanian towns &mdash; a nation where the Orthodox liturgy is part of the calendar of life, and where a younger generation is asking how to know God for itself.`}
+	stats={stats}
+	knownForHeading="What Romania is known for"
+	knownForIntroHtml={`Romania&rsquo;s Bible story runs from a prince&rsquo;s printing house in Bucharest to a young Orthodox translator who gave the people a Bible in everyday speech.`}
+	knownFor={[
+		{ label: "The Bucharest Bible, 1688", text: "Sponsored by Prince Șerban Cantacuzino of Wallachia, it is described as the first complete translation of the Bible into Romanian." },
+		{ label: "The Cornilescu Bible, 1921", text: "Dumitru Cornilescu&rsquo;s full Bible, published in 1921 after his Psalms (1920) and New Testament, became the standard Protestant version in Romania; the British and Foreign Bible Society adopted it for Romania in its 1924 revised edition." },
+		{ label: "An Orthodox heartland", text: "Orthodox believers are the large majority of those who stated a religion in the 2021 census." },
+		{ label: "A growing Pentecostal church", text: "Pentecostals are the only church that grew between the 2011 and 2021 censuses, from about 362,000 to 404,000 people." },
+		{ label: "Romanian, and Hungarian too", text: "Romanian is the national language; a complete Hungarian edition is also free for Hungarian speakers in Romania, alongside the Romanian one." },
+		{ label: "Castles and mountains", text: "From Peleș Castle at Sinaia to the Carpathian villages, Romania&rsquo;s landscape is among Europe&rsquo;s most storied." },
+	]}
+	faithHeading="Faith and the Bible in Romania"
+	faithBodyHtml={`<p>Romania counted <strong>19,053,815 residents</strong> in its 2021 census. Of those who stated a religion, <strong>85.3% were Orthodox</strong> (about 14 million people, down from over 16.3 million in 2011), 4.5% Roman Catholic and 2.5% Pentecostal &mdash; the only church to grow. About 2.7 million people, close to 15% of the population, did not declare a religion.</p><p>The Bible is old here. The Bucharest Bible of 1688 gave Romanians the whole Scripture in their own language, and in 1921 Dumitru Cornilescu&rsquo;s version made it readable in everyday speech for a new generation of Orthodox and Evangelical readers alike.</p><p>The liturgy and the icon are loved, and the Scriptures are heard on Sunday. The invitation of Father&rsquo;s Heart Bible&trade; is a personal one: read the same Word in clear Romanian, and meet in it a Father.</p>`}
+	sources={[
+		{ label: "2021 Romanian census — Wikipedia (cites INSSE final results, 31 May 2023)", url: "https://en.wikipedia.org/wiki/2021_Romanian_census" },
+		{ label: "Religia în recensământ 2021 — RFE/RL Romania, 8 Jan 2023 (INS provisional results)", url: "https://romania.rferl.org/a/religie-recensamant2022-romani-/32210549.html" },
+		{ label: "Religion in Romania — Wikipedia", url: "https://en.wikipedia.org/wiki/Religion_in_Romania" },
+		{ label: "Bucharest Bible — Wikipedia", url: "https://en.wikipedia.org/wiki/Bucharest_Bible" },
+		{ label: "Dumitru Cornilescu — Wikipedia", url: "https://en.wikipedia.org/wiki/Dumitru_Cornilescu" },
+	]}
+	painsHeading="What pains Romania"
+	painsIntroHtml={`Behind Romania&rsquo;s growth and beauty, the census and the headlines show wounds that families carry &mdash; and the Father&rsquo;s heart speaks into them.`}
+	painStats={[
+		{ value: "1.1 million fewer", label: "residents in 2021 than in 2011, according to the census" },
+		{ value: "about 15%", label: "of the population did not declare a religion in 2021" },
+		{ value: "2.3 million fewer", label: "Orthodox believers than in 2011 (just under 14 million, from over 16.3 million)" },
+		{ value: "families apart", label: "parents and children separated by work abroad" },
+		{ value: "a younger generation", label: "asking whether faith is more than tradition" },
+		{ value: "a searching heart", label: "longing to know our Father personally" },
+	]}
+	painsBodyHtml={`<p>Romania&rsquo;s population fell by 1.1 million between the 2011 and 2021 censuses, and behind that number are families divided across borders and a country asking itself what holds it together.</p><p>The Father&rsquo;s answer is not a program. It is a Word to be read, free, in Romanian, in Father&rsquo;s Heart Bible&trade; &mdash; for the believer, the doubter, and the one who simply wants to hear it clearly.</p>`}
+	painsSources={[
+		{ label: "2021 Romanian census — Wikipedia (cites INSSE final results, 31 May 2023)", url: "https://en.wikipedia.org/wiki/2021_Romanian_census" },
+		{ label: "Religia în recensământ 2021 — RFE/RL Romania, 8 Jan 2023", url: "https://romania.rferl.org/a/religie-recensamant2022-romani-/32210549.html" },
+	]}
+	faithsHeading="What “our Father” offers Romania"
+	faithsIntroHtml={`Father&rsquo;s Heart Bible&trade; does not ask Romania to leave the Orthodox faith or the Scriptures it treasures. It lets a faithful people hear, in clear Romanian, the Father whom its own Bible reveals.`}
+	faithsBlocks={[
+		{ heading: "For the one who prays the liturgy", bodyHtml: "Romanians pray <a href=\"https://fathersheartbible.com/read/matthew/6/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;Our Father in heaven&rdquo;</a> from childhood &mdash; and can read it again, as the words of One who knows them by name." },
+		{ heading: "For the one left behind", bodyHtml: "To families scattered by work and distance, Scripture promises <a href=\"https://fathersheartbible.com/read/psalms/68/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;a father to the fatherless&rdquo;</a> &mdash; a Father who stays." },
+		{ heading: "For the child of our Father", bodyHtml: "<a href=\"https://fathersheartbible.com/read/romans/8/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;&hellip;received the Spirit of sonship, by whom we cry, &lsquo;Abba! Father!&rsquo;&rdquo;</a> &mdash; not a slave&rsquo;s fear, but a child&rsquo;s trust." },
+		{ heading: "For the Romanians abroad", bodyHtml: "For Romanian families living in other countries, the whole Bible is free on any phone, in Romanian and in English." },
+	]}
+	whyHeading="Why Father's Heart Bible™ for Romania"
+	whyBlocks={[
+		{ heading: "God revealed as Father", bodyHtml: "Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href=\"https://fathersheartbible.com/read/genesis/1/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Genesis 1:1</a> onward." },
+		{ heading: "Free, with audio, on any phone", bodyHtml: "No purchase, no app, no sign-up. The whole Bible is free to <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read online</a>, with audio, on the phone in your hand." },
+		{ heading: "Now in Romanian", bodyHtml: "The complete Romanian edition is published: <a href=\"https://fathersheartbible.com/read/ro/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read it free</a>, or see the <a href=\"/bibles/romanian-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">print edition</a>." },
+	]}
+	wordHeading="His Word will not return void"
+	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do. In a land that has had it in Romanian since 1688, it will not return empty.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;&hellip;so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
+	resourcesHeading="Learn more about Romania"
+	resourcesIntroHtml={`Trusted sources for the facts on this page &mdash; and for going deeper into Romania&rsquo;s people, faith, and story.`}
+	resources={[
+		{ label: "Romania — Wikipedia", url: "https://en.wikipedia.org/wiki/Romania" },
+		{ label: "Religion in Romania — Wikipedia", url: "https://en.wikipedia.org/wiki/Religion_in_Romania" },
+		{ label: "National Institute of Statistics (INS) — Census 2021", url: "https://www.recensamantromania.ro/" },
+		{ label: "Romania — Joshua Project (people groups)", url: "https://joshuaproject.net/countries/RO" },
+	]}
+	opportunityHeading="The translation opportunity for Romania"
+	opportunityIntroHtml={`Romanian is the heart language of some ${sp('ro')} people worldwide, in Romania, Moldova and the Romanian diaspora &mdash; and the complete edition is free to read in Father&rsquo;s Heart Bible&trade;.`}
+	languages={[
+		{ language: "English", code: "en" },
+		{ language: "Romanian", code: "ro" },
+		{ language: "Hungarian (in Romania)", code: "hu" },
+	]}
+	verses={verses}
+	keepReadingHtml={`Begin with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> &mdash; including <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start</a> and <a href="/guides/what-is-the-gospel/" style="color: var(--color-brand);" class="hover:underline">what the gospel is</a>. Browse Scripture by theme on our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> pages.`}
+	faqs={faqs}
+	ctaMidHeading="Hear the Father in Romanian"
+	ctaMidBodyHtml={`Romania has had the whole Bible in Romanian since 1688. Now hear it in a Father&rsquo;s own voice &mdash; free, with audio, on any phone.`}
+	ctaBottomBodyHtml={`From Genesis to Revelation, free online with audio &mdash; a translation that reveals God as a loving Father to every beloved son and daughter, in Romania and wherever Romanians have gone.`}
+/>

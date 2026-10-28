@@ -5,11 +5,17 @@ import ReviewLink from '../../components/ReviewLink.astro';
 // Add a row to src/data/verseTopics.ts when a new /verses/<topic> page ships.
 import { VERSE_TOPICS } from '../../data/verseTopics';
 import Layout from '../../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const PAGE_URL = 'https://fathersheartbible.com/verses/';
-const TITLE = "Bible Verses by Topic — Read & Listen Free | Father's Heart Bible™ (FHB)";
-const DESCRIPTION =
-	"Find Bible verses by topic — love, strength, faith, anxiety, and healing — read and heard in Father's Heart Bible™ (FHB), free online with audio.";
+// Topic order in title/description follows the measured search demand (Bing Webmaster, US, 25 weeks,
+// aeo-state/fhb-verses-topics-20261028.json): peace, hope, prayer, forgiveness lead.
+const TITLE = fitTitle(
+	"Bible Verses by Topic — Peace, Hope, Prayer, Forgiveness | Father's Heart Bible™ (FHB)",
+);
+const DESCRIPTION = fitDescription(
+	"Bible verses by topic: peace, hope, prayer, forgiveness, joy, anxiety and more. Every collection is read and heard free in Father's Heart Bible™ (FHB).",
+);
 
 const HERO_BASE =
 	'https://cdn.sanity.io/images/rusi1hyi/production/82a0a4ceff7d68b1489b2085f692af2ed4f0e58c-6016x4016.jpg';
@@ -31,6 +37,7 @@ const collectionSchema = {
 	},
 	mainEntity: {
 		'@type': 'ItemList',
+		numberOfItems: VERSE_TOPICS.length,
 		itemListElement: VERSE_TOPICS.map((t, i) => ({
 			'@type': 'ListItem',
 			position: i + 1,
@@ -101,8 +108,11 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				</nav>
 				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Verses by Topic</p>
 				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Bible Verses by Topic</h1>
-				<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
-					Looking for what the Bible says about a specific theme? These collections gather Scripture&rsquo;s best-loved verses on love, strength, faith, anxiety, and healing &mdash; each shown in the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible</a>, a translation in the Father&rsquo;s own voice, and linked into the chapter so you can read and listen free.
+				<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);">
+					Bible verses by topic: {VERSE_TOPICS.length} collections, each gathering Scripture on one need &mdash; from peace, hope, prayer, and forgiveness to anxiety, fear, and healing &mdash; every verse read and heard free.
+				</p>
+				<p class="mt-4 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Looking for what the Bible says about a specific theme? These collections gather Scripture&rsquo;s best-loved verses on love, strength, faith, anxiety, and healing &mdash; each shown in the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible</a>, a translation in the Father&rsquo;s own voice, and linked into the chapter so you can read and listen free. Want one verse each day? Read the <a href="https://fathersheartbible.com/read/verse-of-the-day/" style="color: var(--color-brand);" class="hover:underline">Bible verse of the day</a>.
 				</p>
 			</div>
 		</section>
@@ -121,7 +131,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 						</a>
 					))}
 				</div>
-				<p class="mt-8 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Looking for Scripture for a specific calling? See <a href="/bible-for/worship-leaders/" style="color: var(--color-brand);" class="hover:underline">Bible verses for worship leaders</a> &mdash; part of our growing <em>A Father For</em> series, with the Father&rsquo;s own words for who you are. Wondering what a particular word means? Browse <a href="/meaning/" style="color: var(--color-brand);" class="hover:underline">Bible word meanings</a> &mdash; including what <a href="/meaning/begotten/" style="color: var(--color-brand);" class="hover:underline">&ldquo;begotten&rdquo; means</a> and what <a href="/meaning/hallowed-be-thy-name/" style="color: var(--color-brand);" class="hover:underline">&ldquo;hallowed be thy name&rdquo; means</a>.</p>
+				<p class="mt-8 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Looking for Bible verses about marriage? See <a href="/bible-for/marriage/" style="color: var(--color-brand);" class="hover:underline">Bible verses about marriage</a>, with nine verses and the Father&rsquo;s heart for couples. Looking for Scripture for a specific calling? See <a href="/bible-for/worship-leaders/" style="color: var(--color-brand);" class="hover:underline">Bible verses for worship leaders</a> &mdash; part of our growing <em>A Father For</em> series, with the Father&rsquo;s own words for who you are. Wondering what a particular word means? Browse <a href="/meaning/" style="color: var(--color-brand);" class="hover:underline">Bible word meanings</a> &mdash; including what <a href="/meaning/begotten/" style="color: var(--color-brand);" class="hover:underline">&ldquo;begotten&rdquo; means</a> and what <a href="/meaning/hallowed-be-thy-name/" style="color: var(--color-brand);" class="hover:underline">&ldquo;hallowed be thy name&rdquo; means</a>.</p>
 			</div>
 		</section>
 

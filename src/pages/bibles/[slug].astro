@@ -29,6 +29,8 @@ import readerEntry from '../../data/reader-entry-links.json';
 //   src/data/editions/frontmatter.json — extracted from the shipping interiors: the audience
 //                                     page and the three pillar pages. Read, never retyped.
 import Layout from '../../layouts/Layout.astro';
+import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
 const READ_URL = 'https://fathersheartbible.com/read/';
@@ -306,6 +308,7 @@ const offerFor = (v: (typeof variants)[number]) => ({
 	itemCondition: 'https://schema.org/NewCondition',
 	url,
 	sku: v.sku,
+	hasMerchantReturnPolicy: merchantReturnPolicy,
 	...(v.isbn ? { gtin13: v.isbn.replace(/-/g, '') } : {}),
 	seller: {
 		'@type': 'Organization',
@@ -316,6 +319,13 @@ const offerFor = (v: (typeof variants)[number]) => ({
 		'@type': 'OfferShippingDetails',
 		shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'USD' },
 		shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'US' },
+		// /print promises "most orders arrive in 7–10 days"; Google wants it split into handling +
+		// transit. 2–3 + 5–7 business days sums to that promise (PM ruling 2026-10-27).
+		deliveryTime: {
+			'@type': 'ShippingDeliveryTime',
+			handlingTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 3, unitCode: 'DAY' },
+			transitTime: { '@type': 'QuantitativeValue', minValue: 5, maxValue: 7, unitCode: 'DAY' },
+		},
 	},
 });
 // The page's own Book node is the binding its ISBN names (hardback for every edition today);
@@ -349,10 +359,22 @@ const productSchema = {
 	description: productDescription,
 	image: coverUrl,
 	url,
-	publisher: { '@type': 'Organization', name: 'Spirit Media Publishing' },
-	author: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	author: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
 	// Kevin's absolute rule (2026-10-03): the translator is ALWAYS Spirit Media Publishing.
-	translator: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+	translator: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
 	translationOfWork: { '@type': 'Book', name: 'The Holy Bible' },
 	keywords: (ed.listing.keywordsSchema ?? ed.listing.keywords).join(', '),
 	offers: offerFor(mainVariant),
@@ -391,8 +413,11 @@ const faqSchema = {
 ---
 
 <Layout
-	title={ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`}
-	description={ed.seo?.description ?? `The ${ed.name} — the complete Bible in Divine Voice™ Color. Hardcover, ${pages} pages.`}
+	pageType="book"
+	bookIsbn={ed.isbn || undefined}
+	bookReleaseDate={datePublished}
+	title={fitTitle(ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`)}
+	description={fitDescription(ed.seo?.description ?? `The ${ed.name} — the complete Bible in Divine Voice™ Color. Hardcover, ${pages} pages.`)}
 	image={coverUrl}
 	imageAlt={`${ed.name} — Father's Heart Bible in Divine Voice™ Color`}
 >

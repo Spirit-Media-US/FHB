@@ -33,6 +33,7 @@
 import AuthorBio from '../components/AuthorBio.astro';
 import ReviewLink from '../components/ReviewLink.astro';
 import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
 
 const PAGE_URL = 'https://fathersheartbible.com/italian-bible/'; // trailing slash = the canonical form Layout.astro emits
 const TITLE = "La Bibbia in italiano — Father's Heart Bible, gratis online";
@@ -201,7 +202,7 @@ const TOC = [
 ];
 ---
 
-<Layout title={TITLE} description={DESCRIPTION} lang="it" jsonLd={jsonLd} pageType="article" articleAuthor="Kevin White" articlePublishedTime={PUBLISHED} articleSection="Bible Translations" articleTags={["Bibbia in italiano", "La Bibbia", "Father's Heart Bible"]}>
+<Layout title={fitTitle(TITLE)} description={fitDescription(DESCRIPTION)} lang="it" jsonLd={jsonLd} pageType="article" articleAuthor="Kevin White" articlePublishedTime={PUBLISHED} articleSection="Bible Translations" articleTags={["Bibbia in italiano", "La Bibbia", "Father's Heart Bible"]}>
 	<main id="main-content">
 		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">

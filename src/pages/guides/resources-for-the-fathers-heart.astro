@@ -6,12 +6,13 @@
 import AuthorBio from '../../components/AuthorBio.astro';
 import BlogAudioPlayer from '../../components/BlogAudioPlayer.astro';
 import ReviewLink from '../../components/ReviewLink.astro';
+import { filmSchema } from '../../data/film-schema';
 import Layout from '../../layouts/Layout.astro';
 
 const PAGE_URL = 'https://fathersheartbible.com/guides/resources-for-the-fathers-heart/';
 const TITLE = 'Father Heart of God Resources — Where to Begin';
 const DESCRIPTION =
-	'Free father heart of God resources: read and listen to Scripture that reveals the Father, verse collections, beginner guides, a reading list, a short film, and community.';
+	'Free father heart of God resources: Scripture that reveals the Father, verse collections, beginner guides, a reading list, a short film, and community.';
 const PUBLISHED = '2026-07-13';
 const MODIFIED = '2026-07-16';
 
@@ -268,7 +269,8 @@ const faqSchema = {
 		acceptedAnswer: { '@type': 'Answer', text: f.answer },
 	})),
 };
-const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema];
+// The film iframe renders in the 'watch' group below, so the VideoObject matches the page.
+const jsonLd = [articleSchema, listSchema, breadcrumbSchema, faqSchema, filmSchema];
 const TOC = [
 	{ id: 'read', label: 'Read & listen' },
 	{ id: 'learn', label: 'Learn' },
