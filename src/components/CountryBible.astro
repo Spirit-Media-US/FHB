@@ -84,6 +84,9 @@ export interface Props {
 	h1: string;
 	heroSubhead: string;
 	heroBase: string; // Sanity CDN base
+	// Optional non-Sanity hero (e.g. Wikimedia Commons thumbnails) used only while no Sanity asset exists.
+	// When set, heroBase is ignored for the hero/OG. Swap to a Sanity heroBase once uploaded.
+	heroSrc?: { desktop: string; mobile: string; og: string };
 	heroAlt: string;
 	// Sanity crop mode for the hero (default 'entropy'). Use a focal point when
 	// entropy picks the wrong region, e.g. 'focalpoint&fp-x=0.49&fp-y=0.3'.
@@ -99,6 +102,7 @@ export interface Props {
 	knownForIntroHtml?: string;
 	knownFor?: CountryKnownFor[];
 	gallery?: CountryPhoto[];
+	heroCreditHtml?: string; // visible photo credit under the hero (e.g. CC BY-SA attribution)
 	galleryCreditHtml?: string;
 	galleryBottom?: CountryPhoto[];
 	galleryBottomCreditHtml?: string;
@@ -156,6 +160,7 @@ const {
 	h1,
 	heroSubhead,
 	heroBase,
+	heroSrc,
 	heroAlt,
 	heroCrop = 'entropy',
 	heroBrightness,
@@ -167,6 +172,7 @@ const {
 	knownForIntroHtml,
 	knownFor = [],
 	gallery = [],
+	heroCreditHtml,
 	galleryCreditHtml,
 	galleryBottom = [],
 	galleryBottomCreditHtml,
@@ -272,8 +278,13 @@ const PAGE_URL = `https://fathersheartbible.com/bible-in/${slug}/`;
 // a sponsorship ask, a dollar figure, or a donate link here. The honest CTA on
 // these pages is to READ the editions that are already published and free.
 const HERO_BRI = heroBrightness != null ? `&bri=${heroBrightness}` : '';
-const HERO_IMG = `${heroBase}?w=1400&h=560&fit=crop&crop=${heroCrop}${HERO_BRI}&fm=webp&q=72`;
-const OG_IMG = `${heroBase}?w=1200&h=630&fit=crop&crop=${heroCrop}&fm=jpg&q=80`;
+const HERO_IMG = heroSrc
+	? heroSrc.desktop
+	: `${heroBase}?w=1400&h=560&fit=crop&crop=${heroCrop}${HERO_BRI}&fm=webp&q=72`;
+const HERO_IMG_MOBILE = heroSrc ? heroSrc.mobile : HERO_IMG.replace('w=1400', 'w=640');
+const OG_IMG = heroSrc
+	? heroSrc.og
+	: `${heroBase}?w=1200&h=630&fit=crop&crop=${heroCrop}&fm=jpg&q=80`;
 
 const breadcrumbSchema = {
 	'@context': 'https://schema.org',
@@ -374,7 +385,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 	imageAlt={heroAlt}
 	darkHero={true}
 	jsonLd={jsonLd}
-	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageMobile={HERO_IMG_MOBILE}
 	preloadImageDesktop={HERO_IMG}
 >
 	<main id="main-content">
@@ -382,7 +393,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 		     the title block lives in the section below, like /guides/* and
 		     /bible-for/*. -->
 		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
-			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={heroAlt} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<img src={HERO_IMG} srcset={`${HERO_IMG_MOBILE} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={heroAlt} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
 			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
 			<div class="absolute inset-x-0 bottom-0 z-30 h-1.5" style={`background: linear-gradient(to right, ${colorPrimary} 0%, ${colorPrimary} 50%, ${colorSecondary} 50%, ${colorSecondary} 100%);`} aria-hidden="true"></div>
 		</section>
@@ -390,6 +401,9 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 		<!-- Breadcrumb + direct answer -->
 		<section class="px-6 pt-9 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">
+				{heroCreditHtml && (
+					<p class="mb-5 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={heroCreditHtml}></p>
+				)}
 				<nav aria-label="Breadcrumb" class="mb-6 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
 					<a href="/bible-in/" class="hover:underline">The Bible Around the World</a><span class="px-1.5" aria-hidden="true">/</span>

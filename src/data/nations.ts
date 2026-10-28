@@ -17,6 +17,7 @@ export interface Nation {
 	title: string; // card title, e.g. "The Bible in India"
 	blurb: string; // 1–2 sentence card summary
 	img: string; // Sanity CDN base URL (sizing params appended by the renderer)
+	imgDirect?: boolean; // true = `img` is a complete image URL (e.g. Wikimedia Commons thumbnail), no Sanity params appended
 }
 
 export const NATIONS: Nation[] = [
@@ -202,6 +203,33 @@ export const NATIONS: Nation[] = [
 		blurb:
 			'The heart of Western Christianity — Rome, the Vatican, and centuries of sacred art — where Father’s Heart Bible™ invites a people who revere the Church to meet the Father personally in Scripture. Now in Italian.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/04152bca121aec87b9a859e38f29cce4f4794b31-1880x1177.jpg',
+	},
+	{
+		slug: 'poland',
+		country: 'Poland',
+		title: 'The Bible in Poland',
+		blurb:
+			'A nation that has had the Bible in Polish since 1563, and still overwhelmingly Catholic by census — where Father’s Heart Bible™ invites a faithful people to meet the Father personally in Scripture. Now in Polish.',
+		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/20200826_Wawel_i_Wis%C5%82a_w_Krakowie_1752_1334.jpg/960px-20200826_Wawel_i_Wis%C5%82a_w_Krakowie_1752_1334.jpg',
+		imgDirect: true,
+	},
+	{
+		slug: 'ukraine',
+		country: 'Ukraine',
+		title: 'The Bible in Ukraine',
+		blurb:
+			'A majority-Christian nation with one of Eastern Europe’s oldest Scripture traditions, holding on through war — where Father’s Heart Bible™ offers a Father who is near to the brokenhearted. Now in Ukrainian.',
+		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/2019-07-21_Saint_Sophia_Cathedral_in_Kyiv%2C_Ukraine.jpg/960px-2019-07-21_Saint_Sophia_Cathedral_in_Kyiv%2C_Ukraine.jpg',
+		imgDirect: true,
+	},
+	{
+		slug: 'romania',
+		country: 'Romania',
+		title: 'The Bible in Romania',
+		blurb:
+			'One of Europe’s most Orthodox nations, with the whole Bible in Romanian since 1688 — where Father’s Heart Bible™ lets a faithful people hear, in clear words, the Father its Scriptures reveal. Now in Romanian.',
+		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Castelul_Peles%2C_Sinaia_-_Vedere_panoramica.jpg/960px-Castelul_Peles%2C_Sinaia_-_Vedere_panoramica.jpg',
+		imgDirect: true,
 	},
 	{
 		slug: 'thailand',
