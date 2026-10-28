@@ -1,0 +1,217 @@
+---
+// /verses/trust: unit 6br, ranked by Bing GetKeywordStats 2026-10-28 (aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+	{
+		id: 'trust-all-your-heart',
+		heading: 'Trust with all your heart',
+		intro: 'Not part of it, and not on our own understanding.',
+		verses: [
+			{
+				ref: 'Proverbs 3:5-6',
+				slug: 'proverbs',
+				ch: 3,
+				text: 'Trust in our Father with all your heart, and do not lean on your own understanding. In all your ways know him, and he will make your paths straight.',
+			},
+			{
+				ref: 'Psalm 37:5',
+				slug: 'psalms',
+				ch: 37,
+				text: 'Commit your way to our Father; trust in him, and he will act.',
+			},
+			{
+				ref: 'Isaiah 26:3-4',
+				slug: 'isaiah',
+				ch: 26,
+				text: 'You keep him in perfect peace whose mind is fixed on you, because he trusts in you. Trust in our Father forever, for our Father is the everlasting Rock.',
+			},
+			{
+				ref: 'Psalm 9:10',
+				slug: 'psalms',
+				ch: 9,
+				text: 'Those who know your name trust in you, for you, our Father, have never abandoned those who seek you.',
+			},
+		],
+	},
+	{
+		id: 'trust-when-afraid',
+		heading: 'Trust when you are afraid',
+		intro: 'Fear and trust can sit in the same heart; the Psalms show which one wins.',
+		verses: [
+			{
+				ref: 'Psalm 56:3-4',
+				slug: 'psalms',
+				ch: 56,
+				text: 'When I am afraid, I put my trust in you. In my Father, whose word I praise—in my Father I trust; I will not be afraid. What can mere mortals do to me?',
+			},
+			{
+				ref: 'Psalm 91:2',
+				slug: 'psalms',
+				ch: 91,
+				text: 'I will say of my Father, "He is my refuge and my fortress, my Father, in whom I trust."',
+			},
+			{
+				ref: 'Proverbs 29:25',
+				slug: 'proverbs',
+				ch: 29,
+				text: 'Fear of man lays a snare, but whoever trusts in our Father is kept safe.',
+			},
+			{
+				ref: 'Psalm 31:14-15',
+				slug: 'psalms',
+				ch: 31,
+				text: 'But I trust in you, my Father; I say, "You are my Father." My times are in your hand; rescue me from the hand of my enemies and from my persecutors.',
+			},
+		],
+	},
+	{
+		id: 'trust-that-holds',
+		heading: 'Trust that holds firm',
+		intro: 'He is a stronghold, and those who trust him are not shaken.',
+		verses: [
+			{
+				ref: 'Psalm 125:1',
+				slug: 'psalms',
+				ch: 125,
+				text: 'Those who trust in our Father are like Mount Zion, which cannot be shaken but abides forever.',
+			},
+			{
+				ref: 'Jeremiah 17:7-8',
+				slug: 'jeremiah',
+				ch: 17,
+				text: 'But blessed is the one who trusts in me, whose confidence is in me. He will be like a tree planted by water, sending out its roots by the stream. It has no fear when heat comes; its leaves stay green. It is not anxious in the year of drought and never stops bearing fruit.',
+			},
+			{
+				ref: 'Nahum 1:7',
+				slug: 'nahum',
+				ch: 1,
+				text: 'Our Father is good, a stronghold in the day of trouble; he knows those who take refuge in him.',
+			},
+			{
+				ref: 'Psalm 62:8',
+				slug: 'psalms',
+				ch: 62,
+				text: 'Trust in him at all times, people; pour out your hearts before him; our Father is a refuge for us.',
+			},
+		],
+	},
+	{
+		id: 'not-in-people',
+		heading: 'Our Father, not people',
+		intro: 'Princes, chariots and our own strength all fall short.',
+		verses: [
+			{
+				ref: 'Psalm 118:8-9',
+				slug: 'psalms',
+				ch: 118,
+				text: 'It is better to take refuge in our Father than to trust in people. It is better to take refuge in our Father than to trust in princes.',
+			},
+			{
+				ref: 'Psalm 146:3',
+				slug: 'psalms',
+				ch: 146,
+				text: 'Do not put your trust in princes, in a mortal who cannot save you.',
+			},
+			{
+				ref: 'Psalm 20:7',
+				slug: 'psalms',
+				ch: 20,
+				text: 'Some trust in chariots and some in horses, but we trust in the name of our Father.',
+			},
+			{
+				ref: '2 Corinthians 1:9',
+				slug: '2-corinthians',
+				ch: 1,
+				text: 'We felt we had received a death sentence, so we would rely not on ourselves but on our Father, who raises the dead.',
+			},
+		],
+	},
+	{
+		id: 'trust-brings-hope',
+		heading: 'Trust that brings hope and joy',
+		intro: 'Where we trust him, he fills us.',
+		verses: [
+			{
+				ref: 'Romans 15:13',
+				slug: 'romans',
+				ch: 15,
+				text: "May our Father, the source of hope, fill you with all joy and peace through faith, so by the Holy Spirit's power you overflow with hope.",
+			},
+			{
+				ref: 'Psalm 13:5',
+				slug: 'psalms',
+				ch: 13,
+				text: 'But I have trusted in your faithful love; my heart will rejoice in your salvation.',
+			},
+			{
+				ref: 'Psalm 143:8',
+				slug: 'psalms',
+				ch: 143,
+				text: 'Let me hear of your covenant love in the morning, for in you I trust. Show me the way I should go, for I lift up my soul to you.',
+			},
+			{
+				ref: 'Psalm 28:7',
+				slug: 'psalms',
+				ch: 28,
+				text: 'My Father is my strength and my shield; in him my heart trusts, and I am helped. My heart leaps for joy, and with my song I give thanks to him.',
+			},
+		],
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does the Bible say about trust?',
+		answer:
+			'Proverbs 3:5–6 says, “Trust in our Father with all your heart, and do not lean on your own understanding. In all your ways know him, and he will make your paths straight.”',
+	},
+	{
+		question: 'How do I trust our Father when I am afraid?',
+		answer:
+			'Psalm 56:3–4 says, “When I am afraid, I put my trust in you. In my Father, whose word I praise—in my Father I trust; I will not be afraid. What can mere mortals do to me?”',
+	},
+	{
+		question: 'Is it better to trust our Father than people?',
+		answer:
+			'Psalm 118:8–9 says, “It is better to take refuge in our Father than to trust in people. It is better to take refuge in our Father than to trust in princes.”',
+	},
+	{
+		question: 'What happens to the one who trusts our Father?',
+		answer:
+			'Jeremiah 17:7–8 says, “But blessed is the one who trusts in me, whose confidence is in me. He will be like a tree planted by water, sending out its roots by the stream. It has no fear when heat comes; its leaves stay green. It is not anxious in the year of drought and never stops bearing fruit.”',
+	},
+	{
+		question: 'Does our Father keep those who trust him?',
+		answer:
+			'Nahum 1:7 says, “Our Father is good, a stronghold in the day of trouble; he knows those who take refuge in him.”',
+	},
+	{
+		question: 'How can I be filled with hope and peace?',
+		answer:
+			"Romans 15:13 says, “May our Father, the source of hope, fill you with all joy and peace through faith, so by the Holy Spirit's power you overflow with hope.”",
+	},
+];
+---
+
+<VerseCollection
+	slug="trust"
+	topic="Trust"
+	title="Bible Verses About Trust (with Audio) | Father's Heart Bible™"
+	description="Bible verses about trust in Father's Heart Bible™: trust with all your heart, when afraid, in his keeping, and not in people. Read them free online with audio."
+	h1="Bible Verses About Trust"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg"
+	heroAlt="A man praying quietly"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about trust is Proverbs 3:5&ndash;6: &ldquo;Trust in our Father with all your heart, and do not lean on your own understanding.&rdquo;</strong> Scripture speaks to trust in five ways: trusting with all our heart, trusting when we are afraid, trust that holds firm, trusting our Father rather than people, and the hope and joy trust brings. Below, word for word in Father&rsquo;s Heart Bible&trade;, are the verses on each, linked into the chapter so you can <a href="https://fathersheartbible.com/read/proverbs/3/" style="color: var(--color-brand);" class="hover:underline">read Proverbs 3 free</a> and hear it.`}
+	keyTakeaway="To trust is to lean the whole weight of our lives on our Father, who has never abandoned those who seek him."
+	themes={themes}
+	featured={{"book": "Proverbs", "slug": "proverbs", "chapter": 3, "verseLimit": 10, "heading": "Trust with all your heart: Proverbs 3", "intro": "Proverbs 3 holds the most loved verses on trust in the Bible. Read or hear it below, then follow it to the full chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/proverbs/3/" style="color: var(--color-brand);" class="hover:underline">Proverbs 3</a> or <a href="https://fathersheartbible.com/read/psalms/56/" style="color: var(--color-brand);" class="hover:underline">Psalm 56</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/anxiety/" style="color: var(--color-brand);" class="hover:underline">verses on anxiety</a>, the <a href="/verses/fear/" style="color: var(--color-brand);" class="hover:underline">verses on fear</a>, the <a href="/verses/faith/" style="color: var(--color-brand);" class="hover:underline">verses on faith</a>, or read <a href="/meaning/faith/" style="color: var(--color-brand);" class="hover:underline">what faith means in the Bible</a>.`}
+	ctaMidHeading="Hear Proverbs 3 in full"
+	ctaMidBodyHtml="Read and listen to the chapter on trusting our Father with all your heart &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a Father worth trusting."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about trust", "trust", "Proverbs 3:5-6", "Psalm 56:3-4"]}
+/>

@@ -181,4 +181,18 @@ export const VERSE_TOPICS: VerseTopic[] = [
 			'Saved by grace, grace when we are weak, grace that came with Jesus, and grace that changes how we live.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/4f858cae0aaf68469ed3400e047a53d4af7e5900-8256x5504.jpg',
 	},
+	{
+		slug: 'salvation',
+		title: 'Bible Verses About Salvation',
+		blurb:
+			'Saved by believing, our Father who wants all people saved, Jesus who came to save, and knowing it is ours.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg',
+	},
+	{
+		slug: 'trust',
+		title: 'Bible Verses About Trust',
+		blurb:
+			'Trusting our Father with all your heart, when you are afraid, when life shakes, and not in people.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg',
+	},
 ];
