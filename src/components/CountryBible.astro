@@ -13,6 +13,7 @@ import Layout from '../layouts/Layout.astro';
 // CTAs. Architecture rules (read-first CTA, English-first) live in
 // memory/project_fhb_country_pages.md. Mirror the /verses + /guides patterns.
 import AuthorBio from './AuthorBio.astro';
+import ReadInYourLanguage from './ReadInYourLanguage.astro';
 import TranslationPreview from './TranslationPreview.astro';
 
 export interface CountryStat {
@@ -586,6 +587,9 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 				</div>
 			</section>
 		)}
+
+		<!-- Every live reader language, this country's languages first (W3) -->
+		<ReadInYourLanguage first={(languages || []).map((l) => l.code).filter((c): c is string => !!c)} bg={tintWarm} />
 
 		<!-- Country and the world (diaspora + language spread + strategic role +
 		     how this nation carries FHB out). Shows global/strategic significance. -->
