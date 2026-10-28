@@ -1,0 +1,176 @@
+---
+// /verses/encouragement: unit 6bd, ranked by Bing GetKeywordStats 2026-10-28 (Bing 185; aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+ {
+  "id": "encourage-one-another",
+  "heading": "Encourage one another",
+  "intro": "Encouragement is something we are asked to give, not only receive.",
+  "verses": [
+   {
+    "ref": "1 Thessalonians 5:11",
+    "slug": "1-thessalonians",
+    "ch": 5,
+    "text": "Therefore encourage one another and build one another up, just as you are doing."
+   },
+   {
+    "ref": "Hebrews 10:24–25",
+    "slug": "hebrews",
+    "ch": 10,
+    "text": "And let us consider how to spur one another on to love and good works, not giving up meeting together, as some habitually do, but encouraging each other—even more as you see the Day approaching."
+   },
+   {
+    "ref": "Hebrews 3:13",
+    "slug": "hebrews",
+    "ch": 3,
+    "text": "But encourage each other daily, while it is called \"today,\" so none of you becomes hardened by sin's deceit."
+   },
+   {
+    "ref": "Romans 1:11–12",
+    "slug": "romans",
+    "ch": 1,
+    "text": "For I long to see you, to share a spiritual gift that strengthens you, that is, that we may be mutually encouraged by each other's faith, both yours and mine."
+   }
+  ]
+ },
+ {
+  "id": "our-father-encourages",
+  "heading": "Our Father who encourages",
+  "intro": "The source of every encouraging word is a Father who strengthens his children.",
+  "verses": [
+   {
+    "ref": "2 Thessalonians 2:16–17",
+    "slug": "2-thessalonians",
+    "ch": 2,
+    "text": "May our Lord Jesus Christ himself, and our Father, who loved us and gave us eternal comfort and good hope by grace, comfort your hearts and strengthen them in every good work and word."
+   },
+   {
+    "ref": "2 Corinthians 1:3–4",
+    "slug": "2-corinthians",
+    "ch": 1,
+    "text": "Blessed be our Father, the Father of our Lord Jesus Christ, the Father of compassion and all comfort, who comforts us in all our suffering, so we can comfort others in all their suffering with the comfort we ourselves receive from our Father."
+   },
+   {
+    "ref": "Romans 15:5–6",
+    "slug": "romans",
+    "ch": 15,
+    "text": "May our Father, who gives endurance and encouragement, give you harmony with each other, according to Christ Jesus, so that together, with one voice, you glorify our Father, the Father of our Lord Jesus Christ."
+   },
+   {
+    "ref": "Isaiah 40:31",
+    "slug": "isaiah",
+    "ch": 40,
+    "text": "but those who wait for our Father will renew their strength; they will soar on wings like eagles; they will run and not be weary; they will walk and not faint."
+   }
+  ]
+ },
+ {
+  "id": "words-that-lift",
+  "heading": "Words that lift",
+  "intro": "A single kind word can carry a heavy heart.",
+  "verses": [
+   {
+    "ref": "Proverbs 12:25",
+    "slug": "proverbs",
+    "ch": 12,
+    "text": "Anxiety weighs down the heart, but a kind word cheers it up."
+   },
+   {
+    "ref": "Proverbs 16:24",
+    "slug": "proverbs",
+    "ch": 16,
+    "text": "Pleasant words are a honeycomb, sweet to the soul and healing to the bones."
+   },
+   {
+    "ref": "Ephesians 4:29",
+    "slug": "ephesians",
+    "ch": 4,
+    "text": "Let no rotten word leave your mouth, only what helps others grow, fitting the moment, so it gives grace to hearers."
+   },
+   {
+    "ref": "Colossians 4:6",
+    "slug": "colossians",
+    "ch": 4,
+    "text": "Always speak with grace, seasoned with salt, knowing how to answer each one."
+   }
+  ]
+ },
+ {
+  "id": "do-not-give-up",
+  "heading": "Do not give up",
+  "intro": "Encouragement for the weary, who need strength to keep going.",
+  "verses": [
+   {
+    "ref": "2 Corinthians 4:16",
+    "slug": "2-corinthians",
+    "ch": 4,
+    "text": "So we don't give up. Even as our outer person decays, our inner person is renewed day by day."
+   },
+   {
+    "ref": "Galatians 6:9",
+    "slug": "galatians",
+    "ch": 6,
+    "text": "Let's not tire of doing good—we'll reap a harvest in due time if we don't give up."
+   },
+   {
+    "ref": "Psalm 73:26",
+    "slug": "psalms",
+    "ch": 73,
+    "text": "My flesh and my heart may fail, but our Father is the strength of my heart and my portion forever."
+   },
+   {
+    "ref": "Isaiah 40:29",
+    "slug": "isaiah",
+    "ch": 40,
+    "text": "He gives power to the weary, and increases strength for the powerless."
+   }
+  ]
+ }
+];
+
+const faqs = [
+ {
+  "question": "What is the best Bible verse about encouragement?",
+  "answer": "1 Thessalonians 5:11 says, “Therefore encourage one another and build one another up, just as you are doing.”"
+ },
+ {
+  "question": "What does the Bible say about encouraging others?",
+  "answer": "Hebrews 10:24–25 says, “And let us consider how to spur one another on to love and good works, not giving up meeting together, as some habitually do, but encouraging each other—even more as you see the Day approaching.”"
+ },
+ {
+  "question": "What is a Bible verse for when I need encouragement?",
+  "answer": "Isaiah 40:31 says, “but those who wait for our Father will renew their strength; they will soar on wings like eagles; they will run and not be weary; they will walk and not faint.”"
+ },
+ {
+  "question": "What does the Bible say about not giving up?",
+  "answer": "2 Corinthians 4:16 says, “So we don't give up. Even as our outer person decays, our inner person is renewed day by day.”"
+ },
+ {
+  "question": "Do words really make a difference?",
+  "answer": "Proverbs 12:25 says, “Anxiety weighs down the heart, but a kind word cheers it up.”"
+ }
+];
+---
+
+<VerseCollection
+	slug="encouragement"
+	topic="Encouragement"
+	title="Bible Verses About Encouragement (with Audio) | Father's Heart Bible™"
+	description="Bible verses about encouragement in Father's Heart Bible™: encouraging one another, our Father who encourages us, words that lift, and not giving up. Free to read online with audio."
+	h1="Bible Verses About Encouragement"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg"
+	heroAlt="An older man reading Scripture in a quiet room"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about encouragement is 1 Thessalonians 5:11: &ldquo;Therefore encourage one another and build one another up, just as you are doing.&rdquo;</strong> Scripture treats encouragement as shared work: we give it to one another, and it flows from our Father, who strengthens his children. Below are the verses on each of these, word for word in Father&rsquo;s Heart Bible&trade;, linked into the chapter so you can <a href="https://fathersheartbible.com/read/1-thessalonians/5/" style="color: var(--color-brand);" class="hover:underline">read 1 Thessalonians 5 free</a> and hear it.`}
+	keyTakeaway="Encouragement in the Bible is how a family of believers holds each other up, and every word of it begins with a Father who strengthens us."
+	themes={themes}
+	featured={{"book": "1 Thessalonians", "slug": "1-thessalonians", "chapter": 5, "verseLimit": 11, "heading": "Build one another up: 1 Thessalonians 5", "intro": "1 Thessalonians 5 closes with Paul asking friends to keep encouraging one another. Read or hear it below, then follow it to the full chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/hebrews/10/" style="color: var(--color-brand);" class="hover:underline">Hebrews 10</a> or <a href="https://fathersheartbible.com/read/isaiah/40/" style="color: var(--color-brand);" class="hover:underline">Isaiah 40</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/comfort/" style="color: var(--color-brand);" class="hover:underline">verses for comfort</a>, the <a href="/verses/hope/" style="color: var(--color-brand);" class="hover:underline">verses on hope</a> or the <a href="/verses/strength/" style="color: var(--color-brand);" class="hover:underline">verses on strength</a>.`}
+	ctaMidHeading="Hear 1 Thessalonians 5 in full"
+	ctaMidBodyHtml="Read and listen to the chapter that asks us to encourage one another &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a Father who lifts you up."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about encouragement", "encouragement", "1 Thessalonians 5:11", "Isaiah 40:31"]}
+/>

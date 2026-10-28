@@ -139,4 +139,18 @@ export const VERSE_TOPICS: VerseTopic[] = [
 			'A grateful heart, remembering our Father\u2019s goodness, contentment, and thanks that becomes a daily habit.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
 	},
+	{
+		slug: 'courage',
+		title: 'Bible Verses About Courage',
+		blurb:
+			'Be strong and courageous, courage because our Father is with us, standing firm, and Jesus saying take courage.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg',
+	},
+	{
+		slug: 'encouragement',
+		title: 'Bible Verses About Encouragement',
+		blurb:
+			'Encouraging one another, our Father who encourages us, words that lift, and not giving up.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg',
+	},
 ];
