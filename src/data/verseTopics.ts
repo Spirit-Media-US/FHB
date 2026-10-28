@@ -61,13 +61,15 @@ export const VERSE_TOPICS: VerseTopic[] = [
 	{
 		slug: 'peace',
 		title: 'Bible Verses About Peace',
-		blurb: 'The peace Jesus gives, peace that guards the heart in worry, and peace with our Father.',
+		blurb:
+			'The peace Jesus gives, peace that guards the heart in worry, and peace with our Father.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/4f858cae0aaf68469ed3400e047a53d4af7e5900-8256x5504.jpg',
 	},
 	{
 		slug: 'hope',
 		title: 'Bible Verses About Hope',
-		blurb: 'Hope in hard times, hope that anchors the soul, and waiting on a Father who keeps his word.',
+		blurb:
+			'Hope in hard times, hope that anchors the soul, and waiting on a Father who keeps his word.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg',
 	},
 	{
@@ -91,19 +93,36 @@ export const VERSE_TOPICS: VerseTopic[] = [
 	{
 		slug: 'patience',
 		title: 'Bible Verses About Patience',
-		blurb: 'Waiting on our Father, patience with others, patience that perseveres, and his patience with us.',
+		blurb:
+			'Waiting on our Father, patience with others, patience that perseveres, and his patience with us.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg',
 	},
 	{
 		slug: 'friendship',
 		title: 'Bible Verses About Friendship',
-		blurb: 'A friend who loves at all times, better together, friends in the Bible, and Jesus calling us friends.',
+		blurb:
+			'A friend who loves at all times, better together, friends in the Bible, and Jesus calling us friends.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
 	},
 	{
 		slug: 'family',
 		title: 'Bible Verses About Family',
-		blurb: 'A home that serves our Father, raising children, honoring one another, and his own family.',
+		blurb:
+			'A home that serves our Father, raising children, honoring one another, and his own family.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg',
+	},
+	{
+		slug: 'anger',
+		title: 'Bible Verses About Anger',
+		blurb:
+			'Slow to anger, not sinning in anger, answering with gentleness, and our Father\u2019s own patience.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg',
+	},
+	{
+		slug: 'comfort',
+		title: 'Bible Verses for Comfort',
+		blurb:
+			'Our Father who comforts, near to the brokenhearted, comfort in hard times, and comforting one another.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg',
 	},
 ];
