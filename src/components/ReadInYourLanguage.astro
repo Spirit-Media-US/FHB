@@ -1,0 +1,43 @@
+---
+// "Read in your language" — one link per language that is LIVE in the reader, straight to its
+// hub (/read/<code>/). Generated from src/data/reader-languages.json (itself generated from the
+// community registry each build), so a language that goes live appears here on the next build
+// with no list to remember. `first` = codes shown first (a country page passes the languages
+// spoken there); everything else follows in registry order. W3, master SEO/AEO plan 2026-10-28.
+import readerLanguages from '../data/reader-languages.json' with { type: 'json' };
+
+interface Props {
+	first?: string[];
+	heading?: string;
+	introHtml?: string;
+	bg?: string;
+}
+const {
+	first = [],
+	heading = 'Read in your language',
+	introHtml = 'Father&rsquo;s Heart Bible&trade; is free to read online in every language below &mdash; open its home page and choose any book.',
+	bg = 'var(--color-surface)',
+} = Astro.props;
+
+type Row = { code: string; name: string; endonym?: string };
+const all = (readerLanguages.languages || []) as Row[];
+const lead = first.map((c) => all.find((r) => r.code === c)).filter((r): r is Row => !!r);
+const leadCodes = new Set(lead.map((r) => r.code));
+const rows = [...lead, ...all.filter((r) => !leadCodes.has(r.code))];
+---
+
+<section class="px-6 py-12 lg:px-8 lg:py-14 read-in-your-language" style={`background-color: ${bg};`}>
+	<div class="mx-auto max-w-4xl">
+		<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{heading}</h2>
+		<p class="mt-3 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={introHtml}></p>
+		<ul class="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-2.5">
+			{rows.map((r) => (
+				<li>
+					<a href={r.code === "en" ? "/read/" : `/read/${r.code}/`} class="no-underline hover:underline" style="font-family: var(--font-sans); color: var(--color-brand);">
+						<span lang={r.code} class="font-medium">{r.endonym || r.name}</span>{r.endonym && r.endonym !== r.name && <span style="color: var(--color-muted);"> &middot; {r.name}</span>}
+					</a>
+				</li>
+			))}
+		</ul>
+	</div>
+</section>
