@@ -232,6 +232,15 @@ export const NATIONS: Nation[] = [
 		imgDirect: true,
 	},
 	{
+		slug: 'south-africa',
+		country: 'South Africa',
+		title: 'The Bible in South Africa',
+		blurb:
+			'A majority-Christian nation where isiZulu is the largest home language and the Zulu Bible dates to 1883 — where Father’s Heart Bible™ invites a faithful people to meet the Father personally in Scripture. Now in Zulu.',
+		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Bergville_Drakensbergen_Waterfall_05.jpg/960px-Bergville_Drakensbergen_Waterfall_05.jpg',
+		imgDirect: true,
+	},
+	{
 		slug: 'thailand',
 		country: 'Thailand',
 		title: 'The Bible in Thailand',

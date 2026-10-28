@@ -1,0 +1,165 @@
+---
+// /bible-in/south-africa — Zulu (~28M worldwide). A majority-Christian nation where isiZulu is the largest home language (24.4%); Bible history from the 1883 Zulu Bible to the 1959 version still in use.
+// Facts: every figure on this page is cited in the sources lists below (fetched 2026-10-28). Primary source: Stats SA Census 2022 Statistical Release P0301.4 (read directly, tables 2.8 and 2.10).
+// Hero photo: Bergville, Drakensberg (KwaZulu-Natal), by Ad Meskens, CC BY-SA 4.0 (Wikimedia Commons; file page credited visibly) — hotlinked thumbnails until a Sanity asset can be uploaded (Sanity quota 2026-10-28).
+import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
+
+const verses = [
+	{
+		ref: 'Psalm 68:5',
+		slug: 'psalms',
+		ch: 68,
+		text: 'A father to the fatherless and defender of widows is our Father in his holy dwelling.',
+	},
+	{
+		ref: 'Romans 8:15',
+		slug: 'romans',
+		ch: 8,
+		text: 'You did not receive a spirit of slavery, to fall back into fear, but received the Spirit of sonship, by whom we cry, "Abba! Father!"',
+	},
+	{
+		ref: '1 John 3:1',
+		slug: '1-john',
+		ch: 3,
+		text: 'See what kind of love our Father has given us, that we should be called children of our Father! And we are.',
+	},
+];
+
+const stats = [
+	{ label: 'People', value: '62,027,503 (Census 2022)' },
+	{ label: 'Christian', value: '85.3% of the population (Census 2022)' },
+	{ label: 'Zulu at home', value: '24.4% — the largest home language' },
+	{ label: 'First complete Zulu Bible', value: '1883' },
+];
+
+const faqs = [
+	{
+		question: 'How many Christians are there in South Africa?',
+		answer:
+			'In Census 2022, 85.3% of South Africans reported Christianity as their religious affiliation or belief, followed by Traditional African religion (7.8%) and no religious affiliation (2.9%). The census counted 62,027,503 people (Statistics South Africa, Census 2022 Statistical Release). You can read the Scriptures free at fathersheartbible.com/read.',
+	},
+	{
+		question: 'What is the most spoken language in South Africa?',
+		answer:
+			'isiZulu. In Census 2022 it was the language most often spoken in the household for 24.4% of the population (up from 22.8% in 1996), ahead of isiXhosa (16.3%) and Afrikaans (10.6%). In KwaZulu-Natal, 80.0% of people speak isiZulu at home.',
+	},
+	{
+		question: 'When was the Bible first translated into Zulu?',
+		answer:
+			'A New Testament was published in 1865 by American Board missionaries, and the first complete Zulu Bible was published by the American Bible Society in 1883, according to the Bible Society of South Africa.',
+	},
+	{
+		question: 'Which Zulu Bible translation is mostly used today?',
+		answer:
+			'The translation mainly in use today was first published by the Bible Society of South Africa in 1959. A dynamic translation of the New Testament and Psalms followed in 1986, and the Bible Society restarted work on the Old Testament in August 2009.',
+	},
+	{
+		question: 'Can I read the Bible online free in Zulu?',
+		answer:
+			"Yes. Father's Heart Bible™ is free to read and hear online in Zulu — no account, no purchase, no app — at fathersheartbible.com/read/zu/. The English edition is free too.",
+	},
+	{
+		question: "Is Father's Heart Bible available in Zulu?",
+		answer: `Yes. The Zulu edition is at fathersheartbible.com/read/zu/. Zulu is spoken by some ${sp('zu')} people worldwide. An Afrikaans edition is free at fathersheartbible.com/read/af/ too.`,
+	},
+];
+---
+
+<CountryBible
+	slug="south-africa"
+	country="South Africa"
+	flag="🇿🇦"
+	flagImg="/flags/za.svg"
+	countryWikipedia="https://en.wikipedia.org/wiki/South_Africa"
+	lastUpdated="October 2026"
+	lastUpdatedIso="2026-10-28"
+	colorPrimary="#007749"
+	colorSecondary="#DE3831"
+	colorAccent="#FFB612"
+	tintWarm="#E8F4EE"
+	tintCool="#FCECEB"
+	tintBlue="#FFF6DB"
+	title="The Bible in South Africa — Christianity | Father's Heart Bible™ (FHB)"
+	description="How many Christians live in South Africa, and what is the story of the Zulu Bible? Read the Bible free online in Zulu with audio — Father's Heart Bible™ (FHB)."
+	h1="The Bible in South Africa"
+	heroSubhead="South Africa is a majority-Christian nation where isiZulu is the largest home language — and Father's Heart Bible offers a near and loving Father in Zulu. Free online, with audio."
+	heroBase=""
+	heroSrc={{ desktop: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Bergville_Drakensbergen_Waterfall_05.jpg/1280px-Bergville_Drakensbergen_Waterfall_05.jpg", mobile: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Bergville_Drakensbergen_Waterfall_05.jpg/960px-Bergville_Drakensbergen_Waterfall_05.jpg", og: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Bergville_Drakensbergen_Waterfall_05.jpg/1280px-Bergville_Drakensbergen_Waterfall_05.jpg" }}
+	heroCreditHtml={`Hero photo: <a href="https://commons.wikimedia.org/wiki/File:Bergville_Drakensbergen_Waterfall_05.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Waterfall in the Drakensberg, Bergville</a> by <a href="https://commons.wikimedia.org/wiki/User:Ad_Meskens" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Ad Meskens</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 4.0</a>, via Wikimedia Commons.`}
+	heroAlt="Rock pools and a small waterfall below the Drakensberg escarpment near Bergville, KwaZulu-Natal"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Yes &mdash; you can read the Bible free online in South Africa right now.</strong> In Census 2022, 85.3% of South Africans reported Christianity as their religion, and isiZulu is the language most often spoken at home. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. The <a href="https://fathersheartbible.com/read/zu/" style="color: var(--color-brand);" class="hover:underline"><em>Zulu</em> edition</a> is free to read and hear today &mdash; for a people who have had the whole Bible in Zulu since 1883, where Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	keyTakeaway="South Africa has had the whole Bible in Zulu since 1883 — and Father's Heart Bible™ (FHB) invites the nation's largest language community to hear in it, clearly, the voice of a Father."
+	glanceIntroHtml={`South Africa is a land of mountains, coast and cities &mdash; home to 62 million people and many languages, where the church is part of daily life from KwaZulu-Natal to the Cape.`}
+	stats={stats}
+	knownForHeading="What South Africa is known for"
+	knownForIntroHtml={`South Africa&rsquo;s Zulu Bible story runs from American missionaries in Natal to a translation still in use today.`}
+	knownFor={[
+		{ label: "A New Testament, 1865", text: "The Zulu New Testament was translated by several missionaries of the American Board of Commissioners for Foreign Missions and published in 1865." },
+		{ label: "The first complete Zulu Bible, 1883", text: "The American Bible Society published the first complete Bible in isiZulu in 1883, translated by the American Board, corrected by Andrew Abraham and finally edited by S. C. Pixley." },
+		{ label: "The 1959 Bible", text: "The Zulu translation mainly in use today was first published by the Bible Society of South Africa in 1959; a dynamic translation of the New Testament and Psalms followed in 1986." },
+		{ label: "The largest home language", text: "isiZulu is spoken most often at home by 24.4% of South Africans (Census 2022), and by 80.0% of people in KwaZulu-Natal." },
+		{ label: "A Christian majority", text: "85.3% of South Africans reported Christianity in Census 2022; KwaZulu-Natal, at 74.9%, was the lowest province, with 13.6% reporting Traditional African religion." },
+		{ label: "Mountains and coast", text: "From the Drakensberg escarpment in KwaZulu-Natal to the Cape, South Africa&rsquo;s landscape is among the most varied on the continent." },
+	]}
+	faithHeading="Faith and the Bible in South Africa"
+	faithBodyHtml={`<p>Statistics South Africa counted <strong>62,027,503 people</strong> in Census 2022. <strong>85.3%</strong> reported Christianity as their religious affiliation or belief, <strong>7.8%</strong> Traditional African religion, 1.6% Islam, 1.1% Hinduism and <strong>2.9%</strong> no religious affiliation. In KwaZulu-Natal, where 80.0% speak isiZulu at home, 74.9% reported Christianity and 13.6% Traditional African religion.</p><p>The Zulu Bible is old here. American missionaries published a New Testament in 1865 and the first complete Bible in 1883; the Bible Society of South Africa&rsquo;s 1959 translation is the one mainly in use today.</p><p>The invitation of Father&rsquo;s Heart Bible&trade; is a personal one: read the same Word in clear Zulu, and meet in it a Father.</p>`}
+	sources={[
+		{ label: "Statistics South Africa — Census 2022 Statistical Release (P0301.4), tables 2.8 and 2.10", url: "https://census.statssa.gov.za/assets/documents/2022/P03014_Census_2022_Statistical_Release.pdf" },
+		{ label: "Bible Society of South Africa (BibleSA) — A brief history of isiZulu Bible", url: "https://www.biblesa.co.za/a-brief-history-of-isizulu-bible-2020" },
+		{ label: "Ditsong Museums — The historical background of missionaries in South Africa and the translation of Christian Bibles into isiZulu (1865 New Testament; 1883 translators)", url: "https://ditsong.org.za/en/the-historical-background-of-missionaries-in-south-africa-and-the-translation-of-christian-bibles-into-isizulu/" },
+		{ label: "Zulu language — Wikipedia (L1 12 million, L2 16 million, citing Ethnologue; used because no primary count is published)", url: "https://en.wikipedia.org/wiki/Zulu_language" },
+	]}
+	painsHeading="What pains South Africa"
+	painsIntroHtml={`Behind South Africa&rsquo;s beauty and faith, the official figures show wounds that families carry &mdash; and the Father&rsquo;s heart speaks into them.`}
+	painStats={[
+		{ value: "33.6%", label: "official unemployment rate, second quarter of 2026 (Stats SA Quarterly Labour Force Survey)" },
+		{ value: "47.4%", label: "unemployment rate among young people aged 15–34, second quarter of 2026" },
+		{ value: "5.0 million", label: "unemployed young people (15–34) in the second quarter of 2026" },
+		{ value: "families apart", label: "households stretched by distance and the search for work" },
+		{ value: "a younger generation", label: "asking whether faith is more than tradition" },
+		{ value: "a searching heart", label: "longing to know God personally" },
+	]}
+	painsBodyHtml={`<p>When nearly half of South Africa&rsquo;s young people are looking for work, the weight falls on families and on the hopes of a whole generation.</p><p>The Father&rsquo;s answer is not a program. It is a Word to be read, free, in Zulu or English, in Father&rsquo;s Heart Bible&trade; &mdash; for the believer, the doubter, and the one who simply wants to hear it clearly.</p>`}
+	painsSources={[
+		{ label: "SAnews (South African Government News Agency) — SA official unemployment rate rises to 33.6% (reporting Stats SA QLFS Q2 2026, released 11 August 2026)", url: "https://www.sanews.gov.za/south-africa/sa-official-unemployment-rate-rises-336" },
+		{ label: "Statistics South Africa — Quarterly Labour Force Survey, Q2 2026 (P0211)", url: "https://www.statssa.gov.za/publications/P0211/P02112ndQuarter2026.pdf" },
+	]}
+	faithsHeading="What “our Father” offers South Africa"
+	faithsIntroHtml={`Father&rsquo;s Heart Bible&trade; does not ask South Africa to leave the Scriptures it treasures. It lets a faithful people hear, in clear Zulu, the Father whom its own Bible reveals.`}
+	faithsBlocks={[
+		{ heading: "For the one who prays", bodyHtml: "South Africans pray <a href=\"https://fathersheartbible.com/read/matthew/6/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;Our Father in heaven&rdquo;</a> from childhood &mdash; and can read it again, as the words of One who knows them by name." },
+		{ heading: "For the one left behind", bodyHtml: "To those who feel overlooked, Scripture promises <a href=\"https://fathersheartbible.com/read/psalms/68/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;a father to the fatherless&rdquo;</a> &mdash; a Father who stays." },
+		{ heading: "For the child of God", bodyHtml: "<a href=\"https://fathersheartbible.com/read/romans/8/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;You received the Spirit of sonship, by whom we cry, Abba! Father!&rdquo;</a> &mdash; not a slave&rsquo;s fear, but a child&rsquo;s trust." },
+		{ heading: "For Zulu families abroad", bodyHtml: "For Zulu-speaking families living in other countries, the whole Bible is free on any phone, in Zulu and in English." },
+	]}
+	whyHeading="Why Father's Heart Bible™ for South Africa"
+	whyBlocks={[
+		{ heading: "God revealed as Father", bodyHtml: "Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href=\"https://fathersheartbible.com/read/genesis/1/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Genesis 1:1</a> onward." },
+		{ heading: "Free, with audio, on any phone", bodyHtml: "No purchase, no app, no sign-up. The whole Bible is free to <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read online</a>, with audio, on the phone in your hand." },
+		{ heading: "Now in Zulu", bodyHtml: "The Zulu edition is published: <a href=\"https://fathersheartbible.com/read/zu/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read it free</a>. An <a href=\"https://fathersheartbible.com/read/af/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Afrikaans edition</a> is free too." },
+	]}
+	wordHeading="His Word will not return void"
+	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do. In a land that has had it in Zulu since 1883, it will not return empty.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;&hellip;so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
+	resourcesHeading="Learn more about South Africa"
+	resourcesIntroHtml={`Trusted sources for the facts on this page &mdash; and for going deeper into South Africa&rsquo;s people, faith, and story.`}
+	resources={[
+		{ label: "South Africa — Wikipedia", url: "https://en.wikipedia.org/wiki/South_Africa" },
+		{ label: "Religion in South Africa — Wikipedia", url: "https://en.wikipedia.org/wiki/Religion_in_South_Africa" },
+		{ label: "Statistics South Africa — Census 2022", url: "https://census.statssa.gov.za/" },
+		{ label: "South Africa — Joshua Project (people groups)", url: "https://joshuaproject.net/countries/SF" },
+	]}
+	opportunityHeading="The translation opportunity for South Africa"
+	opportunityIntroHtml={`Zulu is the heart language of some ${sp('zu')} people worldwide &mdash; and the Zulu edition is free to read in Father&rsquo;s Heart Bible&trade;.`}
+	languages={[
+		{ language: "English", code: "en" },
+		{ language: "Zulu", code: "zu" },
+		{ language: "Afrikaans", code: "af" },
+	]}
+	verses={verses}
+	keepReadingHtml={`Begin with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> &mdash; including <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start</a> and <a href="/guides/what-is-the-gospel/" style="color: var(--color-brand);" class="hover:underline">what the gospel is</a>. Browse Scripture by theme on our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> pages.`}
+	faqs={faqs}
+	ctaMidHeading="Hear the Father in Zulu"
+	ctaMidBodyHtml={`South Africa has had the whole Bible in Zulu since 1883. Now hear it in a Father&rsquo;s own voice &mdash; free, with audio, on any phone.`}
+	ctaBottomBodyHtml={`From Genesis to Revelation, free online with audio &mdash; a translation that reveals God as a loving Father to every beloved son and daughter, in South Africa and wherever Zulu speakers have gone.`}
+/>
