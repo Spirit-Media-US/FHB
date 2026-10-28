@@ -37,6 +37,19 @@ const QUOTES: [string, number, number][] = isOT
 			['Galatians', 4, 6],
 			['Hebrews', 1, 3],
 		];
+const allBooks = groups.flatMap((g) => g.books);
+const bookOf = (n: string) => allBooks.find((b) => b.name === n)!;
+const STARTS: string[] = isOT ? ['Genesis', 'Psalms', 'Isaiah'] : ['John', 'Romans', 'Revelation'];
+const starts = STARTS.map(bookOf);
+const maxCh = Math.max(...allBooks.map((b) => b.chapters));
+const longest = allBooks.filter((b) => b.chapters === maxCh).map((b) => b.name);
+const longestText =
+	longest.length === 1
+		? `the longest book is ${longest[0]}, at ${maxCh} chapters`
+		: `the longest books, ${longest.join(' and ')}, have ${maxCh} chapters each`;
+const groupNote = isOT
+	? ' Counted as one division, the Major and Minor Prophets make the seventeen Prophets.'
+	: ' Counted as one division, Paul’s Letters and the General Letters make the twenty-one Letters.';
 const quotes = QUOTES.map(([book, ch, v]) => ({
 	ref: `${book === 'Psalms' ? 'Psalm' : book} ${ch}:${v}`,
 	href: `${READ}/${slugOf(book)}/${ch}/`,
@@ -272,6 +285,14 @@ const jsonLd = [
 					<p id="key-takeaway" class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">{copy.takeaway}</p>
 				</aside>
 
+				<h2 id="divisions" class="text-2xl md:text-3xl font-light mt-10 mb-3 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The divisions of the {name} at a glance</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The {total} books of the {name} fall into {groups.length} groups, the way most Bibles print their contents page. Each count below is read from the book list on this page.{groupNote}</p>
+				<ul class="mb-4 space-y-2" style="font-family: var(--font-sans); color: var(--color-muted); list-style: disc; padding-left: 1.4em;">
+					{groups.map((g) => (
+						<li class="text-lg leading-relaxed"><strong style="color: var(--color-ink);">{g.name}</strong>: {g.books.length} {g.books.length === 1 ? 'book' : 'books'}, {g.books[0].name}{g.books.length > 1 ? ` to ${g.books[g.books.length - 1].name}` : ''}, {g.books.reduce((a, b) => a + b.chapters, 0)} chapters.</li>
+					))}
+				</ul>
+
 				<h2 id="books" class="text-2xl md:text-3xl font-light mt-10 mb-2 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The {total} books of the {name} in order</h2>
 				{groups.map((g) => (
 					<>
@@ -297,6 +318,14 @@ const jsonLd = [
 					</figure>
 				))}
 				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">{copy.after}</p>
+
+				<h2 id="how-to-read" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">How to read the {name} on Father&rsquo;s Heart Bible&trade;</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Every one of the {total} books is free to read online, one chapter at a time, with audio narration so you can read and listen together. The {name} runs to {totalChapters.toLocaleString('en-US')} chapters; {longestText}. Good places to begin:</p>
+				<ul class="mb-4 space-y-2" style="font-family: var(--font-sans); color: var(--color-muted); list-style: disc; padding-left: 1.4em;">
+					{starts.map((b) => (
+						<li class="text-lg leading-relaxed"><a href={`${READ}/${b.slug}/1/`} style="color: var(--color-brand);" class="font-semibold hover:underline">{b.name} 1</a> &mdash; {b.summary}</li>
+					))}
+				</ul>
 
 				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
 					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Read the {name} free</p>
