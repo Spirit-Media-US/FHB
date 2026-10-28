@@ -2,6 +2,7 @@
 import HowToHubCards from '../components/HowToHubCards.astro';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
+import { fitDescription, fitTitle } from '../lib/seoFit';
 
 const rawSanityPosts = await sanityClient.fetch(`
   *[_type == "blogPost"] | order(publishDate desc) {
@@ -74,8 +75,8 @@ const jsonLd = {
 ---
 
 <Layout
-  title="Father's Heart Bible™ (FHB) Blog — Hearing Our Father's Voice in Scripture"
-  description="Articles on hearing the Father's voice across Scripture — orphan spirit and sonship, and what shifts when every verse is read with the Father's heart in view."
+  title={fitTitle("Father's Heart Bible™ (FHB) Blog — Hearing Our Father's Voice in Scripture")}
+  description={fitDescription("Articles on hearing the Father's voice across Scripture — orphan spirit and sonship, and what shifts when every verse is read with the Father's heart in view.")}
   jsonLd={jsonLd}
 >
 

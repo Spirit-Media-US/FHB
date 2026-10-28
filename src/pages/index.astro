@@ -19,6 +19,7 @@ import {
 } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../lib/sanity';
+import { fitDescription, fitTitle } from '../lib/seoFit';
 
 // Now in Print's book thumbnail: /print's General Edition card (600 and 1200 exist on R2).
 const printBookCard = cardUrl('general-regular-charcoal');
@@ -178,8 +179,8 @@ const homeVoices: VoiceGroup[] = [
 
 <Layout
 	youtube
-	title={seoTitle}
-	description={seoDescription}
+	title={fitTitle(seoTitle)}
+	description={fitDescription(seoDescription)}
 	image="https://assets.spiritmediapublishing.com/FHB/share/v3/fhb-og-home.jpg"
 	imageAlt="Father's Heart Bible — Encounter God as Your Father"
 	darkHero={true}

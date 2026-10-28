@@ -29,6 +29,7 @@ import readerEntry from '../../data/reader-entry-links.json';
 //   src/data/editions/frontmatter.json — extracted from the shipping interiors: the audience
 //                                     page and the three pillar pages. Read, never retyped.
 import Layout from '../../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
 const READ_URL = 'https://fathersheartbible.com/read/';
@@ -356,10 +357,22 @@ const productSchema = {
 	description: productDescription,
 	image: coverUrl,
 	url,
-	publisher: { '@type': 'Organization', '@id': 'https://spiritmediapublishing.com/#organization', name: 'Spirit Media Publishing' },
-	author: { '@type': 'Organization', '@id': 'https://spiritmediapublishing.com/#organization', name: 'Spirit Media Publishing' },
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	author: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
 	// Kevin's absolute rule (2026-10-03): the translator is ALWAYS Spirit Media Publishing.
-	translator: { '@type': 'Organization', '@id': 'https://spiritmediapublishing.com/#organization', name: 'Spirit Media Publishing' },
+	translator: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
 	translationOfWork: { '@type': 'Book', name: 'The Holy Bible' },
 	keywords: (ed.listing.keywordsSchema ?? ed.listing.keywords).join(', '),
 	offers: offerFor(mainVariant),
@@ -401,8 +414,8 @@ const faqSchema = {
 	pageType="book"
 	bookIsbn={ed.isbn || undefined}
 	bookReleaseDate={datePublished}
-	title={ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`}
-	description={ed.seo?.description ?? `The ${ed.name} — the complete Bible in Divine Voice™ Color. Hardcover, ${pages} pages.`}
+	title={fitTitle(ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`)}
+	description={fitDescription(ed.seo?.description ?? `The ${ed.name} — the complete Bible in Divine Voice™ Color. Hardcover, ${pages} pages.`)}
 	image={coverUrl}
 	imageAlt={`${ed.name} — Father's Heart Bible in Divine Voice™ Color`}
 >

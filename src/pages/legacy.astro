@@ -8,6 +8,7 @@ import { ROSTER_TOTAL, upcomingLanguages } from '../data/language-roster';
 import { LANGUAGE_TOTAL, readOnlyLanguages } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
 import { sanityClient } from '../lib/sanity';
+import { fitDescription, fitTitle } from '../lib/seoFit';
 
 // Language count: English + every edition in the registry + the read-online languages — the
 // same number /read shows (src/data/receive.ts), never typed here.
@@ -145,8 +146,8 @@ const upcoming = upcomingLanguages;
 ---
 
 <Layout
-	title={seoTitle}
-	description={seoDescription}
+	title={fitTitle(seoTitle)}
+	description={fitDescription(seoDescription)}
 	image="https://assets.spiritmediapublishing.com/FHB/share/fhb-og-partner.jpg?v=2"
 	imageAlt="Father's Heart Bible — Sharing Our Father"
 	darkHero={true}

@@ -8,6 +8,7 @@ import AuthorBio from '../../components/AuthorBio.astro';
 import FeatureChapter from '../../components/FeatureChapter.astro';
 import ReviewLink from '../../components/ReviewLink.astro';
 import Layout from '../../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const PAGE_URL = 'https://fathersheartbible.com/the-fathers-heart-bible/translation-philosophy/';
 const TITLE = "Translation Philosophy — How Father's Heart Bible™ (FHB) Is Translated";
@@ -138,8 +139,8 @@ const TOC = [
 ];
 ---
 <Layout
-	title={TITLE}
-	description={DESCRIPTION}
+	title={fitTitle(TITLE)}
+	description={fitDescription(DESCRIPTION)}
 	image={OG_IMG}
 	darkHero={true}
 	jsonLd={jsonLd}

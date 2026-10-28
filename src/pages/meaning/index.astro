@@ -7,6 +7,7 @@ import { WORD_MEANINGS } from '../../data/wordMeanings';
 // differ, and why this Bible says "our Father". Add a row to src/data/wordMeanings.ts
 // when a new /meaning/<word> page ships.
 import Layout from '../../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const PAGE_URL = 'https://fathersheartbible.com/meaning/';
 const TITLE = "Bible Word Meanings — What Words Mean | Father's Heart Bible™ (FHB)";
@@ -80,8 +81,8 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 ---
 
 <Layout
-	title={TITLE}
-	description={DESCRIPTION}
+	title={fitTitle(TITLE)}
+	description={fitDescription(DESCRIPTION)}
 	image={OG_IMG}
 	darkHero={true}
 	jsonLd={jsonLd}
