@@ -102,7 +102,7 @@ const BOOKS: BookRow[] = [
 		thumb:
 			'https://cdn.sanity.io/images/rusi1hyi/production/504f681a0f8272bc0b8bd9402d16d0961e1bc466-343x522.jpg?w=200&fm=webp&q=75',
 		thumbAlt: 'The Father Heart of God book cover',
-		body: `For decades this slim book has been the doorway into the subject for millions of readers, and it remains the classic. McClung, a longtime Youth With A Mission leader, writes simply and pastorally about God as a Father who heals the wounded and welcomes the wandering — including those whose earthly fathers failed them. If you give one <em>book</em> (rather than a Bible) to someone discovering the Father's love, this is still the safest choice.`,
+		body: `For decades this slim book has been the doorway into the subject for many readers, and it remains the classic. McClung, a longtime Youth With A Mission leader, writes simply and pastorally about God as a Father who heals the wounded and welcomes the wandering — including those whose earthly fathers failed them. If you give one <em>book</em> (rather than a Bible) to someone discovering the Father's love, this is still the safest choice.`,
 	},
 	{
 		id: 'manning',
@@ -129,7 +129,7 @@ const BOOKS: BookRow[] = [
 		thumb:
 			'https://cdn.sanity.io/images/rusi1hyi/production/9e42ed75f639127bd7d1799929e1a7def2604b3a-348x522.jpg?w=200&fm=webp&q=75',
 		thumbAlt: "Experiencing Father's Embrace book cover",
-		body: `Frost was a hard-driving fishing captain whose life was remade by an encounter with the Father's love, and he writes for strivers and performers — people who know all about earning and nothing about resting. His story-driven teaching on moving from performance to sonship has become a staple in father-heart ministry around the world.`,
+		body: `Frost writes about the Father's love for strivers and performers — people who know all about earning and nothing about resting. His story-driven teaching on moving from performance to sonship has become a staple in father-heart ministry around the world.`,
 	},
 	{
 		id: 'jordan',
@@ -173,7 +173,7 @@ const BOOKS: BookRow[] = [
 		author: 'Barry Adams',
 		thumb: 'https://assets.spiritmediapublishing.com/FHB/book-covers/fll.webp',
 		thumbAlt: "Father's Love Letter book cover",
-		body: `Barry Adams took paraphrased passages from across Scripture and wove them into a single tender letter, written as if the Father were speaking straight to you. What began in 1999 as a sermon illustration has since reached millions in more than a hundred languages — and this is the book edition of that message. Short enough to read in one sitting, it is a gentle, disarming doorway into the Father's affection for anyone who struggles to believe He could feel that way about them. Available on <a href="https://www.amazon.com/dp/0875099998" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Amazon</a>.`,
+		body: `Barry Adams took paraphrased passages from across Scripture and wove them into a single tender letter, written as if the Father were speaking straight to you. What began in 1999 as a sermon illustration has since been translated into more than a hundred languages — and this is the book edition of that message. Short enough to read in one sitting, it is a gentle, disarming doorway into the Father's affection for anyone who struggles to believe He could feel that way about them. Available on <a href="https://www.amazon.com/dp/0875099998" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Amazon</a>.`,
 	},
 ];
 
@@ -287,7 +287,11 @@ const listSchema = {
 			name: b.title,
 			author:
 				b.id === 'fhb'
-					? { '@type': 'Organization', '@id': 'https://spiritmediapublishing.com/#organization', name: 'Spirit Media Publishing' }
+					? {
+							'@type': 'Organization',
+							'@id': 'https://spiritmediapublishing.com/#organization',
+							name: 'Spirit Media Publishing',
+						}
 					: { '@type': 'Person', name: b.author.replace(/ —.*$/, '').trim() },
 			url: `${PAGE_URL}#${b.id}`,
 			...(BUY[b.id] ? { sameAs: BUY[b.id] } : {}),
