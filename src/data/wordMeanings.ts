@@ -205,6 +205,18 @@ export const WORD_MEANINGS: WordMeaning[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
 	},
 	{
+		slug: 'philippians-4-13',
+		title: 'What does Philippians 4:13 mean?',
+		blurb: '“I can do all things through Christ” was written from prison, about contentment in every circumstance.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'jeremiah-29-11',
+		title: 'What does Jeremiah 29:11 mean?',
+		blurb: 'A letter to the exiles in Babylon: plans for peace and hope, and the seventy years they had to wait.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
+	},
+	{
 		slug: 'reproof',
 		title: 'What does reproof mean in the Bible?',
 		blurb:
