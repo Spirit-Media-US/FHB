@@ -288,6 +288,27 @@ export const WORD_MEANINGS: WordMeaning[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
 	{
+		slug: '2-timothy-1-7',
+		title: 'What does 2 Timothy 1:7 mean?',
+		blurb:
+			'Paul to Timothy from prison: our Father gave no spirit of fear, but of power, love and self-control.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'psalm-46-10',
+		title: 'What does Psalm 46:10 mean?',
+		blurb:
+			'Our Father to a world of raging nations: be still, know that he is the Father, and trust that he will be exalted.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'matthew-11-28',
+		title: 'What does Matthew 11:28 mean?',
+		blurb:
+			'Jesus to the weary: come to me and I will give you rest, because he reveals the Father.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
 		slug: 'reproof',
 		title: 'What does reproof mean in the Bible?',
 		blurb:
