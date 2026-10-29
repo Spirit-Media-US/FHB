@@ -39,6 +39,15 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { loadLiveCache, saveLiveCache, probeWithCache, DEFAULT_PATH as LIVE_CACHE_PATH } from './lib/live-cache.mjs';
+
+// Shared 24h cache of URLs production already served 200 (unit 2cr). Only 200s are cached, so the
+// guard's drop-on-404 safety is unchanged. FHB_SITEMAP_LIVE_CACHE=off disables; =<path> relocates.
+const LIVE_CACHE_FILE = process.env.FHB_SITEMAP_LIVE_CACHE ?? LIVE_CACHE_PATH;
+const LIVE_CACHE_ON = LIVE_CACHE_FILE !== 'off';
+const liveCache = LIVE_CACHE_ON ? loadLiveCache(LIVE_CACHE_FILE) : new Map();
+let liveFetched = 0;
+let liveSkipped = 0;
 
 const SITE = 'https://fathersheartbible.com';
 const TRANSLATION_OUT = '/home/deploy/bin/tools-api/pipelines/translation/output';
@@ -207,12 +216,17 @@ if (process.env.SITEMAP_SKIP_LIVE_CHECK !== '1') {
 	for (const [lang, t] of [...LOCAL_SLUGS]) {
 		const probe = `${SITE}/read/${lang}/${t.get('john') ?? [...t.values()][0]}/1/`;
 		let ok = false;
-		try {
-			const r = await fetch(probe, { redirect: 'manual' });
-			ok = r.status === 200;
-		} catch {
-			ok = false;
-		}
+		const r = await probeWithCache(
+			[{ url: probe }],
+			async (u) => (await fetch(u, { redirect: 'manual' })).status,
+			liveCache,
+			(_j, res) => {
+				ok = res === 200;
+			},
+		);
+		liveFetched += r.fetched;
+		liveSkipped += r.skipped;
+		if (r.skipped) ok = true;
 		if (!ok) {
 			LOCAL_SLUGS.delete(lang);
 			console.warn(
@@ -258,35 +272,38 @@ async function pruneToLive() {
 	}
 	let dropped = 0;
 	let errors = 0;
-	// Modest concurrency — this hits our own production edge.
-	const QUEUE = [...jobs];
-	const worker = async () => {
-		while (QUEUE.length) {
-			const j = QUEUE.shift();
-			const url = chapterUrl(j.lang, j.slug, j.probe);
-			try {
-				const ac = new AbortController();
-				const t = setTimeout(() => ac.abort(), 15000);
-				const r = await fetch(url, { method: 'GET', signal: ac.signal });
-				clearTimeout(t);
-				if (r.status === 404) {
-					byLang.get(j.lang).delete(j.slug);
-					dropped++;
-					console.warn(
-						`gen-sitemap-read: DROPPED ${j.lang}/${j.slug} — ${url} is 404 in production ` +
-							`(translated but not deployed to the reader yet)`,
-					);
-				} else if (!r.ok) {
-					errors++;
-					console.warn(`gen-sitemap-read: probe ${url} returned ${r.status} — keeping book`);
-				}
-			} catch (e) {
-				errors++;
-				console.warn(`gen-sitemap-read: probe failed for ${url} (${e.message}) — keeping book`);
-			}
+	// Modest concurrency — this hits our own production edge. URLs confirmed 200 within the cache
+	// TTL are skipped (not re-fetched); 404/other results are never cached.
+	for (const j of jobs) j.url = chapterUrl(j.lang, j.slug, j.probe);
+	const fetchStatus = async (url) => {
+		const ac = new AbortController();
+		const t = setTimeout(() => ac.abort(), 15000);
+		try {
+			return (await fetch(url, { method: 'GET', signal: ac.signal })).status;
+		} finally {
+			clearTimeout(t);
 		}
 	};
-	await Promise.all(Array.from({ length: 6 }, worker));
+	const r = await probeWithCache(jobs, fetchStatus, liveCache, (j, res) => {
+		if (res === 404) {
+			byLang.get(j.lang).delete(j.slug);
+			dropped++;
+			console.warn(
+				`gen-sitemap-read: DROPPED ${j.lang}/${j.slug} — ${j.url} is 404 in production ` +
+					`(translated but not deployed to the reader yet)`,
+			);
+		} else if (res instanceof Error) {
+			errors++;
+			console.warn(`gen-sitemap-read: probe failed for ${j.url} (${res.message}) — keeping book`);
+		} else if (res < 200 || res >= 300) {
+			errors++;
+			console.warn(`gen-sitemap-read: probe ${j.url} returned ${res} — keeping book`);
+		}
+	});
+	liveFetched += r.fetched;
+	liveSkipped += r.skipped;
+	if (LIVE_CACHE_ON) saveLiveCache(liveCache, LIVE_CACHE_FILE);
+	console.log(`gen-sitemap-read: live-check requests fetched=${liveFetched} skipped-by-cache=${liveSkipped}`);
 	console.log(
 		`gen-sitemap-read: live guard checked ${jobs.length} non-English books — ` +
 			`${dropped} dropped, ${errors} inconclusive`,
