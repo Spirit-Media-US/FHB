@@ -3,6 +3,11 @@
 // Generated from a verified draft (stats cited, verses slug-checked, images & voice
 // headshots sourced/verified by hand).
 import GroupBible from '../../components/GroupBible.astro';
+import { catalogRows } from '../../data/print-catalog';
+
+const GEN = catalogRows.find((r) => r.category === 'general');
+const GENERAL_PB = (GEN?.pb ?? 79.99).toFixed(2);
+const GENERAL_HB = (GEN?.hb ?? 99.99).toFixed(2);
 ---
 
 <GroupBible
@@ -107,7 +112,7 @@ import GroupBible from '../../components/GroupBible.astro';
 		{ edition: `NIV Study Bible (Zondervan)`, bestFor: `A balanced all-purpose study Bible`, style: `NIV — balanced, widely used`, access: `Hardcover/paperback from retailers` },
 	]}
 	faqs={[
-		{ question: `What is the best Bible to give my father?`, answer: `Give a clear translation in a format he will use every day. Father's Heart Bible™ reveals God as Father from Genesis to Revelation, is free to read and listen to online for the commute, and comes in paperback ($39.99) and hardback ($44.99) to give. If he wants study notes, the NLT Life Application Study Bible suits everyday decisions, the ESV Study Bible deep doctrinal study, and the NIV Study Bible all-purpose reading.` },
+		{ question: `What is the best Bible to give my father?`, answer: `Give a clear translation in a format he will use every day. Father's Heart Bible™ reveals God as Father from Genesis to Revelation, is free to read and listen to online for the commute, and comes in paperback ($${GENERAL_PB}) and hardback ($${GENERAL_HB}) to give. If he wants study notes, the NLT Life Application Study Bible suits everyday decisions, the ESV Study Bible deep doctrinal study, and the NIV Study Bible all-purpose reading.` },
 		{ question: `What are good Bible verses for fathers?`, answer: `Psalm 103:13 (as a father shows compassion), Romans 8:15 and Galatians 4:6 (the Spirit of sonship crying "Abba, Father"), Luke 15:20 (the father runs to the prodigal), Ephesians 3:14-15 (every family named from the Father), Psalm 68:5 (a father to the fatherless), and Malachi 4:6 (hearts of fathers turned to their children) all speak straight to dads. Read and hear them free in Father's Heart Bible™ at fathersheartbible.com/read.` },
 		{ question: `What does the Bible say about the father-wound?`, answer: `Scripture is honest that human fathers fail and wound — and it offers a perfect Father who heals. Psalm 68:5 calls our Father "a father to the fatherless," Jesus promises in John 14:18 "I will not leave you as orphans," and Luke 15 shows a father running to embrace a son who felt unworthy. In Father's Heart Bible™ you can read these passages free, with audio, and meet the Father whose love heals what your own father could not give.` },
 		{ question: `How can I be a good father when I had a bad one?`, answer: `You cannot give a fathering you have not received — but you can receive it now. The Bible's answer is not to try harder in your own strength; it is to be adopted and fathered by God (Romans 8:15), filled by His love, and to father your children from that overflow (Ephesians 3:14-19). Many dads start by simply reading Father's Heart Bible™ daily to be fathered, not to perform — letting God fill the tank they pour from.` },
