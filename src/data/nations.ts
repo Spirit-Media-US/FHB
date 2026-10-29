@@ -259,6 +259,15 @@ export const NATIONS: Nation[] = [
 		imgDirect: true,
 	},
 	{
+		slug: 'netherlands',
+		country: 'Netherlands',
+		title: 'The Bible in the Netherlands',
+		blurb:
+			'Five centuries of the Bible in Dutch, from the Statenvertaling of 1637 to a nation where 58% now say they have no religion — where Father’s Heart Bible™ invites a thoughtful people to meet the Father personally in Scripture. Bijbel gratis online, now in Dutch.',
+		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Amsterdam_Canals_-_July_2006.jpg/960px-Amsterdam_Canals_-_July_2006.jpg',
+		imgDirect: true,
+	},
+	{
 		slug: 'thailand',
 		country: 'Thailand',
 		title: 'The Bible in Thailand',
