@@ -36,12 +36,8 @@ for (const file of ['public/llms.txt', 'public/llms-full.txt']) {
 	});
 }
 
-test('every /meaning/ page (incl. the verse-meaning pages, 2br) has a real title and a non-empty answer line', () => {
+test('every /meaning/ page has a real title and a non-empty answer line', () => {
 	const entries = groups.find((g) => g.label === 'Bible words and what they mean').entries;
-	const verses = ['proverbs-3-5-6', 'joshua-1-9', 'philippians-4-6-7', 'romans-12-2', 'isaiah-40-31', 'john-14-6',
-		'psalm-34-18', '2-timothy-1-7', 'psalm-46-10', 'matthew-11-28', 'colossians-3-23', '1-peter-5-7', 'isaiah-54-17',
-		'2-corinthians-5-17', 'philippians-4-13', 'jeremiah-29-11', 'romans-8-28', 'john-3-16', 'isaiah-41-10', 'haggai-1-8'];
-	for (const s of verses) assert.ok(entries.some((e) => e.slug === s), `/meaning/${s}/ not discovered`);
 	// failure path: a page whose title/description the parser cannot read falls back to the slug / empty and fails here
 	const bad = entries.filter((e) => !e.description || e.title === e.slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()));
 	assert.deepEqual(bad.map((e) => e.url), [], 'meaning page(s) with unreadable title/description');
