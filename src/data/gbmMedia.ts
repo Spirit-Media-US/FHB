@@ -12,3 +12,25 @@ export const GBM_POSTER = {
 	height: 640,
 	alt: "Three smiling people from different nations holding Father's Heart Bible beside a globe, with the words Celebrating Global Bible Month",
 };
+
+// VideoObject for the Short above (pattern of film-schema.ts, unit 6h). Values measured 2026-10-29
+// from YouTube oEmbed + the shorts page (uploadDate 2026-10-28T16:48:37-07:00, lengthSeconds 13;
+// source file 12.52s). Emitted only while GBM_VIDEO_ID is set. Name/description are YouTube's own.
+export const gbmVideoNode = GBM_VIDEO_ID
+	? {
+			'@type': 'VideoObject',
+			name: "Global Bible Month: One Word for the World | Father's Heart Bible™ #Shorts",
+			description:
+				"Global Bible Month is November. The Father's Heart Bible™ in Divine Voice™ Color is free to read now, adding one language a day to reach 80 by December 1.",
+			thumbnailUrl: `https://i.ytimg.com/vi/${GBM_VIDEO_ID}/hqdefault.jpg`,
+			uploadDate: '2026-10-28T16:48:37-07:00',
+			duration: 'PT13S',
+			contentUrl: `https://www.youtube.com/shorts/${GBM_VIDEO_ID}`,
+			embedUrl: `https://www.youtube.com/embed/${GBM_VIDEO_ID}`,
+			publisher: {
+				'@type': 'Organization',
+				name: "Father's Heart Bible",
+				url: 'https://fathersheartbible.com/',
+			},
+		}
+	: null;

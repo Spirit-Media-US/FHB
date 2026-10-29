@@ -5,7 +5,7 @@
 // official partner and nothing here implies it. The 30-day list renders from
 // src/data/globalBibleMonth.ts (generated from claude-config/jobs/state/dbl-nov-30in30.json):
 // a language links to its /read/<code>/ hub ONLY when status is 'readable'. Never "new" for FHB.
-import { GBM_POSTER, GBM_VIDEO_ID } from '../data/gbmMedia';
+import { GBM_POSTER, GBM_VIDEO_ID, gbmVideoNode } from '../data/gbmMedia';
 import { GLOBAL_BIBLE_MONTH } from '../data/globalBibleMonth';
 import Layout from '../layouts/Layout.astro';
 import { gbmCounts } from '../lib/gbmCounts';
@@ -101,7 +101,13 @@ const breadcrumbSchema = {
 		{ '@type': 'ListItem', position: 2, name: 'Global Bible Month', item: PAGE_URL },
 	],
 };
-const jsonLd = [webPageSchema, itemListSchema, faqSchema, breadcrumbSchema];
+const jsonLd = [
+	webPageSchema,
+	itemListSchema,
+	faqSchema,
+	breadcrumbSchema,
+	...(gbmVideoNode ? [{ '@context': 'https://schema.org', ...gbmVideoNode }] : []),
+];
 const P = 'font-family: var(--font-sans); color: var(--color-muted);';
 const LINK = 'color: var(--color-brand);';
 ---
