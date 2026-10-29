@@ -10,7 +10,7 @@ import path from 'node:path';
 
 export const DEFAULT_TTL_MS = 24 * 3600 * 1000;
 export const MAX_ENTRIES = 20000;
-export const DEFAULT_PATH = '/home/deploy/.cache/fhb-sitemap-live.json';
+export const DEFAULT_PATH = '/home/deploy/aeo-state/fhb-sitemap-live-cache.json';
 
 export function loadLiveCache(file = DEFAULT_PATH, now = Date.now(), ttl = DEFAULT_TTL_MS) {
 	const map = new Map();
@@ -48,6 +48,7 @@ export function saveLiveCache(map, file = DEFAULT_PATH, now = Date.now(), ttl = 
 		fs.mkdirSync(path.dirname(file), { recursive: true });
 		const tmp = `${file}.${process.pid}.tmp`;
 		fs.writeFileSync(tmp, JSON.stringify({ v: 1, urls: Object.fromEntries(entries) }));
+		try { fs.chmodSync(tmp, 0o664); } catch {}
 		fs.renameSync(tmp, file);
 		return entries.length;
 	} catch {
