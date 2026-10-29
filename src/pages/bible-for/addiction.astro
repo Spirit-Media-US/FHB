@@ -3,15 +3,18 @@
 // Generated from a verified draft (stats cited, verses slug-checked, images & voice
 // headshots sourced/verified by hand).
 import GroupBible from '../../components/GroupBible.astro';
+import { catalogRows } from '../../data/print-catalog';
+
+const GENERAL_PB = (catalogRows.find((r) => r.category === 'general')?.pb ?? 79.99).toFixed(2);
 ---
 
 <GroupBible
 	slug={`addiction`}
 	group={`Those Facing Addiction`}
 	groupLower={`those facing addiction`}
-	lastUpdated={`October 21, 2026`}
+	lastUpdated={`October 29, 2026`}
 	publishedIso="2026-06-15"
-	lastUpdatedIso={`2026-10-21`}
+	lastUpdatedIso={`2026-10-29`}
 	title={`Bible Verses for Addiction & Recovery — Hear His Voice`}
 	description={`Bible verses for addiction and recovery, free with audio. You're not your addiction and not beyond His reach — meet the Father who runs to meet you.`}
 	h1={`The Bible for Those Facing Addiction`}
@@ -20,7 +23,7 @@ import GroupBible from '../../components/GroupBible.astro';
 	heroBase={`https://cdn.sanity.io/images/rusi1hyi/production/89374a8de11cbbabb93a238ef081f850baaa1214-1100x825.jpg`}
 	heroAlt={`A person with arms raised toward the sunrise in freedom and hope`}
 	heroObjectPosition={`center center`}
-	directAnswerHtml={`<strong style="color: var(--color-ink);">The best Bible for someone struggling with addiction is one they can come back to every day, even on the worst day: a clear modern translation, always within reach, whose words meet shame with mercy instead of more condemnation.</strong> The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father's Heart Bible™ (FHB)</a>, which we publish, is free to read and <em>listen to</em> on any device with no account, so a daily listening rhythm is one tap away, and it reveals God as a <em>Father</em> who runs toward a returning child. For working the 12 steps, the NLT Life Recovery Bible weaves recovery notes through Scripture, and the NIV Celebrate Recovery Study Bible pairs with a Celebrate Recovery group; the comparison below sets them side by side. Whichever you choose: you are not your addiction, and you are not beyond His reach.`}
+	directAnswerHtml={`<strong style="color: var(--color-ink);">The best Bible for someone struggling with addiction is one they can come back to every day, even on the worst day: a clear modern translation, always within reach, whose words meet shame with mercy instead of more condemnation.</strong> That comes down to three checks. <em>Reachable:</em> it is there at the late-night moment, so a free online Bible with audio on the phone they already carry, plus a paperback by the bed. <em>Merciful:</em> it meets shame with the Father who runs toward a returning child, as in Luke 15. <em>Fitted to recovery:</em> for working the 12 steps, the NLT <em>Life Recovery Bible</em> weaves recovery notes through Scripture, and the NIV <em>Celebrate Recovery Study Bible</em> pairs with a Celebrate Recovery group. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father's Heart Bible&trade; (FHB)</a>, which we publish, is free to read and <em>listen to</em> on any device with no account and reveals God as a <em>Father</em> who runs toward a returning child; the comparison below sets all of them side by side. Whichever you choose: you are not your addiction, and you are not beyond His reach.`}
 	keyTakeaway={`You are not your addiction, and you are not beyond His reach — the Father runs down the road to meet the one coming home, exactly as you are.`}
 	painsHeading={`The weight addiction carries`}
 	painsIntroHtml={`If you feel trapped, ashamed, or like you have failed too many times to be loved, you are not alone and you are not beyond hope. Millions are walking the same hard road — and millions more have found their way home. The numbers tell both halves of the truth.`}
@@ -28,7 +31,6 @@ import GroupBible from '../../components/GroupBible.astro';
 		{ value: `48.7 million`, label: `Americans (ages 12+) had a substance use disorder in the past year (SAMHSA NSDUH, 2022)` },
 		{ value: `29.5 million`, label: `Americans (ages 12+) had an alcohol use disorder in the past year (SAMHSA NSDUH, 2022)` },
 		{ value: `107,941`, label: `drug overdose deaths in the United States in 2022 (CDC, 2023)` },
-		{ value: `1 in 4`, label: `adults who ever had a substance use problem are now in recovery — over 20 million Americans (NIDA / Recovery Research Institute)` },
 		{ value: `94%`, label: `of people with a substance use disorder did not receive any treatment in the past year (SAMHSA NSDUH, 2022)` },
 		{ value: `75%`, label: `of people who experience addiction eventually reach long-term recovery (SAMHSA / recovery research)` },
 	]}
@@ -107,13 +109,14 @@ import GroupBible from '../../components/GroupBible.astro';
 	whichBibleHeading={`What is the best Bible for someone struggling with addiction?`}
 	whichBibleIntroHtml={`Choosing a Bible for someone fighting addiction — or for your own recovery? Here's an honest comparison, including the one we publish. Recovery runs on daily rhythm and identity; these editions serve that differently.`}
 	whichBibleRows={[
-		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `Hearing you are a beloved child — not your addiction — and building a daily listening rhythm with free audio`, style: `Translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free online with audio, any device, no account; paperback from $39.99` },
+		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `Hearing you are a beloved child — not your addiction — and building a daily listening rhythm with free audio`, style: `Translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free online with audio, any device, no account; paperback $${GENERAL_PB}` },
 		{ edition: `NLT Life Recovery Bible (Tyndale)`, bestFor: `Working the 12 steps with recovery notes woven through Scripture`, style: `NLT — thought-for-thought, very readable`, access: `Paperback/hardcover from retailers` },
 		{ edition: `NIV Celebrate Recovery Study Bible (Zondervan)`, bestFor: `Companion for a Celebrate Recovery group`, style: `NIV — balanced, widely used`, access: `Paperback from retailers` },
 	]}
 	whichBibleNoteHtml={`Whichever you choose, recovery is not meant to be walked alone — pair the reading with a group, a sponsor, or a counselor (see the resources below).`}
 	faqs={[
-		{ question: `What is the best Bible for someone struggling with addiction?`, answer: `Choose a clear modern translation they can reach every day, even in a hard moment. Father's Heart Bible™ is free to read and listen to online on any device with no account (paperback from $39.99) and reveals God as a Father who runs to meet a returning child. For 12-step work, the NLT Life Recovery Bible weaves recovery notes through Scripture, and the NIV Celebrate Recovery Study Bible is a companion for a Celebrate Recovery group.` },
+		{ question: `What is the best Bible for someone struggling with addiction?`, answer: `Choose a clear modern translation they can reach every day, even in a hard moment. Father's Heart Bible™ is free to read and listen to online on any device with no account (paperback $${GENERAL_PB}) and reveals God as a Father who runs to meet a returning child. For 12-step work, the NLT Life Recovery Bible weaves recovery notes through Scripture, and the NIV Celebrate Recovery Study Bible is a companion for a Celebrate Recovery group.` },
+		{ question: `How do I give a Bible to someone struggling with addiction?`, answer: `Offer it as a gift with no conditions, and let them choose when to open it. Pick a clear modern translation, and consider the free audio version so it is there in the hard moment on the phone they already carry. If they are in a program, a Bible that fits it, such as the NLT Life Recovery Bible for 12-step work, can help. Recovery is not meant to be walked alone, so pair the gift with a group, a sponsor or a counselor. Father's Heart Bible™ is free to read and hear at fathersheartbible.com/read.` },
 		{ question: `What are good Bible verses for addiction and recovery?`, answer: `Luke 15:20 (the Father runs to meet the prodigal), Romans 8:1 (no condemnation), 2 Corinthians 5:17 (a new creation), John 8:36 (whom the Son sets free is free indeed), Psalm 34:18 (close to the brokenhearted), Philippians 4:13 (strength for every step), 1 Corinthians 10:13 (a way out of temptation), and Joel 2:25 (He restores the years the locusts have eaten) all speak straight into addiction and recovery. Read and hear them free in Father's Heart Bible™ at fathersheartbible.com/read.` },
 		{ question: `What does the Bible say about overcoming addiction?`, answer: `Scripture is honest that you cannot do it on willpower alone — and that you do not have to. 1 Corinthians 10:13 promises God will always provide a way out of temptation, Philippians 4:13 says your strength comes from Him, and John 8:36 says the freedom He gives is real and complete. Father's Heart Bible™ reveals God as a Father who walks every step of recovery with you — read those passages free, with audio, at fathersheartbible.com/read.` },
 		{ question: `Does God still love me after I keep relapsing?`, answer: `Yes — and that is the heart of the whole story. In Luke 15 the prodigal's Father ran to meet him while he was still far off, before a single thing was fixed. Romans 8:1 says there is no condemnation for those who belong to Him. Recovery is rarely a straight line, and your Father is patient with every step. In Father's Heart Bible™ you meet God as a Father who keeps watching the road for you, no matter how many times you have fallen.` },

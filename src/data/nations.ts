@@ -81,7 +81,7 @@ export const NATIONS: Nation[] = [
 		country: 'Brazil',
 		title: 'The Bible in Brazil',
 		blurb:
-			'The largest Bible nation on earth — where Father’s Heart Bible™ invites 217 million people to meet the Father in the book they already love.',
+			'The largest Bible nation on earth — where Father’s Heart Bible™ invites some 213 million people to meet the Father in the book they already love.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/d5bf406c5039b3d5ff0262302cdb49a56257060c-2497x3744.jpg',
 	},
 	{
@@ -256,6 +256,15 @@ export const NATIONS: Nation[] = [
 		blurb:
 			'A nation that has had the whole Bible in Hungarian since 1590, with Catholic and Reformed churches at its heart — where Father’s Heart Bible™ invites a faithful people to meet the Father personally in Scripture. Now in Hungarian.',
 		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg/960px-20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg',
+		imgDirect: true,
+	},
+	{
+		slug: 'netherlands',
+		country: 'Netherlands',
+		title: 'The Bible in the Netherlands',
+		blurb:
+			'Five centuries of the Bible in Dutch, from the Statenvertaling of 1637 to a nation where 58% now say they have no religion — where Father’s Heart Bible™ invites a thoughtful people to meet the Father personally in Scripture. Bijbel gratis online, now in Dutch.',
+		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Amsterdam_Canals_-_July_2006.jpg/960px-Amsterdam_Canals_-_July_2006.jpg',
 		imgDirect: true,
 	},
 	{

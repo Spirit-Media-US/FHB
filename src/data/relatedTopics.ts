@@ -11,7 +11,8 @@ import { WORD_MEANINGS } from './wordMeanings';
 
 export const RELATED: Record<string, string[]> = {
 	// /verses
-	'v:advent': ['m:begotten', 'v:hope'],
+	'v:advent': ['v:christmas', 'm:begotten', 'v:hope'],
+	'v:christmas': ['v:advent', 'm:begotten', 'v:joy'],
 	'v:anger': ['m:meek', 'v:patience', 'v:forgiveness', 'b:men'],
 	'v:anxiety': ['v:fear', 'v:peace', 'v:trust', 'v:death', 'b:financial-hardship', 'b:cancer'],
 	'v:comfort': ['v:death', 'v:encouragement', 'b:grief', 'b:widows', 'b:cancer', 'm:forsake'],
@@ -110,7 +111,8 @@ export const RELATED: Record<string, string[]> = {
 	'b:pastors': ['v:prayer', 'm:wisdom', 'v:strength'],
 	'b:sikhs': ['m:our-father', 'm:fathers-heart-of-god', 'v:god-as-father'],
 	'b:singles': ['v:friendship', 'v:hope', 'v:love'],
-	'b:spiritually-curious': ['v:god-as-father', 'm:our-father', 'v:faith', 'm:fathers-heart-of-god'],
+	'b:new-believers': ['v:faith', 'v:god-as-father', 'm:our-father', 'b:spiritually-curious'],
+	'b:spiritually-curious': ['v:god-as-father', 'm:our-father', 'v:faith', 'b:new-believers'],
 	'b:student-ministry': ['v:friendship', 'v:faith', 'm:wisdom'],
 	'b:teachers': ['v:patience', 'm:wisdom', 'v:strength'],
 	'b:teenagers': ['v:friendship', 'v:anxiety', 'v:faith'],

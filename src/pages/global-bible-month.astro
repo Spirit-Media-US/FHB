@@ -1,18 +1,22 @@
 ---
-import { GLOBAL_BIBLE_MONTH } from '../data/globalBibleMonth';
 // /global-bible-month — answer page for the exact phrase "global bible month" (research
 // 2026-10-28: demand is a short November spike; GSC had zero such queries). Truthful framing only:
 // Global Bible Month is YouVersion's November 30-Day Bible Challenge with partners; FHB is NOT an
 // official partner and nothing here implies it. The 30-day list renders from
 // src/data/globalBibleMonth.ts (generated from claude-config/jobs/state/dbl-nov-30in30.json):
 // a language links to its /read/<code>/ hub ONLY when status is 'readable'. Never "new" for FHB.
+import { GBM_POSTER, GBM_VIDEO_ID, gbmVideoNode } from '../data/gbmMedia';
+import { GLOBAL_BIBLE_MONTH } from '../data/globalBibleMonth';
 import Layout from '../layouts/Layout.astro';
+import { gbmCounts } from '../lib/gbmCounts';
 import { fitDescription, fitTitle } from '../lib/seoFit';
 
 const PAGE_URL = 'https://fathersheartbible.com/global-bible-month/';
+// Counts are computed from the schedule (src/lib/gbmCounts.ts): no typed 50 / 30 / 80.
+const { available: AVAILABLE, remaining: REMAINING, total: TOTAL } = gbmCounts(GLOBAL_BIBLE_MONTH);
 const TITLE = fitTitle("Global Bible Month: Father's Heart Bible in 80 Languages");
 const DESCRIPTION = fitDescription(
-	"Global Bible Month is November. Father's Heart Bible is in 50 of 80 languages now, free to read, and adds one a day to reach 80 by December 1.",
+	`Global Bible Month is November. Father's Heart Bible is in ${AVAILABLE} of ${TOTAL} languages now, free to read, and adds one a day to reach ${TOTAL} by December 1.`,
 );
 const PUBLISHED = '2026-10-28';
 
@@ -29,7 +33,7 @@ const liveCount = ROWS.filter((r) => r.status === 'readable').length;
 const FAQS = [
 	{
 		q: 'How many languages is Father’s Heart Bible in?',
-		a: 'Father’s Heart Bible is available now in 50 of 80 languages. In celebration of Global Bible Month we will publish one language a day for 30 days, completing the remaining 30 languages for a total of 80 languages by December 1. The 50 available now are free to read at fathersheartbible.com/read/ and on the Digital Bible Library.',
+		a: `Father’s Heart Bible is available now in ${AVAILABLE} of ${TOTAL} languages. In celebration of Global Bible Month we will publish one language a day for 30 days, completing the remaining ${REMAINING} languages for a total of ${TOTAL} languages by December 1. The ${AVAILABLE} available now are free to read at fathersheartbible.com/read/ and on the Digital Bible Library.`,
 	},
 	{
 		q: 'What is Global Bible Month?',
@@ -97,7 +101,13 @@ const breadcrumbSchema = {
 		{ '@type': 'ListItem', position: 2, name: 'Global Bible Month', item: PAGE_URL },
 	],
 };
-const jsonLd = [webPageSchema, itemListSchema, faqSchema, breadcrumbSchema];
+const jsonLd = [
+	webPageSchema,
+	itemListSchema,
+	faqSchema,
+	breadcrumbSchema,
+	...(gbmVideoNode ? [{ '@context': 'https://schema.org', ...gbmVideoNode }] : []),
+];
 const P = 'font-family: var(--font-sans); color: var(--color-muted);';
 const LINK = 'color: var(--color-brand);';
 ---
@@ -117,11 +127,23 @@ const LINK = 'color: var(--color-brand);';
 
 		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
 			<div class="mx-auto max-w-3xl">
+				<div class="gbm-intro">
+					<div class="gbm-media">
+						<div class="gbm-frame" data-video-id={GBM_VIDEO_ID || undefined}>
+							<img src={GBM_POSTER.src1x} srcset={`${GBM_POSTER.src1x} 1x, ${GBM_POSTER.src2x} 2x`} width={GBM_POSTER.width} height={GBM_POSTER.height} alt={GBM_POSTER.alt} decoding="async" />
+							{GBM_VIDEO_ID && (
+								<button type="button" class="gbm-play" aria-label="Play the Global Bible Month video">
+									<svg viewBox="0 0 68 48" width="68" height="48" aria-hidden="true"><rect width="68" height="48" rx="12" fill="#000" fill-opacity="0.75"></rect><path d="M27 14l20 10-20 10z" fill="#fff"></path></svg>
+								</button>
+							)}
+						</div>
+					</div>
+					<div class="gbm-text">
 				<p class="text-lg leading-relaxed mb-5" style={P}>
-					<strong style="color: var(--color-ink);">Father&rsquo;s Heart Bible is available now in 50 of 80 languages, free to <a href="/read/" style={LINK} class="hover:underline">read online</a> and on the Digital Bible Library.</strong> In celebration of Global Bible Month, we will publish one language a day for 30 days, completing the remaining 30 languages for a total of 80 languages by December 1, reaching the whole world.
+					<strong style="color: var(--color-ink);">Father&rsquo;s Heart Bible is available now in {AVAILABLE} of {TOTAL} languages, free to <a href="/read/" style={LINK} class="hover:underline">read online</a> and on the Digital Bible Library.</strong> In celebration of Global Bible Month, we will publish one language a day for 30 days, completing the remaining {REMAINING} languages for a total of {TOTAL} languages by December 1, reaching the whole world.
 				</p>
 				<p class="text-lg leading-relaxed mb-5" style={P}>
-					Global Bible Month is November, a month of reading Scripture together, built around YouVersion&rsquo;s 30-Day Bible Challenge. You can join the challenge at <a href="https://globalbiblemonth.com" target="_blank" rel="noopener noreferrer" style={LINK} class="hover:underline">globalbiblemonth.com</a>. The 50 languages available now are at <a href="/read/" style={LINK} class="hover:underline">fathersheartbible.com/read</a>.
+					Global Bible Month is November, a month of reading Scripture together, built around YouVersion&rsquo;s 30-Day Bible Challenge. You can join the challenge at <a href="https://globalbiblemonth.com" target="_blank" rel="noopener noreferrer" style={LINK} class="hover:underline">globalbiblemonth.com</a>. The {AVAILABLE} languages available now are at <a href="/read/" style={LINK} class="hover:underline">fathersheartbible.com/read</a>.
 				</p>
 
 				<h2 id="milestone" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">A historic milestone</h2>
@@ -131,6 +153,9 @@ const LINK = 'color: var(--color-brand);';
 				<p class="text-lg leading-relaxed mb-5" style={P}>
 					While AI can be used to accelerate war and other unfortunate things, it can also be used to accelerate good and peace.
 				</p>
+
+					</div>
+				</div>
 
 				<h2 id="plan" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The final 30 languages, one each day of November</h2>
 				<p class="text-lg leading-relaxed mb-5" style={P}>
@@ -174,3 +199,32 @@ const LINK = 'color: var(--color-brand);';
 		</section>
 	</main>
 </Layout>
+
+<style>
+	.gbm-intro { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+	.gbm-media { justify-self: center; width: 100%; max-width: 280px; }
+	.gbm-frame { position: relative; aspect-ratio: 9 / 16; width: 100%; background: var(--color-surface-low); border-radius: 0.5rem; overflow: hidden; }
+	.gbm-frame img, .gbm-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border: 0; display: block; }
+	.gbm-play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; cursor: pointer; }
+	.gbm-play:focus-visible { outline: 3px solid var(--color-brand); outline-offset: -3px; }
+	@media (min-width: 768px) {
+		.gbm-intro { grid-template-columns: 14rem 1fr; gap: 2rem; align-items: start; }
+		.gbm-media { max-width: 14rem; }
+	}
+</style>
+
+<script>
+	// Click-to-play facade: nothing from YouTube loads until the click.
+	document.querySelectorAll<HTMLElement>('.gbm-frame[data-video-id]').forEach((frame) => {
+		frame.querySelector('.gbm-play')?.addEventListener('click', () => {
+			const id = frame.dataset.videoId;
+			if (!id) return;
+			const f = document.createElement('iframe');
+			f.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&playsinline=1`;
+			f.title = 'Global Bible Month video';
+			f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+			f.allowFullscreen = true;
+			frame.replaceChildren(f);
+		});
+	});
+</script>

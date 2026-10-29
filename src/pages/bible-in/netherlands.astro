@@ -1,0 +1,173 @@
+---
+// /bible-in/netherlands — sourced country page; facts cited in the sources lists below (fetched 2026-10-29).
+// Hero photo: Wikimedia Commons, CC BY 2.5 (file page credited visibly) — hotlinked thumbnails like the other /bible-in heroes.
+import CountryBible from '../../components/CountryBible.astro';
+import { GLOBAL_BIBLE_MONTH } from '../../data/globalBibleMonth';
+import { speakersLabel as sp } from '../../data/language-speakers';
+import { gbmCounts } from '../../lib/gbmCounts';
+
+// Public language tally computed from the schedule (no typed "50 of 80" to go stale).
+const _gbm = gbmCounts(GLOBAL_BIBLE_MONTH);
+const langTally = `${_gbm.available} of ${_gbm.total}`;
+
+const verses = [
+	{
+		ref: 'Psalm 68:5',
+		slug: 'psalms',
+		ch: 68,
+		text: 'A father to the fatherless and defender of widows is our Father in his holy dwelling.',
+	},
+	{
+		ref: 'Romans 8:15',
+		slug: 'romans',
+		ch: 8,
+		text: 'You did not receive a spirit of slavery, to fall back into fear, but received the Spirit of sonship, by whom we cry, "Abba! Father!"',
+	},
+	{
+		ref: '1 John 3:1',
+		slug: '1-john',
+		ch: 3,
+		text: 'See what kind of love our Father has given us, that we should be called children of our Father! And we are.',
+	},
+];
+
+const stats = [
+	{ label: 'No religion (2025)', value: '58% (Statistics Netherlands, CBS)' },
+	{ label: 'Roman Catholic (2025)', value: '16%' },
+	{ label: 'Protestant (2025)', value: '12%' },
+	{ label: 'Muslim (2025)', value: '6%' },
+	{ label: 'First authorised Dutch Bible from Hebrew and Greek', value: '1637 (Statenvertaling)' },
+];
+
+const faqs = [
+	{
+		question: 'How many Christians are there in the Netherlands?',
+		answer:
+			'Statistics Netherlands (CBS) reports that in 2025, 58% of the Dutch aged 15 and over had no religion, 16% were Roman Catholic, 12% Protestant and 6% Muslim. In 1849 only 2% had no religion and 56% were Protestant. You can read the Scriptures free at fathersheartbible.com/read.',
+	},
+	{
+		question: 'Waar kan ik de Bijbel online lezen?',
+		answer:
+			"Father's Heart Bible™ is gratis te lezen en te beluisteren in het Nederlands op fathersheartbible.com/read/nl/ — zonder account, zonder aankoop, zonder app.",
+	},
+	{
+		question: 'When was the Bible first translated into Dutch?',
+		answer:
+			'The Liesveltbijbel, printed in Antwerp in 1526, is described as the first fully printed Dutch Bible. The Statenvertaling, ordered at the Synod of Dort in 1618-19 and first published in 1637, was the first authorised Dutch translation made directly from the Hebrew and Greek.',
+	},
+	{
+		question: 'Which Dutch Bible translations are used today?',
+		answer:
+			'The Nederlands Bijbelgenootschap (Dutch Bible Society) translation of 1951 largely replaced the Statenvertaling as the Protestant standard; the ecumenical Nieuwe Bijbelvertaling (NBV) appeared in 2004, and the Herziene Statenvertaling (HSV), a modernised Statenvertaling, in 2010. The Catholic standard is the Willibrordvertaling.',
+	},
+	{
+		question: 'Can I read the Bible online free in Dutch?',
+		answer:
+			"Yes. Father's Heart Bible™ is free to read and hear online in Dutch (Nederlands) — no account, no purchase, no app — at fathersheartbible.com/read/nl/. The English edition is free too.",
+	},
+];
+---
+
+<CountryBible
+	slug="netherlands"
+	country="the Netherlands"
+	flag="🇳🇱"
+	flagImg="/flags/nl.svg"
+	countryWikipedia="https://en.wikipedia.org/wiki/Netherlands"
+	lastUpdated="October 2026"
+	publishedIso="2026-10-29"
+	lastUpdatedIso="2026-10-29"
+	colorPrimary="#C8501E"
+	colorSecondary="#21468B"
+	colorAccent="#AE1C28"
+	tintWarm="#FBEFE7"
+	tintCool="#E9EEF7"
+	tintBlue="#F9E9EB"
+	title="Bijbel online lezen in Nederland — Christianity | Father's Heart Bible™ (FHB)"
+	description="Bijbel gratis online lezen en beluisteren in het Nederlands. How the Statenvertaling of 1637 shaped Dutch faith, and what CBS figures show today — Father's Heart Bible™ (FHB)."
+	h1="De Bijbel in Nederland — The Bible in the Netherlands"
+	heroSubhead="The Netherlands has had the Bible in Dutch for five centuries, and Statistics Netherlands now counts 58% with no religion — Father's Heart Bible offers a near and loving Father in Dutch. Bijbel gratis online lezen, met audio."
+	heroBase=""
+	heroSrc={{ desktop: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Amsterdam_Canals_-_July_2006.jpg/1280px-Amsterdam_Canals_-_July_2006.jpg", mobile: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Amsterdam_Canals_-_July_2006.jpg/960px-Amsterdam_Canals_-_July_2006.jpg", og: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Amsterdam_Canals_-_July_2006.jpg/1280px-Amsterdam_Canals_-_July_2006.jpg" }}
+	heroCreditHtml={`Hero photo: <a href="https://commons.wikimedia.org/wiki/File:Amsterdam_Canals_-_July_2006.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Amsterdam canal in summer</a> by <a href="https://commons.wikimedia.org/wiki/User:Diliff" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">David Iliff</a>, <a href="https://creativecommons.org/licenses/by/2.5/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY 2.5</a>, via Wikimedia Commons.`}
+	heroAlt="A canal lined with historic houses in Amsterdam in summer"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Yes &mdash; you can read the Bible (<em>de Bijbel</em>) free online in the Netherlands right now.</strong> Statistics Netherlands (CBS) reports that in 2025, 58% of the Dutch aged 15 and over had no religion, 16% were Roman Catholic and 12% Protestant. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. The <a href="https://fathersheartbible.com/read/nl/" style="color: var(--color-brand);" class="hover:underline"><em>Dutch</em> edition</a> is free to read and hear today &mdash; for a people who have had the Bible in Dutch since 1526, where Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	keyTakeaway="The Netherlands has had the Bible in Dutch for five centuries — and Father's Heart Bible™ (FHB) invites a now largely secular nation to hear, clearly, the voice of a Father."
+	glanceIntroHtml={`The Netherlands is a land of canals, windmills and open-minded cities &mdash; once among Europe&rsquo;s most Protestant nations, now one where most people say they have no religion.`}
+	stats={stats}
+	knownForHeading="What the Netherlands is known for"
+	knownForIntroHtml={`The Dutch Bible story runs from the first printed Dutch Bible to the translations read today.`}
+	knownFor={[
+	{
+		"label": "The first printed Dutch Bible, 1526",
+		"text": "The Liesveltbijbel, first printed in Antwerp in 1526, is described as the first fully printed Dutch Bible translation."
+	},
+	{
+		"label": "The Statenvertaling, 1637",
+		"text": "Ordered at the Synod of Dort in 1618-19 and first published in 1637, it was the first authorised Dutch translation made directly from the Hebrew and Greek."
+	},
+	{
+		"label": "Bibles for today",
+		"text": "The Nieuwe Bijbelvertaling (NBV) appeared in 2004 and the Herziene Statenvertaling (HSV), a modernised Statenvertaling, in 2010."
+	},
+	{
+		"label": "A great change in belief",
+		"text": "In 1849 only 2% of the Dutch had no religion and 56% were Protestant; in 2025, 58% had no religion, 16% were Roman Catholic and 12% Protestant."
+	}
+]}
+	faithHeading="Faith and the Bible in the Netherlands"
+	faithBodyHtml={`<p>Statistics Netherlands (CBS) reports that in <strong>2025</strong>, <strong>58%</strong> of the Dutch aged 15 and over had no religion, <strong>16%</strong> were Roman Catholic, <strong>12%</strong> Protestant and <strong>6%</strong> Muslim. In 1849 the picture was nearly the reverse: <strong>2%</strong> had no religion and <strong>56%</strong> were Protestant.</p><p>The Dutch Bible is old here. The Liesveltbijbel was printed in 1526, the Statenvertaling followed in 1637, and the Dutch Bible Society&rsquo;s translation of 1951 largely replaced it as the Protestant standard.</p><p>Dutch is also spoken in Belgium. In the European Social Survey 2023, 59% of Belgians said they are non-religious and 31% Catholic (as summarised on Wikipedia&rsquo;s <em>Religion in Belgium</em>); that figure covers all of Belgium, not Flanders alone.</p><p>The invitation of Father&rsquo;s Heart Bible&trade; is a personal one: read the same Word in clear Dutch, and meet in it a Father.</p>`}
+	sources={[
+	{
+		"label": "Statistics Netherlands (CBS), 16 March 2026 — Limburg is the only province where most people still identify as religious (2025 shares, age 15+: no religion 58%, Catholic 16%, Protestant 12%, Muslim 6%)",
+		"url": "https://www.cbs.nl/en-gb/news/2026/11/limburg-is-the-only-province-where-most-people-still-identify-as-religious"
+	},
+	{
+		"label": "Statistics Netherlands (CBS) — The Netherlands in Numbers 2024: What are the major religions? (1849 and post-war comparison: 2% no religion, 56% Protestant in 1849)",
+		"url": "https://longreads.cbs.nl/the-netherlands-in-numbers-2024/what-are-the-major-religions"
+	},
+	{
+		"label": "Bible translations into Dutch — Wikipedia (Liesveltbijbel 1526, Statenvertaling 1637, NBG 1951, NBV 2004, HSV 2010)",
+		"url": "https://en.wikipedia.org/wiki/Bible_translations_into_Dutch"
+	},
+	{
+		"label": "Religion in Belgium — Wikipedia (European Social Survey 2023: 59% non-religious, 31% Catholic)",
+		"url": "https://en.wikipedia.org/wiki/Religion_in_Belgium"
+	}
+]}
+	faithsHeading="What “our Father” offers the Netherlands"
+	faithsIntroHtml={`Father&rsquo;s Heart Bible&trade; does not ask the Netherlands to leave the Scriptures it gave the world in Dutch. It lets a thoughtful people hear, in clear Dutch, the Father whom Scripture reveals.`}
+	faithsBlocks={[
+		{ heading: "For the one who prays", bodyHtml: "Many Dutch families have prayed <a href=\"https://fathersheartbible.com/read/matthew/6/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;Our Father in heaven&rdquo;</a> for generations &mdash; and can read it again, as the words of One who knows them by name." },
+		{ heading: "For the one left behind", bodyHtml: "To those who feel overlooked, Scripture promises <a href=\"https://fathersheartbible.com/read/psalms/68/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;a father to the fatherless&rdquo;</a> &mdash; a Father who stays." },
+		{ heading: "For the child of our Father", bodyHtml: "<a href=\"https://fathersheartbible.com/read/romans/8/\" style=\"color: var(--color-gold);\" class=\"hover:underline\">&ldquo;&hellip;received the Spirit of sonship, by whom we cry, &lsquo;Abba! Father!&rsquo;&rdquo;</a> &mdash; not a slave&rsquo;s fear, but a child&rsquo;s trust." },
+	]}
+	whyHeading="Why Father's Heart Bible™ for the Netherlands"
+	whyBlocks={[
+		{ heading: "God revealed as Father", bodyHtml: "Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href=\"https://fathersheartbible.com/read/genesis/1/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Genesis 1:1</a> onward." },
+		{ heading: "Free, with audio, on any phone", bodyHtml: "No purchase, no app, no sign-up. The whole Bible is free to <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read online</a>, with audio, on the phone in your hand." },
+		{ heading: "Now in Dutch", bodyHtml: "De Nederlandse editie is gepubliceerd: <a href=\"https://fathersheartbible.com/read/nl/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">lees de Bijbel gratis</a>. Father&rsquo;s Heart Bible&trade; is in " + langTally + " languages." },
+	]}
+	wordHeading="His Word will not return void"
+	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do. In a land that has had it in Dutch since 1526, it will not return empty.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;&hellip;so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
+	resourcesHeading="Learn more about the Netherlands"
+	resourcesIntroHtml={`Trusted sources for the facts on this page &mdash; and for going deeper into the Netherlands&rsquo; people, faith, and story.`}
+	resources={[
+	{ "label": "Netherlands — Wikipedia", "url": "https://en.wikipedia.org/wiki/Netherlands" },
+	{ "label": "Religion in the Netherlands — Wikipedia", "url": "https://en.wikipedia.org/wiki/Religion_in_the_Netherlands" },
+	{ "label": "Statistics Netherlands (CBS) — religion", "url": "https://longreads.cbs.nl/the-netherlands-in-numbers-2024/what-are-the-major-religions" },
+	{ "label": "Netherlands — Joshua Project (people groups)", "url": "https://joshuaproject.net/countries/NL" }
+]}
+	opportunityHeading="The translation opportunity for the Netherlands"
+	opportunityIntroHtml={`Dutch is the heart language of some ${sp('nl')} people worldwide &mdash; and the Dutch edition is free to read in Father&rsquo;s Heart Bible&trade;.`}
+	languages={[
+		{ language: "Dutch", code: "nl" },
+		{ language: "English", code: "en" },
+	]}
+	verses={verses}
+	keepReadingHtml={`Begin with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> &mdash; including <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start</a> and <a href="/guides/what-is-the-gospel/" style="color: var(--color-brand);" class="hover:underline">what the gospel is</a>. Browse Scripture by theme on our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> pages.`}
+	faqs={faqs}
+	ctaMidHeading="Hear the Father in Dutch"
+	ctaMidBodyHtml={`Now hear it in a Father&rsquo;s own voice &mdash; free, with audio, on any phone.`}
+	ctaBottomBodyHtml={`From Genesis to Revelation, free online with audio &mdash; a translation that reveals God as a loving Father to every beloved son and daughter, in the Netherlands and wherever Dutch speakers have gone.`}
+/>

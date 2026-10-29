@@ -9,6 +9,7 @@ import isbnList from '../../data/isbn-list.json';
 import { langSlug, languageEditions } from '../../data/language-editions';
 import { catalogRows } from '../../data/print-catalog';
 import readerEntry from '../../data/reader-entry-links.json';
+import youversion from '../../data/youversion-versions.json';
 // /bibles/<slug>-bible — the PRODUCT page for every Divine Voice™ Color edition.
 //
 // Why this exists alongside /bible-for/<audience>: those pages answer a PASTORAL search
@@ -357,6 +358,10 @@ const productSchema = {
 	description: productDescription,
 	image: coverUrl,
 	url,
+	// The same edition on YouVersion, when fhb-partner-link-watch has FOUND it (one map, one line per language).
+	...(ed.lang && (youversion.versions as Record<string, string>)[ed.lang]
+		? { sameAs: [(youversion.versions as Record<string, string>)[ed.lang]] }
+		: {}),
 	publisher: {
 		'@type': 'Organization',
 		'@id': 'https://spiritmediapublishing.com/#organization',

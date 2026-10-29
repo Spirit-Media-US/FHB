@@ -7,6 +7,7 @@ import Header from '../chrome/Header.astro';
 import globalNav from '../chrome/nav.generated.json';
 import MailtoLink from '../components/MailtoLink.astro';
 import WelcomeTour from '../components/WelcomeTour.astro';
+import { ogLocale, ogLocaleAlternates } from '../lib/og-locale';
 import { sanityClient } from '../lib/sanity';
 import '../styles/global.css';
 
@@ -140,7 +141,12 @@ const ORGANIZATION_SCHEMA = {
 	name: 'Spirit Media Publishing',
 	alternateName: 'SMP',
 	// Spirit Media Inc. = the LEGAL company; Spirit Media Publishing is its imprint (Kevin 2026-07-13/10-25).
-	parentOrganization: { '@type': 'Organization', '@id': 'https://spiritmediapublishing.com/#parent-organization', name: 'Spirit Media Inc.', legalName: 'Spirit Media Inc.' },
+	parentOrganization: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#parent-organization',
+		name: 'Spirit Media Inc.',
+		legalName: 'Spirit Media Inc.',
+	},
 	url: 'https://spiritmediapublishing.com',
 	logo: 'https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp',
 	// ONE sameAs list, byte-identical to the Organization on spiritmediapublishing.com
@@ -347,15 +353,13 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		{ogSized && <meta property="og:image:height" content="630" />}
 		{ogSized && <meta property="og:image:type" content="image/jpeg" />}
 		<meta property="og:site_name" content={siteName} />
-		<meta property="og:locale" content={lang === 'te' ? 'te_IN' : 'en_US'} />
-		{alternates
-			.filter((a) => a.hreflang !== 'x-default' && a.hreflang !== lang)
-			.map((a) => (
-				<meta
-					property="og:locale:alternate"
-					content={a.hreflang === 'te' ? 'te_IN' : 'en_US'}
-				/>
-			))}
+		{ogLocale(lang) && <meta property="og:locale" content={ogLocale(lang)} />}
+		{ogLocaleAlternates(
+			lang,
+			alternates.filter((a) => a.hreflang !== 'x-default').map((a) => a.hreflang),
+		).map((loc) => (
+			<meta property="og:locale:alternate" content={loc} />
+		))}
 
 		{pageType === 'book' && bookIsbn && <meta property="book:isbn" content={bookIsbn} />}
 		{pageType === 'book' && bookReleaseDate && <meta property="book:release_date" content={bookReleaseDate} />}
