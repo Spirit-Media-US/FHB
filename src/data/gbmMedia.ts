@@ -2,7 +2,7 @@
 // Hand-edited; NOT generated (unlike globalBibleMonth.ts). While GBM_VIDEO_ID is empty the page
 // shows the poster only, with no play button. Paste the 11-character YouTube ID to activate
 // the click-to-play facade: no other change needed.
-export const GBM_VIDEO_ID = '';
+export const GBM_VIDEO_ID = 'WZ3jxbpypms';
 
 const SANITY = 'https://cdn.sanity.io/images/rusi1hyi/production';
 export const GBM_POSTER = {
