@@ -24,6 +24,7 @@ import {
 	langSlug,
 	languageEditions,
 } from '../data/language-editions';
+import rosterData from '../data/language-roster.json';
 import { reachPhrase } from '../data/language-speakers';
 import lookinsideData from '../data/lookinside.json';
 import Layout from '../layouts/Layout.astro';
@@ -250,6 +251,11 @@ const VOICE = { father: '#2563eb', son: '#c8102e', spirit: '#6a3fa0' };
 // The languages answer is GENERATED: the count and the list from the edition registry (English
 // first), the reach from language-reach.json via language-speakers.ts. Never typed here.
 const LANGUAGE_COUNT = LANGUAGE_EDITION_TOTAL + 1;
+// Kevin 2026-10-29: /print lists ALL 80 languages. Roster = language-roster.json; a language is
+// live in print iff it has a card in the edition registry (never typed); English is the main
+// editions above. Everything else gets a non-link 'Coming soon' button.
+const liveCodes = new Set(allLanguageEditions.map((l) => l.code));
+const restOfRoster = rosterData.languages.filter((r) => !liveCodes.has(r.code));
 const LANGUAGE_NAMES = ['English', ...allLanguageEditions.map((l) => l.english)];
 const LANGUAGE_LIST = `${LANGUAGE_NAMES.slice(0, -1).join(', ')} and ${LANGUAGE_NAMES.at(-1)}`;
 const LANGUAGE_REACH = reachPhrase(['en', ...allLanguageEditions.map((l) => l.code)]);
@@ -501,6 +507,7 @@ const dvcVerses = [
 			     them or with the covers. -->
 			<VoiceChips />
 			<p class="text-center mb-10" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em;">{DVC_TAIL2}</p>
+			<p class="text-center mb-10" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; margin-top: -1.5rem;">Spirit Media Publishing is a registered Content Contributor to the Digital Bible Library (DBL).</p>
 
 			{/* Kevin 2026-10-10: below the title, chips and the two spec lines (his order); same eyebrow + heading as "Language Editions / In N Languages". The
 			    count is every card in the section (Kevin 2026-10-10: 23), computed so it cannot drift. */}
@@ -887,6 +894,23 @@ const dvcVerses = [
 					</div>
 				))}
 			</div>
+			{/* Kevin 2026-10-29: the rest of the 80-language roster. English = the editions above;
+			    every other language without a print edition yet shows a disabled Coming soon button. */}
+			<div class="text-center mt-12 mb-6">
+				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.4rem; font-weight: 600; margin: 0;">All {rosterData.languages.length} Languages</h3>
+			</div>
+			<ul id="all-languages" class="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto list-none p-0" style="margin-left:auto;margin-right:auto;">
+				{restOfRoster.map((r) => (
+					<li class="all-lang flex flex-col items-center text-center rounded-2xl p-4" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);" data-lang={r.code}>
+						<span style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0 0 0.7rem;">{r.language}</span>
+						{r.code === 'en' ? (
+							<a href="/bibles/fathers-heart-bible/" style="font-family: var(--font-sans); font-size: 0.85rem; font-weight: 700; color: #fff; background: var(--color-brand); border-radius: 9999px; padding: 0.45rem 1.1rem; text-decoration: none;">Shop the editions</a>
+						) : (
+							<button type="button" disabled aria-disabled="true" class="coming-soon-btn" style="font-family: var(--font-sans); font-size: 0.85rem; font-weight: 700; color: #71717a; background: #f4f4f5; border: 1px solid #d4d4d8; border-radius: 9999px; padding: 0.45rem 1.1rem; cursor: not-allowed;">Coming soon</button>
+						)}
+					</li>
+				))}
+			</ul>
 			{/* Kevin 2026-10-07: the 33 include editions not yet built (Amharic, Zulu). Named here
 			    as coming soon — no card (no built cover yet), no page, no order form. */}
 			{comingSoonEditions.length > 0 && (
