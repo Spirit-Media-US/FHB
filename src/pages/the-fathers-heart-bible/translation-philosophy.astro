@@ -15,7 +15,7 @@ const TITLE = "Translation Philosophy — How Father's Heart Bible™ (FHB) Is T
 const DESCRIPTION =
 	"Father's Heart Bible™ (FHB) translation philosophy: a meaning-based translation from the original Hebrew, Aramaic, and Greek that renders God as Father wherever Scripture reveals Him.";
 const PUBLISHED = '2026-07-13';
-const MODIFIED = '2026-07-13';
+const MODIFIED = '2026-10-29';
 
 const HERO_BASE =
 	'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg';
@@ -85,6 +85,12 @@ const articleSchema = {
 	description: DESCRIPTION,
 	image: OG_IMG,
 	author: KEVIN_WHITE_AUTHOR,
+	translator: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	editor: { '@type': 'Person', '@id': 'https://kevinwhite.us/#person', name: 'Kevin White' },
 	publisher: {
 		'@type': 'Organization',
 		'@id': 'https://spiritmediapublishing.com/#organization',
@@ -169,7 +175,7 @@ const TOC = [
 				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">How Father&rsquo;s Heart Bible&trade; Is Translated</h1>
 				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
 					<span>By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; Editor, Father&rsquo;s Heart Bible&trade;</span>
-					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
+					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span><span aria-hidden="true">&middot;</span><span>Updated <time datetime={MODIFIED}>{formatDate(MODIFIED)}</time></span>
 				</div>
 			</div>
 		</section>
@@ -183,6 +189,14 @@ const TOC = [
 				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
 					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
 					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">FHB lets the Hebrew and Greek speak a distinction they always made &mdash; between a deity to be appeased and a Father to be received &mdash; and shows its work in footnotes as it does.</p>
+				</aside>
+
+				<aside id="who-made-this" class="my-7 px-6 py-5 rounded-2xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<h2 class="text-xl md:text-2xl font-light mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Who made this translation</h2>
+					<p class="text-base leading-relaxed mb-3" style="font-family: var(--font-sans); color: var(--color-muted);"><strong style="color: var(--color-ink);">Spirit Media Publishing is the translator of record; Kevin White is the editor.</strong> The rules and every interpretive decision are the work of Kevin White of Spirit Media Publishing, who led the process.</p>
+					<p class="text-base leading-relaxed mb-3" style="font-family: var(--font-sans); color: var(--color-muted);"><strong style="color: var(--color-ink);">The process.</strong> Father&rsquo;s Heart Bible&trade; was produced through a structured, rule-governed translation process. Within it, AI language tools rendered the text and footnotes directly from the original Hebrew, Aramaic, and Greek, guided by a written set of 160 translation rules. Each book was then carried through successive passes, its most difficult readings cross-checked against the Hebrew and Greek and against independent references, before being reviewed and finalized.</p>
+					<p class="text-base leading-relaxed mb-3" style="font-family: var(--font-sans); color: var(--color-muted);"><strong style="color: var(--color-ink);">The review.</strong> The text is reviewed by its editor, Kevin White. Independent scholarly review is ongoing, with Bible scholars and global United Bible Societies members in India, Nepal, UK, USA, and other countries. Every reviewer&rsquo;s findings are read by the editor, and corrections are published with each new edition. Readers in every language also tell us what they find, and every correction they report is reviewed.</p>
+					<p class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">Updated <time datetime={MODIFIED}>{formatDate(MODIFIED)}</time></p>
 				</aside>
 
 				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
