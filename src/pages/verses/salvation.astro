@@ -1,0 +1,217 @@
+---
+// /verses/salvation: unit 6br, ranked by Bing GetKeywordStats 2026-10-28 (aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+	{
+		id: 'saved-by-believing',
+		heading: 'Saved by believing',
+		intro: 'Our Father asks us to call on Jesus, and he answers.',
+		verses: [
+			{
+				ref: 'Romans 10:9-10',
+				slug: 'romans',
+				ch: 10,
+				text: 'If you confess with your mouth Jesus is Lord and believe in your heart that our Father raised him from the dead, you will be saved. For with the heart you believe and are made right with our Father, with the mouth you confess and are saved.',
+			},
+			{
+				ref: 'Romans 10:13',
+				slug: 'romans',
+				ch: 10,
+				text: 'For "everyone who calls on the name of our Lord Jesus will be saved."',
+			},
+			{
+				ref: 'Acts 16:31',
+				slug: 'acts',
+				ch: 16,
+				text: 'And they said, "Believe in the Lord Jesus, and you will be saved, you and your household."',
+			},
+			{
+				ref: 'Romans 1:16',
+				slug: 'romans',
+				ch: 1,
+				text: "I'm not ashamed of the gospel—it is our Father's power for salvation to everyone who believes, to the Jew first, and also the Greek.",
+			},
+		],
+	},
+	{
+		id: 'fathers-will',
+		heading: 'Our Father wants us saved',
+		intro: 'Salvation begins in his heart, not ours.',
+		verses: [
+			{
+				ref: 'John 3:16-17',
+				slug: 'john',
+				ch: 3,
+				text: 'For our Father so loved the world that he gave his one and only Son, that whoever believes in him will not perish but have eternal life. For our Father did not send his Son into the world to condemn the world, but so the world could be saved through him.',
+			},
+			{
+				ref: '1 Timothy 2:3-4',
+				slug: '1-timothy',
+				ch: 2,
+				text: 'This is good and pleasing to our Father, our Savior, who wants all people to be saved and to come to know the truth.',
+			},
+			{
+				ref: '1 John 4:14',
+				slug: '1-john',
+				ch: 4,
+				text: 'We have seen and testify that our Father sent the Son as Savior of the world.',
+			},
+			{
+				ref: 'Titus 2:11',
+				slug: 'titus',
+				ch: 2,
+				text: 'For the grace of our Father has appeared, bringing salvation to all people,',
+			},
+		],
+	},
+	{
+		id: 'jesus-came',
+		heading: 'Jesus came to save',
+		intro: 'The Savior was born, and he lives to plead our case.',
+		verses: [
+			{
+				ref: '1 Timothy 1:15',
+				slug: '1-timothy',
+				ch: 1,
+				text: 'A trustworthy saying worthy of full acceptance: Christ Jesus came into the world to save sinners—I am the worst of them.',
+			},
+			{
+				ref: 'Luke 2:11',
+				slug: 'luke',
+				ch: 2,
+				text: 'Today in the city of David, a Savior was born to you—Christ the Lord.',
+			},
+			{
+				ref: 'Hebrews 7:25',
+				slug: 'hebrews',
+				ch: 7,
+				text: 'So he can fully save those who come to our Father through him, since he always lives to plead their case.',
+			},
+			{
+				ref: 'Romans 5:9',
+				slug: 'romans',
+				ch: 5,
+				text: 'Much more then, now made right by his blood, we will be saved through him from the wrath.',
+			},
+		],
+	},
+	{
+		id: 'our-salvation',
+		heading: 'Our Father is our salvation',
+		intro: 'He is the rescue we wait for and sing about.',
+		verses: [
+			{
+				ref: 'Psalm 62:1-2',
+				slug: 'psalms',
+				ch: 62,
+				text: 'For my Father alone my soul waits in silence; from him comes my salvation. He alone is my rock and my salvation, my stronghold; I will never be greatly shaken.',
+			},
+			{
+				ref: 'Psalm 118:14',
+				slug: 'psalms',
+				ch: 118,
+				text: 'My Father is my strength and my song; he has become my salvation.',
+			},
+			{
+				ref: 'Psalm 27:1',
+				slug: 'psalms',
+				ch: 27,
+				text: 'My Father is my light and my salvation—whom should I fear? My Father is the stronghold of my life—of whom should I be afraid?',
+			},
+			{
+				ref: 'Psalm 13:5',
+				slug: 'psalms',
+				ch: 13,
+				text: 'But I have trusted in your faithful love; my heart will rejoice in your salvation.',
+			},
+		],
+	},
+	{
+		id: 'assurance',
+		heading: 'Knowing it is ours',
+		intro: 'Salvation is something we can be sure of.',
+		verses: [
+			{
+				ref: '1 John 5:13',
+				slug: '1-john',
+				ch: 5,
+				text: 'I write these things to you who believe in the name of the Son of our Father, so you may know you have eternal life.',
+			},
+			{
+				ref: 'John 10:28',
+				slug: 'john',
+				ch: 10,
+				text: 'I give them eternal life, and they will never perish, and no one will snatch them from my hand.',
+			},
+			{
+				ref: '1 Thessalonians 5:9',
+				slug: '1-thessalonians',
+				ch: 5,
+				text: 'For our Father has not destined us for wrath, but to gain salvation through our Lord Jesus Christ,',
+			},
+			{
+				ref: 'Romans 8:1',
+				slug: 'romans',
+				ch: 8,
+				text: 'There is therefore now no condemnation for those who are in Christ Jesus.',
+			},
+		],
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does the Bible say about salvation?',
+		answer:
+			'Romans 10:9–10 says, “If you confess with your mouth Jesus is Lord and believe in your heart that our Father raised him from the dead, you will be saved. For with the heart you believe and are made right with our Father, with the mouth you confess and are saved.”',
+	},
+	{
+		question: 'How can a person be saved?',
+		answer:
+			'Acts 16:31 says, “And they said, "Believe in the Lord Jesus, and you will be saved, you and your household."”',
+	},
+	{
+		question: 'Does our Father want everyone to be saved?',
+		answer:
+			'1 Timothy 2:3–4 says, “This is good and pleasing to our Father, our Savior, who wants all people to be saved and to come to know the truth.”',
+	},
+	{
+		question: 'Why did Jesus come into the world?',
+		answer:
+			'1 Timothy 1:15 says, “A trustworthy saying worthy of full acceptance: Christ Jesus came into the world to save sinners—I am the worst of them.”',
+	},
+	{
+		question: 'Can I know that I have eternal life?',
+		answer:
+			'1 John 5:13 says, “I write these things to you who believe in the name of the Son of our Father, so you may know you have eternal life.”',
+	},
+	{
+		question: 'Can anyone take salvation away from me?',
+		answer:
+			'John 10:28 says, “I give them eternal life, and they will never perish, and no one will snatch them from my hand.”',
+	},
+];
+---
+
+<VerseCollection
+	slug="salvation"
+	topic="Salvation"
+	title="Bible Verses About Salvation (with Audio) | Father's Heart Bible™"
+	description="Bible verses about salvation in Father's Heart Bible™: saved by believing, our Father's will, Jesus came to save, and assurance. Read free online with audio."
+	h1="Bible Verses About Salvation"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/f6bf38bde108f79fd6730ab8930750f89bc74ad3-6720x4480.jpg"
+	heroAlt="A woman in a quiet, peaceful church"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about salvation is Romans 10:9&ndash;10: &ldquo;If you confess with your mouth Jesus is Lord and believe in your heart that our Father raised him from the dead, you will be saved.&rdquo;</strong> Scripture speaks to salvation in five ways: how we receive it, our Father&rsquo;s will to save, Jesus who came to save, our Father as our salvation, and the assurance that it is ours. Below, word for word in Father&rsquo;s Heart Bible&trade;, are the verses on each, linked into the chapter so you can <a href="https://fathersheartbible.com/read/romans/10/" style="color: var(--color-brand);" class="hover:underline">read Romans 10 free</a> and hear it.`}
+	keyTakeaway="Salvation is our Father's rescue, given through Jesus to everyone who believes. We receive it, and we can know it is ours."
+	themes={themes}
+	featured={{"book": "Romans", "slug": "romans", "chapter": 10, "verseLimit": 13, "heading": "How we are saved: Romans 10", "intro": "Romans 10 sets out plainly how salvation is received. Read or hear it below, then follow it to the full chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/romans/10/" style="color: var(--color-brand);" class="hover:underline">Romans 10</a> or <a href="https://fathersheartbible.com/read/john/3/" style="color: var(--color-brand);" class="hover:underline">John 3</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/grace/" style="color: var(--color-brand);" class="hover:underline">Bible verses about grace</a>, or read <a href="/meaning/propitiation/" style="color: var(--color-brand);" class="hover:underline">what propitiation means in the Bible</a> for the sacrifice at the heart of salvation.`}
+	ctaMidHeading="Hear Romans 10 in full"
+	ctaMidBodyHtml="Read and listen to the chapter on how salvation is received &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a Father who saves."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about salvation", "salvation", "Romans 10:9-10", "John 3:16"]}
+/>

@@ -19,6 +19,8 @@ export const TYPES = [
 	{ label: 'The Bible by audience and season', dir: 'bible-for' },
 	{ label: 'Bible reading guides', dir: 'guides' },
 	{ label: 'The books of the Bible', pages: ['old-testament', 'new-testament', 'books-of-the-bible'] },
+	// Top-level campaign page (2s, 2026-10-28): a lone page, not a folder, so no dir type reached it.
+	{ label: 'Bible months and campaigns', pages: ['global-bible-month'] },
 ];
 
 const humanize = (s) => s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());

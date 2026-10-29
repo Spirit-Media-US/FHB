@@ -1,0 +1,22 @@
+---
+// Cross-links among /verses, /meaning and /bible-for pages, driven by src/data/relatedTopics.ts
+// (unit 6aq). Renders nothing when a page has no entry.
+import { relatedFor } from '../data/relatedTopics';
+interface Props {
+	kind: 'v' | 'm' | 'b';
+	slug: string;
+}
+const { kind, slug } = Astro.props as Props;
+const links = relatedFor(kind, slug);
+---
+
+{links.length > 0 && (
+	<nav aria-labelledby="related-topics-h" class="mt-10">
+		<h2 id="related-topics-h" class="text-xl md:text-2xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Related on Father&rsquo;s Heart Bible</h2>
+		<ul class="mt-4 space-y-2" style="list-style: none; padding: 0; margin: 0;">
+			{links.map((l) => (
+				<li><a href={l.href} class="text-base hover:underline" style="color: var(--color-brand); font-family: var(--font-sans);">{l.label}</a></li>
+			))}
+		</ul>
+	</nav>
+)}

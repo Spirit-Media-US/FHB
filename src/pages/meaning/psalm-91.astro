@@ -1,0 +1,95 @@
+---
+// /meaning/psalm-91 — plan W2/W9 unit 6ar, built 2026-10-28.
+// Intent: "psalm 91 meaning" (explain), distinct from the /read/psalms/91 chapter (read). Canonical self.
+// Demand (INFERRED, Bing throttled 2026-10-28): bare "psalm 91" Bing 13-week US impressions 37,257 (aeo-state/keywords/bing-20261028.json); GSC "psalm 91 meaning" 2 impressions at position 10 (w2-meaning-topics-20261022/gsc-meaning-queries-90d.json). No measured "psalm 91 meaning" volume.
+// WEDGE: the speaker changes at verse 14 and, in this Bible, our Father Himself speaks vv. 14-16 (canon divineSpeechRanges).
+// Every Scripture quotation is copied VERBATIM from the locked canon (/srv/sites/community/src/content/bible) and checked with bin/fhb-scripture-quote-audit.py. Verse links go to our /read only.
+// Word facts: Blue Letter Bible lexicon (Strong's H5945 elyon, H7706 shaddai).
+import WordMeaning from '../../components/WordMeaning.astro';
+
+const sections = [
+	{
+		id: 'verses-1-2',
+		heading: 'Verses 1-2: living close, and the decision to say it',
+		bodyHtml: `<p>The psalm begins with a condition and a picture: &ldquo;Whoever dwells in the shelter of the Most High will rest in the shadow of the Almighty.&rdquo; (Psalm 91:1). &ldquo;Most High&rdquo; is <em>&lsquo;elyon</em> (Strong&rsquo;s H5945) and &ldquo;Almighty&rdquo; is <em>shadday</em> (H7706), two of the Bible&rsquo;s names for our Father&rsquo;s greatness. To &ldquo;dwell&rdquo; is to live there, not to visit. The promise is for the person who has made His shelter home.</p><p>Verse 2 is where that becomes personal: &ldquo;I will say of my Father, &lsquo;He is my refuge and my fortress, my Father, in whom I trust.&rsquo;&rdquo; (Psalm 91:2). The line is a choice spoken aloud. Trust here is not a feeling that arrives, but something said to Him and about Him.</p>`,
+	},
+	{
+		id: 'verses-3-8',
+		heading: 'Verses 3-8: rescue from the trap, the night and the plague',
+		bodyHtml: `<p>The psalm then lists what the shelter covers. The first is the snare and the sickness: &ldquo;Surely he will rescue you from the hunter&rsquo;s trap and from deadly disease.&rdquo; (Psalm 91:3). The second is the image most readers remember: &ldquo;He will cover you with his feathers, and under his wings you will find refuge; his faithfulness is your shield and rampart.&rdquo; (Psalm 91:4). Our Father is pictured as a bird sheltering her young, and the weapon in His hand is His faithfulness.</p><p>Then come the fears by hour: night terror, the arrow by day, disease in the dark, plague at noon (Psalm 91:5-6). Verse 7 says, &ldquo;1,000 may fall at your side, 10,000 at your right hand, but it will not come near you.&rdquo; (Psalm 91:7). It is a poem of covering, not a guarantee of an easy life, and it has to be read beside the verses that follow.</p>`,
+	},
+	{
+		id: 'verses-9-13',
+		heading: 'Verses 9-13: angels, and the verse that was quoted against Jesus',
+		bodyHtml: `<p>&ldquo;For he will command his angels concerning you, to guard you in all your ways.&rdquo; (Psalm 91:11). This is the verse the devil quotes in the wilderness when he asks Jesus to throw Himself from the temple (Matthew 4:6). Jesus answers him: &ldquo;Again it is written, &lsquo;You must not put your Father to the test.&rsquo;&rdquo; (Matthew 4:7).</p><p>That exchange is the key to reading Psalm 91 well. The protection is for the one who lives in the shelter and walks &ldquo;in all your ways,&rdquo; not a promise to be demanded by someone who is testing Him. Verse 13 gives the picture of the walker in safety: &ldquo;You will tread on the lion and the cobra; you will trample the young lion and the serpent underfoot.&rdquo; (Psalm 91:13).</p>`,
+	},
+	{
+		id: 'verses-14-16',
+		heading: 'Verses 14-16: our Father speaks',
+		bodyHtml: `<p>At verse 14 the voice changes. Up to here a person is speaking about our Father; from here, in Father&rsquo;s Heart Bible, our Father Himself speaks: &ldquo;Because he clings to me in love, I will deliver him; I will set him on high, because he knows my name.&rdquo; (Psalm 91:14). The reason for the rescue is not the person&rsquo;s strength, but that he holds on to the Father and knows Him by name.</p><p>Then the promises get closer: &ldquo;He will call to me, and I will answer him; I will be with him in trouble; I will rescue him and honor him.&rdquo; (Psalm 91:15). Notice &ldquo;I will be with him in trouble.&rdquo; Our Father does not promise to keep trouble from the door; He promises to be in it with His child. The last line is &ldquo;With long life I will satisfy him and show him my salvation.&rdquo; (Psalm 91:16).</p>`,
+	},
+];
+
+const renderings = [
+	{ ref: 'Psalms 91:1', slug: 'psalms', ch: 91, fhb: `Whoever dwells in the shelter of the Most High will rest in the shadow of the Almighty.` },
+	{ ref: 'Psalms 91:2', slug: 'psalms', ch: 91, fhb: `I will say of my Father, "He is my refuge and my fortress, my Father, in whom I trust."` },
+	{ ref: 'Psalms 91:4', slug: 'psalms', ch: 91, fhb: `He will cover you with his feathers, and under his wings you will find refuge; his faithfulness is your shield and rampart.` },
+	{ ref: 'Psalms 91:9', slug: 'psalms', ch: 91, fhb: `Because you have made my Father your refuge—the Most High your dwelling place,` },
+	{ ref: 'Psalms 91:11', slug: 'psalms', ch: 91, fhb: `For he will command his angels concerning you, to guard you in all your ways.` },
+	{ ref: 'Psalms 91:14', slug: 'psalms', ch: 91, fhb: `"Because he clings to me in love, I will deliver him; I will set him on high, because he knows my name.` },
+	{ ref: 'Psalms 91:15', slug: 'psalms', ch: 91, fhb: `He will call to me, and I will answer him; I will be with him in trouble; I will rescue him and honor him.` },
+	{ ref: 'Psalms 91:16', slug: 'psalms', ch: 91, fhb: `With long life I will satisfy him and show him my salvation."` },
+];
+
+const faqs = [
+	{
+		question: 'What does Psalm 91 mean?',
+		answer:
+			'Psalm 91 is a poem of shelter: whoever lives close to our Father is covered from the trap, the night terror and the plague, guarded by angels, and in the end hears our Father Himself promise to answer and be with him. It opens, “Whoever dwells in the shelter of the Most High will rest in the shadow of the Almighty.”',
+	},
+	{
+		question: 'What does “under his wings you will find refuge” mean?',
+		answer:
+			'It pictures our Father as a bird covering her young, close and protective. The verse says, “He will cover you with his feathers, and under his wings you will find refuge; his faithfulness is your shield and rampart.”',
+	},
+	{
+		question: 'Does Psalm 91 promise that nothing bad will ever happen?',
+		answer:
+			'No. The same psalm has our Father promise to be with His child in trouble. The promise is His presence and His rescue, and Jesus refused to turn the psalm into a demand when He answered the devil with “You must not put your Father to the test.”',
+	},
+	{
+		question: 'Who is speaking in Psalm 91?',
+		answer:
+			'The voice moves. A believer speaks of our Father through verse 13, and in Father’s Heart Bible our Father Himself speaks in verses 14 to 16: “He will call to me, and I will answer him.”',
+	},
+	{
+		question: 'What are the “Most High” and the “Almighty”?',
+		answer:
+			'They are two Hebrew names for our Father, elyon (Strong’s H5945) and shadday (H7706). Verse 1 uses both: “Whoever dwells in the shelter of the Most High will rest in the shadow of the Almighty.”',
+	},
+];
+---
+
+<WordMeaning
+	slug="psalm-91"
+	eyebrow="Bible Passage Meanings"
+	title="Psalm 91 Meaning, Verse by Verse | Father’s Heart Bible"
+	description="What does Psalm 91 mean? A verse-by-verse reading of the shelter of the Most High, the angels, and our Father’s own words in verses 14-16."
+	h1="What does Psalm 91 mean?"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg"
+	heroAlt="A man reading and reflecting on Scripture"
+	published="2026-10-28"
+	modified="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Psalm 91 is a poem of shelter: whoever lives close to our Father is covered from the trap, the night terror and the plague, guarded by angels, and promised His presence in trouble.</strong> In Father&rsquo;s Heart Bible the voice changes at verse 14, where our Father Himself says &ldquo;I will answer him.&rdquo; Below: the meaning verse by verse, why Jesus refused to use the angels verse as a test, and the full psalm. You can <a href="https://fathersheartbible.com/read/psalms/91/" style="color: var(--color-brand);" class="hover:underline">read Psalm 91 free</a> and hear it read aloud.`}
+	keyTakeaway="Psalm 91 promises shelter in our Father's presence, and ends with His own voice."
+	sections={sections}
+	renderings={renderings}
+	renderingsHeading="Psalm 91 in Father’s Heart Bible™"
+	renderingsIntro="The key verses of the psalm, word for word in Father’s Heart Bible™. Each reference links into the full chapter, free, with verse-by-verse audio in English."
+	faqs={faqs}
+	relatedHtml={`Related: <a href="/meaning/psalm-23/" style="color: var(--color-brand);" class="hover:underline">what Psalm 23 means</a>, <a href="/meaning/our-father/" style="color: var(--color-brand);" class="hover:underline">why this Bible says &ldquo;our Father&rdquo;</a>, <a href="/meaning/forsake/" style="color: var(--color-brand);" class="hover:underline">what forsake means</a> and <a href="/meaning/selah/" style="color: var(--color-brand);" class="hover:underline">what selah means</a>. Read <a href="https://fathersheartbible.com/read/psalms/91/" style="color: var(--color-brand);" class="hover:underline">Psalm 91</a>, <a href="https://fathersheartbible.com/read/matthew/4/" style="color: var(--color-brand);" class="hover:underline">Matthew 4</a> or the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free with audio</a>. For the original words, see <a href="https://www.blueletterbible.org/lexicon/h5945/kjv/wlc/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">elyon (Strong&rsquo;s H5945)</a> and <a href="https://www.blueletterbible.org/lexicon/h7706/kjv/wlc/0-1/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">shadday (Strong&rsquo;s H7706)</a> on Blue Letter Bible.`}
+	ctaMidHeading="Read Psalm 91 in the Father’s voice"
+	ctaMidBodyHtml="Read it in its chapter &mdash; free online with verse-by-verse audio in English."
+	ctaBottomBodyHtml="From Genesis to Revelation, free online with audio &mdash; an English translation that lets your Father&rsquo;s voice be heard on every page."
+	tags={["psalm 91 meaning", "what does psalm 91 mean", "psalm 91", "shelter of the most high", "under his wings"]}
+/>

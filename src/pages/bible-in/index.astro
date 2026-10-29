@@ -6,15 +6,18 @@ import ReadInYourLanguage from '../../components/ReadInYourLanguage.astro';
 // and adding a row to src/data/nations.ts. Read-first per the architecture
 // rules in memory/project_fhb_country_pages.md.
 import { NATIONS } from '../../data/nations';
-import { LANGUAGE_TOTAL } from '../../data/receive';
 import Layout from '../../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const PAGE_URL = 'https://fathersheartbible.com/bible-in/';
-const TITLE = "The Bible Around the World — Read Free Online | Father's Heart Bible™ (FHB)";
-// Every language live in the reader (follows its registry each build, 2026-10-14) — not
-// the print-edition count, which left this page at 35 while 37 were free to read.
-const LANGUAGE_COUNT = LANGUAGE_TOTAL;
-const DESCRIPTION = `Read the Bible free online, country by country. Father's Heart Bible™ (FHB) reveals God as Father — free to read with audio, soon in 80 languages.`;
+// Lead terms follow the measured language demand behind each country page (fhb-target-queries.json:
+// "bible in hindi" 9,300/mo IN, "bible in tamil" 6,300 IN, "bible in urdu" 2,200 PK, "bible tagalog" 2,100 PH).
+const TITLE = fitTitle(
+	"Bible in India, Pakistan, Philippines & More — Read Free | Father's Heart Bible™ (FHB)",
+);
+const DESCRIPTION = fitDescription(
+	`Bible in India, Pakistan, the Philippines, Nigeria and ${NATIONS.length - 4} more countries: read the Bible free online in Father's Heart Bible™ (FHB), with audio.`,
+);
 
 const HERO_BASE =
 	'https://cdn.sanity.io/images/rusi1hyi/production/9f29bfca381f5c99ffa6ee6cd00f02572f0f7b96-5864x2503.jpg';
@@ -37,6 +40,7 @@ const collectionSchema = {
 	},
 	mainEntity: {
 		'@type': 'ItemList',
+		numberOfItems: NATIONS.length,
 		itemListElement: NATIONS.map((n, i) => ({
 			'@type': 'ListItem',
 			position: i + 1,
@@ -111,9 +115,13 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 				</nav>
 				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">The Bible Around the World</p>
 				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">The Bible, nation by nation</h1>
-				<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+				<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);">
+					Read the Bible free online in {NATIONS.length} countries &mdash; including India, Pakistan, the Philippines, and Nigeria &mdash; in the languages available now in Father&rsquo;s Heart Bible&trade;, with no account and no app.
+				</p>
+				<p class="mt-4 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
 					The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and hear online &mdash; a translation that reveals God as a loving Father. Explore what Scripture looks like country by country, who&rsquo;s reading it, and how to begin wherever you are.
 				</p>
+				<p class="mt-3 text-base" style="font-family: var(--font-sans); color: var(--color-muted);">This November, Father&rsquo;s Heart Bible completes 80 languages during <a href="/global-bible-month/" style="color: var(--color-brand);" class="hover:underline">Global Bible Month</a>.</p>
 			</div>
 		</section>
 
@@ -131,7 +139,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
 						</a>
 					))}
 				</div>
-				<p class="mt-6 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);">Card photos for Ukraine, Poland and Romania via Wikimedia Commons: <a href="https://commons.wikimedia.org/wiki/File:2019-07-21_Saint_Sophia_Cathedral_in_Kyiv,_Ukraine.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Saint Sophia Cathedral</a> by Maksym Kozlenko (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 4.0</a>); <a href="https://commons.wikimedia.org/wiki/File:20200826_Wawel_i_Wis%C5%82a_w_Krakowie_1752_1334.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Wawel Castle</a> by Jakub Hałun (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 4.0</a>); <a href="https://commons.wikimedia.org/wiki/File:Castelul_Peles,_Sinaia_-_Vedere_panoramica.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Peleș Castle</a> by TiberiuSahlean (<a href="https://creativecommons.org/licenses/by-sa/3.0/ro/deed.en" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 3.0 RO</a>).</p>
+				<p class="mt-6 text-xs" style="font-family: var(--font-sans); color: var(--color-muted);">Card photos for Ukraine, Poland, Romania, South Africa, Greece, Hungary and the Netherlands via Wikimedia Commons: <a href="https://commons.wikimedia.org/wiki/File:2019-07-21_Saint_Sophia_Cathedral_in_Kyiv,_Ukraine.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Saint Sophia Cathedral</a> by Maksym Kozlenko (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 4.0</a>); <a href="https://commons.wikimedia.org/wiki/File:20200826_Wawel_i_Wis%C5%82a_w_Krakowie_1752_1334.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Wawel Castle</a> by Jakub Hałun (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 4.0</a>); <a href="https://commons.wikimedia.org/wiki/File:Castelul_Peles,_Sinaia_-_Vedere_panoramica.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Peleș Castle</a> by TiberiuSahlean (<a href="https://creativecommons.org/licenses/by-sa/3.0/ro/deed.en" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 3.0 RO</a>).; <a href="https://commons.wikimedia.org/wiki/File:Bergville_Drakensbergen_Waterfall_05.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Drakensberg waterfall, Bergville</a> by Ad Meskens (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 4.0</a>); <a href="https://commons.wikimedia.org/wiki/File:Meteora_landscape.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Meteora</a> by Sofia Bressan (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 4.0</a>); <a href="https://commons.wikimedia.org/wiki/File:20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Hungarian Parliament Building</a> by Jakub Hałun (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 4.0</a>); <a href="https://commons.wikimedia.org/wiki/File:Amsterdam_Canals_-_July_2006.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Amsterdam canal</a> by David Iliff (<a href="https://creativecommons.org/licenses/by/2.5/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY 2.5</a>).</p>
 			</div>
 		</section>
 

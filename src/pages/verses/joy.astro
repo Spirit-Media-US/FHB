@@ -1,0 +1,176 @@
+---
+// /verses/joy: unit 6ah, ranked by Bing GetKeywordStats 2026-10-28 (aeo-state/fhb-verses-topics-20261028.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+ {
+  "id": "joy-in-our-father",
+  "heading": "Joy in our Father",
+  "intro": "Joy begins in his presence, not in our circumstances.",
+  "verses": [
+   {
+    "ref": "Psalm 16:11",
+    "slug": "psalms",
+    "ch": 16,
+    "text": "You show me the path of life; in your presence is fullness of joy, at your right hand are pleasures forever."
+   },
+   {
+    "ref": "Psalm 30:5",
+    "slug": "psalms",
+    "ch": 30,
+    "text": "For his anger lasts only a moment, but his favor lasts a lifetime; weeping may last through the night, but joy comes in the morning."
+   },
+   {
+    "ref": "Zephaniah 3:17",
+    "slug": "zephaniah",
+    "ch": 3,
+    "text": "Your Father is in your midst, a mighty warrior who saves. He will rejoice over you with gladness; he will quiet you by his love; he will exult over you with loud singing.\""
+   },
+   {
+    "ref": "Nehemiah 8:10",
+    "slug": "nehemiah",
+    "ch": 8,
+    "text": "Nehemiah told them, \"Go eat rich food, drink something sweet, and send portions to those with nothing ready, for this day is holy to our Sovereign Father. Don't grieve; the joy of our Father is your strength.\""
+   }
+  ]
+ },
+ {
+  "id": "joy-in-trials",
+  "heading": "Joy in hard times",
+  "intro": "Scripture never says joy is the absence of trouble; it is a gift that holds in it.",
+  "verses": [
+   {
+    "ref": "James 1:2–3",
+    "slug": "james",
+    "ch": 1,
+    "text": "Consider it pure joy, my brothers and sisters, whenever you face trials of many kinds, because you know that the testing of your faith produces perseverance."
+   },
+   {
+    "ref": "Romans 15:13",
+    "slug": "romans",
+    "ch": 15,
+    "text": "May our Father, the source of hope, fill you with all joy and peace through faith, so by the Holy Spirit's power you overflow with hope."
+   },
+   {
+    "ref": "1 Peter 1:8",
+    "slug": "1-peter",
+    "ch": 1,
+    "text": "Though you've never seen him, you love him; though you don't see him now, you trust him, rejoicing with joy beyond words and full of glory,"
+   },
+   {
+    "ref": "John 15:11",
+    "slug": "john",
+    "ch": 15,
+    "text": "I've told you this so my joy may be in you, and your joy be complete."
+   }
+  ]
+ },
+ {
+  "id": "rejoice",
+  "heading": "Rejoice and give thanks",
+  "intro": "Joy is also a choice to look up and rejoice today.",
+  "verses": [
+   {
+    "ref": "Philippians 4:4",
+    "slug": "philippians",
+    "ch": 4,
+    "text": "Rejoice in the Lord always; again I will say, rejoice."
+   },
+   {
+    "ref": "Psalm 118:24",
+    "slug": "psalms",
+    "ch": 118,
+    "text": "This is the day that our Father has made; let us rejoice and be glad in it."
+   },
+   {
+    "ref": "Psalm 126:5–6",
+    "slug": "psalms",
+    "ch": 126,
+    "text": "Those who sow in tears will reap with shouts of joy. Whoever goes out weeping, carrying the bag of seed to sow, will surely come home with shouts of joy, carrying bundles of grain."
+   },
+   {
+    "ref": "Habakkuk 3:17–18",
+    "slug": "habakkuk",
+    "ch": 3,
+    "text": "Though the fig tree does not blossom, and no fruit is on the vines; though the olive crop fails, and the fields produce no food; though there is no flock in the fold, and there is no herd in the stalls, yet I will rejoice in our Father; I will take joy in the Father of my salvation."
+   }
+  ]
+ },
+ {
+  "id": "joy-restored",
+  "heading": "Joy restored",
+  "intro": "When joy has faded, our Father restores it.",
+  "verses": [
+   {
+    "ref": "Psalm 51:12",
+    "slug": "psalms",
+    "ch": 51,
+    "text": "Restore to me the joy of your salvation, and uphold me with a willing spirit."
+   },
+   {
+    "ref": "John 16:24",
+    "slug": "john",
+    "ch": 16,
+    "text": "Until now you've asked nothing in my name. Ask, and you will receive, so your joy may be complete."
+   },
+   {
+    "ref": "Isaiah 12:3",
+    "slug": "isaiah",
+    "ch": 12,
+    "text": "With joy you will draw water from the wells of salvation."
+   },
+   {
+    "ref": "Psalm 97:11",
+    "slug": "psalms",
+    "ch": 97,
+    "text": "Light is sown for the righteous, and joy for the upright in heart."
+   }
+  ]
+ }
+];
+
+const faqs = [
+ {
+  "question": "What is the best Bible verse about joy?",
+  "answer": "Psalm 16:11 is a favorite: “You show me the path of life; in your presence is fullness of joy, at your right hand are pleasures forever.” A second is Nehemiah 8:10, which says, “Don't grieve; the joy of our Father is your strength.”"
+ },
+ {
+  "question": "What does the Bible say about joy in hard times?",
+  "answer": "James 1:2–3 says, “Consider it pure joy, my brothers and sisters, whenever you face trials of many kinds, because you know that the testing of your faith produces perseverance.” Joy here is not pretending the trial is good; it is trusting our Father inside it."
+ },
+ {
+  "question": "What is the difference between joy and happiness in the Bible?",
+  "answer": "Happiness tends to follow circumstances; joy in Scripture is a gift from our Father. Romans 15:13 prays, “May our Father, the source of hope, fill you with all joy and peace through faith, so by the Holy Spirit's power you overflow with hope.”"
+ },
+ {
+  "question": "Does our Father rejoice over his children?",
+  "answer": "Yes. Zephaniah 3:17 says of our Father, “He will rejoice over you with gladness; he will quiet you by his love; he will exult over you with loud singing.”"
+ },
+ {
+  "question": "What Bible verse helps when joy is gone?",
+  "answer": "Psalm 51:12 is a prayer for exactly that: “Restore to me the joy of your salvation, and uphold me with a willing spirit.”"
+ }
+];
+---
+
+<VerseCollection
+	slug="joy"
+	topic="Joy"
+	title="Bible Verses About Joy (with Audio) | Father's Heart Bible™"
+	description="Bible verses about joy in Father's Heart Bible™: joy in our Father's presence, joy in hard times, rejoicing today and joy restored. Free to read online with audio."
+	h1="Bible Verses About Joy"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg"
+	heroAlt="People gathered together around a table"
+	published="2026-10-28"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about joy is Psalm 16:11: &ldquo;You show me the path of life; in your presence is fullness of joy, at your right hand are pleasures forever.&rdquo;</strong> Scripture roots joy in our Father himself, not in how the day goes. Below are the verses on joy in his presence, joy in hard times, rejoicing today and joy restored, each word for word in Father&rsquo;s Heart Bible&trade; and linked into the chapter so you can <a href="https://fathersheartbible.com/read/psalms/16/" style="color: var(--color-brand);" class="hover:underline">read Psalm 16 free</a> and hear it.`}
+	keyTakeaway="Biblical joy is a gift from our Father: it grows in his presence, holds in hard times and can be restored when it fades."
+	themes={themes}
+	featured={{"book": "Psalm", "slug": "psalms", "chapter": 16, "verseLimit": 11, "heading": "Fullness of joy: Psalm 16", "intro": "Psalm 16 ends with the verse most quoted on joy. Read or hear the chapter below, then follow it to the full psalm."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/psalms/126/" style="color: var(--color-brand);" class="hover:underline">Psalm 126</a> or <a href="https://fathersheartbible.com/read/philippians/4/" style="color: var(--color-brand);" class="hover:underline">Philippians 4</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/peace/" style="color: var(--color-brand);" class="hover:underline">verses on peace</a>, the <a href="/verses/hope/" style="color: var(--color-brand);" class="hover:underline">verses on hope</a> or the <a href="/verses/thanksgiving/" style="color: var(--color-brand);" class="hover:underline">Thanksgiving verses</a>.`}
+	ctaMidHeading="Hear Psalm 16 in full"
+	ctaMidBodyHtml="Read and listen to the psalm of fullness of joy &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a glad child with a rejoicing Father."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about joy", "joy", "Psalm 16:11", "Nehemiah 8:10"]}
+/>

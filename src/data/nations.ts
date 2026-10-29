@@ -232,6 +232,42 @@ export const NATIONS: Nation[] = [
 		imgDirect: true,
 	},
 	{
+		slug: 'south-africa',
+		country: 'South Africa',
+		title: 'The Bible in South Africa',
+		blurb:
+			'A majority-Christian nation where isiZulu is the largest home language and the Zulu Bible dates to 1883 — where Father’s Heart Bible™ invites a faithful people to meet the Father personally in Scripture. Now in Zulu.',
+		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Bergville_Drakensbergen_Waterfall_05.jpg/960px-Bergville_Drakensbergen_Waterfall_05.jpg',
+		imgDirect: true,
+	},
+	{
+		slug: 'greece',
+		country: 'Greece',
+		title: 'The Bible in Greece',
+		blurb:
+			'The home of the language of the New Testament, and overwhelmingly Orthodox by self-identification — where Father’s Heart Bible™ invites a faithful people to meet the Father personally in Scripture. Now in Greek.',
+		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Meteora_landscape.jpg/960px-Meteora_landscape.jpg',
+		imgDirect: true,
+	},
+	{
+		slug: 'hungary',
+		country: 'Hungary',
+		title: 'The Bible in Hungary',
+		blurb:
+			'A nation that has had the whole Bible in Hungarian since 1590, with Catholic and Reformed churches at its heart — where Father’s Heart Bible™ invites a faithful people to meet the Father personally in Scripture. Now in Hungarian.',
+		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg/960px-20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg',
+		imgDirect: true,
+	},
+	{
+		slug: 'netherlands',
+		country: 'Netherlands',
+		title: 'The Bible in the Netherlands',
+		blurb:
+			'Five centuries of the Bible in Dutch, from the Statenvertaling of 1637 to a nation where 58% now say they have no religion — where Father’s Heart Bible™ invites a thoughtful people to meet the Father personally in Scripture. Bijbel gratis online, now in Dutch.',
+		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Amsterdam_Canals_-_July_2006.jpg/960px-Amsterdam_Canals_-_July_2006.jpg',
+		imgDirect: true,
+	},
+	{
 		slug: 'thailand',
 		country: 'Thailand',
 		title: 'The Bible in Thailand',

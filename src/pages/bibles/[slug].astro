@@ -9,6 +9,7 @@ import isbnList from '../../data/isbn-list.json';
 import { langSlug, languageEditions } from '../../data/language-editions';
 import { catalogRows } from '../../data/print-catalog';
 import readerEntry from '../../data/reader-entry-links.json';
+import youversion from '../../data/youversion-versions.json';
 // /bibles/<slug>-bible — the PRODUCT page for every Divine Voice™ Color edition.
 //
 // Why this exists alongside /bible-for/<audience>: those pages answer a PASTORAL search
@@ -29,6 +30,7 @@ import readerEntry from '../../data/reader-entry-links.json';
 //   src/data/editions/frontmatter.json — extracted from the shipping interiors: the audience
 //                                     page and the three pillar pages. Read, never retyped.
 import Layout from '../../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
 const READ_URL = 'https://fathersheartbible.com/read/';
@@ -356,10 +358,26 @@ const productSchema = {
 	description: productDescription,
 	image: coverUrl,
 	url,
-	publisher: { '@type': 'Organization', name: 'Spirit Media Publishing' },
-	author: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+	// The same edition on YouVersion, when fhb-partner-link-watch has FOUND it (one map, one line per language).
+	...(ed.lang && (youversion.versions as Record<string, string>)[ed.lang]
+		? { sameAs: [(youversion.versions as Record<string, string>)[ed.lang]] }
+		: {}),
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	author: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
 	// Kevin's absolute rule (2026-10-03): the translator is ALWAYS Spirit Media Publishing.
-	translator: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+	translator: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
 	translationOfWork: { '@type': 'Book', name: 'The Holy Bible' },
 	keywords: (ed.listing.keywordsSchema ?? ed.listing.keywords).join(', '),
 	offers: offerFor(mainVariant),
@@ -401,8 +419,8 @@ const faqSchema = {
 	pageType="book"
 	bookIsbn={ed.isbn || undefined}
 	bookReleaseDate={datePublished}
-	title={ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`}
-	description={ed.seo?.description ?? `The ${ed.name} — the complete Bible in Divine Voice™ Color. Hardcover, ${pages} pages.`}
+	title={fitTitle(ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`)}
+	description={fitDescription(ed.seo?.description ?? `The ${ed.name} — the complete Bible in Divine Voice™ Color. Hardcover, ${pages} pages.`)}
 	image={coverUrl}
 	imageAlt={`${ed.name} — Father's Heart Bible in Divine Voice™ Color`}
 >

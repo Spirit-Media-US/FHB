@@ -2,11 +2,12 @@
 import MailtoLink from '../components/MailtoLink.astro';
 import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
 ---
 
 <Layout
-  title="Copyright & Permissions | FHB — Father's Heart Bible™"
-  description="Copyright, ownership, and permission to quote Father's Heart Bible™ (FHB) — an original translation published and owned by Spirit Media Publishing, the imprint of Spirit Media Inc."
+  title={fitTitle("Copyright & Permissions | FHB — Father's Heart Bible™")}
+  description={fitDescription("Copyright, ownership, and permission to quote Father's Heart Bible™ (FHB) — an original translation published and owned by Spirit Media Publishing, the imprint of Spirit Media Inc.")}
   jsonLd={{
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -45,6 +46,11 @@ import Layout from '../layouts/Layout.astro';
           <div>
             <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Trademarks</h2>
             <p class="leading-relaxed">Father's Heart Bible™, FHB, the Father's Heart Bible logo, and ComfortLeather™ are trademarks of Spirit Media Inc.</p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Licensing through the Digital Bible Library</h2>
+            <p class="leading-relaxed">Spirit Media Publishing is a registered Content Contributor to the <a href="https://library.bible" class="hover:underline" style="color: var(--color-brand);" rel="noopener">Digital Bible Library</a> (DBL). Organizations are welcome to license Father's Heart Bible™ via the DBL.</p>
           </div>
 
           <div>

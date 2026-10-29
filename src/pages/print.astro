@@ -27,6 +27,7 @@ import {
 import { reachPhrase } from '../data/language-speakers';
 import lookinsideData from '../data/lookinside.json';
 import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
 
 // THE DIVINE VOICE™ COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
 // edition. Every subtitle in the trade metadata ends with the same tail ("Red Letter -
@@ -461,8 +462,8 @@ const dvcVerses = [
 ---
 
 <Layout
-	title="Red Letter, Large Print & Journaling Bibles — Father's Heart Bible™"
-	description={`Hardcover and paperback Bibles with our Father's words in blue and the Son's in red — for men, women and teens, in Large Print, journaling, and soon in 80 languages.`}
+	title={fitTitle("Red Letter, Large Print & Journaling Bibles — Father's Heart Bible™")}
+	description={fitDescription(`Hardcover and paperback Bibles with our Father's words in blue and the Son's in red — for men, women and teens, in Large Print, journaling, and soon in 80 languages.`)}
 	image="https://assets.spiritmediapublishing.com/FHB/share/fhb-og-print-group.jpg"
 	imageAlt="Eight friends holding the Father's Heart Bible™ print edition in three colors and two bindings"
 	darkHero={true}

@@ -10,6 +10,7 @@ import VoiceChips from '../components/VoiceChips.astro';
 import isbns from '../data/isbn-list.json' with { type: 'json' };
 import { allLanguageEditions, langSlug } from '../data/language-editions';
 import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
 
 interface Row {
 	name: string;
@@ -145,8 +146,8 @@ const books = groups.flatMap((g) =>
 ---
 
 <Layout
-	title={seoTitle}
-	description={seoDescription}
+	title={fitTitle(seoTitle)}
+	description={fitDescription(seoDescription)}
 	image="https://assets.spiritmediapublishing.com/FHB/share/fhb-og-print-group.jpg"
 	imageAlt="Father's Heart Bible print editions"
 	darkHero={true}
@@ -174,7 +175,7 @@ const books = groups.flatMap((g) =>
 						name: b.name,
 						isbn: b.isbn,
 						bookFormat: b.format,
-						publisher: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+						publisher: { '@type': 'Organization', '@id': 'https://spiritmediapublishing.com/#organization', name: 'Spirit Media Publishing' },
 					},
 				})),
 			},
