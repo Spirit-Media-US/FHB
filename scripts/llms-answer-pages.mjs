@@ -33,7 +33,17 @@ function meta(file) {
 			'm',
 		);
 		const m = src.match(re);
-		return m ? clean(m.slice(1).find(Boolean)) : '';
+		if (m) return clean(m.slice(1).find(Boolean));
+		// JSON-string expression form, e.g. title={"2 Timothy 1:7 Meaning"} (verse-meaning pages, 2br).
+		const j = src.match(new RegExp('^\\s*' + name + '=\\{("(?:[^"\\\\\\n]|\\\\.)*")\\}', 'm'));
+		if (j) {
+			try {
+				return clean(JSON.parse(j[1]));
+			} catch {
+				/* malformed: treated as missing, caught by the test */
+			}
+		}
+		return '';
 	};
 	return { title: pick('title', 'TITLE'), description: pick('description', 'DESCRIPTION') };
 }
