@@ -337,6 +337,13 @@ export const WORD_MEANINGS: WordMeaning[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
 	{
+		slug: 'haggai-1-8',
+		title: 'What does Haggai 1:8 mean?',
+		blurb:
+			'Our Father to returned exiles: rebuild the house, so that he may take pleasure in it and be honored.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
 		slug: 'reproof',
 		title: 'What does reproof mean in the Bible?',
 		blurb:
