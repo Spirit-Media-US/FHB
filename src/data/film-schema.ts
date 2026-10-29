@@ -13,6 +13,8 @@ export const filmNode = {
 	embedUrl: `https://www.youtube.com/embed/${FILM_ID}`,
 	publisher: {
 		'@type': 'Organization',
+		// Same @id as the home-page Organization so engines merge it (2dg: was an anonymous, unlinked copy).
+		'@id': 'https://fathersheartbible.com/#organization',
 		name: "Father's Heart Bible",
 		url: 'https://fathersheartbible.com/',
 	},
