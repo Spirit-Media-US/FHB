@@ -247,6 +247,27 @@ export const WORD_MEANINGS: WordMeaning[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
 	{
+		slug: 'joshua-1-9',
+		title: 'What does Joshua 1:9 mean?',
+		blurb:
+			'Our Father to Joshua after Moses died: be strong and courageous, do not fear, for he is with you wherever you go.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'philippians-4-6-7',
+		title: 'What does Philippians 4:6-7 mean?',
+		blurb:
+			'Paul in chains: worry about nothing, bring everything to our Father with thanksgiving, and his peace will guard your heart and mind.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'romans-12-2',
+		title: 'What does Romans 12:2 mean?',
+		blurb:
+			'Do not be shaped by this age; be transformed by renewing your mind so you can discern our Father\'s will.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
 		slug: 'reproof',
 		title: 'What does reproof mean in the Bible?',
 		blurb:
