@@ -435,7 +435,14 @@ const VERSE_ENTRIES = [];
 try {
 	const vp = JSON.parse(fs.readFileSync('/srv/sites/community/src/data/verse-pages.json', 'utf8'));
 	const keys = Object.keys(vp.pages || {}).filter((k) => /^[a-z0-9-]+\/\d+\/\d+$/.test(k)).sort();
-	for (const k of keys) VERSE_ENTRIES.push(`<url><loc>${esc(`${SITE}/read/${k}/`)}</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>`);
+	// lastmod = the row's own `published` date (git-verified = the day the page was added), only when it
+	// is a real YYYY-MM-DD; otherwise NO lastmod. Never a build date: a faked freshness signal teaches
+	// Google to discount every lastmod we emit (see the per-chapter note below).
+	for (const k of keys) {
+		const pub = vp.pages[k]?.published;
+		const lm = typeof pub === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(pub) ? `<lastmod>${pub}</lastmod>` : '';
+		VERSE_ENTRIES.push(`<url><loc>${esc(`${SITE}/read/${k}/`)}</loc>${lm}<changefreq>monthly</changefreq><priority>0.8</priority></url>`);
+	}
 	parts.push(...VERSE_ENTRIES);
 	console.log(`gen-sitemap-read: ${keys.length} verse pages listed`);
 } catch (e) {
@@ -523,6 +530,14 @@ if (SPLIT) {
 		const name = `sitemap-read-${l}.xml`;
 		fs.writeFileSync(path.join(path.dirname(OUT), name), HEAD + entries.join('') + '</urlset>');
 		index.push(`<sitemap><loc>${SITE}/${name}</loc></sitemap>`);
+	}
+	// A small DEDICATED verse sitemap so GSC reports the 21 verse pages' indexing on their own. It is a
+	// DUPLICATE listing (the English segment keeps them: fhb-index-submit's per-language Bing queue and
+	// fhb-index-inspect read sitemap-read-<lang>.xml). Named sitemap-verses.xml, NOT sitemap-read-verses.xml,
+	// because those tools parse sitemap-read-<letters>.xml out of the index as a language code.
+	if (VERSE_ENTRIES.length) {
+		fs.writeFileSync(path.join(path.dirname(OUT), 'sitemap-verses.xml'), HEAD + VERSE_ENTRIES.join('') + '</urlset>');
+		index.push(`<sitemap><loc>${SITE}/sitemap-verses.xml</loc></sitemap>`);
 	}
 	const indexXml =
 		'<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
