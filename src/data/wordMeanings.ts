@@ -330,6 +330,13 @@ export const WORD_MEANINGS: WordMeaning[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
 	{
+		slug: '2-corinthians-5-17',
+		title: 'What does 2 Corinthians 5:17 mean?',
+		blurb:
+			'Paul to Corinth: anyone in Christ is a new creation, because our Father reconciled us to himself.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
 		slug: 'reproof',
 		title: 'What does reproof mean in the Bible?',
 		blurb:
