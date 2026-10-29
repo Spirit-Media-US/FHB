@@ -2,7 +2,13 @@
 // /bible-in/netherlands — sourced country page; facts cited in the sources lists below (fetched 2026-10-29).
 // Hero photo: Wikimedia Commons, CC BY 2.5 (file page credited visibly) — hotlinked thumbnails like the other /bible-in heroes.
 import CountryBible from '../../components/CountryBible.astro';
+import { GLOBAL_BIBLE_MONTH } from '../../data/globalBibleMonth';
 import { speakersLabel as sp } from '../../data/language-speakers';
+import { gbmCounts } from '../../lib/gbmCounts';
+
+// Public language tally computed from the schedule (no typed "50 of 80" to go stale).
+const _gbm = gbmCounts(GLOBAL_BIBLE_MONTH);
+const langTally = `${_gbm.available} of ${_gbm.total}`;
 
 const verses = [
 	{
@@ -26,10 +32,10 @@ const verses = [
 ];
 
 const stats = [
-	{ label: 'No religion (2023)', value: '58% (Statistics Netherlands, CBS)' },
-	{ label: 'Roman Catholic (2023)', value: '17%' },
-	{ label: 'Protestant (2023)', value: '13%' },
-	{ label: 'Muslim (2023)', value: '6%' },
+	{ label: 'No religion (2025)', value: '58% (Statistics Netherlands, CBS)' },
+	{ label: 'Roman Catholic (2025)', value: '16%' },
+	{ label: 'Protestant (2025)', value: '12%' },
+	{ label: 'Muslim (2025)', value: '6%' },
 	{ label: 'First authorised Dutch Bible from Hebrew and Greek', value: '1637 (Statenvertaling)' },
 ];
 
@@ -37,7 +43,7 @@ const faqs = [
 	{
 		question: 'How many Christians are there in the Netherlands?',
 		answer:
-			'Statistics Netherlands (CBS) reports that in 2023, 58% of the Dutch had no religion, 17% were Roman Catholic, 13% Protestant and 6% Muslim. In 1849 only 2% had no religion and 56% were Protestant. You can read the Scriptures free at fathersheartbible.com/read.',
+			'Statistics Netherlands (CBS) reports that in 2025, 58% of the Dutch aged 15 and over had no religion, 16% were Roman Catholic, 12% Protestant and 6% Muslim. In 1849 only 2% had no religion and 56% were Protestant. You can read the Scriptures free at fathersheartbible.com/read.',
 	},
 	{
 		question: 'Waar kan ik de Bijbel online lezen?',
@@ -85,7 +91,7 @@ const faqs = [
 	heroSrc={{ desktop: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Amsterdam_Canals_-_July_2006.jpg/1280px-Amsterdam_Canals_-_July_2006.jpg", mobile: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Amsterdam_Canals_-_July_2006.jpg/960px-Amsterdam_Canals_-_July_2006.jpg", og: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Amsterdam_Canals_-_July_2006.jpg/1280px-Amsterdam_Canals_-_July_2006.jpg" }}
 	heroCreditHtml={`Hero photo: <a href="https://commons.wikimedia.org/wiki/File:Amsterdam_Canals_-_July_2006.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Amsterdam canal in summer</a> by <a href="https://commons.wikimedia.org/wiki/User:Diliff" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">David Iliff</a>, <a href="https://creativecommons.org/licenses/by/2.5/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY 2.5</a>, via Wikimedia Commons.`}
 	heroAlt="A canal lined with historic houses in Amsterdam in summer"
-	directAnswerHtml={`<strong style="color: var(--color-ink);">Yes &mdash; you can read the Bible (<em>de Bijbel</em>) free online in the Netherlands right now.</strong> Statistics Netherlands (CBS) reports that in 2023, 58% of the Dutch had no religion, 17% were Roman Catholic and 13% Protestant. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. The <a href="https://fathersheartbible.com/read/nl/" style="color: var(--color-brand);" class="hover:underline"><em>Dutch</em> edition</a> is free to read and hear today &mdash; for a people who have had the Bible in Dutch since 1526, where Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Yes &mdash; you can read the Bible (<em>de Bijbel</em>) free online in the Netherlands right now.</strong> Statistics Netherlands (CBS) reports that in 2025, 58% of the Dutch aged 15 and over had no religion, 16% were Roman Catholic and 12% Protestant. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. The <a href="https://fathersheartbible.com/read/nl/" style="color: var(--color-brand);" class="hover:underline"><em>Dutch</em> edition</a> is free to read and hear today &mdash; for a people who have had the Bible in Dutch since 1526, where Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
 	keyTakeaway="The Netherlands has had the Bible in Dutch for five centuries — and Father's Heart Bible™ (FHB) invites a now largely secular nation to hear, clearly, the voice of a Father."
 	glanceIntroHtml={`The Netherlands is a land of canals, windmills and open-minded cities &mdash; once among Europe&rsquo;s most Protestant nations, now one where most people say they have no religion.`}
 	stats={stats}
@@ -106,14 +112,18 @@ const faqs = [
 	},
 	{
 		"label": "A great change in belief",
-		"text": "In 1849 only 2% of the Dutch had no religion and 56% were Protestant; in 2023, 58% had no religion, 17% were Roman Catholic and 13% Protestant."
+		"text": "In 1849 only 2% of the Dutch had no religion and 56% were Protestant; in 2025, 58% had no religion, 16% were Roman Catholic and 12% Protestant."
 	}
 ]}
 	faithHeading="Faith and the Bible in the Netherlands"
-	faithBodyHtml={`<p>Statistics Netherlands (CBS) reports that in <strong>2023</strong>, <strong>58%</strong> of the Dutch had no religion, <strong>17%</strong> were Roman Catholic, <strong>13%</strong> Protestant and <strong>6%</strong> Muslim. In 1849 the picture was nearly the reverse: <strong>2%</strong> had no religion and <strong>56%</strong> were Protestant.</p><p>The Dutch Bible is old here. The Liesveltbijbel was printed in 1526, the Statenvertaling followed in 1637, and the Dutch Bible Society&rsquo;s translation of 1951 largely replaced it as the Protestant standard.</p><p>Dutch is also spoken in Belgium. In the European Social Survey 2023, 59% of Belgians said they are non-religious and 31% Catholic (as summarised on Wikipedia&rsquo;s <em>Religion in Belgium</em>); that figure covers all of Belgium, not Flanders alone.</p><p>The invitation of Father&rsquo;s Heart Bible&trade; is a personal one: read the same Word in clear Dutch, and meet in it a Father.</p>`}
+	faithBodyHtml={`<p>Statistics Netherlands (CBS) reports that in <strong>2025</strong>, <strong>58%</strong> of the Dutch aged 15 and over had no religion, <strong>16%</strong> were Roman Catholic, <strong>12%</strong> Protestant and <strong>6%</strong> Muslim. In 1849 the picture was nearly the reverse: <strong>2%</strong> had no religion and <strong>56%</strong> were Protestant.</p><p>The Dutch Bible is old here. The Liesveltbijbel was printed in 1526, the Statenvertaling followed in 1637, and the Dutch Bible Society&rsquo;s translation of 1951 largely replaced it as the Protestant standard.</p><p>Dutch is also spoken in Belgium. In the European Social Survey 2023, 59% of Belgians said they are non-religious and 31% Catholic (as summarised on Wikipedia&rsquo;s <em>Religion in Belgium</em>); that figure covers all of Belgium, not Flanders alone.</p><p>The invitation of Father&rsquo;s Heart Bible&trade; is a personal one: read the same Word in clear Dutch, and meet in it a Father.</p>`}
 	sources={[
 	{
-		"label": "Statistics Netherlands (CBS) — The Netherlands in Numbers 2024: What are the major religions? (1849, post-war and 2023 shares: no religion 58%, Catholic 17%, Protestant 13%, Muslim 6%)",
+		"label": "Statistics Netherlands (CBS), 16 March 2026 — Limburg is the only province where most people still identify as religious (2025 shares, age 15+: no religion 58%, Catholic 16%, Protestant 12%, Muslim 6%)",
+		"url": "https://www.cbs.nl/en-gb/news/2026/11/limburg-is-the-only-province-where-most-people-still-identify-as-religious"
+	},
+	{
+		"label": "Statistics Netherlands (CBS) — The Netherlands in Numbers 2024: What are the major religions? (1849 and post-war comparison: 2% no religion, 56% Protestant in 1849)",
 		"url": "https://longreads.cbs.nl/the-netherlands-in-numbers-2024/what-are-the-major-religions"
 	},
 	{
@@ -136,7 +146,7 @@ const faqs = [
 	whyBlocks={[
 		{ heading: "God revealed as Father", bodyHtml: "Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href=\"https://fathersheartbible.com/read/genesis/1/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Genesis 1:1</a> onward." },
 		{ heading: "Free, with audio, on any phone", bodyHtml: "No purchase, no app, no sign-up. The whole Bible is free to <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read online</a>, with audio, on the phone in your hand." },
-		{ heading: "Now in Dutch", bodyHtml: "De Nederlandse editie is gepubliceerd: <a href=\"https://fathersheartbible.com/read/nl/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">lees de Bijbel gratis</a>. Father&rsquo;s Heart Bible&trade; is in 50 of 80 languages." },
+		{ heading: "Now in Dutch", bodyHtml: "De Nederlandse editie is gepubliceerd: <a href=\"https://fathersheartbible.com/read/nl/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">lees de Bijbel gratis</a>. Father&rsquo;s Heart Bible&trade; is in " + langTally + " languages." },
 	]}
 	wordHeading="His Word will not return void"
 	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do. In a land that has had it in Dutch since 1526, it will not return empty.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;&hellip;so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
