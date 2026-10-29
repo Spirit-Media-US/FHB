@@ -1,0 +1,230 @@
+---
+// /versiculos-sobre-oracao — Portuguese verse-topic page (unit 2ar, 2026-10-29). HELD for Kevin.
+// DEMAND: Bing GetKeywordStats, pt-BR "versiculos sobre oracao" 476 impressions / 25 weeks
+//   (aeo-state/fhb-verses-topics-intl-20261028.json) — the only strong non-English verse-topic cell.
+// WHY HERE: same precedent as /italian-bible — a page in the searcher's language on this site, linking
+//   into our /read/pt/ reader. The reader (community app) is NOT touched.
+// VERSES: the SAME 16 references as /verses/prayer, quoted VERBATIM from our Portuguese canon
+//   (/srv/sites/community/src/content/bible-pt), pulled by script, never typed or translated by hand.
+//   Re-verify with the string-equality check before any change to the text below.
+// NATIVE REVIEW: the Portuguese UI copy (title, description, intro, 4 theme headings, link labels, CTA)
+//   was written by an AI and has NOT had a native Portuguese read yet. Verse text is canon, not ours to edit.
+import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+
+const PAGE_URL = 'https://fathersheartbible.com/versiculos-sobre-oracao/';
+const READ_PT = 'https://fathersheartbible.com/read/pt/';
+const TITLE = 'Versículos sobre oração | Father’s Heart Bible™';
+const DESCRIPTION =
+	'Versículos da Bíblia sobre oração, palavra por palavra, na edição em português do Father’s Heart Bible™. Cada versículo leva ao capítulo completo, grátis online.';
+const PUBLISHED = '2026-10-29';
+
+const themes = [
+	{
+		heading: 'Orar ao nosso Pai',
+		verses: [
+			{
+				ref: 'Mateus 6:6',
+				loc: 'mateus',
+				ch: 6,
+				v: 6,
+				text: 'Mas você, quando orar, entre no seu quarto e, fechada a porta, ore ao seu Pai em secreto. E seu Pai, que vê em secreto, o recompensará.',
+			},
+			{
+				ref: 'Mateus 6:9–13',
+				loc: 'mateus',
+				ch: 6,
+				v: 9,
+				text: 'Portanto, orem assim: ‘Pai nosso, que estás nos céus, seja o teu nome honrado como santo, venha o teu reino, seja feita a tua vontade, assim na terra como no céu. O pão nosso de cada dia dá-nos hoje. E perdoa-nos as nossas dívidas, assim como nós também temos perdoado aos nossos devedores. E não nos deixes cair em tentação, mas livra-nos do maligno.’',
+			},
+			{
+				ref: 'Romanos 8:15',
+				loc: 'romanos',
+				ch: 8,
+				v: 15,
+				text: 'Vocês não receberam um espírito de escravidão, para recaírem no medo, mas receberam o Espírito de adoção de filhos, pelo qual clamamos: “Aba, Pai!”',
+			},
+			{
+				ref: 'Hebreus 4:16',
+				loc: 'hebreus',
+				ch: 4,
+				v: 16,
+				text: 'Cheguemo-nos, pois, com confiança ao trono da graça, para que recebamos misericórdia e encontremos graça que nos ajude no momento da necessidade.',
+			},
+		],
+	},
+	{
+		heading: 'Peça, procure, bata',
+		verses: [
+			{
+				ref: 'Mateus 7:7–8',
+				loc: 'mateus',
+				ch: 7,
+				v: 7,
+				text: '“Peçam, e receberão; busquem, e encontrarão; batam, e a porta se abrirá para vocês. Pois todo o que pede recebe, quem busca encontra, e a quem bate, a porta se abrirá.',
+			},
+			{
+				ref: 'Jeremias 29:12–13',
+				loc: 'jeremias',
+				ch: 29,
+				v: 12,
+				text: '“Então me invocareis, vireis e orareis a mim, e eu vos ouvirei. Buscar-me-eis e me achareis, quando me procurardes de todo o vosso coração.',
+			},
+			{
+				ref: '1 João 5:14',
+				loc: '1-joao',
+				ch: 5,
+				v: 14,
+				text: 'E esta é a confiança que temos diante dele: que, se pedirmos alguma coisa segundo a sua vontade, ele nos ouve.',
+			},
+			{
+				ref: 'Salmo 145:18',
+				loc: 'salmo',
+				ch: 145,
+				v: 18,
+				text: 'O nosso Pai está perto de todos os que o invocam, de todos os que o invocam em verdade.',
+			},
+		],
+	},
+	{
+		heading: 'Oração na ansiedade e na gratidão',
+		verses: [
+			{
+				ref: 'Filipenses 4:6',
+				loc: 'filipenses',
+				ch: 4,
+				v: 6,
+				text: 'Não vos preocupeis com coisa alguma; antes, em tudo, pela oração e pela súplica com ações de graças, apresentai os vossos pedidos ao nosso Pai.',
+			},
+			{
+				ref: '1 Tessalonicenses 5:16–18',
+				loc: '1-tessalonicenses',
+				ch: 5,
+				v: 16,
+				text: 'Alegrai-vos sempre, orai sem cessar, em tudo dai graças; pois esta é a vontade do nosso Pai, em Cristo Jesus, para convosco.',
+			},
+			{
+				ref: '1 Pedro 5:7',
+				loc: '1-pedro',
+				ch: 5,
+				v: 7,
+				text: 'lançando sobre o nosso Pai toda a sua ansiedade, porque ele cuida de vocês.',
+			},
+			{
+				ref: 'Salmo 55:22',
+				loc: 'salmo',
+				ch: 55,
+				v: 22,
+				text: 'Lança o teu fardo sobre o nosso Pai, e ele te susterá; jamais permitirá que o justo seja abalado.',
+			},
+		],
+	},
+	{
+		heading: 'Orar pelos outros e não desistir',
+		verses: [
+			{
+				ref: 'Tiago 5:16',
+				loc: 'tiago',
+				ch: 5,
+				v: 16,
+				text: 'Portanto, confessem os seus pecados uns aos outros e orem uns pelos outros, para que sejam curados. A oração de um justo é poderosa e eficaz.',
+			},
+			{
+				ref: 'Colossenses 4:2',
+				loc: 'colossenses',
+				ch: 4,
+				v: 2,
+				text: 'Dediquem-se à oração, mantendo-se vigilantes nela, com ações de graças.',
+			},
+			{
+				ref: 'Lucas 18:1',
+				loc: 'lucas',
+				ch: 18,
+				v: 1,
+				text: 'Então Jesus lhes contou uma parábola sobre a necessidade de orar sempre e nunca desanimar.',
+			},
+			{
+				ref: 'Efésios 6:18',
+				loc: 'efesios',
+				ch: 6,
+				v: 18,
+				text: 'Orem no Espírito em todo tempo, com toda oração e súplica. Vigiem quanto a isto com toda perseverança, intercedendo por todos os santos,',
+			},
+		],
+	},
+];
+
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'Article',
+		headline: 'Versículos sobre oração',
+		description: DESCRIPTION,
+		url: PAGE_URL,
+		mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+		datePublished: PUBLISHED,
+		dateModified: PUBLISHED,
+		inLanguage: 'pt',
+		author: {
+			'@type': 'Organization',
+			'@id': 'https://spiritmediapublishing.com/#organization',
+			name: 'Spirit Media Publishing',
+		},
+		publisher: {
+			'@type': 'Organization',
+			'@id': 'https://spiritmediapublishing.com/#organization',
+			name: 'Spirit Media Publishing',
+			url: 'https://spiritmediapublishing.com',
+		},
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{ '@type': 'ListItem', position: 2, name: 'Versículos sobre oração', item: PAGE_URL },
+		],
+	},
+];
+---
+
+<Layout title={fitTitle(TITLE)} description={fitDescription(DESCRIPTION)} lang="pt" jsonLd={jsonLd} pageType="article" articlePublishedTime={PUBLISHED} articleSection="Bible Verses" articleTags={["versículos sobre oração", "oração", "Father's Heart Bible"]}>
+	<main id="main-content">
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Versículos sobre oração</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Father&rsquo;s Heart Bible&trade;</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Versículos sobre oração</h1>
+				<p class="mt-5 pb-8 text-lg leading-relaxed border-b" style="font-family: var(--font-sans); color: var(--color-muted); border-color: var(--color-hairline);">Versículos da Bíblia sobre oração, palavra por palavra, na edição em português do Father&rsquo;s Heart Bible&trade;. Cada versículo leva ao capítulo completo, para ler grátis online.</p>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				{themes.map((t, i) => (
+					<h2 id={`tema-${i + 1}`} class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">{t.heading}</h2>
+					<div class="space-y-5">
+						{t.verses.map((v) => (
+							<figure class="m-0 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+								<blockquote class="m-0 text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">{v.text}</blockquote>
+								<figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);">
+									<a href={`${READ_PT}${v.loc}/${v.ch}/#v${v.v}`} style="color: var(--color-brand);" class="hover:underline font-semibold">{v.ref}</a>
+								</figcaption>
+							</figure>
+						))}
+					</div>
+				))}
+
+				<aside class="my-12 px-6 py-10 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Leia a Bíblia em português, grátis</p>
+					<a href={READ_PT} class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Ler em português<span aria-hidden="true">&rarr;</span></a>
+				</aside>
+
+				<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Também em inglês: <a href="/verses/prayer/" style="color: var(--color-brand);" class="hover:underline">Bible verses about prayer</a>.</p>
+			</div>
+		</section>
+	</main>
+</Layout>
