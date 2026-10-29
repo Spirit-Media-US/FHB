@@ -264,7 +264,27 @@ export const WORD_MEANINGS: WordMeaning[] = [
 		slug: 'romans-12-2',
 		title: 'What does Romans 12:2 mean?',
 		blurb:
-			'Do not be shaped by this age; be transformed by renewing your mind so you can discern our Father\'s will.',
+			"Do not be shaped by this age; be transformed by renewing your mind so you can discern our Father's will.",
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'isaiah-40-31',
+		title: 'What does Isaiah 40:31 mean?',
+		blurb:
+			'To weary exiles: those who wait for our Father will renew their strength, because the everlasting Creator never grows weary.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'john-14-6',
+		title: 'What does John 14:6 mean?',
+		blurb:
+			'Jesus to troubled disciples: he is the way, the truth and the life, and the way leads to the Father.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'psalm-34-18',
+		title: 'What does Psalm 34:18 mean?',
+		blurb: 'David: our Father is near to the brokenhearted and saves those crushed in spirit.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
 	{
