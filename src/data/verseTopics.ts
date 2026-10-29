@@ -53,6 +53,13 @@ export const VERSE_TOPICS: VerseTopic[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
 	},
 	{
+		slug: 'christmas',
+		title: 'Christmas Bible Verses',
+		blurb:
+			'The promise, the birth in Bethlehem, the wise men, and what Christmas means: our Father come near.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
+	},
+	{
 		slug: 'advent',
 		title: 'Advent Scripture Readings',
 		blurb: 'The light, the promise and the coming of our Father near, from Isaiah 9 to Luke 2.',

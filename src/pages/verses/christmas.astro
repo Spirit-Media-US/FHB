@@ -1,0 +1,186 @@
+---
+// /verses/christmas — unit 2fi 2026-10-29. Demand: Bing GetKeywordStats (us/en-US, 2026-04-01..10-29) 'christmas bible verses' = 812 weekly impressions over 23 weeks (biggest truthful phrasing; 'bible verses about christmas' unmeasured/0, 'christmas verses' 44).
+// Coverage map (regen.py --fetch --curl 2026-10-29): covered_by() = [] for christmas / new year phrasings. /verses/advent exists (different intent: Advent readings, 0 Bing); this page is the Christmas story + meaning and links to it.
+// Verses are VERBATIM from src/content/bible (generated from the locked canon, not typed). Christmas 25 Dec 2026.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+	{
+		id: 'promised-long-ago',
+		heading: 'The promise made long before',
+		intro:
+			'Centuries before Bethlehem, the prophets said who would come, where, and under what sign.',
+		verses: [
+			{
+				ref: 'Isaiah 9:6',
+				slug: 'isaiah',
+				ch: 9,
+				text: 'For to us a child is born, to us a son is given; and the government will be upon his shoulder. And his name will be called Wonderful Counselor, Mighty God, Everlasting Father, Prince of Peace.',
+			},
+			{
+				ref: 'Micah 5:2',
+				slug: 'micah',
+				ch: 5,
+				text: 'But you, Bethlehem Ephrathah, though you are small among the clans of Judah, from you will come forth for me one who will be ruler over Israel, whose origins are from ancient times, from the days of eternity.',
+			},
+			{
+				ref: 'Numbers 24:17',
+				slug: 'numbers',
+				ch: 24,
+				text: 'I see him, but not now; I gaze on him, but not near. A star will come out of Jacob, and a scepter will rise out of Israel; it will crush the brow of Moab and break down all the sons of Sheth.',
+			},
+		],
+	},
+	{
+		id: 'the-birth',
+		heading: 'The birth of Jesus',
+		intro:
+			'The Gospels tell the first Christmas plainly: a decree, a long road, a manger, shepherds in the night, and an angel choir.',
+		verses: [
+			{
+				ref: 'Matthew 1:20–21',
+				slug: 'matthew',
+				ch: 1,
+				text: 'While Joseph considered this, an angel of the Lord appeared to him in a dream: "Joseph, son of David, don\'t be afraid to take Mary as your wife—the child conceived in her is from the Holy Spirit. She will bear a son; name him Jesus, for he will save his people from their sins."',
+			},
+			{
+				ref: 'Luke 2:4–7',
+				slug: 'luke',
+				ch: 2,
+				text: "Joseph too went up from Galilee, from the town of Nazareth, to Judea, to the city of David called Bethlehem, since he belonged to David's house and family, to be registered with Mary, his fiancée, who was expecting a child. While they were there, the time came for her to give birth. She gave birth to her firstborn son, wrapped him in cloths, and laid him in a manger, because the inn had no place for them.",
+			},
+			{
+				ref: 'Luke 2:8–11',
+				slug: 'luke',
+				ch: 2,
+				text: 'Shepherds were in that same region, staying out in the fields, keeping watch over their flock by night. An angel of our Father stood before them; the glory of our Father shone around them, and great fear seized them. The angel told them, "Don\'t be afraid—I bring good news of great joy for everyone: Today in the city of David, a Savior was born to you—Christ the Lord.',
+			},
+			{
+				ref: 'Luke 2:13–14',
+				slug: 'luke',
+				ch: 2,
+				text: 'Suddenly there was with the angel a multitude of the heavenly host, praising our Father and saying, "Glory to our Father in the highest, and on earth peace among those with whom he is pleased!"',
+			},
+			{
+				ref: 'Luke 2:19',
+				slug: 'luke',
+				ch: 2,
+				text: 'But Mary treasured up all these things, pondering them in her heart.',
+			},
+		],
+	},
+	{
+		id: 'the-wise-men',
+		heading: 'The wise men',
+		intro:
+			'Matthew adds the visit from the east: a star, a question about a king, and gifts worth giving.',
+		verses: [
+			{
+				ref: 'Matthew 2:1–2',
+				slug: 'matthew',
+				ch: 2,
+				text: 'After Jesus was born in Bethlehem, Judea, in the days of King Herod, magi from the east arrived in Jerusalem, saying, "Where is the one born king of the Jews? For we saw his star in the east and have come to worship him."',
+			},
+			{
+				ref: 'Matthew 2:10–11',
+				slug: 'matthew',
+				ch: 2,
+				text: 'When they saw the star, they rejoiced with overwhelming joy. Entering the house, they saw the child with Mary his mother, fell down and worshiped him. They opened their treasure boxes and gave him gifts: gold, frankincense, and myrrh.',
+			},
+		],
+	},
+	{
+		id: 'what-it-means',
+		heading: 'What Christmas means',
+		intro:
+			'Why did he come? The letters of the New Testament answer in a sentence or two, and each answer points back to our Father.',
+		verses: [
+			{
+				ref: 'John 1:14',
+				slug: 'john',
+				ch: 1,
+				text: 'The Word became flesh and lived among us. We saw his glory, the glory of the one and only Son from the Father, full of grace and truth.',
+			},
+			{
+				ref: 'John 3:16',
+				slug: 'john',
+				ch: 3,
+				text: 'For our Father so loved the world that he gave his one and only Son, that whoever believes in him will not perish but have eternal life.',
+			},
+			{
+				ref: 'Galatians 4:4–5',
+				slug: 'galatians',
+				ch: 4,
+				text: 'When the time had fully come, our Father sent his Son, born of a woman, born under the law, to redeem those under the law, that we might be received as sons.',
+			},
+			{
+				ref: 'Philippians 2:6–8',
+				slug: 'philippians',
+				ch: 2,
+				text: 'who, existing in the form of our Father, did not consider equality with our Father something to be grasped, but emptied himself by taking on the form of a servant and being born in human likeness. And appearing as a human being, he humbled himself by becoming obedient to death—even death on a cross.',
+			},
+			{
+				ref: 'Titus 2:11',
+				slug: 'titus',
+				ch: 2,
+				text: 'For the grace of our Father has appeared, bringing salvation to all people,',
+			},
+			{
+				ref: '1 John 4:9–10',
+				slug: '1-john',
+				ch: 4,
+				text: "This is how our Father's love was shown among us: our Father sent his one and only Son into the world so we might live through him. This is love: not that we loved our Father, but that he loved us and sent his Son as the atoning sacrifice for our sins.",
+			},
+		],
+	},
+];
+
+const faqs = [
+	{
+		question: 'What Bible verses are about Christmas?',
+		answer:
+			'The Christmas story is told in Matthew 1–2 and Luke 2, and it is promised in Isaiah 9:6 and Micah 5:2. John 1:14 and John 3:16 give its meaning. Each is on this page, word for word in Father’s Heart Bible™.',
+	},
+	{
+		question: 'Where is the Christmas story in the Bible?',
+		answer:
+			'Luke 2:1–20 tells the birth in Bethlehem, the shepherds and the angels. Matthew 1:18–2:12 adds Joseph’s dream and the visit of the wise men. You can read both chapters free in Father’s Heart Bible™.',
+	},
+	{
+		question: 'What is the best Bible verse for Christmas?',
+		answer:
+			'John 3:16 says why Christmas happened: our Father gave his one and only Son. For the announcement itself, read Luke 2:11, which the angel spoke to the shepherds: “Today in the city of David, a Savior was born to you—Christ the Lord.”',
+	},
+	{
+		question: 'What does Immanuel mean at Christmas?',
+		answer:
+			'Matthew 1:23 gives the meaning of Immanuel: “our Father with us.” Christmas is our Father coming near, not staying far off.',
+	},
+	{
+		question: 'What is a good Bible verse for a Christmas card?',
+		answer:
+			'Luke 2:14 and Luke 2:11 are short and card-sized, and Titus 2:11 (“the grace of our Father has appeared, bringing salvation to all people”) is a good one for a note. All three are on this page.',
+	},
+];
+---
+
+<VerseCollection
+	slug="christmas"
+	topic="Christmas"
+	title="Christmas Bible Verses (with Audio) | Father's Heart Bible™"
+	description="Christmas Bible verses in Father's Heart Bible™: the promise, the birth in Bethlehem, the wise men and what it means. Free to read, with audio."
+	h1="Christmas Bible Verses"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg"
+	heroAlt="An open Bible with morning light across its pages"
+	published="2026-10-29"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">The Christmas story is in Luke 2 and Matthew 1&ndash;2, promised in Isaiah 9:6 and Micah 5:2, and its meaning is in John 3:16.</strong> Below are 16 Christmas Bible passages in four parts: the promise, the birth, the wise men, and what it all means. In Father&rsquo;s Heart Bible&trade; the angels praise &ldquo;our Father&rdquo; in Luke 2:13&ndash;14, Immanuel means &ldquo;our Father with us&rdquo; (Matthew 1:23), and John 3:16 begins &ldquo;For our Father so loved the world.&rdquo; Each verse links into its chapter, so you can <a href="https://fathersheartbible.com/read/luke/2/" style="color: var(--color-brand);" class="hover:underline">read Luke 2 free</a> and hear it.`}
+	keyTakeaway="Christmas is our Father coming near: promised through the prophets, born in Bethlehem, and given because he so loved the world."
+	themes={themes}
+	featured={{ book: 'Luke', slug: 'luke', chapter: 2, verseLimit: 14, heading: 'The Christmas story: Luke 2:1–14', intro: 'Luke 2 is the chapter read aloud on Christmas Eve. Read or hear the first fourteen verses below, then continue into the whole chapter.' }}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/matthew/2/" style="color: var(--color-brand);" class="hover:underline">Matthew 2</a> or <a href="https://fathersheartbible.com/read/isaiah/9/" style="color: var(--color-brand);" class="hover:underline">Isaiah 9</a>, see the waiting season in <a href="/verses/advent/" style="color: var(--color-brand);" class="hover:underline">Advent Scripture readings</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, read <a href="/verses/god-as-father/" style="color: var(--color-brand);" class="hover:underline">Bible verses about God as Father</a>, or see <a href="/meaning/our-father/" style="color: var(--color-brand);" class="hover:underline">what &ldquo;Our Father&rdquo; means</a>.`}
+	ctaMidHeading="Hear Luke 2 in full"
+	ctaMidBodyHtml="Read and listen to the Christmas story &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear our Father coming near."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["christmas bible verses", "christmas", "Luke 2", "Immanuel", "nativity"]}
+/>

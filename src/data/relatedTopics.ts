@@ -11,7 +11,8 @@ import { WORD_MEANINGS } from './wordMeanings';
 
 export const RELATED: Record<string, string[]> = {
 	// /verses
-	'v:advent': ['m:begotten', 'v:hope'],
+	'v:advent': ['v:christmas', 'm:begotten', 'v:hope'],
+	'v:christmas': ['v:advent', 'm:begotten', 'v:joy'],
 	'v:anger': ['m:meek', 'v:patience', 'v:forgiveness', 'b:men'],
 	'v:anxiety': ['v:fear', 'v:peace', 'v:trust', 'v:death', 'b:financial-hardship', 'b:cancer'],
 	'v:comfort': ['v:death', 'v:encouragement', 'b:grief', 'b:widows', 'b:cancer', 'm:forsake'],
