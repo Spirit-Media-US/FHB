@@ -3,6 +3,11 @@
 // Generated from a verified draft (stats cited, verses slug-checked, images & voice
 // headshots sourced/verified by hand).
 import GroupBible from '../../components/GroupBible.astro';
+import { catalogRows } from '../../data/print-catalog';
+
+const GEN = catalogRows.find((r) => r.category === 'general');
+const GENERAL_PB = (GEN?.pb ?? 79.99).toFixed(2);
+const GENERAL_HB = (GEN?.hb ?? 99.99).toFixed(2);
 ---
 
 <GroupBible
@@ -92,13 +97,13 @@ import GroupBible from '../../components/GroupBible.astro';
 	whichBibleHeading={`What is the best Bible to give a new believer?`}
 	whichBibleIntroHtml={`If you're choosing a first Bible for a new believer, or for yourself, here's an honest comparison, including the one we publish. Start any of them in the Gospel of John.`}
 	whichBibleRows={[
-		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `Meeting God as a Father, not the distant scorekeeper many people walked away from`, style: `Translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free online with audio, no account; paperback from $39.99` },
+		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `Meeting God as a Father, not the distant scorekeeper many people walked away from`, style: `Translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free online with audio, no account; paperback $${GENERAL_PB}` },
 		{ edition: `NLT (New Living Translation, Tyndale)`, bestFor: `A first read in natural, everyday English`, style: `Thought-for-thought, very readable`, access: `Many editions from retailers` },
 		{ edition: `NIV (New International Version, Zondervan)`, bestFor: `The translation most churches and study guides use`, style: `A balance of word-for-word and thought-for-thought`, access: `Many editions from retailers` },
 		{ edition: `The Message (NavPress)`, bestFor: `A fresh, conversational read alongside a translation`, style: `Eugene Peterson's contemporary paraphrase`, access: `Paperback from retailers` },
 	]}
 	faqs={[
-		{ question: `What is the best Bible to give a new believer?`, answer: `Give a clear modern translation they will read, and point them to the Gospel of John first. Father's Heart Bible™ is free to read and listen to online with no account (paperback from $39.99) and reveals God as a Father rather than a scorekeeper. The NLT is very readable, the NIV is the most widely used modern translation, and The Message is a contemporary paraphrase best read alongside a translation.` },
+		{ question: `What is the best Bible to give a new believer?`, answer: `Give a clear modern translation they will read, and point them to the Gospel of John first. Father's Heart Bible™ is free to read and listen to online with no account (paperback $${GENERAL_PB}) and reveals God as a Father rather than a scorekeeper. The NLT is very readable, the NIV is the most widely used modern translation, and The Message is a contemporary paraphrase best read alongside a translation.` },
 		{ question: `Is God real?`, answer: `That's one of the most honest questions a person can ask, and you're allowed to ask it without pretending to know the answer. This page won't try to win a debate. What it offers is the chance to read the source for yourself: Acts 17:27 describes a God who is "not far from any one of us" and who honors the seeking. Rather than take anyone's word for it, read and listen free at fathersheartbible.com/read and decide what you actually find there.` },
 		{ question: `Why should I read the Bible if I'm not religious?`, answer: `Because the Bible is one of the most influential texts in human history, and most people — religious or not — have only ever heard it secondhand, often the angry, rule-heavy version. Reading it yourself lets you replace the caricature with the actual text. Father's Heart Bible™ reveals God as a Father, not a scorekeeper, wherever Scripture does. You don't have to believe anything to read it free, with audio, at fathersheartbible.com/read.` },
 		{ question: `Can I read the Bible without joining a church?`, answer: `Absolutely. No church, no membership, no account, no one watching. Father's Heart Bible™ is free to read and listen to online, privately, on your own terms — open fathersheartbible.com/read on your phone and read or hear any book whenever you want. If church is part of why you left in the first place, you can explore the text completely on your own.` },
