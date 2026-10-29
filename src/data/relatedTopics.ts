@@ -72,6 +72,8 @@ export const RELATED: Record<string, string[]> = {
 	'm:psalm-91': ['m:psalm-23', 'v:peace', 'v:comfort', 'm:forsake'],
 	'm:philippians-4-13': ['m:jeremiah-29-11', 'v:strength', 'v:peace', 'm:our-father'],
 	'm:jeremiah-29-11': ['m:philippians-4-13', 'v:hope', 'v:peace', 'm:psalm-91'],
+	'm:romans-8-28': ['m:philippians-4-13', 'm:jeremiah-29-11', 'v:hope', 'm:our-father'],
+	'm:john-3-16': ['m:begotten', 'm:love', 'v:love', 'm:our-father'],
 	'm:sheol': ['b:grief', 'v:hope', 'v:comfort'],
 	'm:ten-commandments': ['m:covenant', 'm:righteousness', 'v:family', 'b:jews'],
 	'm:wisdom': ['v:wisdom', 'm:folly', 'm:reproof', 'b:leaders', 'b:teachers'],

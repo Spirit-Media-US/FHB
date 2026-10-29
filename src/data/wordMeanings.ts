@@ -207,13 +207,29 @@ export const WORD_MEANINGS: WordMeaning[] = [
 	{
 		slug: 'philippians-4-13',
 		title: 'What does Philippians 4:13 mean?',
-		blurb: '“I can do all things through Christ” was written from prison, about contentment in every circumstance.',
+		blurb:
+			'“I can do all things through Christ” was written from prison, about contentment in every circumstance.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
 	{
 		slug: 'jeremiah-29-11',
 		title: 'What does Jeremiah 29:11 mean?',
-		blurb: 'A letter to the exiles in Babylon: plans for peace and hope, and the seventy years they had to wait.',
+		blurb:
+			'A letter to the exiles in Babylon: plans for peace and hope, and the seventy years they had to wait.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
+	},
+	{
+		slug: 'romans-8-28',
+		title: 'What does Romans 8:28 mean?',
+		blurb:
+			'“All things work together for good” comes after groaning, and the good is being shaped to the Son’s image.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'john-3-16',
+		title: 'What does John 3:16 mean?',
+		blurb:
+			'Spoken to Nicodemus at night: our Father’s giving, the whole world, and the “one and only Son.”',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
 	},
 	{

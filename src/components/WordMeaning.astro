@@ -26,6 +26,7 @@ interface Rendering {
 	slug: string; // 'john'
 	ch: number; // 3
 	fhb: string; // VERBATIM Father's Heart Bible text
+	v?: number; // optional verse anchor (#v<N>) on the /read chapter link
 	traditional?: string; // the familiar older rendering, for contrast
 }
 interface Section {
@@ -98,13 +99,21 @@ const fitDescription = (d: string, max = 160): string => {
 	const s = d.replace("Father's Heart Bible™ (FHB)", "Father's Heart Bible™");
 	if (s.length <= max) return s;
 	const sentences = s.match(/[^.!?]+[.!?]+(\s|$)/g);
-	while (sentences && sentences.length > 1 && sentences.join('').trim().length > max) sentences.pop();
-	if (sentences && sentences.join('').trim().length <= max && sentences.join('').trim().length >= 110) return sentences.join('').trim();
-	return `${s.slice(0, max - 1).replace(/\s+\S*$/, '').replace(/[,;:\s—-]+$/, '')}.`;
+	while (sentences && sentences.length > 1 && sentences.join('').trim().length > max)
+		sentences.pop();
+	if (
+		sentences &&
+		sentences.join('').trim().length <= max &&
+		sentences.join('').trim().length >= 110
+	)
+		return sentences.join('').trim();
+	return `${s
+		.slice(0, max - 1)
+		.replace(/\s+\S*$/, '')
+		.replace(/[,;:\s—-]+$/, '')}.`;
 };
 const metaTitle = fitTitle(title);
 const metaDescription = fitDescription(description);
-
 
 const PAGE_URL = `https://fathersheartbible.com/meaning/${slug}/`;
 const HERO_IMG = `${heroBase}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
@@ -116,7 +125,8 @@ const formatDate = (iso: string) =>
 		month: 'long',
 		day: 'numeric',
 	});
-const reader = (s: string, ch: number) => `https://fathersheartbible.com/read/${s}/${ch}/`;
+const reader = (s: string, ch: number, v?: number) =>
+	`https://fathersheartbible.com/read/${s}/${ch}/${v ? `#v${v}` : ''}`;
 const refLabel = (ref: string) => ref.split('–')[0].split(':')[0];
 
 const KEVIN_WHITE_AUTHOR = {
@@ -191,7 +201,7 @@ if (renderings.length) {
 			'@type': 'ListItem',
 			position: i + 1,
 			name: r.ref,
-			url: reader(r.slug, r.ch),
+			url: reader(r.slug, r.ch, r.v),
 		})),
 	});
 }
@@ -277,7 +287,7 @@ const TOC = [
 									{r.traditional && (
 										<p class="mt-3 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);"><span class="font-semibold">Familiar older wording:</span> {r.traditional}</p>
 									)}
-									<a href={reader(r.slug, r.ch)} class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold hover:underline" style="color: #a04060; font-family: var(--font-sans);">Read &amp; listen to {refLabel(r.ref)} <span aria-hidden="true">&rarr;</span></a>
+									<a href={reader(r.slug, r.ch, r.v)} class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold hover:underline" style="color: #a04060; font-family: var(--font-sans);">Read &amp; listen to {refLabel(r.ref)} <span aria-hidden="true">&rarr;</span></a>
 								</div>
 							))}
 						</div>
