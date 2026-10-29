@@ -188,7 +188,11 @@ const jsonLd = [
 ];
 ---
 
-<Layout title={fitTitle(TITLE)} description={fitDescription(DESCRIPTION)} lang="pt" jsonLd={jsonLd} pageType="article" articlePublishedTime={PUBLISHED} articleSection="Bible Verses" articleTags={["versículos sobre oração", "oração", "Father's Heart Bible"]}>
+<Layout title={fitTitle(TITLE)} description={fitDescription(DESCRIPTION)} lang="pt" alternates={[
+	{ hreflang: 'en', href: 'https://fathersheartbible.com/verses/prayer/' },
+	{ hreflang: 'pt', href: 'https://fathersheartbible.com/versiculos-sobre-oracao/' },
+	{ hreflang: 'x-default', href: 'https://fathersheartbible.com/verses/prayer/' },
+]} jsonLd={jsonLd} pageType="article" articlePublishedTime={PUBLISHED} articleSection="Bible Verses" articleTags={["versículos sobre oração", "oração", "Father's Heart Bible"]}>
 	<main id="main-content">
 		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">

@@ -55,6 +55,7 @@ interface Props {
 	ctaMidBodyHtml: string;
 	ctaBottomBodyHtml: string;
 	tags?: string[];
+	alternates?: { hreflang: string; href: string }[];
 }
 const {
 	slug,
@@ -77,6 +78,7 @@ const {
 	ctaMidBodyHtml,
 	ctaBottomBodyHtml,
 	tags = [],
+	alternates = [],
 } = Astro.props as Props;
 
 // W7 recipe (unit 6au): <title> <= 60 chars, meta description <= 160 chars, applied centrally so
@@ -216,6 +218,7 @@ const TOC = [
 	articlePublishedTime={published}
 	articleSection="Bible Verses by Topic"
 	articleTags={tags}
+	alternates={alternates}
 	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
 	preloadImageDesktop={HERO_IMG}
 >
