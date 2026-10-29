@@ -1,11 +1,12 @@
 ---
-import Layout from '../layouts/Layout.astro';
 // Reusable topical verse-collection page (/verses/<topic>). Each /verses page is
 // a thin data file that passes props here; this renders the full Gold-Level page
 // so the pattern never drifts. Verses must be REAL FHB renderings (verbatim from
 // src/content/bible). Locked conventions: generic+brand title, full-bleed hero,
 // direct-answer + key-takeaway, FHB framing, FeatureChapter anchor + audio,
 // Article+ItemList+BreadcrumbList+FAQPage JSON-LD, Read-FHB CTA, absolute reader links.
+import { readFileSync } from 'node:fs';
+import Layout from '../layouts/Layout.astro';
 import AuthorBio from './AuthorBio.astro';
 import FeatureChapter from './FeatureChapter.astro';
 import RelatedTopics from './RelatedTopics.astro';
@@ -121,6 +122,21 @@ const formatDate = (iso: string) =>
 		day: 'numeric',
 	});
 const reader = (s: string, ch: number) => `https://fathersheartbible.com/read/${s}/${ch}/`;
+// Crawl path (2ei): a verse that has its own /read verse page (community's verse-pages.json,
+// the same file gen-sitemap-read.mjs reads) gets a second link to it. Data-driven; no list here.
+let VERSE_PAGES: Record<string, unknown> = {};
+try {
+	VERSE_PAGES = JSON.parse(
+		readFileSync('/srv/sites/community/src/data/verse-pages.json', 'utf8'),
+	).pages;
+} catch {
+	// file absent (build elsewhere): no verse-page links, page still renders
+}
+const versePageHref = (v: Verse) => {
+	const m = v.ref.match(/:(\d+)/);
+	const key = m ? `${v.slug}/${v.ch}/${m[1]}` : '';
+	return key in VERSE_PAGES ? `https://fathersheartbible.com/read/${key}/` : '';
+};
 const refLabel = (ref: string) => ref.split('–')[0].split(':')[0]; // "Romans 8:38–39" → "Romans 8"
 
 const KEVIN_WHITE_AUTHOR = {
@@ -270,6 +286,7 @@ const TOC = [
 									<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: #a04060; font-family: var(--font-sans);">{v.ref}</p>
 									<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">{v.text}</p>
 									<a href={reader(v.slug, v.ch)} class="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold hover:underline" style="color: #a04060; font-family: var(--font-sans);">Read &amp; listen to {refLabel(v.ref)} <span aria-hidden="true">&rarr;</span></a>
+									{versePageHref(v) && (<a href={versePageHref(v)} class="inline-flex items-center gap-1.5 mt-3 ml-5 text-sm font-semibold hover:underline" style="color: #a04060; font-family: var(--font-sans);">What {v.ref.split('–')[0].split('-')[0]} means <span aria-hidden="true">&rarr;</span></a>)}
 								</div>
 							))}
 						</div>
