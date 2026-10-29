@@ -14,6 +14,7 @@ export const RELATED: Record<string, string[]> = {
 	'v:advent': ['m:begotten', 'v:hope'],
 	'v:anger': ['m:meek', 'v:patience', 'v:forgiveness', 'b:men'],
 	'v:anxiety': [
+		'm:1-peter-5-7',
 		'v:fear',
 		'v:peace',
 		'v:trust',
@@ -38,6 +39,7 @@ export const RELATED: Record<string, string[]> = {
 	'v:faith': ['m:faith', 'v:trust', 'v:hope'],
 	'v:fear': [
 		'm:2-timothy-1-7',
+		'm:isaiah-54-17',
 		'v:courage',
 		'v:anxiety',
 		'v:trust',
@@ -106,6 +108,9 @@ export const RELATED: Record<string, string[]> = {
 	'm:2-timothy-1-7': ['v:fear', 'v:courage', 'm:fathers-heart-of-god', 'm:our-father'],
 	'm:psalm-46-10': ['v:peace', 'v:fear', 'm:psalm-23', 'm:our-father'],
 	'm:matthew-11-28': ['v:comfort', 'v:anxiety', 'm:john-14-6', 'm:our-father'],
+	'm:colossians-3-23': ['b:work', 'v:strength', 'm:wisdom', 'm:our-father'],
+	'm:1-peter-5-7': ['v:anxiety', 'm:philippians-4-6-7', 'v:trust', 'm:our-father'],
+	'm:isaiah-54-17': ['v:fear', 'm:isaiah-40-31', 'v:courage', 'm:our-father'],
 	'm:psalm-34-18': ['v:comfort', 'm:psalm-23', 'v:hope', 'm:our-father'],
 	'm:romans-12-2': ['v:wisdom', 'm:romans-8-28', 'm:wisdom', 'm:our-father'],
 	'm:proverbs-3-5-6': ['v:trust', 'm:wisdom', 'm:isaiah-41-10', 'm:our-father'],
@@ -158,7 +163,7 @@ export const RELATED: Record<string, string[]> = {
 	'b:widows': ['v:comfort', 'v:hope', 'v:peace'],
 	'b:wives': ['v:love', 'v:family', 'v:patience'],
 	'b:women': ['v:strength', 'v:faith', 'v:peace'],
-	'b:work': ['v:strength', 'm:wisdom', 'v:anxiety'],
+	'b:work': ['m:colossians-3-23', 'v:strength', 'm:wisdom', 'v:anxiety'],
 	'b:worship-leaders': ['v:prayer', 'v:joy', 'v:thanksgiving', 'm:selah'],
 };
 

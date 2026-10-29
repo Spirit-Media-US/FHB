@@ -309,6 +309,27 @@ export const WORD_MEANINGS: WordMeaning[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
 	{
+		slug: 'colossians-3-23',
+		title: 'What does Colossians 3:23 mean?',
+		blurb:
+			'Paul to enslaved believers: work wholeheartedly as for the Lord, who gives the inheritance as reward.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: '1-peter-5-7',
+		title: 'What does 1 Peter 5:7 mean?',
+		blurb:
+			'Peter to believers under strain: cast all your anxiety on our Father, because he cares for you.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'isaiah-54-17',
+		title: 'What does Isaiah 54:17 mean?',
+		blurb:
+			"Our Father to restored Zion: no weapon forged against you will succeed, and vindication is his servants' inheritance.",
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
 		slug: 'reproof',
 		title: 'What does reproof mean in the Bible?',
 		blurb:
