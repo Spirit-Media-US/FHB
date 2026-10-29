@@ -390,6 +390,44 @@ const KEVIN = {
 	url: 'https://fathersheartbible.com/the-fathers-heart-bible/leadership/',
 	jobTitle: "Editor, Father's Heart Bible™",
 };
+// Press releases issued by Spirit Media Publishing on PR Newswire (all five verified 200, 2026-10-29).
+// They are about the publisher, not about the Bible text, so they are cited on the publisher entity only.
+const PRESS = [
+	{
+		date: '2024-11-13',
+		title: 'Coach Cori Close Applauds The Pyramid Principle by John Vallely',
+		url: 'https://www.prnewswire.com/news-releases/coach-cori-close-applauds-the-pyramid-principle-by-john-vallely-302304309.html',
+	},
+	{
+		date: '2024-12-02',
+		title:
+			'Generosity Campaign Launched To Share a Gift of Courage with 400,000 Families Fighting Cancer',
+		url: 'https://www.prnewswire.com/news-releases/generosity-campaign-launched-to-share-a-gift-of-courage-with-400-000-families-fighting-cancer-302319839.html',
+	},
+	{
+		date: '2024-02-01',
+		title: 'Spirit Media Poised for Rapid Growth, Robust Profitability in 2024',
+		url: 'https://www.prnewswire.com/news-releases/spirit-media-poised-for-rapid-growth-robust-profitability-in-2024-302050871.html',
+	},
+	{
+		date: '2024-06-18',
+		title: 'Spirit Media Shakes up the Publishing Industry with Unique, Expedited Process',
+		url: 'https://www.prnewswire.com/news-releases/spirit-media-shakes-up-the-publishing-industry-with-unique-expedited-process-302175618.html',
+	},
+	{
+		date: '2024-08-15',
+		title:
+			'SpiritMedia.US to Publish The Pyramid Principle by UCLA Superstar and NBA Pro John Vallely',
+		url: 'https://www.prnewswire.com/news-releases/spiritmediaus-to-publish-the-pyramid-principle-by-ucla-superstar-and-nba-pro-john-vallely-302223398.html',
+	},
+].sort((a, b) => b.date.localeCompare(a.date));
+const fmtPressDate = (d: string) =>
+	new Date(d + 'T12:00:00Z').toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+		timeZone: 'UTC',
+	});
 const jsonLd = [
 	{
 		'@context': 'https://schema.org',
@@ -418,6 +456,23 @@ const jsonLd = [
 				'@type': 'Organization',
 				'@id': 'https://spiritmediapublishing.com/#organization',
 				name: 'Spirit Media Publishing',
+			},
+		})),
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		subjectOf: PRESS.map((r) => ({
+			'@type': 'NewsArticle',
+			headline: r.title,
+			url: r.url,
+			datePublished: r.date,
+			publisher: {
+				'@type': 'Organization',
+				name: 'PR Newswire',
+				url: 'https://www.prnewswire.com',
 			},
 		})),
 	},
@@ -638,6 +693,14 @@ const P = 'text-lg leading-relaxed mb-4';
 				<p class="mb-4">
 					<MailtoLink email="publisher@spiritmediapublishing.com" class="inline-flex items-center px-6 py-3 rounded-full text-sm font-semibold no-underline" style="background-color: var(--color-brand); color: var(--color-on-primary);">License to print</MailtoLink>
 				</p>
+
+				<h2 id="press" class={H2} style="font-family: var(--font-serif); color: var(--color-ink);">In the news</h2>
+				<p class={P}>Press releases from Spirit Media Publishing, the publisher of Father&rsquo;s Heart Bible&trade;, distributed on PR Newswire.</p>
+				<ul class="mb-6 pl-5 list-disc">
+					{PRESS.map((r) => (
+						<li class="mb-2"><a href={r.url} rel="noopener" style="color: var(--color-brand);">{r.title}</a> &mdash; PR Newswire, {fmtPressDate(r.date)}</li>
+					))}
+				</ul>
 
 				<aside id="contact" class="my-14 px-6 py-8 lg:px-10 rounded-2xl scroll-mt-28" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
 					<h2 class="text-2xl md:text-3xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">Contact</h2>
