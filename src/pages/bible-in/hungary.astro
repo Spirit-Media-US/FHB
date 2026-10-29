@@ -2,7 +2,13 @@
 // /bible-in/hungary — sourced country page; facts cited in the sources lists below (fetched 2026-10-28).
 // Hero photo: Wikimedia Commons, CC BY-SA 4.0 (file page credited visibly) — hotlinked thumbnails like the other /bible-in heroes.
 import CountryBible from '../../components/CountryBible.astro';
+import { GLOBAL_BIBLE_MONTH } from '../../data/globalBibleMonth';
 import { speakersLabel as sp } from '../../data/language-speakers';
+import { gbmCounts } from '../../lib/gbmCounts';
+
+// Public language tally computed from the schedule (no typed "50 of 80" to go stale).
+const _gbm = gbmCounts(GLOBAL_BIBLE_MONTH);
+const langTally = `${_gbm.available} of ${_gbm.total}`;
 
 const verses = [
 	{
@@ -57,7 +63,9 @@ const faqs = [
 	{
 		question: "Is Father's Heart Bible available in Hungarian?",
 		answer:
-			"Yes. The Hungarian edition is at fathersheartbible.com/read/hu/. Father's Heart Bible is now in 50 of 80 languages.",
+			"Yes. The Hungarian edition is at fathersheartbible.com/read/hu/. Father's Heart Bible is now in " +
+			langTally +
+			' languages.',
 	},
 ];
 ---
@@ -132,7 +140,7 @@ const faqs = [
 	whyBlocks={[
 		{ heading: "God revealed as Father", bodyHtml: "Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href=\"https://fathersheartbible.com/read/genesis/1/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Genesis 1:1</a> onward." },
 		{ heading: "Free, with audio, on any phone", bodyHtml: "No purchase, no app, no sign-up. The whole Bible is free to <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read online</a>, with audio, on the phone in your hand." },
-		{ heading: "Now in Hungarian", bodyHtml: "The Hungarian edition is published: <a href=\"https://fathersheartbible.com/read/hu/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read it free</a>. Father&rsquo;s Heart Bible&trade; is in 50 of 80 languages." },
+		{ heading: "Now in Hungarian", bodyHtml: "The Hungarian edition is published: <a href=\"https://fathersheartbible.com/read/hu/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">read it free</a>. Father&rsquo;s Heart Bible&trade; is in " + langTally + " languages." },
 	]}
 	wordHeading="His Word will not return void"
 	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do. In a land that has had it in Hungarian since 1590, it will not return empty.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;&hellip;so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
