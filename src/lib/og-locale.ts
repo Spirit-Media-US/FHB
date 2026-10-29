@@ -7,12 +7,24 @@
  * The registry carries no region/country field, so the country below is the
  * language's single Facebook-listed regional default where one is unambiguous.
  * Where a language has several regions (es, pt, fr-style splits we did not
- * list) or no Facebook locale we can name, the bare language code is used —
- * Facebook accepts that. NOTHING is guessed: add a row only when you can point
- * at the locale in Facebook's supported-locales list.
+ * list) or no Facebook locale exists, NO og:locale is emitted (ogLocale returns
+ * undefined) — a bare "pt" or an invented ll_CC is invalid on Facebook (2au,
+ * 2026-10-29). NOTHING is guessed: add a row only when you can point at the
+ * locale in Facebook's supported-locales list (Facebook's FacebookLocales.xml,
+ * now 404; mirrored at gist.github.com/mechastorm/3626739 and
+ * gist.github.com/fabulator/27aa3af1e51e6c2060c840d5dfaa177e, plus
+ * developers.facebook.com/docs/messenger-platform/messenger-profile/supported-locales).
+ * Region picks: pt_BR (measured pt-BR demand), es_LA (Facebook's region-neutral
+ * Spanish; region unmeasured), tl_PH = Filipino, cx_PH = Bisaya (Cebuano).
  */
 const OG_LOCALE: Record<string, string> = {
 	en: 'en_US',
+	pt: 'pt_BR',
+	es: 'es_LA',
+	he: 'he_IL',
+	sn: 'sn_ZW',
+	uz: 'uz_UZ',
+	ht: 'ht_HT',
 	fr: 'fr_FR',
 	de: 'de_DE',
 	it: 'it_IT',
@@ -29,7 +41,7 @@ const OG_LOCALE: Record<string, string> = {
 	id: 'id_ID',
 	ms: 'ms_MY',
 	vi: 'vi_VN',
-	fil: 'fil_PH',
+	fil: 'tl_PH',
 	hi: 'hi_IN',
 	bn: 'bn_IN',
 	ta: 'ta_IN',
@@ -45,27 +57,26 @@ const OG_LOCALE: Record<string, string> = {
 	sw: 'sw_KE',
 	am: 'am_ET',
 	af: 'af_ZA',
-	zu: 'zu_ZA',
 	ha: 'ha_NG',
-	ig: 'ig_NG',
-	yo: 'yo_NG',
-	ceb: 'ceb_PH',
+	ceb: 'cx_PH',
 	jv: 'jv_ID',
-	su: 'su_ID',
 	my: 'my_MM',
 	'zh-hans': 'zh_CN',
 	'zh-hant': 'zh_TW',
 	yue: 'zh_HK',
 };
 
-/** Facebook-form og:locale for a language code; bare code when no defensible country. */
-export function ogLocale(code: string): string {
+/** Every ll_CC value the map can emit (asserted valid by og-locale.test.ts). */
+export const OG_LOCALE_VALUES: string[] = [...new Set(Object.values(OG_LOCALE))];
+
+/** Facebook-form og:locale for a language code; undefined (omit the tag) when Facebook has none. */
+export function ogLocale(code: string): string | undefined {
 	const c = code.toLowerCase();
-	return OG_LOCALE[c] ?? OG_LOCALE[c.split('-')[0]] ?? c.replace('-', '_');
+	return OG_LOCALE[c] ?? OG_LOCALE[c.split('-')[0]];
 }
 
 /** og:locale:alternate values: every code except `current`, deduped, in input order. */
 export function ogLocaleAlternates(current: string, codes: string[]): string[] {
 	const self = ogLocale(current);
-	return [...new Set(codes.map(ogLocale))].filter((v) => v !== self);
+	return [...new Set(codes.map(ogLocale))].filter((v): v is string => !!v && v !== self);
 }
