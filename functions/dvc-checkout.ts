@@ -409,6 +409,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		retail: 7999,
 		img: `${ASSETS}/lang/v1/lang-bn-600.webp`,
 	},
+	'lang-my-hb': {
+		title: 'မြန်မာ သမ္မာကျမ်းစာ (Burmese) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-my-600.webp`,
+	},
+	'lang-my-pb': {
+		title: 'မြန်မာ သမ္မာကျမ်းစာ (Burmese) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-my-600.webp`,
+	},
 	'lang-yue-hb': {
 		title: '廣東話聖經 (Cantonese) — Hardback',
 		retail: 9999,
