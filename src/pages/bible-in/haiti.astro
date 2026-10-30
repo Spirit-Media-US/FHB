@@ -1,0 +1,141 @@
+---
+// /bible-in/haiti — Haitian Creole (Kreyòl ayisyen). Built 2026-10-30 (pmseoaeo reach lane, Kevin L1139:
+// a /bible-in page for every live reader language) because Haitian Creole had no country page and so no
+// crawl path from /bible-in. Sourced facts only: population = World Bank 2024; religion = CIA World Factbook 2018 and Pew Research, with Policite 2024 (via Religion in Haiti, Wikipedia); Haitian Creole speakers = Wikipedia (typed, not in language-reach.json).
+// Pattern = /bible-in/malaysia. Father voice; verse text = the audited FHB quotes. No Scripture edits.
+import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
+
+const verses = [
+	{
+		ref: 'Psalm 34:18',
+		slug: 'psalms',
+		ch: 34,
+		text: 'Our Father is near to the brokenhearted; he saves those crushed in spirit.',
+	},
+	{
+		ref: 'John 14:18',
+		slug: 'john',
+		ch: 14,
+		text: 'I will not leave you as orphans; I will come to you.',
+	},
+	{
+		ref: 'Psalm 103:13',
+		slug: 'psalms',
+		ch: 103,
+		text: "As a father's heart goes out to his children, so our Father's heart goes out to those who fear him.",
+	},
+];
+
+const stats = [
+	{ label: 'People', value: 'about 11.8 million' },
+	{ label: 'Catholic', value: 'about 55–57%' },
+	{ label: 'Protestant', value: 'about 28–37%' },
+	{ label: 'Creole speakers', value: 'over 13 million worldwide' },
+];
+
+const faqs = [
+	{
+		question: 'How many Christians are there in Haiti?',
+		answer: `Haiti is a majority Christian country. Catholics are about 55% (CIA World Factbook 2018) to 57% (Pew Research) of the population, and Protestants about 28%. A 2024 survey by Policite found 37% Protestant and 29% Catholic. Vodou is also practised, often alongside Christianity; the CIA World Factbook reports 2.1% identifying with Vodou.`,
+	},
+	{
+		question: 'Can I read the Bible online free in Haitian Creole?',
+		answer: `Yes. Father's Heart Bible™ is free to read online in Haitian Creole (Kreyòl ayisyen) — all 66 books, no account, no purchase, no app — at fathersheartbible.com/read/ht/. Start with Jan 3 (John 3) or Sòm 23 (Psalm 23). The English edition is free too, with audio.`,
+	},
+	{
+		question: "Is Father's Heart Bible available in Haitian Creole?",
+		answer: `Yes. The Haitian Creole edition is free to read at fathersheartbible.com/read/ht/. Haitian Creole is spoken by over 13 million people worldwide, the native language of the vast majority of Haitians and of the Haitian diaspora.`,
+	},
+	{
+		question: 'Which other languages of Haiti can I read the Bible in here?',
+		answer: `French, Haiti's other official language, is free to read at fathersheartbible.com/read/fr/, and English is free to read at fathersheartbible.com/read/, with audio on every chapter.`,
+	},
+	{
+		question: 'Is there a free audio Bible I can listen to?',
+		answer: `Yes. Every chapter of the English Father's Heart Bible™ comes with free audio, so it can be heard on any phone, from Port-au-Prince to Cap-Haïtien.`,
+	},
+];
+---
+
+<CountryBible
+	slug="haiti"
+	country="Haiti"
+	flag="🇭🇹"
+	flagImg="/flags/ht.svg"
+	countryWikipedia="https://en.wikipedia.org/wiki/Haiti"
+	lastUpdated="October 2026"
+	lastUpdatedIso="2026-10-30"
+	colorPrimary="#00209F"
+	colorSecondary="#D21034"
+	colorAccent="#FFFFFF"
+	tintWarm="#E6EAF7"
+	tintCool="#FBE8EB"
+	tintBlue="#EEF1F7"
+	title="The Bible in Haiti — Christianity | Father's Heart Bible™ (FHB)"
+	description="How many Christians live in Haiti? Read the Bible free online in Haitian Creole, French and English with audio — Father's Heart Bible™ (FHB)."
+	h1="The Bible in Haiti"
+	heroSubhead="A deeply Christian people carrying heavy burdens — Father's Heart Bible reveals God as a loving Father. Free online in Haitian Creole, with audio in English."
+	heroBase=""
+	heroSrc={{ desktop: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/The_Citadelle_Laferri%C3%A8re%2C_Haiti_%287761638618%29.jpg/1280px-The_Citadelle_Laferri%C3%A8re%2C_Haiti_%287761638618%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", mobile: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/The_Citadelle_Laferri%C3%A8re%2C_Haiti_%287761638618%29.jpg/960px-The_Citadelle_Laferri%C3%A8re%2C_Haiti_%287761638618%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", og: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/The_Citadelle_Laferri%C3%A8re%2C_Haiti_%287761638618%29.jpg/1280px-The_Citadelle_Laferri%C3%A8re%2C_Haiti_%287761638618%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail" }}
+	heroCreditHtml={`Hero photo: <a href="https://commons.wikimedia.org/wiki/File:The_Citadelle_Laferri%C3%A8re,_Haiti_(7761638618).jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">The Citadelle Laferrière, Haiti</a> by Alex Proimos, <a href="https://creativecommons.org/licenses/by/2.0" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY 2.0</a>, via Wikimedia Commons.`}
+	heroAlt="The Citadelle Laferrière fortress on its mountaintop in northern Haiti"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Yes &mdash; you can read the Bible free online in Haiti right now.</strong> Haiti is a majority Christian country: Catholics are roughly 55&ndash;57% and Protestants roughly 28&ndash;37%, depending on the survey. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account, and the <a href="https://fathersheartbible.com/read/ht/" style="color: var(--color-brand);" class="hover:underline"><em>Haitian Creole</em> edition</a> is free to read today &mdash; the language of the home for nearly every Haitian, where Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	keyTakeaway="Haiti has carried more than its share of sorrow and kept its faith — and Father's Heart Bible™ (FHB) offers the Father near to every Haitian, in Kreyòl."
+	glanceIntroHtml={`Haiti shares the island of Hispaniola with the Dominican Republic. Haitian Creole and French are the two official languages, Creole is the native language of the vast majority, and Christianity, mostly Catholic and increasingly Protestant, is part of daily life.`}
+	stats={stats}
+	knownForHeading="What Haiti is known for"
+	knownForIntroHtml={`The first free Black republic, a people of art, music and resilience.`}
+	knownFor={[
+		{ label: 'The first Black republic', text: 'Haiti declared independence in 1804, after the only successful slave revolt to found a nation.' },
+		{ label: 'The Citadelle Laferrière', text: 'A mountaintop fortress in the north, one of the largest in the Americas, built after independence.' },
+		{ label: 'Kreyòl', text: 'Haitian Creole is spoken by over 13 million people and is the most widely spoken creole language in the world.' },
+		{ label: 'Art and music', text: 'Vivid painting, rara processions and kompa music are known far beyond the island.' },
+		{ label: 'A praying people', text: 'Churches and prayer shape the rhythm of the week, in town and countryside.' },
+	]}
+	faithHeading="Faith and the Bible in Haiti"
+	faithBodyHtml={`<p>Haiti is a majority Christian country. <strong>Catholics</strong> are the largest group, about <strong>55%</strong> by the CIA World Factbook (2018) and <strong>57%</strong> by Pew Research; <strong>Protestants</strong> are about <strong>28%</strong> by both, and 37% in a 2024 Policite survey, which put Catholics at 29%. Vodou is also practised, often alongside Christianity.</p><p>For a people who have lived through so much, Father&rsquo;s Heart Bible&trade; offers the Scriptures free, in the language of the home, revealing God as a near and loving <em>Father</em>.</p>`}
+	sources={[
+		{ label: 'World Bank, Population, total (2024) — compiled from UN World Population Prospects 2024 and national statistics offices', url: 'https://data.worldbank.org/indicator/SP.POP.TOTL?locations=HT' },
+		{ label: 'CIA World Factbook 2018, Pew Research Center and Policite 2024 (Catholic 55–57%, Protestant 28–37%, Vodou 2.1%), as summarised in Religion in Haiti — Wikipedia', url: 'https://en.wikipedia.org/wiki/Religion_in_Haiti' },
+		{ label: 'Haitian Creole — Wikipedia (over 13 million speakers worldwide; official with French)', url: 'https://en.wikipedia.org/wiki/Haitian_Creole' },
+		{ label: 'Haiti — Wikipedia (independence 1804; Citadelle Laferrière)', url: 'https://en.wikipedia.org/wiki/Haiti' },
+	]}
+	faithsHeading="What “our Father” offers Haiti"
+	faithsIntroHtml={`In towns and hillside villages alike, many are looking for a Father who stays. Father&rsquo;s Heart Bible&trade; does not bring a foreign religion &mdash; it answers a universal longing: to be held by a Father who never abandons His children.`}
+	faithsBlocks={[
+		{ heading: 'For the brokenhearted', bodyHtml: `&ldquo;Our Father is near to the brokenhearted; he saves those crushed in spirit.&rdquo; <a href="https://fathersheartbible.com/read/psalms/34/" style="color: var(--color-gold);" class="hover:underline">Read Psalm 34</a> free.` },
+		{ heading: 'For the one who feels alone', bodyHtml: `&ldquo;I will not leave you as orphans; I will come to you.&rdquo; Read <a href="https://fathersheartbible.com/read/john/14/" style="color: var(--color-gold);" class="hover:underline">John 14</a> free.` },
+		{ heading: 'For the weary', bodyHtml: `To families bearing heavy loads, the Father says, <a href="https://fathersheartbible.com/read/matthew/11/" style="color: var(--color-gold);" class="hover:underline">&ldquo;Come to me, all you who are weary&hellip; and I will give you rest.&rdquo;</a>` },
+		{ heading: 'For every Haitian', bodyHtml: `In the capital, the mountains and the diaspora, the Father calls each Haitian His beloved son or daughter.` },
+	]}
+	whyHeading="Why Father's Heart Bible™ for Haiti"
+	whyBlocks={[
+		{ heading: 'God revealed as Father', bodyHtml: `Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
+		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a>, with audio on every English chapter.` },
+		{ heading: 'In Haitian Creole', bodyHtml: `The Haitian Creole edition is published: <a href="https://fathersheartbible.com/read/ht/" style="color: var(--color-brand);" class="hover:underline">read it free</a> &mdash; Kreyòl ayisyen, the language of the home.` },
+	]}
+	wordHeading="His Word will not return void"
+	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do. From Port-au-Prince to the northern mountains, His Word will not return empty.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;&hellip;so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
+	resourcesHeading="Learn more about Haiti"
+	resourcesIntroHtml={`Trusted sources for the facts on this page &mdash; and for going deeper into Haiti&rsquo;s people, faith, and story.`}
+	resources={[
+		{ label: 'Haiti — Wikipedia', url: 'https://en.wikipedia.org/wiki/Haiti' },
+		{ label: 'Religion in Haiti — Wikipedia', url: 'https://en.wikipedia.org/wiki/Religion_in_Haiti' },
+		{ label: 'Haiti — Encyclopaedia Britannica', url: 'https://www.britannica.com/place/Haiti' },
+		{ label: 'Haiti — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/HA' },
+	]}
+	opportunityHeading="Bible languages for Haiti"
+	opportunityIntroHtml={`Haitian Creole is the native language of the vast majority of Haitians, and French is the other official language. Both, with English, are free to read today.`}
+	languages={[
+		{ language: 'English', code: 'en' },
+		{ language: 'Haitian Creole (Kreyòl ayisyen)', code: 'ht', speakers: 'over 13 million' },
+		{ language: 'French', code: 'fr' },
+	]}
+	verses={verses}
+	keepReadingHtml={`Begin with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> &mdash; including <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start</a> and <a href="/guides/what-is-the-gospel/" style="color: var(--color-brand);" class="hover:underline">what the gospel is</a>. Browse Scripture by theme on our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> pages.`}
+	faqs={faqs}
+	ctaMidHeading="Know God as a Father near to you"
+	ctaMidBodyHtml={`In Haitian Creole, French or English, read God in His own voice as Father &mdash; free, on any phone.`}
+	ctaBottomBodyHtml={`From Genesis to Revelation, free online &mdash; a translation that reveals God as a loving Father to every beloved son and daughter across Haiti.`}
+/>

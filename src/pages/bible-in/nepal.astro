@@ -1,0 +1,142 @@
+---
+// /bible-in/nepal — Nepali (नेपाली). Built 2026-10-30 (pmseoaeo reach lane, Kevin L1139:
+// a /bible-in page for every live reader language) because Nepali had no country page and so no
+// crawl path from /bible-in. Sourced facts only: population = World Bank 2024; religion = Nepal 2021 census (via Religion in Nepal, Wikipedia).
+// Pattern = /bible-in/malaysia. Father voice; verse text = the audited FHB quotes. No Scripture edits.
+import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
+
+const verses = [
+	{
+		ref: 'Psalm 34:18',
+		slug: 'psalms',
+		ch: 34,
+		text: 'Our Father is near to the brokenhearted; he saves those crushed in spirit.',
+	},
+	{
+		ref: 'Matthew 11:28',
+		slug: 'matthew',
+		ch: 11,
+		text: 'Come to me, all you who are weary and burdened, and I will give you rest.',
+	},
+	{
+		ref: '1 John 3:1',
+		slug: '1-john',
+		ch: 3,
+		text: 'See what kind of love our Father has given us, that we should be called children of our Father! And we are.',
+	},
+];
+
+const stats = [
+	{ label: 'People', value: 'about 29.7 million' },
+	{ label: 'Hindu', value: '81.19% (2021 census)' },
+	{ label: 'Buddhist', value: '8.21%' },
+	{ label: 'Christian', value: '1.76% — 512,191 people' },
+];
+
+const faqs = [
+	{
+		question: 'How many Christians are there in Nepal?',
+		answer: `Nepal's 2021 census counted 512,191 Christians, 1.76% of the population, alongside 81.19% Hindu, 8.21% Buddhist, 5.09% Muslim and 3.17% Kiratist. You can read the Scriptures they treasure free in Father's Heart Bible™ at fathersheartbible.com/read.`,
+	},
+	{
+		question: 'Can I read the Bible online free in Nepali?',
+		answer: `Yes. Father's Heart Bible™ is free to read online in Nepali (नेपाली) — all 66 books, no account, no purchase, no app — at fathersheartbible.com/read/ne/. Start with John 3 or Psalm 23. The English edition is free too, with audio.`,
+	},
+	{
+		question: "Is Father's Heart Bible available in Nepali?",
+		answer: `Yes. The Nepali edition is free to read at fathersheartbible.com/read/ne/. Nepali is the official language of Nepal and is spoken by about ${sp('ne')} people, in Nepal and in India, Bhutan and the Nepali diaspora.`,
+	},
+	{
+		question: 'Which other languages of Nepal can I read the Bible in here?',
+		answer: `English is free to read at fathersheartbible.com/read/, with audio on every chapter. Hindi, widely understood across the border region, is free to read at fathersheartbible.com/read/hi/.`,
+	},
+	{
+		question: 'Is there a free audio Bible I can listen to?',
+		answer: `Yes. Every chapter of the English Father's Heart Bible™ comes with free audio, so it can be heard on any phone from Kathmandu to the Terai.`,
+	},
+];
+---
+
+<CountryBible
+	slug="nepal"
+	country="Nepal"
+	flag="🇳🇵"
+	flagImg="/flags/np.svg"
+	countryWikipedia="https://en.wikipedia.org/wiki/Nepal"
+	lastUpdated="October 2026"
+	lastUpdatedIso="2026-10-30"
+	colorPrimary="#DC143C"
+	colorSecondary="#003893"
+	colorAccent="#FFFFFF"
+	tintWarm="#FBE8EC"
+	tintCool="#E6ECF5"
+	tintBlue="#EEF1F7"
+	title="The Bible in Nepal — Christianity | Father's Heart Bible™ (FHB)"
+	description="How many Christians live in Nepal? Read the Bible free online in Nepali and English with audio — Father's Heart Bible™ (FHB)."
+	h1="The Bible in Nepal"
+	heroSubhead="A Himalayan nation where about one in sixty is Christian — Father's Heart Bible reveals God as a loving Father. Free online in Nepali, with audio in English."
+	heroBase=""
+	heroSrc={{ desktop: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Kathmandu_Durbar_Square%2C_Shiva_Parvati_Temple%2C_Nepal_%28edit%29.jpg/1280px-Kathmandu_Durbar_Square%2C_Shiva_Parvati_Temple%2C_Nepal_%28edit%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", mobile: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Kathmandu_Durbar_Square%2C_Shiva_Parvati_Temple%2C_Nepal_%28edit%29.jpg/960px-Kathmandu_Durbar_Square%2C_Shiva_Parvati_Temple%2C_Nepal_%28edit%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", og: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Kathmandu_Durbar_Square%2C_Shiva_Parvati_Temple%2C_Nepal_%28edit%29.jpg/1280px-Kathmandu_Durbar_Square%2C_Shiva_Parvati_Temple%2C_Nepal_%28edit%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail" }}
+	heroCreditHtml={`Hero photo: <a href="https://commons.wikimedia.org/wiki/File:Kathmandu_Durbar_Square,_Shiva_Parvati_Temple,_Nepal_(edit).jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Kathmandu Durbar Square, Shiva Parvati Temple</a> by Vyacheslav Argenberg (derivative work: UnpetitproleX), <a href="https://creativecommons.org/licenses/by/4.0" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY 4.0</a>, via Wikimedia Commons.`}
+	heroAlt="The Shiva Parvati Temple in Kathmandu Durbar Square, Nepal"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Yes &mdash; you can read the Bible free online in Nepal right now.</strong> In the 2021 census, 1.76% of Nepalis &mdash; 512,191 people &mdash; were Christian, in a nation that is 81.19% Hindu and 8.21% Buddhist. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account, and the <a href="https://fathersheartbible.com/read/ne/" style="color: var(--color-brand);" class="hover:underline"><em>Nepali</em> edition</a> is free to read today &mdash; the official language of Nepal, where Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	keyTakeaway="Nepal lifts the highest mountains on earth and holds many faiths — and Father's Heart Bible™ (FHB) offers a Father near to every Nepali, in Nepali."
+	glanceIntroHtml={`Nepal is a Himalayan republic between India and China. Nepali is the official language, hundreds of ethnic communities live in its valleys, hills and plains, and Hindu and Buddhist traditions shape daily life.`}
+	stats={stats}
+	knownForHeading="What Nepal is known for"
+	knownForIntroHtml={`A small country with some of the largest mountains, oldest temples and most generous hosts in Asia.`}
+	knownFor={[
+		{ label: 'Mount Everest', text: 'Eight of the world’s ten highest peaks, Everest among them, rise in Nepal.' },
+		{ label: 'Lumbini', text: 'The birthplace of the Buddha lies in the southern plains.' },
+		{ label: 'Kathmandu Valley', text: 'Durbar Squares, stupas and temples crowd one of the oldest cities in South Asia.' },
+		{ label: 'Many peoples', text: 'Newar, Tamang, Gurung, Tharu and many more communities share one nation.' },
+		{ label: 'Nepali, a bridge language', text: 'Nepali is the national language and is also spoken in Sikkim and Darjeeling in India.' },
+	]}
+	faithHeading="Faith and the Bible in Nepal"
+	faithBodyHtml={`<p>Nepal is the world&rsquo;s largest Hindu country by percentage. In the 2021 census, <strong>81.19%</strong> of Nepalis were Hindu, <strong>8.21%</strong> Buddhist, <strong>5.09%</strong> Muslim, <strong>3.17%</strong> Kiratist, and <strong>1.76% Christian</strong> &mdash; 512,191 people.</p><p>For readers of every background, Father&rsquo;s Heart Bible&trade; offers the Scriptures free, in the language of the home, revealing God as a near and loving <em>Father</em>.</p>`}
+	sources={[
+		{ label: 'World Bank, Population, total (2024) — compiled from UN World Population Prospects 2024 and national statistics offices', url: 'https://data.worldbank.org/indicator/SP.POP.TOTL?locations=NP' },
+		{ label: 'Nepal 2021 census, as summarised in Religion in Nepal — Wikipedia (Hindu 81.19%, Buddhist 8.21%, Muslim 5.09%, Kiratist 3.17%, Christian 1.76% = 512,191)', url: 'https://en.wikipedia.org/wiki/Religion_in_Nepal' },
+		{ label: 'Nepali language — Wikipedia', url: 'https://en.wikipedia.org/wiki/Nepali_language' },
+		{ label: 'Nepal — Wikipedia (Everest; Lumbini; Kathmandu Valley)', url: 'https://en.wikipedia.org/wiki/Nepal' },
+		{ label: 'Language-reach register, Father\'s Heart Bible (speakers of Nepali worldwide)', url: 'https://fathersheartbible.com/read/ne/' },
+	]}
+	faithsHeading="What “our Father” offers Nepal"
+	faithsIntroHtml={`In the valleys beneath the great peaks, many hearts are searching. Father&rsquo;s Heart Bible&trade; does not bring a foreign religion &mdash; it answers a universal longing: to be held by a Father who never abandons His children.`}
+	faithsBlocks={[
+		{ heading: 'For the brokenhearted', bodyHtml: `&ldquo;Our Father is near to the brokenhearted.&rdquo; <a href="https://fathersheartbible.com/read/psalms/34/" style="color: var(--color-gold);" class="hover:underline">Read Psalm 34</a> free.` },
+		{ heading: 'For the weary', bodyHtml: `To families bearing heavy loads, the Father says, <a href="https://fathersheartbible.com/read/matthew/11/" style="color: var(--color-gold);" class="hover:underline">&ldquo;Come to me, all you who are weary&hellip; and I will give you rest.&rdquo;</a>` },
+		{ heading: 'For the one who feels far off', bodyHtml: `Father&rsquo;s Heart Bible&trade; reveals <a href="https://fathersheartbible.com/read/luke/15/" style="color: var(--color-gold);" class="hover:underline">the Father who runs to His child</a> &mdash; near, not distant.` },
+		{ heading: 'For every people of the nation', bodyHtml: `Newar, Tamang, Gurung, Tharu and every community &mdash; the Father calls each Nepali His beloved son or daughter.` },
+	]}
+	whyHeading="Why Father's Heart Bible™ for Nepal"
+	whyBlocks={[
+		{ heading: 'God revealed as Father', bodyHtml: `Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
+		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a>, with audio on every English chapter.` },
+		{ heading: 'In Nepali', bodyHtml: `The Nepali edition is published: <a href="https://fathersheartbible.com/read/ne/" style="color: var(--color-brand);" class="hover:underline">read it free</a> &mdash; the official language of Nepal.` },
+	]}
+	wordHeading="His Word will not return void"
+	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do. From the Kathmandu Valley to the villages beneath the Himalaya, His Word will not return empty.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;&hellip;so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
+	resourcesHeading="Learn more about Nepal"
+	resourcesIntroHtml={`Trusted sources for the facts on this page &mdash; and for going deeper into Nepal&rsquo;s people, faith, and story.`}
+	resources={[
+		{ label: 'Nepal — Wikipedia', url: 'https://en.wikipedia.org/wiki/Nepal' },
+		{ label: 'Religion in Nepal — Wikipedia', url: 'https://en.wikipedia.org/wiki/Religion_in_Nepal' },
+		{ label: 'Nepal — Encyclopaedia Britannica', url: 'https://www.britannica.com/place/Nepal' },
+		{ label: 'Nepal — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/NP' },
+	]}
+	opportunityHeading="Bible languages for Nepal"
+	opportunityIntroHtml={`Nepali is the official language of Nepal, and English is understood in the cities and the mountain trekking towns. Both are free to read today.`}
+	languages={[
+		{ language: 'English', code: 'en' },
+		{ language: 'Nepali (नेपाली)', code: 'ne' },
+		{ language: 'Hindi', code: 'hi' },
+	]}
+	verses={verses}
+	keepReadingHtml={`Begin with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> &mdash; including <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start</a> and <a href="/guides/what-is-the-gospel/" style="color: var(--color-brand);" class="hover:underline">what the gospel is</a>. Browse Scripture by theme on our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> pages.`}
+	faqs={faqs}
+	ctaMidHeading="Know God as a Father near to you"
+	ctaMidBodyHtml={`In Nepali, English or Hindi, read God in His own voice as Father &mdash; free, on any phone.`}
+	ctaBottomBodyHtml={`From Genesis to Revelation, free online &mdash; a translation that reveals God as a loving Father to every beloved son and daughter across Nepal.`}
+/>
