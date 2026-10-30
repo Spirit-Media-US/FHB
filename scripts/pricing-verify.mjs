@@ -81,12 +81,18 @@ const isbns = haveIsbns ? JSON.parse(readFileSync(ISBNS, 'utf8')) : null;
 
 const checkoutSrc = readFileSync(CHECKOUT, 'utf8');
 
-/** Retail cents per SKU from dvc-checkout.ts EDITIONS, plus each SKU's `books` weight. */
+/** Retail cents per SKU from dvc-checkout.ts EDITIONS, plus each SKU's `books` weight. The
+ *  CATALOG_LANG_EDITIONS block (fhb-chain.py edition-roster, Kevin 2026-10-29: "buy any of the 80
+ *  languages") is merged in exactly as the function merges it: a SKU EDITIONS already sells wins. */
 function parseCheckout(src) {
-	const body = src.slice(
-		src.indexOf('const EDITIONS'),
-		src.indexOf('\n};', src.indexOf('const EDITIONS')),
-	);
+	const out = parseObject(src, 'const EDITIONS');
+	for (const [sku, v] of Object.entries(parseObject(src, 'const CATALOG_LANG_EDITIONS')))
+		if (!(sku in out)) out[sku] = v;
+	return out;
+}
+function parseObject(src, decl) {
+	if (src.indexOf(decl) < 0) return {};
+	const body = src.slice(src.indexOf(decl), src.indexOf('\n};', src.indexOf(decl)));
 	const out = {};
 	// BRACE-DEPTH SCAN, not a [^}]* regex. Every entry's `img` is a template literal, and
 	// the `}` that closes `${ASSETS}` ends a lazy [^}] match early — which silently cut each
@@ -243,7 +249,12 @@ if (haveIsbns) {
 	// 8. LANGUAGE EDITIONS (Kevin 2026-10-03). Every on-sale language item is sold in both
 	// bindings at its recorded price, and the checkout sells no language SKU the master does
 	// not put on sale.
-	const langs = (isbns.language_editions?.items ?? []).filter((i) => i.on_sale === true);
+	// Sold = on_sale (Ingram + the edition chain) OR direct_sale (Kevin 2026-10-29: "People can go
+	// ahead and buy any of the 80 languages" — sold here before Ingram lists them). The code is the
+	// item's own, else its Bowker register's.
+	const langs = (isbns.language_editions?.items ?? [])
+		.filter((i) => i.on_sale === true || Boolean(i.direct_sale))
+		.map((i) => ({ ...i, code: i.code ?? i.register?.code }));
 	check(
 		langs.length >= 26,
 		`expected at least 26 language editions ON SALE in ISBNS.json, found ${langs.length}`,
@@ -270,7 +281,7 @@ if (haveIsbns) {
 		const code = sku.replace(/^lang-/, '').replace(/-(hb|pb)$/, '');
 		check(
 			langCodes.has(code),
-			`${sku}: sold by ${CHECKOUT} but not on sale in ISBNS.json language_editions`,
+			`${sku}: sold by ${CHECKOUT} but neither on_sale nor direct_sale in ISBNS.json language_editions`,
 		);
 	}
 } else {
@@ -452,7 +463,9 @@ function ldNodes(html) {
 		out.push(n);
 		for (const [k, v] of Object.entries(n)) if (k !== '@graph' && typeof v === 'object') walk(v);
 	};
-	for (const m of html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {
+	for (const m of html.matchAll(
+		/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g,
+	)) {
 		try {
 			walk(JSON.parse(m[1]));
 		} catch {
@@ -467,7 +480,9 @@ function merchantErrs(pages, srv) {
 		const pageUrl = `https://fathersheartbible.com/${f.replace(/^dist\//, '').replace(/index\.html$/, '')}`;
 		const nodes = ldNodes(html);
 		if (nodes.some((n) => n.__parseError)) errs.push(`${f}: JSON-LD does not parse`);
-		const products = nodes.filter((n) => [].concat(n['@type'] ?? []).includes('Product') && n.offers);
+		const products = nodes.filter(
+			(n) => [].concat(n['@type'] ?? []).includes('Product') && n.offers,
+		);
 		const seen = new Set();
 		for (const p of products) {
 			const o = p.offers;
@@ -479,19 +494,26 @@ function merchantErrs(pages, srv) {
 			seen.add(o.sku);
 			const sv = srv[o.sku];
 			if (!sv) errs.push(`${tag}: schema offers a SKU the server does not sell`);
-			else if (cents(o.price) !== sv.cents) errs.push(`${tag}: schema price ${o.price}, server charges ${usd(sv.cents)}`);
+			else if (cents(o.price) !== sv.cents)
+				errs.push(`${tag}: schema price ${o.price}, server charges ${usd(sv.cents)}`);
 			if (o.priceCurrency !== 'USD') errs.push(`${tag}: priceCurrency ${o.priceCurrency}`);
-			if (o.availability !== 'https://schema.org/InStock') errs.push(`${tag}: availability ${o.availability}`);
+			if (o.availability !== 'https://schema.org/InStock')
+				errs.push(`${tag}: availability ${o.availability}`);
 			if (o.url !== pageUrl) errs.push(`${tag}: offer url ${o.url} is not this page (${pageUrl})`);
 			const sh = o.shippingDetails;
 			if (sh?.shippingRate?.value !== '0' || sh?.shippingDestination?.addressCountry !== 'US')
-				errs.push(`${tag}: shipping must be free and to the US (shippingRate 0 + shippingDestination US)`);
+				errs.push(
+					`${tag}: shipping must be free and to the US (shippingRate 0 + shippingDestination US)`,
+				);
 			if (!p.name || !p.image) errs.push(`${tag}: Product needs name and image`);
 			const g = o.gtin13 ?? p.gtin13;
-			if (!/^lp-set-/.test(o.sku ?? '') && !isbn13ok(g)) errs.push(`${tag}: gtin13 ${g} is not a valid ISBN-13`);
+			if (!/^lp-set-/.test(o.sku ?? '') && !isbn13ok(g))
+				errs.push(`${tag}: gtin13 ${g} is not a valid ISBN-13`);
 		}
 		const formSkus = Object.keys(forms[f]?.[0]?.prices ?? parseForms(html)[0]?.prices ?? {});
-		for (const sku of formSkus) if (!seen.has(sku)) errs.push(`${f}: the form sells ${sku} but no Product/Offer describes it`);
+		for (const sku of formSkus)
+			if (!seen.has(sku))
+				errs.push(`${f}: the form sells ${sku} but no Product/Offer describes it`);
 	}
 	return errs;
 }
@@ -607,7 +629,10 @@ if (process.argv.includes('--selftest')) {
 			() => {
 				const f = Object.keys(editionPages).find((k) => k.includes('/moms-bible/'));
 				if (!f) return false;
-				const broken = editionPages[f].replace(/"DefinedRegion","addressCountry":"US"/, '"DefinedRegion","addressCountry":"CA"');
+				const broken = editionPages[f].replace(
+					/"DefinedRegion","addressCountry":"US"/,
+					'"DefinedRegion","addressCountry":"CA"',
+				);
 				return broken !== editionPages[f] && merchantErrs({ [f]: broken }, server).length > 0;
 			},
 		],
@@ -646,6 +671,13 @@ if (process.argv.includes('--selftest')) {
 					broken['chosen-pb'].cents !==
 						cents(isbns.hardcover_case_laminate.chosen.price_usd.Paperback)
 				);
+			},
+		],
+		[
+			'a direct-sale language SKU missing from the catalog region',
+			() => {
+				const broken = parseCheckout(checkoutSrc.replace("'lang-af-hb': {", "'lang-af-hbX': {"));
+				return checkoutSrc.includes("'lang-af-hb': {") && broken['lang-af-hb'] == null;
 			},
 		],
 		[

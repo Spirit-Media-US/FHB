@@ -1,12 +1,13 @@
 ---
 import EditionOrder from '../../components/EditionOrder.astro';
+import LangCover from '../../components/LangCover.astro';
 import LookInside from '../../components/LookInside.astro';
 import Section from '../../components/Section.astro';
-import { cardUrl } from '../../data/card-art';
+import { cardUrl, hasLangCard } from '../../data/card-art';
 import frontmatter from '../../data/editions/frontmatter.json';
 import shared from '../../data/editions/shared.json';
 import isbnList from '../../data/isbn-list.json';
-import { langSlug, languageEditions } from '../../data/language-editions';
+import { langSlug, orderableLanguages } from '../../data/language-editions';
 import { catalogRows } from '../../data/print-catalog';
 import readerEntry from '../../data/reader-entry-links.json';
 import youversion from '../../data/youversion-versions.json';
@@ -115,15 +116,22 @@ const pillars: Pillar[] = fm?.pillars ?? [];
 // cardUrl decides the location: a card re-rendered to a NEW key resolves there, and one
 // that has not been re-rendered (journaling's 8x10, D166) keeps the key it has. The old
 // `?v=` is gone with it — a new key has nothing cached against it to bust.
-const coverUrl = cardUrl(ed.coverImage ?? `dvc-${ed.slug}`, 1200);
 const isLang = ed.kind === 'language';
+// A language edition whose case is not built yet has no card (Kevin 2026-10-29: all 80 listed, each
+// cover as it is built): the hero shows LangCover's cover-pending tile, and the share/schema image is
+// the site's branded card rather than a URL that 404s or another edition's cover.
+const langCode = isLang ? (ed.coverImage ?? '').replace(/^lang-/, '') : '';
+const hasCover = !isLang || hasLangCard(langCode);
+const coverUrl = hasCover
+	? cardUrl(ed.coverImage ?? `dvc-${ed.slug}`, 1200)
+	: 'https://assets.spiritmediapublishing.com/FHB/share/fhb-og-default.jpg?v=3';
 // THE ORDER FORM under the header, on EVERY edition (Kevin 2026-10-05; language pages since
 // 2026-10-03). It sells this edition's catalog row(s) from print-catalog.ts — the same record
 // /print's rows and dvc-checkout.ts use: lang-<code> for a language, the slug itself for an
 // audience or Large Print edition, and the three cover colours for the General edition, whose
 // page sells "Charcoal, Plum or White". A page with no catalog row FAILS THE BUILD: an edition
 // page that cannot be ordered is the defect this replaced.
-const langEd = isLang ? languageEditions.find((l) => langSlug(l) === ed.slug) : undefined;
+const langEd = isLang ? orderableLanguages.find((l) => langSlug(l) === ed.slug) : undefined;
 // Chapters of THIS language to read free (full-site audit M6): the page passes its
 // trust to the language's own chapters, and their native book names make each edition
 // page its own text rather than a 53%-shared template (M8). Generated, live-guarded.
@@ -436,7 +444,11 @@ const faqSchema = {
 				     on a phone, where most of this traffic lands. -->
 				<div class="flex flex-col items-center">
 					<div style="max-width: 340px; width: 100%;">
-						<img id="cover-main" src={coverUrl} alt={ed.name.startsWith('Father') ? `${ed.name} in Divine Voice™ Color` : `${ed.name} — Father's Heart Bible (FHB) in Divine Voice™ Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
+						{isLang ? (
+							<LangCover code={langCode} name={ed.name} english={ed.english ?? ''} rtl={ed.dir === 'rtl'} variant="page" />
+						) : (
+							<img id="cover-main" src={coverUrl} alt={ed.name.startsWith('Father') ? `${ed.name} in Divine Voice™ Color` : `${ed.name} — Father's Heart Bible (FHB) in Divine Voice™ Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
+						)}
 					</div>
 				</div>
 				<div>

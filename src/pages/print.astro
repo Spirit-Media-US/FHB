@@ -2,6 +2,7 @@
 import BuyControls from '../components/BuyControls.astro';
 import CatalogOrderForm from '../components/CatalogOrderForm.astro';
 import HearTheFather from '../components/HearTheFather.astro';
+import LangCover from '../components/LangCover.astro';
 import LookInside from '../components/LookInside.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
@@ -17,14 +18,14 @@ import digital from '../data/digital-listings.json';
 import { AUDIENCE_EDITION_TOTAL, dvcEditions as dvcEditionList } from '../data/dvc-editions';
 import {
 	allLanguageEditions,
-	comingSoonEditions,
 	LANG_HB,
 	LANG_PB,
 	LANGUAGE_EDITION_TOTAL,
 	langSlug,
-	languageEditions,
+	ROSTER_REGIONS,
+	type RosterLanguage,
+	rosterLanguages,
 } from '../data/language-editions';
-import rosterData from '../data/language-roster.json';
 import { reachPhrase } from '../data/language-speakers';
 import lookinsideData from '../data/lookinside.json';
 import Layout from '../layouts/Layout.astro';
@@ -225,8 +226,6 @@ const builtPages = new Set(
 		.map((slug) => `${slug}-bible`),
 );
 // A language card shows Look inside only once its sample pages are in lookinside.json.
-// Runtime value used in the template below (biome cannot see .astro template use, keep this line).
-const langCards = languageEditions;
 type DigitalLink = { store: string; url: string; price: string; label?: string };
 const langDigital = (code: string) => {
 	const d = (
@@ -237,7 +236,7 @@ const langDigital = (code: string) => {
 		...(d?.audiobook ?? []).map((x) => ({ ...x, kind: 'Audio' })),
 	];
 };
-const langHasLi = (l: (typeof languageEditions)[number]) =>
+const langHasLi = (l: RosterLanguage) =>
 	Boolean((lookinsideData as Record<string, { pages?: unknown[] }>)[langSlug(l)]?.pages?.length);
 const TRANSLATION_URL = '/the-fathers-heart-bible/translation-philosophy/';
 const CONTACT = 'mailto:hello@spiritmediapublishing.com?subject=Father%27s%20Heart%20Bible%20print';
@@ -251,11 +250,28 @@ const VOICE = { father: '#2563eb', son: '#c8102e', spirit: '#6a3fa0' };
 // The languages answer is GENERATED: the count and the list from the edition registry (English
 // first), the reach from language-reach.json via language-speakers.ts. Never typed here.
 const LANGUAGE_COUNT = LANGUAGE_EDITION_TOTAL + 1;
-// Kevin 2026-10-29: /print lists ALL 80 languages. Roster = language-roster.json; a language is
-// live in print iff it has a card in the edition registry (never typed); English is the main
-// editions above. Everything else gets a non-link 'Coming soon' button.
-const liveCodes = new Set(allLanguageEditions.map((l) => l.code));
-const restOfRoster = rosterData.languages.filter((r) => !liveCodes.has(r.code));
+// Kevin 2026-10-29: /print shows ALL 80 languages as cards (language-roster.json, generated). English
+// leads; then each world region in data order, A–Z by English name inside it. Runtime values used in
+// the template below (biome cannot see .astro template use, keep these lines).
+const langRegions = ROSTER_REGIONS.map((g) => ({
+	...g,
+	langs: rosterLanguages
+		.filter((l) => l.region === g.key)
+		.sort((a, b) => a.english.localeCompare(b.english)),
+})).filter((g) => g.langs.length);
+/** What the finder matches: English, the edition's own name, the language's own name, the roster name, country. */
+const langSearch = (l: RosterLanguage) =>
+	[
+		l.english,
+		l.code === 'en' ? 'English Father’s Heart Bible' : l.name,
+		l.endonym,
+		l.roster,
+		l.place,
+	]
+		.filter(Boolean)
+		.join(' ');
+/** Sold by our own checkout (an ISBN and on_sale/direct_sale); otherwise no Buy now / Buy Direct. */
+const langSold = (l: RosterLanguage) => l.sellable && Boolean(l.isbn);
 const LANGUAGE_NAMES = ['English', ...allLanguageEditions.map((l) => l.english)];
 const LANGUAGE_LIST = `${LANGUAGE_NAMES.slice(0, -1).join(', ')} and ${LANGUAGE_NAMES.at(-1)}`;
 const LANGUAGE_REACH = reachPhrase(['en', ...allLanguageEditions.map((l) => l.code)]);
@@ -853,74 +869,110 @@ const dvcVerses = [
 				<VoiceChips class="mt-5 mb-0" />
 			</div>
 
-			<div class="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7 max-w-6xl mx-auto">
-				{langCards.map((l) => (
-					<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
-						<img
-							src={cardUrl(`lang-${l.code}`)}
-							srcset={`${cardUrl(`lang-${l.code}`)} 600w, ${cardUrl(`lang-${l.code}`, 1200)} 1200w`}
-							sizes="(min-width: 1024px) 260px, 44vw"
-							alt={`Father's Heart Bible (FHB) — ${l.name}, the ${l.english} edition`}
-							width="600" height="764" loading="lazy" decoding="async"
-							class="block w-full h-auto" style="max-width: 220px;"
-						/>
-						<h3 lang={l.code} dir={l.rtl ? 'rtl' : undefined} style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{l.name}</h3>
-						<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">{l.english}</p>
-						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">{l.sub}</p>
-						<div class="flex flex-col gap-2 w-full mt-auto">
-							<div class="lang-links flex items-center justify-center gap-2 flex-nowrap whitespace-nowrap" style="margin: 0 0 0.2rem;">
-								{builtPages.has(`${langSlug(l)}-bible`) && (
-									<a href={`/bibles/${langSlug(l)}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
-								)}
-								{builtPages.has(`${langSlug(l)}-bible`) && langHasLi(l) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
-								{langHasLi(l) && <LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" />}
-							</div>
-							{/* Kevin 2026-10-10: the language's eBook and audiobook sit on its own card as store
-							    buttons in the Amazon shape, before Buy Direct (src/data/digital-listings.json). */}
-							<BuyControls
-								hbHref={l.amazon?.hardback}
-								pbHref={l.amazon?.paperback}
-								hbPrice={LANG_HB}
-								pbPrice={LANG_PB}
-								buyNowHref={builtPages.has(`${langSlug(l)}-bible`) ? `/bibles/${langSlug(l)}-bible/#order` : null}
-								pick={`lang-${l.code}`}
-								bn={bnLinks[`lang-${l.code}`]}
-								reserveBn
-								reserveSlots={4}
-								tightDirect
-								stores={langDigital(l.code).map((d) => ({ logo: 'google' as const, label: d.kind, price: d.price, href: d.url }))}
-							/>
-						</div>
-					</div>
-				))}
-			</div>
-			{/* Kevin 2026-10-29: the rest of the 80-language roster. English = the editions above;
-			    every other language without a print edition yet shows a disabled Coming soon button. */}
-			<div class="text-center mt-12 mb-6">
-				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.4rem; font-weight: 600; margin: 0;">All {rosterData.languages.length} Languages</h3>
-			</div>
-			<ul id="all-languages" class="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto list-none p-0" style="margin-left:auto;margin-right:auto;">
-				{restOfRoster.map((r) => (
-					<li class="all-lang flex flex-col items-center text-center rounded-2xl p-4" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);" data-lang={r.code}>
-						<span style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0 0 0.7rem;">{r.language}</span>
-						{r.code === 'en' ? (
-							<a href="/bibles/fathers-heart-bible/" style="font-family: var(--font-sans); font-size: 0.85rem; font-weight: 700; color: #fff; background: var(--color-brand); border-radius: 9999px; padding: 0.45rem 1.1rem; text-decoration: none;">Shop the editions</a>
-						) : (
-							<button type="button" disabled aria-disabled="true" class="coming-soon-btn" style="font-family: var(--font-sans); font-size: 0.85rem; font-weight: 700; color: #71717a; background: #f4f4f5; border: 1px solid #d4d4d8; border-radius: 9999px; padding: 0.45rem 1.1rem; cursor: not-allowed;">Coming soon</button>
-						)}
-					</li>
-				))}
-			</ul>
-			{/* Kevin 2026-10-07: the 33 include editions not yet built (Amharic, Zulu). Named here
-			    as coming soon — no card (no built cover yet), no page, no order form. */}
-			{comingSoonEditions.length > 0 && (
-				<p class="text-center mt-8" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; font-weight: 600; margin-left: auto; margin-right: auto; max-width: 40rem;">
-					Coming soon:{' '}
-					{comingSoonEditions.map((l, i) => (
-						<span>{i > 0 && ' · '}<span lang={l.code}>{l.name}</span> ({l.english})</span>
+			{/* Kevin 2026-10-29: "80 cards for 80 languages with book covers, full detail pages, look inside,
+			    and buttons list like all the others … Use wisdom to help people find their language. People
+			    can go ahead and buy any of the 80 languages." ONE card per roster language, GENERATED
+			    (language-roster.json, `fhb-chain.py edition-roster`; the edition registry wins for every
+			    edition the chain lists). English leads; then world regions (the language's primary country),
+			    A–Z by English name inside each, a jump bar and a filter that matches the English name, the
+			    edition's own name, the language's own name and the country. Same card, frame and button set
+			    as before: an Amazon / B&N button is live only once its link is in the data (D184); Buy now
+			    and Buy Direct only where the checkout sells the edition (no ISBN = never sold); the cover is
+			    the card cut from the BUILT case, else LangCover's cover-pending tile. */}
+			<div class="lang-finder max-w-6xl mx-auto" style="margin: 0 auto 1.5rem;">
+				<label for="lang-filter" style="display: block; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600; color: var(--color-ink); margin: 0 0 0.35rem; text-align: center;">Find your language</label>
+				<input id="lang-filter" type="search" placeholder="Type a language or country — Swahili, Español, Nigeria…" autocomplete="off" enterkeyhint="search" data-lang-filter style="display: block; width: 100%; max-width: 30rem; margin: 0 auto; font-family: var(--font-sans); font-size: 1rem; padding: 0.65rem 1rem; border: 1px solid #d4d4d8; border-radius: 9999px; background: #fff; color: var(--color-ink);" />
+				<p data-lang-filter-msg aria-live="polite" style="font-family: var(--font-sans); font-size: 0.85rem; color: var(--color-muted); text-align: center; min-height: 1.2em; margin: 0.4rem 0 0;"></p>
+				<nav aria-label="Jump to a region" class="lang-jump flex flex-wrap justify-center gap-2" style="margin: 0.6rem 0 0;">
+					{langRegions.map((g) => (
+						<a href={`#region-${g.key}`} data-region-link={g.key} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); background: #fff; border: 1px solid var(--color-hairline); border-radius: 9999px; padding: 0.35rem 0.9rem; text-decoration: none; white-space: nowrap;">{g.label} <span style="color: #71717a; font-weight: 600;">{g.langs.length}</span></a>
 					))}
-				</p>
-			)}
+				</nav>
+			</div>
+
+			{langRegions.map((g) => (
+				<section id={`region-${g.key}`} data-region={g.key} class="lang-region max-w-6xl mx-auto" style="scroll-margin-top: 90px; margin: 0 auto 2.5rem;">
+					<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.4rem; font-weight: 600; margin: 0 0 1rem; text-align: center;">{g.label}</h3>
+					<div class="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7">
+						{g.langs.map((l) => (
+							l.code === 'en' ? (
+								<div class="lang-card flex flex-col items-center text-center rounded-2xl p-4 md:p-5" data-lang-card="en" data-search={langSearch(l)} style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+									<img src={cardUrl('general-regular-charcoal')} srcset={`${cardUrl('general-regular-charcoal')} 600w, ${cardUrl('general-regular-charcoal', 1200)} 1200w`} sizes="(min-width: 1024px) 260px, 44vw" alt="Father's Heart Bible (FHB) — the English edition" width="600" height="764" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 220px;" />
+									<h3 lang="en" style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">Father’s Heart Bible™</h3>
+									<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">English</p>
+									<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">Every English edition — General, Large Print, Journaling and the audience editions — is on this page.</p>
+									<div class="flex flex-col gap-2 w-full mt-auto">
+										<a href="/bibles/fathers-heart-bible/" style="font-family: var(--font-sans); font-size: 0.85rem; font-weight: 700; color: #fff; background: var(--color-brand); border-radius: 9999px; padding: 0.5rem 1.1rem; text-decoration: none;">Shop the English editions</a>
+									</div>
+								</div>
+							) : (
+								<div class="lang-card flex flex-col items-center text-center rounded-2xl p-4 md:p-5" data-lang-card={l.code} data-search={langSearch(l)} style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+									<LangCover code={l.code} name={l.name} english={l.english} rtl={l.rtl} />
+									<h3 lang={l.code} dir={l.rtl ? 'rtl' : undefined} style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{l.name}</h3>
+									<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">{l.english}</p>
+									<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">{l.sub}</p>
+									<div class="flex flex-col gap-2 w-full mt-auto">
+										<div class="lang-links flex items-center justify-center gap-2 flex-nowrap whitespace-nowrap" style="margin: 0 0 0.2rem;">
+											{builtPages.has(`${langSlug(l)}-bible`) && (
+												<a href={`/bibles/${langSlug(l)}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
+											)}
+											{builtPages.has(`${langSlug(l)}-bible`) && langHasLi(l) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
+											{langHasLi(l) && <LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" />}
+										</div>
+										{/* Kevin 2026-10-10: the language's eBook and audiobook sit on its own card as store
+										    buttons in the Amazon shape, before Buy Direct (src/data/digital-listings.json). */}
+										<BuyControls
+											hbHref={l.amazon?.hardback}
+											pbHref={l.amazon?.paperback}
+											hbPrice={LANG_HB}
+											pbPrice={LANG_PB}
+											buyNowHref={langSold(l) && builtPages.has(`${langSlug(l)}-bible`) ? `/bibles/${langSlug(l)}-bible/#order` : null}
+											showDirect={langSold(l)}
+											pick={`lang-${l.code}`}
+											bn={bnLinks[`lang-${l.code}`]}
+											reserveBn
+											reserveSlots={4}
+											tightDirect
+											stores={langDigital(l.code).map((d) => ({ logo: 'google' as const, label: d.kind, price: d.price, href: d.url }))}
+										/>
+									</div>
+								</div>
+							)
+						))}
+					</div>
+				</section>
+			))}
+			<p data-lang-none hidden class="text-center" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; margin: 1rem auto 0; max-width: 36rem;">No language matches that yet. Every one of our 80 languages is on this page — try its English name or a country, or <a href={CONTACT} style={LINK}>ask us</a>.</p>
+			<script>
+				// The language finder (Kevin 2026-10-29: "Use wisdom to help people find their language").
+				// Matches every word typed against each card's data-search (English name, the edition's
+				// own name, the language's own name, the roster name and the country), accent-insensitive;
+				// a region with no match hides with its jump link.
+				const fold = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+				const input = document.querySelector<HTMLInputElement>('[data-lang-filter]');
+				const msg = document.querySelector<HTMLElement>('[data-lang-filter-msg]');
+				const none = document.querySelector<HTMLElement>('[data-lang-none]');
+				const cards = [...document.querySelectorAll<HTMLElement>('[data-lang-card]')];
+				const keys = new Map(cards.map((c) => [c, fold(c.dataset.search ?? '')]));
+				const apply = () => {
+					const words = fold(input?.value ?? '').split(/\s+/).filter(Boolean);
+					let shown = 0;
+					for (const c of cards) {
+						const hit = words.every((w) => keys.get(c)?.includes(w));
+						c.style.display = hit ? '' : 'none';
+						if (hit) shown++;
+					}
+					for (const r of document.querySelectorAll<HTMLElement>('[data-region]')) {
+						const any = [...r.querySelectorAll<HTMLElement>('[data-lang-card]')].some((c) => c.style.display !== 'none');
+						r.style.display = any ? '' : 'none';
+						const link = document.querySelector<HTMLElement>(`[data-region-link="${r.dataset.region}"]`);
+						if (link) link.style.display = any ? '' : 'none';
+					}
+					if (none) none.hidden = shown > 0;
+					if (msg) msg.textContent = words.length ? `${shown} of ${cards.length} languages` : '';
+				};
+				input?.addEventListener('input', apply);
+			</script>
 		</Section>
 
 		<!-- ═══════════════ HIS VOICE — DVC ON THE PAGE (shared component) ═══════════════ -->
