@@ -11,6 +11,7 @@ import VoiceChips from '../components/VoiceChips.astro';
 // R2 under FHB/scholars/ (dated names — a new edition is a NEW file, never a rename); download/ holds the
 // same bytes served with Content-Disposition: attachment. Trademark form: "Divine Voice™ Color" ONLY.
 import Layout from '../layouts/Layout.astro';
+import { FHB_ORG_CORE } from '../lib/fhb-org';
 import { fitDescription, fitTitle } from '../lib/seoFit';
 
 const PAGE_URL = 'https://fathersheartbible.com/overview/';
@@ -391,6 +392,7 @@ const KEVIN = {
 	jobTitle: "Editor, Father's Heart Bible™",
 };
 const jsonLd = [
+	{ '@context': 'https://schema.org', ...FHB_ORG_CORE },
 	{
 		'@context': 'https://schema.org',
 		'@type': 'CollectionPage',
