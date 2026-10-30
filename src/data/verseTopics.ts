@@ -16,6 +16,13 @@ export const VERSE_TOPICS: VerseTopic[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
 	},
 	{
+		slug: 'kindness',
+		title: 'Bible Verses About Kindness',
+		blurb:
+			'Being kind to one another, our Father\u2019s own kindness toward us, kindness to the needy, and kind words.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
+	},
+	{
 		slug: 'strength',
 		title: 'Bible Verses About Strength',
 		blurb: 'Where strength comes from, and how His power is made perfect in our weakness.',
