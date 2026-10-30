@@ -2,12 +2,20 @@
 // Unit 6aq. ONE map drives the "Related" block rendered by <RelatedTopics> inside
 // VerseCollection, WordMeaning and GroupBible, so no page hand-pastes these links.
 // Keys and values are "v:<slug>" (/verses), "m:<slug>" (/meaning), "b:<slug>" (/bible-for).
+// Values may also be "p:<slug>" for the fixed Bible-structure pages (PAGE_LINKS below; discovery links,
+// seo-bigkw-discovery-20261030).
 // Rules: 2-4 links per page, only where the topics truly overlap, no link farms.
 // Anchor text comes from each target's own registry title (verseTopics, wordMeanings, groups).
 
 import { FAITH_GROUPS, GROUPS } from './groups';
 import { VERSE_TOPICS } from './verseTopics';
 import { WORD_MEANINGS } from './wordMeanings';
+
+const PAGE_LINKS: Record<string, RelatedLink> = {
+	'old-testament': { href: '/old-testament/', label: 'The Old Testament: 39 books and how they fit together' },
+	'new-testament': { href: '/new-testament/', label: 'The New Testament: 27 books and how they fit together' },
+	'books-of-the-bible': { href: '/books-of-the-bible/', label: 'All 66 books of the Bible, in order' },
+};
 
 export const RELATED: Record<string, string[]> = {
 	// /verses
@@ -37,7 +45,7 @@ export const RELATED: Record<string, string[]> = {
 	'v:joy': ['v:thanksgiving', 'v:peace', 'b:worship-leaders'],
 	'v:money': ['v:gratitude', 'v:anxiety', 'b:financial-hardship'],
 	'v:grace': ['m:grace', 'v:salvation', 'v:forgiveness', 'v:strength'],
-	'v:love': ['m:love', 'm:covenant', 'b:marriage'],
+	'v:love': ['m:love', 'm:covenant', 'b:marriage', 'm:ten-commandments'],
 	'v:salvation': ['m:propitiation', 'v:grace', 'v:forgiveness', 'v:faith'],
 	'v:perseverance': ['v:strength', 'v:patience', 'v:courage', 'v:hope'],
 	'v:trust': ['v:anxiety', 'v:fear', 'v:faith', 'm:faith'],
@@ -49,13 +57,13 @@ export const RELATED: Record<string, string[]> = {
 	'v:thanksgiving': ['v:gratitude', 'v:joy', 'v:family', 'b:worship-leaders'],
 
 	// /meaning
-	'm:abba-father': ['m:our-father', 'v:god-as-father', 'v:prayer'],
-	'm:abide': ['m:love', 'm:faith'],
-	'm:begotten': ['m:our-father', 'm:abba-father', 'v:advent'],
+	'm:abba-father': ['m:our-father', 'v:god-as-father', 'v:prayer', 'p:new-testament'],
+	'm:abide': ['m:love', 'm:faith', 'p:new-testament'],
+	'm:begotten': ['m:our-father', 'm:abba-father', 'v:advent', 'p:new-testament'],
 	'm:consecrate': ['m:sanctified', 'm:hallowed-be-thy-name'],
 	'm:conviction': ['m:reproof', 'm:righteousness', 'm:grace', 'v:forgiveness'],
 	'm:covenant': ['m:love', 'm:grace', 'b:marriage', 'b:jews'],
-	'm:faith': ['v:faith', 'm:righteousness', 'm:grace'],
+	'm:faith': ['v:faith', 'm:righteousness', 'm:grace', 'p:new-testament'],
 	'm:fathers-heart-of-god': ['m:our-father', 'm:abba-father', 'v:god-as-father', 'b:fathers'],
 	'm:folly': ['m:wisdom', 'm:reproof', 'b:leaders'],
 	'm:forsake': ['v:comfort', 'b:grief', 'v:god-as-father'],
@@ -68,12 +76,12 @@ export const RELATED: Record<string, string[]> = {
 	'm:our-father': ['m:abba-father', 'm:hallowed-be-thy-name', 'v:god-as-father', 'v:prayer'],
 	'm:propitiation': ['v:salvation', 'm:grace', 'm:mercy', 'v:forgiveness'],
 	'm:reproof': ['m:conviction', 'm:wisdom', 'm:folly'],
-	'm:righteousness': ['m:faith', 'm:grace', 'm:conviction'],
+	'm:righteousness': ['m:faith', 'm:grace', 'm:conviction', 'm:ten-commandments'],
 	'm:sanctified': ['m:consecrate', 'm:hallowed-be-thy-name', 'm:righteousness'],
-	'm:selah': ['v:prayer', 'v:peace', 'b:jews'],
+	'm:selah': ['v:prayer', 'v:peace', 'b:jews', 'p:old-testament'],
 	'm:psalm-23': ['m:psalm-91', 'v:comfort', 'v:peace', 'm:our-father'],
 	'm:psalm-91': ['m:psalm-23', 'v:peace', 'v:comfort', 'm:forsake'],
-	'm:sheol': ['b:grief', 'v:hope', 'v:comfort'],
+	'm:sheol': ['b:grief', 'v:hope', 'v:comfort', 'p:old-testament'],
 	'm:ten-commandments': ['m:covenant', 'm:righteousness', 'v:family', 'b:jews'],
 	'm:wisdom': ['v:wisdom', 'm:folly', 'm:reproof', 'b:leaders', 'b:teachers'],
 
@@ -98,7 +106,7 @@ export const RELATED: Record<string, string[]> = {
 	'b:high-schoolers': ['v:friendship', 'v:anxiety', 'v:faith', 'm:wisdom'],
 	'b:hindus': ['m:our-father', 'm:fathers-heart-of-god', 'v:god-as-father'],
 	'b:husbands': ['v:love', 'v:family', 'v:patience', 'm:covenant'],
-	'b:incarcerated': ['v:forgiveness', 'v:hope', 'm:grace'],
+	'b:incarcerated': ['v:forgiveness', 'v:hope', 'm:grace', 'p:books-of-the-bible'],
 	'b:jews': ['m:covenant', 'm:ten-commandments', 'm:selah'],
 	'b:kids': ['v:family', 'v:joy', 'v:god-as-father'],
 	'b:leaders': ['m:wisdom', 'm:folly', 'v:strength', 'v:prayer'],
@@ -139,6 +147,7 @@ function resolve(key: string): RelatedLink | null {
 		const t = VERSE_TOPICS.find((x) => x.slug === slug);
 		return t ? { href: `/verses/${slug}/`, label: t.title } : null;
 	}
+	if (kind === 'p') return PAGE_LINKS[slug] ?? null;
 	if (kind === 'm') {
 		const w = WORD_MEANINGS.find((x) => x.slug === slug);
 		return w ? { href: `/meaning/${slug}/`, label: w.title } : null;
