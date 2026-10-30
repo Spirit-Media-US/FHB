@@ -202,4 +202,11 @@ export const VERSE_TOPICS: VerseTopic[] = [
 			'Trusting our Father with all your heart, when you are afraid, when life shakes, and not in people.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg',
 	},
+	{
+		slug: 'perseverance',
+		title: 'Bible Verses About Perseverance',
+		blurb:
+			'Endurance in trials, running the race, not giving up, and our Father who finishes what he begins.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg',
+	},
 ];
