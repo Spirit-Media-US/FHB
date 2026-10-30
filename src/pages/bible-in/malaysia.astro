@@ -1,0 +1,149 @@
+---
+// /bible-in/malaysia — Bahasa Melayu (Malay). Built 2026-10-30 (pmseoaeo reach lane) because
+// ms had no country page and so no crawl path from /bible-in (fhb-red-paths-20261030.json).
+// Sourced facts only: population = World Bank 2024; religion = Department of Statistics
+// Malaysia, Census 2020 (via Religion in Malaysia, Wikipedia); Malay speakers = Wikipedia
+// infobox (typed, not in language-reach.json). Respectful, Father-first: Islam is the official
+// religion; Christians are about 9%, and half of Sarawak. No Scripture edits.
+import CountryBible from '../../components/CountryBible.astro';
+
+const verses = [
+	{
+		ref: 'Psalm 68:5',
+		slug: 'psalms',
+		ch: 68,
+		text: 'A father to the fatherless and defender of widows is our Father in his holy dwelling.',
+	},
+	{
+		ref: 'Matthew 11:28',
+		slug: 'matthew',
+		ch: 11,
+		text: 'Come to me, all you who are weary and burdened, and I will give you rest.',
+	},
+	{
+		ref: 'John 3:16',
+		slug: 'john',
+		ch: 3,
+		text: 'For our Father so loved the world that he gave his one and only Son, that whoever believes in him will not perish but have eternal life.',
+	},
+];
+
+const stats = [
+	{ label: 'People', value: 'about 35.6 million' },
+	{ label: 'Christians', value: '9.1% of Malaysia' },
+	{ label: 'Sarawak', value: '50.1% Christian' },
+	{ label: 'Sabah', value: '24.7% Christian' },
+];
+
+const faqs = [
+	{
+		question: 'How many Christians are there in Malaysia?',
+		answer:
+			"Malaysia's 2020 census counted 9.1% of the population as Christian, alongside 63.5% Muslim, 18.7% Buddhist and 6.1% Hindu. Christians are about half of Sarawak (50.1%) and a large minority in Sabah (24.7%). You can read and hear the Scriptures they treasure free in Father's Heart Bible™ at fathersheartbible.com/read.",
+	},
+	{
+		question: 'Can I read the Bible online free in Malay?',
+		answer:
+			"Yes. Father's Heart Bible™ is free to read online in Malay (Bahasa Melayu) — all 66 books, no account, no purchase, no app — at fathersheartbible.com/read/ms/. Start with Yohanes 3 (John 3) or Mazmur 23 (Psalm 23). The English edition is free too, with audio.",
+	},
+	{
+		question: "Is Father's Heart Bible available in Malay?",
+		answer:
+			'Yes. The complete Malay edition — Alkitab Melayu, all 66 books — is free to read at fathersheartbible.com/read/ms/ and published in print (fathersheartbible.com/bibles/malay-bible/). Malay is the national language of Malaysia and is spoken as a first language by about 90 million people.',
+	},
+	{
+		question: 'Which other languages of Malaysia can I read the Bible in here?',
+		answer:
+			"English, Simplified Chinese and Tamil are each free to read at fathersheartbible.com/read/, alongside Malay. Malaysia's population is about 22% Chinese and 6.5% Indian, and English remains an active second language.",
+	},
+	{
+		question: 'Is there a free audio Bible I can listen to?',
+		answer:
+			"Yes. Every chapter of the English Father's Heart Bible™ comes with free audio, so it can be heard on any phone across Peninsular Malaysia, Sabah and Sarawak.",
+	},
+];
+---
+
+<CountryBible
+	slug="malaysia"
+	country="Malaysia"
+	flag="🇲🇾"
+	flagImg="/flags/my.svg"
+	countryWikipedia="https://en.wikipedia.org/wiki/Malaysia"
+	lastUpdated="October 2026"
+	lastUpdatedIso="2026-10-30"
+	colorPrimary="#CC0001"
+	colorSecondary="#010066"
+	colorAccent="#FFCC00"
+	tintWarm="#FBE8E8"
+	tintCool="#E6E6F2"
+	tintBlue="#FFF7D6"
+	title="The Bible in Malaysia — Christianity | Father's Heart Bible™ (FHB)"
+	description="How many Christians live in Malaysia? Read the Bible free online in Malay, English, Chinese and Tamil with audio — Father's Heart Bible™ (FHB)."
+	h1="The Bible in Malaysia"
+	heroSubhead="About one in eleven Malaysians is Christian, and in Sarawak it is one in two — Father's Heart Bible reveals God as a loving Father. Free online in Malay, with audio in English."
+	heroBase=""
+	heroSrc={{ desktop: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Kuala_Lumpur_Malaysia_Skyline-03.jpg/1280px-Kuala_Lumpur_Malaysia_Skyline-03.jpg", mobile: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Kuala_Lumpur_Malaysia_Skyline-03.jpg/960px-Kuala_Lumpur_Malaysia_Skyline-03.jpg", og: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Kuala_Lumpur_Malaysia_Skyline-03.jpg/1280px-Kuala_Lumpur_Malaysia_Skyline-03.jpg" }}
+	heroCreditHtml={`Hero photo: <a href="https://commons.wikimedia.org/wiki/File:Kuala_Lumpur_Malaysia_Skyline-03.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Kuala Lumpur skyline</a> by <a href="https://commons.wikimedia.org/wiki/User:Cccefalon" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CEphoto, Uwe Aranas</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 3.0</a>, via Wikimedia Commons.`}
+	heroAlt="The Kuala Lumpur skyline with the Petronas Twin Towers, Malaysia"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Yes &mdash; you can read the Bible free online in Malaysia right now.</strong> In the 2020 census, 9.1% of Malaysians were Christian &mdash; about half of Sarawak and a quarter of Sabah &mdash; in a nation where Islam is the official religion. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account. The complete <a href="https://fathersheartbible.com/read/ms/" style="color: var(--color-brand);" class="hover:underline"><em>Malay</em> edition</a> is free to read today and <a href="/bibles/malay-bible/" style="color: var(--color-brand);" class="hover:underline">published in print</a> &mdash; the national language of Malaysia, where Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	keyTakeaway="Malaysia holds Malay, Chinese, Indian and indigenous peoples in one nation — and Father's Heart Bible™ (FHB) offers a Father near to each of them, in Bahasa Melayu and beyond."
+	glanceIntroHtml={`Malaysia is a federation of Peninsular Malaysia and the Borneo states of Sabah and Sarawak. Malay is the national language, English remains an active second language, and Malay, Chinese, Indian and indigenous communities live side by side &mdash; with a Christian community that is strongest in East Malaysia.`}
+	stats={stats}
+	knownForHeading="What Malaysia is known for"
+	knownForIntroHtml={`A meeting place of peoples, tongues and tastes between the South China Sea and the Strait of Malacca.`}
+	knownFor={[
+		{ label: 'Two lands, one nation', text: 'Peninsular Malaysia and the Borneo states of Sabah and Sarawak form one federation.' },
+		{ label: 'Many peoples', text: 'Malay and other indigenous peoples, Chinese and Indian communities share one country.' },
+		{ label: 'Kuala Lumpur', text: 'The capital is home to the Petronas Twin Towers, a skyline known around the world.' },
+		{ label: 'A church in East Malaysia', text: 'Half of Sarawak and a quarter of Sabah are Christian.' },
+		{ label: 'A national language', text: 'Bahasa Melayu is the national language under Article 152 of the Constitution.' },
+	]}
+	faithHeading="Faith and the Bible in Malaysia"
+	faithBodyHtml={`<p>Islam is Malaysia&rsquo;s official religion, followed by 63.5% of the population in the 2020 census. Buddhists are 18.7%, <strong>Christians 9.1%</strong>, and Hindus 6.1%.</p><p>The Christian community is strongest in East Malaysia: <strong>50.1% of Sarawak</strong> and <strong>24.7% of Sabah</strong>.</p><p>For readers of every background, Father&rsquo;s Heart Bible&trade; offers the Scriptures free, in the language of the home, revealing God as a near and loving <em>Father</em>.</p>`}
+	sources={[
+		{ label: 'World Bank, Population, total (2024) — compiled from UN World Population Prospects 2024 and national statistics offices', url: 'https://data.worldbank.org/indicator/SP.POP.TOTL?locations=MY' },
+		{ label: 'Department of Statistics Malaysia, Key Findings of Population and Housing Census of Malaysia 2020 (religion: 63.5% Islam, 18.7% Buddhism, 9.1% Christianity, 6.1% Hinduism; Sarawak 50.1% and Sabah 24.7% Christian)', url: 'https://www.dosm.gov.my/' },
+		{ label: 'Religion in Malaysia — Wikipedia (summarizing the 2020 census)', url: 'https://en.wikipedia.org/wiki/Religion_in_Malaysia' },
+		{ label: 'Malay language — Wikipedia (about 90 million first-language speakers; national language, Article 152)', url: 'https://en.wikipedia.org/wiki/Malay_language' },
+		{ label: 'Malaysia — Wikipedia (ethnic composition: Chinese 22.1%, Indian 6.5%)', url: 'https://en.wikipedia.org/wiki/Malaysia' },
+	]}
+	faithsHeading="What “our Father” offers Malaysia"
+	faithsIntroHtml={`Across Peninsular Malaysia and Borneo, hearts are searching. Father&rsquo;s Heart Bible&trade; does not bring a foreign religion &mdash; it answers a universal longing: to be held by a Father who never abandons His children.`}
+	faithsBlocks={[
+		{ heading: 'For the fatherless', bodyHtml: `To the child no one came back for, Scripture promises <a href="https://fathersheartbible.com/read/psalms/68/" style="color: var(--color-gold);" class="hover:underline">&ldquo;a father to the fatherless&rdquo;</a>.` },
+		{ heading: 'For the weary', bodyHtml: `To families bearing heavy loads, the Father says, <a href="https://fathersheartbible.com/read/matthew/11/" style="color: var(--color-gold);" class="hover:underline">&ldquo;Come to me, all you who are weary&hellip; and I will give you rest.&rdquo;</a>` },
+		{ heading: 'For the one who feels far off', bodyHtml: `Father&rsquo;s Heart Bible&trade; reveals <a href="https://fathersheartbible.com/read/luke/15/" style="color: var(--color-gold);" class="hover:underline">the Father who runs to His child</a> &mdash; near, not distant.` },
+		{ heading: 'For every people of the nation', bodyHtml: `Malay, Chinese, Indian and indigenous &mdash; the Father calls each Malaysian His beloved son or daughter.` },
+	]}
+	whyHeading="Why Father's Heart Bible™ for Malaysia"
+	whyBlocks={[
+		{ heading: 'God revealed as Father', bodyHtml: `Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
+		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a>, with audio on every English chapter.` },
+		{ heading: 'In Bahasa Melayu', bodyHtml: `The complete Malay edition &mdash; the national language of Malaysia &mdash; is published: <a href="https://fathersheartbible.com/read/ms/" style="color: var(--color-brand);" class="hover:underline">read it free</a>, or see the <a href="/bibles/malay-bible/" style="color: var(--color-brand);" class="hover:underline">print edition</a>.` },
+	]}
+	wordHeading="His Word will not return void"
+	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do. From Kuala Lumpur to the longhouses of Sarawak, His Word will not return empty.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;&hellip;so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
+	resourcesHeading="Learn more about Malaysia"
+	resourcesIntroHtml={`Trusted sources for the facts on this page &mdash; and for going deeper into Malaysia&rsquo;s people, faith, and story.`}
+	resources={[
+		{ label: 'Malaysia — Wikipedia', url: 'https://en.wikipedia.org/wiki/Malaysia' },
+		{ label: 'Religion in Malaysia — Wikipedia', url: 'https://en.wikipedia.org/wiki/Religion_in_Malaysia' },
+		{ label: 'Malaysia — Encyclopaedia Britannica', url: 'https://www.britannica.com/place/Malaysia' },
+		{ label: 'Malaysia — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/MY' },
+	]}
+	opportunityHeading="Bible languages for Malaysia"
+	opportunityIntroHtml={`Malay is Malaysia&rsquo;s national language, and English, Chinese and Tamil are spoken in homes across the country. Each is free to read today.`}
+	languages={[
+		{ language: 'English', code: 'en' },
+		{ language: 'Malay (Bahasa Melayu)', code: 'ms', speakers: '90 million first-language speakers' },
+		{ language: 'Chinese (Simplified)', code: 'zh-hans' },
+		{ language: 'Tamil', code: 'ta' },
+	]}
+	verses={verses}
+	keepReadingHtml={`Begin with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> &mdash; including <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start</a> and <a href="/guides/what-is-the-gospel/" style="color: var(--color-brand);" class="hover:underline">what the gospel is</a>. Browse Scripture by theme on our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> pages.`}
+	faqs={faqs}
+	ctaMidHeading="Know God as a Father near to you"
+	ctaMidBodyHtml={`In Malay, English, Chinese or Tamil, read God in His own voice as Father &mdash; free, on any phone.`}
+	ctaBottomBodyHtml={`From Genesis to Revelation, free online &mdash; a translation that reveals God as a loving Father to every beloved son and daughter across Malaysia.`}
+/>
