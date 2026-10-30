@@ -383,11 +383,28 @@ const firstPct = Number(/FIRST_ORDER_PCT\s*=\s*(\d+)/.exec(readFileSync(PRICING_
 check(firstPct > 0, `could not read FIRST_ORDER_PCT from ${PRICING_TS}`);
 const firstUnit = (c) => c - Math.round((c * firstPct) / 100);
 const usd = (c) => `$${(c / 100).toFixed(2)}`;
-const editionSlugs = readdirSync(EDITIONS_DIR)
+const editionData = readdirSync(EDITIONS_DIR)
 	.filter((f) => /^[a-z0-9-]+\.json$/.test(f))
 	.map((f) => JSON.parse(readFileSync(`${EDITIONS_DIR}/${f}`, 'utf8')))
-	.filter((e) => typeof e?.slug === 'string' && e.listing && e.hook)
-	.map((e) => e.slug);
+	.filter((e) => typeof e?.slug === 'string' && e.listing && e.hook);
+// RESERVE-ONLY editions (no ISBN yet, `orderable: false` — Kevin 2026-10-30, full details NOW): the
+// page must carry NO order form and NO Offer (nothing the checkout cannot sell), and a #order block.
+for (const e of editionData.filter((x) => x.orderable === false)) {
+	const f = `${DIST}/bibles/${e.slug}-bible/index.html`;
+	if (!existsSync(f)) {
+		check(false, `${f} not built — reserve-only edition ${e.slug} has no page`);
+		continue;
+	}
+	const html = readFileSync(f, 'utf8');
+	check(
+		!e.isbn,
+		`${e.slug}: orderable false but carries ISBN ${e.isbn} — drop the flag and rebuild the page`,
+	);
+	check(parseForms(html).length === 0, `${f}: reserve-only edition must have NO order form`);
+	check(!/"@type":"Offer"/.test(html), `${f}: reserve-only edition must declare NO Offer`);
+	check(/id="order"/.test(html), `${f}: reserve-only edition has no #order block`);
+}
+const editionSlugs = editionData.filter((e) => e.orderable !== false).map((e) => e.slug);
 const editionPages = {};
 for (const slug of editionSlugs) {
 	const f = `${DIST}/bibles/${slug}-bible/index.html`;
