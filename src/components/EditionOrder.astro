@@ -27,8 +27,10 @@ interface Props {
 	heading: string;
 	/** this page's path, so a cancelled checkout returns here rather than to /print */
 	returnPath: string;
+	/** one line under the price, e.g. a pre-order's "ships when published" (no ISBN yet, Kevin 2026-10-30) */
+	note?: string;
 }
-const { rows, heading, returnPath } = Astro.props;
+const { rows, heading, returnPath, note } = Astro.props;
 const multi = rows.length > 1;
 // Runtime const: biome cannot see .astro template use (keep this line).
 const tiers = PRINT_TIERS;
@@ -69,6 +71,7 @@ const idp = `eo-${lead.id}`;
 			</p>
 		))}
 		<p class="eo-price__note">{FIRST_ORDER_LABEL} · free shipping</p>
+		{note && <p class="eo-price__note" data-preorder-note>{note}</p>}
 	</div>
 	{rows.map((r) => (
 		<div class={multi ? 'eo-variant' : undefined}>

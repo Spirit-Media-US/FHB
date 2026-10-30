@@ -96,6 +96,11 @@ type Edition = {
 	 *  added NOW". The page states the facts and offers a reserve-by-email in place of the order
 	 *  form — never an offer the checkout cannot fulfil, and no Offer in the structured data. */
 	orderable?: boolean;
+	/** true = no ISBN yet but SOLD NOW as a pre-order (Kevin 2026-10-30, kevin-decisions L1197: "All
+	 *  languages cards can offer a Buy now · free shipping button ... By the time people notice these
+	 *  will be published"). The order form sells lang-<code>; fulfilled on publication. Still no ISBN,
+	 *  date, GTIN or Offer in the structured data (a merchant Offer needs a GTIN). */
+	preorder?: boolean;
 	seo?: { title?: string; description?: string };
 };
 
@@ -194,7 +199,8 @@ function isoDate(display: string): string {
 	const i = MONTHS.indexOf(m[1]);
 	return i < 0 ? display : `${m[2]}-${String(i + 1).padStart(2, '0')}-01`;
 }
-const datePublished = ed.datePublished ?? (reserveOnly ? undefined : isoDate(ed.published));
+const datePublished =
+	ed.datePublished ?? (reserveOnly || ed.preorder ? undefined : isoDate(ed.published));
 
 // `title` is the long JSON-LD name ("Father's Heart Bible — Dad's Bible"); `name` is the h1.
 // Tolerate a data file that set them equal rather than emitting a Book whose name and
@@ -307,7 +313,9 @@ const BIND = {
 	hb: { label: 'Hardcover', format: 'https://schema.org/Hardcover' },
 	pb: { label: 'Paperback', format: 'https://schema.org/Paperback' },
 } as const;
-const variants = orderRows.flatMap((r) => {
+// A pre-order (no ISBN yet) sells through the form but declares no Product/Offer: no GTIN to give.
+const preorder = ed.preorder === true && !ed.isbn;
+const variants = (preorder ? [] : orderRows).flatMap((r) => {
 	const pair = pairFor(r.id);
 	return (['hb', 'pb'] as const).map((b) => ({
 		sku: `${r.id}-${b}`,
@@ -491,7 +499,7 @@ const faqSchema = {
 					<a href={RESERVE_MAIL} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; padding: 0.75rem 1.6rem; text-decoration: none; font-size: 0.95rem;">Reserve a copy by email</a>
 				</div>
 			) : (
-				<EditionOrder rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} />
+				<EditionOrder rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} note={preorder ? 'Pre-order: this edition ships as soon as it is published.' : undefined} />
 			)}
 		</Section>
 		<Section variant="warm">
