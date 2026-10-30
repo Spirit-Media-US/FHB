@@ -91,6 +91,12 @@ type Edition = {
 	hookNative?: { text: string; father?: string[]; son?: string[]; spirit?: string[] };
 	/** Kevin 2026-10-01: the ONE sentence every language edition states about its source. */
 	translationStatement?: string;
+	/** false = no ISBN assigned yet (build_language_pages.py, sheet "Pending Bowker"). Kevin
+	 *  2026-10-30: "ALL editions and languages need full details page ... The full details can be
+	 *  added NOW". The page states the facts and offers a reserve-by-email in place of the order
+	 *  form — never an offer the checkout cannot fulfil, and no Offer in the structured data. */
+	orderable?: boolean;
+	seo?: { title?: string; description?: string };
 };
 
 export async function getStaticPaths() {
@@ -145,8 +151,11 @@ const orderIds = langEd
 	: ed.slug === 'fathers-heart'
 		? catalogRows.filter((r) => r.category === 'general').map((r) => r.id)
 		: [ed.slug];
-const orderRows = catalogRows.filter((r) => orderIds.includes(r.id));
-if (!orderRows.length)
+// No ISBN yet = nothing the checkout can sell: an empty order set, by declaration, not by accident.
+const reserveOnly = ed.orderable === false;
+const orderRows = reserveOnly ? [] : catalogRows.filter((r) => orderIds.includes(r.id));
+const RESERVE_MAIL = `mailto:hello@spiritmediapublishing.com?subject=${encodeURIComponent(`Reserve: ${ed.english ?? ed.name} Father's Heart Bible`)}`;
+if (!orderRows.length && !reserveOnly)
 	throw new Error(
 		`/bibles/${ed.slug}-bible/: no print-catalog row for [${orderIds.join(', ')}] — this edition page would have no order form`,
 	);
@@ -185,7 +194,7 @@ function isoDate(display: string): string {
 	const i = MONTHS.indexOf(m[1]);
 	return i < 0 ? display : `${m[2]}-${String(i + 1).padStart(2, '0')}-01`;
 }
-const datePublished = ed.datePublished ?? isoDate(ed.published);
+const datePublished = ed.datePublished ?? (reserveOnly ? undefined : isoDate(ed.published));
 
 // `title` is the long JSON-LD name ("Father's Heart Bible — Dad's Bible"); `name` is the h1.
 // Tolerate a data file that set them equal rather than emitting a Book whose name and
@@ -339,12 +348,20 @@ const offerFor = (v: (typeof variants)[number]) => ({
 // the other binding(s) hang off it as workExample editions, each a Product with its own offer.
 const mainVariant = variants.find((v) => v.isbn && v.isbn === ed.isbn) ?? variants[0];
 const otherVariants = variants.filter((v) => v !== mainVariant);
+// A reserve-only edition (no ISBN yet) is a Book, not a Product: no SKU, no Offer, no GTIN.
+const commerce = mainVariant
+	? {
+			'@type': ['Book', 'Product'],
+			bookFormat: BIND[mainVariant.binding].format,
+			...(mainVariant.isbn ? { gtin13: mainVariant.isbn.replace(/-/g, '') } : {}),
+			sku: mainVariant.sku,
+		}
+	: { '@type': 'Book' };
 // Every binding carries the same description: Google's merchant listings flag a Product with none
 // (Search Console 2026-10-27, "Missing field description" on the workExample bindings).
 const productDescription = `${ed.sub}. The complete Bible in Divine Voice™ Color — our Father's words in blue, the Son's in red, the Spirit's in purple.`;
 const productSchema = {
 	'@context': 'https://schema.org',
-	'@type': ['Book', 'Product'],
 	'@id': `${url}#book`,
 	name: schemaName,
 	// FHB has no established search demand the way NIV or ESV does, so the abbreviation has
@@ -352,17 +369,15 @@ const productSchema = {
 	// abbreviation as alternate names (Kevin approved 2026-09-18). Other pages already do
 	// this; the 22 edition pages — the ones carrying the SKUs — did not.
 	alternateName: [ed.name, 'FHB'],
-	bookFormat: BIND[mainVariant.binding].format,
+	...commerce,
 	...(pages ? { numberOfPages: pages } : {}),
-	...(mainVariant.isbn ? { gtin13: mainVariant.isbn.replace(/-/g, '') } : {}),
-	sku: mainVariant.sku,
 	brand: { '@type': 'Brand', name: "Father's Heart Bible" },
 	// The Large Print SET carries no ISBN of its own — Kevin assigned numbers per volume, as
 	// lp-set.json's _isbnNote records. An empty string is not an ISBN, so the property is
 	// omitted rather than emitted blank, which is invalid structured data.
 	...(ed.isbn ? { isbn: ed.isbn } : {}),
 	inLanguage: ed.lang ?? 'en',
-	datePublished,
+	...(datePublished ? { datePublished } : {}),
 	description: productDescription,
 	image: coverUrl,
 	url,
@@ -388,7 +403,7 @@ const productSchema = {
 	},
 	translationOfWork: { '@type': 'Book', name: 'The Holy Bible' },
 	keywords: (ed.listing.keywordsSchema ?? ed.listing.keywords).join(', '),
-	offers: offerFor(mainVariant),
+	...(mainVariant ? { offers: offerFor(mainVariant) } : {}),
 	// The other binding(s): each its own book, ISBN and offer (Google: one product per GTIN).
 	workExample: otherVariants.map((v) => ({
 		'@type': ['Book', 'Product'],
@@ -469,7 +484,15 @@ const faqSchema = {
 					</div>
 				</div>
 			</div>
-			<EditionOrder rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} />
+			{reserveOnly ? (
+				<div id="order" class="max-w-3xl mx-auto rounded-2xl p-6 md:p-7 mt-10 text-center" style="background: #fff; border: 1px solid var(--color-hairline); scroll-margin-top: 90px;">
+					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.5rem;">Order the {ed.english} Edition direct</h2>
+					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.6; margin: 0 0 1.1rem;">This edition is in preparation: its ISBN, page count and price are assigned when the book is typeset. Reserve a copy now and we will write to you the day it can be ordered, direct from us with free shipping.</p>
+					<a href={RESERVE_MAIL} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; padding: 0.75rem 1.6rem; text-decoration: none; font-size: 0.95rem;">Reserve a copy by email</a>
+				</div>
+			) : (
+				<EditionOrder rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} />
+			)}
 		</Section>
 		<Section variant="warm">
 			<div class="max-w-3xl mx-auto">
