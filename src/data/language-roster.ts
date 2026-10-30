@@ -7,55 +7,22 @@
 // Greek were counted twice on /legacy, 85 instead of 80, because only read-online languages were
 // filtered out).
 import { allLanguageEditions } from './language-editions';
+import roster from './language-roster.json' with { type: 'json' };
 import { LANGUAGE_TOTAL, readOnlyLanguages } from './receive';
 
-const upcomingAll: [string, string, string][] = [
-	['Afrikaans', 'za', 'South Africa'],
-	['Anaang', 'ng', 'Nigeria'],
-	['Azerbaijani (South)', 'ir', 'Iran'],
-	['Greek', 'gr', 'Greece'],
-	['Gujarati', 'in', 'India'],
-	['Hausa', 'ng', 'Nigeria & West Africa'],
-	['Hiligaynon', 'ph', 'Philippines'],
-	['Haitian Creole', 'ht', 'Haiti'],
-	['Hungarian', 'hu', 'Hungary'],
-	['Igbo', 'ng', 'Nigeria'],
-	['Izon', 'ng', 'Nigeria'],
-	['Ilocano', 'ph', 'Philippines'],
-	['Javanese', 'id', 'Indonesia'],
-	['Gikuyu', 'ke', 'Kenya'],
-	['Kurdish (Kurmanji)', 'tr', 'Türkiye, Syria & Iraq'],
-	['Kannada', 'in', 'India'],
-	['Kituba', 'cd', 'DR Congo & Congo'],
-	['Mangbetu', 'cd', 'DR Congo'],
-	['Malagasy', 'mg', 'Madagascar'],
-	['Malayalam', 'in', 'India'],
-	['Malay', 'my', 'Malaysia'],
-	['Burmese', 'mm', 'Myanmar'],
-	['Nagamese', 'in', 'Northeast India'],
-	['Nepali', 'np', 'Nepal'],
-	['Inpui Naga', 'in', 'Northeast India'],
-	['Dutch', 'nl', 'Netherlands & Belgium'],
-	['Chokri Naga', 'in', 'Northeast India'],
-	['Chichewa', 'mw', 'Malawi'],
-	['Oromo', 'et', 'Ethiopia'],
-	['Odia', 'in', 'India'],
-	['Pashto', 'af', 'Afghanistan & Pakistan'],
-	['Kirundi', 'bi', 'Burundi'],
-	['Kinyarwanda', 'rw', 'Rwanda'],
-	['Sindhi', 'pk', 'Pakistan'],
-	['Sena', 'mz', 'Mozambique'],
-	['Kipsigis', 'ke', 'Kenya'],
-	['Shona', 'zw', 'Zimbabwe'],
-	['Somali', 'so', 'Somalia'],
-	['Sundanese', 'id', 'Indonesia'],
-	['Thai', 'th', 'Thailand'],
-	['Tigrinya', 'er', 'Eritrea & Ethiopia'],
-	['Akan (Twi)', 'gh', 'Ghana'],
-	['Uzbek', 'uz', 'Uzbekistan'],
-	['Xhosa', 'za', 'South Africa'],
-	['Yaka', 'cd', 'DR Congo'],
-].sort((a, b) => a[0].localeCompare(b[0])) as [string, string, string][];
+// GENERATED, no longer typed (2026-10-30): the roster's own name, the language's primary-country
+// flag and its place line, from src/data/language-roster.json (`fhb-chain.py edition-roster`).
+const upcomingAll: [string, string, string][] = (
+	roster.languages as {
+		code: string;
+		roster?: string;
+		flag?: string | null;
+		place?: string | null;
+	}[]
+)
+	.filter((l) => l.code !== 'en')
+	.map((l) => [l.roster ?? l.code, l.flag ?? '', l.place ?? ''] as [string, string, string])
+	.sort((a, b) => a[0].localeCompare(b[0]));
 
 /** "Modern Greek" -> "greek", "Persian (Farsi)" -> "persian": one key per language. */
 const identity = (name: string) =>
