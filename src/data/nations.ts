@@ -300,4 +300,67 @@ export const NATIONS: Nation[] = [
 			'The Pearl of Africa, at the source of the Nile — where Father’s Heart Bible™ reveals a Father near to the orphan and the displaced, in one of earth’s most Christian nations.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c5e5be6f9fcdb72e8ccc12ff70f82a79f0e7e9a7-1880x1253.jpg',
 	},
+	{
+		slug: 'myanmar',
+		country: 'Myanmar',
+		title: 'The Bible in Myanmar',
+		blurb:
+			'Golden pagodas, a great river and a country of many peoples, with a faithful Christian minority among the Chin, Kachin and Karen — where Father’s Heart Bible™ offers a Father near to each, in Burmese.',
+		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/Shwedagon_Zedi_Daw_Yangon_3.jpg/1280px-Shwedagon_Zedi_Daw_Yangon_3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		imgDirect: true,
+	},
+	{
+		slug: 'uzbekistan',
+		country: 'Uzbekistan',
+		title: 'The Bible in Uzbekistan',
+		blurb:
+			'The heart of the Silk Road, where Eastern Christians lived at Samarkand and Bukhara from the 7th century — where Father’s Heart Bible™ offers the Scriptures free in Uzbek.',
+		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Registan_01.jpg/1280px-Registan_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		imgDirect: true,
+	},
+	{
+		slug: 'nepal',
+		country: 'Nepal',
+		title: 'The Bible in Nepal',
+		blurb:
+			'A Himalayan nation of many peoples and many faiths, with a Christian community of over half a million — where Father’s Heart Bible™ offers a Father near to every Nepali, in Nepali.',
+		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Kathmandu_Durbar_Square%2C_Shiva_Parvati_Temple%2C_Nepal_%28edit%29.jpg/1280px-Kathmandu_Durbar_Square%2C_Shiva_Parvati_Temple%2C_Nepal_%28edit%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		imgDirect: true,
+	},
+	{
+		slug: 'zimbabwe',
+		country: 'Zimbabwe',
+		title: 'The Bible in Zimbabwe',
+		blurb:
+			'Victoria Falls, Great Zimbabwe and a people more than eight in ten Christian — where Father’s Heart Bible™ offers the Father near to them in Shona.',
+		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Victoria_Falls%2C_Zimbabwe_01.jpg/1280px-Victoria_Falls%2C_Zimbabwe_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		imgDirect: true,
+	},
+	{
+		slug: 'haiti',
+		country: 'Haiti',
+		title: 'The Bible in Haiti',
+		blurb:
+			'The first free Black republic, a deeply Christian people carrying heavy burdens — where Father’s Heart Bible™ offers a Father near to every Haitian, in Kreyòl.',
+		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/The_Citadelle_Laferri%C3%A8re%2C_Haiti_%287761638618%29.jpg/1280px-The_Citadelle_Laferri%C3%A8re%2C_Haiti_%287761638618%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		imgDirect: true,
+	},
+	{
+		slug: 'malawi',
+		country: 'Malawi',
+		title: 'The Bible in Malawi',
+		blurb:
+			'The warm heart of Africa on the shore of a great lake, with nearly nine in ten Christian — where Father’s Heart Bible™ offers a Father near to every Malawian, in Chichewa.',
+		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Otter_Point%2C_Cape_Maclear_%28Malawi%29.jpg/1280px-Otter_Point%2C_Cape_Maclear_%28Malawi%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		imgDirect: true,
+	},
+	{
+		slug: 'mozambique',
+		country: 'Mozambique',
+		title: 'The Bible in Mozambique',
+		blurb:
+			'A long Indian Ocean coast and the Zambezi valley, seven in ten Christian — where Father’s Heart Bible™ offers a Father near to each, in Sena, Chichewa and Portuguese.',
+		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Maputo_skyline_2006.jpg/1280px-Maputo_skyline_2006.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		imgDirect: true,
+	},
 ];
