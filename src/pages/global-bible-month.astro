@@ -114,7 +114,7 @@ const LINK = 'color: var(--color-brand);';
 
 <Layout title={TITLE} description={DESCRIPTION} jsonLd={jsonLd}>
 	<main id="main-content">
-		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">
 				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style={P}>
 					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
@@ -204,7 +204,9 @@ const LINK = 'color: var(--color-brand);';
 	.gbm-intro { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
 	.gbm-media { justify-self: center; width: 100%; max-width: 280px; }
 	.gbm-frame { position: relative; aspect-ratio: 9 / 16; width: 100%; background: var(--color-surface-low); border-radius: 0.5rem; overflow: hidden; }
-	.gbm-frame img, .gbm-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border: 0; display: block; }
+	/* :global(iframe) — the iframe is created by the script below, so it never carries Astro's scope attribute and a
+	   scoped `iframe` selector cannot match it (it fell back to 300x150: a 16:9 strip in a 9:16 frame). */
+	.gbm-frame img, .gbm-frame :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border: 0; display: block; }
 	.gbm-play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; cursor: pointer; }
 	.gbm-play:focus-visible { outline: 3px solid var(--color-brand); outline-offset: -3px; }
 	@media (min-width: 768px) {
