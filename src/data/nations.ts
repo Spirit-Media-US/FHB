@@ -268,6 +268,15 @@ export const NATIONS: Nation[] = [
 		imgDirect: true,
 	},
 	{
+		slug: 'malaysia',
+		country: 'Malaysia',
+		title: 'The Bible in Malaysia',
+		blurb:
+			'Malay, Chinese, Indian and indigenous peoples in one nation, with a church that is half of Sarawak — where Father’s Heart Bible™ offers a Father near to each, in Bahasa Melayu and beyond.',
+		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Kuala_Lumpur_Malaysia_Skyline-03.jpg/1280px-Kuala_Lumpur_Malaysia_Skyline-03.jpg',
+		imgDirect: true,
+	},
+	{
 		slug: 'thailand',
 		country: 'Thailand',
 		title: 'The Bible in Thailand',
