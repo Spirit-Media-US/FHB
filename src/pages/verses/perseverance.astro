@@ -1,0 +1,216 @@
+---
+// /verses/perseverance: unit W2 2026-10-30, ranked by Bing GetKeywordStats (aeo-state/fhb-verses-next-20261030.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+	{
+		id: 'endurance-grows',
+		heading: 'Suffering that builds endurance',
+		intro: 'Trials are not wasted; the Scriptures say they produce something lasting.',
+		verses: [
+			{
+				ref: 'Romans 5:3-5',
+				slug: 'romans',
+				ch: 5,
+				text: "Not only that, but we also boast in our suffering, since suffering produces endurance, and endurance produces character, and character produces hope. Hope doesn't put us to shame, because our Father's love has been poured into our hearts through the Holy Spirit given to us.",
+			},
+			{
+				ref: 'James 1:2-4',
+				slug: 'james',
+				ch: 1,
+				text: 'Consider it pure joy, my brothers and sisters, whenever you face trials of many kinds, because you know that the testing of your faith produces perseverance. Let perseverance finish its work so that you may be mature and complete, lacking nothing.',
+			},
+			{
+				ref: 'James 1:12',
+				slug: 'james',
+				ch: 1,
+				text: "Blessed is the one who endures trial, because once tested they'll receive the crown of life our Father promised to those who love him.",
+			},
+			{
+				ref: 'Romans 12:12',
+				slug: 'romans',
+				ch: 12,
+				text: 'Rejoice in hope, be patient in affliction, be devoted to prayer.',
+			},
+		],
+	},
+	{
+		id: 'run-the-race',
+		heading: 'Run the race with endurance',
+		intro: 'Perseverance is a long run, and others have run it before us.',
+		verses: [
+			{
+				ref: 'Hebrews 12:1-3',
+				slug: 'hebrews',
+				ch: 12,
+				text: "So, with so great a cloud of witnesses surrounding us, let's strip off every weight and the sin that clings so tightly, and run with endurance the race laid out before us. Looking to Jesus, the founder and perfecter of our faith, who for the joy set before him endured the cross, despising its shame, and is seated at the right hand of our Father's throne. Weigh how he endured such hostility from sinners against himself, so you don't grow weary or lose heart.",
+			},
+			{
+				ref: '1 Corinthians 9:24-25',
+				slug: '1-corinthians',
+				ch: 9,
+				text: "Don't you know all runners in a race run, but only one gets the prize? Run to win. Everyone who competes disciplines himself in everything, to win a crown that fades—but ours does not.",
+			},
+			{
+				ref: 'Philippians 3:13-14',
+				slug: 'philippians',
+				ch: 3,
+				text: "Brothers, I don't count myself as having grasped it yet. But one thing: forgetting what's behind, reaching for what's ahead, I press toward the goal for the prize of our Father's heavenward call in Christ Jesus.",
+			},
+			{
+				ref: '2 Timothy 4:7-8',
+				slug: '2-timothy',
+				ch: 4,
+				text: 'I have fought the good fight, I have finished the race, I have kept the faith. Now a crown of righteousness awaits me, which the Lord, the righteous judge, will give me on that day—not only to me but to all who have loved his appearing.',
+			},
+		],
+	},
+	{
+		id: 'do-not-give-up',
+		heading: 'Do not give up',
+		intro: 'When we are weary, the Word tells us where renewal comes from.',
+		verses: [
+			{
+				ref: 'Galatians 6:9',
+				slug: 'galatians',
+				ch: 6,
+				text: "Let's not tire of doing good—we'll reap a harvest in due time if we don't give up.",
+			},
+			{
+				ref: '2 Corinthians 4:16-18',
+				slug: '2-corinthians',
+				ch: 4,
+				text: "So we don't give up. Even as our outer person decays, our inner person is renewed day by day. For this light, momentary suffering produces for us an eternal weight of glory beyond all comparison, so we fix attention not on visible things but invisible ones, for the visible is passing but the invisible is eternal.",
+			},
+			{
+				ref: '2 Corinthians 4:8-9',
+				slug: '2-corinthians',
+				ch: 4,
+				text: 'We are afflicted in every way, but not crushed; perplexed, but not driven to despair; persecuted, but not abandoned; struck down, but not destroyed.',
+			},
+			{
+				ref: 'Isaiah 40:29-31',
+				slug: 'isaiah',
+				ch: 40,
+				text: 'He gives power to the weary, and increases strength for the powerless. Even youths will grow faint and weary, and young men will fall exhausted; but those who wait for our Father will renew their strength; they will soar on wings like eagles; they will run and not be weary; they will walk and not faint.',
+			},
+		],
+	},
+	{
+		id: 'stand-firm',
+		heading: 'Stand firm and hold on',
+		intro: 'Steadfastness rests on the faithfulness of the one who promised.',
+		verses: [
+			{
+				ref: '1 Corinthians 15:58',
+				slug: '1-corinthians',
+				ch: 15,
+				text: "So, my dear brothers and sisters, be steadfast, immovable, always overflowing in the Lord's work, knowing your labor in the Lord is not wasted.",
+			},
+			{
+				ref: 'Hebrews 10:23',
+				slug: 'hebrews',
+				ch: 10,
+				text: 'Let us hold tightly to the hope we declare, unshaken, for he who promised is faithful.',
+			},
+			{
+				ref: 'Hebrews 10:35-36',
+				slug: 'hebrews',
+				ch: 10,
+				text: "So do not throw away your confidence; it holds a great reward. You need endurance, so that having done our Father's will, you may receive the promise.",
+			},
+			{
+				ref: 'Matthew 24:13',
+				slug: 'matthew',
+				ch: 24,
+				text: 'but the one who endures to the end will be saved.',
+			},
+		],
+	},
+	{
+		id: 'father-sustains',
+		heading: 'Our Father who carries us through',
+		intro: 'We do not persevere alone; he finishes what he begins.',
+		verses: [
+			{
+				ref: 'Philippians 1:6',
+				slug: 'philippians',
+				ch: 1,
+				text: "I'm confident of this very thing: the one who began a good work in you will complete it until the day of Christ Jesus.",
+			},
+			{
+				ref: '2 Thessalonians 3:5',
+				slug: '2-thessalonians',
+				ch: 3,
+				text: "May the Lord guide your hearts into our Father's love and into Christ's endurance.",
+			},
+			{
+				ref: '1 Peter 5:10',
+				slug: '1-peter',
+				ch: 5,
+				text: 'And our Father of all grace, who called you to his eternal glory in Christ, will himself restore, support, strengthen, and ground you after brief suffering.',
+			},
+			{
+				ref: 'Psalm 73:26',
+				slug: 'psalms',
+				ch: 73,
+				text: 'My flesh and my heart may fail, but our Father is the strength of my heart and my portion forever.',
+			},
+		],
+	},
+];
+
+const faqs = [
+	{
+		question: 'What does the Bible say about perseverance?',
+		answer:
+			"Romans 5:3–5 says, “Not only that, but we also boast in our suffering, since suffering produces endurance, and endurance produces character, and character produces hope. Hope doesn't put us to shame, because our Father's love has been poured into our hearts through the Holy Spirit given to us.”",
+	},
+	{
+		question: 'Why does our Father allow trials?',
+		answer:
+			'James 1:2–4 says, “Consider it pure joy, my brothers and sisters, whenever you face trials of many kinds, because you know that the testing of your faith produces perseverance. Let perseverance finish its work so that you may be mature and complete, lacking nothing.”',
+	},
+	{
+		question: 'How do I keep going when I am weary?',
+		answer:
+			'Isaiah 40:29–31 says, “He gives power to the weary, and increases strength for the powerless. Even youths will grow faint and weary, and young men will fall exhausted; but those who wait for our Father will renew their strength; they will soar on wings like eagles; they will run and not be weary; they will walk and not faint.”',
+	},
+	{
+		question: 'What is the reward for enduring?',
+		answer:
+			"James 1:12 says, “Blessed is the one who endures trial, because once tested they'll receive the crown of life our Father promised to those who love him.”",
+	},
+	{
+		question: 'Should I give up on doing good?',
+		answer:
+			"Galatians 6:9 says, “Let's not tire of doing good—we'll reap a harvest in due time if we don't give up.”",
+	},
+	{
+		question: 'Who finishes the work in me?',
+		answer:
+			"Philippians 1:6 says, “I'm confident of this very thing: the one who began a good work in you will complete it until the day of Christ Jesus.”",
+	},
+];
+---
+<VerseCollection
+	slug="perseverance"
+	topic="Perseverance"
+	title="Bible Verses About Perseverance (with Audio) | Father's Heart Bible™"
+	description="Bible verses about perseverance in Father's Heart Bible™: endurance in trials, running the race, not giving up, standing firm. Read them free online with audio."
+	h1="Bible Verses About Perseverance"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg"
+	heroAlt="A man praying quietly"
+	published="2026-10-30"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about perseverance is James 1:2&ndash;4: &ldquo;Consider it pure joy, my brothers and sisters, whenever you face trials of many kinds, because you know that the testing of your faith produces perseverance.&rdquo;</strong> Scripture speaks to perseverance in five ways: suffering that builds endurance, running the race, not giving up when weary, standing firm, and our Father who carries us through. Below, word for word in Father&rsquo;s Heart Bible&trade;, are the verses on each, linked into the chapter so you can <a href="https://fathersheartbible.com/read/hebrews/12/" style="color: var(--color-brand);" class="hover:underline">read Hebrews 12 free</a> and hear it.`}
+	keyTakeaway="Perseverance is not gritting our teeth alone; it is staying on the road because our Father, who began a good work in us, will finish it."
+	themes={themes}
+	featured={{"book": "Hebrews", "slug": "hebrews", "chapter": 12, "verseLimit": 6, "heading": "Run with endurance: Hebrews 12", "intro": "Hebrews 12 is the Bible's great call to keep running. Read or hear the opening verses below, then follow them into the full chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/hebrews/12/" style="color: var(--color-brand);" class="hover:underline">Hebrews 12</a> or <a href="https://fathersheartbible.com/read/james/1/" style="color: var(--color-brand);" class="hover:underline">James 1</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/strength/" style="color: var(--color-brand);" class="hover:underline">verses on strength</a>, the <a href="/verses/patience/" style="color: var(--color-brand);" class="hover:underline">verses on patience</a>, the <a href="/verses/courage/" style="color: var(--color-brand);" class="hover:underline">verses on courage</a>, or the <a href="/verses/hope/" style="color: var(--color-brand);" class="hover:underline">verses on hope</a>.`}
+	ctaMidHeading="Hear Hebrews 12 in full"
+	ctaMidBodyHtml="Read and listen to the chapter on running with endurance &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear a Father who stays with you to the finish."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about perseverance", "perseverance", "James 1:2-4", "Hebrews 12:1-3"]}
+/>
