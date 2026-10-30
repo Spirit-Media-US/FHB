@@ -22,7 +22,7 @@ export const RELATED: Record<string, string[]> = {
 	'v:faith': ['m:faith', 'v:trust', 'v:hope'],
 	'v:fear': ['v:courage', 'v:anxiety', 'v:trust', 'v:peace', 'v:comfort', 'b:cancer'],
 	'v:family': ['b:fathers', 'b:mothers', 'b:marriage', 'v:thanksgiving'],
-	'v:forgiveness': ['m:grace', 'm:mercy', 'b:divorce', 'm:lords-prayer'],
+	'v:forgiveness': ['v:kindness', 'm:grace', 'm:mercy', 'b:divorce', 'm:lords-prayer'],
 	'v:friendship': ['b:singles', 'b:college-students'],
 	'v:god-as-father': [
 		'm:our-father',
@@ -33,6 +33,7 @@ export const RELATED: Record<string, string[]> = {
 	'v:gratitude': ['v:money', 'v:thanksgiving', 'v:joy', 'v:family'],
 	'v:healing': ['b:cancer', 'b:addiction', 'b:family-caregivers'],
 	'v:hope': ['v:death', 'b:grief', 'b:addiction', 'v:comfort'],
+	'v:kindness': ['v:love', 'v:forgiveness', 'v:patience', 'v:grace'],
 	'v:joy': ['v:thanksgiving', 'v:peace', 'b:worship-leaders'],
 	'v:money': ['v:gratitude', 'v:anxiety', 'b:financial-hardship'],
 	'v:grace': ['m:grace', 'v:salvation', 'v:forgiveness', 'v:strength'],

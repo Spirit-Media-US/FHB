@@ -1,0 +1,216 @@
+---
+// /verses/kindness: unit W2 2026-10-30, ranked by Bing GetKeywordStats (aeo-state/fhb-verses-next-20261030.json).
+// Verses are VERBATIM from the locked canon (/srv/sites/community/src/content/bible), fetched by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+	{
+		id: "kind-to-one-another",
+		heading: "Be kind to one another",
+		intro: "Kindness is the daily shape of love between brothers and sisters.",
+		verses: [
+			{
+				ref: "Ephesians 4:32",
+				slug: "ephesians",
+				ch: 4,
+				text: "Be kind to one another, tenderhearted, forgiving one another, just as our Father forgave you through Christ.",
+			},
+			{
+				ref: "Colossians 3:12",
+				slug: "colossians",
+				ch: 3,
+				text: "So, as our Father's chosen, holy and dearly loved, put on heartfelt compassion, kindness, humility, gentleness, and patience.",
+			},
+			{
+				ref: "1 Corinthians 13:4-7",
+				slug: "1-corinthians",
+				ch: 13,
+				text: "Love is patient, love is kind. It does not envy, it does not boast, it is not proud. It isn't rude, doesn't seek its own, isn't provoked, keeps no record of wrongs. Love does not delight in wrongdoing, but rejoices with the truth. It always protects, always trusts, always hopes, always perseveres.",
+			},
+			{
+				ref: "Galatians 5:22-23",
+				slug: "galatians",
+				ch: 5,
+				text: "But the fruit of the Spirit is love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, self-control. Against such things there is no law.",
+			},
+		],
+	},
+	{
+		id: "our-fathers-kindness",
+		heading: "Our Father’s kindness toward us",
+		intro: "Before we are asked to be kind, we are shown kindness.",
+		verses: [
+			{
+				ref: "Romans 2:4",
+				slug: "romans",
+				ch: 2,
+				text: "Or do you despise the riches of his kindness and restraint and patience, not realizing that our Father's kindness is meant to lead you to repentance?",
+			},
+			{
+				ref: "Titus 3:4-5",
+				slug: "titus",
+				ch: 3,
+				text: "But when the goodness and loving kindness of our Father, our Savior, appeared, he saved us—not for righteous deeds we did, but by his mercy, through washing of new birth and renewal by the Holy Spirit,",
+			},
+			{
+				ref: "Ephesians 2:7",
+				slug: "ephesians",
+				ch: 2,
+				text: "so that in the ages to come he might display his grace's overflowing riches in kindness toward us in Christ Jesus.",
+			},
+			{
+				ref: "Hosea 11:4",
+				slug: "hosea",
+				ch: 11,
+				text: "I led them with cords of kindness, with bands of love; I was like one who lifts the yoke from their jaws, and I bent down to feed them.",
+			},
+		],
+	},
+	{
+		id: "kindness-to-the-needy",
+		heading: "Kindness to the poor and the needy",
+		intro: "Kindness reaches those who cannot repay it, and our Father counts it done for him.",
+		verses: [
+			{
+				ref: "Proverbs 14:31",
+				slug: "proverbs",
+				ch: 14,
+				text: "Whoever oppresses the poor reproaches our Father, their Maker, but whoever is kind to the needy honors him.",
+			},
+			{
+				ref: "Proverbs 11:17",
+				slug: "proverbs",
+				ch: 11,
+				text: "A kind person benefits himself, but a cruel person brings trouble on himself.",
+			},
+			{
+				ref: "Micah 6:8",
+				slug: "micah",
+				ch: 6,
+				text: "He has told you what is good; and what does our Father require of you but to do justice, to love kindness, and to walk humbly with your Father?",
+			},
+			{
+				ref: "Zechariah 7:9",
+				slug: "zechariah",
+				ch: 7,
+				text: "What the Father of heaven's armies says: Render true justice; show kindness and compassion to one another.",
+			},
+		],
+	},
+	{
+		id: "kind-words",
+		heading: "Kind words",
+		intro: "A gentle word costs little and carries weight.",
+		verses: [
+			{
+				ref: "Proverbs 12:25",
+				slug: "proverbs",
+				ch: 12,
+				text: "Anxiety weighs down the heart, but a kind word cheers it up.",
+			},
+			{
+				ref: "Proverbs 16:24",
+				slug: "proverbs",
+				ch: 16,
+				text: "Pleasant words are a honeycomb, sweet to the soul and healing to the bones.",
+			},
+			{
+				ref: "Ephesians 4:29",
+				slug: "ephesians",
+				ch: 4,
+				text: "Let no rotten word leave your mouth, only what helps others grow, fitting the moment, so it gives grace to hearers.",
+			},
+			{
+				ref: "Colossians 4:6",
+				slug: "colossians",
+				ch: 4,
+				text: "Always speak with grace, seasoned with salt, knowing how to answer each one.",
+			},
+		],
+	},
+	{
+		id: "kindness-remembered",
+		heading: "Kindness shown and remembered",
+		intro: "Scripture is full of small kindnesses that were never forgotten.",
+		verses: [
+			{
+				ref: "Ruth 2:20",
+				slug: "ruth",
+				ch: 2,
+				text: "Naomi told her daughter-in-law, \"May our Father bless him, whose kindness hasn't left the living or the dead.\" She added, \"He's a close relative, one of our redeemers.\"",
+			},
+			{
+				ref: "2 Samuel 9:3",
+				slug: "2-samuel",
+				ch: 9,
+				text: "The king asked, \"Is no one left of Saul's house to whom I can show the kindness of our Father?\" Ziba answered the king, \"There is still a son of Jonathan; he is crippled in both feet.\"",
+			},
+			{
+				ref: "Acts 28:2",
+				slug: "acts",
+				ch: 28,
+				text: "Local people showed us unusual kindness: they lit a fire and welcomed us all, since rain had started and it was cold.",
+			},
+			{
+				ref: "Luke 6:35",
+				slug: "luke",
+				ch: 6,
+				text: "But love your enemies, do good, and lend expecting nothing back; your reward will be great, and you will be children of the Most High, for he is kind to the ungrateful and evil.",
+			},
+		],
+	},
+];
+
+const faqs = [
+	{
+		question: "What does the Bible say about kindness?",
+		answer:
+			"Ephesians 4:32 says, “Be kind to one another, tenderhearted, forgiving one another, just as our Father forgave you through Christ.”",
+	},
+	{
+		question: "Is kindness a fruit of the Spirit?",
+		answer:
+			"Galatians 5:22–23 says, “But the fruit of the Spirit is love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, self-control. Against such things there is no law.”",
+	},
+	{
+		question: "What is our Father’s kindness like?",
+		answer:
+			"Romans 2:4 says, “Or do you despise the riches of his kindness and restraint and patience, not realizing that our Father's kindness is meant to lead you to repentance?”",
+	},
+	{
+		question: "What does it mean to love kindness?",
+		answer:
+			"Micah 6:8 says, “He has told you what is good; and what does our Father require of you but to do justice, to love kindness, and to walk humbly with your Father?”",
+	},
+	{
+		question: "How does the Bible say to treat the poor?",
+		answer:
+			"Proverbs 14:31 says, “Whoever oppresses the poor reproaches our Father, their Maker, but whoever is kind to the needy honors him.”",
+	},
+	{
+		question: "Does a kind word matter?",
+		answer:
+			"Proverbs 12:25 says, “Anxiety weighs down the heart, but a kind word cheers it up.”",
+	},
+];
+---
+<VerseCollection
+	slug="kindness"
+	topic="Kindness"
+	title="Bible Verses About Kindness (with Audio) | Father's Heart Bible™"
+	description="Bible verses about kindness in Father's Heart Bible™: being kind to one another, our Father's kindness, kindness to the needy, and kind words. Read them free online with audio."
+	h1="Bible Verses About Kindness"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg"
+	heroAlt="People gathered together around a table"
+	published="2026-10-30"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">A key Bible verse about kindness is Ephesians 4:32: &ldquo;Be kind to one another, tenderhearted, forgiving one another, just as our Father forgave you through Christ.&rdquo;</strong> Scripture speaks to kindness in five ways: being kind to one another, our Father&rsquo;s own kindness toward us, kindness to the poor and needy, kind words, and kindness remembered. Below, word for word in Father&rsquo;s Heart Bible&trade;, are the verses on each, linked into the chapter so you can <a href="https://fathersheartbible.com/read/ephesians/4/" style="color: var(--color-brand);" class="hover:underline">read Ephesians 4 free</a> and hear it.`}
+	keyTakeaway="Kindness is not a mood we muster; it is the family likeness. Our Father showed us kindness first, and we pass it on."
+	themes={themes}
+	featured={{"book": "Ephesians", "slug": "ephesians", "chapter": 4, "verseLimit": 6, "heading": "Be kind to one another: Ephesians 4", "intro": "Ephesians 4 begins with humility, gentleness and patience, bearing with one another in love, and ends at verse 32 with kindness and forgiveness. Hear the opening verses below, then follow them into the full chapter."}}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/ephesians/4/" style="color: var(--color-brand);" class="hover:underline">Ephesians 4</a> or <a href="https://fathersheartbible.com/read/colossians/3/" style="color: var(--color-brand);" class="hover:underline">Colossians 3</a>, browse more <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a>, see the <a href="/verses/love/" style="color: var(--color-brand);" class="hover:underline">verses on love</a>, the <a href="/verses/forgiveness/" style="color: var(--color-brand);" class="hover:underline">verses on forgiveness</a>, the <a href="/verses/patience/" style="color: var(--color-brand);" class="hover:underline">verses on patience</a>, or the <a href="/verses/grace/" style="color: var(--color-brand);" class="hover:underline">verses on grace</a>.`}
+	ctaMidHeading="Hear Ephesians 4 in full"
+	ctaMidBodyHtml="Read and listen to the chapter on kindness and forgiveness &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear the kindness of a Father who forgave you first."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about kindness", "kindness", "Ephesians 4:32", "Galatians 5:22-23"]}
+/>
