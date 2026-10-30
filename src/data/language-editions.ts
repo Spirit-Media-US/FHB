@@ -103,8 +103,10 @@ export interface RosterLanguage extends LanguageEdition {
 	flag?: string | null;
 	place?: string | null;
 	isbn?: { hardback: string; paperback: string } | null;
-	/** sold by our own checkout (ISBNS.json on_sale or direct_sale) */
+	/** sold by our own checkout (ISBNS.json on_sale or direct_sale, or a pre-order) */
 	sellable: boolean;
+	/** no ISBN yet, sold now and shipped on publication (Kevin 2026-10-30: Buy now on all 80) */
+	preorder?: boolean;
 	/** listed by the edition chain (edition-registry.json) */
 	listed: boolean;
 	/** R2 card line (v1/v2) cut from the BUILT case; null = no cover built yet */
@@ -134,14 +136,18 @@ export const rosterLanguages: RosterLanguage[] = (roster.languages as RosterRow[
 		place: (r.place as string) ?? null,
 		isbn: (r.isbn as RosterLanguage['isbn']) ?? null,
 		sellable: Boolean(r.sellable) || Boolean(reg),
+		...(r.preorder ? { preorder: true } : {}),
 		listed: Boolean(reg),
 		card: (r.card as string | null) ?? null,
 	};
 });
 
-/** Every language edition our own checkout sells: the registry's, then the roster's direct-sale ones
- *  (dvc-checkout.ts CATALOG LANGUAGE region). An edition with no ISBN is never sold. */
+/** Every language edition our own checkout sells: the registry's, then the roster's direct-sale and
+ *  pre-order ones (dvc-checkout.ts CATALOG LANGUAGE region). Kevin 2026-10-30: "Make sure all languages
+ *  show in the bookstore order form" — a language with no ISBN yet is a pre-order, still sold. */
 export const orderableLanguages: LanguageEdition[] = [
 	...languageEditions,
-	...rosterLanguages.filter((l) => l.code !== 'en' && l.sellable && !l.listed && l.isbn),
+	...rosterLanguages.filter(
+		(l) => l.code !== 'en' && l.sellable && !l.listed && (l.isbn || l.preorder),
+	),
 ];
