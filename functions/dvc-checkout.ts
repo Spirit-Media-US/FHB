@@ -818,12 +818,12 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 	'lang-gu-hb': {
 		title: 'ગુજરાતી બાઇબલ (Gujarati) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-gu-600.webp`,
 	},
 	'lang-gu-pb': {
 		title: 'ગુજરાતી બાઇબલ (Gujarati) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-gu-600.webp`,
 	},
 	'lang-ht-hb': {
 		title: 'Bib Kreyòl Ayisyen (Haitian Creole) — Hardback',
@@ -848,12 +848,12 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 	'lang-hil-hb': {
 		title: 'Hiligaynon nga Biblia (Hiligaynon) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-hil-600.webp`,
 	},
 	'lang-hil-pb': {
 		title: 'Hiligaynon nga Biblia (Hiligaynon) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-hil-600.webp`,
 	},
 	'lang-ig-hb': {
 		title: 'Baịbụl Igbo (Igbo) — Hardback',
@@ -868,12 +868,12 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 	'lang-ilo-hb': {
 		title: 'Biblia nga Ilokano (Ilocano) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ilo-600.webp`,
 	},
 	'lang-ilo-pb': {
 		title: 'Biblia nga Ilokano (Ilocano) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ilo-600.webp`,
 	},
 	'lang-jv-hb': {
 		title: 'Kitab Suci Jawa (Javanese) — Hardback',
@@ -898,62 +898,62 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 	'lang-ki-hb': {
 		title: 'Bibilia ya Gĩkũyũ (Kikuyu) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ki-600.webp`,
 	},
 	'lang-ki-pb': {
 		title: 'Bibilia ya Gĩkũyũ (Kikuyu) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ki-600.webp`,
 	},
 	'lang-rw-hb': {
 		title: "Bibiliya y'Ikinyarwanda (Kinyarwanda) — Hardback",
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-rw-600.webp`,
 	},
 	'lang-rw-pb': {
 		title: "Bibiliya y'Ikinyarwanda (Kinyarwanda) — Paperback",
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-rw-600.webp`,
 	},
 	'lang-rn-hb': {
 		title: "Bibiliya y'Ikirundi (Kirundi) — Hardback",
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-rn-600.webp`,
 	},
 	'lang-rn-pb': {
 		title: "Bibiliya y'Ikirundi (Kirundi) — Paperback",
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-rn-600.webp`,
 	},
 	'lang-kmr-hb': {
 		title: 'Kitêba Pîroz a Kurmancî (Kurmanji Kurdish) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-kmr-600.webp`,
 	},
 	'lang-kmr-pb': {
 		title: 'Kitêba Pîroz a Kurmancî (Kurmanji Kurdish) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-kmr-600.webp`,
 	},
 	'lang-mg-hb': {
 		title: 'Baiboly Malagasy (Malagasy) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-mg-600.webp`,
 	},
 	'lang-mg-pb': {
 		title: 'Baiboly Malagasy (Malagasy) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-mg-600.webp`,
 	},
 	'lang-ms-hb': {
 		title: 'Alkitab Melayu (Malay) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ms-600.webp`,
 	},
 	'lang-ms-pb': {
 		title: 'Alkitab Melayu (Malay) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ms-600.webp`,
 	},
 	'lang-ml-hb': {
 		title: 'മലയാളം ബൈബിൾ (Malayalam) — Hardback',
@@ -968,42 +968,42 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 	'lang-nag-hb': {
 		title: 'Nagamese Pobitro Kitab (Nagamese) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-nag-600.webp`,
 	},
 	'lang-nag-pb': {
 		title: 'Nagamese Pobitro Kitab (Nagamese) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-nag-600.webp`,
 	},
 	'lang-or-hb': {
 		title: 'ଓଡ଼ିଆ ବାଇବଲ (Odia) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-or-600.webp`,
 	},
 	'lang-or-pb': {
 		title: 'ଓଡ଼ିଆ ବାଇବଲ (Odia) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-or-600.webp`,
 	},
 	'lang-om-hb': {
 		title: 'Macaafa Qulqulluu Oromoo (Oromo) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-om-600.webp`,
 	},
 	'lang-om-pb': {
 		title: 'Macaafa Qulqulluu Oromoo (Oromo) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-om-600.webp`,
 	},
 	'lang-ps-hb': {
 		title: 'د پښتو سپیڅلی کتاب (Pashto) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ps-600.webp`,
 	},
 	'lang-ps-pb': {
 		title: 'د پښتو سپیڅلی کتاب (Pashto) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ps-600.webp`,
 	},
 	'lang-seh-hb': {
 		title: 'Bukhu ya Mulungu ya Chisena (Sena) — Hardback',
@@ -1028,72 +1028,72 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 	'lang-sd-hb': {
 		title: 'سنڌي بائيبل (Sindhi) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-sd-600.webp`,
 	},
 	'lang-sd-pb': {
 		title: 'سنڌي بائيبل (Sindhi) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-sd-600.webp`,
 	},
 	'lang-so-hb': {
 		title: 'Kitaabka Quduuska ah ee Soomaaliga (Somali) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-so-600.webp`,
 	},
 	'lang-so-pb': {
 		title: 'Kitaabka Quduuska ah ee Soomaaliga (Somali) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-so-600.webp`,
 	},
 	'lang-azb-hb': {
 		title: 'تۆرکجه موقدس کتاب (South Azerbaijani) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-azb-600.webp`,
 	},
 	'lang-azb-pb': {
 		title: 'تۆرکجه موقدس کتاب (South Azerbaijani) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-azb-600.webp`,
 	},
 	'lang-th-hb': {
 		title: 'พระคัมภีร์​ไทย (Thai) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-th-600.webp`,
 	},
 	'lang-th-pb': {
 		title: 'พระคัมภีร์​ไทย (Thai) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-th-600.webp`,
 	},
 	'lang-ti-hb': {
 		title: 'ናይ ትግርኛ መጽሓፍ ቅዱስ (Tigrinya) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ti-600.webp`,
 	},
 	'lang-ti-pb': {
 		title: 'ናይ ትግርኛ መጽሓፍ ቅዱስ (Tigrinya) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ti-600.webp`,
 	},
 	'lang-ak-hb': {
 		title: 'Twi Twerɛ Kronkron (Twi) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ak-600.webp`,
 	},
 	'lang-ak-pb': {
 		title: 'Twi Twerɛ Kronkron (Twi) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-ak-600.webp`,
 	},
 	'lang-xh-hb': {
 		title: 'IBhayibhile yesiXhosa (Xhosa) — Hardback',
 		retail: 9999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-xh-600.webp`,
 	},
 	'lang-xh-pb': {
 		title: 'IBhayibhile yesiXhosa (Xhosa) — Paperback',
 		retail: 7999,
-		img: `${ASSETS}/fhb-ebook-cover-2026-6-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-xh-600.webp`,
 	},
 };
 for (const [sku, e] of Object.entries(CATALOG_LANG_EDITIONS))
