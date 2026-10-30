@@ -1,0 +1,87 @@
+---
+// /bible-for/new-believers: "A Father For" series. Data only; rendered by <GroupBible>.
+// Unit 2fm 2026-10-29: answers the target question "best Bible to give a new believer"
+// (no page covered it; /bible-for/spiritually-curious is a skeptics page). Verses read
+// from the locked canon in community/src/content/bible.
+import GroupBible from '../../components/GroupBible.astro';
+import { catalogRows } from '../../data/print-catalog';
+
+const GEN = catalogRows.find((r) => r.category === 'general');
+const GENERAL_PB = (GEN?.pb ?? 79.99).toFixed(2);
+const GENERAL_HB = (GEN?.hb ?? 99.99).toFixed(2);
+---
+
+<GroupBible
+	slug={`new-believers`}
+	group={`New Believers`}
+	groupLower={`new believers`}
+	lastUpdated={`October 29, 2026`}
+	publishedIso="2026-10-29"
+	lastUpdatedIso={`2026-10-29`}
+	title={`Best Bible for a New Believer | Father's Heart Bible™`}
+	description={`The best Bible to give a new believer: a clear translation, a simple place to start, and free audio. Compare FHB, NLT, NIV and The Message.`}
+	h1={`The Best Bible to Give a New Believer`}
+	heroEyebrow={`A Father For`}
+	heroSubhead={`You said yes to Jesus, or someone you love just did. Now comes a plain question: which Bible, and where do I start? You do not need to know everything. You need a Bible you will actually open, and a Father who is already glad you are here.`}
+	heroBase={`https://cdn.sanity.io/images/rusi1hyi/production/31ce0dfcf38aa361b40c1c77a33370ae85328c53-1100x788.jpg`}
+	heroAlt={`The first light of dawn over an open landscape`}
+	heroObjectPosition={`center center`}
+	directAnswerHtml={`<strong style="color: var(--color-ink);">The best Bible to give a new believer is a clear modern translation they will actually read, with one simple place to start: the Gospel of John.</strong> The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father's Heart Bible™ (FHB)</a>, which we publish, is free to read and <em>listen to</em> online with no account, and it shows God as a <em>Father</em> from the first page, which is exactly what a new believer needs to hear. The NLT is the easiest first read, the NIV is the translation most churches and study guides use, and The Message is a fresh paraphrase best read beside a translation. The comparison below sets them side by side.`}
+	keyTakeaway={`A new believer does not need the most scholarly Bible. They need one they will open tomorrow. Start in John, read a little each day, and let the Father speak for Himself.`}
+	aFatherHeading={`A Father for new believers`}
+	aFatherBodyHtml={`<p>Many new believers are quietly afraid they will get it wrong: the wrong translation, the wrong book, the wrong words in prayer. Hear this first. You did not receive a spirit of slavery to fall back into fear. You received the Spirit of sonship, and you are already a child of <strong style="color: var(--color-ink);">our Father</strong>. Nothing you read this week can undo that.</p><p>So the best first Bible is not the one with the most notes. It is the one that makes you want to keep reading. Open <a href="https://fathersheartbible.com/read/john/1/" style="color: var(--color-brand);" class="hover:underline">John 1</a> and read slowly. When you finish John, move to <a href="https://fathersheartbible.com/read/luke/15/" style="color: var(--color-brand);" class="hover:underline">Luke 15</a>, then Romans 8. If you would rather listen, every chapter has audio, free. Our <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start reading the Bible</a> and <a href="/guides/how-to-pray/" style="color: var(--color-brand);" class="hover:underline">how to pray</a> guides are good next steps.</p>`}
+	pullQuote={`You do not need to know everything. You need a Bible you will actually open, and a Father who is already glad you are here.`}
+	voiceHeading={`Bible verses for a new believer: the Father's voice`}
+	voiceIntroHtml={`Ten passages from Father's Heart Bible™ to read in your first week. Tap any reference to read and listen free.`}
+	verses={[
+		{ ref: `John 1:12`, slug: `john`, ch: 1, text: `But to all who received him, believing in his name, he gave the right to become children of our Father,`, note: `This is what just happened to you: you were given the right to become a child of our Father.` },
+		{ ref: `John 3:16`, slug: `john`, ch: 3, text: `For our Father so loved the world that he gave his one and only Son, that whoever believes in him will not perish but have eternal life.`, note: `The whole message in one sentence, and a good first verse to memorize.` },
+		{ ref: `Romans 8:15`, slug: `romans`, ch: 8, text: `You did not receive a spirit of slavery, to fall back into fear, but received the Spirit of sonship, by whom we cry, "Abba! Father!"`, note: `If you are afraid of getting it wrong, this says fear was never the point.` },
+		{ ref: `Romans 8:16`, slug: `romans`, ch: 8, text: `The Spirit himself bears witness with our spirit that we are children of our Father.`, note: `Your belonging does not rest on how well you read or pray this week.` },
+		{ ref: `2 Corinthians 5:17`, slug: `2-corinthians`, ch: 5, text: `So if anyone is in Christ, new creation! The old has passed away; look, the new has come!`, note: `A fresh start is not a slogan here. It is a description of you.` },
+		{ ref: `Ephesians 2:8-9`, slug: `ephesians`, ch: 2, text: `For by grace you have been saved through faith—not your own doing; it is the gift of our Father. Not from works, so that no one may boast.`, note: `You did not earn this and you cannot lose it by reading slowly.` },
+		{ ref: `1 John 1:9`, slug: `1-john`, ch: 1, text: `If we confess our sins, our Father is faithful and just to forgive us our sins and cleanse us from all wrongdoing.`, note: `When you fail, and you will, go straight back to Him.` },
+		{ ref: `1 John 5:13`, slug: `1-john`, ch: 5, text: `I write these things to you who believe in the name of the Son of our Father, so you may know you have eternal life.`, note: `The Bible says you can know, not just hope.` },
+		{ ref: `Psalm 119:105`, slug: `psalms`, ch: 119, text: `Your word is a lamp to my feet and a light to my path.`, note: `You only need light for the next step, not the whole road.` },
+		{ ref: `Matthew 6:9`, slug: `matthew`, ch: 6, text: `This, then, is how you should pray: 'Our Father in heaven, may your name be honored as holy,`, note: `Jesus' own first lesson in prayer begins with the word Father.` },
+	]}
+	offersHeading={`What our Father offers a new believer`}
+	offersIntroHtml={`Everything below is free, with no account and no one watching.`}
+	offersBlocks={[
+		{ heading: `A place to start`, bodyHtml: `Begin in the <a href="https://fathersheartbible.com/read/john/1/" style="color: var(--color-brand);" class="hover:underline">Gospel of John</a>. It was written so that you may believe and know, and it introduces Jesus in plain words.` },
+		{ heading: `Audio for every chapter`, bodyHtml: `If reading feels slow, <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">listen on your phone</a> while you walk, drive or fold laundry.` },
+		{ heading: `Room to start small`, bodyHtml: `One chapter a day is enough. If you miss a day, pick up where you stopped. Nobody is keeping score.` },
+		{ heading: `Prayer in plain words`, bodyHtml: `You do not need a formula. Our <a href="/guides/how-to-pray/" style="color: var(--color-brand);" class="hover:underline">how to pray guide</a> starts with the prayer Jesus taught, which begins with the words "Our Father."` },
+	]}
+	whyHeading={`Why Father's Heart Bible™ for a new believer`}
+	whyBlocks={[
+		{ heading: `It says Father where Scripture does`, bodyHtml: `A new believer is learning who God is. Father's Heart Bible™ reveals God as <em>Father</em> wherever the text reveals Him that way, from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1</a> on, so the first picture you form is the right one.` },
+		{ heading: `Free to read, free to hear`, bodyHtml: `No purchase, no app and no sign-up. If you or your church would like a printed copy to give away, the paperback is $${GENERAL_PB} and the hardcover is $${GENERAL_HB}. See <a href="/print/" style="color: var(--color-brand);" class="hover:underline">the print editions</a>.` },
+	]}
+	wordHeading={`His Word will not return void`}
+	wordBodyHtml={`<p>You do not have to feel anything special the first time you read, or the tenth. Faithfulness here looks like showing up again tomorrow.</p><p class="mt-4" style="color: var(--color-ink);">"…so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it." <span style="color: var(--color-muted);">— Isaiah 55:11</span></p>`}
+	fatherSaysHeading={`What your Father says over you`}
+	fatherSaysHtml={`<p>"Welcome home. I have been waiting for you. You do not have to be sure of everything, and you do not have to read it perfectly. Come as you are and ask Me anything.</p><p>When you stumble, come back. I am not keeping a record. You are Mine, and I am glad."</p>`}
+	prayerHeading={`A prayer for a new believer`}
+	prayerHtml={`<p>Our Father, thank You for every person who has just said yes to You. Be near them this week. Give them a Bible they will open, a friend who will walk beside them, and a quiet place to read. Quiet their fear of getting it wrong. Teach them that they are Yours, and that this is only the beginning.</p><p>In Jesus' name, amen.</p>`}
+	keepReadingHtml={`Read the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/guides/how-to-read-the-bible/" style="color: var(--color-brand);" class="hover:underline">how to read the Bible</a>, or explore who else the Father is for in the <a href="/bible-for/" style="color: var(--color-brand);" class="hover:underline">A Father For series</a>.`}
+	whichBibleHeading={`What is the best Bible to give a new believer?`}
+	whichBibleIntroHtml={`Here is an honest comparison, including the one we publish. Whichever you choose, start in the Gospel of John.`}
+	whichBibleRows={[
+		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `Meeting God as a Father from the first chapter`, style: `Translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free online with audio, no account; paperback $${GENERAL_PB}` },
+		{ edition: `NLT (New Living Translation, Tyndale)`, bestFor: `A first read in natural, everyday English`, style: `Thought-for-thought, very readable`, access: `Many editions from retailers` },
+		{ edition: `NIV (New International Version, Zondervan)`, bestFor: `The translation most churches and study guides use`, style: `A balance of word-for-word and thought-for-thought`, access: `Many editions from retailers` },
+		{ edition: `The Message (NavPress)`, bestFor: `A fresh, conversational read alongside a translation`, style: `Eugene Peterson's contemporary paraphrase`, access: `Paperback from retailers` },
+	]}
+	faqs={[
+		{ question: `What is the best Bible to give a new believer?`, answer: `Give a clear modern translation they will actually read, and point them to the Gospel of John first. Father's Heart Bible™ is free to read and listen to online with no account (paperback $${GENERAL_PB}) and shows God as a Father. The NLT is very readable, the NIV is the most widely used modern translation, and The Message is a paraphrase best read alongside a translation.` },
+		{ question: `Where should a new believer start reading the Bible?`, answer: `Start with the Gospel of John, then Luke 15, then Romans 8. Read one chapter a day, or listen to it free at fathersheartbible.com/read/john/1/.` },
+		{ question: `Should a new believer read the Old Testament first?`, answer: `Not usually. Begin with the Gospels so you meet Jesus, then Acts and Romans, and add the Psalms for daily prayer. The Old Testament makes more sense once you know the Son.` },
+		{ question: `How much should a new believer read each day?`, answer: `One chapter a day is plenty. A short, steady habit beats a long plan you drop in a week. If you miss a day, simply pick up where you stopped.` },
+		{ question: `Is a study Bible better for a new believer?`, answer: `Notes can help, but they can also overwhelm. Many new believers do best with a clean, readable text first and a study resource later. You can read Father's Heart Bible™ free online while you decide.` },
+		{ question: `What is a good verse for a new believer to memorize first?`, answer: `A close second is John 1:12, but the best first verse to memorize is the one that holds the whole message. Here it is, John 3:16: "For our Father so loved the world that he gave his one and only Son, that whoever believes in him will not perish but have eternal life."` },
+		{ question: `Can a new believer pray without knowing the right words?`, answer: `Yes. Jesus taught His followers to pray "Our Father in heaven" in Matthew 6:9. Speak to Him plainly, as to a Father who is already listening.` },
+	]}
+	ctaBottomHeading={`Start with John, and start today`}
+	ctaBottomBodyHtml={`Watch the short story behind Father's Heart Bible™, then open the Gospel of John and read one chapter, free.`}
+/>

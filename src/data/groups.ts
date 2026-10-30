@@ -494,6 +494,14 @@ export const FAITH_GROUPS: Group[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/e83d5889cb68eac4987b21065ca3a3cd96d8e58c-1100x734.jpg',
 	},
 	{
+		slug: 'new-believers',
+		group: 'New Believers',
+		title: 'For New Believers',
+		blurb:
+			'You just said yes to Jesus and wonder which Bible to read and where to start. Start in John, read a little each day, and meet a Father who is already glad you are here.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/31ce0dfcf38aa361b40c1c77a33370ae85328c53-1100x788.jpg',
+	},
+	{
 		slug: 'spiritually-curious',
 		group: 'The Spiritually Curious',
 		title: 'For Skeptics & the Spiritually Curious',
