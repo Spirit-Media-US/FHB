@@ -1,0 +1,142 @@
+---
+// /bible-in/uzbekistan — Uzbek (Oʻzbekcha). Built 2026-10-30 (pmseoaeo reach lane, Kevin L1139:
+// a /bible-in page for every live reader language) because Uzbek had no country page and so no
+// crawl path from /bible-in. Sourced facts only: population = World Bank 2024; religion = Uzbek Ministry of Foreign Affairs 2022 estimate (via Religion in Uzbekistan, Wikipedia); Christian history = same article.
+// Pattern = /bible-in/malaysia. Father voice; verse text = the audited FHB quotes. No Scripture edits.
+import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
+
+const verses = [
+	{
+		ref: 'Isaiah 41:10',
+		slug: 'isaiah',
+		ch: 41,
+		text: 'Fear not, for I am with you; do not be dismayed, for I am your Father.',
+	},
+	{
+		ref: 'Psalm 34:18',
+		slug: 'psalms',
+		ch: 34,
+		text: 'Our Father is near to the brokenhearted; he saves those crushed in spirit.',
+	},
+	{
+		ref: 'John 3:16',
+		slug: 'john',
+		ch: 3,
+		text: 'For our Father so loved the world that he gave his one and only Son, that whoever believes in him will not perish but have eternal life.',
+	},
+];
+
+const stats = [
+	{ label: 'People', value: 'about 36.4 million' },
+	{ label: 'Muslim', value: '97% (2022 state estimate)' },
+	{ label: 'Silk Road cities', value: 'Samarkand, Bukhara, Khiva' },
+	{ label: 'Uzbek speakers', value: 'about 36 million worldwide' },
+];
+
+const faqs = [
+	{
+		question: 'What is the religious makeup of Uzbekistan?',
+		answer: `In 2022 the Uzbek Ministry of Foreign Affairs estimated that 97% of the population is Muslim, mostly Sunni of the Hanafi school. Uzbekistan also has a Christian community with a long history, including Eastern Christians at Bukhara and Samarkand from the 7th century and Orthodox churches since 1867.`,
+	},
+	{
+		question: 'Can I read the Bible online free in Uzbek?',
+		answer: `Yes. Father's Heart Bible™ is free to read online in Uzbek (Oʻzbekcha) — all 66 books, no account, no purchase, no app — at fathersheartbible.com/read/uz/. Start with John 3 or Psalm 23. The English edition is free too, with audio.`,
+	},
+	{
+		question: "Is Father's Heart Bible available in Uzbek?",
+		answer: `Yes. The Uzbek edition is free to read at fathersheartbible.com/read/uz/. Uzbek is the official language of Uzbekistan and is spoken by about ${sp('uz')} people, in Uzbekistan and across Central Asia.`,
+	},
+	{
+		question: 'Which other languages of Uzbekistan can I read the Bible in here?',
+		answer: `Russian, still widely used in Uzbek cities, is free to read at fathersheartbible.com/read/ru/, and English is free to read at fathersheartbible.com/read/, with audio on every chapter.`,
+	},
+	{
+		question: 'Is there a free audio Bible I can listen to?',
+		answer: `Yes. Every chapter of the English Father's Heart Bible™ comes with free audio, so it can be heard on any phone from Tashkent to Samarkand.`,
+	},
+];
+---
+
+<CountryBible
+	slug="uzbekistan"
+	country="Uzbekistan"
+	flag="🇺🇿"
+	flagImg="/flags/uz.svg"
+	countryWikipedia="https://en.wikipedia.org/wiki/Uzbekistan"
+	lastUpdated="October 2026"
+	lastUpdatedIso="2026-10-30"
+	colorPrimary="#1EB53A"
+	colorSecondary="#0099B5"
+	colorAccent="#CE1126"
+	tintWarm="#E8F6EB"
+	tintCool="#E6F3F6"
+	tintBlue="#FBE8EA"
+	title="The Bible in Uzbekistan — Faith | Father's Heart Bible™ (FHB)"
+	description="Read the Bible free online in Uzbek, Russian and English with audio — Father's Heart Bible™ (FHB), for the heart of the Silk Road."
+	h1="The Bible in Uzbekistan"
+	heroSubhead="The heart of the Silk Road, home to a Christian community with roots 1,300 years deep — Father's Heart Bible reveals God as a loving Father. Free online in Uzbek."
+	heroBase=""
+	heroSrc={{ desktop: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Registan_01.jpg/1280px-Registan_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", mobile: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Registan_01.jpg/960px-Registan_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", og: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Registan_01.jpg/1280px-Registan_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail" }}
+	heroCreditHtml={`Hero photo: <a href="https://commons.wikimedia.org/wiki/File:Registan_01.jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Registan, Samarkand</a> by Bernard Gagnon, <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC0</a>, via Wikimedia Commons.`}
+	heroAlt="The Registan ensemble of madrasas in Samarkand, Uzbekistan"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Yes &mdash; you can read the Bible free online in Uzbek right now.</strong> Uzbekistan is a nation where an estimated 97% are Muslim, and also the land of Samarkand and Bukhara, where Eastern Christian communities lived from the 7th century. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account, and the <a href="https://fathersheartbible.com/read/uz/" style="color: var(--color-brand);" class="hover:underline"><em>Uzbek</em> edition</a> is free to read today &mdash; the official language of Uzbekistan, where Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	keyTakeaway="Uzbekistan is the crossroads of the Silk Road — and Father's Heart Bible™ (FHB) offers the Scriptures free in Uzbek to any reader who wants to know the Father."
+	glanceIntroHtml={`Uzbekistan is a doubly landlocked nation in Central Asia, with a young population and the great Silk Road cities of Samarkand, Bukhara and Khiva. Uzbek is the official language, Russian remains widely used, and Islam is the faith of most families.`}
+	stats={stats}
+	knownForHeading="What Uzbekistan is known for"
+	knownForIntroHtml={`A land of turquoise domes, bazaars and caravan history at the centre of Asia.`}
+	knownFor={[
+		{ label: 'Samarkand', text: 'The Registan and its three madrasas are among the best-known sights of the Silk Road.' },
+		{ label: 'Bukhara and Khiva', text: 'Old caravan cities with walled centres, minarets and covered bazaars.' },
+		{ label: 'Amir Timur', text: 'The 14th-century ruler Timur (Tamerlane) made Samarkand his capital.' },
+		{ label: 'Hospitality', text: 'Tea, plov and a generous table are at the heart of Uzbek family life.' },
+		{ label: 'Two languages of the city', text: 'Uzbek is the national language; Russian is still widely used in cities.' },
+	]}
+	faithHeading="Faith and the Bible in Uzbekistan"
+	faithBodyHtml={`<p>The Uzbek Ministry of Foreign Affairs estimated in 2022 that <strong>97%</strong> of Uzbekistan follows Islam, most of them Hanafi Sunni. There is also a Christian community with deep roots: Eastern Christians (Assyrians and others) lived at Bukhara and Samarkand from the 7th century, and Orthodox churches arrived with the Russian era from 1867.</p><p>For readers of every background, Father&rsquo;s Heart Bible&trade; offers the Scriptures free, in the language of the home, revealing God as a near and loving <em>Father</em>.</p>`}
+	sources={[
+		{ label: 'World Bank, Population, total (2024) — compiled from UN World Population Prospects 2024 and national statistics offices', url: 'https://data.worldbank.org/indicator/SP.POP.TOTL?locations=UZ' },
+		{ label: 'Uzbek Ministry of Foreign Affairs 2022 estimate (Islam 97%) and the history of Christianity in Uzbekistan, as summarised in Religion in Uzbekistan — Wikipedia', url: 'https://en.wikipedia.org/wiki/Religion_in_Uzbekistan' },
+		{ label: 'Uzbek language — Wikipedia', url: 'https://en.wikipedia.org/wiki/Uzbek_language' },
+		{ label: 'Uzbekistan — Wikipedia (Samarkand; Bukhara; Khiva; Timur)', url: 'https://en.wikipedia.org/wiki/Uzbekistan' },
+		{ label: 'Language-reach register, Father\'s Heart Bible (speakers of Uzbek worldwide)', url: 'https://fathersheartbible.com/read/uz/' },
+	]}
+	faithsHeading="What “our Father” offers Uzbekistan"
+	faithsIntroHtml={`Along the old caravan roads, hearts have always been searching. Father&rsquo;s Heart Bible&trade; does not bring a foreign religion &mdash; it answers a universal longing: to be held by a Father who never abandons His children.`}
+	faithsBlocks={[
+		{ heading: 'For the one who is afraid', bodyHtml: `&ldquo;Fear not, for I am with you; do not be dismayed, for I am your Father.&rdquo; <a href="https://fathersheartbible.com/read/isaiah/41/" style="color: var(--color-gold);" class="hover:underline">Read Isaiah 41</a> free.` },
+		{ heading: 'For the brokenhearted', bodyHtml: `&ldquo;Our Father is near to the brokenhearted.&rdquo; <a href="https://fathersheartbible.com/read/psalms/34/" style="color: var(--color-gold);" class="hover:underline">Read Psalm 34</a> free.` },
+		{ heading: 'For the seeker', bodyHtml: `&ldquo;You will seek me and find me, when you search for me with all your heart.&rdquo; <a href="https://fathersheartbible.com/read/jeremiah/29/" style="color: var(--color-gold);" class="hover:underline">Jeremiah 29</a>` },
+		{ heading: 'For every family', bodyHtml: `Uzbek, Karakalpak, Russian and every household &mdash; the Father calls each Uzbek His beloved son or daughter.` },
+	]}
+	whyHeading="Why Father's Heart Bible™ for Uzbekistan"
+	whyBlocks={[
+		{ heading: 'God revealed as Father', bodyHtml: `Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
+		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a>, with audio on every English chapter.` },
+		{ heading: 'In Uzbek', bodyHtml: `The Uzbek edition is published: <a href="https://fathersheartbible.com/read/uz/" style="color: var(--color-brand);" class="hover:underline">read it free</a> &mdash; the official language of Uzbekistan, read privately on any phone.` },
+	]}
+	wordHeading="His Word will not return void"
+	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do. From the Registan of Samarkand to the oases of Khiva, His Word will not return empty.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;&hellip;so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
+	resourcesHeading="Learn more about Uzbekistan"
+	resourcesIntroHtml={`Trusted sources for the facts on this page &mdash; and for going deeper into Uzbekistan&rsquo;s people, faith, and story.`}
+	resources={[
+		{ label: 'Uzbekistan — Wikipedia', url: 'https://en.wikipedia.org/wiki/Uzbekistan' },
+		{ label: 'Religion in Uzbekistan — Wikipedia', url: 'https://en.wikipedia.org/wiki/Religion_in_Uzbekistan' },
+		{ label: 'Uzbekistan — Encyclopaedia Britannica', url: 'https://www.britannica.com/place/Uzbekistan' },
+		{ label: 'Uzbekistan — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/UZ' },
+	]}
+	opportunityHeading="Bible languages for Uzbekistan"
+	opportunityIntroHtml={`Uzbek is the official language of Uzbekistan, Russian is still widely used in the cities, and English is learned by many. Each is free to read today.`}
+	languages={[
+		{ language: 'English', code: 'en' },
+		{ language: 'Uzbek (Oʻzbekcha)', code: 'uz' },
+		{ language: 'Russian', code: 'ru' },
+	]}
+	verses={verses}
+	keepReadingHtml={`Begin with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> &mdash; including <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start</a> and <a href="/guides/what-is-the-gospel/" style="color: var(--color-brand);" class="hover:underline">what the gospel is</a>. Browse Scripture by theme on our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> pages.`}
+	faqs={faqs}
+	ctaMidHeading="Know God as a Father near to you"
+	ctaMidBodyHtml={`In Uzbek, Russian or English, read God in His own voice as Father &mdash; free, on any phone.`}
+	ctaBottomBodyHtml={`From Genesis to Revelation, free online &mdash; a translation that reveals God as a loving Father to every beloved son and daughter across Uzbekistan.`}
+/>
