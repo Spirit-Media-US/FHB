@@ -18,6 +18,7 @@ import {
 	LANGUAGE_TOTAL,
 } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
+import { FHB_ORG_CORE } from '../lib/fhb-org';
 import { sanityClient, urlFor } from '../lib/sanity';
 import { fitDescription, fitTitle } from '../lib/seoFit';
 
@@ -191,30 +192,10 @@ const homeVoices: VoiceGroup[] = [
 		"@context": "https://schema.org",
 		"@graph": [
 			{
-				"@type": "Organization",
-				"@id": "https://fathersheartbible.com/#organization",
-				"name": "Father's Heart Bible",
-				"alternateName": ["Father's Heart Bible™", "FHB"],
-				"url": "https://fathersheartbible.com",
-				"logo": "https://fathersheartbible.com/fhb-logo.png",
-				"parentOrganization": { "@id": "https://spiritmediapublishing.com/#organization" },
-				// Publisher/imprint is Spirit Media Publishing; Spirit Media Inc. is its PARENT
-				// (Metadata & Messaging Guidelines, Publication facts). Reference the canonical
-				// @id that Layout.astro already emits on this page — the previous inline copy
-				// named the parent and carried no @id, creating a second, unlinked publisher
-				// entity on the same page that engines could not merge.
-				"publisher": { "@id": "https://spiritmediapublishing.com/#organization" },
+				// Name, logo, parent, sameAs come from the shared node (src/lib/fhb-org.ts); only page-specific fields here.
+				...FHB_ORG_CORE,
 				"description": `Father's Heart Bible™ (FHB) is the complete Bible — 66 books, 1,189 chapters, 31,087 verses — in a translation from the original Hebrew, Aramaic, and Greek. Free to read and hear online, in print, and soon in 80 languages.`,
 				"knowsLanguage": publishedLangCodes,
-				// FHB's own accounts (Kevin's Digital Positioning Playbook). TikTok
-				// @fathersheartbible is left out: TikTok reports the account does not exist (2026-10-21).
-				"sameAs": [
-					"https://www.youtube.com/channel/UCzgp9q1JnqyyEgz_j--KiQg",
-					"https://www.youtube.com/@FathersHeartBible",
-					"https://www.instagram.com/fathersheartbible/",
-					"https://www.facebook.com/1176654175531729",
-					"https://www.linkedin.com/company/130004384"
-				]
 			},
 			{
 				"@type": "WebSite",
