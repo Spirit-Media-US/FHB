@@ -27,9 +27,8 @@ import {
 	rosterLanguages,
 } from '../data/language-editions';
 import { reachPhrase } from '../data/language-speakers';
-import lookinsideData from '../data/lookinside.json';
 import Layout from '../layouts/Layout.astro';
-import { directTarget, hasLookInside } from '../lib/print-cards.mjs';
+import { directTarget } from '../lib/print-cards.mjs';
 import { fitDescription, fitTitle } from '../lib/seoFit';
 
 // THE DIVINE VOICE™ COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
@@ -226,11 +225,11 @@ const builtPages = new Set(
 		.filter(Boolean)
 		.map((slug) => `${slug}-bible`),
 );
-// A language card shows Look inside only once its sample pages are in lookinside.json.
+// A language card shows Look inside once its sample pages are in lookinside.json, and bold
+// COMING SOON in that slot until then (LookInside.astro decides, Kevin 2026-10-30).
 type DigitalLink = { store: string; url: string; price: string; label?: string };
-// Data-driven (src/lib/print-cards.mjs, tested): the chain writes lookinside.json when a print
-// artifact publishes, and the card picks it up on the next build.
-const langHasLi = (l: RosterLanguage) => hasLookInside(lookinsideData, langSlug(l));
+// Data-driven: the chain writes lookinside.json when a print artifact publishes, and the card
+// picks it up on the next build.
 const TRANSLATION_URL = '/the-fathers-heart-bible/translation-philosophy/';
 const CONTACT = 'mailto:hello@spiritmediapublishing.com?subject=Father%27s%20Heart%20Bible%20print';
 // SCREEN divine-voice palette — the same values /read has always used, adopted here so a
@@ -968,8 +967,8 @@ const dvcVerses = [
 											{builtPages.has(`${langSlug(l)}-bible`) && (
 												<a href={`/bibles/${langSlug(l)}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
 											)}
-											{builtPages.has(`${langSlug(l)}-bible`) && langHasLi(l) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
-											{langHasLi(l) && <LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" />}
+											{builtPages.has(`${langSlug(l)}-bible`) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
+											<LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" />
 										</div>
 										{/* Kevin 2026-10-10: the language's eBook and audiobook sit on its own card as store
 										    buttons in the Amazon shape, before Buy Direct (src/data/digital-listings.json). */}
