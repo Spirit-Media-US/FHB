@@ -46,6 +46,11 @@ interface Props {
 		price: string;
 		href?: string;
 		ebookDirect?: boolean;
+		/** Not live yet (Kevin 2026-10-30: "add that but fade it until live"): the same pill, FADED,
+		 *  not a link, aria-disabled, and NO price. Goes live by itself once the listing is in the data. */
+		off?: boolean;
+		/** counting/test hook: data-store="<key>" on the pill */
+		key?: string;
 	}[];
 	/** Where "Buy Direct" goes. */
 	directHref?: string;
@@ -72,6 +77,9 @@ interface Props {
 	/** Keep an invisible B&N-sized slot when this card has no verified B&N listing, so the
 	 *  Buy Direct line still lines up across the row. */
 	reserveBn?: boolean;
+	/** No verified B&N listing: show the B&N pill FADED (not linked, aria-disabled) instead of an
+	 *  invisible slot (Kevin 2026-10-30: "Same with B&N keep fade until live"). */
+	fadeBn?: boolean;
 	/** "Buy now" (Kevin 2026-10-22): this edition's OWN order form, /bibles/<slug>-bible/#order
 	 *  (EditionOrder.astro). `null` = the card has no edition page yet: an invisible slot of the
 	 *  same size keeps the row lined up. Omitted = no Buy now on this card at all. */
@@ -91,6 +99,7 @@ const {
 	reserveSlots = 0,
 	bn,
 	reserveBn = false,
+	fadeBn = false,
 	buyNowHref,
 } = Astro.props;
 const bnLinks = [
@@ -221,10 +230,17 @@ const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
 				{(st.label || st.price) && <span>{`${logo ? '· ' : ''}${[st.label, st.price].filter(Boolean).join(' ')}`}</span>}
 			</>
 		);
+		if (st.off)
+			return (
+				<span class={`${btnClass} buy-btn-off`} aria-disabled="true" data-store={st.key} data-store-off>
+					{logo && <img src={logo.src} alt={STORE_NAMES[st.logo as keyof typeof STORE_NAMES]} width={logo.w} height={logo.h} loading="lazy" decoding="async" class="store-logo store-logo-off" />}
+					{st.label && <span>{`· ${st.label}`}</span>}
+				</span>
+			);
 		return st.ebookDirect ? (
 			<button type="button" data-ebook-buy class={btnClass}>{inner}</button>
 		) : (
-			<a href={st.href} target="_blank" rel="noopener" class={btnClass} style="text-decoration: none;">{inner}</a>
+			<a href={st.href} target="_blank" rel="noopener" class={btnClass} style="text-decoration: none;" data-store={st.key}>{inner}</a>
 		);
 	})
 }
@@ -237,7 +253,7 @@ const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
 }
 {
 	bnLinks.length > 0 ? (
-		<span class="buy-btn buy-btn-bn">
+		<span class="buy-btn buy-btn-bn" data-store="bn">
 			<img src={LOGOS.bn.src} alt="Barnes & Noble" width={LOGOS.bn.w} height={LOGOS.bn.h} loading="lazy" decoding="async" class="store-logo" />
 			{bnLinks.map((x) => (
 				<>
@@ -247,6 +263,14 @@ const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
 					</a>
 				</>
 			))}
+		</span>
+	) : fadeBn ? (
+		<span class="buy-btn buy-btn-bn buy-btn-off" aria-disabled="true" data-store="bn" data-store-off>
+			<img src={LOGOS.bn.src} alt="Barnes & Noble" width={LOGOS.bn.w} height={LOGOS.bn.h} loading="lazy" decoding="async" class="store-logo store-logo-off" />
+			<span aria-hidden="true">·</span>
+			<span>Hardback</span>
+			<span aria-hidden="true">·</span>
+			<span>Paperback</span>
 		</span>
 	) : (
 		reserveBn && (
@@ -355,6 +379,13 @@ const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
 		color: #9a8c90;
 		border-color: #eccdd6;
 		cursor: default;
+	}
+	/* A faded store pill is not a control at all until its listing is live: nothing to click. */
+	.buy-btn-off[data-store-off] {
+		pointer-events: none;
+	}
+	.buy-btn .store-logo-off {
+		opacity: 0.45;
 	}
 	.buy-direct {
 		font-family: var(--font-sans);

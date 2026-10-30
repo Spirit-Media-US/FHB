@@ -260,6 +260,33 @@ if (haveIsbns) {
 		`expected at least 26 language editions ON SALE in ISBNS.json, found ${langs.length}`,
 	);
 	const langCodes = new Set(langs.map((i) => i.code));
+	// PRE-ORDERS (Kevin 2026-10-30, kevin-decisions L1197: "All languages cards can offer a Buy now ·
+	// free shipping button ... By the time people notice these will be published"): a roster language
+	// with NO ISBN yet is sold now at THE language price, which fhb-chain.py edition-roster writes into
+	// src/data/language-roster.json (refusing unless every ISBNS.json language item carries one price
+	// pair). Only a language ISBNS.json does not list may be a pre-order; the server must charge that price.
+	const rosterData = JSON.parse(readFileSync('src/data/language-roster.json', 'utf8'));
+	const isbnCodes = new Set(
+		(isbns.language_editions?.items ?? []).map((i) => i.code ?? i.register?.code),
+	);
+	for (const r of (rosterData.languages ?? []).filter((x) => x.preorder === true)) {
+		check(
+			!r.isbn && !isbnCodes.has(r.code),
+			`${r.code}: pre-order in language-roster.json but ISBNS.json lists it — re-run fhb-chain.py edition-roster`,
+		);
+		for (const [binding, key] of [
+			['hardback', 'hb'],
+			['paperback', 'pb'],
+		]) {
+			const want = cents(r.price?.[binding]);
+			const got = server[`lang-${r.code}-${key}`]?.cents;
+			check(
+				got === want,
+				`lang-${r.code}-${key}: pre-order — ${CHECKOUT} says ${got} cents, language-roster.json says ${want}`,
+			);
+		}
+		langCodes.add(r.code);
+	}
 	for (const i of langs) {
 		check(
 			i.code && i.isbn && i.isbn_paperback,
@@ -404,6 +431,28 @@ for (const e of editionData.filter((x) => x.orderable === false)) {
 	check(!/"@type":"Offer"/.test(html), `${f}: reserve-only edition must declare NO Offer`);
 	check(/id="order"/.test(html), `${f}: reserve-only edition has no #order block`);
 }
+// PRE-ORDER editions (no ISBN yet, `preorder: true` — Kevin 2026-10-30, kevin-decisions L1197: "All
+// languages cards can offer a Buy now · free shipping button ... By the time people notice these will be
+// published"). This REPLACES the old rule for them (no-ISBN = no order form, reserve by email): they now
+// carry the ONE order form like every edition (checked with the rest below, price line against the
+// server), and still NO Offer/GTIN — there is no ISBN to give, so no merchant listing is declared.
+const preorderSlugs = new Set(editionData.filter((e) => e.preorder === true).map((e) => e.slug));
+for (const e of editionData.filter((x) => x.preorder === true)) {
+	check(
+		!e.isbn,
+		`${e.slug}: preorder but carries ISBN ${e.isbn} — drop the flag and rebuild the page`,
+	);
+	check(e.orderable !== false, `${e.slug}: preorder and orderable:false contradict each other`);
+	const f = `${DIST}/bibles/${e.slug}-bible/index.html`;
+	if (existsSync(f)) {
+		const html = readFileSync(f, 'utf8');
+		check(!/"@type":"Offer"/.test(html), `${f}: pre-order edition (no ISBN) must declare NO Offer`);
+		check(
+			/data-preorder-note/.test(html),
+			`${f}: pre-order edition must say it ships on publication`,
+		);
+	}
+}
 const editionSlugs = editionData.filter((e) => e.orderable !== false).map((e) => e.slug);
 const editionPages = {};
 for (const slug of editionSlugs) {
@@ -528,6 +577,8 @@ function merchantErrs(pages, srv) {
 				errs.push(`${tag}: gtin13 ${g} is not a valid ISBN-13`);
 		}
 		const formSkus = Object.keys(forms[f]?.[0]?.prices ?? parseForms(html)[0]?.prices ?? {});
+		// a pre-order page sells through its form but has no GTIN, so it declares no Offer (above)
+		if (preorderSlugs.has(/bibles\/([a-z0-9-]+)-bible\//.exec(f)?.[1])) continue;
 		for (const sku of formSkus)
 			if (!seen.has(sku))
 				errs.push(`${f}: the form sells ${sku} but no Product/Offer describes it`);

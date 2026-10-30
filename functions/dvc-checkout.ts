@@ -805,15 +805,15 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-af-600.webp`,
 	},
-	'lang-my-hb': {
-		title: 'မြန်မာ သမ္မာကျမ်းစာ (Burmese) — Hardback',
+	'lang-anw-hb': {
+		title: 'Adisana Ñwed Anaang (Anaang) — Hardback (pre-order)',
 		retail: 9999,
-		img: `${ASSETS}/lang/v2/lang-my-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-anw-600.webp`,
 	},
-	'lang-my-pb': {
-		title: 'မြန်မာ သမ္မာကျမ်းစာ (Burmese) — Paperback',
+	'lang-anw-pb': {
+		title: 'Adisana Ñwed Anaang (Anaang) — Paperback (pre-order)',
 		retail: 7999,
-		img: `${ASSETS}/lang/v2/lang-my-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-anw-600.webp`,
 	},
 	'lang-ny-hb': {
 		title: 'Baibulo la Chicheŵa (Chichewa) — Hardback',
@@ -824,6 +824,16 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 		title: 'Baibulo la Chicheŵa (Chichewa) — Paperback',
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-ny-600.webp`,
+	},
+	'lang-nri-hb': {
+		title: 'Chokri Ketholesi (Chokri Naga) — Hardback (pre-order)',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-nri-600.webp`,
+	},
+	'lang-nri-pb': {
+		title: 'Chokri Ketholesi (Chokri Naga) — Paperback (pre-order)',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-nri-600.webp`,
 	},
 	'lang-gu-hb': {
 		title: 'ગુજરાતી બાઇબલ (Gujarati) — Hardback',
@@ -885,6 +895,26 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-ilo-600.webp`,
 	},
+	'lang-nkf-hb': {
+		title: 'Inpui Bathiangnu Chongdip (Inpui Naga) — Hardback (pre-order)',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-nkf-600.webp`,
+	},
+	'lang-nkf-pb': {
+		title: 'Inpui Bathiangnu Chongdip (Inpui Naga) — Paperback (pre-order)',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-nkf-600.webp`,
+	},
+	'lang-ijc-hb': {
+		title: 'Izon Baibul (Izon) — Hardback (pre-order)',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-ijc-600.webp`,
+	},
+	'lang-ijc-pb': {
+		title: 'Izon Baibul (Izon) — Paperback (pre-order)',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-ijc-600.webp`,
+	},
 	'lang-jv-hb': {
 		title: 'Kitab Suci Jawa (Javanese) — Hardback',
 		retail: 9999,
@@ -925,6 +955,16 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-rw-600.webp`,
 	},
+	'lang-sgc-hb': {
+		title: 'Bukuit ne Tilil ab Kipsigis (Kipsigis) — Hardback (pre-order)',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-sgc-600.webp`,
+	},
+	'lang-sgc-pb': {
+		title: 'Bukuit ne Tilil ab Kipsigis (Kipsigis) — Paperback (pre-order)',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-sgc-600.webp`,
+	},
 	'lang-rn-hb': {
 		title: "Bibiliya y'Ikirundi (Kirundi) — Hardback",
 		retail: 9999,
@@ -934,6 +974,16 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 		title: "Bibiliya y'Ikirundi (Kirundi) — Paperback",
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-rn-600.webp`,
+	},
+	'lang-ktu-hb': {
+		title: 'Biblia ya Kituba (Kituba) — Hardback (pre-order)',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-ktu-600.webp`,
+	},
+	'lang-ktu-pb': {
+		title: 'Biblia ya Kituba (Kituba) — Paperback (pre-order)',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-ktu-600.webp`,
 	},
 	'lang-kmr-hb': {
 		title: 'Kitêba Pîroz a Kurmancî (Kurmanji Kurdish) — Hardback',
@@ -974,6 +1024,16 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 		title: 'മലയാളം ബൈബിൾ (Malayalam) — Paperback',
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-ml-600.webp`,
+	},
+	'lang-mdj-hb': {
+		title: 'Biblia Nemangbetu (Mangbetu) — Hardback (pre-order)',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-mdj-600.webp`,
+	},
+	'lang-mdj-pb': {
+		title: 'Biblia Nemangbetu (Mangbetu) — Paperback (pre-order)',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-mdj-600.webp`,
 	},
 	'lang-nag-hb': {
 		title: 'Nagamese Pobitro Kitab (Nagamese) — Hardback',
@@ -1104,6 +1164,16 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 		title: 'IBhayibhile yesiXhosa (Xhosa) — Paperback',
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-xh-600.webp`,
+	},
+	'lang-yaf-hb': {
+		title: 'Masonuku Matoma ma Kiyaka (Yaka) — Hardback (pre-order)',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-yaf-600.webp`,
+	},
+	'lang-yaf-pb': {
+		title: 'Masonuku Matoma ma Kiyaka (Yaka) — Paperback (pre-order)',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-yaf-600.webp`,
 	},
 };
 for (const [sku, e] of Object.entries(CATALOG_LANG_EDITIONS))
