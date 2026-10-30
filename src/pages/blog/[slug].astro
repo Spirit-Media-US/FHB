@@ -96,7 +96,8 @@ function sentenceSpans(children: any[], linkByKey: Record<string, string>): stri
 		if (marks.includes('em')) t = `<em>${t}</em>`;
 		const linkKey = marks.find((m: any) => typeof m === 'string' && linkByKey[m]);
 		if (linkKey) {
-			const href = linkByKey[linkKey];
+			// /about is owned by the community app and answers 301 on '/about/': link the final 200 URL.
+			const href = linkByKey[linkKey].replace(/^\/about\/(?=$|[?#])/, '/about');
 			const isExternal = /^https?:\/\//i.test(href);
 			const targetAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
 			t = `<a href="${href}" style="color: var(--color-brand);" class="hover:underline"${targetAttrs}>${t}</a>`;
