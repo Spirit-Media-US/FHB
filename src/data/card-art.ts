@@ -13,6 +13,7 @@
 // it keeps the key it already has. Anything not in this set resolves to its existing
 // location, which makes the set the single place that decides.
 import registry from './edition-registry.json' with { type: 'json' };
+import roster from './language-roster.json' with { type: 'json' };
 
 const BASE = 'https://assets.spiritmediapublishing.com/FHB/print';
 
@@ -50,7 +51,19 @@ const LANG_PREFIX = `${BASE}/lang/v1`;
 // first 26 land here directly. A code not in this set keeps its v1 card.
 // The set is READ from the edition registry (fhb-chain.py edition-emit measures which R2 line
 // holds each card), so a newly cut card needs no edit here.
-const LANG_V2 = new Set(registry.editions.filter((e) => e.card === 'v2').map((e) => e.code));
+const LANG_V2 = new Set([
+	...registry.editions.filter((e) => e.card === 'v2').map((e) => e.code),
+	// The rest of the 80 (Kevin 2026-10-29): cards cut from a BUILT case before the chain lists the
+	// edition, measured on R2 by `fhb-chain.py edition-roster`.
+	...roster.languages.filter((l) => 'card' in l && l.card === 'v2').map((l) => l.code),
+]);
+/** Language codes with a card on R2 (registry or roster). One without has no built cover yet: the
+ *  page shows the cover-pending tile (LangCover.astro), never another edition's art. */
+const LANG_CARDS = new Set([
+	...registry.editions.filter((e) => e.card).map((e) => e.code),
+	...roster.languages.filter((l) => 'card' in l && l.card).map((l) => l.code),
+]);
+export const hasLangCard = (code: string) => LANG_CARDS.has(code);
 // Language cards also come at 360 (= the marquee's 180 CSS px at 2x): the second marquee row
 // sits inside the lazy-load distance on first paint, and 600px art there cost ~400KB on the
 // homepage's mobile Lighthouse run (measured 2026-10-02); 360 is every pixel a 2x screen draws.

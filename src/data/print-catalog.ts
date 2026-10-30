@@ -3,9 +3,9 @@
 // them (Kevin 2026-10-03). The SKUs are functions/dvc-checkout.ts's; scripts/pricing-verify.mjs
 // reads the prices each BUILT order form carries and fails the build if any differs from the
 // server's, or if the catalog misses a SKU the server sells.
-import { cardUrl } from './card-art';
+import { cardUrl, hasLangCard } from './card-art';
 import { dvcEditions, trimTargeted } from './dvc-editions';
-import { LANG_HB, LANG_PB, langSlug, languageEditions } from './language-editions';
+import { LANG_HB, LANG_PB, langSlug, orderableLanguages } from './language-editions';
 
 export type CatalogCategory = 'general' | 'audience' | 'large-print' | 'language';
 
@@ -19,7 +19,8 @@ export interface CatalogRow {
 	lang?: string;
 	rtl?: boolean;
 	trim: string;
-	img: string;
+	/** absent = no card cut yet (a language whose cover is not built): the row shows no thumbnail */
+	img?: string;
 	hb: number;
 	pb: number;
 	/** lowercased, apostrophes dropped — what the search box matches */
@@ -89,7 +90,9 @@ export const catalogRows: CatalogRow[] = [
 		pb: v.pb,
 		search: norm(v.title, 'large print'),
 	})),
-	...languageEditions.map((l) => ({
+	// Every language our checkout sells: the registry's editions, then the roster's direct-sale ones
+	// (Kevin 2026-10-29: "People can go ahead and buy any of the 80 languages").
+	...orderableLanguages.map((l) => ({
 		id: `lang-${l.code}`,
 		category: 'language' as const,
 		title: `${l.english} Edition`,
@@ -97,7 +100,7 @@ export const catalogRows: CatalogRow[] = [
 		lang: l.code,
 		rtl: l.rtl,
 		trim: trimTargeted,
-		img: cardUrl(`lang-${l.code}`, 360),
+		img: hasLangCard(l.code) ? cardUrl(`lang-${l.code}`, 360) : undefined,
 		hb: LANG_HB,
 		pb: LANG_PB,
 		search: norm(l.english, l.name, langSlug(l), 'language'),

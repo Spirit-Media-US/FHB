@@ -29,6 +29,7 @@
 // projects/fhb-lang-covers/cards/build_lang_cards.py — the same house renderer as every
 // other /print card.
 import registry from './edition-registry.json' with { type: 'json' };
+import roster from './language-roster.json' with { type: 'json' };
 
 export interface LanguageEdition {
 	code: string;
@@ -85,3 +86,62 @@ export const langSlug = (l: LanguageEdition) =>
 		.replace(/\s*\(.*\)/, '')
 		.toLowerCase()
 		.replace(/[^a-z]+/g, '-');
+
+// ───────────────────────── THE 80 (Kevin 2026-10-29) ─────────────────────────
+// "I want the page we have showing 80 cards for 80 languages with book covers, full detail pages,
+// look inside, and buttons list like all the others. The buttons will not show live until they are
+// linked … People can go ahead and buy any of the 80 languages."
+// src/data/language-roster.json is GENERATED (`fhb-chain.py edition-roster`) from the roster, the ISBN
+// master, the title master, fors.d and the reader flags. The REGISTRY above still wins for every
+// edition the chain lists: name, English name, For line, Amazon and card come from it.
+
+export interface RosterLanguage extends LanguageEdition {
+	/** the roster's own name for the language, when it differs (filter alias: "Gikuyu", "Akan (Twi)") */
+	roster?: string;
+	endonym?: string;
+	region: string;
+	flag?: string | null;
+	place?: string | null;
+	isbn?: { hardback: string; paperback: string } | null;
+	/** sold by our own checkout (ISBNS.json on_sale or direct_sale) */
+	sellable: boolean;
+	/** listed by the edition chain (edition-registry.json) */
+	listed: boolean;
+	/** R2 card line (v1/v2) cut from the BUILT case; null = no cover built yet */
+	card: string | null;
+}
+
+type RosterRow = (typeof roster.languages)[number] & Record<string, unknown>;
+const byCode = new Map(allLanguageEditions.map((l) => [l.code, l]));
+
+/** World regions in page order, only those with a language. */
+export const ROSTER_REGIONS: { key: string; label: string }[] = roster.regions;
+
+/** All 80 roster languages, English first, the rest in roster order (the page sorts). */
+export const rosterLanguages: RosterLanguage[] = (roster.languages as RosterRow[]).map((r) => {
+	const reg = byCode.get(r.code);
+	return {
+		code: r.code,
+		name: reg?.name ?? (r.name as string) ?? 'Father’s Heart Bible',
+		english: reg?.english ?? (r.english as string),
+		sub: reg?.sub ?? ((r.sub as string) || ''),
+		...(reg?.rtl || r.rtl ? { rtl: true } : {}),
+		...(reg?.amazon ? { amazon: reg.amazon } : {}),
+		...(r.roster && r.roster !== r.english ? { roster: r.roster as string } : {}),
+		...(r.endonym ? { endonym: r.endonym as string } : {}),
+		region: r.region as string,
+		flag: (r.flag as string) ?? null,
+		place: (r.place as string) ?? null,
+		isbn: (r.isbn as RosterLanguage['isbn']) ?? null,
+		sellable: Boolean(r.sellable) || Boolean(reg),
+		listed: Boolean(reg),
+		card: (r.card as string | null) ?? null,
+	};
+});
+
+/** Every language edition our own checkout sells: the registry's, then the roster's direct-sale ones
+ *  (dvc-checkout.ts CATALOG LANGUAGE region). An edition with no ISBN is never sold. */
+export const orderableLanguages: LanguageEdition[] = [
+	...languageEditions,
+	...rosterLanguages.filter((l) => l.code !== 'en' && l.sellable && !l.listed && l.isbn),
+];
