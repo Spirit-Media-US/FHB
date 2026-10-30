@@ -14,7 +14,8 @@ export function hasLookInside(manifest, slug) {
 
 /**
  * Where a card's "Buy Direct & Save + Free Shipping" goes. Never a dead link:
- *  - sold by our checkout (an ISBN + a catalog row): the /print catalog form, row pre-filled;
+ *  - sold by our checkout (an ISBN + a catalog row, or a PRE-ORDER with no ISBN yet — Kevin 2026-10-30,
+ *    Buy now on all 80): the /print catalog form, row pre-filled;
  *  - no ISBN yet but an edition page: that page's #order block (reserve by email) — the
  *    checkout cannot take an edition with no ISBN, so the card never points at it;
  *  - neither: null (no link).
