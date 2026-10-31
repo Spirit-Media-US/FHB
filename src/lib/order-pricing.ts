@@ -56,3 +56,45 @@ export function quote(
 		copies < 1 ? 'none' : FIRST_ORDER_PCT > bulkPct ? 'first' : bulkPct > 0 ? 'bulk' : 'none';
 	return { copies, subtotal, bulkPct, bulkTotal, firstTotal, best };
 }
+
+// THE ORDER TALLY ON THE STRIPE SESSION ("sku:qty,sku:qty"). Stripe caps EACH metadata value at
+// 500 characters, and one key holding the whole order failed every cart of ~35+ SKUs with a 502
+// (82 pb SKUs = 1,138 chars, measured 2026-10-30). The tally is split at SKU boundaries across
+// `breakdown`, `breakdown_2`, `breakdown_3`…, each under the cap; readers join it back with
+// readBreakdown() (a session written before the split reads the same).
+export const META_VALUE_MAX = 500;
+/** Stripe refuses a Checkout session with more than 100 line items. */
+export const MAX_LINE_ITEMS = 100;
+
+export function breakdownKey(i: number): string {
+	return i === 0 ? 'breakdown' : `breakdown_${i + 1}`;
+}
+
+/** metadata[key] -> value for the non-zero counts, every value at most META_VALUE_MAX chars. */
+export function packBreakdown(counts: Record<string, number>): Record<string, string> {
+	const chunks: string[] = [];
+	let cur = '';
+	for (const [k, n] of Object.entries(counts)) {
+		if (!(n > 0)) continue;
+		const p = `${k}:${n}`;
+		if (cur && cur.length + 1 + p.length > META_VALUE_MAX) {
+			chunks.push(cur);
+			cur = p;
+		} else {
+			cur = cur ? `${cur},${p}` : p;
+		}
+	}
+	if (cur) chunks.push(cur);
+	const out: Record<string, string> = {};
+	chunks.forEach((c, i) => {
+		out[`metadata[${breakdownKey(i)}]`] = c;
+	});
+	return out;
+}
+
+/** The whole tally from a session's metadata. */
+export function readBreakdown(m: Record<string, unknown> | null | undefined): string {
+	const out: string[] = [];
+	for (let i = 0; m?.[breakdownKey(i)]; i++) out.push(String(m[breakdownKey(i)]));
+	return out.join(',');
+}

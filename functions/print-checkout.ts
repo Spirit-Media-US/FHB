@@ -17,6 +17,8 @@
 // NB: path is /print-checkout, not /api/* — the apex router proxies /api/* to
 // the community app, so this marketing function must live off that prefix.
 
+import { packBreakdown } from '../src/lib/order-pricing';
+
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
 }
@@ -125,10 +127,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		'metadata[kind]': 'print_bulk',
 		'metadata[total]': total,
 		'metadata[pct_off]': tier.pct,
-		'metadata[breakdown]': Object.entries(counts)
-			.filter(([, n]) => n > 0)
-			.map(([k, n]) => `${k}:${n}`)
-			.join(','),
+		...packBreakdown(counts),
 	};
 	// One line item per line+edition+binding ordered, each at its binding's
 	// volume-tier unit price (LP prices identically to Compact).

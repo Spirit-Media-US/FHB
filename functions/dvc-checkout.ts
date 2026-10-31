@@ -19,7 +19,13 @@
 // NB: path is /dvc-checkout, not /api/* — the apex router proxies /api/* to the community
 // app, so this marketing function must live off that prefix.
 
-import { FIRST_ORDER_CODE, FIRST_ORDER_PCT, unitAfter } from '../src/lib/order-pricing';
+import {
+	FIRST_ORDER_CODE,
+	FIRST_ORDER_PCT,
+	MAX_LINE_ITEMS,
+	packBreakdown,
+	unitAfter,
+} from '../src/lib/order-pricing';
 
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
@@ -1308,6 +1314,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	const tier = tierFor(total);
 	// tierFor covers everything from 1 upward, so a null here means an empty order.
 	if (total < 1 || tier === null) return json({ error: 'empty' }, 400);
+	// One line item per SKU, and Stripe refuses a session with more than 100 of them.
+	if (Object.values(counts).filter((n) => n > 0).length > MAX_LINE_ITEMS) {
+		return json(
+			{
+				error: 'too_many_items',
+				message: `One order can hold up to ${MAX_LINE_ITEMS} different editions. Please split it into two orders.`,
+			},
+			400,
+		);
+	}
 
 	if (!env.STRIPE_FHB_SECRET_KEY) {
 		return json({ disabled: true, message: 'Checkout is not enabled yet.' });
@@ -1360,10 +1376,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		'metadata[total]': total,
 		'metadata[pct_off]': promo ? FIRST_ORDER_PCT : pct,
 		'metadata[offer]': promo ? 'first_order' : pct > 0 ? 'volume' : 'none',
-		'metadata[breakdown]': Object.entries(counts)
-			.filter(([, n]) => n > 0)
-			.map(([k, n]) => `${k}:${n}`)
-			.join(','),
+		// Split under Stripe's 500-char value cap (an 82-SKU cart was one 1,138-char value: 502).
+		...packBreakdown(counts),
 	};
 
 	let li = 0;
