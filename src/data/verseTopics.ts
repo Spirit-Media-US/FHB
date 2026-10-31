@@ -16,6 +16,13 @@ export const VERSE_TOPICS: VerseTopic[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
 	},
 	{
+		slug: 'kindness',
+		title: 'Bible Verses About Kindness',
+		blurb:
+			'Being kind to one another, our Father\u2019s own kindness toward us, kindness to the needy, and kind words.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/30a02ceb242880eee698a7c8a0ff2938ff0fced2-7934x5292.jpg',
+	},
+	{
 		slug: 'strength',
 		title: 'Bible Verses About Strength',
 		blurb: 'Where strength comes from, and how His power is made perfect in our weakness.',
@@ -200,6 +207,13 @@ export const VERSE_TOPICS: VerseTopic[] = [
 		title: 'Bible Verses About Trust',
 		blurb:
 			'Trusting our Father with all your heart, when you are afraid, when life shakes, and not in people.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg',
+	},
+	{
+		slug: 'perseverance',
+		title: 'Bible Verses About Perseverance',
+		blurb:
+			'Endurance in trials, running the race, not giving up, and our Father who finishes what he begins.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/c09239e8726c9ae68d2ca8985df5eef0832422f9-6720x4480.jpg',
 	},
 ];

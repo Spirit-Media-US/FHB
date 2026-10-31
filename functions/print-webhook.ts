@@ -12,6 +12,8 @@
 // NB: path is /print-webhook, not /api/* — the apex router proxies /api/* to
 // the community app, so this marketing function lives off that prefix.
 
+import { readBreakdown } from '../src/lib/order-pricing';
+
 interface Env {
 	STRIPE_PRINT_WEBHOOK_SECRET?: string;
 	// Also used to stamp notified_at back onto the session (see markNotified).
@@ -313,7 +315,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		`New print order — Father's Heart Bible\n\n` +
 		`Total: ${amount} (incl. tax ${tax})\n` +
 		`Copies: ${m.total ?? '?'}  ·  Discount: ${m.pct_off ?? '?'}% off${m.offer === 'first_order' ? ' (first order, WELCOME15)' : m.offer === 'volume' ? ' (volume)' : ''}\n` +
-		`Editions:\n${fmtOrder(m.breakdown)}\n\n` +
+		`Editions:\n${fmtOrder(readBreakdown(m))}\n\n` +
 		`Ship to:\n${name}\n${fmtAddr(ship.address)}\n\n` +
 		`Customer email: ${email}\n` +
 		`Phone: ${s.customer_details?.phone ?? '(none)'}\n` +
@@ -323,7 +325,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	// no confirmation their ORDER (as opposed to their payment) existed.
 	const custText =
 		`Thank you — we've received your order.\n\n` +
-		`What you ordered:\n${fmtOrder(m.breakdown)}\n\n` +
+		`What you ordered:\n${fmtOrder(readBreakdown(m))}\n\n` +
 		`Total paid: ${amount}\n` +
 		`Order reference: ${s.id ?? '?'}\n\n` +
 		`Shipping to:\n${name}\n${fmtAddr(ship.address)}\n\n` +

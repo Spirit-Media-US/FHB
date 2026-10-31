@@ -12,8 +12,15 @@
 const SLASH_ROOTS =
 	/^(https:\/\/fathersheartbible\.com)?(\/(?:read|blog|te\/blog|meaning|verses|guides|bibles|bible-for|bible-in|words|print|review|privacy|terms|family|the-fathers-heart-bible|a-bible-for-the-whole-world|legacy)(?:\/[^?#]*)?)([?#].*)?$/;
 
+// Community-app root routes answer 301 on the slash form ('/about/' -> '/about'), so a hand-typed
+// slash link is a wasted crawler hit (2026-10-30, W1). Exact roots only; sub-paths are untouched.
+const NO_SLASH_ROOTS =
+	/^(https:\/\/fathersheartbible\.com)?(\/(?:about|library|map|groups|login))\/([?#].*)?$/;
+
 export function canonHref(href: string): string {
 	if (typeof href !== 'string') return href;
+	const ns = href.match(NO_SLASH_ROOTS);
+	if (ns) return `${ns[1] ?? ''}${ns[2]}${ns[3] ?? ''}`;
 	const m = href.match(SLASH_ROOTS);
 	if (!m) return href;
 	const [, origin = '', path, rest = ''] = m;

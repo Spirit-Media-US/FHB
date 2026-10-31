@@ -23,6 +23,10 @@ import { execSync } from 'node:child_process';
  *   5. Every SKU weighs one product on the ladder server-side, as the forms count it.
  *   6. No RETIRED ISBN appears anywhere in src/ or functions/.
  *   7. Every targeted edition is priced in BOTH bindings, and matches ISBNS.json.
+ *  12. A big cart fits a Stripe session: every SKU the server sells (and all paperbacks), one
+ *      each, packs into metadata values of <= 500 chars that read back to the same order
+ *      (one 1,138-char value 502'd every ~35+ SKU cart, 2026-10-30), and dvc-checkout.ts
+ *      refuses more than 100 line items rather than sending them to Stripe.
  *  10. EVERY edition page (/bibles/<slug>-bible/) has ONE order form at #order, no price
  *      above it, and a price line — paperback first, then hardback — whose first-order and
  *      regular figures are the server's price and order-pricing.ts's FIRST_ORDER_PCT rule.
@@ -260,6 +264,33 @@ if (haveIsbns) {
 		`expected at least 26 language editions ON SALE in ISBNS.json, found ${langs.length}`,
 	);
 	const langCodes = new Set(langs.map((i) => i.code));
+	// PRE-ORDERS (Kevin 2026-10-30, kevin-decisions L1197: "All languages cards can offer a Buy now ·
+	// free shipping button ... By the time people notice these will be published"): a roster language
+	// with NO ISBN yet is sold now at THE language price, which fhb-chain.py edition-roster writes into
+	// src/data/language-roster.json (refusing unless every ISBNS.json language item carries one price
+	// pair). Only a language ISBNS.json does not list may be a pre-order; the server must charge that price.
+	const rosterData = JSON.parse(readFileSync('src/data/language-roster.json', 'utf8'));
+	const isbnCodes = new Set(
+		(isbns.language_editions?.items ?? []).map((i) => i.code ?? i.register?.code),
+	);
+	for (const r of (rosterData.languages ?? []).filter((x) => x.preorder === true)) {
+		check(
+			!r.isbn && !isbnCodes.has(r.code),
+			`${r.code}: pre-order in language-roster.json but ISBNS.json lists it — re-run fhb-chain.py edition-roster`,
+		);
+		for (const [binding, key] of [
+			['hardback', 'hb'],
+			['paperback', 'pb'],
+		]) {
+			const want = cents(r.price?.[binding]);
+			const got = server[`lang-${r.code}-${key}`]?.cents;
+			check(
+				got === want,
+				`lang-${r.code}-${key}: pre-order — ${CHECKOUT} says ${got} cents, language-roster.json says ${want}`,
+			);
+		}
+		langCodes.add(r.code);
+	}
 	for (const i of langs) {
 		check(
 			i.code && i.isbn && i.isbn_paperback,
@@ -383,11 +414,50 @@ const firstPct = Number(/FIRST_ORDER_PCT\s*=\s*(\d+)/.exec(readFileSync(PRICING_
 check(firstPct > 0, `could not read FIRST_ORDER_PCT from ${PRICING_TS}`);
 const firstUnit = (c) => c - Math.round((c * firstPct) / 100);
 const usd = (c) => `$${(c / 100).toFixed(2)}`;
-const editionSlugs = readdirSync(EDITIONS_DIR)
+const editionData = readdirSync(EDITIONS_DIR)
 	.filter((f) => /^[a-z0-9-]+\.json$/.test(f))
 	.map((f) => JSON.parse(readFileSync(`${EDITIONS_DIR}/${f}`, 'utf8')))
-	.filter((e) => typeof e?.slug === 'string' && e.listing && e.hook)
-	.map((e) => e.slug);
+	.filter((e) => typeof e?.slug === 'string' && e.listing && e.hook);
+// RESERVE-ONLY editions (no ISBN yet, `orderable: false` — Kevin 2026-10-30, full details NOW): the
+// page must carry NO order form and NO Offer (nothing the checkout cannot sell), and a #order block.
+for (const e of editionData.filter((x) => x.orderable === false)) {
+	const f = `${DIST}/bibles/${e.slug}-bible/index.html`;
+	if (!existsSync(f)) {
+		check(false, `${f} not built — reserve-only edition ${e.slug} has no page`);
+		continue;
+	}
+	const html = readFileSync(f, 'utf8');
+	check(
+		!e.isbn,
+		`${e.slug}: orderable false but carries ISBN ${e.isbn} — drop the flag and rebuild the page`,
+	);
+	check(parseForms(html).length === 0, `${f}: reserve-only edition must have NO order form`);
+	check(!/"@type":"Offer"/.test(html), `${f}: reserve-only edition must declare NO Offer`);
+	check(/id="order"/.test(html), `${f}: reserve-only edition has no #order block`);
+}
+// PRE-ORDER editions (no ISBN yet, `preorder: true` — Kevin 2026-10-30, kevin-decisions L1197: "All
+// languages cards can offer a Buy now · free shipping button ... By the time people notice these will be
+// published"). This REPLACES the old rule for them (no-ISBN = no order form, reserve by email): they now
+// carry the ONE order form like every edition (checked with the rest below, price line against the
+// server), and still NO Offer/GTIN — there is no ISBN to give, so no merchant listing is declared.
+const preorderSlugs = new Set(editionData.filter((e) => e.preorder === true).map((e) => e.slug));
+for (const e of editionData.filter((x) => x.preorder === true)) {
+	check(
+		!e.isbn,
+		`${e.slug}: preorder but carries ISBN ${e.isbn} — drop the flag and rebuild the page`,
+	);
+	check(e.orderable !== false, `${e.slug}: preorder and orderable:false contradict each other`);
+	const f = `${DIST}/bibles/${e.slug}-bible/index.html`;
+	if (existsSync(f)) {
+		const html = readFileSync(f, 'utf8');
+		check(!/"@type":"Offer"/.test(html), `${f}: pre-order edition (no ISBN) must declare NO Offer`);
+		check(
+			/data-preorder-note/.test(html),
+			`${f}: pre-order edition must say it ships on publication`,
+		);
+	}
+}
+const editionSlugs = editionData.filter((e) => e.orderable !== false).map((e) => e.slug);
 const editionPages = {};
 for (const slug of editionSlugs) {
 	const f = `${DIST}/bibles/${slug}-bible/index.html`;
@@ -511,6 +581,8 @@ function merchantErrs(pages, srv) {
 				errs.push(`${tag}: gtin13 ${g} is not a valid ISBN-13`);
 		}
 		const formSkus = Object.keys(forms[f]?.[0]?.prices ?? parseForms(html)[0]?.prices ?? {});
+		// a pre-order page sells through its form but has no GTIN, so it declares no Offer (above)
+		if (preorderSlugs.has(/bibles\/([a-z0-9-]+)-bible\//.exec(f)?.[1])) continue;
 		for (const sku of formSkus)
 			if (!seen.has(sku))
 				errs.push(`${f}: the form sells ${sku} but no Product/Offer describes it`);
@@ -519,9 +591,50 @@ function merchantErrs(pages, srv) {
 }
 for (const e of merchantErrs(editionPages, server)) check(false, e);
 
+// ── 12. a big cart fits one Stripe session ────────────────────────────────────────────
+const op = await import(`../${PRICING_TS}`);
+function cartErrs(skus, pack = op.packBreakdown) {
+	const errs = [];
+	const counts = Object.fromEntries(skus.map((k) => [k, 1]));
+	const meta = pack(counts);
+	const plain = Object.fromEntries(
+		Object.entries(meta).map(([k, v]) => [k.replace(/^metadata\[(.*)\]$/, '$1'), v]),
+	);
+	for (const [k, v] of Object.entries(meta))
+		if (v.length > op.META_VALUE_MAX)
+			errs.push(
+				`${skus.length}-SKU cart: ${k} is ${v.length} chars (Stripe max ${op.META_VALUE_MAX})`,
+			);
+	const back = op.readBreakdown(plain).split(',').filter(Boolean);
+	if (back.join(',') !== skus.map((k) => `${k}:1`).join(','))
+		errs.push(
+			`${skus.length}-SKU cart: the order does not read back whole (${back.length} of ${skus.length} SKUs)`,
+		);
+	if (Object.keys(meta).length > 40)
+		errs.push(
+			`${skus.length}-SKU cart: ${Object.keys(meta).length} metadata keys (Stripe allows 50 in all)`,
+		);
+	return errs;
+}
+const pbSkus = Object.keys(server).filter((k) => k.endsWith('-pb'));
+for (const e of [...cartErrs(pbSkus), ...cartErrs(Object.keys(server))]) check(false, e);
+check(
+	/MAX_LINE_ITEMS/.test(checkoutSrc) && /too_many_items/.test(checkoutSrc),
+	`${CHECKOUT} does not refuse an order of more than ${op.MAX_LINE_ITEMS} line items (Stripe's session limit)`,
+);
+
 // ── self-test: prove each assertion can actually fail ───────────────────────────────
 if (process.argv.includes('--selftest')) {
 	const cases = [
+		[
+			'the whole order in ONE metadata value (the 2026-10-30 502)',
+			() =>
+				cartErrs(pbSkus, (c) => ({
+					'metadata[breakdown]': Object.entries(c)
+						.map(([k, n]) => `${k}:${n}`)
+						.join(','),
+				})).length > 0,
+		],
 		[
 			'set priced above its parts',
 			() => {

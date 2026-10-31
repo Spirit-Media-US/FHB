@@ -93,6 +93,14 @@ const ph = pages[0]?.h ?? 1400;
 
 {/* The reuse form: a trigger and nothing else. It carries no manifest and no modal — it
     points at the full instance for this slug, which the script binds on load. */}
+{/* No sample pages yet: the slot says so instead of disappearing (Kevin 2026-10-30, "On /print where
+    there should be Look Inside please put in bold caps: COMING SOON"). The day lookinside.json gains
+    this slug, the trigger below replaces it — no per-edition edit. */}
+{total === 0 && (
+	<div class={`lookinside li-${variant} li-size-${size}`}>
+		<span class="li-soon">COMING SOON</span>
+	</div>
+)}
 {total > 0 && reuse && (
 	<div class={`lookinside li-${variant} li-size-${size}`}>
 		<button type="button" class="li-trigger" data-li-open-ref={slug} aria-haspopup="dialog">
@@ -238,6 +246,19 @@ const ph = pages[0]?.h ?? 1400;
 	}
 	.li-trigger:hover { background: #f3f3f3; border-color: #a1a1aa; }
 	.li-trigger:focus-visible { outline: 2px solid #3f3f46; outline-offset: 2px; }
+	/* COMING SOON takes the trigger's exact box in each variant (same padding, border, type
+	   size), so the card does not shift when the link replaces it (Kevin 2026-10-30). */
+	.li-soon {
+		display: inline-flex; align-items: center;
+		font-family: var(--font-sans); font-size: 0.9rem; font-weight: 800; letter-spacing: 0.04em;
+		color: #3f3f46; border: 1px solid var(--color-hairline); border-radius: 999px;
+		padding: 0.55rem 1.1rem;
+	}
+	.li-size-lg .li-soon { padding: calc(0.8rem - 1px) calc(1.8rem - 1px); font-size: 1rem; }
+	.li-link .li-soon {
+		display: inline; border: 0; border-radius: 0; padding: 0;
+		font-size: var(--li-link-size, 0.82rem);
+	}
 
 	.li-note { font-family: var(--font-sans); color: #71717a; font-size: 0.78rem; margin: 0.5rem 0 0; }
 

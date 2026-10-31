@@ -1,0 +1,141 @@
+---
+// /bible-in/malawi — Chichewa (Chewa). Built 2026-10-30 (pmseoaeo reach lane, Kevin L1139:
+// a /bible-in page for every live reader language) because Chichewa had no country page and so no
+// crawl path from /bible-in. Sourced facts only: population = World Bank 2024; religion = Malawi government surveys and World Religion Database (via Religion in Malawi, Wikipedia).
+// Pattern = /bible-in/malaysia. Father voice; verse text = the audited FHB quotes. No Scripture edits.
+import CountryBible from '../../components/CountryBible.astro';
+import { speakersLabel as sp } from '../../data/language-speakers';
+
+const verses = [
+	{
+		ref: 'Psalm 68:5',
+		slug: 'psalms',
+		ch: 68,
+		text: 'A father to the fatherless and defender of widows is our Father in his holy dwelling.',
+	},
+	{
+		ref: 'John 3:16',
+		slug: 'john',
+		ch: 3,
+		text: 'For our Father so loved the world that he gave his one and only Son, that whoever believes in him will not perish but have eternal life.',
+	},
+	{
+		ref: 'Psalm 103:13',
+		slug: 'psalms',
+		ch: 103,
+		text: "As a father's heart goes out to his children, so our Father's heart goes out to those who fear him.",
+	},
+];
+
+const stats = [
+	{ label: 'People', value: 'about 21.7 million' },
+	{ label: 'Christians', value: '87% of Malawi' },
+	{ label: 'Muslim', value: '11.6%' },
+	{ label: 'Catholic', value: '36.3%' },
+];
+
+const faqs = [
+	{
+		question: 'How many Christians are there in Malawi?',
+		answer: `Government surveys indicate that 87% of Malawians are Christian and 11.6% are Muslim. Catholics are 36.3% of the population and the Church of Central Africa Presbyterian (CCAP) 18%, with 1.3 million members. You can read the Scriptures they treasure free in Father's Heart Bible™ at fathersheartbible.com/read.`,
+	},
+	{
+		question: 'Can I read the Bible online free in Chichewa?',
+		answer: `Yes. Father's Heart Bible™ is free to read online in Chichewa — all 66 books, no account, no purchase, no app — at fathersheartbible.com/read/ny/. Start with Yohane 3 (John 3) or Salmo 23 (Psalm 23). The English edition is free too, with audio.`,
+	},
+	{
+		question: "Is Father's Heart Bible available in Chichewa?",
+		answer: `Yes. The Chichewa edition is free to read at fathersheartbible.com/read/ny/. Chichewa is the national language of Malawi and is spoken by about ${sp('ny')} people, in Malawi and in neighbouring Zambia and Mozambique.`,
+	},
+	{
+		question: 'Which other languages of Malawi can I read the Bible in here?',
+		answer: `English, the other official language, is free to read at fathersheartbible.com/read/, with audio on every chapter. The Sena edition, spoken along the lower Zambezi, is free to read at fathersheartbible.com/read/seh/.`,
+	},
+	{
+		question: 'Is there a free audio Bible I can listen to?',
+		answer: `Yes. Every chapter of the English Father's Heart Bible™ comes with free audio, so it can be heard on any phone from Lilongwe to Lake Malawi.`,
+	},
+];
+---
+
+<CountryBible
+	slug="malawi"
+	country="Malawi"
+	flag="🇲🇼"
+	flagImg="/flags/mw.svg"
+	countryWikipedia="https://en.wikipedia.org/wiki/Malawi"
+	lastUpdated="October 2026"
+	lastUpdatedIso="2026-10-30"
+	colorPrimary="#CE1126"
+	colorSecondary="#000000"
+	colorAccent="#339E35"
+	tintWarm="#FBE8EA"
+	tintCool="#EDEDED"
+	tintBlue="#E8F4E8"
+	title="The Bible in Malawi — Christianity | Father's Heart Bible™ (FHB)"
+	description="How many Christians live in Malawi? Read the Bible free online in Chichewa and English with audio — Father's Heart Bible™ (FHB)."
+	h1="The Bible in Malawi"
+	heroSubhead="Nearly nine in ten Malawians are Christian — Father's Heart Bible reveals God as a loving Father. Free online in Chichewa, with audio in English."
+	heroBase=""
+	heroSrc={{ desktop: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Otter_Point%2C_Cape_Maclear_%28Malawi%29.jpg/1280px-Otter_Point%2C_Cape_Maclear_%28Malawi%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", mobile: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Otter_Point%2C_Cape_Maclear_%28Malawi%29.jpg/960px-Otter_Point%2C_Cape_Maclear_%28Malawi%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", og: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Otter_Point%2C_Cape_Maclear_%28Malawi%29.jpg/1280px-Otter_Point%2C_Cape_Maclear_%28Malawi%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail" }}
+	heroCreditHtml={`Hero photo: <a href="https://commons.wikimedia.org/wiki/File:Otter_Point,_Cape_Maclear_(Malawi).jpg" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">Otter Point, Cape Maclear</a> by Hans Hillewaert, <a href="https://creativecommons.org/licenses/by-sa/4.0" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand);" class="hover:underline">CC BY-SA 4.0</a>, via Wikimedia Commons.`}
+	heroAlt="Rocks and water at Otter Point, Cape Maclear, on Lake Malawi"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">Yes &mdash; you can read the Bible free online in Malawi right now.</strong> Government surveys indicate that 87% of Malawians are Christian, with Catholics the largest church at 36.3% and the CCAP at 18%. The <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">Father&rsquo;s Heart Bible&trade;</a> is free to read and <em>hear</em> on any phone, with no app and no account, and the <a href="https://fathersheartbible.com/read/ny/" style="color: var(--color-brand);" class="hover:underline"><em>Chichewa</em> edition</a> is free to read today &mdash; the national language of Malawi, where Father&rsquo;s Heart Bible&trade; reveals God as a near and loving <em>Father</em>.`}
+	keyTakeaway="Malawi, the warm heart of Africa, is among the most Christian nations on earth — and Father's Heart Bible™ (FHB) offers the Father near to every Malawian, in Chichewa."
+	glanceIntroHtml={`Malawi is a narrow landlocked country in south-east Africa, running along the shore of Lake Malawi. Chichewa and English are its main languages, and Christianity is the faith of most families.`}
+	stats={stats}
+	knownForHeading="What Malawi is known for"
+	knownForIntroHtml={`A small, friendly country built around one of Africa’s great lakes.`}
+	knownFor={[
+		{ label: 'Lake Malawi', text: 'One of Africa’s great lakes fills much of the country’s length; Lake Malawi National Park is a UNESCO World Heritage Site.' },
+		{ label: 'The warm heart of Africa', text: 'Malawi is widely known by this nickname for the warmth of its people.' },
+		{ label: 'Chichewa', text: 'The national language, officially renamed from Chinyanja to Chichewa in 1968.' },
+		{ label: 'A secular state, a church-going people', text: 'Malawi is a secular state in which Christmas and Good Friday are national holidays.' },
+		{ label: 'Many churches', text: 'Catholic and Presbyterian churches are the largest in a country where 87% are Christian.' },
+	]}
+	faithHeading="Faith and the Bible in Malawi"
+	faithBodyHtml={`<p>Malawi is a majority Christian country. Government surveys indicate that <strong>87%</strong> of Malawians are Christian and <strong>11.6%</strong> are Muslim. The largest churches are the <strong>Roman Catholic Church</strong> (36.3% of Malawians) and the <strong>Church of Central Africa Presbyterian</strong> (18%, with 1.3 million members); Anglicans, Baptists, Adventists and Lutherans are smaller.</p><p>For readers of every background, Father&rsquo;s Heart Bible&trade; offers the Scriptures free, in the language of the home, revealing God as a near and loving <em>Father</em>.</p>`}
+	sources={[
+		{ label: 'World Bank, Population, total (2024) — compiled from UN World Population Prospects 2024 and national statistics offices', url: 'https://data.worldbank.org/indicator/SP.POP.TOTL?locations=MW' },
+		{ label: 'Malawi government surveys and World Religion Database (Christian 87%, Muslim 11.6%, Catholic 36.3%, CCAP 18%), as summarised in Religion in Malawi — Wikipedia', url: 'https://en.wikipedia.org/wiki/Religion_in_Malawi' },
+		{ label: 'Chewa language — Wikipedia (national language; renamed Chichewa in 1968)', url: 'https://en.wikipedia.org/wiki/Chewa_language' },
+		{ label: 'Malawi — Wikipedia (Lake Malawi; secular state)', url: 'https://en.wikipedia.org/wiki/Malawi' },
+		{ label: 'Language-reach register, Father\'s Heart Bible (speakers of Chichewa worldwide)', url: 'https://fathersheartbible.com/read/ny/' },
+	]}
+	faithsHeading="What “our Father” offers Malawi"
+	faithsIntroHtml={`From the lakeshore to the highlands, many families are looking for a Father who stays. Father&rsquo;s Heart Bible&trade; answers a longing every church already knows: to be held by a Father who never abandons His children.`}
+	faithsBlocks={[
+		{ heading: 'For the fatherless', bodyHtml: `To the child no one came back for, Scripture promises <a href="https://fathersheartbible.com/read/psalms/68/" style="color: var(--color-gold);" class="hover:underline">&ldquo;a father to the fatherless&rdquo;</a>.` },
+		{ heading: 'For the whole world', bodyHtml: `&ldquo;For our Father so loved the world that he gave his one and only Son.&rdquo; <a href="https://fathersheartbible.com/read/john/3/" style="color: var(--color-gold);" class="hover:underline">Read John 3</a> free.` },
+		{ heading: 'For those who honour Him', bodyHtml: `&ldquo;As a father&rsquo;s heart goes out to his children, so our Father&rsquo;s heart goes out to those who fear him.&rdquo; <a href="https://fathersheartbible.com/read/psalms/103/" style="color: var(--color-gold);" class="hover:underline">Read Psalm 103</a>` },
+		{ heading: 'For every community', bodyHtml: `Chewa, Tumbuka, Yao and every people of Malawi &mdash; the Father calls each Malawian His beloved son or daughter.` },
+	]}
+	whyHeading="Why Father's Heart Bible™ for Malawi"
+	whyBlocks={[
+		{ heading: 'God revealed as Father', bodyHtml: `Father&rsquo;s Heart Bible&trade; reveals God as <em>Father</em> wherever Scripture reveals Him that way &mdash; from <a href="https://fathersheartbible.com/read/genesis/1/" style="color: var(--color-brand);" class="hover:underline">Genesis 1:1</a> onward.` },
+		{ heading: 'Free, with audio, on any phone', bodyHtml: `No purchase, no app, no sign-up. The whole Bible is free to <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">read online</a>, with audio on every English chapter.` },
+		{ heading: 'In Chichewa', bodyHtml: `The Chichewa edition is published: <a href="https://fathersheartbible.com/read/ny/" style="color: var(--color-brand);" class="hover:underline">read it free</a> &mdash; the national language of Malawi.` },
+	]}
+	wordHeading="His Word will not return void"
+	wordBodyHtml={`<p>When our Father said, &ldquo;Let there be light,&rdquo; there was light. His Word accomplishes what He sends it to do. From the shore of Lake Malawi to the highlands of Mzuzu, His Word will not return empty.</p><p class="mt-4" style="color: var(--color-ink);">&ldquo;&hellip;so will my word be that goes out from my mouth: it will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.&rdquo; <span style="color: var(--color-muted);">&mdash; Isaiah 55:11</span></p>`}
+	resourcesHeading="Learn more about Malawi"
+	resourcesIntroHtml={`Trusted sources for the facts on this page &mdash; and for going deeper into Malawi&rsquo;s people, faith, and story.`}
+	resources={[
+		{ label: 'Malawi — Wikipedia', url: 'https://en.wikipedia.org/wiki/Malawi' },
+		{ label: 'Religion in Malawi — Wikipedia', url: 'https://en.wikipedia.org/wiki/Religion_in_Malawi' },
+		{ label: 'Malawi — Encyclopaedia Britannica', url: 'https://www.britannica.com/place/Malawi' },
+		{ label: 'Malawi — Joshua Project (people groups)', url: 'https://joshuaproject.net/countries/MI' },
+	]}
+	opportunityHeading="Bible languages for Malawi"
+	opportunityIntroHtml={`Chichewa is the national language of Malawi, and English is the other official language. Both are free to read today.`}
+	languages={[
+		{ language: 'English', code: 'en' },
+		{ language: 'Chichewa', code: 'ny' },
+	]}
+	verses={verses}
+	keepReadingHtml={`Begin with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> &mdash; including <a href="/guides/where-to-start-reading-the-bible/" style="color: var(--color-brand);" class="hover:underline">where to start</a> and <a href="/guides/what-is-the-gospel/" style="color: var(--color-brand);" class="hover:underline">what the gospel is</a>. Browse Scripture by theme on our <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">Bible verses by topic</a> pages.`}
+	faqs={faqs}
+	ctaMidHeading="Know God as a Father near to you"
+	ctaMidBodyHtml={`In Chichewa or English, read God in His own voice as Father &mdash; free, on any phone.`}
+	ctaBottomBodyHtml={`From Genesis to Revelation, free online &mdash; a translation that reveals God as a loving Father to every beloved son and daughter across Malawi.`}
+/>

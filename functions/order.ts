@@ -16,6 +16,8 @@
 // NB: path is /order, not /api/* — the apex router proxies /api/* to the
 // community app, so this marketing function must live off that prefix.
 
+import { readBreakdown } from '../src/lib/order-pricing';
+
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
 }
@@ -171,7 +173,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 		style: 'currency',
 		currency: (s.currency ?? 'usd').toUpperCase(),
 	});
-	const items = String(m.breakdown ?? '')
+	const items = readBreakdown(m)
 		.split(/[,\s]+/)
 		.filter(Boolean)
 		.map((part: string) => {

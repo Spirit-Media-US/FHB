@@ -256,7 +256,13 @@ const EN_ENTRY: Record<string, { href: string; label: string }> = {
 // Near-index-floor languages (2d, 2026-10-28): Google has indexed under ~75% of these
 // editions' chapters, so their country-page row carries five more of the same
 // generated, live-guarded entry chapters (a plain crawl path, nothing new to maintain).
-const NEAR_FLOOR_LANGS = new Set(['ko', 'el', 'hu', 'uk', 'tr', 'ur', 'zh-hans']);
+// 2026-10-30 (reach unit 2 wave 4): widened to every language the exposure engine counts RED
+// (aeo-state/fhb-red-wave3-20261030.json red_list: indexed share under its floor). Same plain
+// links to live chapters; the live-guard in entryLinksFor() still drops any code not live.
+const NEAR_FLOOR_LANGS = new Set([
+	'ko', 'el', 'hu', 'uk', 'tr', 'ur', 'zh-hans',
+	'fa', 'fil', 'ig', 'it', 'ja', 'jv', 'ml', 'ms', 'nl', 'nmf', 'pa', 'pcm', 'pl', 'ro', 'vi', 'yo', 'yue', 'zu',
+]);
 const NEAR_FLOOR_EXTRA = ['psalms/91', 'matthew/5', 'luke/15', 'romans/8', 'isaiah/53'];
 function entryLinksFor(code: string): { href: string; label: string }[] {
 	if (code === 'en') return ENTRY_PICK.map((k) => EN_ENTRY[k]);
