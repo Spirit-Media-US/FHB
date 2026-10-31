@@ -23,6 +23,10 @@ import { execSync } from 'node:child_process';
  *   5. Every SKU weighs one product on the ladder server-side, as the forms count it.
  *   6. No RETIRED ISBN appears anywhere in src/ or functions/.
  *   7. Every targeted edition is priced in BOTH bindings, and matches ISBNS.json.
+ *  12. A big cart fits a Stripe session: every SKU the server sells (and all paperbacks), one
+ *      each, packs into metadata values of <= 500 chars that read back to the same order
+ *      (one 1,138-char value 502'd every ~35+ SKU cart, 2026-10-30), and dvc-checkout.ts
+ *      refuses more than 100 line items rather than sending them to Stripe.
  *  10. EVERY edition page (/bibles/<slug>-bible/) has ONE order form at #order, no price
  *      above it, and a price line — paperback first, then hardback — whose first-order and
  *      regular figures are the server's price and order-pricing.ts's FIRST_ORDER_PCT rule.
@@ -587,9 +591,50 @@ function merchantErrs(pages, srv) {
 }
 for (const e of merchantErrs(editionPages, server)) check(false, e);
 
+// ── 12. a big cart fits one Stripe session ────────────────────────────────────────────
+const op = await import(`../${PRICING_TS}`);
+function cartErrs(skus, pack = op.packBreakdown) {
+	const errs = [];
+	const counts = Object.fromEntries(skus.map((k) => [k, 1]));
+	const meta = pack(counts);
+	const plain = Object.fromEntries(
+		Object.entries(meta).map(([k, v]) => [k.replace(/^metadata\[(.*)\]$/, '$1'), v]),
+	);
+	for (const [k, v] of Object.entries(meta))
+		if (v.length > op.META_VALUE_MAX)
+			errs.push(
+				`${skus.length}-SKU cart: ${k} is ${v.length} chars (Stripe max ${op.META_VALUE_MAX})`,
+			);
+	const back = op.readBreakdown(plain).split(',').filter(Boolean);
+	if (back.join(',') !== skus.map((k) => `${k}:1`).join(','))
+		errs.push(
+			`${skus.length}-SKU cart: the order does not read back whole (${back.length} of ${skus.length} SKUs)`,
+		);
+	if (Object.keys(meta).length > 40)
+		errs.push(
+			`${skus.length}-SKU cart: ${Object.keys(meta).length} metadata keys (Stripe allows 50 in all)`,
+		);
+	return errs;
+}
+const pbSkus = Object.keys(server).filter((k) => k.endsWith('-pb'));
+for (const e of [...cartErrs(pbSkus), ...cartErrs(Object.keys(server))]) check(false, e);
+check(
+	/MAX_LINE_ITEMS/.test(checkoutSrc) && /too_many_items/.test(checkoutSrc),
+	`${CHECKOUT} does not refuse an order of more than ${op.MAX_LINE_ITEMS} line items (Stripe's session limit)`,
+);
+
 // ── self-test: prove each assertion can actually fail ───────────────────────────────
 if (process.argv.includes('--selftest')) {
 	const cases = [
+		[
+			'the whole order in ONE metadata value (the 2026-10-30 502)',
+			() =>
+				cartErrs(pbSkus, (c) => ({
+					'metadata[breakdown]': Object.entries(c)
+						.map(([k, n]) => `${k}:${n}`)
+						.join(','),
+				})).length > 0,
+		],
 		[
 			'set priced above its parts',
 			() => {
