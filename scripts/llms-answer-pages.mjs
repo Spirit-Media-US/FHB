@@ -21,6 +21,8 @@ export const TYPES = [
 	{ label: 'The books of the Bible', pages: ['old-testament', 'new-testament', 'books-of-the-bible'] },
 	// Top-level campaign page (2s, 2026-10-28): a lone page, not a folder, so no dir type reached it.
 	{ label: 'Bible months and campaigns', pages: ['global-bible-month'] },
+	// Original data (2gm, 2026-10-31): per-book words of the Father, Son and Spirit from the locked Divine Voice Color tags.
+	{ label: 'Original data', pages: ['who-speaks-in-scripture'] },
 ];
 
 const humanize = (s) => s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());

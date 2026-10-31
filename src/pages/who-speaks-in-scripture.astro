@@ -1,0 +1,237 @@
+---
+// /who-speaks-in-scripture/ — original-data page (unit 2gm, 2026-10-31). Words and verses spoken by our Father,
+// the Son and the Holy Spirit, per book, MEASURED from the locked English canon's Divine Voice Color tags.
+// Data: src/data/who-speaks.json + public/data/who-speaks-by-book.csv, both written by scripts/gen-who-speaks.py,
+// which refuses to write unless the book sums equal the locked whole-canon figures (never edition figures).
+// No Scripture is quoted. Every book links to our /read. Trademark form: "Divine Voice™ Color".
+import data from '../data/who-speaks.json';
+import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+
+const PAGE_URL = 'https://fathersheartbible.com/who-speaks-in-scripture/';
+const CSV_URL = 'https://fathersheartbible.com/data/who-speaks-by-book.csv';
+const T = data.totals;
+const N = (n: number) => n.toLocaleString('en-US');
+const pct = (n: number) => `${((n / data.canon.verses) * 100).toFixed(1)}%`;
+const TITLE = fitTitle('Who Speaks in Scripture: Words of the Father, Son and Spirit by Book');
+const DESCRIPTION = fitDescription(
+	`Our Father speaks ${N(T.father.words)} words across ${N(T.father.verses)} verses, the Son ${N(T.son.words)}, the Holy Spirit ${N(T.spirit.words)}. Counted book by book from Father’s Heart Bible. Free CSV.`,
+);
+const PUBLISHED = '2026-10-31';
+const ROWS = data.rows;
+const slug = (b: string) => b.toLowerCase().replace(/\s+/g, '-');
+
+// Chart: the 12 books where divine speech runs longest, stacked by speaker (static SVG, no script).
+const top = [...ROWS]
+	.map((r) => ({ ...r, all: r.father_words + r.son_words + r.spirit_words }))
+	.sort((a, b) => b.all - a.all)
+	.slice(0, 12);
+const MAX = top[0].all;
+const LABEL_W = 110,
+	BAR_W = 420,
+	ROW_H = 26;
+const CHART_H = top.length * ROW_H + 8;
+const w = (n: number) => (n / MAX) * BAR_W;
+
+const CITE = `Spirit Media Publishing. “Who Speaks in Scripture: words of the Father, the Son and the Holy Spirit, by book.” Father’s Heart Bible™, Divine Voice™ Color, edition ${data.edition}. ${PAGE_URL} (data: ${CSV_URL}), accessed ${PUBLISHED}.`;
+
+const FAQS = [
+	{
+		q: 'How many words does our Father speak in the Bible?',
+		a: `In Father’s Heart Bible, our Father speaks ${N(T.father.words)} words across ${N(T.father.verses)} verses (${pct(T.father.verses)} of the ${N(data.canon.verses)} verses of the locked ${data.edition} text).`,
+	},
+	{
+		q: 'How many words did Jesus speak in the Bible?',
+		a: `The Son speaks ${N(T.son.words)} words across ${N(T.son.verses)} verses in Father’s Heart Bible. Most are in Matthew, Luke, John and Mark. A red letter Bible shows only this part; this page counts all three divine speakers.`,
+	},
+	{
+		q: 'Does the Holy Spirit speak in the Bible?',
+		a: `Yes, rarely and briefly. The Holy Spirit speaks ${N(T.spirit.words)} words across ${N(T.spirit.verses)} verses, in Acts, Galatians and Revelation.`,
+	},
+	{
+		q: 'What counts as a divine word here?',
+		a: 'Divine Voice™ Color marks ownership, not quotation: were these words actually spoken by a divine person? Words He repeats back from someone else stay His. Words never spoken by Him are never counted, and narration is never counted. A verse counts for a speaker when any part of it is his, and words are counted once even where colours touch.',
+	},
+	{
+		q: 'Can I use these numbers?',
+		a: 'Yes. Download the CSV and cite this page with the citation above. The figures come from the locked English text of Father’s Heart Bible, so they match the whole-canon figures printed in the Divine Voice™ Color editions.',
+	},
+];
+
+const SITE = {
+	'@type': 'Organization',
+	name: 'Spirit Media Publishing',
+	url: 'https://spiritmediapublishing.com/',
+};
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'Dataset',
+		name: 'Who speaks in Scripture: words and verses of the Father, the Son and the Holy Spirit, by book',
+		description: `Words and verses spoken by our Father, the Son and the Holy Spirit in each of the 66 books, counted from the Divine Voice™ Color tags of the locked English text of Father’s Heart Bible, edition ${data.edition}. Whole-canon totals: Father ${N(T.father.words)} words / ${N(T.father.verses)} verses; Son ${N(T.son.words)} / ${N(T.son.verses)}; Holy Spirit ${N(T.spirit.words)} / ${N(T.spirit.verses)}.`,
+		url: PAGE_URL,
+		datePublished: PUBLISHED,
+		dateModified: PUBLISHED,
+		version: data.edition,
+		inLanguage: 'en',
+		creator: SITE,
+		publisher: { '@id': 'https://spiritmediapublishing.com/#organization' },
+		keywords: [
+			'words of Jesus',
+			'red letter Bible',
+			'words of God in the Bible',
+			'Divine Voice Color',
+			'who speaks in the Bible',
+		],
+		measurementTechnique:
+			'Fragment-level Divine Voice™ Color tags on the locked English text; words counted over merged spans; a verse counts for a speaker when any fragment is his.',
+		variableMeasured: [
+			'father_words',
+			'father_verses',
+			'son_words',
+			'son_verses',
+			'spirit_words',
+			'spirit_verses',
+		],
+		distribution: [{ '@type': 'DataDownload', encodingFormat: 'text/csv', contentUrl: CSV_URL }],
+		isPartOf: {
+			'@type': 'WebSite',
+			name: "Father's Heart Bible™",
+			url: 'https://fathersheartbible.com/',
+		},
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: FAQS.map((f) => ({
+			'@type': 'Question',
+			name: f.q,
+			acceptedAnswer: { '@type': 'Answer', text: f.a },
+		})),
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{ '@type': 'ListItem', position: 2, name: 'Who speaks in Scripture', item: PAGE_URL },
+		],
+	},
+];
+const P = 'font-family: var(--font-sans); color: var(--color-muted);';
+const H2 = 'font-family: var(--font-serif); color: var(--color-ink);';
+const LINK = 'color: var(--color-brand);';
+const FATHER = '#2563eb',
+	SON = '#c8102e',
+	SPIRIT = '#6a3fa0';
+---
+
+<Layout title={TITLE} description={DESCRIPTION} jsonLd={jsonLd}>
+	<main id="main-content">
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style={P}>
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Who speaks in Scripture</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Divine Voice&trade; Color &middot; counted book by book</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style={H2}>Who Speaks in Scripture</h1>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style={P}>
+					<strong style="color: var(--color-ink);">Our Father speaks {N(T.father.words)} words across {N(T.father.verses)} verses. The Son speaks {N(T.son.words)} words across {N(T.son.verses)} verses. The Holy Spirit speaks {N(T.spirit.words)} words across {N(T.spirit.verses)} verses.</strong> That is {pct(T.father.verses)} of the Bible&rsquo;s {N(data.canon.verses)} verses with our Father speaking, and our Father speaks more than three times the words of the Son. A red letter Bible shows only the Son. Father&rsquo;s Heart Bible&trade; prints all three in Divine Voice&trade; Color: our Father in <strong style={`color:${FATHER}`}>blue</strong>, the Son in <strong style={`color:${SON}`}>red</strong>, the Holy Spirit in <strong style={`color:${SPIRIT}`}>purple</strong>.
+				</p>
+				<p class="text-lg leading-relaxed mb-5" style={P}>
+					Below is the count for every book, a chart of where divine speech runs longest, a <a href="/data/who-speaks-by-book.csv" style={LINK} class="hover:underline" download>free CSV</a> you can use, and how to cite it. Each book name opens that book in the <a href="/read/" style={LINK} class="hover:underline">free reader</a>.
+				</p>
+
+				<h2 id="chart" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>Where divine speech runs longest</h2>
+				<figure class="m-0">
+					<svg viewBox={`0 0 ${LABEL_W + BAR_W + 70} ${CHART_H}`} width="100%" role="img" aria-labelledby="ws-chart-title ws-chart-desc" style="max-width:640px;height:auto;font-family:var(--font-sans);">
+						<title id="ws-chart-title">Words spoken by the Father, the Son and the Holy Spirit in the 12 books with the most divine speech</title>
+						<desc id="ws-chart-desc">{top.map((r) => `${r.book}: ${N(r.father_words)} Father, ${N(r.son_words)} Son, ${N(r.spirit_words)} Spirit.`).join(' ')}</desc>
+						{top.map((r, i) => (
+							<g transform={`translate(0 ${i * ROW_H + 4})`}>
+								<text x={LABEL_W - 8} y="15" text-anchor="end" font-size="13" fill="currentColor">{r.book}</text>
+								<rect x={LABEL_W} y="3" width={w(r.father_words)} height="16" fill={FATHER}></rect>
+								<rect x={LABEL_W + w(r.father_words)} y="3" width={w(r.son_words)} height="16" fill={SON}></rect>
+								<rect x={LABEL_W + w(r.father_words) + w(r.son_words)} y="3" width={Math.max(w(r.spirit_words), r.spirit_words ? 1 : 0)} height="16" fill={SPIRIT}></rect>
+								<text x={LABEL_W + w(r.all) + 6} y="15" font-size="12" fill="currentColor">{N(r.all)}</text>
+							</g>
+						))}
+					</svg>
+					<figcaption class="text-sm mt-3" style={P}>
+						Words per book, stacked: <span style={`color:${FATHER}`}>&#9632;</span> our Father, <span style={`color:${SON}`}>&#9632;</span> the Son, <span style={`color:${SPIRIT}`}>&#9632;</span> the Holy Spirit. Ezekiel and Jeremiah, where our Father speaks almost without pause, lead the Old Testament; Matthew and Luke lead the Son&rsquo;s words.
+					</figcaption>
+				</figure>
+
+				<h2 id="table" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>Every book, counted</h2>
+				<div style="overflow-x:auto;" tabindex="0" role="region" aria-label="Words and verses spoken per book">
+					<table class="ws-table">
+						<thead>
+							<tr>
+								<th scope="col" class="l">Book</th>
+								<th scope="col" style={`color:${FATHER}`}>Father words</th>
+								<th scope="col" style={`color:${FATHER}`}>Father verses</th>
+								<th scope="col" style={`color:${SON}`}>Son words</th>
+								<th scope="col" style={`color:${SON}`}>Son verses</th>
+								<th scope="col" style={`color:${SPIRIT}`}>Spirit words</th>
+								<th scope="col" style={`color:${SPIRIT}`}>Spirit verses</th>
+							</tr>
+						</thead>
+						<tbody>
+							{ROWS.map((r) => (
+								<tr>
+									<th scope="row" class="l"><a href={`/read/${slug(r.book)}/`} style={LINK} class="hover:underline">{r.book}</a></th>
+									<td>{N(r.father_words)}</td><td>{N(r.father_verses)}</td>
+									<td>{N(r.son_words)}</td><td>{N(r.son_verses)}</td>
+									<td>{N(r.spirit_words)}</td><td>{N(r.spirit_verses)}</td>
+								</tr>
+							))}
+						</tbody>
+						<tfoot>
+							<tr>
+								<th scope="row" class="l">Whole Bible</th>
+								<td>{N(T.father.words)}</td><td>{N(T.father.verses)}</td>
+								<td>{N(T.son.words)}</td><td>{N(T.son.verses)}</td>
+								<td>{N(T.spirit.words)}</td><td>{N(T.spirit.verses)}</td>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+				<p class="text-lg leading-relaxed mt-5 mb-5" style={P}>
+					<a href="/data/who-speaks-by-book.csv" style={LINK} class="font-semibold hover:underline" download>Download the CSV</a> (66 rows, one per book, with the reader link for each).
+				</p>
+
+				<h2 id="method" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How we counted</h2>
+				<p class="text-lg leading-relaxed mb-4" style={P}>
+					The color marks ownership, not quotation: were these words actually spoken by a divine person? Everything inside our Father&rsquo;s utterance is His, including a saying He repeats back from someone else. Words He never spoke are never counted, and narration never is. Words are counted over the colored passages, once each; a verse counts for a speaker when any part of it is his, so a verse where two divine persons speak appears in both columns. Figures are from the locked English text, edition {data.edition} ({N(data.canon.verses)} verses), the same whole-Bible figures printed in the Divine Voice&trade; Color editions. See <a href="/overview/" style={LINK} class="hover:underline">how the Divine Voice&trade; Color is decided</a>.
+				</p>
+
+				<h2 id="cite" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How to cite</h2>
+				<p class="text-base leading-relaxed mb-5 p-4" style="font-family: var(--font-sans); color: var(--color-ink); background: var(--color-surface-low); border-radius: 0.5rem; user-select: all;" id="ws-cite">{CITE}</p>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style={H2}>Frequently asked questions</h2>
+				<dl class="space-y-6">
+					{FAQS.map((f) => (
+						<div>
+							<dt class="text-xl font-medium mb-2" style={H2}>{f.q}</dt>
+							<dd class="text-lg leading-relaxed" style={P}>{f.a}</dd>
+						</div>
+					))}
+				</dl>
+			</div>
+		</section>
+	</main>
+</Layout>
+
+<style>
+	.ws-table { border-collapse: collapse; width: 100%; min-width: 560px; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+	.ws-table th, .ws-table td { padding: 0.45rem 0.6rem; text-align: right; border-bottom: 1px solid var(--color-hairline); }
+	.ws-table .l { text-align: left; font-weight: 500; }
+	.ws-table thead th { font-size: 0.8rem; font-weight: 600; vertical-align: bottom; }
+	.ws-table tfoot th, .ws-table tfoot td { font-weight: 700; border-top: 2px solid var(--color-ink); }
+</style>
