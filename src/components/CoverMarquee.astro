@@ -158,6 +158,7 @@ const { showTitle = true, showChips = true } = Astro.props;
 	aria-label={showTitle ? undefined : "Father's Heart Bible editions"}
 >
 	{showTitle && <h2 id="fhbm-title" class="fhbm-title">Father&rsquo;s Heart Bible™ + Divine Voice™ Color</h2>}
+	{showTitle && <p class="fhbm-line">Where other Bibles use &ldquo;God&rdquo; to say what He is, the Father&rsquo;s Heart Bible™ uses &ldquo;our Father&rdquo; to show who He has been all along.</p>}
 
 	<!-- The strip. The track holds the covers TWICE and travels exactly -50%, so the
 	     second copy is under the cursor at the moment the first wraps — that is what
@@ -239,6 +240,17 @@ const { showTitle = true, showChips = true } = Astro.props;
 	   shrink the type past legibility, so it wraps there instead (brief, §on one line). */
 	@media (min-width: 768px) {
 		.fhbm-title { white-space: nowrap; }
+	}
+	/* Kevin 2026-10-31: the "our Father" line under the title, in the home page's body-copy style (text-xl, muted). */
+	.fhbm-line {
+		font-family: var(--font-body);
+		color: var(--color-muted);
+		text-align: center;
+		font-size: 1.25rem;
+		line-height: 1.625;
+		max-width: 48rem;
+		margin: -1rem auto 2rem;
+		padding: 0 1.5rem;
 	}
 	.fhbm-viewport { overflow: hidden; }
 	.fhbm-track {
