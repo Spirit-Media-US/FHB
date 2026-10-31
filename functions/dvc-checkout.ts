@@ -445,6 +445,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-ceb-600.webp`,
 	},
+	'lang-ny-hb': {
+		title: 'Baibulo la Chicheŵa (Chichewa) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-ny-600.webp`,
+	},
+	'lang-ny-pb': {
+		title: 'Baibulo la Chicheŵa (Chichewa) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-ny-600.webp`,
+	},
 	'lang-nl-hb': {
 		title: 'Nederlandse Bijbel (Dutch) — Hardback',
 		retail: 9999,
@@ -484,6 +494,16 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		title: 'Deutsche Bibel (German) — Paperback',
 		retail: 7999,
 		img: `${ASSETS}/lang/v1/lang-de-600.webp`,
+	},
+	'lang-ha-hb': {
+		title: 'Littafi Mai Tsarki na Hausa (Hausa) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-ha-600.webp`,
+	},
+	'lang-ha-pb': {
+		title: 'Littafi Mai Tsarki na Hausa (Hausa) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-ha-600.webp`,
 	},
 	'lang-hi-hb': {
 		title: 'हिन्दी बाइबिल (Hindi) — Hardback',
@@ -644,6 +664,26 @@ const EDITIONS: Record<string, { title: string; retail: number; img: string; boo
 		title: 'Русская Библия (Russian) — Paperback',
 		retail: 7999,
 		img: `${ASSETS}/lang/v1/lang-ru-600.webp`,
+	},
+	'lang-seh-hb': {
+		title: 'Bukhu ya Mulungu ya Chisena (Sena) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-seh-600.webp`,
+	},
+	'lang-seh-pb': {
+		title: 'Bukhu ya Mulungu ya Chisena (Sena) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-seh-600.webp`,
+	},
+	'lang-sn-hb': {
+		title: 'Bhaibheri rechiShona (Shona) — Hardback',
+		retail: 9999,
+		img: `${ASSETS}/lang/v2/lang-sn-600.webp`,
+	},
+	'lang-sn-pb': {
+		title: 'Bhaibheri rechiShona (Shona) — Paperback',
+		retail: 7999,
+		img: `${ASSETS}/lang/v2/lang-sn-600.webp`,
 	},
 	'lang-zh-hans-hb': {
 		title: '中文圣经 (Simplified Chinese) — Hardback',
