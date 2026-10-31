@@ -696,46 +696,33 @@ let READ_LANGUAGE_TOTAL = 0;
 	}
 }
 
-// ── llms.txt / llms-full.txt typed language COUNTS (indexing audit 2026-10-17) ───
-// The prose said "published in 35 languages" while the generated table said 44: a typed
-// count goes stale the day a language ships. The print-language figure is now computed
-// with the SAME rule the site pages use (src/data/receive.ts PRINT_LANGUAGE_TOTAL =
-// English + every edition in src/data/edition-registry.json, which fhb-chain.py emits),
-// and written into each "published in N languages" phrase. Fails LOUD (exit 1) if a phrase
-// is missing, so a rewrite of the prose cannot silently orphan the number.
+// ── llms.txt / llms-full.txt typed COUNTS (indexing audit 2026-10-17; widened 2ge 2026-10-31) ───
+// Every count in the hand-written prose is rewritten from its own source on each build:
+// languages in print, languages online, the 80-language roster, canon books/chapters/verses.
+// They are DIFFERENT TRUE FACTS (see scripts/llms-facts.mjs). Fails LOUD (exit 1) if a phrase
+// is missing, so a rewrite of the prose cannot silently orphan a number. Test:
+// scripts/site-facts.test.mjs.
 {
-	const reg = JSON.parse(
-		fs.readFileSync(path.resolve(process.cwd(), 'src/data/edition-registry.json'), 'utf8'),
-	);
-	const printTotal = (reg.editions || []).length + 1;
-	if (printTotal < 2) {
+	const { measureFacts, applyFacts } = await import('./llms-facts.mjs');
+	const facts = measureFacts(process.cwd(), { online: READ_LANGUAGE_TOTAL });
+	if (facts.print < 2) {
 		console.error('gen-sitemap-read: edition-registry.json has no editions — refusing to write a count');
 		process.exit(1);
 	}
+	if (!facts.online) console.warn('gen-sitemap-read: online language count NOT refreshed (coverage block failed)');
+	if (!facts.verses) console.warn('gen-sitemap-read: canon counts NOT refreshed (community canon unreadable)');
 	for (const name of ['llms.txt', 'llms-full.txt']) {
 		const f = path.resolve(process.cwd(), 'public', name);
 		const cur = fs.readFileSync(f, 'utf8');
-		const re = /published in \d+ languages/g;
-		const hits = cur.match(re) || [];
-		if (hits.length === 0) {
-			console.error(`gen-sitemap-read: ${name} has no "published in N languages" phrase to generate`);
+		let res;
+		try {
+			res = applyFacts(cur, facts, name);
+		} catch (err) {
+			console.error(`gen-sitemap-read: ${err.message}`);
 			process.exit(1);
 		}
-		let next = cur.replace(re, `published in ${printTotal} languages`);
-		// The print count alone read as "47 live? no, 37" to AI engines (plan W3, 2026-10-21).
-		// The ONLINE count is the coverage table's own row count, written beside it. Fails
-		// loud if the phrase is missing; skipped (file keeps its last good number, with a
-		// warning) only if the coverage block could not run.
-		const reRead = /free to read online in \d+ languages/g;
-		const readHits = next.match(reRead) || [];
-		if (readHits.length === 0) {
-			console.error(`gen-sitemap-read: ${name} has no "free to read online in N languages" phrase to generate`);
-			process.exit(1);
-		}
-		if (READ_LANGUAGE_TOTAL > 0) next = next.replace(reRead, `free to read online in ${READ_LANGUAGE_TOTAL} languages`);
-		else console.warn(`gen-sitemap-read: ${name} — online language count NOT refreshed (coverage block failed)`);
-		if (next !== cur) fs.writeFileSync(f, next);
-		console.log(`gen-sitemap-read: ${name} — ${hits.length} print count(s) set to ${printTotal}, ${readHits.length} online count(s) set to ${READ_LANGUAGE_TOTAL || 'unchanged'}`);
+		if (res.text !== cur) fs.writeFileSync(f, res.text);
+		console.log(`gen-sitemap-read: ${name} — counts set from source`, JSON.stringify(res.hits), JSON.stringify(facts));
 	}
 }
 
