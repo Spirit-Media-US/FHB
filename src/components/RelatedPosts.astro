@@ -46,6 +46,10 @@ const related = allPosts
               <img
                 src={urlFor(post.heroImage).width(768).height(512).format('webp').url()}
                 alt={post.heroImage?.alt || post.title}
+                width="768"
+                height="512"
+                loading="lazy"
+                decoding="async"
                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
