@@ -22,8 +22,8 @@ export const TYPES = [
 	// Top-level campaign page (2s, 2026-10-28): a lone page, not a folder, so no dir type reached it.
 	{ label: 'Bible months and campaigns', pages: ['global-bible-month'] },
 	// Original data (2gm, 2026-10-31): per-book words of the Father, Son and Spirit from the locked Divine Voice Color tags.
-	// 2hh (2026-11-01): + the by-the-numbers page. 2he (2026-11-01): + the names page; each page's CSV downloads are listed too (DATA_FILES below).
-	{ label: 'Original data', pages: ['who-speaks-in-scripture', 'names-of-god-the-father', 'bible-by-the-numbers'] },
+	// 2hi (2026-11-01): + the read-the-Bible-in-a-year plan. 2hh (2026-11-01): + the by-the-numbers page. 2he (2026-11-01): + the names page; each page's CSV downloads are listed too (DATA_FILES below).
+	{ label: 'Original data', pages: ['who-speaks-in-scripture', 'names-of-god-the-father', 'bible-by-the-numbers', 'read-the-bible-in-a-year'] },
 ];
 
 // CSV downloads of the Original data pages, listed in the answer-page block with a line DERIVED from the file.
@@ -33,6 +33,7 @@ export const DATA_FILES = [
 	'public/data/names-of-the-father-by-book.csv',
 	'public/data/bible-by-the-numbers-by-book.csv',
 	'public/data/bible-by-the-numbers-by-chapter.csv',
+	'public/data/bible-reading-plan.csv',
 ];
 
 // Pages whose title/description live in a shared component's copy object, not in the page file (2he):

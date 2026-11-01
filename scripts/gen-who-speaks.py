@@ -13,6 +13,7 @@ moved since the lock). Refuses to write unless the book sums equal the locked `d
   python3 scripts/gen-who-speaks.py --check  exit 1 if the committed files differ from a fresh measurement
   python3 scripts/gen-who-speaks.py --selftest-names  prove the names reconcile REFUSES an altered count
   python3 scripts/gen-who-speaks.py --selftest-stats  prove the by-the-numbers reconcile REFUSES an altered count
+  python3 scripts/gen-who-speaks.py --selftest-plan   prove the 365-day plan reconcile REFUSES a tampered plan (unit 2hi)
 
 Unit 2gz (2026-11-01) adds measure_names(): how the locked English text NAMES the Father (/names-of-god-the-father/).
 Same locked tree, same refusal pattern. METHOD (documented on the page too, reproducible from this file):
@@ -430,6 +431,140 @@ def selftest_stats():
     print("selftest-stats: untouched passes; 4/4 altered copies refused")
 
 
+# ---------------------------------------------------------------- unit 2hi: read the Bible in a year, balanced by words
+PLAN_JSON = os.path.join(ROOT, "src/data/bible-reading-plan.json")
+PLAN_CSV = os.path.join(ROOT, "public/data/bible-reading-plan.csv")
+PLAN_DAYS = 365
+PLAN_WPM = 200   # a stated ASSUMPTION, never a measured figure
+
+
+def build_plan(chapters, days=PLAN_DAYS):
+    """chapters: [(book, chapter, words)] in canon order. Cut at chapter boundaries into `days` non-empty runs, choosing the cuts
+    that minimise the sum of squared distances of each day's words from the mean day (dynamic programme, exact, deterministic;
+    a day may span at most MAXCH chapters). Returns [(lo, hi)] chapter-index slices per day."""
+    MAXCH = 14
+    n, total = len(chapters), sum(c[2] for c in chapters)
+    cum = [0]
+    for c in chapters:
+        cum.append(cum[-1] + c[2])
+    mean = total / days
+    INF = float("inf")
+    dp = [[INF] * (n + 1) for _ in range(days + 1)]
+    back = [[0] * (n + 1) for _ in range(days + 1)]
+    dp[0][0] = 0.0
+    for k in range(1, days + 1):
+        for i in range(k, n - (days - k) + 1):
+            best, bj = INF, 0
+            for j in range(max(k - 1, i - MAXCH), i):
+                if dp[k - 1][j] == INF:
+                    continue
+                v = dp[k - 1][j] + (cum[i] - cum[j] - mean) ** 2
+                if v < best:
+                    best, bj = v, j
+            dp[k][i], back[k][i] = best, bj
+    if dp[days][n] == INF:
+        raise SystemExit("gen-who-speaks: no plan fits the chapter limit")
+    cuts, i = [], n
+    for k in range(days, 0, -1):
+        j = back[k][i]
+        cuts.append((j, i))
+        i = j
+    return cuts[::-1]
+
+
+def reconcile_plan(plan, canon_chapters, canon_words, days=PLAN_DAYS):
+    """Refuse (SystemExit) unless the plan is a complete, ordered, exact cover of the locked canon. Pure, so selftest can tamper."""
+    if len(plan) != days:
+        raise SystemExit(f"gen-who-speaks: plan has {len(plan)} days, not {days}")
+    flat = []
+    for d in plan:
+        if not d["chapters"]:
+            raise SystemExit(f"gen-who-speaks: day {d['day']} has no chapters")
+        if d["words"] != sum(c["words"] for c in d["chapters"]):
+            raise SystemExit(f"gen-who-speaks: day {d['day']} words {d['words']} != sum of its chapters")
+        flat += [(c["book"], c["chapter"]) for c in d["chapters"]]
+    if sum(d["words"] for d in plan) != canon_words:
+        raise SystemExit(f"gen-who-speaks: sum of days {sum(d['words'] for d in plan):,} != canon words {canon_words:,}")
+    want = [(c[0], c[1]) for c in canon_chapters]
+    if flat != want:
+        raise SystemExit(f"gen-who-speaks: plan chapters are not every canon chapter exactly once in canon order ({len(flat)} vs {len(want)})")
+
+
+def _passage(chs):
+    """'Genesis 1-3' / 'Genesis 50; Exodus 1-2' for one day's chapters."""
+    import itertools
+    parts = []
+    for book, grp in itertools.groupby(chs, key=lambda c: c["book"]):
+        nums = [c["chapter"] for c in grp]
+        parts.append(f"{book} {nums[0]}" + (f"-{nums[-1]}" if len(nums) > 1 else ""))
+    return "; ".join(parts)
+
+
+def measure_plan(stats_json):
+    sd = json.loads(stats_json)
+    order = {b["book"]: i for i, b in enumerate(sd["books"])}    # books[] is already in canon order
+    chs = sorted(sd["chapters"], key=lambda c: (order[c["book"]], c["chapter"]))
+    canon_words = sd["totals"]["words"]
+    cuts = build_plan([(c["book"], c["chapter"], c["words"]) for c in chs])
+    plan = []
+    for k, (a, b) in enumerate(cuts, 1):
+        grp = [{"book": c["book"], "chapter": c["chapter"], "words": c["words"]} for c in chs[a:b]]
+        plan.append({"day": k, "words": sum(c["words"] for c in grp), "passage": _passage(grp), "chapters": grp})
+    reconcile_plan(plan, [(c["book"], c["chapter"]) for c in chs], canon_words)
+    ws = sorted(d["words"] for d in plan)
+    data = {"edition": sd["edition"], "locked_commit": sd["locked_commit"], "days": PLAN_DAYS, "canon_words": canon_words,
+            "assumed_wpm": PLAN_WPM,
+            "stats": {"min_words": ws[0], "median_words": ws[len(ws) // 2], "max_words": ws[-1], "spread": ws[-1] - ws[0],
+                      "mean_words": round(canon_words / PLAN_DAYS, 1),
+                      "mean_words_rounded": round(canon_words / PLAN_DAYS), "mean_minutes_rounded": round(canon_words / PLAN_DAYS / PLAN_WPM)},
+            "plan": plan}
+    cb = io.StringIO()
+    w = csv.writer(cb, lineterminator="\n")
+    w.writerow(["day", "passage", "chapters", "words", f"minutes_at_{PLAN_WPM}_wpm", "read_urls"])
+    for d in plan:
+        w.writerow([d["day"], d["passage"], len(d["chapters"]), d["words"], ((d["words"] * 10 + PLAN_WPM // 2) // PLAN_WPM) / 10,
+                    " ".join(f"{READ}{_slug(c['book'])}/{c['chapter']}/" for c in d["chapters"])])
+    return json.dumps(data, indent="\t", ensure_ascii=False) + "\n", cb.getvalue()
+
+
+def selftest_plan():
+    """Failure path: every tampered plan MUST be refused. Exit 0 only if all are."""
+    import copy
+    sj = measure_stats()[0]
+    pj, _c = measure_plan(sj)
+    pd, sd = json.loads(pj), json.loads(sj)
+    order = {b["book"]: i for i, b in enumerate(sd["books"])}
+    chs = [(c["book"], c["chapter"]) for c in sorted(sd["chapters"], key=lambda c: (order[c["book"]], c["chapter"]))]
+    cw = pd["canon_words"]
+    reconcile_plan(pd["plan"], chs, cw)   # untouched must pass
+    def drop():
+        p = copy.deepcopy(pd["plan"]); p[10]["chapters"].pop(); return p
+    def drop_fix_day():   # chapter removed AND its day total fixed up: only the canon-sum check can catch it
+        p = copy.deepcopy(pd["plan"]); c = p[10]["chapters"].pop(); p[10]["words"] -= c["words"]; return p
+    def alter_day():
+        p = copy.deepcopy(pd["plan"]); p[200]["words"] += 1; return p
+    def dup():
+        p = copy.deepcopy(pd["plan"]); c0 = copy.deepcopy(p[50]["chapters"][0]); p[50]["chapters"].append(c0); p[50]["words"] += c0["words"]; return p
+    def swap():
+        p = copy.deepcopy(pd["plan"]); p[5]["chapters"], p[6]["chapters"] = p[6]["chapters"], p[5]["chapters"]
+        for i in (5, 6): p[i]["words"] = sum(c["words"] for c in p[i]["chapters"])
+        return p
+    def short():
+        p = copy.deepcopy(pd["plan"]); p.pop(); return p
+    n = 0
+    for name, fn in (("drop one chapter", drop), ("drop chapter + fix day total", drop_fix_day), ("alter one day sum", alter_day),
+                     ("duplicate a chapter", dup), ("swap two days", swap), ("364 days", short)):
+        try:
+            reconcile_plan(fn(), chs, cw)
+        except SystemExit as e:
+            print("REFUSED as required:", name, "->", str(e)[:110])
+            n += 1
+            continue
+        print("NOT REFUSED (selftest FAILS):", name)
+        sys.exit(1)
+    print(f"selftest-plan: untouched passes; {n}/6 tampered plans refused")
+
+
 if __name__ == "__main__":
     if "--selftest-names" in sys.argv:
         selftest_names()
@@ -437,13 +572,18 @@ if __name__ == "__main__":
     if "--selftest-stats" in sys.argv:
         selftest_stats()
         sys.exit(0)
+    if "--selftest-plan" in sys.argv:
+        selftest_plan()
+        sys.exit(0)
     nj, nt, nb = measure_names()[:3]
     sj, sb, sc_ = measure_stats()[:3]
+    pj, pc = measure_plan(sj)
     j, c = measure()
     if "--check" in sys.argv:
         ok = (open(JSON_OUT).read() == j and open(CSV_OUT).read() == c and open(NAMES_JSON).read() == nj
               and open(NAMES_CSV).read() == nt and open(NAMES_BOOK_CSV).read() == nb
-              and open(STATS_JSON).read() == sj and open(STATS_BOOK_CSV).read() == sb and open(STATS_CHAPTER_CSV).read() == sc_)
+              and open(STATS_JSON).read() == sj and open(STATS_BOOK_CSV).read() == sb and open(STATS_CHAPTER_CSV).read() == sc_
+              and open(PLAN_JSON).read() == pj and open(PLAN_CSV).read() == pc)
         print("who-speaks data " + ("current" if ok else "DRIFTED: rerun scripts/gen-who-speaks.py"))
         sys.exit(0 if ok else 1)
     open(JSON_OUT, "w").write(j)
@@ -454,5 +594,7 @@ if __name__ == "__main__":
     open(STATS_JSON, "w").write(sj)
     open(STATS_BOOK_CSV, "w").write(sb)
     open(STATS_CHAPTER_CSV, "w").write(sc_)
+    open(PLAN_JSON, "w").write(pj)
+    open(PLAN_CSV, "w").write(pc)
     t = json.loads(j)["totals"]
     print("wrote", JSON_OUT, CSV_OUT, {k: v for k, v in t.items()})
