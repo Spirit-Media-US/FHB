@@ -12,6 +12,7 @@ moved since the lock). Refuses to write unless the book sums equal the locked `d
   python3 scripts/gen-who-speaks.py          write both files
   python3 scripts/gen-who-speaks.py --check  exit 1 if the committed files differ from a fresh measurement
   python3 scripts/gen-who-speaks.py --selftest-names  prove the names reconcile REFUSES an altered count
+  python3 scripts/gen-who-speaks.py --selftest-stats  prove the by-the-numbers reconcile REFUSES an altered count
 
 Unit 2gz (2026-11-01) adds measure_names(): how the locked English text NAMES the Father (/names-of-god-the-father/).
 Same locked tree, same refusal pattern. METHOD (documented on the page too, reproducible from this file):
@@ -301,15 +302,148 @@ def selftest_names():
     print("selftest-names: untouched passes; 3/3 altered copies refused")
 
 
+# ---------------------------------------------------------------- unit 2hh: the Bible by the numbers
+STATS_JSON = os.path.join(ROOT, "src/data/bible-by-the-numbers.json")
+STATS_BOOK_CSV = os.path.join(ROOT, "public/data/bible-by-the-numbers-by-book.csv")
+STATS_CHAPTER_CSV = os.path.join(ROOT, "public/data/bible-by-the-numbers-by-chapter.csv")
+READ = "https://fathersheartbible.com/read/"
+
+
+def _ties(rows, key, pick):
+    """Every row that ties for the max/min of key (pick = max or min). Ties are reported, never broken silently."""
+    best = pick(key(r_) for r_ in rows)
+    return [r_ for r_ in rows if key(r_) == best]
+
+
+def reconcile_stats(data, fig, raw_words_by_book, raw_chapters_by_book, struct_chapters):
+    """Refuse (SystemExit) unless every figure reconciles. Pure, so selftest can feed it a tampered copy."""
+    bks = data["books"]
+    for b in bks:
+        n = b["book"]
+        if b["words"] != raw_words_by_book[n]:
+            raise SystemExit(f"gen-who-speaks: {n}: words {b['words']:,} but the independent recount says {raw_words_by_book[n]:,}")
+        if b["chapters"] != raw_chapters_by_book[n] or b["chapters"] != struct_chapters[n]:
+            raise SystemExit(f"gen-who-speaks: {n}: chapters {b['chapters']} != recount {raw_chapters_by_book[n]} / structure {struct_chapters[n]}")
+        chs = [c for c in data["chapters"] if c["book"] == n]
+        if sum(c["verses"] for c in chs) != b["verses"] or sum(c["words"] for c in chs) != b["words"] or len(chs) != b["chapters"]:
+            raise SystemExit(f"gen-who-speaks: {n}: chapter rows do not sum to the book row")
+    t = data["totals"]
+    if sum(b["verses"] for b in bks) != t["verses"] or sum(b["words"] for b in bks) != t["words"] or sum(b["chapters"] for b in bks) != t["chapters"]:
+        raise SystemExit("gen-who-speaks: book rows do not sum to the totals")
+    if t["verses"] != fig["_canon"]["verses"] or t["chapters"] != fig["_canon"]["chapters"] or len(bks) != fig["_canon"]["books"]:
+        raise SystemExit(f"gen-who-speaks: stats verses/chapters/books {t['verses']}/{t['chapters']}/{len(bks)} != locked whole-canon figure {fig['_canon']}")
+    if t["words"] != sum(raw_words_by_book.values()):
+        raise SystemExit("gen-who-speaks: total words != independent recount")
+
+
+def measure_stats():
+    st = json.load(open(STATE, encoding="utf-8"))
+    if st.get("state") != "locked":
+        raise SystemExit("gen-who-speaks: canon edition is not locked; refusing")
+    fig, commit, version = st["dvc_figures"], st["locked_commit"], st["version"]
+    struct = json.load(open(os.path.join(ROOT, "src/lib/bible_structure.json")))
+    order = struct["order"]
+    chapters = _locked_chapters(commit)
+    chrows, vrows, skipped = [], [], []
+    for book, ch, vs in chapters:
+        w = sum(len(t.split()) for _v, t in vs)
+        chrows.append({"book": book, "chapter": ch, "verses": len(vs), "words": w,
+                       "read_url": f"{READ}{_slug(book)}/{ch}/"})
+        nums = sorted(v for v, _t in vs)
+        miss = [i for i in range(1, nums[-1] + 1) if i not in set(nums)]
+        if miss:
+            skipped.append({"book": book, "chapter": ch, "numbers": miss})
+        for vn, t in vs:
+            vrows.append({"book": book, "chapter": ch, "verse": vn, "words": len(t.split()), "chars": len(t), "text": t})
+    brows = []
+    for i, name in enumerate(order):
+        cs = [c for c in chrows if c["book"] == name]
+        lv = _ties(cs, lambda c: c["verses"], max)[0]
+        lw = _ties(cs, lambda c: c["words"], max)[0]
+        brows.append({"book": name, "testament": "OT" if i < 39 else "NT", "chapters": len(cs),
+                      "verses": sum(c["verses"] for c in cs), "words": sum(c["words"] for c in cs),
+                      "longest_chapter": lw["chapter"], "longest_chapter_words": lw["words"],
+                      "read_url": f"{READ}{_slug(name)}/"})
+    ext = {}
+    for label, rows, key in (("chapter_by_verses", chrows, lambda r_: r_["verses"]), ("chapter_by_words", chrows, lambda r_: r_["words"]),
+                             ("verse_by_words", vrows, lambda r_: r_["words"]), ("verse_by_chars", vrows, lambda r_: r_["chars"]),
+                             ("book_by_chapters", brows, lambda r_: r_["chapters"]), ("book_by_verses", brows, lambda r_: r_["verses"]),
+                             ("book_by_words", brows, lambda r_: r_["words"])):
+        ext[label] = {"longest": _ties(rows, key, max), "shortest": _ties(rows, key, min)}
+    otw = sum(b["words"] for b in brows if b["testament"] == "OT")
+    ntw = sum(b["words"] for b in brows if b["testament"] == "NT")
+    data = {"edition": version, "locked_commit": commit,
+            "measured_from": "locked English canon, fhb_text, words split on whitespace",
+            "totals": {"books": len(brows), "chapters": len(chrows), "verses": len(vrows), "words": otw + ntw,
+                       "ot": {"books": 39, "chapters": sum(b["chapters"] for b in brows if b["testament"] == "OT"),
+                              "verses": sum(b["verses"] for b in brows if b["testament"] == "OT"), "words": otw},
+                       "nt": {"books": 27, "chapters": sum(b["chapters"] for b in brows if b["testament"] == "NT"),
+                              "verses": sum(b["verses"] for b in brows if b["testament"] == "NT"), "words": ntw},
+                       "distinct_verse_texts": len({v_["text"] for v_ in vrows})},
+            "canon": {"books": len(brows), "verses": len(vrows)},
+            "skipped_numbers": skipped,
+            "extremes": {k: {side: [{kk: vv for kk, vv in r_.items()} for r_ in rows_] for side, rows_ in v.items()} for k, v in ext.items()},
+            "books": brows, "chapters": chrows}
+    # independent recount: re-read the same locked text through a different path (regex tokens, file structure)
+    raw_w = collections.Counter()
+    raw_c = collections.Counter()
+    for book, _ch, vs in chapters:
+        raw_c[book] += 1
+        for _v, t in vs:
+            raw_w[book] += len(re.findall(r"\S+", t))
+    reconcile_stats(data, fig, dict(raw_w), dict(raw_c), struct["chapters"])
+    bb = io.StringIO()
+    w = csv.writer(bb, lineterminator="\n")
+    w.writerow(["book", "testament", "chapters", "verses", "words", "longest_chapter", "longest_chapter_words", "read_url"])
+    for r_ in brows:
+        w.writerow([r_["book"], r_["testament"], r_["chapters"], r_["verses"], r_["words"], r_["longest_chapter"],
+                    r_["longest_chapter_words"], r_["read_url"]])
+    cb = io.StringIO()
+    w = csv.writer(cb, lineterminator="\n")
+    w.writerow(["book", "chapter", "verses", "words", "read_url"])
+    for r_ in chrows:
+        w.writerow([r_["book"], r_["chapter"], r_["verses"], r_["words"], r_["read_url"]])
+    return (json.dumps(data, indent="\t", ensure_ascii=False) + "\n", bb.getvalue(), cb.getvalue(),
+            fig, dict(raw_w), dict(raw_c), struct["chapters"])
+
+
+def selftest_stats():
+    """Failure path: an altered count MUST be refused, naming the book. Exit 0 only if every defect is refused."""
+    j, _b, _c, fig, rw, rc, sc = measure_stats()
+    reconcile_stats(json.loads(j), fig, rw, rc, sc)   # untouched must pass
+    defects = {}
+    d = json.loads(j); d["books"][0]["verses"] += 1; defects["Genesis verses +1 (chapter rows disagree)"] = (d, "Genesis")
+    d = json.loads(j); d["books"][3]["words"] += 1; defects["Numbers words +1 (vs independent recount)"] = (d, "Numbers")
+    d = json.loads(j); d["books"][39]["chapters"] += 1; defects["Matthew chapters +1 (vs structure)"] = (d, "Matthew")
+    d = json.loads(j); d["totals"]["verses"] += 1; defects["total verses +1 (vs locked figure)"] = (d, "")
+    for name, (d, book) in defects.items():
+        try:
+            reconcile_stats(d, fig, rw, rc, sc)
+        except SystemExit as e:
+            if book and book not in str(e):
+                print("REFUSED but did not name the book (selftest FAILS):", name, str(e)[:90])
+                sys.exit(1)
+            print("REFUSED as required:", name, "->", str(e)[:100])
+            continue
+        print("NOT REFUSED (selftest FAILS):", name)
+        sys.exit(1)
+    print("selftest-stats: untouched passes; 4/4 altered copies refused")
+
+
 if __name__ == "__main__":
     if "--selftest-names" in sys.argv:
         selftest_names()
         sys.exit(0)
+    if "--selftest-stats" in sys.argv:
+        selftest_stats()
+        sys.exit(0)
     nj, nt, nb = measure_names()[:3]
+    sj, sb, sc_ = measure_stats()[:3]
     j, c = measure()
     if "--check" in sys.argv:
         ok = (open(JSON_OUT).read() == j and open(CSV_OUT).read() == c and open(NAMES_JSON).read() == nj
-              and open(NAMES_CSV).read() == nt and open(NAMES_BOOK_CSV).read() == nb)
+              and open(NAMES_CSV).read() == nt and open(NAMES_BOOK_CSV).read() == nb
+              and open(STATS_JSON).read() == sj and open(STATS_BOOK_CSV).read() == sb and open(STATS_CHAPTER_CSV).read() == sc_)
         print("who-speaks data " + ("current" if ok else "DRIFTED: rerun scripts/gen-who-speaks.py"))
         sys.exit(0 if ok else 1)
     open(JSON_OUT, "w").write(j)
@@ -317,5 +451,8 @@ if __name__ == "__main__":
     open(NAMES_JSON, "w").write(nj)
     open(NAMES_CSV, "w").write(nt)
     open(NAMES_BOOK_CSV, "w").write(nb)
+    open(STATS_JSON, "w").write(sj)
+    open(STATS_BOOK_CSV, "w").write(sb)
+    open(STATS_CHAPTER_CSV, "w").write(sc_)
     t = json.loads(j)["totals"]
     print("wrote", JSON_OUT, CSV_OUT, {k: v for k, v in t.items()})

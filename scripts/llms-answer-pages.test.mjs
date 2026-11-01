@@ -61,15 +61,15 @@ test('every answer page has a description (none is a bare title)', () => {
 	assert.deepEqual(all.filter((e) => !e.description).map((e) => e.url), []);
 });
 
-test('original-data pages and their 3 CSVs are listed, with the page title and derived descriptions', () => {
-	for (const u of ['/who-speaks-in-scripture/', '/names-of-god-the-father/']) {
+test('original-data pages and their 5 CSVs are listed, with the page title and derived descriptions', () => {
+	for (const u of ['/who-speaks-in-scripture/', '/names-of-god-the-father/', '/bible-by-the-numbers/']) {
 		const e = all.find((x) => x.url === u);
 		assert.ok(e, `${u} not discovered`);
 		assert.ok(e.title.length > 20 && e.description.length > 60, `${u} title/description not read`);
 	}
-	assert.equal(DATA_FILES.length, 3);
+	assert.equal(DATA_FILES.length, 5);
 	for (const f of DATA_FILES) assert.ok(all.some((e) => e.url === `/${f.replace(/^public\//, '')}` && /rows\. Columns:/.test(e.description)), `${f} not listed`);
 	const out = render(groups);
 	assert.equal((out.match(/- \/names-of-god-the-father\/ /g) || []).length, 1);
-	assert.equal((out.match(/\.csv /g) || []).length, 3);
+	assert.equal((out.match(/\.csv /g) || []).length, 5);
 });
