@@ -1,0 +1,222 @@
+---
+// /names-of-god-the-father/ — original-data page (unit 2gz, 2026-11-01). How the LOCKED English text of
+// Father's Heart Bible names the Father: every term counted, with its book distribution.
+// Data: src/data/names-of-the-father.json + public/data/names-of-the-father-{terms,by-book}.csv, all written by
+// scripts/gen-who-speaks.py (measure_names), which refuses to write unless the terms reconcile to an independent
+// recount of the locked tree. No Scripture is quoted; only the term names. Every link into the text goes to our /read.
+import data from '../data/names-of-the-father.json';
+import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+
+const PAGE_URL = 'https://fathersheartbible.com/names-of-god-the-father/';
+const CSV_URL = 'https://fathersheartbible.com/data/names-of-the-father-terms.csv';
+const CSV_BOOK_URL = 'https://fathersheartbible.com/data/names-of-the-father-by-book.csv';
+const T = data.totals;
+const N = (n: number) => n.toLocaleString('en-US');
+const pct = (n: number, d: number) => `${((n / d) * 100).toFixed(1)}%`;
+const TITLE = fitTitle('Names of God the Father: Every Name in the Bible Counted');
+const DESCRIPTION = fitDescription(
+	`Father’s Heart Bible names our Father ${N(T.tokens)} times in ${N(T.verses_naming)} verses, in ${T.terms} different forms. Every name counted by book. Free CSV.`,
+);
+const PUBLISHED = '2026-11-01';
+const TERMS = data.terms;
+const TOP = TERMS[0];
+const slug = (b: string) => b.toLowerCase().replace(/\s+/g, '-');
+const topBooks = [...data.books].sort((a, b) => b.tokens - a.tokens).slice(0, 10);
+const naming = data.books.filter((b) => b.tokens > 0).length;
+const sovereign = TERMS.filter((t) => t.term.includes('sovereign')).reduce((a, t) => a + t.count, 0);
+const heaven = data.overlay.find((o) => o.term === 'Father of heaven');
+const israel = data.overlay.find((o) => o.term === 'Father of Israel');
+const CITE = `Spirit Media Publishing. “Names of God the Father: how Father’s Heart Bible names our Father, counted.” Father’s Heart Bible™, edition ${data.edition}. ${PAGE_URL} (data: ${CSV_URL}), accessed ${PUBLISHED}.`;
+
+const FAQS = [
+	{
+		q: 'How many times does the Bible say "Father" for God?',
+		a: `In Father’s Heart Bible, locked edition ${data.edition}, our Father is named ${N(T.tokens)} times, in ${N(T.verses_naming)} of ${N(data.canon.verses)} verses (${pct(T.verses_naming, data.canon.verses)}), across ${naming} of the 66 books. Other English Bibles will give a different number, because this Bible says “our Father” where the text speaks of Him in His fatherly relationship.`,
+	},
+	{
+		q: 'What are the names of God the Father?',
+		a: `Counted from the text, the most common form is “${TOP.term}” (${N(TOP.count)} times), then “${TERMS[1].term}” (${N(TERMS[1].count)}), “${TERMS[2].term}” (${N(TERMS[2].count)}) and “${TERMS[3].term}” (${N(TERMS[3].count)}). In all ${T.terms} forms occur, from “Father” alone to epithets such as “sovereign Father”, “living Father” and “heavenly Father”. The table lists every one.`,
+	},
+	{
+		q: 'Does Father’s Heart Bible still use the word God?',
+		a: `Yes. The word God appears ${N(T.context_words.God)} times in the locked text. The method counts words, not meanings: “Lord” (${N(T.context_words.Lord)}) is also used for the Son, so it is shown only for scale.`,
+	},
+	{
+		q: 'Where does Abba appear?',
+		a: `The Aramaic word Abba appears ${T.abba} times in the locked text, each time beside “Father”. Read the story behind it at what “Abba, Father” means.`,
+	},
+	{
+		q: 'Can I use these numbers?',
+		a: 'Yes. Download the CSV and cite this page with the citation above. Every figure was counted from the locked English text and checked against a second, independent count of the same text.',
+	},
+];
+
+const SITE = { '@type': 'Organization', name: 'Spirit Media Publishing', url: 'https://spiritmediapublishing.com/' };
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'Dataset',
+		name: 'Names of God the Father: how the English text of Father’s Heart Bible names our Father, counted by term and by book',
+		description: `Every form in which the locked English text of Father’s Heart Bible (edition ${data.edition}) names the Father, ${N(T.tokens)} occurrences in ${T.terms} forms across ${naming} of 66 books, with counts per term and per book.`,
+		url: PAGE_URL,
+		datePublished: PUBLISHED,
+		dateModified: PUBLISHED,
+		version: data.edition,
+		inLanguage: 'en',
+		creator: SITE,
+		publisher: { '@id': 'https://spiritmediapublishing.com/#organization' },
+		keywords: ['names of God', 'God the Father', 'names of the Father', 'Abba Father', 'how many times Father in the Bible'],
+		measurementTechnique:
+			'Every capitalised token Father in the locked English text, classified by the determiner and epithet words directly before it; term counts reconciled to an independent recount of the same text, per book and in total.',
+		variableMeasured: ['term', 'count', 'verses', 'books', 'by_book', 'father_names', 'verses_naming_the_father'],
+		distribution: [
+			{ '@type': 'DataDownload', encodingFormat: 'text/csv', contentUrl: CSV_URL },
+			{ '@type': 'DataDownload', encodingFormat: 'text/csv', contentUrl: CSV_BOOK_URL },
+		],
+		isPartOf: { '@type': 'WebSite', name: "Father's Heart Bible™", url: 'https://fathersheartbible.com/' },
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: FAQS.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{ '@type': 'ListItem', position: 2, name: 'Names of God the Father', item: PAGE_URL },
+		],
+	},
+];
+const P = 'font-family: var(--font-sans); color: var(--color-muted);';
+const H2 = 'font-family: var(--font-serif); color: var(--color-ink);';
+const LINK = 'color: var(--color-brand);';
+---
+
+<Layout title={TITLE} description={DESCRIPTION} jsonLd={jsonLd}>
+	<main id="main-content">
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style={P}>
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Names of God the Father</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Counted from the locked text &middot; edition {data.edition}</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style={H2}>Names of God the Father: Every Name Counted</h1>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style={P}>
+					<strong style="color: var(--color-ink);">Father&rsquo;s Heart Bible&trade; names our Father {N(T.tokens)} times, in {N(T.verses_naming)} verses ({pct(T.verses_naming, data.canon.verses)} of the text), in {T.terms} different forms.</strong> The most common is &ldquo;{TOP.term}&rdquo; ({N(TOP.count)} times). The word God still appears {N(T.context_words.God)} times. The word Father is used for Him in {naming} of the 66 books; only Esther and Ecclesiastes never use it.
+				</p>
+				<p class="text-lg leading-relaxed mb-5" style={P}>
+					This is a count of one Bible&rsquo;s English wording, not of the original languages. This Bible says &ldquo;our Father&rdquo; where the text speaks of Him in His fatherly relationship (<a href="/meaning/our-father/" style={LINK} class="hover:underline">why it says &ldquo;our Father&rdquo; instead of &ldquo;God&rdquo;</a>). Below: every form, how they spread across the books, a <a href="/data/names-of-the-father-terms.csv" style={LINK} class="hover:underline" download>free CSV</a>, and how we counted. For who speaks, see <a href="/who-speaks-in-scripture/" style={LINK} class="hover:underline">who speaks in Scripture</a>.
+				</p>
+
+				<h2 id="terms" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>All {T.terms} names, counted</h2>
+				<p class="text-base leading-relaxed mb-4" style={P}>
+					&ldquo;{TOP.term}&rdquo; is {pct(TOP.count, T.tokens)} of all {N(T.tokens)}. Forms with &ldquo;sovereign&rdquo; together make {N(sovereign)} ({pct(sovereign, T.tokens)}), led by Ezekiel. Each term links to the first chapter where it appears.
+				</p>
+				<div style="overflow-x:auto;" tabindex="0" role="region" aria-label="Every name of the Father, counted">
+					<table class="nf-table">
+						<thead>
+							<tr>
+								<th scope="col" class="l">Name</th>
+								<th scope="col">Times</th>
+								<th scope="col">Verses</th>
+								<th scope="col">Books</th>
+								<th scope="col" class="l">Most in</th>
+							</tr>
+						</thead>
+						<tbody>
+							{TERMS.map((r) => (
+								<tr>
+									<th scope="row" class="l"><a href={r.first_read_url.replace('https://fathersheartbible.com', '')} style={LINK} class="hover:underline">{r.term}</a></th>
+									<td>{N(r.count)}</td><td>{N(r.verses)}</td><td>{r.books}</td>
+									<td class="l">{r.top_books.map((b, i) => (<Fragment>{i ? ', ' : ''}<a href={`/read/${slug(b.book)}/`} style={LINK} class="hover:underline">{b.book}</a>&nbsp;{N(b.count)}</Fragment>))}</td>
+								</tr>
+							))}
+						</tbody>
+						<tfoot>
+							<tr>
+								<th scope="row" class="l">All forms</th>
+								<td>{N(T.tokens)}</td><td>{N(T.verses_naming)}</td><td>{naming}</td><td class="l"></td>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+				<p class="text-lg leading-relaxed mt-5 mb-5" style={P}>
+					<a href="/data/names-of-the-father-terms.csv" style={LINK} class="font-semibold hover:underline" download>Download the CSV of names</a> (one row per name, with the count in every book) and the <a href="/data/names-of-the-father-by-book.csv" style={LINK} class="font-semibold hover:underline" download>CSV by book</a> (66 rows, with the reader link for each).
+				</p>
+
+				<h2 id="of" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>&ldquo;Father of &hellip;&rdquo; titles</h2>
+				<p class="text-base leading-relaxed mb-4" style={P}>
+					These count the same occurrences, read forward: where the name continues with &ldquo;of&rdquo;. They are an overlay on the table above, not extra names. &ldquo;Father of heaven&rdquo; ({N(heaven?.count ?? 0)}) and &ldquo;Father of Israel&rdquo; ({N(israel?.count ?? 0)}) lead.
+				</p>
+				<div style="overflow-x:auto;" tabindex="0" role="region" aria-label="Father of titles, counted">
+					<table class="nf-table">
+						<thead><tr><th scope="col" class="l">Title</th><th scope="col">Times</th><th scope="col">Books</th><th scope="col" class="l">Most in</th></tr></thead>
+						<tbody>
+							{data.overlay.map((r) => (
+								<tr>
+									<th scope="row" class="l">{r.term}</th>
+									<td>{N(r.count)}</td><td>{r.books}</td>
+									<td class="l">{r.top_books.map((b, i) => (<Fragment>{i ? ', ' : ''}<a href={`/read/${slug(b.book)}/`} style={LINK} class="hover:underline">{b.book}</a>&nbsp;{N(b.count)}</Fragment>))}</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+
+				<h2 id="books" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>Where our Father is named most</h2>
+				<div style="overflow-x:auto;" tabindex="0" role="region" aria-label="The ten books that name our Father most often">
+					<table class="nf-table">
+						<thead><tr><th scope="col" class="l">Book</th><th scope="col">Times</th><th scope="col">Verses</th></tr></thead>
+						<tbody>
+							{topBooks.map((b) => (
+								<tr><th scope="row" class="l"><a href={`/read/${slug(b.book)}/`} style={LINK} class="hover:underline">{b.book}</a></th><td>{N(b.tokens)}</td><td>{N(b.verses_naming)}</td></tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+				<p class="text-lg leading-relaxed mt-5 mb-5" style={P}>
+					All 66 books are in the <a href="/data/names-of-the-father-by-book.csv" style={LINK} class="hover:underline" download>CSV by book</a>. For the Aramaic word, see <a href="/meaning/abba-father/" style={LINK} class="hover:underline">what &ldquo;Abba, Father&rdquo; means</a>; for a reading list, <a href="/verses/god-as-father/" style={LINK} class="hover:underline">Bible verses about God as Father</a>.
+				</p>
+
+				<h2 id="method" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How we counted</h2>
+				<ol class="text-lg leading-relaxed mb-5 list-decimal pl-6 space-y-2" style={P}>
+					<li>Source: the locked English text, edition {data.edition} ({N(data.canon.verses)} verses, {data.canon.books} books). Nothing was edited or sampled.</li>
+					<li>We count every capitalised word <em>Father</em> (and <em>Father&rsquo;s</em>). Lower-case <em>father</em> is a human father and is not counted; the plural <em>Fathers</em> is not counted.</li>
+					<li>The name is the words directly before it: a determiner (our, your, my, the, his, her, their, no, a, one, O) and, if present, an epithet word that the text itself puts between a determiner and Father (for example sovereign, living, heavenly). Reading never crosses a comma or dash. No determiner and no epithet is plain &ldquo;Father&rdquo;.</li>
+					<li>Every occurrence lands in exactly one name. The names add up to {N(T.tokens)}, and that total is checked against a second, separate count of the same text, book by book, before this page can be built.</li>
+					<li>Words count, not meanings. &ldquo;God&rdquo; ({N(T.context_words.God)}) and &ldquo;Lord&rdquo; ({N(T.context_words.Lord)}, plus {N(T.context_words.LORD)} in capitals) are shown only for scale; &ldquo;Lord&rdquo; also names the Son.</li>
+				</ol>
+
+				<h2 id="cite" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How to cite</h2>
+				<p class="text-base leading-relaxed mb-5 p-4" style="font-family: var(--font-sans); color: var(--color-ink); background: var(--color-surface-low); border-radius: 0.5rem; user-select: all;" id="nf-cite">{CITE}</p>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style={H2}>Frequently asked questions</h2>
+				<dl class="space-y-6">
+					{FAQS.map((f) => (
+						<div>
+							<dt class="text-xl font-medium mb-2" style={H2}>{f.q}</dt>
+							<dd class="text-lg leading-relaxed" style={P}>{f.a}</dd>
+						</div>
+					))}
+				</dl>
+			</div>
+		</section>
+	</main>
+</Layout>
+
+<style>
+	.nf-table { border-collapse: collapse; width: 100%; min-width: 520px; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+	.nf-table th, .nf-table td { padding: 0.45rem 0.6rem; text-align: right; border-bottom: 1px solid var(--color-hairline); }
+	.nf-table .l { text-align: left; font-weight: 500; }
+	.nf-table thead th { font-size: 0.8rem; font-weight: 600; vertical-align: bottom; }
+	.nf-table tfoot th, .nf-table tfoot td { font-weight: 700; border-top: 2px solid var(--color-ink); }
+</style>
