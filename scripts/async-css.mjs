@@ -32,6 +32,10 @@ const SYNC_CSS_PAGES = new Set([
 	'read/index.html',
 	'nations/index.html', // minor CLS + the country grid reflows from deferred CSS
 	'family/index.html', // text-LCP hero + card grid; deferred CSS would reflow the hero
+	'who-speaks-in-scripture/index.html', // text-LCP data page, no hero image; deferred CSS reflowed the page (desktop CLS 0.17-0.52 measured 2026-11-01, unit 2hj)
+	'names-of-god-the-father/index.html', // text-LCP data page, no hero image; deferred CSS reflowed the page (desktop CLS 0.17-0.52 measured 2026-11-01, unit 2hj)
+	'bible-by-the-numbers/index.html', // text-LCP data page, no hero image; deferred CSS reflowed the page (desktop CLS 0.17-0.52 measured 2026-11-01, unit 2hj)
+	'read-the-bible-in-a-year/index.html', // text-LCP data page, no hero image; deferred CSS reflowed the page (desktop CLS 0.17-0.52 measured 2026-11-01, unit 2hj)
 ]);
 
 // Render-blocking page prefixes (dir + everything under it).
