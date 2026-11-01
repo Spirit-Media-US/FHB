@@ -42,3 +42,34 @@ test('every /meaning/ page has a real title and a non-empty answer line', () => 
 	const bad = entries.filter((e) => !e.description || e.title === e.slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()));
 	assert.deepEqual(bad.map((e) => e.url), [], 'meaning page(s) with unreadable title/description');
 });
+
+// ---- 2he (2026-11-01): pages that wrap their text in fitTitle()/fitDescription() ----
+import os from 'node:os';
+import path from 'node:path';
+import { meta, DATA_FILES, render } from './llms-answer-pages.mjs';
+
+test('meta() reads title/description written through fitTitle()/fitDescription() (fixture)', () => {
+	const d = fs.mkdtempSync(path.join(os.tmpdir(), 'llms-2he-'));
+	const f = path.join(d, 'p.astro');
+	fs.writeFileSync(f, "---\nconst TITLE = fitTitle(\"Fixture Page: It's Wrapped\");\nconst DESCRIPTION = fitDescription(\n\t'A wrapped description that must be read.',\n);\n---\n");
+	const m = meta(f, d);
+	assert.equal(m.title, "Fixture Page: It's Wrapped");
+	assert.equal(m.description, 'A wrapped description that must be read.');
+});
+
+test('every answer page has a description (none is a bare title)', () => {
+	assert.deepEqual(all.filter((e) => !e.description).map((e) => e.url), []);
+});
+
+test('original-data pages and their 3 CSVs are listed, with the page title and derived descriptions', () => {
+	for (const u of ['/who-speaks-in-scripture/', '/names-of-god-the-father/']) {
+		const e = all.find((x) => x.url === u);
+		assert.ok(e, `${u} not discovered`);
+		assert.ok(e.title.length > 20 && e.description.length > 60, `${u} title/description not read`);
+	}
+	assert.equal(DATA_FILES.length, 3);
+	for (const f of DATA_FILES) assert.ok(all.some((e) => e.url === `/${f.replace(/^public\//, '')}` && /rows\. Columns:/.test(e.description)), `${f} not listed`);
+	const out = render(groups);
+	assert.equal((out.match(/- \/names-of-god-the-father\/ /g) || []).length, 1);
+	assert.equal((out.match(/\.csv /g) || []).length, 3);
+});

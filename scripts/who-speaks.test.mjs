@@ -52,3 +52,19 @@ test('page has no outside Bible links and uses the trademark form', () => {
 		.join('\n');
 	assert.ok(!/Divine Voice Color/.test(body.replace(/Divine Voice™ Color/g, '')));
 });
+
+// 2he: the Dataset JSON-LD carries a citation and isAccessibleForFree (no licence: a data licence is Kevin's decision).
+const astro = fs.readFileSync(path.join(root, 'src/pages/who-speaks-in-scripture.astro'), 'utf8');
+const datasetBlock = (src) => src.slice(src.indexOf("'@type': 'Dataset'"), src.indexOf("'@type': 'FAQPage'") > 0 ? src.indexOf("'@type': 'FAQPage'") : undefined);
+test('Dataset JSON-LD has citation and isAccessibleForFree: true, and no licence', () => {
+	const b = datasetBlock(astro);
+	assert.match(b, /isAccessibleForFree: true,/);
+	assert.match(b, /citation: CITE,/);
+	assert.doesNotMatch(b, /\blicense\b/);
+	assert.match(astro, /const CITE = `/);
+});
+test('failure path: the same block without those fields is rejected', () => {
+	const b = datasetBlock(astro).replace('isAccessibleForFree: true,', '').replace('citation: CITE,', '');
+	assert.doesNotMatch(b, /isAccessibleForFree: true,/);
+	assert.doesNotMatch(b, /citation: CITE,/);
+});
