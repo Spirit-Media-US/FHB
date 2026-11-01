@@ -1,10 +1,9 @@
 // node --test scripts/llms-answer-pages.test.mjs
-// Fails when ANY answer page under a covered type is missing from public/llms.txt or
-// public/llms-full.txt (run the generator, or `npm run build`, to fix).
+// Fails when the generator would leave ANY answer page under a covered type out of llms.txt / llms-full.txt.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { collect, TYPES } from './llms-answer-pages.mjs';
+import { collect, TYPES, render, apply } from './llms-answer-pages.mjs';
 
 const groups = collect();
 const all = groups.flatMap((g) => g.entries);
@@ -28,11 +27,15 @@ test('every src/pages folder of a covered type is registered', () => {
 	}
 });
 
+// 2hm (2026-11-01): these assert on GENERATOR OUTPUT (apply(committed file, render(groups)) is exactly what
+// the build writes), NOT on the committed file's current contents. The committed public/llms*.txt are refreshed
+// only by the post-live regen (fhb-announce-drift); lanes must not commit them (10-28 'Nothing to deploy'
+// failure), so a test on the committed copy fails on every clean dev checkout whenever a page merges.
 for (const file of ['public/llms.txt', 'public/llms-full.txt']) {
-	test(`${file} lists every answer page`, () => {
-		const text = fs.readFileSync(file, 'utf8');
+	test(`generator output for ${file} lists every answer page`, () => {
+		const text = apply(fs.readFileSync(file, 'utf8'), render(groups));
 		const missing = all.filter((e) => !text.includes(`- ${e.url} `)).map((e) => e.url);
-		assert.deepEqual(missing, [], `${missing.length} answer page(s) missing from ${file}: ${missing.join(', ')}`);
+		assert.deepEqual(missing, [], `${missing.length} answer page(s) missing from generated ${file}: ${missing.join(', ')}`);
 	});
 }
 
@@ -46,7 +49,7 @@ test('every /meaning/ page has a real title and a non-empty answer line', () => 
 // ---- 2he (2026-11-01): pages that wrap their text in fitTitle()/fitDescription() ----
 import os from 'node:os';
 import path from 'node:path';
-import { meta, DATA_FILES, render } from './llms-answer-pages.mjs';
+import { meta, DATA_FILES } from './llms-answer-pages.mjs';
 
 test('meta() reads title/description written through fitTitle()/fitDescription() (fixture)', () => {
 	const d = fs.mkdtempSync(path.join(os.tmpdir(), 'llms-2he-'));
