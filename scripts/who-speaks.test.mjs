@@ -43,6 +43,12 @@ test('failure path: a tampered row breaks the reconciliation', () => {
 test('page has no outside Bible links and uses the trademark form', () => {
 	const src = fs.readFileSync(path.join(root, 'src/pages/who-speaks-in-scripture.astro'), 'utf8');
 	assert.ok(!/biblegateway|biblehub|youversion/i.test(src));
-	const body = src.replace(/\/\/[^\n]*\n/g, '').split('\n').filter((l) => !l.includes('keywords:')).join('\n');
+	// keywords (searcher wording, plain form on purpose) are exempt, single-line or multi-line array
+	const body = src
+		.replace(/\/\/[^\n]*\n/g, '')
+		.replace(/keywords:\s*\[[\s\S]*?\]/g, '')
+		.split('\n')
+		.filter((l) => !l.includes('keywords:'))
+		.join('\n');
 	assert.ok(!/Divine Voice Color/.test(body.replace(/Divine Voice™ Color/g, '')));
 });
