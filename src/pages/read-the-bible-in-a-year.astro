@@ -1,0 +1,191 @@
+---
+// /read-the-bible-in-a-year/ — original-data page (unit 2hi, 2026-11-01). A 365-day plan cut at chapter boundaries and balanced by the
+// WORDS of the locked English text of Father's Heart Bible. Data: src/data/bible-reading-plan.json + public/data/bible-reading-plan.csv,
+// written by scripts/gen-who-speaks.py (measure_plan) from the same per-chapter word counts as /bible-by-the-numbers/ (one counter). The
+// generator refuses to write unless the days add up to the locked canon word total and cover every chapter once, in order.
+// Minutes are words / 200, a stated assumption. No Scripture text is quoted; every chapter links to our /read.
+import plan from '../data/bible-reading-plan.json';
+import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+
+const PAGE_URL = 'https://fathersheartbible.com/read-the-bible-in-a-year/';
+const CSV_URL = 'https://fathersheartbible.com/data/bible-reading-plan.csv';
+const S = plan.stats;
+const CHAPTERS = plan.plan.reduce((a: number, d: any) => a + d.chapters.length, 0);
+const N = (n: number) => n.toLocaleString('en-US');
+const slug = (b: string) => b.toLowerCase().replace(/\s+/g, '-');
+const mins = (w: number) => Math.round(w / plan.assumed_wpm);
+const TITLE = fitTitle('Read the Bible in a Year: A 365-Day Plan by Word Count');
+const DESCRIPTION = fitDescription(
+	`Read the whole Bible in a year with a 365-day plan balanced by words: about ${N(S.mean_words_rounded)} words, roughly ${S.mean_minutes_rounded} minutes, a day. Every day links to the reader. Free CSV.`,
+);
+const heaviest: any = plan.plan.find((d: any) => d.words === S.max_words);
+const PUBLISHED = '2026-11-01';
+const ntStart: any = plan.plan.find((d: any) =>
+	d.chapters.some((c: any) => c.book === 'Matthew' && c.chapter === 1),
+);
+const CITE = `Spirit Media Publishing. “Read the Bible in a Year: a 365-day plan balanced by words.” Father’s Heart Bible™, edition ${plan.edition}. ${PAGE_URL} (data: ${CSV_URL}), accessed ${PUBLISHED}.`;
+const FAQS = [
+	{
+		q: 'Can you read the Bible in a year?',
+		a: `Yes. The Father’s Heart Bible text has ${N(plan.canon_words)} words, which is ${N(Math.round(S.mean_words))} words a day over 365 days. At a steady 200 words a minute (an assumption, not a measurement) that is about ${mins(S.mean_words)} minutes a day.`,
+	},
+	{
+		q: 'How long does it take to read the Bible?',
+		a: `${N(plan.canon_words)} words at 200 words a minute is ${N(Math.round(plan.canon_words / plan.assumed_wpm))} minutes, about ${Math.round(plan.canon_words / plan.assumed_wpm / 60)} hours, in total. The 200 is our assumption for steady silent reading; yours may be faster or slower.`,
+	},
+	{
+		q: 'How is this plan different from other Bible-in-a-year plans?',
+		a: `Each day is cut at a chapter boundary, then the cuts are chosen so the days carry about the same number of words. Days range from ${N(S.min_words)} to ${N(S.max_words)} words and the median day is ${N(S.median_words)}, because a chapter is never split.`,
+	},
+	{
+		q: 'Where does the plan start and end?',
+		a: `Day 1 is ${plan.plan[0].passage} and day ${plan.days} is ${plan.plan[plan.days - 1].passage}. The New Testament begins on day ${ntStart.day} (${ntStart.passage}). It runs in canon order, so you can start on any date.`,
+	},
+	{
+		q: 'Can I download the plan?',
+		a: 'Yes. The CSV has one row per day with the passage, the word count, the minutes at 200 words a minute and a link to each chapter in our reader. Cite this page with the citation above.',
+	},
+];
+const SITE = {
+	'@type': 'Organization',
+	name: 'Spirit Media Publishing',
+	url: 'https://spiritmediapublishing.com/',
+};
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'Dataset',
+		name: 'Read the Bible in a Year: a 365-day reading plan balanced by words, from the English text of Father’s Heart Bible',
+		description: `A 365-day plan covering all ${N(CHAPTERS)} chapters of Father’s Heart Bible (edition ${plan.edition}) in canon order, cut at chapter boundaries so each day carries about ${N(Math.round(S.mean_words))} words (${N(plan.canon_words)} in total).`,
+		url: PAGE_URL,
+		datePublished: PUBLISHED,
+		dateModified: PUBLISHED,
+		version: plan.edition,
+		inLanguage: 'en',
+		isAccessibleForFree: true,
+		citation: CITE,
+		creator: SITE,
+		publisher: { '@id': 'https://spiritmediapublishing.com/#organization' },
+		keywords: [
+			'read the Bible in a year',
+			'Bible reading plan',
+			'how long does it take to read the Bible',
+			'365 day Bible reading plan',
+		],
+		measurementTechnique:
+			'Words counted per chapter in the locked English text; days cut at chapter boundaries to balance words; day totals reconciled to the locked whole-canon word total. Minutes are words divided by an assumed 200 words per minute.',
+		variableMeasured: ['day', 'passage', 'chapters', 'words', 'minutes_at_200_wpm', 'read_urls'],
+		distribution: [{ '@type': 'DataDownload', encodingFormat: 'text/csv', contentUrl: CSV_URL }],
+		isPartOf: {
+			'@type': 'WebSite',
+			name: "Father's Heart Bible™",
+			url: 'https://fathersheartbible.com/',
+		},
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: FAQS.map((f) => ({
+			'@type': 'Question',
+			name: f.q,
+			acceptedAnswer: { '@type': 'Answer', text: f.a },
+		})),
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{ '@type': 'ListItem', position: 2, name: 'Read the Bible in a Year', item: PAGE_URL },
+		],
+	},
+];
+const P = 'font-family: var(--font-sans); color: var(--color-muted);';
+const H2 = 'font-family: var(--font-serif); color: var(--color-ink);';
+const LINK = 'color: var(--color-brand);';
+// One day's chapters, book name once per run: "Genesis 1, 2, 3" with each number linking to /read.
+const runs = (chs: any[]) => {
+	const out: { book: string; nums: number[] }[] = [];
+	for (const c of chs) {
+		const last = out[out.length - 1];
+		if (last && last.book === c.book) last.nums.push(c.chapter);
+		else out.push({ book: c.book, nums: [c.chapter] });
+	}
+	return out;
+};
+---
+
+<Layout title={TITLE} description={DESCRIPTION} jsonLd={jsonLd}>
+	<main id="main-content">
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style={P}>
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Read the Bible in a Year</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">365 days &middot; balanced by words &middot; edition {plan.edition}</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style={H2}>Read the Bible in a Year</h1>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style={P}>
+					<strong style="color: var(--color-ink);">Reading the whole Bible in a year takes about {mins(S.mean_words)} minutes a day.</strong> The text of Father&rsquo;s Heart Bible&trade; has {N(plan.canon_words)} words, so 365 days is {N(Math.round(S.mean_words))} words a day. This plan cuts every day at the end of a chapter and chooses the cuts so the days carry nearly the same number of words: the median day is {N(S.median_words)} words, the lightest {N(S.min_words)} and the heaviest {N(S.max_words)}.
+				</p>
+				<p class="text-lg leading-relaxed mb-5" style={P}>
+					Every chapter opens in our <a href="/read/genesis/1/" style={LINK} class="hover:underline">free online reader</a>, with audio. Start on any date: day 1 is <a href="/read/genesis/1/" style={LINK} class="hover:underline">{plan.plan[0].passage}</a> and the New Testament begins on day {ntStart.day}. Download the <a href="/data/bible-reading-plan.csv" style={LINK} class="font-semibold hover:underline" download>plan as a CSV</a>. Looking for where to begin instead? See <a href="/guides/how-to-read-the-bible/" style={LINK} class="hover:underline">how to read the Bible</a>, or the <a href="/bible-by-the-numbers/" style={LINK} class="hover:underline">Bible by the numbers</a>.
+				</p>
+
+				<h2 id="plan" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>The 365-day plan</h2>
+				<p class="text-base leading-relaxed mb-4" style={P}>Minutes are words divided by 200, an assumption for steady silent reading and not a measurement. Your pace will differ.</p>
+				<div style="overflow-x:auto;" tabindex="0" role="region" aria-label="365-day Bible reading plan">
+					<table class="yr-table">
+						<thead><tr><th scope="col" class="l">Day</th><th scope="col" class="l">Read</th><th scope="col">Words</th><th scope="col">Min</th></tr></thead>
+						<tbody>
+							{plan.plan.map((d: any) => (
+								<tr>
+									<th scope="row" class="l">{d.day}</th>
+									<td class="l">{runs(d.chapters).map((r, i) => (<Fragment>{i ? '; ' : ''}{r.book} {r.nums.map((n, j) => (<Fragment>{j ? ', ' : ''}<a href={`/read/${slug(r.book)}/${n}/`} style={LINK} class="hover:underline">{n}</a></Fragment>))}</Fragment>))}</td>
+									<td>{N(d.words)}</td><td>{mins(d.words)}</td>
+								</tr>
+							))}
+						</tbody>
+						<tfoot><tr><th scope="row" class="l" colspan="2">Whole Bible</th><td>{N(plan.canon_words)}</td><td>{N(Math.round(plan.canon_words / plan.assumed_wpm))}</td></tr></tfoot>
+					</table>
+				</div>
+
+				<h2 id="method" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How the plan was built</h2>
+				<ol class="text-lg leading-relaxed mb-5 list-decimal pl-6 space-y-2" style={P}>
+					<li>Words are counted per chapter in the locked English text, edition {plan.edition}, the same counts that power <a href="/bible-by-the-numbers/" style={LINK} class="hover:underline">the Bible by the numbers</a>.</li>
+					<li>The chapters stay in canon order and each day ends at a chapter boundary, never mid-chapter. Out of all the ways to cut {N(CHAPTERS)} chapters into 365 days, the plan uses the one that keeps the days closest to the average ({N(Math.round(S.mean_words))} words).</li>
+					<li>Before the page can be built, the 365 day totals must add up to the locked word total ({N(plan.canon_words)}) and every chapter must appear exactly once, in order. A plan that drops, repeats or reorders a chapter is refused.</li>
+					<li>Chapters differ in length, so no chapter-bounded plan is exactly even. The heaviest day, {heaviest.passage}, is {N(S.max_words)} words.</li>
+				</ol>
+
+				<h2 id="cite" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How to cite</h2>
+				<p class="text-base leading-relaxed mb-5 p-4" style="font-family: var(--font-sans); color: var(--color-ink); background: var(--color-surface-low); border-radius: 0.5rem; user-select: all;">{CITE}</p>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style={H2}>Frequently asked questions</h2>
+				<dl class="space-y-6">
+					{FAQS.map((f) => (
+						<div>
+							<dt class="text-xl font-medium mb-2" style={H2}>{f.q}</dt>
+							<dd class="text-lg leading-relaxed" style={P}>{f.a}</dd>
+						</div>
+					))}
+				</dl>
+			</div>
+		</section>
+	</main>
+</Layout>
+
+<style>
+	.yr-table { border-collapse: collapse; width: 100%; min-width: 420px; font-family: var(--font-sans); font-size: 0.9rem; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+	.yr-table th, .yr-table td { padding: 0.3rem 0.5rem; text-align: right; border-bottom: 1px solid var(--color-hairline); }
+	.yr-table .l { text-align: left; }
+	.yr-table tbody th { font-weight: 500; }
+	.yr-table thead th { font-size: 0.8rem; font-weight: 600; vertical-align: bottom; }
+	.yr-table tfoot th, .yr-table tfoot td { font-weight: 700; border-top: 2px solid var(--color-ink); }
+</style>

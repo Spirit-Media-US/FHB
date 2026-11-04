@@ -23,30 +23,30 @@ export const GLOBAL_BIBLE_MONTH: GbmRow[] = [
 		date: '2026-11-02',
 		name: 'Chichewa',
 		code: 'ny',
-		status: 'scheduled',
+		status: 'readable',
 	},
 	{
 		date: '2026-11-03',
 		name: 'Nagamese',
 		code: 'nag',
-		status: 'scheduled',
+		status: 'readable',
 	},
 	{
 		date: '2026-11-04',
 		name: 'Sena',
-		code: null,
-		status: 'scheduled',
+		code: 'seh',
+		status: 'readable',
 	},
 	{
 		date: '2026-11-05',
 		name: 'Gikuyu',
-		code: null,
+		code: 'ki',
 		status: 'scheduled',
 	},
 	{
 		date: '2026-11-06',
 		name: 'Xhosa',
-		code: null,
+		code: 'xh',
 		status: 'scheduled',
 	},
 	{
@@ -58,7 +58,7 @@ export const GLOBAL_BIBLE_MONTH: GbmRow[] = [
 	{
 		date: '2026-11-08',
 		name: 'Chang Naga',
-		code: null,
+		code: 'nbc',
 		status: 'scheduled',
 	},
 	{
@@ -76,13 +76,13 @@ export const GLOBAL_BIBLE_MONTH: GbmRow[] = [
 	{
 		date: '2026-11-11',
 		name: 'Thai',
-		code: null,
+		code: 'th',
 		status: 'scheduled',
 	},
 	{
 		date: '2026-11-12',
 		name: 'Gujarati',
-		code: null,
+		code: 'gu',
 		status: 'scheduled',
 	},
 	{

@@ -72,7 +72,8 @@ for (const [code, s] of Object.entries(status.languages || {})) {
 		want.push({
 			kind: 'audiobook',
 			url: s.google_url,
-			id: (s.note || '').replace(/^google\s+/, ''),
+			// The GGKEY only: `note` is free text the publisher seat appends to ("; spotify edit submitted").
+			id: (s.note || '').match(/GGKEY:[A-Z0-9]+/)?.[0] ?? '',
 			price: audioPrice(code),
 		});
 	if (s.google_ebook?.state === 'live' && s.google_ebook.url)

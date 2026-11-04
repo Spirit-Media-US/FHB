@@ -19,6 +19,16 @@
  * Pages WITH hero images (/, /about, /samples, blog posts, etc.) are fine
  * with async because the preloaded hero dominates LCP and absorbs the
  * subsequent stylesheet-driven text reflow.
+ *
+ * RULE (unit 2hk, 2026-11-01, replaces the hand-kept list of text-LCP pages):
+ * a page with NO <link rel="preload" as="image"> keeps its stylesheet
+ * render-blocking. Hand-listing failed three times (2hj: 4 data pages; 2hk
+ * measured 6 more at desktop CLS 0.22-0.42: marathi-bible, italian-bible,
+ * tangkhul-bible, telugu-bible, versiculos-sobre-oracao, global-bible-month).
+ * ASYNC_OK_* below is the explicit exception set: no-hero pages MEASURED fine
+ * under async CSS (PSI median-of-5 desktop 100, CLS <0.01 on /bibles/ editions)
+ * that stay async. Add to it only with a measurement.
+ * The legacy SYNC_CSS_* lists still apply on top (hero pages that reflow).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -42,11 +52,21 @@ const SYNC_CSS_PREFIXES = [
 	'blog/', // blog index + posts: deferred CSS reflowed the content sections (CLS ~0.6 on posts, measured 2026-06-13)
 ];
 
-function isSyncPage(relPath) {
+// Exceptions to the no-hero rule: measured fine with async CSS (2hk, 2026-11-01).
+const ASYNC_OK_PREFIXES = [
+	'bibles/', // 107 edition pages: PSI desktop 100, CLS 0.006, mobile 91-99
+	'glossary-review/', // internal review pages
+	'the-fathers-heart-bible/', // desktop 100 / mobile 99, CLS 0.005-0.026
+];
+
+const HERO_PRELOAD = /<link\b(?=[^>]*\brel="preload")(?=[^>]*\bas="image")[^>]*>/;
+
+function isSyncPage(relPath, html) {
 	if (SYNC_CSS_PAGES.has(relPath)) return true;
 	for (const prefix of SYNC_CSS_PREFIXES) {
 		if (relPath.startsWith(prefix)) return true;
 	}
+	if (!HERO_PRELOAD.test(html) && !ASYNC_OK_PREFIXES.some((p) => relPath.startsWith(p))) return true;
 	return false;
 }
 
@@ -66,11 +86,11 @@ let converted = 0;
 let skipped = 0;
 for (const file of walk(DIST)) {
 	const rel = path.relative(DIST, file);
-	if (isSyncPage(rel)) {
+	const before = fs.readFileSync(file, 'utf8');
+	if (isSyncPage(rel, before)) {
 		skipped++;
 		continue;
 	}
-	const before = fs.readFileSync(file, 'utf8');
 	const after = before.replace(re, (m) => {
 		converted++;
 		const href = m.match(/href="([^"]+)"/)[1];

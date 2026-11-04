@@ -1,0 +1,261 @@
+---
+// /bible-by-the-numbers/ — original-data page (unit 2hh, 2026-11-01). How many chapters, verses and words the LOCKED
+// English text of Father's Heart Bible has, per book, with the longest and shortest chapter, verse and book.
+// Data: src/data/bible-by-the-numbers.json + public/data/bible-by-the-numbers-{by-book,by-chapter}.csv, all written by
+// scripts/gen-who-speaks.py (measure_stats), which refuses to write unless every figure reconciles to an independent
+// recount and to the locked whole-canon figure. Only the one short verse quoted below is Scripture text, and it is read
+// from the locked tree. Every link into the text goes to our /read.
+import data from '../data/bible-by-the-numbers.json';
+import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+
+const PAGE_URL = 'https://fathersheartbible.com/bible-by-the-numbers/';
+const CSV_BOOK_URL = 'https://fathersheartbible.com/data/bible-by-the-numbers-by-book.csv';
+const CSV_CHAPTER_URL = 'https://fathersheartbible.com/data/bible-by-the-numbers-by-chapter.csv';
+const T = data.totals;
+const X = data.extremes;
+const N = (n: number) => n.toLocaleString('en-US');
+const slug = (b: string) => b.toLowerCase().replace(/\s+/g, '-');
+const TITLE = fitTitle('The Bible by the Numbers: Chapters, Verses and Words');
+const DESCRIPTION = fitDescription(
+	`The Bible has ${N(T.chapters)} chapters, ${N(T.verses)} verses and ${N(T.words)} words in Father’s Heart Bible. Longest and shortest chapter, verse and book. Free CSV.`,
+);
+const PUBLISHED = '2026-11-01';
+const ref = (r: any) => `${r.book} ${r.chapter}${r.verse ? ':' + r.verse : ''}`;
+const url = (r: any) => `/read/${slug(r.book)}/${r.chapter}/`;
+const chapLong = X.chapter_by_words.longest[0];
+const chapShort = X.chapter_by_words.shortest[0];
+const verseLong = X.verse_by_words.longest[0];
+const verseLongChars = X.verse_by_chars.longest[0];
+const verseShortChars: any = X.verse_by_chars.shortest[0];
+const verseShortTies: any[] = X.verse_by_words.shortest;
+const wept: any = verseShortTies.find(
+	(v: any) => v.book === 'John' && v.chapter === 11 && v.verse === 35,
+);
+const bookLong = X.book_by_words.longest[0];
+const bookShort = X.book_by_words.shortest[0];
+const oneChapter: any[] = X.book_by_chapters.shortest;
+const skippedN = data.skipped_numbers.reduce((a: number, s: any) => a + s.numbers.length, 0);
+const TRADITIONAL = 31102;
+const gap = TRADITIONAL - T.verses;
+const unlocated = gap - skippedN;
+const CITE = `Spirit Media Publishing. “The Bible by the Numbers: chapters, verses and words in Father’s Heart Bible, counted.” Father’s Heart Bible™, edition ${data.edition}. ${PAGE_URL} (data: ${CSV_BOOK_URL}), accessed ${PUBLISHED}.`;
+
+const FAQS = [
+	{
+		q: 'How many chapters are in the Bible?',
+		a: `${N(T.chapters)} chapters in 66 books: ${N(T.ot.chapters)} in the Old Testament and ${N(T.nt.chapters)} in the New Testament (Father’s Heart Bible, edition ${data.edition}).`,
+	},
+	{
+		q: 'How many verses are in the Bible?',
+		a: `${N(T.verses)} verses in Father’s Heart Bible, edition ${data.edition}: ${N(T.ot.verses)} in the Old Testament and ${N(T.nt.verses)} in the New Testament. The figure usually cited is ${N(TRADITIONAL)}; this edition has ${gap} fewer, and the section below shows where its verse numbering skips.`,
+	},
+	{
+		q: 'How many words are in the Bible?',
+		a: `${N(T.words)} words in the English text of Father’s Heart Bible: ${N(T.ot.words)} in the Old Testament and ${N(T.nt.words)} in the New Testament. A word is anything between spaces, so a number such as 4,600 counts as one. Other English Bibles give other totals.`,
+	},
+	{
+		q: 'What is the longest chapter in the Bible?',
+		a: `${ref(chapLong)}, with ${chapLong.verses} verses and ${N(chapLong.words)} words. It is the longest chapter by verses and by words.`,
+	},
+	{
+		q: 'What is the shortest chapter in the Bible?',
+		a: `${ref(chapShort)}, with ${chapShort.verses} verses and ${chapShort.words} words, the shortest chapter by verses and by words.`,
+	},
+	{
+		q: 'What is the shortest verse in the Bible?',
+		a: `By word count, ${verseShortTies.length} verses tie at two words, including John 11:35, “${wept.text}” By characters the shortest is ${ref(verseShortChars)} (${verseShortChars.chars} characters). The tie list is below.`,
+	},
+	{
+		q: 'What is the longest verse in the Bible?',
+		a: `By words, ${ref(verseLong)} (${verseLong.words} words). By characters, ${ref(verseLongChars)} (${verseLongChars.chars} characters, ${verseLongChars.words} words). Neither is quoted here; both link to our reader.`,
+	},
+	{
+		q: 'What is the longest book of the Bible, and the shortest?',
+		a: `${bookLong.book} is longest on every measure: ${bookLong.chapters} chapters, ${N(bookLong.verses)} verses, ${N(bookLong.words)} words. The shortest by verses and words is ${bookShort.book} (${bookShort.verses} verses, ${bookShort.words} words). ${oneChapter.map((b: any) => b.book).join(', ')} are the books with a single chapter.`,
+	},
+	{
+		q: 'Can I use these numbers?',
+		a: 'Yes. Download the CSVs and cite this page with the citation above. Every figure was counted from the locked English text and checked against a second, independent count of the same text.',
+	},
+];
+
+const SITE = {
+	'@type': 'Organization',
+	name: 'Spirit Media Publishing',
+	url: 'https://spiritmediapublishing.com/',
+};
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'Dataset',
+		name: 'The Bible by the Numbers: chapters, verses and words per book and per chapter in the English text of Father’s Heart Bible',
+		description: `Chapter, verse and word counts for all 66 books and ${N(T.chapters)} chapters of the locked English text of Father’s Heart Bible (edition ${data.edition}): ${N(T.verses)} verses and ${N(T.words)} words in total.`,
+		url: PAGE_URL,
+		datePublished: PUBLISHED,
+		dateModified: PUBLISHED,
+		version: data.edition,
+		inLanguage: 'en',
+		isAccessibleForFree: true,
+		citation: CITE,
+		creator: SITE,
+		publisher: { '@id': 'https://spiritmediapublishing.com/#organization' },
+		keywords: [
+			'how many chapters in the Bible',
+			'how many verses in the Bible',
+			'how many words in the Bible',
+			'longest chapter in the Bible',
+			'shortest verse in the Bible',
+		],
+		measurementTechnique:
+			'Chapters, verses and whitespace-separated words counted in the locked English text, per chapter and per book; every figure reconciled to an independent recount and to the locked whole-canon verse figure.',
+		variableMeasured: [
+			'book',
+			'testament',
+			'chapters',
+			'verses',
+			'words',
+			'longest_chapter',
+			'longest_chapter_words',
+			'chapter',
+		],
+		distribution: [
+			{ '@type': 'DataDownload', encodingFormat: 'text/csv', contentUrl: CSV_BOOK_URL },
+			{ '@type': 'DataDownload', encodingFormat: 'text/csv', contentUrl: CSV_CHAPTER_URL },
+		],
+		isPartOf: {
+			'@type': 'WebSite',
+			name: "Father's Heart Bible™",
+			url: 'https://fathersheartbible.com/',
+		},
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: FAQS.map((f) => ({
+			'@type': 'Question',
+			name: f.q,
+			acceptedAnswer: { '@type': 'Answer', text: f.a },
+		})),
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{ '@type': 'ListItem', position: 2, name: 'The Bible by the Numbers', item: PAGE_URL },
+		],
+	},
+];
+const P = 'font-family: var(--font-sans); color: var(--color-muted);';
+const H2 = 'font-family: var(--font-serif); color: var(--color-ink);';
+const LINK = 'color: var(--color-brand);';
+---
+
+<Layout title={TITLE} description={DESCRIPTION} jsonLd={jsonLd}>
+	<main id="main-content">
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style={P}>
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">The Bible by the Numbers</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Counted from the locked text &middot; edition {data.edition}</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style={H2}>The Bible by the Numbers</h1>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style={P}>
+					<strong style="color: var(--color-ink);">The Bible has {N(T.chapters)} chapters, {N(T.verses)} verses and {N(T.words)} words</strong> in 66 books, counted from the locked English text of Father&rsquo;s Heart Bible&trade; (edition {data.edition}). The longest chapter is <a href={url(chapLong)} style={LINK} class="hover:underline">{ref(chapLong)}</a> ({N(chapLong.words)} words), the shortest is <a href={url(chapShort)} style={LINK} class="hover:underline">{ref(chapShort)}</a> ({chapShort.words} words) and the longest book is <a href={`/read/${slug(bookLong.book)}/`} style={LINK} class="hover:underline">{bookLong.book}</a>.
+				</p>
+				<p class="text-lg leading-relaxed mb-5" style={P}>
+					Below: every question answered, all 66 books, two <a href="/data/bible-by-the-numbers-by-book.csv" style={LINK} class="hover:underline" download>free CSVs</a>, and how we counted. For a book-by-book guide see <a href="/books-of-the-bible/" style={LINK} class="hover:underline">the books of the Bible</a>; for who speaks, <a href="/who-speaks-in-scripture/" style={LINK} class="hover:underline">who speaks in Scripture</a>; for how our Father is named, <a href="/names-of-god-the-father/" style={LINK} class="hover:underline">the names of God the Father counted</a>. To read it all in a year, see the <a href="/read-the-bible-in-a-year/" style={LINK} class="hover:underline">365-day plan balanced by words</a>.
+				</p>
+
+				<h2 id="answers" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>The answers</h2>
+				<div style="overflow-x:auto;" tabindex="0" role="region" aria-label="Chapters, verses and words">
+					<table class="bn-table">
+						<thead><tr><th scope="col" class="l"></th><th scope="col">Books</th><th scope="col">Chapters</th><th scope="col">Verses</th><th scope="col">Words</th></tr></thead>
+						<tbody>
+							<tr><th scope="row" class="l">Old Testament</th><td>{T.ot.books}</td><td>{N(T.ot.chapters)}</td><td>{N(T.ot.verses)}</td><td>{N(T.ot.words)}</td></tr>
+							<tr><th scope="row" class="l">New Testament</th><td>{T.nt.books}</td><td>{N(T.nt.chapters)}</td><td>{N(T.nt.verses)}</td><td>{N(T.nt.words)}</td></tr>
+						</tbody>
+						<tfoot><tr><th scope="row" class="l">Whole Bible</th><td>{T.books}</td><td>{N(T.chapters)}</td><td>{N(T.verses)}</td><td>{N(T.words)}</td></tr></tfoot>
+					</table>
+				</div>
+				<ul class="text-lg leading-relaxed mt-6 mb-5 list-disc pl-6 space-y-2" style={P}>
+					<li><strong style="color: var(--color-ink);">Longest chapter:</strong> <a href={url(chapLong)} style={LINK} class="hover:underline">{ref(chapLong)}</a>, {chapLong.verses} verses, {N(chapLong.words)} words.</li>
+					<li><strong style="color: var(--color-ink);">Shortest chapter:</strong> <a href={url(chapShort)} style={LINK} class="hover:underline">{ref(chapShort)}</a>, {chapShort.verses} verses, {chapShort.words} words.</li>
+					<li><strong style="color: var(--color-ink);">Longest verse:</strong> by words, <a href={url(verseLong)} style={LINK} class="hover:underline">{ref(verseLong)}</a> ({verseLong.words} words); by characters, <a href={url(verseLongChars)} style={LINK} class="hover:underline">{ref(verseLongChars)}</a> ({verseLongChars.chars} characters).</li>
+					<li><strong style="color: var(--color-ink);">Shortest verse:</strong> by words, {verseShortTies.length} verses tie at two (listed below), among them <a href={url(wept)} style={LINK} class="hover:underline">John 11:35</a>, &ldquo;{wept.text}&rdquo; By characters the shortest is <a href={url(verseShortChars)} style={LINK} class="hover:underline">{ref(verseShortChars)}</a>, {verseShortChars.chars} characters.</li>
+					<li><strong style="color: var(--color-ink);">Longest book:</strong> <a href={`/read/${slug(bookLong.book)}/`} style={LINK} class="hover:underline">{bookLong.book}</a>, {bookLong.chapters} chapters, {N(bookLong.verses)} verses, {N(bookLong.words)} words.</li>
+					<li><strong style="color: var(--color-ink);">Shortest book:</strong> <a href={`/read/${slug(bookShort.book)}/`} style={LINK} class="hover:underline">{bookShort.book}</a> by verses and words ({bookShort.verses} verses, {bookShort.words} words). Books of one chapter: {oneChapter.map((b: any, i: number) => (<Fragment>{i ? ', ' : ''}<a href={`/read/${slug(b.book)}/`} style={LINK} class="hover:underline">{b.book}</a></Fragment>))}.</li>
+				</ul>
+				<p class="text-base leading-relaxed mb-5" style={P}>
+					Verses that tie for shortest by words:
+					{verseShortTies.map((v: any, i: number) => (<Fragment>{i ? ', ' : ' '}<a href={url(v)} style={LINK} class="hover:underline">{ref(v)}</a></Fragment>))}.
+				</p>
+
+				<h2 id="verse-count" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>Why {N(T.verses)} verses and not {N(TRADITIONAL)}</h2>
+				<p class="text-lg leading-relaxed mb-4" style={P}>
+					This edition has {N(T.verses)} verses. The figure usually cited is {N(TRADITIONAL)}, which is {gap} more; we did not count that figure, we only compare to it. What the locked text itself shows is that its verse numbering skips {skippedN} numbers, in {data.skipped_numbers.length} chapters of Matthew, Mark, Luke, John, Acts and Romans. Those {skippedN} account for {skippedN} of the {gap}; this data does not show where the other {unlocated === 1 ? 'one' : unlocated} falls, so we do not assign it.
+				</p>
+				<p class="text-base leading-relaxed mb-5" style={P}>
+					The skipped numbers, each linking to its chapter:
+					{data.skipped_numbers.map((s: any, i: number) => (<Fragment>{i ? '; ' : ' '}<a href={url(s)} style={LINK} class="hover:underline">{s.book} {s.chapter}</a>:{s.numbers.join(', ')}</Fragment>))}.
+				</p>
+
+				<h2 id="books" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>All 66 books</h2>
+				<div style="overflow-x:auto;" tabindex="0" role="region" aria-label="Chapters, verses and words in every book">
+					<table class="bn-table">
+						<thead><tr><th scope="col" class="l">Book</th><th scope="col">Chapters</th><th scope="col">Verses</th><th scope="col">Words</th><th scope="col">Longest chapter</th></tr></thead>
+						<tbody>
+							{data.books.map((b: any) => (
+								<tr>
+									<th scope="row" class="l"><a href={`/read/${slug(b.book)}/`} style={LINK} class="hover:underline">{b.book}</a></th>
+									<td>{b.chapters}</td><td>{N(b.verses)}</td><td>{N(b.words)}</td>
+									<td><a href={`/read/${slug(b.book)}/${b.longest_chapter}/`} style={LINK} class="hover:underline">{b.longest_chapter}</a> ({N(b.longest_chapter_words)})</td>
+								</tr>
+							))}
+						</tbody>
+						<tfoot><tr><th scope="row" class="l">Total</th><td>{N(T.chapters)}</td><td>{N(T.verses)}</td><td>{N(T.words)}</td><td></td></tr></tfoot>
+					</table>
+				</div>
+				<p class="text-lg leading-relaxed mt-5 mb-5" style={P}>
+					<a href="/data/bible-by-the-numbers-by-book.csv" style={LINK} class="font-semibold hover:underline" download>Download the CSV by book</a> (66 rows) and the <a href="/data/bible-by-the-numbers-by-chapter.csv" style={LINK} class="font-semibold hover:underline" download>CSV by chapter</a> ({N(T.chapters)} rows, each with its reader link).
+				</p>
+
+				<h2 id="method" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How we counted</h2>
+				<ol class="text-lg leading-relaxed mb-5 list-decimal pl-6 space-y-2" style={P}>
+					<li>Source: the locked English text, edition {data.edition} ({N(data.canon.verses)} verses, {data.canon.books} books). Nothing was edited or sampled.</li>
+					<li>A chapter is one chapter file; a verse is one numbered entry; a word is any run of characters between spaces, so &ldquo;4,600&rdquo; is one word and so is a word joined to the next by a dash.</li>
+					<li>Per-chapter counts add up to each book, and the books add up to the totals. Words are checked against a second, separate count of the same text, book by book, and chapters, verses and books against the locked whole-canon figure, before this page can be built.</li>
+					<li>These are counts of one Bible&rsquo;s English wording. Other translations, and the original languages, give different totals.</li>
+				</ol>
+
+				<h2 id="cite" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How to cite</h2>
+				<p class="text-base leading-relaxed mb-5 p-4" style="font-family: var(--font-sans); color: var(--color-ink); background: var(--color-surface-low); border-radius: 0.5rem; user-select: all;" id="bn-cite">{CITE}</p>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style={H2}>Frequently asked questions</h2>
+				<dl class="space-y-6">
+					{FAQS.map((f) => (
+						<div>
+							<dt class="text-xl font-medium mb-2" style={H2}>{f.q}</dt>
+							<dd class="text-lg leading-relaxed" style={P}>{f.a}</dd>
+						</div>
+					))}
+				</dl>
+			</div>
+		</section>
+	</main>
+</Layout>
+
+<style>
+	.bn-table { border-collapse: collapse; width: 100%; min-width: 520px; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+	.bn-table th, .bn-table td { padding: 0.45rem 0.6rem; text-align: right; border-bottom: 1px solid var(--color-hairline); }
+	.bn-table .l { text-align: left; font-weight: 500; }
+	.bn-table thead th { font-size: 0.8rem; font-weight: 600; vertical-align: bottom; }
+	.bn-table tfoot th, .bn-table tfoot td { font-weight: 700; border-top: 2px solid var(--color-ink); }
+</style>
