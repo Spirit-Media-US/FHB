@@ -37,6 +37,45 @@ const OUT = new URL('../src/data/digital-listings.json', import.meta.url);
 const DRY = process.argv.includes('--dry');
 const today = new Date().toISOString().slice(0, 10);
 
+// --generated-only (PM 2026-11-05 12:34Z: the GBM ship blocked on this file, dirtied by the prebuild): exit 0 only when
+// the uncommitted change is generator output — every difference from HEAD lies in a non-English Google Play
+// ebook/audiobook entry. A hand edit anywhere else (Kindle, Kobo, English, _about) exits 1, so the ship tools that read
+// bin/fhb-build-generated.txt discard this file only when no one's work is in it.
+if (process.argv.includes('--generated-only')) {
+	const { execFileSync } = await import('node:child_process');
+	const repo = new URL('..', import.meta.url).pathname;
+	const canon = (v) =>
+		Array.isArray(v)
+			? `[${v.map(canon).join(',')}]`
+			: v && typeof v === 'object'
+				? `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}:${canon(v[k])}`).join(',')}}`
+				: JSON.stringify(v);
+	const handKept = (d) => {
+		const c = structuredClone(d);
+		for (const [code, e] of Object.entries(c)) {
+			if (code === 'en' || code.startsWith('_') || !e || typeof e !== 'object') continue;
+			for (const k of ['ebook', 'audiobook']) {
+				if (!Array.isArray(e[k])) continue;
+				e[k] = e[k].filter((x) => x.store !== 'Google Play');
+				if (!e[k].length) delete e[k];
+			}
+			if (!Object.keys(e).length) delete c[code];
+		}
+		return canon(c);
+	};
+	let head, work;
+	try {
+		head = JSON.parse(execFileSync('git', ['show', 'HEAD:src/data/digital-listings.json'], { cwd: repo, encoding: 'utf8' }));
+		work = JSON.parse(readFileSync(OUT, 'utf8'));
+	} catch (e) {
+		console.log(`sync-digital-listings --generated-only: unreadable (${String(e.message).slice(0, 80)}) — NOT generated-only`);
+		process.exit(1);
+	}
+	const ok = handKept(head) === handKept(work);
+	console.log(`sync-digital-listings --generated-only: ${ok ? 'only Google Play entries differ from HEAD — generator output' : 'a HAND-KEPT part differs from HEAD — someone\'s edit, keep it'}`);
+	process.exit(ok ? 0 : 1);
+}
+
 if (!existsSync(STATUS)) {
 	console.log(`sync-digital-listings: ${STATUS} absent — digital-listings.json left as is`);
 	process.exit(0);
