@@ -41,7 +41,7 @@ export const GLOBAL_BIBLE_MONTH: GbmRow[] = [
 		date: '2026-11-05',
 		name: 'Gikuyu',
 		code: 'ki',
-		status: 'scheduled',
+		status: 'readable',
 	},
 	{
 		date: '2026-11-06',
