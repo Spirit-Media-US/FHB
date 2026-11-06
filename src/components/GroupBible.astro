@@ -24,6 +24,7 @@ import { editionForAudiencePage } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
 import AuthorBio from './AuthorBio.astro';
 import RelatedTopics from './RelatedTopics.astro';
+import YouVersionBanner from './YouVersionBanner.astro';
 
 // The print offers in this page's Book JSON-LD read the catalog's list price for the general edition
 // (the same row /print and checkout use). They were hardcoded at $39.99/$44.99 on 2026-07-13 and
@@ -505,6 +506,7 @@ const relatedGroups: Group[] = _sibSlugs
 			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
 			<div class="absolute inset-x-0 bottom-0 z-30 h-1.5" style="background: linear-gradient(to right, var(--color-gold) 0%, var(--color-brand) 100%);" aria-hidden="true"></div>
 		</section>
+		<YouVersionBanner />
 
 		<!-- Title block + direct answer -->
 		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">

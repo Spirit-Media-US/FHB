@@ -15,6 +15,7 @@ import Layout from '../layouts/Layout.astro';
 import AuthorBio from './AuthorBio.astro';
 import ReadInYourLanguage from './ReadInYourLanguage.astro';
 import TranslationPreview from './TranslationPreview.astro';
+import YouVersionBanner from './YouVersionBanner.astro';
 
 export interface CountryStat {
 	label: string;
@@ -260,8 +261,31 @@ const EN_ENTRY: Record<string, { href: string; label: string }> = {
 // (aeo-state/fhb-red-wave3-20261030.json red_list: indexed share under its floor). Same plain
 // links to live chapters; the live-guard in entryLinksFor() still drops any code not live.
 const NEAR_FLOOR_LANGS = new Set([
-	'ko', 'el', 'hu', 'uk', 'tr', 'ur', 'zh-hans',
-	'fa', 'fil', 'ig', 'it', 'ja', 'jv', 'ml', 'ms', 'nl', 'nmf', 'pa', 'pcm', 'pl', 'ro', 'vi', 'yo', 'yue', 'zu',
+	'ko',
+	'el',
+	'hu',
+	'uk',
+	'tr',
+	'ur',
+	'zh-hans',
+	'fa',
+	'fil',
+	'ig',
+	'it',
+	'ja',
+	'jv',
+	'ml',
+	'ms',
+	'nl',
+	'nmf',
+	'pa',
+	'pcm',
+	'pl',
+	'ro',
+	'vi',
+	'yo',
+	'yue',
+	'zu',
 ]);
 const NEAR_FLOOR_EXTRA = ['psalms/91', 'matthew/5', 'luke/15', 'romans/8', 'isaiah/53'];
 function entryLinksFor(code: string): { href: string; label: string }[] {
@@ -446,6 +470,7 @@ const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema, versesItemList];
 			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
 			<div class="absolute inset-x-0 bottom-0 z-30 h-1.5" style={`background: linear-gradient(to right, ${colorPrimary} 0%, ${colorPrimary} 50%, ${colorSecondary} 50%, ${colorSecondary} 100%);`} aria-hidden="true"></div>
 		</section>
+		<YouVersionBanner />
 
 		<!-- Breadcrumb + direct answer -->
 		<section class="px-6 pt-9 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">

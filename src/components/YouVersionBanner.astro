@@ -1,0 +1,19 @@
+---
+// Thin black "Now on YouVersion" announcement under the hero on every FHB page (Kevin 2026-11-06
+// ~22:0xZ: "we need announcement banner like SMP to grab people's attention. Add this black banner
+// under the hero on every page."). Same look as SMP's live one (spirit-media-publishing
+// CoverMarquee .fhbm-yv). Layout renders it under the top bar; a page whose first section is a hero
+// sets youversionBanner={false} on Layout and places this right after that hero.
+const YOUVERSION_URL = 'https://www.bible.com/organizations/89162c01-3892-4c7b-a462-239df0931522';
+---
+
+<a class="fhb-yv-banner" href={YOUVERSION_URL} target="_blank" rel="noopener">
+	<img src="https://assets.spiritmediapublishing.com/FHB/partners/youversion-icon-96.webp" alt="" width="20" height="20" decoding="async" loading="lazy" />
+	<span>Now on YouVersion &mdash; read free in the Bible App <span aria-hidden="true">&rarr;</span></span>
+</a>
+
+<style>
+	.fhb-yv-banner { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; text-align: center; text-decoration: none; background: #1a1714; color: #f5f5f4; font-family: var(--font-body); font-size: 0.875rem; line-height: 1.25rem; }
+	.fhb-yv-banner:hover { color: #fff; }
+	.fhb-yv-banner img { width: 20px; height: 20px; border-radius: 0.25rem; flex-shrink: 0; }
+</style>
