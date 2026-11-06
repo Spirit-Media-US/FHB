@@ -10,6 +10,7 @@ import WelcomeTour from '../components/WelcomeTour.astro';
 import { ogLocale, ogLocaleAlternates } from '../lib/og-locale';
 import { sanityClient } from '../lib/sanity';
 import '../styles/global.css';
+import YouVersionBanner from '../components/YouVersionBanner.astro';
 
 interface Props {
 	/** Page language for <html lang> (default en). Translated pages pass their code. */
@@ -26,6 +27,10 @@ interface Props {
 	imageAlt?: string;
 	noindex?: boolean;
 	darkHero?: boolean;
+	// Kevin 2026-11-06: thin black "Now on YouVersion" banner under the hero on every page. Rendered
+	// here under the top bar; a page whose first section is a hero passes false and places
+	// <YouVersionBanner /> right after that hero instead. Dark-hero pages default to false.
+	youversionBanner?: boolean;
 	// jsonLd accepts a single schema.org object OR an array. The Organization
 	// schema for Spirit Media Publishing is appended automatically on every
 	// page so AI engines and search crawlers always see the publisher entity.
@@ -60,6 +65,7 @@ const {
 	imageAlt,
 	noindex = false,
 	darkHero = false,
+	youversionBanner = !darkHero,
 	jsonLd,
 	preloadImageMobile,
 	preloadImageMobileSrcset,
@@ -412,6 +418,7 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 			inFlow={true}
 			transparentOverHero={darkHero}
 		/>
+		{youversionBanner && <YouVersionBanner />}
 		<slot />
 		<Footer
 			variant="full"

@@ -19,6 +19,7 @@ import BlogCTA from '../../../components/BlogCTA.astro';
 import ChapterEmbed from '../../../components/ChapterEmbed.astro';
 import FeatureChapter from '../../../components/FeatureChapter.astro';
 import ShareBar from '../../../components/ShareBar.astro';
+import YouVersionBanner from '../../../components/YouVersionBanner.astro';
 import Layout from '../../../layouts/Layout.astro';
 import { sanityClient, urlFor } from '../../../lib/sanity';
 
@@ -184,9 +185,18 @@ const fitTitle = (t: string, max = 70): string => {
 const fitDescription = (d: string | undefined, max = 160): string | undefined => {
 	if (!d || d.length <= max) return d;
 	const sentences = d.match(/[^.!?]+[.!?]+(\s|$)/g);
-	while (sentences && sentences.length > 1 && sentences.join('').trim().length > max) sentences.pop();
-	if (sentences && sentences.join('').trim().length <= max && sentences.join('').trim().length >= 120) return sentences.join('').trim();
-	return `${d.slice(0, max - 1).replace(/\s+\S*$/, '').replace(/[,;:\s—-]+$/, '')}…`;
+	while (sentences && sentences.length > 1 && sentences.join('').trim().length > max)
+		sentences.pop();
+	if (
+		sentences &&
+		sentences.join('').trim().length <= max &&
+		sentences.join('').trim().length >= 120
+	)
+		return sentences.join('').trim();
+	return `${d
+		.slice(0, max - 1)
+		.replace(/\s+\S*$/, '')
+		.replace(/[,;:\s—-]+$/, '')}…`;
 };
 const metaTitle = fitTitle(te.seoTitle ?? post.seoTitle ?? title);
 const metaDescription = fitDescription(te.seoDescription ?? post.seoDescription);
@@ -278,6 +288,7 @@ const jsonLd = [
 			>
 			</div>
 		</div>
+		<YouVersionBanner />
 
 		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">

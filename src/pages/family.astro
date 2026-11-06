@@ -1,4 +1,5 @@
 ---
+import YouVersionBanner from '../components/YouVersionBanner.astro';
 // /family — the public hub for the Father's Heart Family community.
 //
 // Replaces the long "Family" dropdown in the global nav (which made the mobile
@@ -111,7 +112,7 @@ const jsonLd = {
 };
 ---
 
-<Layout
+<Layout youversionBanner={false}
 	title="Join the Father's Heart Family"
 	description="Connect with beloved sons and daughters around the world. Join the free Father's Heart Family — reader groups, intercessors, events, the world map, and more."
 	jsonLd={jsonLd}
@@ -124,6 +125,7 @@ const jsonLd = {
 				<a href={JOIN_URL} class="fam-join">Join the Family</a>
 				<p class="fam-free">Free to join — one tap, no password.</p>
 			</header>
+			<YouVersionBanner />
 
 			<section class="fam-why" aria-labelledby="fam-why-title">
 				<h2 id="fam-why-title">Why join? It's all free.</h2>
