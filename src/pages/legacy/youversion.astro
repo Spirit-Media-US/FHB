@@ -7,6 +7,9 @@ import Layout from '../../layouts/Layout.astro';
 // can track it ... added to our legacy page using the SM Gives Stripe form ... Keep it simple").
 // The YouVersion Connect "Giving Link" points here. /legacy itself stays a no-giving page
 // (Kevin 2026-10-13), so the form lives on this sub-page. noindex: a tracking URL, not a search page.
+// Trust line under the form (Kevin 2026-11-06 "2 YES: under giving form"): the YouVersion app icon links to
+// our bible.com partner page, which lists every FHB version.
+const YOUVERSION_URL = 'https://www.bible.com/organizations/89162c01-3892-4c7b-a462-239df0931522';
 ---
 
 <Layout
@@ -27,6 +30,10 @@ import Layout from '../../layouts/Layout.astro';
 					Your gift helps carry the Father&rsquo;s Heart Bible in Divine Voice&trade; Color to every language, so everyone can know Him as Father.
 				</p>
 				<DonationForm />
+				<a href={YOUVERSION_URL} target="_blank" rel="noopener" class="flex items-center gap-3 mt-6 no-underline" style="font-family: var(--font-sans); color: var(--color-ink);">
+					<img src="https://assets.spiritmediapublishing.com/FHB/partners/youversion-icon-96.webp" alt="YouVersion Bible App" width="48" height="48" loading="lazy" decoding="async" style="width: 48px; height: 48px; border-radius: 11px;" />
+					<span class="text-sm leading-snug">Bible Publisher on YouVersion. Read every Father&rsquo;s Heart Bible edition in the Bible App.</span>
+				</a>
 				<p class="text-sm mt-6" style="font-family: var(--font-sans); color: var(--color-muted);">
 					<a href="/legacy/" style="color: var(--color-brand);">Read our story</a>
 				</p>
