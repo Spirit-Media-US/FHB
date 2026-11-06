@@ -1,0 +1,36 @@
+---
+import DonationForm from '../../components/donations/DonationForm.astro';
+import Section from '../../components/Section.astro';
+import Layout from '../../layouts/Layout.astro';
+
+// YouVersion giving link (Kevin 2026-11-06: "a giving link with /youversion in the url so they
+// can track it ... added to our legacy page using the SM Gives Stripe form ... Keep it simple").
+// The YouVersion Connect "Giving Link" points here. /legacy itself stays a no-giving page
+// (Kevin 2026-10-13), so the form lives on this sub-page. noindex: a tracking URL, not a search page.
+---
+
+<Layout
+	title="Give | Father's Heart Bible"
+	description="Support the Father's Heart Bible in Divine Voice Color, sharing our Father with every language."
+	noindex={true}
+>
+	<main>
+		<Section variant="light">
+			<div class="max-w-xl mx-auto">
+				<p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">
+					Thank you for finding us on YouVersion
+				</p>
+				<h1 class="text-3xl md:text-4xl mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Share Our Father with the World
+				</h1>
+				<p class="leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Your gift helps carry the Father&rsquo;s Heart Bible in Divine Voice&trade; Color to every language, so everyone can know Him as Father.
+				</p>
+				<DonationForm />
+				<p class="text-sm mt-6" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<a href="/legacy/" style="color: var(--color-brand);">Read our story</a>
+				</p>
+			</div>
+		</Section>
+	</main>
+</Layout>
