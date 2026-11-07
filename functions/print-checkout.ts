@@ -47,9 +47,9 @@ const tierFor = (total: number) => TIERS.find((t) => total >= t.min) ?? null;
 const TAX_CODE = 'txcd_99999999';
 
 const COVER: Record<Color, string> = {
-	plum: 'https://assets.spiritmediapublishing.com/FHB/print/edition-plum.webp',
-	charcoal: 'https://assets.spiritmediapublishing.com/FHB/print/edition-charcoal.webp',
-	white: 'https://assets.spiritmediapublishing.com/FHB/print/edition-white.webp',
+	plum: 'https://assets.spiritmediapublishing.com/FHB/print/general-regular-plum-600.webp',
+	charcoal: 'https://assets.spiritmediapublishing.com/FHB/print/general-regular-charcoal-600.webp',
+	white: 'https://assets.spiritmediapublishing.com/FHB/print/general-regular-white-600.webp',
 };
 
 const BINDING_LABEL: Record<Binding, string> = { pb: 'Paperback', hb: 'Hardback' };
