@@ -1,4 +1,5 @@
 ---
+import YouVersionBanner from '../../components/YouVersionBanner.astro';
 // /bible-for — the "A Father For" hub. Sibling to /bible-in. Lists every live
 // group page as a card (from GROUPS) and the rest of the roadmap as an
 // "on the way" list (from UPCOMING_GROUPS). The URL is "bible-for" for SEO/AEO,
@@ -117,6 +118,7 @@ const sectionCards = (slugs: string[]) => slugs.map((s) => bySlug.get(s)).filter
 			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
 			<div class="absolute inset-x-0 bottom-0 z-30 h-1.5" style="background: linear-gradient(to right, var(--color-gold) 0%, var(--color-brand) 100%);" aria-hidden="true"></div>
 		</section>
+		<YouVersionBanner />
 
 		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">

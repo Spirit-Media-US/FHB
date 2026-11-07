@@ -11,6 +11,7 @@ import AuthorBio from './AuthorBio.astro';
 import FeatureChapter from './FeatureChapter.astro';
 import RelatedTopics from './RelatedTopics.astro';
 import ReviewLink from './ReviewLink.astro';
+import YouVersionBanner from './YouVersionBanner.astro';
 
 interface Verse {
 	ref: string;
@@ -243,6 +244,7 @@ const TOC = [
 			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={heroAlt} class="absolute inset-0 w-full h-full object-cover" style={`object-position: ${heroPosition};`} fetchpriority="high" decoding="async" />
 			<div class="absolute inset-x-0 top-0 z-10" style="height: 160px; background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0));"></div>
 		</section>
+		<YouVersionBanner />
 
 		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
 			<div class="mx-auto max-w-3xl">
