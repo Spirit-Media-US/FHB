@@ -94,13 +94,13 @@ export const GLOBAL_BIBLE_MONTH: GbmRow[] = [
 	{
 		date: '2026-11-14',
 		name: 'Odia',
-		code: null,
-		status: 'scheduled',
+		code: 'or',
+		status: 'readable',
 	},
 	{
 		date: '2026-11-15',
 		name: 'Pashto',
-		code: null,
+		code: 'ps',
 		status: 'scheduled',
 	},
 	{
