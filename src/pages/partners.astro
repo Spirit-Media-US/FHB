@@ -1,0 +1,113 @@
+---
+// /partners/ — the kit for Digital Bible Library licensees and other partners (Kevin 2026-11-07:
+// "how do we empower all DBL users with the same content we used in our youversion connection page
+// listing ... We MUST make this easy for our partners. Copyright with Links to FHB should be required.")
+// Description = the wording Kevin approved for the YouVersion page (2026-11-06). Copyright = the DBL
+// statement fhb-usx-export writes (bin/fhb-usx-export COPYRIGHT). Logos live on R2 (FHB/partners/).
+import MailtoLink from '../components/MailtoLink.astro';
+import Section from '../components/Section.astro';
+import readerLanguages from '../data/reader-languages.json';
+import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+
+const COPYRIGHT =
+	"Holy Bible, Father's Heart Bible™, copyright © 2026 by Spirit Media Publishing, the imprint of Spirit Media Inc. All rights reserved. https://fathersheartbible.com/";
+const CREDIT =
+	"Scripture quotations are taken from Father's Heart Bible™, copyright © 2026 by Spirit Media Publishing. Used by permission. All rights reserved. https://fathersheartbible.com/";
+const DESCRIPTION =
+	"Spirit Media Publishing publishes the Father's Heart Bible™ in Divine Voice™ Color, a complete Bible translation that reveals God as our Father. The words spoken by the Father appear in blue, the Son's words in red, and the Holy Spirit's in purple. Available in print in 25 editions and 80 languages at fathersheartbible.com.";
+
+const logos = [
+	{
+		label: 'Round mark (fits circle crops)',
+		src: 'https://assets.spiritmediapublishing.com/FHB/partners/fhb-logo-round-1024.jpg',
+		file: 'JPEG, 1024 × 1024',
+	},
+	{
+		label: 'Square mark',
+		src: 'https://assets.spiritmediapublishing.com/FHB/partners/fhb-logo-square-1024.png',
+		file: 'PNG, 1024 × 1024',
+	},
+	{ label: 'Logo', src: '/fhb-logo.png', file: 'PNG, 1024 × 1024, transparent' },
+];
+
+const languages = readerLanguages.languages.map((l) => ({
+	...l,
+	href: l.code === 'en' ? '/read/' : `/read/${l.code}/`,
+}));
+
+const box = 'background: var(--color-surface-lowest, #f5f0e8); border-radius: 8px;';
+---
+
+<Layout
+  title={fitTitle("Partner Kit | FHB — Father's Heart Bible™")}
+  description={fitDescription("Everything a Digital Bible Library licensee or partner needs to present Father's Heart Bible™: description, logos, required copyright notice with link, reader links in every language and contact details.")}
+  jsonLd={{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Partner Kit", "item": "https://fathersheartbible.com/partners/" }
+    ]
+  }}
+>
+  <main id="main-content" style="margin-top: 80px;">
+    <Section variant="soft">
+      <div class="max-w-3xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-light mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">Partner Kit</h1>
+        <p class="text-base mb-8 leading-relaxed" style="color: var(--color-ink); font-family: var(--font-sans);">
+          Thank you for carrying Father's Heart Bible™ to your readers. Everything you need to present it is on this page: copy the text, download the logos, and link each language to its own reader.
+        </p>
+
+        <div class="space-y-10" style="font-family: var(--font-sans); color: var(--color-muted);">
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Required copyright notice</h2>
+            <p class="leading-relaxed mb-3">Every display of the Father's Heart Bible™ text, in any language, must carry this notice with its link, for example under each chapter or on your about page for the version:</p>
+            <p class="leading-relaxed p-4" style={box}>{COPYRIGHT}</p>
+            <p class="leading-relaxed mt-4 mb-3">When you quote the text in another work, use this credit line:</p>
+            <p class="leading-relaxed p-4" style={box}>{CREDIT}</p>
+            <p class="leading-relaxed mt-3">Full terms are on our <a href="/copyright/" class="hover:underline" style="color: var(--color-brand);">Copyright &amp; Permissions</a> page.</p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Name and description</h2>
+            <p class="leading-relaxed mb-2"><strong style="color: var(--color-ink);">Name:</strong> Father's Heart Bible™ in Divine Voice™ Color (short form: FHB)</p>
+            <p class="leading-relaxed mb-2"><strong style="color: var(--color-ink);">Publisher:</strong> Spirit Media Publishing, the imprint of Spirit Media Inc.</p>
+            <p class="leading-relaxed p-4" style={box}>{DESCRIPTION}</p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Logos</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {logos.map((l) => (
+                <a href={l.src} download class="block text-center hover:underline" style="color: var(--color-brand);">
+                  <img src={l.src} alt={`Father's Heart Bible ${l.label}`} width="160" height="160" loading="lazy" decoding="async" class="mx-auto mb-2" style="width: 160px; height: 160px; object-fit: contain;" />
+                  <span class="block font-bold">{l.label}</span>
+                  <span class="block text-sm" style="color: var(--color-muted);">{l.file}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Website and reader links</h2>
+            <p class="leading-relaxed mb-3">Website: <a href="https://fathersheartbible.com/" class="hover:underline" style="color: var(--color-brand);">https://fathersheartbible.com/</a>. Link each language edition to its own free online reader:</p>
+            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-sm">
+              {languages.map((l) => (
+                <li><a href={l.href} class="hover:underline" style="color: var(--color-brand);">{l.name}{l.endonym && l.endonym !== l.name ? ` (${l.endonym})` : ''}</a> <code>https://fathersheartbible.com{l.href}</code></li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Contact</h2>
+            <p class="leading-relaxed">Spirit Media Publishing · <MailtoLink email="hello@spiritmediapublishing.com" class="hover:underline" style="color: var(--color-brand);">hello@spiritmediapublishing.com</MailtoLink> · <a href="tel:+18888003744" class="hover:underline" style="color: var(--color-brand);">+1 888 800 3744</a></p>
+            <p class="leading-relaxed mt-2">Licensing is through the <a href="https://library.bible" class="hover:underline" style="color: var(--color-brand);" rel="noopener">Digital Bible Library</a>. For permission beyond our quotation allowance, <MailtoLink email="publisher@spiritmediapublishing.com" class="hover:underline" style="color: var(--color-brand);">email the publisher</MailtoLink>.</p>
+          </div>
+
+        </div>
+      </div>
+    </Section>
+  </main>
+</Layout>
