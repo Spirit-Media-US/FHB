@@ -30,12 +30,19 @@ test("unknown code '?' never linked, even if public and 200", async () => {
 });
 test('already-readable row (Hausa, not yet DBL-public) is never regressed', async () => {
 	const ha = st({ public_day: '2026-11-01', name: 'Hausa', code: 'ha', public: false });
-	const { rows, flipped } = await buildRows([ha], { '2026-11-01': 'readable' }, no);
+	const { rows, flipped } = await buildRows([ha], { ha: 'readable' }, no);
 	assert.equal(rows[0].status, 'readable');
 	assert.equal(flipped.length, 0);
+});
+test('a readable row never makes another language on the SAME date readable (njo 2026-11-07)', async () => {
+	const nbc = st({ public_day: '2026-11-07', name: 'Chang Naga', code: 'nbc' });
+	const njo = st({ public_day: '2026-11-07', name: 'Ao Naga', code: 'njo', public: false });
+	const { rows } = await buildRows([nbc, njo], { nbc: 'readable' }, no);
+	assert.equal(rows[0].status, 'readable');
+	assert.equal(rows[1].status, 'scheduled');
 });
 test('render/parse round trip', async () => {
 	const { rows } = await buildRows([st({})], {}, yes);
 	const text = render('// h\n', rows);
-	assert.deepEqual(parseCommitted(text), { '2026-11-02': 'readable' });
+	assert.deepEqual(parseCommitted(text), { ny: 'readable' });
 });
