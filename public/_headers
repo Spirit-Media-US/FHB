@@ -48,3 +48,14 @@
 /icon-*
   Cache-Control: public, max-age=86400
 
+
+# pages.dev MIRROR = noindex (Kevin 2026-11-07 ASAP via pmseoaeo 13:52Z: AI engines cited
+# fathersheartbible.pages.dev). Host rules only, so fathersheartbible.com is untouched: the apex router
+# fetches marketing FROM fathersheartbible.pages.dev and resets this to "index, follow"
+# (bin/workers/fhb-apex-router apexRobots). The router must ship BEFORE this reaches main.
+https://fathersheartbible.pages.dev/*
+  ! X-Robots-Tag
+  X-Robots-Tag: noindex
+https://:sub.fathersheartbible.pages.dev/*
+  ! X-Robots-Tag
+  X-Robots-Tag: noindex
