@@ -19,7 +19,7 @@ export const FIRST_ORDER_FINE = 'Can’t be combined with other discounts. Best 
  *  only ever the final amount, in Stripe's option and nowhere on the page; delivery times are estimates. */
 export const EXPEDITED_LABEL = 'Expedited delivery';
 export const EXPEDITED_DISCLAIMER =
-	'Expedited delivery: your order is printed and dispatched faster, with faster shipping where available. Delivery dates are estimates provided by our printer and carriers and are not guaranteed.';
+	"Expedited delivery: your order is printed and dispatched sooner, with faster shipping where available. Delivery dates are estimates from our printer and carriers and can't be guaranteed, as delays outside our control can occur.";
 
 export interface Tier {
 	min: number;
@@ -57,6 +57,8 @@ export function quote(
 	 * so it rounds per unit instead of once on the subtotal.
 	 */
 	firstPerUnit = false,
+	/** false until the buyer's email is known to belong to a first order: never show a total the buyer will not pay (no-drip rule) */
+	firstAvailable = true,
 ): Quote {
 	const copies = lines.reduce((s, l) => s + l.qty * (l.books ?? 1), 0);
 	const subtotal = lines.reduce((s, l) => s + l.cents * l.qty, 0);
@@ -67,7 +69,13 @@ export function quote(
 		? lines.reduce((s, l) => s + unitAfter(l.cents, FIRST_ORDER_PCT) * l.qty, 0)
 		: subtotal - Math.round((subtotal * FIRST_ORDER_PCT) / 100);
 	const best =
-		copies < 1 ? 'none' : FIRST_ORDER_PCT > bulkPct ? 'first' : bulkPct > 0 ? 'bulk' : 'none';
+		copies < 1
+			? 'none'
+			: firstAvailable && FIRST_ORDER_PCT > bulkPct
+				? 'first'
+				: bulkPct > 0
+					? 'bulk'
+					: 'none';
 	return { copies, subtotal, bulkPct, bulkTotal, firstTotal, best };
 }
 

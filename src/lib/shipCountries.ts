@@ -242,8 +242,18 @@ const detail = (
 	},
 });
 /** The default (free standard) detail for one country. */
-export const offerShippingDetails = (c: ShipCountry) =>
-	detail(c, 'Standard', c.shippingRate.value, c.handlingDays, c.transitDays);
+export const offerShippingDetails = (c: ShipCountry, handlingCents = 0) =>
+	detail(
+		c,
+		'Standard',
+		// The per-copy International handling fee at LIST price is part of what Google sees as the
+		// shipping rate (Kevin 2026-11-08, PM ruling); unchanged where list price already clears the floor.
+		handlingCents > 0
+			? ((cents(c.shippingRate.value) + handlingCents) / 100).toFixed(2)
+			: c.shippingRate.value,
+		c.handlingDays,
+		c.transitDays,
+	);
 /**
  * Every OfferShippingDetails for one country: the free standard rate only. The paid expedited option
  * is a checkout-time choice priced per order; its price (and anything behind it) never goes into the

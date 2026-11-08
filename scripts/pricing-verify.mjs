@@ -42,6 +42,7 @@ import { execSync } from 'node:child_process';
  * gate that has never rejected anything is unproven.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { handlingFeeCents } from '../src/lib/marginGuard.ts';
 import { LIVE_COUNTRIES } from '../src/lib/shipCountries.ts';
 
 const ISBNS = '/home/deploy/projects/fhb-print-bible/editions/ISBNS.json';
@@ -575,7 +576,12 @@ function merchantErrs(pages, srv) {
 			// country's configured rate; nothing else (unit 2js).
 			const shs = [].concat(o.shippingDetails ?? []);
 			const got = shs.map((x) => `${x?.shippingDestination?.addressCountry}:${x?.shippingRate?.value}`).sort().join(',');
-			const want = LIVE_COUNTRIES.map((c) => `${c.code}:${c.shippingRate.value}`).sort().join(',');
+			// The rate Google sees = free standard + that country's handling fee at LIST price (the fee a buyer
+			// without the first-order discount is charged), so it never differs from checkout (2kj).
+			const want = LIVE_COUNTRIES.map((c) => {
+				const fee = sv ? handlingFeeCents(o.sku, sv.cents, c) : 0;
+				return `${c.code}:${fee > 0 ? ((Math.round(Number(c.shippingRate.value) * 100) + fee) / 100).toFixed(2) : c.shippingRate.value}`;
+			}).sort().join(',');
 			if (got !== want)
 				errs.push(`${tag}: shipping must match the live ship-country list (${want}), page says ${got || 'none'}`);
 			if (!p.name || !p.image) errs.push(`${tag}: Product needs name and image`);

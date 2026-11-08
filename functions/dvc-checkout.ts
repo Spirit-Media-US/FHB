@@ -1343,11 +1343,28 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		returnPath?: string;
 		email?: string;
 		country?: string;
+		/** the order form asks: is this email a first order? (no session is created) */
+		firstOrderCheck?: boolean;
 	};
 	try {
 		payload = await request.json();
 	} catch {
 		return json({ error: 'bad_request' }, 400);
+	}
+
+	// The order form asks before checkout whether this email gets WELCOME15, so the total it shows is
+	// the total the buyer will pay (no understated totals). Same check checkout itself uses; fails
+	// to "not first", never to a discount. Answers only yes/no, and creates nothing.
+	if (payload.firstOrderCheck) {
+		const em = String(payload.email ?? '').trim();
+		const noStore = { 'content-type': 'application/json', 'cache-control': 'no-store' };
+		const answer = (first: boolean) =>
+			new Response(JSON.stringify({ first }), { headers: noStore });
+		if (!env.STRIPE_FHB_SECRET_KEY || em.length > 254 || !EMAIL_RE.test(em)) return answer(false);
+		const first =
+			(await isFirstOrder(em, env.STRIPE_FHB_SECRET_KEY)) &&
+			(await firstOrderPromo(env.STRIPE_FHB_SECRET_KEY)) !== null;
+		return answer(first);
 	}
 
 	const counts: Record<string, number> = {};

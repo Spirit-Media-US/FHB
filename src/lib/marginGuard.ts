@@ -23,7 +23,7 @@
 // exercises them (with injected rows, because pending countries are never read by checkout).
 import raw from '../data/ship-countries.json' with { type: 'json' };
 import { bindingFor, type IntlRow, unitAfter, volumesFor } from './order-pricing.ts';
-import { LIVE_COUNTRIES, type ShipCountry } from './shipCountries.ts';
+import { LIVE_COUNTRIES, offerShippingDetails, type ShipCountry } from './shipCountries.ts';
 
 export { bindingFor, volumesFor };
 
@@ -172,4 +172,24 @@ export function marginCheck(
 			worst,
 		};
 	return { ok: true, reason: '', worst };
+}
+
+/**
+ * OfferShippingDetails for ONE offer (a SKU at its list price): per live country, the free standard
+ * rate PLUS that country's handling fee at LIST price, so what Google sees equals what checkout
+ * charges a buyer without the first-order discount. Zero where list price already clears the floor
+ * (all of today's price points). Expedited stays out of structured data. `item` absent = no
+ * per-copy fee (an aggregate offer that spans SKUs).
+ */
+export function shippingDetailsFor(
+	item?: { slug: string; listUsd: number },
+	countries: readonly ShipCountry[] = LIVE_COUNTRIES,
+) {
+	const l = countries.map((c) =>
+		offerShippingDetails(
+			c,
+			item ? handlingFeeCents(item.slug, Math.round(item.listUsd * 100), c) : 0,
+		),
+	);
+	return l.length === 1 ? l[0] : l;
 }

@@ -119,7 +119,7 @@ test('dist: Merchant feed ships to exactly the live list, per item', () => {
 	for (const [, body] of items) {
 		const cs = [...body.matchAll(/<g:shipping><g:country>([A-Z]{2})<\/g:country><g:service>([^<]*)<\/g:service><g:price>([\d.]+) ([A-Z]{3})<\/g:price>/g)];
 		assert.deepEqual([...new Set(cs.map((m) => m[1]))].sort(), [...SHIP_CODES].sort(), 'feed countries != live list');
-		for (const m of cs.filter((x) => x[2] === 'Standard')) assert.equal(m[3], Number(countryFor(m[1]).shippingRate.value).toFixed(2));
+		for (const m of cs.filter((x) => x[2] === 'Standard')) assert.ok(Number(m[3]) >= Number(countryFor(m[1]).shippingRate.value), 'Standard = free rate + handling at list price (never below the base rate)');
 		for (const code of SHIP_CODES) assert.equal(cs.filter((m) => m[1] === code && m[2] === 'Standard').length, 1, `${code} needs exactly one Standard feed row`);
 	}
 	for (const code of pendingCodes) assert.ok(!new RegExp(`<g:country>${code}</g:country>`).test(feed), `${code} leaked into feed`);

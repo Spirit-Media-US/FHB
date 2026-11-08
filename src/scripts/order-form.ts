@@ -29,6 +29,8 @@ interface Config {
 	intl?: Record<string, IntlRow>;
 }
 
+const UNKNOWN_OFFER = `First order? ${FIRST_ORDER_PCT}% off at checkout.`;
+
 const money = (cents: number) =>
 	`$${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -200,16 +202,25 @@ function init(root: HTMLElement) {
 					: '';
 		}
 	}
+	// FIRST-ORDER STATE (no understated totals): 'unknown' until an email is entered and the server
+	// confirms; only 'first' counts the 15%. Before that the total is list price + fee, and the form
+	// says "First order? 15% off at checkout." A repeat buyer sees no offer at all.
+	let firstState: 'unknown' | 'first' | 'repeat' = 'unknown';
+	function paintOffer() {
+		for (const el of qa('[data-offer]')) el.hidden = firstState === 'repeat';
+		set('[data-offer-label]', firstState === 'first' ? FIRST_ORDER_LABEL : UNKNOWN_OFFER);
+	}
 	function render() {
 		// 1A: the first-order 15% is offered everywhere. Outside the US it comes off each unit
 		// (the server does the same), so it rounds per unit.
 		const { code, row } = countryRow();
-		const r = quote(lines(), cfg.tiers, code !== 'US');
+		const r = quote(lines(), cfg.tiers, code !== 'US', firstState === 'first');
 		const base = r.best === 'first' ? r.firstTotal : r.bulkTotal;
 		const appliedPct = r.best === 'first' ? FIRST_ORDER_PCT : r.best === 'bulk' ? r.bulkPct : 0;
 		const h = handlingFor(lines(), appliedPct, row);
 		const total = base + h.total;
 		paintFees();
+		paintOffer();
 		for (const n of qa('[data-expedited-note]')) n.hidden = !row;
 		for (const d of qa('[data-sum-fee]')) d.hidden = h.total <= 0;
 		set('[data-sum-fee-label]', row ? `${row.label} (${row.name})` : '');
@@ -235,6 +246,41 @@ function init(root: HTMLElement) {
 	// ── checkout ──
 	const email = q<HTMLInputElement>('[data-email]');
 	const msg = q('[data-msg]');
+	// Ask the server (the same check checkout uses) once the email looks valid; any failure leaves
+	// the total at list price, which can only be higher than what is charged, never lower.
+	let askId = 0;
+	let askTimer: number | undefined;
+	async function askFirst() {
+		const id = ++askId;
+		if (!email || !email.value.trim() || !email.checkValidity()) return;
+		try {
+			const res = await fetch('/dvc-checkout', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ firstOrderCheck: true, email: email.value.trim() }),
+			});
+			const d = (await res.json()) as { first?: boolean };
+			if (id !== askId) return;
+			firstState = d.first === true ? 'first' : 'repeat';
+		} catch {
+			if (id !== askId) return;
+			firstState = 'unknown';
+		}
+		render();
+	}
+	email?.addEventListener('input', () => {
+		askId++;
+		window.clearTimeout(askTimer);
+		if (firstState !== 'unknown') {
+			firstState = 'unknown';
+			render();
+		}
+		askTimer = window.setTimeout(askFirst, 600);
+	});
+	email?.addEventListener('change', () => {
+		window.clearTimeout(askTimer);
+		askFirst();
+	});
 	const say = (t: string) => {
 		if (msg) {
 			msg.textContent = t;

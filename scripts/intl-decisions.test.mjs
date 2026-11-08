@@ -97,7 +97,7 @@ test('EXPEDITED: faster tracked shipping where a sane method exists, otherwise f
 		const f = checkoutShippingForm(c.code, 1, wave);
 		assert.doesNotMatch(JSON.stringify(f), /2 days|1-2 business|instead of 5-10|guarantee(?!d)/i);
 	}
-	assert.match(EXPEDITED_DISCLAIMER, /estimates provided by our printer and carriers and are not guaranteed\.$/);
+	assert.equal(EXPEDITED_DISCLAIMER, "Expedited delivery: your order is printed and dispatched sooner, with faster shipping where available. Delivery dates are estimates from our printer and carriers and can't be guaranteed, as delays outside our control can occur.");
 });
 
 test('JSON-LD carries the free standard rate only: the expedited option and its price stay out of structured data', () => {

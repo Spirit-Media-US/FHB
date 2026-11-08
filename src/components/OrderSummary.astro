@@ -2,7 +2,7 @@
 import {
 	EXPEDITED_DISCLAIMER,
 	FIRST_ORDER_FINE,
-	FIRST_ORDER_LABEL,
+	FIRST_ORDER_PCT,
 	type Tier,
 } from '../lib/order-pricing';
 /* THE ORDER SUMMARY every print order form ends in (Kevin 2026-10-03): copies, subtotal, the
@@ -25,14 +25,14 @@ const { tiers, idp } = Astro.props;
 // into `import type` (a production ReferenceError). Keep these lines.
 const multiCountry = LIVE_COUNTRIES.length > 1;
 const shipNote = allFreeShipping() ? 'Free standard shipping' : 'Shipping added at checkout';
-const offerLabel = FIRST_ORDER_LABEL;
+const offerLabel = `First order? ${FIRST_ORDER_PCT}% off at checkout.`;
 const offerFine = FIRST_ORDER_FINE;
 const expeditedNote = EXPEDITED_DISCLAIMER;
 const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min);
 ---
 <div class="osum" data-summary>
-	<p class="osum__offer" data-offer>{offerLabel}</p>
-	<p class="osum__fine" data-offer>{offerFine}</p>
+	<p class="osum__offer" data-offer data-offer-label>{offerLabel}</p>
+	<p class="osum__fine" data-offer data-offer-fine>{offerFine}</p>
 	<p class="osum__tiers">
 		<span>Volume:</span>
 		{ladder.map((t) => <span class="osum__tier" data-tier={t.pct}>{t.pct}% off {t.min}+</span>)}
