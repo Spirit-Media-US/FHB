@@ -10,6 +10,13 @@ export interface ShipCountry {
 	shippingRate: { value: string; currency: string };
 	handlingDays: [number, number];
 	transitDays: [number, number];
+	/** Landed Ingram cost per copy (USD, tracked + duty-paid). Absent on US (free shipping baked in). */
+	landed_cost_usd?: LandedCost;
+}
+export interface LandedCost {
+	hc: number;
+	pb: number;
+	basis: 'MEASURED' | 'ZONE_MAX';
 }
 export interface PendingCountry {
 	status: 'PENDING';
@@ -26,6 +33,7 @@ export interface PendingCountry {
 	ingram_cost_hc?: Record<string, unknown> | null;
 	ingram_cost_pb?: Record<string, unknown> | null;
 	ingram_cost_status?: 'MEASURED' | 'UNMEASURED';
+	landed_cost_usd?: LandedCost;
 	note?: string;
 }
 

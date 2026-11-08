@@ -19,13 +19,15 @@
 // NB: path is /dvc-checkout, not /api/* — the apex router proxies /api/* to the community
 // app, so this marketing function must live off that prefix.
 
+import { marginCheck } from '../src/lib/marginGuard.ts';
 import {
 	FIRST_ORDER_CODE,
 	FIRST_ORDER_PCT,
 	MAX_LINE_ITEMS,
 	packBreakdown,
 	unitAfter,
-} from '../src/lib/order-pricing';
+} from '../src/lib/order-pricing.ts';
+import { checkoutShippingForm } from '../src/lib/shipCountries.ts';
 
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
@@ -1383,15 +1385,29 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	// larger AND this email has never paid before. Tie or larger tier → the tier, no lookup.
 	const email = String(payload.email ?? '').trim();
 	const validEmail = email.length <= 254 && EMAIL_RE.test(email);
+	// MARGIN FLOOR (unit 2jz): a discount that would take net per copy under MIN_NET_USD for this
+	// destination is dropped, never the sale. US is outside the guard (unchanged).
+	const destCode = String(payload.country ?? 'US').toUpperCase();
+	const lines = Object.entries(counts)
+		.filter(([, n]) => n > 0)
+		.map(([slug]) => ({ slug, retail: EDITIONS[slug].retail }));
 	let promo: string | null = null;
-	if (
-		validEmail &&
-		FIRST_ORDER_PCT > tier.pct &&
-		(await isFirstOrder(email, env.STRIPE_FHB_SECRET_KEY))
-	) {
-		promo = await firstOrderPromo(env.STRIPE_FHB_SECRET_KEY);
+	if (validEmail && FIRST_ORDER_PCT > tier.pct) {
+		const m = marginCheck(lines, FIRST_ORDER_PCT, destCode);
+		if (!m.ok) {
+			console.log(`margin-guard: dropped ${FIRST_ORDER_CODE}: ${m.reason}`);
+		} else if (await isFirstOrder(email, env.STRIPE_FHB_SECRET_KEY)) {
+			promo = await firstOrderPromo(env.STRIPE_FHB_SECRET_KEY);
+		}
 	}
-	const pct = promo ? 0 : tier.pct;
+	let pct = promo ? 0 : tier.pct;
+	if (!promo && pct > 0) {
+		const m = marginCheck(lines, pct, destCode);
+		if (!m.ok) {
+			console.log(`margin-guard: dropped ${pct}% volume tier: ${m.reason}`);
+			pct = 0;
+		}
+	}
 
 	// Destination: defaults to US (every form before international shipping). A country that is not
 	// in the LIVE list (pending, unknown, malformed) is refused, never passed to Stripe.
