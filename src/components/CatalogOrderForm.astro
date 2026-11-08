@@ -18,6 +18,7 @@
 import { CATALOG_CATEGORIES, catalogPrices, catalogRows } from '../data/print-catalog';
 import { PRINT_TIERS } from '../data/print-tiers';
 import { shipsLine, shipsToSentence } from '../lib/shipCountries';
+import FarBandNote from './FarBandNote.astro';
 import OrderRow from './OrderRow.astro';
 import OrderSummary from './OrderSummary.astro';
 
@@ -47,6 +48,7 @@ const config = JSON.stringify({
 <div class="cat__form" data-order={config}>
 	<div class="cat__grid">
 		<div class="cat__list">
+			<FarBandNote />
 			<label class="cat__search-label" for={`${idp}-search`}>Find an edition</label>
 			<input id={`${idp}-search`} class="cat__search" type="search" placeholder="Spanish, Nurses, Large Print…" autocomplete="off" enterkeyhint="search" data-search />
 			<p class="cat__search-msg" data-search-msg aria-live="polite"></p>

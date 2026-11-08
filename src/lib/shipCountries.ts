@@ -19,6 +19,8 @@ export interface ShipCountry {
 }
 export interface FastOption {
 	label: string;
+	/** Full buyer-facing name at checkout; defaults to "<label>: dispatches in a-b business days". */
+	displayName?: string;
 	/** OUR extra cost per copy, USD (rush print delta + faster tracked duty-paid method delta). */
 	extra_usd: number;
 	handlingDays: [number, number];
@@ -199,7 +201,8 @@ export function checkoutShippingForm(
 		...(c.fast
 			? opt(
 					1,
-					`${c.fast.label}: dispatches in ${bd(c.fast.handlingDays)} business days`,
+					c.fast.displayName ??
+						`${c.fast.label}: dispatches in ${bd(c.fast.handlingDays)} business days`,
 					fastPriceCents(c.fast.extra_usd, copies),
 					c.fast.handlingDays,
 					c.fast.transitDays,

@@ -56,13 +56,13 @@ test('3A: free standard is option 0 (default) and Adaptive Pricing is on, in eve
 
 test('3A: faster option present exactly where the route has one, after the free one, with honest estimates', () => {
 	const withFast = new Set(wave.filter((c) => c.fast).map((c) => c.code));
-	assert.deepEqual([...withFast].sort(), ['AU', 'CA', 'DE', 'ES', 'FR', 'GB']);
+	assert.deepEqual([...withFast].sort(), [...WAVE].sort(), 'every wave country now has a faster option');
 	for (const c of wave) {
 		const f = checkoutShippingForm(c.code, 1, wave);
 		assert.equal(f[key(1, '[type]')] !== undefined, withFast.has(c.code), c.code);
 		assert.equal(Object.keys(f).filter((k) => /^shipping_options\[2\]/.test(k)).length, 0);
 		if (!c.fast) continue;
-		assert.match(f[key(1, '[display_name]')], /^Faster delivery/);
+		assert.match(f[key(1, '[display_name]')], c.fast.label === 'Priority printing' ? /^Priority printing/ : /^Faster delivery/);
 		assert.equal(f[key(1, '[fixed_amount][amount]')], fastPriceCents(c.fast.extra_usd, 1));
 		// dispatch 1-2 vs 5-10 business days, transit added on top, and faster must really be faster
 		assert.ok(f[key(1, '[delivery_estimate][maximum][value]')] < f[key(0, '[delivery_estimate][maximum][value]')], `${c.code} fast max < standard max`);
@@ -82,13 +82,35 @@ test('3A: JSON-LD carries both options per country, the free one first', () => {
 		assert.equal(mine[0].shippingRate.value, '0');
 		assert.equal(mine[0].name, 'Standard');
 		if (c.fast) {
-			assert.equal(mine[1].name, 'Faster delivery');
+			assert.equal(mine[1].name, c.fast.label);
 			assert.equal(mine[1].shippingRate.value, (fastPriceCents(c.fast.extra_usd, 1) / 100).toFixed(2));
 			assert.deepEqual([mine[1].deliveryTime.handlingTime.minValue, mine[1].deliveryTime.handlingTime.maxValue], c.fast.handlingDays);
 		}
 	}
 	// committed state stays a single object, as before
 	assert.equal(Array.isArray(shippingDetailsForOffers(live([]))), false);
+});
+
+test('priority printing (rush print only): MX, other Americas and far band; honest label; transit unchanged', () => {
+	const PRINT_ONLY = ['MX', 'PH', 'IN', 'NG', 'AE'];
+	const w = live([...WAVE, 'BR', 'EG', 'ZA']); // NZ already in WAVE
+	const want = 'Priority printing \u2014 ships in 1-2 business days instead of 5-10; delivery time otherwise the same.';
+	for (const code of [...PRINT_ONLY, 'NZ', 'BR', 'EG', 'ZA']) {
+		const c = w.find((x) => x.code === code);
+		assert.equal(c.fast.label, 'Priority printing', code);
+		assert.equal(c.fast.extra_usd, 9.9);
+		const f = checkoutShippingForm(code, 1, w);
+		assert.equal(f[key(1, '[display_name]')], want);
+		assert.ok(f[key(1, '[display_name]')].length <= 100, 'Stripe display_name cap');
+		assert.equal(f[key(1, '[fixed_amount][amount]')], 1299, `${code} $12.99 for one copy`);
+		// transit identical, dispatch 1-2 vs 5-10
+		assert.deepEqual(c.fast.transitDays, c.transitDays, `${code} transit unchanged`);
+		assert.deepEqual(c.fast.handlingDays, [1, 2]);
+		assert.deepEqual(c.handlingDays, [5, 10]);
+	}
+	assert.ok(fastPriceCents(9.9, 3) > 1299, 'scales per volume');
+	// routes with a real faster shipping method keep the Faster delivery label
+	for (const code of ['GB', 'DE', 'ES', 'CA', 'AU', 'FR']) assert.equal(wave.find((x) => x.code === code).fast.label, 'Faster delivery', code);
 });
 
 test('faster price: extra x 1.15 + Stripe fee, rounded UP to .99, scales with copies; fixed table', () => {
@@ -146,4 +168,30 @@ test('2A: the first-order offer is neither counted nor shown when firstOffered=f
 	const q = quote(lines, [{ min: 5, pct: 10 }], false);
 	assert.equal(q.best, 'none');
 	assert.equal(quote([{ cents: 9999, qty: 5 }], [{ min: 5, pct: 10 }], false).best, 'bulk');
+});
+
+// ---- far-band eBook/reader line (Kevin 2026-11-08 "1 A") ----
+import fs from 'node:fs';
+import { FAR_NOTE_READ_HREF, FAR_NOTE_EBOOK_HREF, FAR_NOTE_EBOOK_PRICE, farNoteText } from '../src/lib/farBandNote.ts';
+
+test('far-band note: exact copy, existing links, price matches the eBook section, house voice', () => {
+	assert.equal(farNoteText(), 'Read it free online now, or get the eBook for $7.49 — instant, no shipping.');
+	const print = fs.readFileSync('src/pages/print.astro', 'utf8');
+	assert.match(print, new RegExp(`EBOOK_DIRECT = '\\${FAR_NOTE_EBOOK_PRICE}'`), 'price equals the eBook direct price on /print');
+	assert.match(print, /id="ebook"/, 'the link target exists');
+	assert.match(print, /fetch\('\/ebook-checkout'/, 'that section buys through /ebook-checkout');
+	assert.equal(FAR_NOTE_EBOOK_HREF, '/print/#ebook');
+	assert.equal(FAR_NOTE_READ_HREF, '/read/');
+	assert.match(print, /const READ_URL = '\/read\/'/);
+	const src = fs.readFileSync('src/lib/farBandNote.ts', 'utf8').split('\n').filter((l) => !l.trim().startsWith('//')).join('\n') + fs.readFileSync('src/components/FarBandNote.astro', 'utf8');
+	assert.doesNotMatch(src, /amazon|kindle|amzn/i);
+	assert.doesNotMatch(farNoteText(), /\bGod\b/);
+});
+test('far-band note: wired to the form, shown only for far band, in both order forms', () => {
+	const js = fs.readFileSync('src/scripts/order-form.ts', 'utf8');
+	assert.match(js, /\[data-far-note\]'\)\) o\.hidden = !far/);
+	for (const f of ['src/components/CatalogOrderForm.astro', 'src/components/EditionOrder.astro']) assert.match(fs.readFileSync(f, 'utf8'), /<FarBandNote \/>/, f);
+	// same print price: the checkout never changes a unit price by country (list price + shipping lines only)
+	const d = fs.readFileSync('functions/dvc-checkout.ts', 'utf8');
+	assert.doesNotMatch(d, /unit_amount\]'\] = [^;]*(country|destCode|farBand)/);
 });

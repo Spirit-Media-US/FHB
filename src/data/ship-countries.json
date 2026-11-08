@@ -38,7 +38,7 @@
 		"exceptCodes": ["AU"]
 	},
 	"deliveryRoutes": {
-		"_readme": "Delivery model per route. A pending row names its route. handlingDays = Ingram dispatch in business days (measured: economy 5 paperback / 10 hardcover, rush 1 / 2). transitDays = carrier transit in business days, an ESTIMATE from conservative published carrier ranges (Ingram's calculator shows dispatch only; transit is UNMEASURED). fast = the optional buyer-paid 'Faster delivery' option: extra_usd is OUR extra cost per copy = (rush print - economy print) + (fastest reasonable tracked duty-paid method - the free method), USD at the fx above, rounded UP to the cent. Its price is computed in src/lib/shipCountries.ts (fastPriceCents) as extra x 1.15 plus the Stripe fee on it, rounded up to a .99 price point, and scales with copies. fast=null means no faster tracked duty-paid method that is sane (or no sane cost basis), so the option is NOT offered; the evidence file carries the dispatch-only alternative price for Kevin. Full table + sources: /home/deploy/aeo-state/fhb-intl-decisions-2kd-20261108.json.",
+		"_readme": "Delivery model per route. A pending row names its route. handlingDays = Ingram dispatch in business days (measured: economy 5 paperback / 10 hardcover, rush 1 / 2). transitDays = carrier transit in business days, an ESTIMATE from conservative published carrier ranges (Ingram's calculator shows dispatch only; transit is UNMEASURED). fast = the optional buyer-paid 'Faster delivery' option: extra_usd is OUR extra cost per copy = (rush print - economy print) + (fastest reasonable tracked duty-paid method - the free method), USD at the fx above, rounded UP to the cent. Its price is computed in src/lib/shipCountries.ts (fastPriceCents) as extra x 1.15 plus the Stripe fee on it, rounded up to a .99 price point, and scales with copies. fast=null means the option is NOT offered. Where no sane faster tracked duty-paid method exists the option is rush PRINT only (label 'Priority printing', extra = rush print delta, transit unchanged). Full table + sources: /home/deploy/aeo-state/fhb-intl-decisions-2kd-20261108.json.",
 		"GB": {
 			"handlingDays": [5, 10],
 			"transitDays": [2, 5],
@@ -121,15 +121,31 @@
 			"handlingDays": [5, 10],
 			"transitDays": [6, 12],
 			"transitBasis": "ESTIMATE: USPS Global Priority Mail DDP 6-10 business days, +2",
-			"fast": null,
-			"fastSkippedReason": "US-site route: the only faster method is International Premium at $233-$417 (absurd); UK site offers DAP only (buyer pays duty), so no duty-paid faster method"
+			"fast": {
+				"label": "Priority printing",
+				"displayName": "Priority printing — ships in 1-2 business days instead of 5-10; delivery time otherwise the same.",
+				"extra_usd": 9.9,
+				"handlingDays": [1, 2],
+				"transitDays": [6, 12],
+				"basis": "MEASURED rush print only (US site USD: rush 42.89 vs economy 32.99 = +9.90, hardcover); shipping method unchanged (Global Priority DDP), so transit is the same as standard; no sane faster method exists",
+				"source": "/home/deploy/aeo-state/fhb-ingram-shipto-20261108.json"
+			},
+			"fastNote": "No sane faster shipping method (International Premium $233-$417 is absurd; UK site is DAP only), so the option is rush PRINT only (dispatch 1-2 instead of 5-10 business days); delivery time otherwise the same"
 		},
 		"FAR": {
 			"handlingDays": [5, 10],
 			"transitDays": [7, 14],
 			"transitBasis": "ESTIMATE: USPS Global Priority Mail DDP 6-10 business days (longer in far zones), +4",
-			"fast": null,
-			"fastSkippedReason": "US-site route: the only faster method is International Premium at $340-$619 (absurd); UK site offers DAP only (buyer pays duty)"
+			"fast": {
+				"label": "Priority printing",
+				"displayName": "Priority printing — ships in 1-2 business days instead of 5-10; delivery time otherwise the same.",
+				"extra_usd": 9.9,
+				"handlingDays": [1, 2],
+				"transitDays": [7, 14],
+				"basis": "MEASURED rush print only (US site USD: rush 42.89 vs economy 32.99 = +9.90, hardcover); shipping method unchanged, so transit is the same as standard; no sane faster method exists",
+				"source": "/home/deploy/aeo-state/fhb-ingram-shipto-20261108.json"
+			},
+			"fastNote": "No sane faster shipping method (International Premium $340-$619 is absurd; UK site is DAP only), so the option is rush PRINT only (dispatch 1-2 instead of 5-10 business days); delivery time otherwise the same"
 		}
 	},
 	"pending": [
