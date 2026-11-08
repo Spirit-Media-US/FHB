@@ -4,6 +4,7 @@ import path from 'node:path';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
+import { sitemapLinksFor } from './src/lib/bibles-hreflang-fs.mjs';
 
 const SITE = 'https://fathersheartbible.com';
 
@@ -127,6 +128,9 @@ export default defineConfig({
 				const lastmod = lastmodFor(url);
 				if (lastmod) item = { ...item, lastmod };
 				else delete item.lastmod;
+				// 2jx: xhtml:link hreflang alternates for the language-edition product pages (same source as the head).
+				const links = sitemapLinksFor(url);
+				if (links) item = { ...item, links };
 				// Homepage — highest priority
 				if (url.endsWith('.com/') || url.endsWith('.com')) {
 					return { ...item, changefreq: 'weekly', priority: 1.0 };

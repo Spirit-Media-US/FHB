@@ -31,6 +31,7 @@ import youversion from '../../data/youversion-versions.json';
 //   src/data/editions/frontmatter.json — extracted from the shipping interiors: the audience
 //                                     page and the three pillar pages. Read, never retyped.
 import Layout from '../../layouts/Layout.astro';
+import { alternatesFrom, bcp47 } from '../../lib/bibles-hreflang.mjs';
 import { FHB_ORG_ID } from '../../lib/fhb-org';
 import { merchantReturnPolicy, shippingDestination } from '../../lib/merchantReturnPolicy';
 import { fitDescription, fitTitle } from '../../lib/seoFit';
@@ -120,10 +121,16 @@ export async function getStaticPaths() {
 		.filter(([path]) => /\/[a-z0-9-]+\.json$/.test(path))
 		.map(([, mod]) => mod.default)
 		.filter((e) => e && typeof e.slug === 'string' && e.listing && e.hook);
-	return editions.map((ed) => ({ params: { slug: `${ed.slug}-bible` }, props: { ed } }));
+	return editions.map((ed) => ({
+		params: { slug: `${ed.slug}-bible` },
+		props: { ed, alternates: alternatesFrom(editions, ed.slug) },
+	}));
 }
 
-const { ed } = Astro.props as { ed: Edition };
+const { ed, alternates } = Astro.props as {
+	ed: Edition;
+	alternates: { hreflang: string; href: string }[];
+};
 
 const fm = (frontmatter as Record<string, { pages?: number; pillars?: Pillar[] }>)[
 	ed.frontmatterKey ?? FM_ALIAS[ed.slug] ?? ed.slug
@@ -218,12 +225,7 @@ const englishSchemaName = ed.title === ed.name ? `Father’s Heart Bible — ${e
 const nativeMeta = isLang && ed.seo?.native === true && !!ed.lang;
 const schemaName = nativeMeta ? ed.name : englishSchemaName;
 // BCP-47 casing for schema.org inLanguage (zh-hans -> zh-Hans); en for non-language editions.
-const inLang = ed.lang
-	? ed.lang.replace(
-			/-(\w+)$/,
-			(_m, r) => '-' + (r.length === 4 ? r[0].toUpperCase() + r.slice(1) : r.toUpperCase()),
-		)
-	: 'en';
+const inLang = ed.lang ? bcp47(ed.lang) : 'en';
 
 // "Also known as" is a READER-FACING list, not the keyword field (Kevin 2026-09-18). The
 // sheet's 500-byte Ingram line opens with fhb;fhb bible;father's heart bible fhb — correct
@@ -471,6 +473,8 @@ const faqSchema = {
 
 <Layout
 	pageType="book"
+	alternates={alternates}
+	ogAlternates={false}
 	ogLang={nativeMeta ? ed.lang : undefined}
 	bookIsbn={ed.isbn || undefined}
 	bookReleaseDate={datePublished}
