@@ -298,7 +298,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 				'Your Father’s Heart Bible eBook',
 				`Thank you — your eBook is ready.\n\n` +
 					`Download it here (the link stays valid, so keep this email):\n${link}\n\n` +
-					`It's a DRM-free EPUB — open it in Apple Books, Google Play Books, Kindle,\n` +
+					`It's a DRM-free EPUB — open it in Apple Books, Google Play Books,\n` +
 					`or any reader. Total paid: ${amount}\n\n` +
 					`Order reference: ${s.id ?? '?'}\n\n` +
 					`Trouble opening it? Just reply to this email.\n\nSpirit Media Publishing\n`,

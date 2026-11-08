@@ -47,7 +47,7 @@ interface FormatRow {
 	stores: Record<string, StoreCell | null>;
 	status: string;
 }
-const stores = isbns.stores as { key: string; name: string }[];
+const stores = (isbns.stores as { key: string; name: string }[]).filter((s) => s.key !== 'kindle'); // no Amazon column (Kevin 2026-11-08)
 const formatTables = [
 	{ id: 'audiobooks', title: 'Audiobooks', rows: isbns.audiobooks as FormatRow[] },
 	{ id: 'listening-ebooks', title: 'Listening eBooks', rows: isbns.listeningEbooks as FormatRow[] },
@@ -304,7 +304,7 @@ const books = groups.flatMap((g) =>
 				<section id="totals" class="isbn-group">
 					<h3>Totals</h3>
 					<div class="isbn-table" role="table" aria-label="ISBN and product totals">
-						{(isbns.totals as { label: string; n: number }[]).map((t) => (
+						{(isbns.totals as { label: string; n: number }[]).filter((t) => !/kindle|amazon/i.test(t.label)).map((t) => (
 							<div class="isbn-row isbn-two" role="row">
 								<span class="isbn-name" role="cell">{t.label}</span>
 								<span class="isbn-num" role="cell">{t.n}</span>
@@ -339,7 +339,7 @@ const books = groups.flatMap((g) =>
 	.isbn-name a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
 	.isbn-num { color: var(--color-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
 	#ebooks-audiobooks { width: min(68rem, calc(100vw - 2rem)); margin-left: 50%; transform: translateX(-50%); }
-	.store-row { grid-template-columns: minmax(9rem, 1fr) 13rem 15.5rem 3.5rem 9rem 3.5rem 6rem; gap: 0 0.6rem; }
+	.store-row { grid-template-columns: minmax(9rem, 1fr) 13rem 15.5rem 3.5rem 3.5rem 6rem; gap: 0 0.6rem; }
 	.store-cell, .store-status { font-size: 0.82rem; color: var(--color-ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
 	.store-cell a { color: var(--color-brand); font-weight: 600; text-decoration: none; }
 	.store-cell a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
