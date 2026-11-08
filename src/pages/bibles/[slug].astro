@@ -31,6 +31,7 @@ import youversion from '../../data/youversion-versions.json';
 //   src/data/editions/frontmatter.json — extracted from the shipping interiors: the audience
 //                                     page and the three pillar pages. Read, never retyped.
 import Layout from '../../layouts/Layout.astro';
+import { FHB_ORG_ID } from '../../lib/fhb-org';
 import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
@@ -334,10 +335,12 @@ const offerFor = (v: (typeof variants)[number]) => ({
 	url,
 	sku: v.sku,
 	...(v.isbn ? { gtin13: v.isbn.replace(/-/g, '') } : {}),
+	// FHB sells its own Bibles (Kevin 2026-11-08): the seller is Father's Heart Bible itself.
 	seller: {
 		'@type': 'Organization',
-		'@id': 'https://spiritmediapublishing.com/#organization',
-		name: 'Spirit Media Publishing',
+		'@id': FHB_ORG_ID,
+		name: "Father's Heart Bible",
+		url: 'https://fathersheartbible.com/',
 	},
 	shippingDetails: {
 		'@type': 'OfferShippingDetails',
@@ -620,7 +623,7 @@ const faqSchema = {
 				</div>
 			</div>
 		</Section>
-		<!-- The full listing — the same copy the Ingram/Amazon record carries, not a summary
+		<!-- The full listing — the same copy the Ingram record carries, not a summary
 		     of it. Kevin 2026-08-23: "you have a full page to describe this bible, but you are
 		     only given 10% of what we gave Ingram." -->
 		<Section variant="light">
