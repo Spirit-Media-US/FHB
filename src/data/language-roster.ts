@@ -8,7 +8,7 @@
 // filtered out).
 import { allLanguageEditions } from './language-editions';
 import roster from './language-roster.json' with { type: 'json' };
-import { LANGUAGE_TOTAL, readOnlyLanguages } from './receive';
+import { readOnlyLanguages } from './receive';
 
 // GENERATED, no longer typed (2026-10-30): the roster's own name, the language's primary-country
 // flag and its place line, from src/data/language-roster.json (`fhb-chain.py edition-roster`).
@@ -42,5 +42,7 @@ const liveIds = new Set(LIVE_NAMES.map(identity));
 /** Roster languages not yet live, alphabetical: [name, flag, region]. */
 export const upcomingLanguages = upcomingAll.filter(([name]) => !liveIds.has(identity(name)));
 
-/** The whole commitment (Kevin 2026-10-14: "let's just declare: 80 Languages"). */
-export const ROSTER_TOTAL = LANGUAGE_TOTAL + upcomingLanguages.length;
+/** The whole commitment (Kevin 2026-10-14: "let's just declare: 80 Languages"; 2026-11-08: "80 everywhere
+ * not 83 anywhere"). Counted from the roster itself: read-online languages outside the roster
+ * (gikuyu, chang, ao) made LANGUAGE_TOTAL + upcoming read 83. */
+export const ROSTER_TOTAL = roster.languages.length;
