@@ -169,29 +169,3 @@ test('2A: the first-order offer is neither counted nor shown when firstOffered=f
 	assert.equal(q.best, 'none');
 	assert.equal(quote([{ cents: 9999, qty: 5 }], [{ min: 5, pct: 10 }], false).best, 'bulk');
 });
-
-// ---- far-band eBook/reader line (Kevin 2026-11-08 "1 A") ----
-import fs from 'node:fs';
-import { FAR_NOTE_READ_HREF, FAR_NOTE_EBOOK_HREF, FAR_NOTE_EBOOK_PRICE, farNoteText } from '../src/lib/farBandNote.ts';
-
-test('far-band note: exact copy, existing links, price matches the eBook section, house voice', () => {
-	assert.equal(farNoteText(), 'Read it free online now, or get the eBook for $7.49 — instant, no shipping.');
-	const print = fs.readFileSync('src/pages/print.astro', 'utf8');
-	assert.match(print, new RegExp(`EBOOK_DIRECT = '\\${FAR_NOTE_EBOOK_PRICE}'`), 'price equals the eBook direct price on /print');
-	assert.match(print, /id="ebook"/, 'the link target exists');
-	assert.match(print, /fetch\('\/ebook-checkout'/, 'that section buys through /ebook-checkout');
-	assert.equal(FAR_NOTE_EBOOK_HREF, '/print/#ebook');
-	assert.equal(FAR_NOTE_READ_HREF, '/read/');
-	assert.match(print, /const READ_URL = '\/read\/'/);
-	const src = fs.readFileSync('src/lib/farBandNote.ts', 'utf8').split('\n').filter((l) => !l.trim().startsWith('//')).join('\n') + fs.readFileSync('src/components/FarBandNote.astro', 'utf8');
-	assert.doesNotMatch(src, /amazon|kindle|amzn/i);
-	assert.doesNotMatch(farNoteText(), /\bGod\b/);
-});
-test('far-band note: wired to the form, shown only for far band, in both order forms', () => {
-	const js = fs.readFileSync('src/scripts/order-form.ts', 'utf8');
-	assert.match(js, /\[data-far-note\]'\)\) o\.hidden = !far/);
-	for (const f of ['src/components/CatalogOrderForm.astro', 'src/components/EditionOrder.astro']) assert.match(fs.readFileSync(f, 'utf8'), /<FarBandNote \/>/, f);
-	// same print price: the checkout never changes a unit price by country (list price + shipping lines only)
-	const d = fs.readFileSync('functions/dvc-checkout.ts', 'utf8');
-	assert.doesNotMatch(d, /unit_amount\]'\] = [^;]*(country|destCode|farBand)/);
-});

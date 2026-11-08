@@ -19,7 +19,6 @@ import { PRINT_TIERS } from '../data/print-tiers';
 import { FIRST_ORDER_LABEL, firstOrderUnit } from '../lib/order-pricing';
 import { allFreeShipping, shipsLine, shipsToSentence } from '../lib/shipCountries';
 import BindingQty from './BindingQty.astro';
-import FarBandNote from './FarBandNote.astro';
 import OrderSummary from './OrderSummary.astro';
 
 interface Props {
@@ -78,7 +77,6 @@ const idp = `eo-${lead.id}`;
 		<p class="eo-price__note"><a href="/returns/">30-day returns, full refund</a></p>
 		<p class="eo-price__note" data-ships-line>{shipsLine()} {shipsToSentence()}</p>
 	</div>
-	<FarBandNote />
 	{rows.map((r) => (
 		<div class={multi ? 'eo-variant' : undefined}>
 			{multi && <p class="eo-variant__name">{r.title.replace(/^.*—\s*/, '')}</p>}

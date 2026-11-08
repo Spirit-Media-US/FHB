@@ -172,7 +172,6 @@ function init(root: HTMLElement) {
 		const sel = q<HTMLSelectElement>('[data-country]');
 		const far = sel?.selectedOptions[0]?.dataset.far === '1';
 		for (const o of qa('[data-offer]')) o.hidden = far;
-		for (const o of qa('[data-far-note]')) o.hidden = !far;
 		const r = quote(lines(), cfg.tiers, !far);
 		const total = r.best === 'first' ? r.firstTotal : r.bulkTotal;
 		set('[data-sum-copies]', String(r.copies));
