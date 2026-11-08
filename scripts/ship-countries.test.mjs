@@ -93,8 +93,8 @@ const html = (d, out = []) => { for (const e of fs.readdirSync(d, { withFileType
 export function leakedCodes(seen, live = SHIP_CODES) { return [...new Set(seen)].filter((c) => !live.includes(c)); }
 
 test('failure path: the leak detector flags a pending country', () => {
-	assert.deepEqual(leakedCodes(['US', 'GB']), ['GB']);
-	assert.deepEqual(leakedCodes(['US']), []);
+	assert.deepEqual(leakedCodes(['US', 'ZZ'], ['US']), ['ZZ']);
+	assert.deepEqual(leakedCodes(['US'], ['US']), []);
 });
 test('dist: every shipping/return country in JSON-LD is live; no pending country leaks', () => {
 	assert.ok(fs.existsSync('dist'), 'dist/ missing: run the build first');

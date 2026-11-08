@@ -10,12 +10,23 @@
 //     edits whichever binding is pressed, and each binding keeps its own count
 // Every catalog row keeps its own counts, so a buyer builds the order edition by edition and
 // nothing resets; /print's cards ([data-pick-edition]) pre-fill a row without touching the rest.
-import { FIRST_ORDER_LABEL, quote, type Tier } from '../lib/order-pricing';
+import {
+	FIRST_ORDER_LABEL,
+	FIRST_ORDER_PCT,
+	feeKey,
+	handlingFor,
+	type IntlRow,
+	quote,
+	type Tier,
+	unitAfter,
+} from '../lib/order-pricing';
 
 interface Config {
 	prices: Record<string, number>;
 	tiers: Tier[];
 	returnPath?: string;
+	/** per-country international handling fee, embedded at build (Kevin 2026-11-08); US has no entry */
+	intl?: Record<string, IntlRow>;
 }
 
 const money = (cents: number) =>
@@ -165,15 +176,44 @@ function init(root: HTMLElement) {
 	function lines() {
 		return Object.entries(counts)
 			.filter(([k, n]) => n > 0 && cfg.prices[k] != null)
-			.map(([k, n]) => ({ cents: Math.round(cfg.prices[k] * 100), qty: n }));
+			.map(([k, n]) => ({ slug: k, cents: Math.round(cfg.prices[k] * 100), qty: n }));
+	}
+	const countryRow = (): { code: string; row: IntlRow | undefined } => {
+		const code = q<HTMLSelectElement>('[data-country]')?.value ?? 'US';
+		return { code, row: cfg.intl?.[code] };
+	};
+	// The fee beside each price, BEFORE checkout (no drip pricing). The price shown is the
+	// first-order unit price, so the fee shown is the one sized on that price.
+	function paintFees() {
+		const { row } = countryRow();
+		for (const el of qa('[data-fee-sku]')) {
+			const sku = el.dataset.feeSku as string;
+			const list = cfg.prices[sku];
+			const fee =
+				row && list != null
+					? (row.fees[feeKey(sku, unitAfter(Math.round(list * 100), FIRST_ORDER_PCT))] ?? 0)
+					: 0;
+			el.hidden = !(row && fee > 0);
+			el.textContent =
+				row && fee > 0
+					? `+ ${money(fee)} ${row.label.toLowerCase()}${el.hasAttribute('data-fee-full') ? ` (${row.name})` : ''}`
+					: '';
+		}
 	}
 	function render() {
-		// Far shipping band (2A): no first-order 15% there, so it is neither shown nor counted.
-		const sel = q<HTMLSelectElement>('[data-country]');
-		const far = sel?.selectedOptions[0]?.dataset.far === '1';
-		for (const o of qa('[data-offer]')) o.hidden = far;
-		const r = quote(lines(), cfg.tiers, !far);
-		const total = r.best === 'first' ? r.firstTotal : r.bulkTotal;
+		// 1A: the first-order 15% is offered everywhere. Outside the US it comes off each unit
+		// (the server does the same), so it rounds per unit.
+		const { code, row } = countryRow();
+		const r = quote(lines(), cfg.tiers, code !== 'US');
+		const base = r.best === 'first' ? r.firstTotal : r.bulkTotal;
+		const appliedPct = r.best === 'first' ? FIRST_ORDER_PCT : r.best === 'bulk' ? r.bulkPct : 0;
+		const h = handlingFor(lines(), appliedPct, row);
+		const total = base + h.total;
+		paintFees();
+		for (const n of qa('[data-expedited-note]')) n.hidden = !row;
+		for (const d of qa('[data-sum-fee]')) d.hidden = h.total <= 0;
+		set('[data-sum-fee-label]', row ? `${row.label} (${row.name})` : '');
+		set('[data-sum-fee-amt]', money(h.total));
 		set('[data-sum-copies]', String(r.copies));
 		set('[data-sum-copies-word]', r.copies === 1 ? 'copy' : 'copies');
 		set('[data-sum-subtotal]', money(r.subtotal));
@@ -184,7 +224,7 @@ function init(root: HTMLElement) {
 			'[data-sum-disc-label]',
 			r.best === 'first' ? FIRST_ORDER_LABEL : `Volume discount, ${r.bulkPct}%`,
 		);
-		set('[data-sum-disc-amt]', `−${money(r.subtotal - total)}`);
+		set('[data-sum-disc-amt]', `−${money(r.subtotal - base)}`);
 		for (const s of qa('[data-sum-subtotal]')) s.classList.toggle('is-struck', r.best !== 'none');
 		for (const t of qa('[data-tier]'))
 			t.toggleAttribute('data-on', Number(t.dataset.tier) === r.bulkPct && r.bulkPct > 0);

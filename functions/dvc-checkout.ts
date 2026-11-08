@@ -19,7 +19,12 @@
 // NB: path is /dvc-checkout, not /api/* — the apex router proxies /api/* to the community
 // app, so this marketing function must live off that prefix.
 
-import { marginCheck, volumesFor, welcomeOffered } from '../src/lib/marginGuard.ts';
+import {
+	handlingFeeCents,
+	handlingLabel,
+	marginCheck,
+	volumesFor,
+} from '../src/lib/marginGuard.ts';
 import {
 	FIRST_ORDER_CODE,
 	FIRST_ORDER_PCT,
@@ -27,7 +32,7 @@ import {
 	packBreakdown,
 	unitAfter,
 } from '../src/lib/order-pricing.ts';
-import { checkoutShippingForm } from '../src/lib/shipCountries.ts';
+import { checkoutShippingForm, countryFor } from '../src/lib/shipCountries.ts';
 
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
@@ -1385,15 +1390,27 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	// larger AND this email has never paid before. Tie or larger tier → the tier, no lookup.
 	const email = String(payload.email ?? '').trim();
 	const validEmail = email.length <= 254 && EMAIL_RE.test(email);
-	// MARGIN FLOOR (unit 2jz): a discount that would take net per copy under MIN_NET_USD for this
-	// destination is dropped, never the sale. US is outside the guard (unchanged).
+	// MARGIN FLOOR + INTERNATIONAL HANDLING (units 2jz, 2kj). Destination: defaults to US (every form
+	// before international shipping). A country that is not in the LIVE list (pending, unknown,
+	// malformed) is refused, never passed to Stripe. US is outside the guard and shows no fee; every
+	// other country needs a landed cost, or the sale cannot be sized and is refused (fail closed).
 	const destCode = String(payload.country ?? 'US').toUpperCase();
+	const dest = countryFor(destCode);
+	const intl = destCode !== 'US';
+	if (dest && intl && !dest.landed_cost_usd) {
+		return json(
+			{ error: 'country_not_served', message: 'We do not ship to that country yet.' },
+			400,
+		);
+	}
 	const lines = Object.entries(counts)
 		.filter(([, n]) => n > 0)
 		.map(([slug]) => ({ slug, retail: EDITIONS[slug].retail }));
 	let promo: string | null = null;
-	// 2A: far-band destinations never get WELCOME15 (explicit zone rule; the margin check below stays as the dynamic backstop).
-	if (validEmail && FIRST_ORDER_PCT > tier.pct && welcomeOffered(destCode)) {
+	// 1A (Kevin 2026-11-08): WELCOME15 is offered to EVERYONE, every country. The margin check is
+	// now only the backstop (handling is sized to the floor, so it drops a discount only when the
+	// fee cannot reach it, or the landed cost is unknown).
+	if (validEmail && FIRST_ORDER_PCT > tier.pct) {
 		const m = marginCheck(lines, FIRST_ORDER_PCT, destCode);
 		if (!m.ok) {
 			console.log(`margin-guard: dropped ${FIRST_ORDER_CODE}: ${m.reason}`);
@@ -1409,15 +1426,56 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 			pct = 0;
 		}
 	}
-
-	// Destination: defaults to US (every form before international shipping). A country that is not
-	// in the LIVE list (pending, unknown, malformed) is refused, never passed to Stripe.
-	// `copies` = physical volumes (a Large Print set is three), which scales the faster-delivery price.
+	// Outside the US the first-order discount is taken off each unit instead of by Stripe's coupon,
+	// because a percent-off coupon discounts EVERY line, and the handling line must not be discounted
+	// (the floor is sized on it). The buyer sees the same 15% as unit prices; the US is unchanged.
+	// Last guard, whatever happened above: the order as it will be charged, handling included, must
+	// net the floor. If it does not at the discounted price, charge list price; if still not, refuse.
+	if (intl) {
+		const last = marginCheck(lines, promo ? FIRST_ORDER_PCT : pct, destCode);
+		if (!last.ok) {
+			if (!marginCheck(lines, 0, destCode).ok) {
+				return json(
+					{ error: 'country_not_served', message: 'We cannot ship that order to that country.' },
+					400,
+				);
+			}
+			console.log(`margin-guard: backstop dropped discount: ${last.reason}`);
+			promo = null;
+			pct = 0;
+		}
+	}
+	const unitPctFinal = intl && promo ? FIRST_ORDER_PCT : pct;
+	const useCode = Boolean(promo) && !intl;
+	// `copies` = physical volumes (a Large Print set is three), which scales the expedited price.
 	const copies = Object.entries(counts).reduce((s, [slug, n]) => s + n * volumesFor(slug), 0);
 	const shipForm = checkoutShippingForm(payload.country ?? 'US', copies);
 	if (!shipForm) {
 		return json(
 			{ error: 'country_not_served', message: 'We do not ship to that country yet.' },
+			400,
+		);
+	}
+	// The per-copy handling lines: one Stripe line per (binding, fee) with quantity = units, named
+	// for the destination (EU: "Import & handling"). Zero where the floor is already met.
+	const handling: { binding: string; fee: number; qty: number }[] = [];
+	if (dest && intl) {
+		for (const [slug, qty] of Object.entries(counts)) {
+			if (qty <= 0) continue;
+			const fee = handlingFeeCents(slug, unitAfter(EDITIONS[slug].retail, unitPctFinal), dest);
+			if (fee <= 0) continue;
+			const binding = slug.endsWith('-hb') ? 'hardback' : 'paperback';
+			const row = handling.find((h) => h.binding === binding && h.fee === fee);
+			if (row) row.qty += qty;
+			else handling.push({ binding, fee, qty });
+		}
+	}
+	if (Object.values(counts).filter((n) => n > 0).length + handling.length > MAX_LINE_ITEMS) {
+		return json(
+			{
+				error: 'too_many_items',
+				message: `One order can hold up to ${MAX_LINE_ITEMS} different editions. Please split it into two orders.`,
+			},
 			400,
 		);
 	}
@@ -1449,6 +1507,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		'metadata[kind]': 'dvc_print',
 		'metadata[total]': total,
 		'metadata[pct_off]': promo ? FIRST_ORDER_PCT : pct,
+		'metadata[handling_cents]': handling.reduce((t, h) => t + h.fee * h.qty, 0),
 		'metadata[offer]': promo ? 'first_order' : pct > 0 ? 'volume' : 'none',
 		// Split under Stripe's 500-char value cap (an 82-SKU cart was one 1,138-char value: 502).
 		...packBreakdown(counts),
@@ -1458,7 +1517,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	for (const [slug, qty] of Object.entries(counts)) {
 		if (qty <= 0) continue;
 		const e = EDITIONS[slug];
-		const unit = unitAfter(e.retail, pct);
+		const unit = unitAfter(e.retail, unitPctFinal);
 		form[`line_items[${li}][quantity]`] = qty;
 		form[`line_items[${li}][price_data][currency]`] = 'usd';
 		form[`line_items[${li}][price_data][unit_amount]`] = unit;
@@ -1466,18 +1525,32 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		form[`line_items[${li}][price_data][product_data][name]`] =
 			`Father’s Heart Bible™ — ${e.title}`;
 		form[`line_items[${li}][price_data][product_data][description]`] =
-			pct > 0
-				? `Divine Voice Color · Complete Bible · ${pct}% volume discount · free shipping`
-				: 'Divine Voice Color · Complete Bible · free shipping';
+			intl && promo
+				? `Divine Voice Color · Complete Bible · ${FIRST_ORDER_PCT}% off your first order · free shipping`
+				: pct > 0
+					? `Divine Voice Color · Complete Bible · ${pct}% volume discount · free shipping`
+					: 'Divine Voice Color · Complete Bible · free shipping';
 		form[`line_items[${li}][price_data][product_data][images][0]`] = e.img;
 		form[`line_items[${li}][price_data][product_data][tax_code]`] = TAX_CODE;
+		li++;
+	}
+	// Handling lines come after the books and are never discounted (see the first-order note above).
+	for (const h of handling) {
+		form[`line_items[${li}][quantity]`] = h.qty;
+		form[`line_items[${li}][price_data][currency]`] = 'usd';
+		form[`line_items[${li}][price_data][unit_amount]`] = h.fee;
+		form[`line_items[${li}][price_data][tax_behavior]`] = 'exclusive';
+		form[`line_items[${li}][price_data][product_data][name]`] = handlingLabel(destCode);
+		form[`line_items[${li}][price_data][product_data][description]`] =
+			`Per ${h.binding} copy · ${dest?.name ?? destCode}`;
+		form[`line_items[${li}][price_data][product_data][tax_code]`] = 'txcd_92010001';
 		li++;
 	}
 
 	if (validEmail) form.customer_email = email;
 	// Pre-applied, so the buyer never types it; Stripe shows WELCOME15 on the summary and counts
 	// its redemptions. Units above are at list price when it applies — the two never stack.
-	if (promo) form['discounts[0][promotion_code]'] = promo;
+	if (promo && useCode) form['discounts[0][promotion_code]'] = promo;
 
 	const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
 		method: 'POST',

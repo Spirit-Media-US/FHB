@@ -1,9 +1,10 @@
 // node --test scripts/margin-guard.test.mjs   (unit 2jz)
-// Margin floor: a discount that would push net per copy under MIN_NET_USD is dropped, never the sale.
+// Margin floor, now the BACKSTOP behind the sized International handling fee (2kj): a discount that
+// would push net per copy under the floor even with the fee is dropped, never the sale.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import raw from '../src/data/ship-countries.json' with { type: 'json' };
-import { MIN_NET_USD, marginCheck, netPerItemUsd, volumesFor } from '../src/lib/marginGuard.ts';
+import { MIN_NET_USD, MIN_NET_FAR_USD, marginCheck, netPerItemUsd, volumesFor } from '../src/lib/marginGuard.ts';
 
 // Pending countries are never read by checkout, so the pure guard is exercised on ALL rows.
 const ROWS = [...raw.live, ...raw.pending];
@@ -32,11 +33,12 @@ test('net formula: price - (4.4% + $0.30) - landed', () => {
 	assert.equal(volumesFor('lp-set-pb'), 3);
 	assert.equal(volumesFor('moms-pb'), 1);
 });
-test('far-zone paperback with WELCOME15 drops the discount', () => {
-	const m = marginCheck(pb, 15, 'PH', ROWS);
-	assert.equal(m.ok, false);
-	assert.match(m.reason, /nets \$/);
-	assert.equal(marginCheck(pb, 0, 'PH', ROWS).ok, true); // full price is never refused
+test('far-zone paperback with WELCOME15 now KEEPS the discount: the handling fee carries the floor', () => {
+	assert.equal(marginCheck(pb, 15, 'PH', ROWS).ok, true);
+	assert.equal(marginCheck(pb, 0, 'PH', ROWS).ok, true);
+	// the backstop still bites: a floor the fee cannot reach (explicit override) refuses
+	assert.equal(marginCheck(pb, 15, 'PH', ROWS, 1000).ok, false);
+	assert.match(marginCheck(pb, 15, 'PH', ROWS, 1000).reason, /even with handling/);
 });
 test('UK hardcover with WELCOME15 keeps it', () => {
 	assert.equal(marginCheck(hc, 15, 'GB', ROWS).ok, true);
@@ -49,12 +51,12 @@ test('failure path: unknown / cost-less destination fails closed (no discount), 
 	assert.equal(marginCheck(pb, 15, 'ZZ', ROWS).ok, false);
 	assert.equal(marginCheck(pb, 15, 'GB', [{ code: 'GB' }]).ok, false);
 });
-test('volume tier is dropped too when it breaks the floor; a set counts three volumes', () => {
-	assert.equal(marginCheck(pb, 10, 'PH', ROWS).ok, false);
+test('volume tiers are sized too; a set counts three volumes', () => {
+	for (const pct of [10, 20, 30]) assert.equal(marginCheck(pb, pct, 'PH', ROWS).ok, true, `${pct}%`);
 	assert.equal(marginCheck([{ slug: 'lp-set-pb', retail: 24999 }], 15, 'GB', ROWS).ok, true);
-	assert.equal(marginCheck([{ slug: 'lp-set-pb', retail: 24999 }], 30, 'PH', ROWS).ok, false); // 3 x $63.17 landed
+	assert.equal(marginCheck([{ slug: 'lp-set-pb', retail: 24999 }], 30, 'PH', ROWS).ok, true); // 3 x $63.17 landed, covered by the fee
 });
-test('floor constant', () => assert.equal(MIN_NET_USD, 20));
+test('floor constants', () => { assert.equal(MIN_NET_USD, 20); assert.equal(MIN_NET_FAR_USD, 10); });
 
 // ---- handler: US WELCOME15 still applied, end to end with Stripe mocked ----
 test('dvc-checkout US first order still gets WELCOME15 (unchanged)', async () => {
@@ -79,16 +81,13 @@ test('dvc-checkout US first order still gets WELCOME15 (unchanged)', async () =>
 		assert.equal(r2.status, 400);
 	} else {
 		body = '';
-		await mk('PH'); // live far-band country (after the wave): WELCOME15 is never applied there
+		await mk('PH'); // live far-band country: WELCOME15 is offered here too (1A), taken off the unit price
 		assert.doesNotMatch(decodeURIComponent(body), /discounts\[0\]/);
+		assert.match(decodeURIComponent(body), /unit_amount\]=6799/);
 	}
 });
 
-test('floor $20 (Kevin 1A): WELCOME15 outcomes per binding at list price', () => {
+test('floor $20 (Kevin 1A): WELCOME15 is kept everywhere; the fee, not a dropped discount, carries the floor', () => {
 	const hb = [{ slug: 'moms-hb', retail: 9999 }], pbk = [{ slug: 'moms-pb', retail: 7999 }];
-	for (const c of ['GB', 'AU', 'CA']) { assert.equal(marginCheck(hb, 15, c, ROWS).ok, true, `${c} hc`); assert.equal(marginCheck(pbk, 15, c, ROWS).ok, true, `${c} pb`); }
-	for (const c of ['DE', 'ES', 'MX']) assert.equal(marginCheck(pbk, 15, c, ROWS).ok, false, `${c} pb drops`);
-	assert.equal(marginCheck(hb, 15, 'MX', ROWS).ok, false, 'MX hc drops');
-	assert.equal(marginCheck(hb, 15, 'DE', ROWS).ok, true);
-	assert.equal(marginCheck(hb, 15, 'ES', ROWS).ok, true);
+	for (const c of ['GB', 'AU', 'CA', 'DE', 'ES', 'MX', 'IN', 'PH', 'NG', 'AE']) { assert.equal(marginCheck(hb, 15, c, ROWS).ok, true, `${c} hc`); assert.equal(marginCheck(pbk, 15, c, ROWS).ok, true, `${c} pb`); }
 });

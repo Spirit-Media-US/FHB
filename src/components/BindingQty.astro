@@ -47,6 +47,7 @@ const rows = [
 			<span class="binding-qty__label">
 				<span class="binding-qty__binding">{r.binding}</span>
 				<span class="binding-qty__price"><s>${r.price.toFixed(2)}</s> <b>{first(r.price)}</b></span>
+				<span class="binding-qty__fee" data-fee-sku={r.slug} hidden></span>
 			</span>
 			<div class="binding-qty__ctl">
 				<button type="button" class="qty-step" data-slug={r.slug} data-dir="-1" aria-label={`Fewer ${label} ${r.binding}`}>−</button>
@@ -81,6 +82,8 @@ const rows = [
 	}
 	.binding-qty__binding { color: var(--color-muted); }
 	.binding-qty__price { color: var(--color-ink); }
+	.binding-qty__fee { display: block; font-size: 0.78rem; color: var(--color-muted); }
+	.binding-qty__fee[hidden] { display: none; }
 	.binding-qty__price s { color: var(--color-muted); font-weight: 400; }
 	.binding-qty__price b { font-weight: 700; }
 	.binding-qty__ctl {

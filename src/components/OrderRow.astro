@@ -46,6 +46,7 @@ const name = native ? `${native} (${title})` : title;
 					<button type="button" class="orow__bind" data-bind={b.key} aria-pressed={b.key === 'hb' ? 'true' : 'false'}>
 						<span class="orow__bname">{b.label} <span class="orow__count" data-seg-count hidden></span></span>
 						<span class="orow__price"><s data-list={b.key}>{money(b.cents)}</s> <b data-first={b.key}>{money(b.first)}</b></span>
+						<span class="orow__fee" data-fee-sku={`${id}-${b.key}`} hidden></span>
 					</button>
 				))}
 			</div>
@@ -110,6 +111,8 @@ const name = native ? `${native} (${title})` : title;
 	.orow__count { font-weight: 700; color: var(--color-primary, #b60057); }
 	.orow__price { font-size: 0.8rem; white-space: nowrap; }
 	.orow__price s { color: var(--color-muted); }
+	.orow__fee { display: block; font-size: 0.72rem; color: var(--color-muted); }
+	.orow__fee[hidden] { display: none; }
 	.orow__qty {
 		display: inline-flex;
 		align-items: center;

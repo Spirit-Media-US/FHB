@@ -16,7 +16,8 @@
  */
 import type { CatalogRow } from '../data/print-catalog';
 import { PRINT_TIERS } from '../data/print-tiers';
-import { FIRST_ORDER_LABEL, firstOrderUnit } from '../lib/order-pricing';
+import { handlingTable } from '../lib/marginGuard';
+import { FIRST_ORDER_LABEL, FIRST_ORDER_PCT, firstOrderUnit } from '../lib/order-pricing';
 import { allFreeShipping, shipsLine, shipsToSentence } from '../lib/shipCountries';
 import BindingQty from './BindingQty.astro';
 import OrderSummary from './OrderSummary.astro';
@@ -36,15 +37,21 @@ const multi = rows.length > 1;
 const freeShip = allFreeShipping();
 // Runtime const: biome cannot see .astro template use (keep this line).
 const tiers = PRINT_TIERS;
+const skuPrices: Record<string, number> = Object.fromEntries(
+	rows.flatMap((r) => [
+		[`${r.id}-hb`, r.hb],
+		[`${r.id}-pb`, r.pb],
+	]),
+);
 const config = JSON.stringify({
-	prices: Object.fromEntries(
-		rows.flatMap((r) => [
-			[`${r.id}-hb`, r.hb],
-			[`${r.id}-pb`, r.pb],
-		]),
-	),
+	prices: skuPrices,
 	tiers: PRINT_TIERS,
 	returnPath,
+	// International handling per country (Kevin 2026-11-08), shown beside each price before checkout.
+	intl: handlingTable(
+		Object.fromEntries(Object.entries(skuPrices).map(([k, v]) => [k, Math.round(v * 100)])),
+		[FIRST_ORDER_PCT, ...PRINT_TIERS.map((t) => t.pct)],
+	),
 });
 // THE PRICE LINE (Kevin 2026-10-05, B15): paperback first, then hardback, each at the
 // first-order unit price with the regular price struck through. Read from the first row; the
@@ -69,7 +76,7 @@ const idp = `eo-${lead.id}`;
 	<div class="eo-price" data-price-line>
 		{priceLine.map((l) => (
 			<p class="eo-price__row" data-line-sku={l.sku}>
-				<span class="eo-price__binding">{l.binding}</span> <b data-first>{l.first}</b> <span class="eo-price__reg">(reg. <s data-reg>{l.reg}</s>)</span>
+				<span class="eo-price__binding">{l.binding}</span> <b data-first>{l.first}</b> <span class="eo-price__reg">(reg. <s data-reg>{l.reg}</s>)</span> <span class="eo-price__fee" data-fee-sku={l.sku} data-fee-full hidden></span>
 			</p>
 		))}
 		<p class="eo-price__note">{FIRST_ORDER_LABEL}{freeShip ? ' · free shipping' : ''}</p>
@@ -98,6 +105,8 @@ const idp = `eo-${lead.id}`;
 	.eo-price__binding { font-weight: 600; }
 	.eo-price__row b { font-weight: 800; }
 	.eo-price__reg { color: #71717a; font-size: 0.9rem; }
+	.eo-price__fee { color: #3f3f46; font-size: 0.9rem; font-weight: 600; }
+	.eo-price__fee[hidden] { display: none; }
 	.eo-price__note {
 		margin: 0.35rem 0 0;
 		color: #3f3f46;

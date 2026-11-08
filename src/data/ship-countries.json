@@ -31,20 +31,40 @@
 			"Middle East": { "hc": 73.34, "pb": 63.17 }
 		}
 	},
-	"liveWave": [],
+	"liveWave": [
+		"GB",
+		"DE",
+		"FR",
+		"ES",
+		"IT",
+		"IE",
+		"NL",
+		"NO",
+		"CH",
+		"CA",
+		"AU",
+		"NZ",
+		"MX",
+		"BR",
+		"IN",
+		"PH",
+		"ZA",
+		"JP",
+		"SG"
+	],
 	"farBand": {
-		"_readme": "Kevin 2026-11-08 (2A): the first-order 15% (WELCOME15) is never shown or applied in the farthest shipping band. Flag = zone in [Africa, Middle East] or (zone Asia-Pacific and code != AU), per the zones in this file; it covers South and Southeast Asia. Row field: far_band. Enforced in src/lib/marginGuard.ts (welcomeOffered) on top of the dynamic MIN_NET_USD guard.",
+		"_readme": "Kevin 2026-11-08 (1A): the first-order 15% (WELCOME15) is offered to EVERYONE, everywhere. The far band now only sets the net floor: $10 per copy here (MIN_NET_FAR_USD) against $20 everywhere else (MIN_NET_USD). Flag = zone in [Africa, Middle East] or (zone Asia-Pacific and code != AU); it covers South and Southeast Asia. Row field: far_band. Used by src/lib/marginGuard.ts (floorFor).",
 		"zones": ["Africa", "Middle East", "Asia-Pacific"],
 		"exceptCodes": ["AU"]
 	},
 	"deliveryRoutes": {
-		"_readme": "Delivery model per route. A pending row names its route. handlingDays = Ingram dispatch in business days (measured: economy 5 paperback / 10 hardcover, rush 1 / 2). transitDays = carrier transit in business days, an ESTIMATE from conservative published carrier ranges (Ingram's calculator shows dispatch only; transit is UNMEASURED). fast = the optional buyer-paid 'Faster delivery' option: extra_usd is OUR extra cost per copy = (rush print - economy print) + (fastest reasonable tracked duty-paid method - the free method), USD at the fx above, rounded UP to the cent. Its price is computed in src/lib/shipCountries.ts (fastPriceCents) as extra x 1.15 plus the Stripe fee on it, rounded up to a .99 price point, and scales with copies. fast=null means the option is NOT offered. Where no sane faster tracked duty-paid method exists the option is rush PRINT only (label 'Priority printing', extra = rush print delta, transit unchanged). Full table + sources: /home/deploy/aeo-state/fhb-intl-decisions-2kd-20261108.json.",
+		"_readme": "Delivery model per route. A pending row names its route. handlingDays = Ingram dispatch in business days (measured: economy 5 paperback / 10 hardcover, rush 1 / 2). transitDays = carrier transit in business days, an ESTIMATE from conservative published carrier ranges (Ingram's calculator shows dispatch only; transit is UNMEASURED). fast = the optional buyer-paid 'Expedited delivery' option: extra_usd is OUR extra cost per copy = (rush print - economy print) + (fastest reasonable tracked duty-paid method - the free method), USD at the fx above, rounded UP to the cent. Its price is computed in src/lib/shipCountries.ts (fastPriceCents) as extra x 1.10 plus the Stripe fee on it, rounded up to a .99 price point, and scales with copies. fast=null means the option is NOT offered. Where no sane faster tracked duty-paid method exists the option is rush PRINT only (same label 'Expedited delivery', the name stays short, extra = rush print delta, transit unchanged). Full table + sources: /home/deploy/aeo-state/fhb-intl-decisions-2kd-20261108.json.",
 		"GB": {
 			"handlingDays": [5, 10],
 			"transitDays": [2, 5],
 			"transitBasis": "ESTIMATE: Royal Mail tracked services publish 1-4 working days",
 			"fast": {
-				"label": "Faster delivery",
+				"label": "Expedited delivery",
 				"extra_usd": 13.2,
 				"handlingDays": [1, 2],
 				"transitDays": [1, 3],
@@ -57,7 +77,7 @@
 			"transitDays": [6, 12],
 			"transitBasis": "ESTIMATE: USPS Global Priority Mail DDP publishes 6-10 business days, +2 margin",
 			"fast": {
-				"label": "Faster delivery",
+				"label": "Expedited delivery",
 				"extra_usd": 23.74,
 				"handlingDays": [1, 2],
 				"transitDays": [3, 6],
@@ -70,7 +90,7 @@
 			"transitDays": [6, 12],
 			"transitBasis": "ESTIMATE: USPS Global Priority Mail DDP publishes 6-10 business days, +2 margin",
 			"fast": {
-				"label": "Faster delivery",
+				"label": "Expedited delivery",
 				"extra_usd": 28.63,
 				"handlingDays": [1, 2],
 				"transitDays": [3, 6],
@@ -83,7 +103,7 @@
 			"transitDays": [6, 12],
 			"transitBasis": "ESTIMATE: as DE/ES (unmeasured countries use the zone max cost)",
 			"fast": {
-				"label": "Faster delivery",
+				"label": "Expedited delivery",
 				"extra_usd": 28.63,
 				"handlingDays": [1, 2],
 				"transitDays": [3, 6],
@@ -96,7 +116,7 @@
 			"transitDays": [5, 10],
 			"transitBasis": "ESTIMATE: USPS/UPS ground to Canada, conservative",
 			"fast": {
-				"label": "Faster delivery",
+				"label": "Expedited delivery",
 				"extra_usd": 14.23,
 				"handlingDays": [1, 2],
 				"transitDays": [5, 10],
@@ -109,7 +129,7 @@
 			"transitDays": [3, 8],
 			"transitBasis": "ESTIMATE: Australia Post parcel services publish 2-7 business days",
 			"fast": {
-				"label": "Faster delivery",
+				"label": "Expedited delivery",
 				"extra_usd": 12.35,
 				"handlingDays": [1, 2],
 				"transitDays": [2, 5],
@@ -122,8 +142,7 @@
 			"transitDays": [6, 12],
 			"transitBasis": "ESTIMATE: USPS Global Priority Mail DDP 6-10 business days, +2",
 			"fast": {
-				"label": "Priority printing",
-				"displayName": "Priority printing — ships in 1-2 business days instead of 5-10; delivery time otherwise the same.",
+				"label": "Expedited delivery",
 				"extra_usd": 9.9,
 				"handlingDays": [1, 2],
 				"transitDays": [6, 12],
@@ -137,8 +156,7 @@
 			"transitDays": [7, 14],
 			"transitBasis": "ESTIMATE: USPS Global Priority Mail DDP 6-10 business days (longer in far zones), +4",
 			"fast": {
-				"label": "Priority printing",
-				"displayName": "Priority printing — ships in 1-2 business days instead of 5-10; delivery time otherwise the same.",
+				"label": "Expedited delivery",
 				"extra_usd": 9.9,
 				"handlingDays": [1, 2],
 				"transitDays": [7, 14],

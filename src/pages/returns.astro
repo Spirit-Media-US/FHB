@@ -2,6 +2,7 @@
 import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
 import { RETURN_DAYS } from '../lib/merchantReturnPolicy';
+import { EXPEDITED_DISCLAIMER } from '../lib/order-pricing';
 ---
 
 <Layout
@@ -52,6 +53,11 @@ import { RETURN_DAYS } from '../lib/merchantReturnPolicy';
               <li>Tell us whether you want a refund or, for a damaged copy, a replacement.</li>
               <li>We confirm by email. Refunds go back to your original payment method; your bank typically posts them within 5 to 10 business days.</li>
             </ol>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Delivery Times and Expedited Delivery</h2>
+            <p class="leading-relaxed">{EXPEDITED_DISCLAIMER} Estimated delivery ranges are shown at checkout for your country.</p>
           </div>
 
           <div>
