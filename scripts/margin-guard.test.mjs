@@ -54,7 +54,7 @@ test('volume tier is dropped too when it breaks the floor; a set counts three vo
 	assert.equal(marginCheck([{ slug: 'lp-set-pb', retail: 24999 }], 15, 'GB', ROWS).ok, true);
 	assert.equal(marginCheck([{ slug: 'lp-set-pb', retail: 24999 }], 30, 'PH', ROWS).ok, false); // 3 x $63.17 landed
 });
-test('floor constant', () => assert.equal(MIN_NET_USD, 13));
+test('floor constant', () => assert.equal(MIN_NET_USD, 20));
 
 // ---- handler: US WELCOME15 still applied, end to end with Stripe mocked ----
 test('dvc-checkout US first order still gets WELCOME15 (unchanged)', async () => {
@@ -71,6 +71,24 @@ test('dvc-checkout US first order still gets WELCOME15 (unchanged)', async () =>
 	const r = await mk('US');
 	assert.equal((await r.json()).url, 'https://stripe.test/x');
 	assert.match(decodeURIComponent(body), /discounts\[0\]\[promotion_code\]=promo_1/);
-	const r2 = await mk('PH'); // pending country: refused outright, never reaches Stripe
-	assert.equal(r2.status, 400);
+	assert.match(decodeURIComponent(body), /adaptive_pricing\[enabled\]=true/); // 3A, unit 2kd
+	assert.doesNotMatch(decodeURIComponent(body), /shipping_options\[1\]/); // US: no faster option
+	const { SHIP_CODES } = await import('../src/lib/shipCountries.ts');
+	if (!SHIP_CODES.includes('PH')) {
+		const r2 = await mk('PH'); // pending country: refused outright, never reaches Stripe
+		assert.equal(r2.status, 400);
+	} else {
+		body = '';
+		await mk('PH'); // live far-band country (after the wave): WELCOME15 is never applied there
+		assert.doesNotMatch(decodeURIComponent(body), /discounts\[0\]/);
+	}
+});
+
+test('floor $20 (Kevin 1A): WELCOME15 outcomes per binding at list price', () => {
+	const hb = [{ slug: 'moms-hb', retail: 9999 }], pbk = [{ slug: 'moms-pb', retail: 7999 }];
+	for (const c of ['GB', 'AU', 'CA']) { assert.equal(marginCheck(hb, 15, c, ROWS).ok, true, `${c} hc`); assert.equal(marginCheck(pbk, 15, c, ROWS).ok, true, `${c} pb`); }
+	for (const c of ['DE', 'ES', 'MX']) assert.equal(marginCheck(pbk, 15, c, ROWS).ok, false, `${c} pb drops`);
+	assert.equal(marginCheck(hb, 15, 'MX', ROWS).ok, false, 'MX hc drops');
+	assert.equal(marginCheck(hb, 15, 'DE', ROWS).ok, true);
+	assert.equal(marginCheck(hb, 15, 'ES', ROWS).ok, true);
 });

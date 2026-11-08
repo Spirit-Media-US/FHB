@@ -19,7 +19,7 @@
 // NB: path is /dvc-checkout, not /api/* — the apex router proxies /api/* to the community
 // app, so this marketing function must live off that prefix.
 
-import { marginCheck } from '../src/lib/marginGuard.ts';
+import { marginCheck, volumesFor, welcomeOffered } from '../src/lib/marginGuard.ts';
 import {
 	FIRST_ORDER_CODE,
 	FIRST_ORDER_PCT,
@@ -1392,7 +1392,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		.filter(([, n]) => n > 0)
 		.map(([slug]) => ({ slug, retail: EDITIONS[slug].retail }));
 	let promo: string | null = null;
-	if (validEmail && FIRST_ORDER_PCT > tier.pct) {
+	// 2A: far-band destinations never get WELCOME15 (explicit zone rule; the margin check below stays as the dynamic backstop).
+	if (validEmail && FIRST_ORDER_PCT > tier.pct && welcomeOffered(destCode)) {
 		const m = marginCheck(lines, FIRST_ORDER_PCT, destCode);
 		if (!m.ok) {
 			console.log(`margin-guard: dropped ${FIRST_ORDER_CODE}: ${m.reason}`);
@@ -1411,7 +1412,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
 	// Destination: defaults to US (every form before international shipping). A country that is not
 	// in the LIVE list (pending, unknown, malformed) is refused, never passed to Stripe.
-	const shipForm = checkoutShippingForm(payload.country ?? 'US');
+	// `copies` = physical volumes (a Large Print set is three), which scales the faster-delivery price.
+	const copies = Object.entries(counts).reduce((s, [slug, n]) => s + n * volumesFor(slug), 0);
+	const shipForm = checkoutShippingForm(payload.country ?? 'US', copies);
 	if (!shipForm) {
 		return json(
 			{ error: 'country_not_served', message: 'We do not ship to that country yet.' },

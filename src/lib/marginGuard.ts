@@ -14,8 +14,8 @@
 // exercises them (with injected rows, because pending countries are never read by checkout).
 import { LIVE_COUNTRIES, type ShipCountry } from './shipCountries.ts';
 
-/** Floor for expected net per copy, USD. Kevin may change it; it is the only place it lives. */
-export const MIN_NET_USD = 13.0;
+/** Floor for expected net per copy, USD (Kevin 2026-11-08 "1A": $20 minimum profit per book; was $13). Kevin may change it; it is the only place it lives. */
+export const MIN_NET_USD = 20.0;
 export const STRIPE_INTL_PCT = 0.044;
 export const STRIPE_FIXED_USD = 0.3;
 
@@ -35,6 +35,22 @@ export function netPerItemUsd(
 	const price = priceCents / 100;
 	const landed = lc[bindingFor(slug)] * volumesFor(slug);
 	return price - (price * STRIPE_INTL_PCT + STRIPE_FIXED_USD) - landed;
+}
+
+/**
+ * 2A (Kevin 2026-11-08): the first-order 15% (WELCOME15) is NOT offered in the farthest shipping
+ * band, so every sale there clears at least MIN_NET_USD. This is the explicit zone rule, on top of
+ * the dynamic margin check above (which would also drop it): a far-band country never shows or
+ * applies the code. US is always offered; an unknown or not-live destination is never offered.
+ */
+export function welcomeOffered(
+	code: string,
+	rows: readonly ShipCountry[] = LIVE_COUNTRIES,
+): boolean {
+	const c = code.toUpperCase();
+	if (c === 'US') return true;
+	const r = rows.find((x) => x.code === c);
+	return !!r && r.farBand !== true;
 }
 
 export interface MarginResult {

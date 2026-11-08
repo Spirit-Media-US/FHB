@@ -168,7 +168,11 @@ function init(root: HTMLElement) {
 			.map(([k, n]) => ({ cents: Math.round(cfg.prices[k] * 100), qty: n }));
 	}
 	function render() {
-		const r = quote(lines(), cfg.tiers);
+		// Far shipping band (2A): no first-order 15% there, so it is neither shown nor counted.
+		const sel = q<HTMLSelectElement>('[data-country]');
+		const far = sel?.selectedOptions[0]?.dataset.far === '1';
+		for (const o of qa('[data-offer]')) o.hidden = far;
+		const r = quote(lines(), cfg.tiers, !far);
 		const total = r.best === 'first' ? r.firstTotal : r.bulkTotal;
 		set('[data-sum-copies]', String(r.copies));
 		set('[data-sum-copies-word]', r.copies === 1 ? 'copy' : 'copies');
@@ -185,6 +189,8 @@ function init(root: HTMLElement) {
 		for (const t of qa('[data-tier]'))
 			t.toggleAttribute('data-on', Number(t.dataset.tier) === r.bulkPct && r.bulkPct > 0);
 	}
+
+	q<HTMLSelectElement>('[data-country]')?.addEventListener('change', render);
 
 	// ── checkout ──
 	const email = q<HTMLInputElement>('[data-email]');

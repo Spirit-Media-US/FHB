@@ -12,19 +12,23 @@ import {
 } from '../src/lib/shipCountries.ts';
 import { merchantReturnPolicy } from '../src/lib/merchantReturnPolicy.ts';
 
-const pendingCodes = PENDING_COUNTRIES.map((c) => c.code);
+const allPending = PENDING_COUNTRIES.map((c) => c.code);
+// A pending row named in `liveWave` is live (promoted at runtime); the rest are WAITING.
+const pendingCodes = allPending.filter((c) => !SHIP_CODES.includes(c));
 
 test('config: live rows are complete, pending rows are not live and do not overlap', () => {
 	assert.ok(LIVE_COUNTRIES.length >= 1);
 	for (const c of LIVE_COUNTRIES) assert.deepEqual(validateRow(c), [], `live ${c.code}`);
 	for (const c of PENDING_COUNTRIES) assert.equal(c.status, 'PENDING');
-	for (const code of pendingCodes) assert.ok(!SHIP_CODES.includes(code), `${code} is both live and pending`);
+	for (const code of SHIP_CODES) assert.ok(code === 'US' || allPending.includes(code), `${code} is live but is neither US nor a pending row in liveWave`);
 	assert.equal(new Set(SHIP_CODES).size, SHIP_CODES.length, 'duplicate live country');
 });
 test('pending data: ISO alpha-2, unique, zoned, sited, no charge model filled in', () => {
 	const zones = ['Europe+UK', 'Middle East', 'Americas (non-US)', 'Asia-Pacific', 'Africa'];
-	assert.equal(new Set(pendingCodes).size, pendingCodes.length, 'duplicate pending code');
+	assert.equal(new Set(allPending).size, allPending.length, 'duplicate pending code');
 	for (const c of PENDING_COUNTRIES) {
+		assert.equal(typeof c.far_band, 'boolean', `${c.code} far_band`);
+		assert.ok(c.route, `${c.code} route`);
 		assert.match(c.code, /^[A-Z]{2}$/, c.code);
 		assert.ok(zones.includes(c.zone), `${c.code} zone`);
 		assert.ok(['US', 'UK', 'AU'].includes(c.printSite), `${c.code} printSite`);
@@ -63,7 +67,8 @@ test('checkout functions use the list, no hard-coded country', () => {
 });
 test('schema: one OfferShippingDetails per live country; return policy uses the same list', () => {
 	const d = [].concat(shippingDetailsForOffers());
-	assert.deepEqual(d.map((x) => x.shippingDestination.addressCountry), [...SHIP_CODES]);
+	assert.deepEqual([...new Set(d.map((x) => x.shippingDestination.addressCountry))], [...SHIP_CODES]);
+	for (const code of SHIP_CODES) assert.equal(d.filter((x) => x.shippingDestination.addressCountry === code)[0].shippingRate.value, '0', `${code}: the free option must be the default (first)`);
 	assert.deepEqual([].concat(merchantReturnPolicy.applicableCountry), [...SHIP_CODES]);
 	for (const x of d) assert.ok(x.deliveryTime.handlingTime && x.deliveryTime.transitTime && x.shippingRate.currency);
 });
@@ -112,9 +117,10 @@ test('dist: Merchant feed ships to exactly the live list, per item', () => {
 	const items = [...feed.matchAll(/<item>([\s\S]*?)<\/item>/g)];
 	assert.ok(items.length > 0);
 	for (const [, body] of items) {
-		const cs = [...body.matchAll(/<g:shipping><g:country>([A-Z]{2})<\/g:country>[\s\S]*?<g:price>([\d.]+) ([A-Z]{3})<\/g:price>/g)];
-		assert.deepEqual(cs.map((m) => m[1]).sort(), [...SHIP_CODES].sort(), 'feed countries != live list');
-		for (const m of cs) assert.equal(m[2], Number(countryFor(m[1]).shippingRate.value).toFixed(2));
+		const cs = [...body.matchAll(/<g:shipping><g:country>([A-Z]{2})<\/g:country><g:service>([^<]*)<\/g:service><g:price>([\d.]+) ([A-Z]{3})<\/g:price>/g)];
+		assert.deepEqual([...new Set(cs.map((m) => m[1]))].sort(), [...SHIP_CODES].sort(), 'feed countries != live list');
+		for (const m of cs.filter((x) => x[2] === 'Standard')) assert.equal(m[3], Number(countryFor(m[1]).shippingRate.value).toFixed(2));
+		for (const code of SHIP_CODES) assert.equal(cs.filter((m) => m[1] === code && m[2] === 'Standard').length, 1, `${code} needs exactly one Standard feed row`);
 	}
 	for (const code of pendingCodes) assert.ok(!new RegExp(`<g:country>${code}</g:country>`).test(feed), `${code} leaked into feed`);
 });

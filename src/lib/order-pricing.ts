@@ -45,6 +45,8 @@ export interface Quote {
 export function quote(
 	lines: { cents: number; qty: number; books?: number }[],
 	tiers: Tier[],
+	/** false in the far shipping band: the first-order 15% is not offered there (Kevin 2026-11-08, 2A). */
+	firstOffered = true,
 ): Quote {
 	const copies = lines.reduce((s, l) => s + l.qty * (l.books ?? 1), 0);
 	const subtotal = lines.reduce((s, l) => s + l.cents * l.qty, 0);
@@ -53,7 +55,13 @@ export function quote(
 	// Stripe applies the percent-off coupon to the order subtotal and rounds the discount once.
 	const firstTotal = subtotal - Math.round((subtotal * FIRST_ORDER_PCT) / 100);
 	const best =
-		copies < 1 ? 'none' : FIRST_ORDER_PCT > bulkPct ? 'first' : bulkPct > 0 ? 'bulk' : 'none';
+		copies < 1
+			? 'none'
+			: firstOffered && FIRST_ORDER_PCT > bulkPct
+				? 'first'
+				: bulkPct > 0
+					? 'bulk'
+					: 'none';
 	return { copies, subtotal, bulkPct, bulkTotal, firstTotal, best };
 }
 

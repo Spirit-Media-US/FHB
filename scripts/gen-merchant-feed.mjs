@@ -69,7 +69,7 @@ const rows = [...items.values()].map((i) => {
 		.map((d) => {
 			const dt = d.deliveryTime;
 			const cc = [].concat(d.shippingDestination)[0]?.addressCountry;
-			return `<g:shipping><g:country>${esc(cc)}</g:country><g:service>Standard</g:service><g:price>${Number(d.shippingRate?.value ?? 0).toFixed(2)} ${esc(d.shippingRate?.currency ?? 'USD')}</g:price>` +
+			return `<g:shipping><g:country>${esc(cc)}</g:country><g:service>${esc(d.name ?? "Standard")}</g:service><g:price>${Number(d.shippingRate?.value ?? 0).toFixed(2)} ${esc(d.shippingRate?.currency ?? 'USD')}</g:price>` +
 				`<g:min_handling_time>${num(dt?.handlingTime, 'minValue')}</g:min_handling_time><g:max_handling_time>${num(dt?.handlingTime, 'maxValue')}</g:max_handling_time>` +
 				`<g:min_transit_time>${num(dt?.transitTime, 'minValue')}</g:min_transit_time><g:max_transit_time>${num(dt?.transitTime, 'maxValue')}</g:max_transit_time></g:shipping>`;
 		})

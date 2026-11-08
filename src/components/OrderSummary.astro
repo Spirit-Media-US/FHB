@@ -25,8 +25,8 @@ const offerFine = FIRST_ORDER_FINE;
 const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min);
 ---
 <div class="osum" data-summary>
-	<p class="osum__offer">{offerLabel}</p>
-	<p class="osum__fine">{offerFine}</p>
+	<p class="osum__offer" data-offer>{offerLabel}</p>
+	<p class="osum__fine" data-offer>{offerFine}</p>
 	<p class="osum__tiers">
 		<span>Volume:</span>
 		{ladder.map((t) => <span class="osum__tier" data-tier={t.pct}>{t.pct}% off {t.min}+</span>)}
@@ -40,7 +40,7 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	{multiCountry && (<>
 	<label class="osum__label" for={`${idp}-country`}>Ship to</label>
 	<select id={`${idp}-country`} class="osum__email" name="country" autocomplete="country" data-country>
-		{LIVE_COUNTRIES.map((c) => <option value={c.code}>{c.name}</option>)}
+		{LIVE_COUNTRIES.map((c) => <option value={c.code} data-far={c.farBand ? '1' : '0'}>{c.name}</option>)}
 	</select>
 	</>)}
 	<label class="osum__label" for={`${idp}-email`}>Email</label>
