@@ -49,15 +49,15 @@ const [pageData, media] = await Promise.all([
   }`),
 ]);
 
-// Generic-first per the SEO strategy (Part 3): lead with the high-volume
-// "Read the Bible Free Online with Audio" phrase so the home surfaces for
-// everyday Bible searches, brand second. NOTE: the LIVE value comes from
+// BRAND-FIRST (Kevin 2026-11-08, unit 2jd): on Bing, spiritmediapublishing.com outranked us for
+// "father's heart bible" because its title leads with the exact name. The generic phrase stays
+// in the title, second. NOTE: the LIVE value comes from
 // Sanity (pageData.seoTitle) when set — update it there to match.
 const seoTitle =
-	pageData?.seoTitle || "Read the Bible Free Online with Audio — Father's Heart Bible™";
+	pageData?.seoTitle || "Father's Heart Bible™ (FHB) — Read the Bible Free Online with Audio";
 const seoDescription =
 	pageData?.seoDescription ||
-	`Read the Bible free online with audio. Father's Heart Bible™ (FHB) is the complete Bible, showing our Father's heart, with His words in blue — in print and soon in 80 languages.`;
+	`Father's Heart Bible™ (FHB) is the complete Bible, showing our Father's heart, with His words in blue. Read it free online with audio, or get it in print — soon in 80 languages.`;
 // Hero copy retired from the photo 2026-09-24 (Kevin: no title or text on the
 // hero image). heroSubheading still feeds the intro section below.
 const heroSubheading =
@@ -203,6 +203,7 @@ const homeVoices: VoiceGroup[] = [
 				"@id": "https://fathersheartbible.com/#website",
 				"url": "https://fathersheartbible.com",
 				"name": "Father's Heart Bible",
+				"alternateName": ["Father's Heart Bible™", "FHB", "The Father's Heart Bible"],
 				"publisher": { "@id": "https://fathersheartbible.com/#organization" }
 			},
 			{
@@ -252,7 +253,7 @@ const homeVoices: VoiceGroup[] = [
 			@media (min-width: 1280px) { #hero-section { padding-top: 75px; } }
 		</style>
 		<section id="hero-section" style="background-color: var(--color-deep); margin-top: -1px; line-height: 0;">
-			<h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Read the Bible free online with audio &mdash; Father&rsquo;s Heart Bible&trade;, in print</h1>
+			<h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Father&rsquo;s Heart Bible&trade; (FHB) &mdash; read the Bible free online with audio, and in print</h1>
 			<picture>
 				<source media="(min-width: 1024px)" srcset={heroDesktop} width="1920" height="736" />
 				<img
