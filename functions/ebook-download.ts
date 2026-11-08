@@ -69,6 +69,6 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
 	// Thank-you page with the download button (re-verifies on click).
 	return page(
-		`<h1>Thank you — welcome home</h1><p>Your Father’s Heart Bible eBook is ready. It’s a DRM-free EPUB — open it in Apple Books, Google Play Books, Kindle, or any reader.</p><a class="btn" href="/ebook-download?s=${encodeURIComponent(sid)}&dl=epub">Download EPUB →</a>`,
+		`<h1>Thank you — welcome home</h1><p>Your Father’s Heart Bible eBook is ready. It’s a DRM-free EPUB — open it in Apple Books, Google Play Books, or any reader.</p><a class="btn" href="/ebook-download?s=${encodeURIComponent(sid)}&dl=epub">Download EPUB →</a>`,
 	);
 };

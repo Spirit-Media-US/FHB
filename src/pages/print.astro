@@ -12,10 +12,9 @@ import YouVersionBanner from '../components/YouVersionBanner.astro';
 // the bookstore is the one master for an Amazon link and no ASIN is typed into this page.
 // An edition absent from this file keeps its "coming soon" state, so a listing appearing
 // later needs a re-run of the sync, not an edit here.
-import amazonLinks from '../data/amazon-links.json';
 import bnData from '../data/bn-links.json';
 import { cardUrl } from '../data/card-art';
-import digital from '../data/digital-listings.json';
+import digital from '../data/digital-listings-public';
 import { AUDIENCE_EDITION_TOTAL, dvcEditions as dvcEditionList } from '../data/dvc-editions';
 import {
 	allLanguageEditions,
@@ -29,6 +28,7 @@ import {
 } from '../data/language-editions';
 import { reachPhrase } from '../data/language-speakers';
 import Layout from '../layouts/Layout.astro';
+import { FHB_ORG_ID } from '../lib/fhb-org';
 import { directTarget } from '../lib/print-cards.mjs';
 import { fitDescription, fitTitle } from '../lib/seoFit';
 
@@ -65,12 +65,7 @@ const EBOOK_COVER =
 	'https://assets.spiritmediapublishing.com/FHB/print/fhb-ebook-cover-2026-6-600.webp';
 const EBOOK_COVER_2X =
 	'https://assets.spiritmediapublishing.com/FHB/print/fhb-ebook-cover-2026-6-1200.webp';
-const storeLogo = (store: string) =>
-	store === 'Kindle'
-		? ('amazon' as const)
-		: store === 'Kobo'
-			? ('kobo' as const)
-			: ('google' as const);
+const storeLogo = (store: string) => (store === 'Kobo' ? ('kobo' as const) : ('google' as const));
 const EBOOK_DIRECT = '$7.49';
 
 // ───────────────────────── GENERAL AUDIENCE ─────────────────────────
@@ -324,7 +319,7 @@ const printFaq = [
 		// quoted in an earlier brief, found present, and read as confirmation. Matching the
 		// wrong authority returns a true answer to the wrong question. The task register
 		// carries the quote WITH its timestamp; that is the authority, not a brief.
-		a: `Yes. For orders placed directly with us, <a href="${CONTACT}" style="${LINK}">reach out</a> and we'll make it right. Copies bought on Amazon or other retailers follow their return policy.`,
+		a: `Yes. For orders placed directly with us, <a href="${CONTACT}" style="${LINK}">reach out</a> and we'll make it right. Copies bought from other retailers follow their return policy.`,
 	},
 	{
 		q: 'How is Father’s Heart Bible™ different from other translations?',
@@ -332,7 +327,7 @@ const printFaq = [
 	},
 	{
 		q: 'How long does shipping take?',
-		a: `Order direct from us today and shipping is free — most orders arrive in 7–10 days, and larger bulk orders in 3–4 weeks. The Divine Voice™ Color editions are on Amazon now, and every card above links to its listing. Ordering direct from us includes free shipping. <a href="${CONTACT}" style="${LINK}">Reach out</a> if you need them by a particular date.`,
+		a: `Order direct from us today and shipping is free — most orders arrive in 7–10 days, and larger bulk orders in 3–4 weeks. Ordering direct from us includes free shipping. <a href="${CONTACT}" style="${LINK}">Reach out</a> if you need them by a particular date.`,
 	},
 	{
 		q: 'Is the color throughout the whole Bible?',
@@ -417,6 +412,12 @@ const bookSchema = {
 		offerCount: 29,
 		availability: 'https://schema.org/InStock',
 		url: 'https://fathersheartbible.com/print/',
+		seller: {
+			'@type': 'Organization',
+			'@id': FHB_ORG_ID,
+			name: "Father's Heart Bible",
+			url: 'https://fathersheartbible.com/',
+		},
 	},
 };
 const breadcrumbSchema = {
@@ -609,8 +610,6 @@ const dvcVerses = [
 							</div>
 							{/* One shared control set for every card on the page — see BuyControls. */}
 							<BuyControls
-								hbHref={amazonLinks[e.slug]?.formats?.hardback}
-								pbHref={amazonLinks[e.slug]?.formats?.paperback}
 								hbPrice={e.hb}
 								pbPrice={e.pb}
 								buyNowHref={builtPages.has(`${e.slug}-bible`) ? `/bibles/${e.slug}-bible/#order` : null}
@@ -699,8 +698,6 @@ const dvcVerses = [
 							     hardback have no listing yet and render as placeholders. */}
 							<div class="flex flex-col gap-2 w-full mt-auto">
 								<BuyControls
-									hbHref={amazonLinks[`general-${l.line}-${c.key}`]?.formats?.hardback}
-									pbHref={amazonLinks[`general-${l.line}-${c.key}`]?.formats?.paperback}
 									hbPrice={l.hb}
 									pbPrice={l.pb}
 									buyNowHref={builtPages.has('fathers-heart-bible') ? '/bibles/fathers-heart-bible/#order' : null}
@@ -726,14 +723,14 @@ const dvcVerses = [
 							<div class="flex flex-col gap-2 w-full mt-auto">
 								<div class="flex flex-wrap justify-center gap-2 w-full">
 								<BuyControls compact showDirect={false} stores={[
-									...digitalEn.ebook.map((d) => ({ logo: storeLogo(d.store), label: d.store === 'Kindle' ? 'Kindle' : 'eBook', price: d.price, href: d.url })),
+									...digitalEn.ebook.map((d) => ({ logo: storeLogo(d.store), label: 'eBook', price: d.price, href: d.url })),
 									{ label: 'Buy Direct', price: EBOOK_DIRECT, ebookDirect: true },
 								]} />
 								</div>
 								<p data-ebook-msg style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.4rem 0 0; display: none;"></p>
 								<p style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-ink); font-weight: 600; margin: 0.7rem 0 0;">Listening Edition (for read-aloud apps)</p>
 								<div class="flex flex-wrap justify-center gap-2 w-full">
-								<BuyControls compact showDirect={false} stores={digitalEn.listening.map((d) => ({ logo: storeLogo(d.store), label: d.label ? `${d.store} ${d.label}` : d.store === 'Kindle' ? 'Kindle' : 'eBook', price: d.price, href: d.url }))} />
+								<BuyControls compact showDirect={false} stores={digitalEn.listening.map((d) => ({ logo: storeLogo(d.store), label: d.label ? `${d.store} ${d.label}` : 'eBook', price: d.price, href: d.url }))} />
 								</div>
 							</div>
 							<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">
@@ -833,8 +830,6 @@ const dvcVerses = [
 						     hollow beside its siblings. */}
 						<div class="flex flex-col gap-2 w-full mt-auto">
 							<BuyControls
-								hbHref={amazonLinks[v.key]?.formats?.hardback}
-								pbHref={amazonLinks[v.key]?.formats?.paperback}
 								hbPrice={v.hb}
 								pbPrice={v.pb}
 								buyNowHref={builtPages.has(`${v.key}-bible`) ? `/bibles/${v.key}-bible/#order` : null}
@@ -945,8 +940,6 @@ const dvcVerses = [
 											<LookInside slug="general" title="FHB — Father’s Heart Bible — English" variant="link" label="Look inside" reuse />
 										</div>
 										<BuyControls
-											hbHref={amazonLinks[EN_KEY]?.formats?.hardback}
-											pbHref={amazonLinks[EN_KEY]?.formats?.paperback}
 											hbPrice={enLine.hb}
 											pbPrice={enLine.pb}
 											buyNowHref={builtPages.has('fathers-heart-bible') ? '/bibles/fathers-heart-bible/#order' : null}
@@ -976,8 +969,6 @@ const dvcVerses = [
 										{/* Kevin 2026-10-10: the language's eBook and audiobook sit on its own card as store
 										    buttons in the Amazon shape, before Buy Direct (src/data/digital-listings.json). */}
 										<BuyControls
-											hbHref={l.amazon?.hardback}
-											pbHref={l.amazon?.paperback}
 											hbPrice={LANG_HB}
 											pbPrice={LANG_PB}
 											buyNowHref={langSold(l) && builtPages.has(`${langSlug(l)}-bible`) ? `/bibles/${langSlug(l)}-bible/#order` : null}
@@ -1247,7 +1238,7 @@ const dvcVerses = [
 				const r = await fetch('/ebook-checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
 				const d = await r.json();
 				if (d.url) { window.location.href = d.url; return; }
-				if (msg) { msg.style.display = 'block'; msg.textContent = d.disabled ? 'Direct download is opening soon — grab it on Amazon meanwhile.' : 'Sorry, something went wrong. Please try again.'; }
+				if (msg) { msg.style.display = 'block'; msg.textContent = d.disabled ? 'Direct download is opening soon — please try again shortly or order the print edition direct from us.' : 'Sorry, something went wrong. Please try again.'; }
 			} catch {
 				if (msg) { msg.style.display = 'block'; msg.textContent = 'Network error — please try again.'; }
 			}

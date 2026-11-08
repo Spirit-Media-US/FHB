@@ -5,43 +5,30 @@
 // volume cards had three separate copies of this markup, which is how they drifted into three
 // different shapes — Kevin's round-3 review found the LP cards carrying a third button and the
 // general cards carrying none (2026-09-17, "LP Editions need buttons formatted like all other
-// buttons... No third button" / "General editions buttons need Amazon"). One component means
+// buttons... No third button" / "General editions buttons"). One component means
 // "formatted like all other buttons" is structurally true rather than re-checked by eye.
 //
 // THE SHAPE, fixed for every card:
-//   Amazon · Hardback  $x.xx        ← link, or a disabled PLACEHOLDER when unlisted
-//   Amazon · Paperback $y.yy        ← link, or a disabled PLACEHOLDER when unlisted
-//   Buy Direct & Save + Free Shipping   ← a LINK, never a button, to the bulk form
+//   Hardback $x.xx · Paperback $y.yy    ← our own FHB prices, plain text
+//   Buy now · free shipping             ← this edition's own FHB order form
+//   Store buttons, then Buy Direct & Save + Free Shipping
 //
-// PLACEHOLDERS RATHER THAN OMISSIONS (Kevin: "add placeholders for ALL buttons"): a binding
-// with no Amazon listing still renders its button, disabled, in the same position — so every
-// card has the same control set and the grid lines up instead of going ragged. Four bindings
-// are genuinely unlisted (men's and Peace paperback, Recovery and Teen hardback) and a link is
-// never invented to fill one (D184).
-//
-// A PLACEHOLDER CARRIES THE SAME LABEL AS A LIVE BUTTON — binding and price, nothing else
-// (Kevin 2026-09-17: "remove 'coming soon' ... Do show the price and everything ready to be
-// linked and activated"). The trailing phrase was spilling the label onto a second line, and
-// it made activation a copy edit as well as a link change. Now the ONLY difference between a
-// placeholder and a live button is the href and the fade, so turning one live when the listing
-// appears is adding the URL and nothing else.
+// FHB is the seller (Kevin 2026-11-08): no third-party retailer button that points away from us
+// except faith-aligned ones listed in the data once live. Unlisted stores render a faded pill.
 //
 // The fade is VISUAL ONLY. aria-disabled stays, because a screen reader gets no colour.
 interface Props {
-	/** Amazon URLs per binding. Absent = no listing = a disabled placeholder. */
-	hbHref?: string;
-	pbHref?: string;
-	/** Omit both prices on a card with no print binding (the eBook / audiobook cards). */
+	/** Print prices, shown as plain text (our own FHB price list). Omit both on a card with no print binding. */
 	hbPrice?: number;
 	pbPrice?: number;
 	/**
-	 * Store buttons after the Amazon print buttons and BEFORE Buy Direct (Kevin 2026-10-10:
+	 * Store buttons BEFORE Buy Direct (Kevin 2026-10-10:
 	 * "all store buttons come before Buy Direct & Save"). Same pill, logo first, then
-	 * label + price — the Amazon shape. `ebookDirect` renders the direct eBook checkout
+	 * label + price. `ebookDirect` renders the direct eBook checkout
 	 * button the page script binds to ([data-ebook-buy]) instead of a link.
 	 */
 	stores?: {
-		logo?: 'amazon' | 'google' | 'kobo' | 'spotify' | 'youtube' | 'applepodcasts';
+		logo?: 'google' | 'kobo' | 'spotify' | 'youtube' | 'applepodcasts';
 		label: string;
 		price: string;
 		href?: string;
@@ -86,8 +73,6 @@ interface Props {
 	buyNowHref?: string | null;
 }
 const {
-	hbHref,
-	pbHref,
 	hbPrice,
 	pbPrice,
 	directHref = '#bulk-order',
@@ -107,13 +92,11 @@ const bnLinks = [
 	{ label: 'Paperback', href: bn?.paperback },
 ].filter((x) => x.href);
 
-const AMAZON_LOGO = 'https://assets.spiritmediapublishing.com/FHB/print/amazon-logo.webp';
-// Store logos, self-hosted on R2 like the Amazon one (never hotlinked). Google Play: Google's
+// Store logos, self-hosted on R2 (never hotlinked). Google Play: Google's
 // own horizontal lockup from gstatic (play_prism_hlock_2x.png), the same mark as the 2016 logo
 // Kevin pointed at. Kobo: the "kobo" wordmark cut from Kobo Writing Life's own logo SVG
 // (kobo.com bot-checks our servers). Sized by HEIGHT so the three marks sit level.
 const LOGOS = {
-	amazon: { src: AMAZON_LOGO, w: 192, h: 58 },
 	google: {
 		src: 'https://assets.spiritmediapublishing.com/FHB/print/google-play-logo.webp',
 		w: 288,
@@ -142,7 +125,6 @@ const LOGOS = {
 } as const;
 
 const STORE_NAMES = {
-	amazon: 'Amazon',
 	google: 'Google Play Books',
 	kobo: 'Kobo',
 	bn: 'Barnes & Noble',
@@ -151,18 +133,19 @@ const STORE_NAMES = {
 	applepodcasts: 'Listen on Apple Podcasts',
 } as const;
 
-const bindings = [
-	{ label: 'Hardback', href: hbHref, price: hbPrice },
-	{ label: 'Paperback', href: pbHref, price: pbPrice },
-].filter((b) => b.price !== undefined) as { label: string; href?: string; price: number }[];
+const priceBits = [
+	hbPrice !== undefined ? `Hardback $${hbPrice.toFixed(2)}` : '',
+	pbPrice !== undefined ? `Paperback $${pbPrice.toFixed(2)}` : '',
+].filter(Boolean);
 const btnClass = compact ? 'buy-btn buy-btn-compact' : 'buy-btn';
-const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
+const spare = Math.max(0, reserveSlots - stores.length);
 ---
 
 {/* LIGHT PINK on every button (Kevin 2026-09-17, "Turn all button light pink"), taken from
     the existing brand token --color-primary-fixed rather than a new colour invented for this
     page. Ink on light pink is a strong contrast; the disabled placeholder drops to a muted
     pink with grey text so it reads as unavailable without becoming pink-on-pink. */}
+{priceBits.length > 0 && <p class="buy-prices">{priceBits.join(' · ')}</p>}
 {
 	buyNowHref ? (
 		<a href={buyNowHref} class="buy-btn buy-now" style="text-decoration: none;" data-buy-now>
@@ -174,48 +157,6 @@ const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
 				<span>&nbsp;</span>
 			</span>
 		)
-	)
-}
-{
-	bindings.map((b) =>
-		b.href ? (
-			<a
-				href={b.href}
-				target="_blank"
-				rel="noopener"
-				class="buy-btn"
-				style="text-decoration: none;"
-			>
-				{/* alt="Amazon": the button text is only "· Hardback $99.99", so the logo is
-				    the one thing that names the store — without it the link reads as a bare
-				    price. Explicit width/height so it cannot shift layout
-				    (performance gate, trait 8). Served from OUR asset host — the logo Kevin
-				    supplied was fetched, cleaned and uploaded to R2 rather than hotlinked. */}
-				<img
-					src={AMAZON_LOGO}
-					alt="Amazon"
-					width="64"
-					height="19"
-					loading="lazy"
-					decoding="async"
-					style="width: 52px; height: auto; display: block;"
-				/>
-				<span>· {b.label} ${b.price.toFixed(2)}</span>
-			</a>
-		) : (
-			<span class="buy-btn buy-btn-off" aria-disabled="true">
-				<img
-					src={AMAZON_LOGO}
-					alt="Amazon"
-					width="64"
-					height="19"
-					loading="lazy"
-					decoding="async"
-					style="width: 52px; height: auto; display: block; opacity: 0.45;"
-				/>
-				<span>· {b.label} ${b.price.toFixed(2)}</span>
-			</span>
-		),
 	)
 }
 {
@@ -289,6 +230,14 @@ const spare = Math.max(0, reserveSlots - bindings.length - stores.length);
 }
 
 <style>
+	.buy-prices {
+		font-family: var(--font-sans);
+		font-size: 0.82rem;
+		font-weight: 700;
+		color: var(--color-ink);
+		text-align: center;
+		margin: 0;
+	}
 	/* NO `white-space: nowrap` HERE. It was the actual cause of the spill Kevin saw: the logo
 	   plus "· Hardback $99.99" needs about 199px and a card is 133px wide at phone width, so
 	   the label ran straight out of the pill — measured as scrollWidth > clientWidth on 32 of
