@@ -1,0 +1,152 @@
+---
+// /youversion/ — landing page for readers who arrive from our YouVersion reading plans ("Meet Your
+// Father", "The Words of the Father") and from the Bible App (Kevin 2026-11-07 13:35Z, "1 A").
+// YouVersion has no page listing every FHB language, so this page does: one button per edition, from
+// src/data/youversion-editions.json (a LIVE scan of the bible.com version API; its header says how).
+// Wording is reused from the approved pages: intro = /overview/ + the /partners/ description,
+// Divine Voice Color = the homepage, community invite = /family/, audio = receive.ts AUDIO.
+// First section is a plain <section> (no data-reveal) so nothing above the fold animates.
+import Section from '../components/Section.astro';
+import VoiceChips from '../components/VoiceChips.astro';
+import roster from '../data/language-roster.json';
+import { AUDIO } from '../data/receive';
+import yv from '../data/youversion-editions.json';
+import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+
+// English first, then alphabetical by English name.
+const editions = [...yv.editions].sort((a, b) =>
+	a.code === 'en' ? -1 : b.code === 'en' ? 1 : a.english.localeCompare(b.english),
+);
+const YV_COUNT = editions.length;
+// The 80-language roster (fhb-chain.py edition-roster). Not language-roster.ts ROSTER_TOTAL, which
+// also counts read-online languages outside the roster (83 on 2026-11-08).
+const ROSTER_COUNT = roster.languages.length;
+const JOIN_URL = 'https://fathersheartbible.com/login?error=join-to-interact';
+const YOUVERSION_ORG = 'https://www.bible.com/organizations/89162c01-3892-4c7b-a462-239df0931522';
+
+const P = 'text-lg leading-relaxed mb-4';
+const btn =
+	'inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold no-underline rounded-lg';
+const btnStyle = 'font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A;';
+---
+
+<Layout
+  title={fitTitle("Father's Heart Bible™ on YouVersion — Every Language")}
+  description={fitDescription(`Welcome, YouVersion readers. Read Father's Heart Bible™ in Divine Voice™ Color in ${YV_COUNT} languages in the Bible App, free online, and as a free audio Bible.`)}
+  jsonLd={{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Father's Heart Bible on YouVersion", "item": "https://fathersheartbible.com/youversion/" }
+    ]
+  }}
+>
+  <main id="main-content" style="margin-top: 80px;">
+    <section class="py-8 md:py-12 lg:py-16" style="background-color: var(--color-surface-low);">
+      <div class="max-w-3xl mx-auto px-4 md:px-6" style="font-family: var(--font-sans);">
+        <p class="text-xs font-semibold tracking-widest uppercase mb-4" style="color: var(--color-brand);">Welcome, YouVersion readers</p>
+        <h1 class="text-4xl md:text-5xl font-light mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">Father&rsquo;s Heart Bible&trade; on YouVersion</h1>
+        <p class={P} style="color: var(--color-ink);">Thank you for reading with us in the Bible App. We are glad you are here.</p>
+        <p class={P} style="color: var(--color-muted);">Father&rsquo;s Heart Bible&trade; is a complete translation of the Bible, 66 books and 31,087 verses, from the original Hebrew, Aramaic and Greek. Where other Bibles use &ldquo;God&rdquo; to say what He is, the Father&rsquo;s Heart Bible&trade; uses &ldquo;our Father&rdquo; to show who He has been all along.</p>
+        <div class="flex flex-wrap gap-3 mt-6">
+          <a href="#languages" class={btn} style={btnStyle}>Choose your language</a>
+          <a href="/read/" class={btn} style="font-family: var(--font-sans); border: 2px solid var(--color-ink); color: var(--color-ink);">Read free online</a>
+        </div>
+      </div>
+    </section>
+
+    <Section variant="light">
+      <div class="max-w-3xl mx-auto text-center" style="font-family: var(--font-sans);">
+        <h2 class="text-3xl md:text-4xl font-light mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">His voice in Divine Voice&trade; Color</h2>
+        <VoiceChips size="1.25rem" class="mb-6" />
+        <p class={P} style="color: var(--color-muted);">For a hundred and twenty-five years, red letters have shown you the Son speaking. Our Father speaks more than three times as often. Father&rsquo;s Heart Bible is, to our knowledge, the first Bible in print where you can see who is speaking.</p>
+        <p class={P} style="color: var(--color-muted);">Our Father&rsquo;s words in <strong style="color:#2563eb">BLUE</strong>. The Son&rsquo;s in <strong style="color:#c8102e">RED</strong>. The Spirit&rsquo;s in <strong style="color:#6a3fa0">PURPLE</strong>.</p>
+        <p class="text-base leading-relaxed" style="color: var(--color-muted);"><a href="/who-speaks-in-scripture/" class="hover:underline" style="color: var(--color-brand);">See who speaks in every book</a></p>
+      </div>
+    </Section>
+
+    <Section variant="soft" id="languages">
+      <div class="max-w-5xl mx-auto" style="font-family: var(--font-sans);">
+        <h2 class="text-3xl md:text-4xl font-light mb-4 text-center" style="font-family: var(--font-serif); color: var(--color-ink);">Read the FHB in your language on YouVersion</h2>
+        <p class="text-lg leading-relaxed mb-8 text-center max-w-3xl mx-auto" style="color: var(--color-muted);">{YV_COUNT} editions are on YouVersion now, and more are coming, until all {ROSTER_COUNT} languages are there. Tap your language to open it in the Bible App.</p>
+        <ul class="yv-grid" role="list">
+          {editions.map((e) => (
+            <li>
+              <a href={e.url} target="_blank" rel="noopener" class="yv-lang" lang={e.code} dir={e.dir}>
+                <span class="yv-local">{e.local}</span>
+                {e.local !== e.english && <span class="yv-eng" lang="en" dir="ltr">{e.english}</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="text-sm leading-relaxed mt-8 text-center" style="color: var(--color-muted);">
+          All our editions in the Bible App: <a href={YOUVERSION_ORG} target="_blank" rel="noopener" class="hover:underline" style="color: var(--color-brand);">Spirit Media Publishing on YouVersion</a>
+        </p>
+      </div>
+    </Section>
+
+    <Section variant="light">
+      <div class="max-w-3xl mx-auto text-center" style="font-family: var(--font-sans);">
+        <p class="text-xs font-semibold tracking-widest uppercase mb-4" style="color: var(--color-gold);">Read &amp; Listen</p>
+        <h2 class="text-3xl md:text-4xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">Always FREE</h2>
+        <p class={P} style="color: var(--color-muted);">The whole Father&rsquo;s Heart Bible&trade;, Genesis to Revelation, is free to read online and free to hear as an audio Bible.</p>
+        <div class="flex flex-wrap justify-center gap-3 mt-6">
+          <a href="/read/" class={btn} style={btnStyle}>Read Online</a>
+          <a href={`${AUDIO.page}/`} class={btn} style="font-family: var(--font-sans); border: 2px solid var(--color-ink); color: var(--color-ink);">Audio Bible</a>
+        </div>
+        <p class="text-sm leading-relaxed mt-4" style="color: var(--color-muted);">
+          Also on <a href={AUDIO.spotify} target="_blank" rel="noopener" class="hover:underline" style="color: var(--color-brand);">Spotify</a>,
+          <a href={AUDIO.apple} target="_blank" rel="noopener" class="hover:underline" style="color: var(--color-brand);">Apple Podcasts</a> and
+          <a href={AUDIO.youtube} target="_blank" rel="noopener" class="hover:underline" style="color: var(--color-brand);">YouTube</a>.
+        </p>
+      </div>
+    </Section>
+
+    <Section variant="soft">
+      <div class="max-w-3xl mx-auto text-center" style="font-family: var(--font-sans);">
+        <h2 class="text-3xl md:text-4xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">Join the Father&rsquo;s Heart Family</h2>
+        <p class={P} style="color: var(--color-muted);">Connect with beloved sons and daughters around the world.</p>
+        <a href={JOIN_URL} class={btn} style={btnStyle}>Join the Family</a>
+        <p class="text-sm mt-3" style="color: var(--color-muted);">Free to join — one tap, no password.</p>
+      </div>
+    </Section>
+  </main>
+</Layout>
+
+<style>
+  .yv-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  @media (min-width: 640px) {
+    .yv-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .yv-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  .yv-lang {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 64px;
+    height: 100%;
+    padding: 0.625rem 0.875rem;
+    background: var(--color-surface, #fff);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--color-ink);
+    overflow-wrap: anywhere;
+    transition: border-color 0.12s;
+  }
+  .yv-lang:hover,
+  .yv-lang:focus-visible { border-color: var(--color-brand); }
+  .yv-local { font-weight: 700; font-size: 1rem; line-height: 1.3; }
+  .yv-eng { font-size: 0.8125rem; line-height: 1.3; color: var(--color-muted); margin-top: 0.125rem; }
+</style>
