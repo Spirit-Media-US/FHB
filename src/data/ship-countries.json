@@ -1,0 +1,101 @@
+{
+	"_readme": "ONE list that drives checkout (allowed_countries + shipping_options), Offer/OfferShippingDetails/MerchantReturnPolicy JSON-LD, the Merchant Center feed and the visible 'ships to' lines. Only `live` is ever emitted. `pending` is a candidate list: it is NEVER read by checkout, schema, feed or pages (a test fails the build if it leaks). To launch a country: fill printSite, shippingRate, handlingDays, transitDays from IngramSpark's ship-to data (pmpublish 2026-11-09, /home/deploy/aeo-state/fhb-ingram-shipto-20261108.json), set status live, and move the row from `pending` to `live`. Rates are fixed per order (Stripe shipping rates cannot vary by item count). shippingRate.value is a decimal string in `currency`.",
+	"live": [
+		{
+			"code": "US",
+			"name": "United States",
+			"printSite": "US",
+			"shippingRate": { "value": "0", "currency": "USD" },
+			"handlingDays": [2, 3],
+			"transitDays": [5, 7]
+		}
+	],
+	"printSites": {
+		"US": "the United States",
+		"UK": "the United Kingdom",
+		"AU": "Australia",
+		"UAE": "the United Arab Emirates"
+	},
+	"pending": [
+		{
+			"status": "PENDING",
+			"code": "GB",
+			"name": "United Kingdom",
+			"printSite": "UK",
+			"shippingRate": null,
+			"handlingDays": null,
+			"transitDays": null,
+			"note": "Candidate. UK print time 8 business days paperback / 13 hardcover (Ingram notice Nov 2025). Rate and transit need Ingram data. UK VAT: books zero-rated (inferred), needs adviser."
+		},
+		{
+			"status": "PENDING",
+			"code": "CA",
+			"name": "Canada",
+			"printSite": "US",
+			"shippingRate": null,
+			"handlingDays": null,
+			"transitDays": null,
+			"note": "Candidate. Ground from US 3-7 business days (snippet). Duty/GST above CAD 20/40 mail threshold."
+		},
+		{
+			"status": "PENDING",
+			"code": "AU",
+			"name": "Australia",
+			"printSite": "AU",
+			"shippingRate": null,
+			"handlingDays": null,
+			"transitDays": null,
+			"note": "Candidate. AU print 5 days paperback / 7 hardcover. Ingram AU orders carry 10% GST."
+		},
+		{
+			"status": "PENDING",
+			"code": "AE",
+			"name": "United Arab Emirates",
+			"printSite": "UAE",
+			"shippingRate": null,
+			"handlingDays": null,
+			"transitDays": null,
+			"note": "Candidate. UAE site named in one Ingram document only."
+		},
+		{
+			"status": "PENDING",
+			"code": "DE",
+			"name": "Germany",
+			"printSite": "UK",
+			"shippingRate": null,
+			"handlingDays": null,
+			"transitDays": null,
+			"note": "Candidate. Printed at UK site; EUR 3 customs duty from 2026-07-01 on small parcels."
+		},
+		{
+			"status": "PENDING",
+			"code": "IN",
+			"name": "India",
+			"printSite": null,
+			"shippingRate": null,
+			"handlingDays": null,
+			"transitDays": null,
+			"note": "Candidate. No public shipping/duty data. Stripe Tax: digital only."
+		},
+		{
+			"status": "PENDING",
+			"code": "NG",
+			"name": "Nigeria",
+			"printSite": null,
+			"shippingRate": null,
+			"handlingDays": null,
+			"transitDays": null,
+			"note": "Candidate. No book duty exemption found; VAT 7.5%."
+		},
+		{
+			"status": "PENDING",
+			"code": "PH",
+			"name": "Philippines",
+			"printSite": null,
+			"shippingRate": null,
+			"handlingDays": null,
+			"transitDays": null,
+			"note": "Candidate. Books exempt from duty/VAT (DOF); commercial importers need exemption."
+		}
+	]
+}

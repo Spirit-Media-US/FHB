@@ -1,4 +1,5 @@
 ---
+import { FIRST_ORDER_FINE, FIRST_ORDER_LABEL, type Tier } from '../lib/order-pricing';
 /* THE ORDER SUMMARY every print order form ends in (Kevin 2026-10-03): copies, subtotal, the
  * ONE discount that applies (volume tier or 15% off a first order — never both), the total,
  * the buyer's email and the Checkout button. Driven by src/scripts/order-form.ts.
@@ -7,7 +8,7 @@
  * nothing else. The email is asked for here because a first order can only be recognised by
  * it; the server checks it before applying WELCOME15, and Stripe receives it pre-filled.
  */
-import { FIRST_ORDER_FINE, FIRST_ORDER_LABEL, type Tier } from '../lib/order-pricing';
+import { allFreeShipping, LIVE_COUNTRIES } from '../lib/shipCountries';
 
 interface Props {
 	tiers: Tier[];
@@ -17,6 +18,8 @@ interface Props {
 const { tiers, idp } = Astro.props;
 // Runtime consts: biome cannot see .astro template use and would turn template-only imports
 // into `import type` (a production ReferenceError). Keep these lines.
+const multiCountry = LIVE_COUNTRIES.length > 1;
+const shipNote = allFreeShipping() ? 'Free shipping' : 'Shipping added at checkout';
 const offerLabel = FIRST_ORDER_LABEL;
 const offerFine = FIRST_ORDER_FINE;
 const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min);
@@ -33,7 +36,13 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 		<div data-sum-disc hidden><dt data-sum-disc-label></dt><dd data-sum-disc-amt></dd></div>
 		<div class="osum__total"><dt>Total</dt><dd data-sum-total>$0.00</dd></div>
 	</dl>
-	<p class="osum__note">Free shipping · sales tax calculated at checkout</p>
+	<p class="osum__note">{shipNote} · tax calculated at checkout</p>
+	{multiCountry && (<>
+	<label class="osum__label" for={`${idp}-country`}>Ship to</label>
+	<select id={`${idp}-country`} class="osum__email" name="country" autocomplete="country" data-country>
+		{LIVE_COUNTRIES.map((c) => <option value={c.code}>{c.name}</option>)}
+	</select>
+	</>)}
 	<label class="osum__label" for={`${idp}-email`}>Email</label>
 	<input id={`${idp}-email`} class="osum__email" type="email" name="email" autocomplete="email" inputmode="email" required data-email />
 	<button type="button" class="osum__checkout" data-checkout>Checkout →</button>

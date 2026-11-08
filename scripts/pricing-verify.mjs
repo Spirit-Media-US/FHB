@@ -42,6 +42,7 @@ import { execSync } from 'node:child_process';
  * gate that has never rejected anything is unproven.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { LIVE_COUNTRIES } from '../src/lib/shipCountries.ts';
 
 const ISBNS = '/home/deploy/projects/fhb-print-bible/editions/ISBNS.json';
 const CHECKOUT = 'functions/dvc-checkout.ts';
@@ -570,11 +571,13 @@ function merchantErrs(pages, srv) {
 			if (o.availability !== 'https://schema.org/InStock')
 				errs.push(`${tag}: availability ${o.availability}`);
 			if (o.url !== pageUrl) errs.push(`${tag}: offer url ${o.url} is not this page (${pageUrl})`);
-			const sh = o.shippingDetails;
-			if (sh?.shippingRate?.value !== '0' || sh?.shippingDestination?.addressCountry !== 'US')
-				errs.push(
-					`${tag}: shipping must be free and to the US (shippingRate 0 + shippingDestination US)`,
-				);
+			// One OfferShippingDetails per LIVE country in src/data/ship-countries.json, each with that
+			// country's configured rate; nothing else (unit 2js).
+			const shs = [].concat(o.shippingDetails ?? []);
+			const got = shs.map((x) => `${x?.shippingDestination?.addressCountry}:${x?.shippingRate?.value}`).sort().join(',');
+			const want = LIVE_COUNTRIES.map((c) => `${c.code}:${c.shippingRate.value}`).sort().join(',');
+			if (got !== want)
+				errs.push(`${tag}: shipping must match the live ship-country list (${want}), page says ${got || 'none'}`);
 			if (!p.name || !p.image) errs.push(`${tag}: Product needs name and image`);
 			const g = o.gtin13 ?? p.gtin13;
 			if (!/^lp-set-/.test(o.sku ?? '') && !isbn13ok(g))

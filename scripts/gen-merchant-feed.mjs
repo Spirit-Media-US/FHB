@@ -60,10 +60,20 @@ for (const d of readdirSync(`${DIST}/bibles`).sort()) {
 
 const num = (q, k) => q?.[k] ?? '';
 const rows = [...items.values()].map((i) => {
-	const dt = i.ship?.deliveryTime;
-	const ship = `<g:shipping><g:country>US</g:country><g:service>Standard</g:service><g:price>${Number(i.ship?.shippingRate?.value ?? 0).toFixed(2)} USD</g:price>` +
-		`<g:min_handling_time>${num(dt?.handlingTime, 'minValue')}</g:min_handling_time><g:max_handling_time>${num(dt?.handlingTime, 'maxValue')}</g:max_handling_time>` +
-		`<g:min_transit_time>${num(dt?.transitTime, 'minValue')}</g:min_transit_time><g:max_transit_time>${num(dt?.transitTime, 'maxValue')}</g:max_transit_time></g:shipping>`;
+	// One <g:shipping> per OfferShippingDetails, i.e. one per LIVE country in
+	// src/data/ship-countries.json (the page JSON-LD is built from it). No shipping in the page = no
+	// shipping in the feed: fail loudly rather than invent a US default.
+	const details = [].concat(i.ship ?? []);
+	if (!details.length) throw new Error(`merchant-feed: ${i.id} has no shippingDetails in its page JSON-LD`);
+	const ship = details
+		.map((d) => {
+			const dt = d.deliveryTime;
+			const cc = [].concat(d.shippingDestination)[0]?.addressCountry;
+			return `<g:shipping><g:country>${esc(cc)}</g:country><g:service>Standard</g:service><g:price>${Number(d.shippingRate?.value ?? 0).toFixed(2)} ${esc(d.shippingRate?.currency ?? 'USD')}</g:price>` +
+				`<g:min_handling_time>${num(dt?.handlingTime, 'minValue')}</g:min_handling_time><g:max_handling_time>${num(dt?.handlingTime, 'maxValue')}</g:max_handling_time>` +
+				`<g:min_transit_time>${num(dt?.transitTime, 'minValue')}</g:min_transit_time><g:max_transit_time>${num(dt?.transitTime, 'maxValue')}</g:max_transit_time></g:shipping>`;
+		})
+		.join('\n');
 	return `<item>
 <g:id>${esc(i.id)}</g:id>
 <title>${esc(i.title)}</title>

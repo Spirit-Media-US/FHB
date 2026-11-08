@@ -32,6 +32,12 @@ import { FHB_ORG_ID } from '../lib/fhb-org';
 import { merchantReturnPolicy } from '../lib/merchantReturnPolicy';
 import { directTarget } from '../lib/print-cards.mjs';
 import { fitDescription, fitTitle } from '../lib/seoFit';
+import {
+	LIVE_COUNTRIES,
+	shippingDetailsForOffers,
+	shipsLine,
+	shipsToList,
+} from '../lib/shipCountries';
 
 // THE DIVINE VOICE™ COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
 // edition. Every subtitle in the trade metadata ends with the same tail ("Red Letter -
@@ -330,6 +336,16 @@ const printFaq = [
 		q: 'How long does shipping take?',
 		a: `Order direct from us today and shipping is free — most orders arrive in 7–10 days, and larger bulk orders in 3–4 weeks. Ordering direct from us includes free shipping. <a href="${CONTACT}" style="${LINK}">Reach out</a> if you need them by a particular date.`,
 	},
+	// International answer exists ONLY when more than one country is live (src/data/ship-countries.json);
+	// at US-only it would claim shipping we do not do. Built from the list, never typed.
+	...(LIVE_COUNTRIES.length > 1
+		? [
+				{
+					q: 'Do you ship outside the United States?',
+					a: `Yes. ${shipsLine()} We currently ship to: ${shipsToList()}. Your delivery estimate and any shipping charge appear in checkout once you choose your country, and the delivery carrier may call the phone number you give at checkout, so please include your country code. <a href="${CONTACT}" style="${LINK}">Reach out</a> if your country is not listed.`,
+				},
+			]
+		: []),
 	{
 		q: 'Is the color throughout the whole Bible?',
 		a: `Yes — Genesis to Revelation, every divine voice, in full color on every page. Not a red-letter New Testament with a black Old Testament, and not a study section at the back. You can see it for yourself free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
@@ -408,6 +424,7 @@ const bookSchema = {
 	offers: {
 		'@type': 'AggregateOffer',
 		hasMerchantReturnPolicy: merchantReturnPolicy,
+		shippingDetails: shippingDetailsForOffers(),
 		priceCurrency: 'USD',
 		lowPrice: '7.49',
 		highPrice: '124.99',

@@ -1331,7 +1331,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	const json = (body: unknown, status = 200) =>
 		new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
-	let payload: { counts?: Record<string, number>; returnPath?: string; email?: string };
+	let payload: {
+		counts?: Record<string, number>;
+		returnPath?: string;
+		email?: string;
+		country?: string;
+	};
 	try {
 		payload = await request.json();
 	} catch {
@@ -1388,6 +1393,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	}
 	const pct = promo ? 0 : tier.pct;
 
+	// Destination: defaults to US (every form before international shipping). A country that is not
+	// in the LIVE list (pending, unknown, malformed) is refused, never passed to Stripe.
+	const shipForm = checkoutShippingForm(payload.country ?? 'US');
+	if (!shipForm) {
+		return json(
+			{ error: 'country_not_served', message: 'We do not ship to that country yet.' },
+			400,
+		);
+	}
+
 	const reqUrl = new URL(request.url);
 	const origin =
 		reqUrl.hostname === 'fathersheartbible.pages.dev'
@@ -1408,10 +1423,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 				? `${origin}/print/order/?order=canceled`
 				: `${origin}/print/?order=canceled#bulk-order`,
 		'automatic_tax[enabled]': 'true',
-		// Free shipping is baked into the unit price; the address is still collected for
-		// tax calculation and fulfilment.
-		'shipping_address_collection[allowed_countries][0]': 'US',
-		'phone_number_collection[enabled]': 'true',
+		// Country, shipping rate + delivery estimate, REQUIRED phone and the address-form hint all
+		// come from src/data/ship-countries.json via checkoutShippingForm (unit 2js). US ships free
+		// (baked into the unit price); a country with a rate adds it as the Stripe shipping option.
+		...shipForm,
 		'metadata[kind]': 'dvc_print',
 		'metadata[total]': total,
 		'metadata[pct_off]': promo ? FIRST_ORDER_PCT : pct,

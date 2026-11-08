@@ -211,6 +211,8 @@ function init(root: HTMLElement) {
 				body: JSON.stringify({
 					counts: Object.fromEntries(Object.entries(counts).filter(([, n]) => n > 0)),
 					email: email?.value.trim() ?? '',
+					// Only rendered when more than one country is live; the server defaults to US.
+					country: q<HTMLSelectElement>('[data-country]')?.value,
 					returnPath: cfg.returnPath,
 				}),
 			});

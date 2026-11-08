@@ -19,9 +19,11 @@
 //  - returnFees FreeReturn = "no charge to the consumer to return the product" (true: nothing
 //    is shipped back). refundType FullRefund.
 //
-// COUNTRIES come from ONE list. Keep applicableCountry equal to shippingDestination; when
-// international shipping lands, add the codes HERE and both follow.
-export const SHIP_COUNTRIES: readonly string[] = ['US'];
+import { SHIP_CODES } from './shipCountries.ts';
+
+// COUNTRIES come from ONE list. Keep applicableCountry equal to shippingDestination; the list lives in
+// src/data/ship-countries.json; add a country THERE and both follow.
+export const SHIP_COUNTRIES: readonly string[] = SHIP_CODES;
 export const RETURN_DAYS = 30;
 export const RETURNS_URL = 'https://fathersheartbible.com/returns/';
 

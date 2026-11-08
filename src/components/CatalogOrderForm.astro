@@ -17,6 +17,7 @@
  */
 import { CATALOG_CATEGORIES, catalogPrices, catalogRows } from '../data/print-catalog';
 import { PRINT_TIERS } from '../data/print-tiers';
+import { shipsLine, shipsToSentence } from '../lib/shipCountries';
 import OrderRow from './OrderRow.astro';
 import OrderSummary from './OrderSummary.astro';
 
@@ -65,6 +66,7 @@ const config = JSON.stringify({
 					</div>
 				</section>
 			))}
+			<p class="cat__more" data-ships-line>{shipsLine()} {shipsToSentence()}</p>
 			<p class="cat__more">Need 500 or more? <a href="mailto:hello@spiritmediapublishing.com?subject=FHB%20bulk%20order%20(500%2B)">Contact us</a>.</p>
 		</div>
 

@@ -17,6 +17,7 @@
 import type { CatalogRow } from '../data/print-catalog';
 import { PRINT_TIERS } from '../data/print-tiers';
 import { FIRST_ORDER_LABEL, firstOrderUnit } from '../lib/order-pricing';
+import { allFreeShipping, shipsLine, shipsToSentence } from '../lib/shipCountries';
 import BindingQty from './BindingQty.astro';
 import OrderSummary from './OrderSummary.astro';
 
@@ -32,6 +33,7 @@ interface Props {
 }
 const { rows, heading, returnPath, note } = Astro.props;
 const multi = rows.length > 1;
+const freeShip = allFreeShipping();
 // Runtime const: biome cannot see .astro template use (keep this line).
 const tiers = PRINT_TIERS;
 const config = JSON.stringify({
@@ -62,7 +64,7 @@ const idp = `eo-${lead.id}`;
 <div id="order" class="lqo" data-order={config}>
 	{/* Kevin 2026-10-04: the same line on every single-edition form, at its top. */}
 	<p class="lqo__catalog"><a href="/print/order/">Need to order multiple editions? Use the catalog order form →</a></p>
-	<p class="lqo__eyebrow">Order direct · free shipping</p>
+	<p class="lqo__eyebrow">Order direct{freeShip ? ' · free shipping' : ''}</p>
 	<h2 class="lqo__title">Order {heading}</h2>
 	<div class="eo-price" data-price-line>
 		{priceLine.map((l) => (
@@ -70,9 +72,10 @@ const idp = `eo-${lead.id}`;
 				<span class="eo-price__binding">{l.binding}</span> <b data-first>{l.first}</b> <span class="eo-price__reg">(reg. <s data-reg>{l.reg}</s>)</span>
 			</p>
 		))}
-		<p class="eo-price__note">{FIRST_ORDER_LABEL} · free shipping</p>
+		<p class="eo-price__note">{FIRST_ORDER_LABEL}{freeShip ? ' · free shipping' : ''}</p>
 		{note && <p class="eo-price__note" data-preorder-note>{note}</p>}
 		<p class="eo-price__note"><a href="/returns/">30-day returns, full refund</a></p>
+		<p class="eo-price__note" data-ships-line>{shipsLine()} {shipsToSentence()}</p>
 	</div>
 	{rows.map((r) => (
 		<div class={multi ? 'eo-variant' : undefined}>
