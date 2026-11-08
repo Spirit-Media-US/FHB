@@ -18,7 +18,6 @@ import HearTheFather, { type VoiceGroup } from '../components/HearTheFather.astr
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import VoiceChips from '../components/VoiceChips.astro';
-import YouVersionBanner from '../components/YouVersionBanner.astro';
 import roster from '../data/language-roster.json';
 import { AUDIO } from '../data/receive';
 import yv from '../data/youversion-editions.json';
@@ -134,17 +133,15 @@ const homeVoices: VoiceGroup[] = [
       imagePosition="top"
       href="/print/"
       heading="Father’s Heart Bible™ on YouVersion"
-      headingBelow
+      headingClass="sr-only"
     />
-    <YouVersionBanner />
     <section style="background-color: var(--color-canvas); padding: 2rem 1rem 3rem;">
       <div style="max-width: 42rem; margin: 0 auto; text-align: center;">
-        <div class="yvp-lockup" aria-label="Father's Heart Bible on YouVersion">
-          <span class="yvp-lockup-name">Father&rsquo;s Heart Bible&trade;</span>
-          <span class="yvp-lockup-on">on</span>
-          <img src={YV_ICON} alt="" width="40" height="40" decoding="async" class="yvp-lockup-icon" />
-          <img src={YV_WORDMARK} alt="YouVersion" width="156" height="24" decoding="async" class="yvp-lockup-wordmark" />
-        </div>
+        <p class="yvp-title" aria-hidden="true">
+          <span>Father&rsquo;s Heart Bible&trade; on</span>
+          <img src={YV_ICON} alt="" width="48" height="48" loading="eager" fetchpriority="high" decoding="async" class="yvp-title-icon" />
+          <img src={YV_WORDMARK} alt="" width="208" height="32" loading="eager" decoding="async" class="yvp-title-wordmark" />
+        </p>
         <p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.2rem; line-height: 1.7; margin: 0 0 1rem;">
           Welcome, YouVersion readers. Thank you for reading with us in the Bible App. We are glad you are here.
         </p>
@@ -200,12 +197,11 @@ const homeVoices: VoiceGroup[] = [
   .yvp-wrap { max-width: 72rem; margin: 0 auto; padding: 0 16px; }
   @media (min-width: 768px) { .yvp-wrap { padding: 0 24px; } }
 
-  /* CO-BRAND LOCKUP (under the hero, on canvas) */
-  .yvp-lockup { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 12px; margin: 0 0 1.5rem; }
-  .yvp-lockup-name { font-family: var(--font-serif); font-size: 1.35rem; color: var(--color-ink); }
-  .yvp-lockup-on { font-family: var(--font-sans); font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-muted); }
-  .yvp-lockup-icon { width: 40px; height: 40px; border-radius: 9px; }
-  .yvp-lockup-wordmark { width: 156px; height: auto; }
+  /* TITLE: said once, with the YouVersion logo once (Kevin 2026-11-08) */
+  .yvp-title { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 14px; margin: 0 0 1.75rem; font-family: var(--font-serif); font-weight: 300; font-size: 2rem; line-height: 1.2; color: var(--color-ink); }
+  @media (min-width: 768px) { .yvp-title { font-size: 2.75rem; } }
+  .yvp-title-icon { width: 48px; height: 48px; border-radius: 11px; }
+  .yvp-title-wordmark { width: 208px; height: auto; }
 
   /* SHARED TYPE */
   .yvp-kicker { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; margin: 0 0 10px; text-align: center; }
