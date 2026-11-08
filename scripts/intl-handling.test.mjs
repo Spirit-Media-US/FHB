@@ -300,7 +300,7 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	const txt = (sel) => d.querySelector(sel).textContent;
 	const hbList = Math.round(cfg.prices[hb] * 100), pbList = Math.round(cfg.prices[pb] * 100);
 
-	const answers = { value: { first: true } };
+	const answers = { value: { status: 'first' } };
 	let asked = [];
 	w.fetch = async (url, init) => { asked.push(JSON.parse(init.body)); return { json: async () => answers.value }; };
 	const email = d.querySelector('[data-email]');
@@ -338,7 +338,7 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	email.value = 'x';
 	email.dispatchEvent(new w.Event('input', { bubbles: true }));
 	assert.equal(offer().textContent, 'First order? 15% off at checkout.');
-	answers.value = { first: false };
+	answers.value = { status: 'repeat' };
 	await typeEmail('old@buyer.co');
 	assert.equal(d.querySelector('[data-offer]').hidden, true, 'repeat buyer: no offer shown');
 	assert.equal(d.querySelector('[data-sum-disc]').hidden, true);
@@ -351,7 +351,7 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(hbList * 2 + feeList * 2)}`);
 
 	// EU label, and a country with no fee at all
-	answers.value = { first: true };
+	answers.value = { status: 'first' };
 	w.fetch = async (u, init) => { asked.push(JSON.parse(init.body)); return { json: async () => answers.value }; };
 	await typeEmail('new2@buyer.co');
 	pick('DE');
@@ -374,13 +374,15 @@ test('server: the first-order check answers yes/no from the same rule checkout u
 			if (u.includes('checkout/sessions')) return j({ data: repeat ? [{ payment_status: 'paid' }] : [] });
 			return j({ data: [] });
 		};
+		const store = new Map();
+		globalThis.caches = { default: { match: async (q) => (store.has(q.url) ? new Response(store.get(q.url)) : undefined), put: async (q, res) => { store.set(q.url, await res.text()); } } };
 		const { onRequestPost } = await import('../functions/dvc-checkout.ts');
-		const r = await onRequestPost({ request: new Request('https://x.test/dvc-checkout', { method: 'POST', body: JSON.stringify({ firstOrderCheck: true, email }) }), env: { STRIPE_FHB_SECRET_KEY: 'sk_test' } });
+		const r = await onRequestPost({ request: new Request('https://x.test/dvc-checkout', { method: 'POST', headers: { origin: 'https://fathersheartbible.com' }, body: JSON.stringify({ firstOrderCheck: true, email }) }), env: { STRIPE_FHB_SECRET_KEY: 'sk_test' } });
 		return { body: await r.json(), posted, cache: r.headers.get('cache-control') };
 	};
-	assert.deepEqual((await ask('a@b.co', false)).body, { first: true });
-	assert.deepEqual((await ask('a@b.co', true)).body, { first: false });
-	assert.deepEqual((await ask('not-an-email', false)).body, { first: false });
+	assert.deepEqual((await ask('a@b.co', false)).body, { status: 'first' });
+	assert.deepEqual((await ask('a@b.co', true)).body, { status: 'repeat' });
+	assert.deepEqual((await ask('not-an-email', false)).body, { status: 'unknown' });
 	const r = await ask('a@b.co', false);
 	assert.equal(r.posted, false, 'no Checkout Session is created');
 	assert.equal(r.cache, 'no-store');

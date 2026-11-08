@@ -32,6 +32,14 @@ import {
 	packBreakdown,
 	unitAfter,
 } from '../src/lib/order-pricing.ts';
+import {
+	allowCheck,
+	answerBody,
+	constantTime,
+	emailTag,
+	type FirstStatus,
+	sameOrigin,
+} from '../src/lib/firstOrderGuard.ts';
 import { checkoutShippingForm, countryFor } from '../src/lib/shipCountries.ts';
 
 interface Env {
@@ -1356,15 +1364,33 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	// the total the buyer will pay (no understated totals). Same check checkout itself uses; fails
 	// to "not first", never to a discount. Answers only yes/no, and creates nothing.
 	if (payload.firstOrderCheck) {
-		const em = String(payload.email ?? '').trim();
-		const noStore = { 'content-type': 'application/json', 'cache-control': 'no-store' };
-		const answer = (first: boolean) =>
-			new Response(JSON.stringify({ first }), { headers: noStore });
-		if (!env.STRIPE_FHB_SECRET_KEY || em.length > 254 || !EMAIL_RE.test(em)) return answer(false);
-		const first =
-			(await isFirstOrder(em, env.STRIPE_FHB_SECRET_KEY)) &&
-			(await firstOrderPromo(env.STRIPE_FHB_SECRET_KEY)) !== null;
-		return answer(first);
+		const headers = { 'content-type': 'application/json', 'cache-control': 'no-store' };
+		const reply = (status: FirstStatus) => new Response(answerBody(status), { headers });
+		// Same-origin only: the order form on our own pages is the sole legitimate caller.
+		if (!sameOrigin(request.headers)) {
+			return new Response(JSON.stringify({ error: 'forbidden' }), { status: 403, headers });
+		}
+		return constantTime(async () => {
+			const em = String(payload.email ?? '')
+				.trim()
+				.toLowerCase();
+			if (!env.STRIPE_FHB_SECRET_KEY || em.length > 254 || !EMAIL_RE.test(em)) {
+				return reply('unknown');
+			}
+			const tag = await emailTag(em);
+			const ip = request.headers.get('cf-connecting-ip') ?? '';
+			// No cache to count in = no way to limit = fail closed to "unknown" (list price).
+			const cache = (globalThis as unknown as { caches?: { default?: Cache } }).caches?.default;
+			const ok = cache ? await allowCheck(cache, ip, tag) : false;
+			if (!ok) {
+				console.log(`first-order-check limited tag=${tag}`);
+				return reply('unknown');
+			}
+			const first =
+				(await isFirstOrder(em, env.STRIPE_FHB_SECRET_KEY)) &&
+				(await firstOrderPromo(env.STRIPE_FHB_SECRET_KEY)) !== null;
+			return reply(first ? 'first' : 'repeat');
+		});
 	}
 
 	const counts: Record<string, number> = {};

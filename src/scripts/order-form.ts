@@ -20,6 +20,7 @@ import {
 	type Tier,
 	unitAfter,
 } from '../lib/order-pricing';
+import { firstStateFrom } from '../lib/firstOrderGuard';
 
 interface Config {
 	prices: Record<string, number>;
@@ -259,9 +260,9 @@ function init(root: HTMLElement) {
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({ firstOrderCheck: true, email: email.value.trim() }),
 			});
-			const d = (await res.json()) as { first?: boolean };
+			const d = await res.json();
 			if (id !== askId) return;
-			firstState = d.first === true ? 'first' : 'repeat';
+			firstState = firstStateFrom(d);
 		} catch {
 			if (id !== askId) return;
 			firstState = 'unknown';
