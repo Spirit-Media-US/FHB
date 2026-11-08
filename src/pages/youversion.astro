@@ -17,7 +17,6 @@
 import HearTheFather, { type VoiceGroup } from '../components/HearTheFather.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
-import VoiceChips from '../components/VoiceChips.astro';
 import roster from '../data/language-roster.json';
 import { AUDIO } from '../data/receive';
 import yv from '../data/youversion-editions.json';
@@ -126,11 +125,14 @@ const homeVoices: VoiceGroup[] = [
 >
   <main id="main-content" class="yvp">
     <VideoHeroInner
-      imageSrc="https://assets.spiritmediapublishing.com/FHB/print/about-hero-pews.webp"
-      imageSrcMobile="https://assets.spiritmediapublishing.com/FHB/print/about-hero-pews-960.webp"
-      imageWidth={1902}
-      imageHeight={686}
-      imagePosition="top"
+      imageSrc="https://assets.spiritmediapublishing.com/FHB/print/print-hero-a01-2400.webp"
+      imageSrcMobile="https://assets.spiritmediapublishing.com/FHB/print/print-hero-a01-960.webp 960w, https://assets.spiritmediapublishing.com/FHB/print/print-hero-a01-1600.webp 1600w"
+      imageWidth={2400}
+      imageHeight={920}
+      stackOnMobile={true}
+      imagePosition="54% 30%"
+      headingLift="0"
+      contentPad="pt-0! pb-0 md:pb-4 lg:pb-5"
       href="/print/"
       heading="Father’s Heart Bible™ on YouVersion"
       headingClass="sr-only"
@@ -145,15 +147,11 @@ const homeVoices: VoiceGroup[] = [
         <p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.2rem; line-height: 1.7; margin: 0 0 1rem;">
           Welcome, YouVersion readers. Thank you for reading with us in the Bible App. We are glad you are here.
         </p>
-        <p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.2rem; line-height: 1.7; margin: 0 0 1.75rem;">
-          Father&rsquo;s Heart Bible&trade; is a complete translation of the Bible, 66 books and 31,087 verses, from the original Hebrew, Aramaic and Greek. Where other Bibles use &ldquo;God&rdquo; to say what He is, the Father&rsquo;s Heart Bible&trade; uses &ldquo;our Father&rdquo; to show who He has been all along. To our knowledge, it is the first Bible in print to show which words a divine person spoke &mdash; <span style="color: #2563eb; font-weight: 600;">our Father&rsquo;s in blue</span>, <span style="color: #c8102e; font-weight: 600;">the Son&rsquo;s in red</span>, <span style="color: #6a3fa0; font-weight: 600;">the Spirit&rsquo;s in purple</span>.
+        <p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.2rem; line-height: 1.7; margin: 0;">
+          Father&rsquo;s Heart Bible&trade; is a complete translation of the Bible, 66 books and 31,087 verses, from the original Hebrew, Aramaic and Greek. Where other Bibles use &ldquo;God&rdquo; to say what He is, the Father&rsquo;s Heart Bible&trade; uses &ldquo;our Father&rdquo; to show who He has been all along.
         </p>
-        <VoiceChips class="mb-8" />
-        <a href="/read/" style="display: inline-flex; align-items: center; padding: 0.875rem 2rem; font-family: var(--font-body); font-size: 1rem; font-weight: 600; text-decoration: none; background: #FFD9E0; color: #4A4A4A;">Read FHB &rarr;</a>
       </div>
     </section>
-
-    <HearTheFather groups={homeVoices} variant="scripture" />
 
     <!-- LANGUAGES -->
     <section class="yvp-langs" id="languages">
@@ -180,6 +178,8 @@ const homeVoices: VoiceGroup[] = [
         <p class="yvp-org">All our editions in the Bible App: <a href={YOUVERSION_ORG} target="_blank" rel="noopener" class="yvp-link">Father’s Heart Bible on YouVersion</a></p>
       </div>
     </section>
+
+    <HearTheFather groups={homeVoices.map((g) => ({ ...g, verses: g.verses.slice(0, 1) }))} variant="scripture" />
 
 
     <Section variant="soft">
