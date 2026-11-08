@@ -15,6 +15,9 @@ import YouVersionBanner from '../components/YouVersionBanner.astro';
 interface Props {
 	/** Page language for <html lang> (default en). Translated pages pass their code. */
 	lang?: string;
+	/** og:locale language when it differs from <html lang> (2jw: a page whose metadata is native
+	 *  but whose body is still English keeps lang="en" and sets this). Default: `lang`. */
+	ogLang?: string;
 	/** hreflang alternate links [{hreflang, href}] — emitted when present. */
 	alternates?: { hreflang: string; href: string }[];
 	title: string;
@@ -80,6 +83,7 @@ const {
 	bookIsbn,
 	bookReleaseDate,
 	lang = 'en',
+	ogLang,
 	alternates = [],
 } = Astro.props;
 
@@ -358,9 +362,9 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		{ogSized && <meta property="og:image:height" content="630" />}
 		{ogSized && <meta property="og:image:type" content="image/jpeg" />}
 		<meta property="og:site_name" content={siteName} />
-		{ogLocale(lang) && <meta property="og:locale" content={ogLocale(lang)} />}
+		{ogLocale(ogLang ?? lang) && <meta property="og:locale" content={ogLocale(ogLang ?? lang)} />}
 		{ogLocaleAlternates(
-			lang,
+			ogLang ?? lang,
 			alternates.filter((a) => a.hreflang !== 'x-default').map((a) => a.hreflang),
 		).map((loc) => (
 			<meta property="og:locale:alternate" content={loc} />
