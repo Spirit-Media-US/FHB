@@ -1,13 +1,20 @@
 ---
-// /youversion/ — landing page for readers who arrive from our YouVersion reading plans ("Meet Your
-// Father", "The Words of the Father") and from the Bible App (Kevin 2026-11-07 13:35Z, "1 A").
-// YouVersion has no page listing every FHB language, so this page does: one button per edition, from
+// /youversion/ — partner landing page for readers who arrive from our YouVersion reading plans
+// ("Meet Your Father", "The Words of the Father") and from the Bible App (Kevin 2026-11-07 13:35Z,
+// "1 A"; redesigned 2026-11-08 after Kevin: "not even branded using the YouVersion logos I gave you.
+// It looks plain. No color.").
+// YouVersion has no page listing every FHB language, so this page does: one card per edition, from
 // src/data/youversion-editions.json (a LIVE scan of the bible.com version API; its header says how).
-// Wording is reused from the approved pages: intro = /overview/ + the /partners/ description,
-// Divine Voice Color = the homepage, community invite = /family/, audio = receive.ts AUDIO.
-// First section is a plain <section> (no data-reveal) so nothing above the fold animates.
-import Section from '../components/Section.astro';
-import VoiceChips from '../components/VoiceChips.astro';
+// Wording is reused from the approved pages: intro = /overview/, Divine Voice Color = the homepage
+// (sample verses = homeVoices in index.astro, locked FHB text), community invite = /family/,
+// audio = receive.ts AUDIO.
+// Brand: FHB flame mark drawn from public/favicon.svg (vector, never the retired heart-over-book
+// PNG); YouVersion app icon + black wordmark as Kevin supplied them (R2 FHB/partners/youversion/),
+// never recoloured, stretched or cropped, the wordmark on white only. YouVersion red sampled from the
+// icon (#C13B34 -> #7F2429, bookmark #FF3D4D); FHB plum #5b2b55 / #3d1a39. Every text/background pair
+// was computed to WCAG AA (white on #C13B34 = 5.33:1, the weakest pair on the page).
+// Nothing above the fold animates; the hero has a fixed px min-height on phones (no vh/svh).
+import YouVersionBanner from '../components/YouVersionBanner.astro';
 import roster from '../data/language-roster.json';
 import { AUDIO } from '../data/receive';
 import yv from '../data/youversion-editions.json';
@@ -24,16 +31,50 @@ const YV_COUNT = editions.length;
 const ROSTER_COUNT = roster.languages.length;
 const JOIN_URL = 'https://fathersheartbible.com/login?error=join-to-interact';
 const YOUVERSION_ORG = 'https://www.bible.com/organizations/89162c01-3892-4c7b-a462-239df0931522';
+const YV = 'https://assets.spiritmediapublishing.com/FHB/partners/youversion/';
+const YV_ICON = `${YV}youversion-app-icon-256.webp`;
+const YV_WORDMARK = `${YV}youversion-wordmark-935.webp`;
 
-const P = 'text-lg leading-relaxed mb-4';
-const btn =
-	'inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold no-underline rounded-lg';
-const btnStyle = 'font-family: var(--font-sans); background-color: #FFD9E0; color: #4A4A4A;';
+// Locked FHB text, the same passages and coloured spans as the homepage's HearTheFather block.
+const samples = [
+	{
+		key: 'father',
+		label: 'FATHER',
+		color: '#2563eb',
+		ref: 'Isaiah 43:1',
+		href: '/read/isaiah/43/#v1',
+		before:
+			'But now, this is what our Father says—he who created you, Jacob, he who formed you, Israel: ',
+		spoken: 'Do not be afraid, for I have redeemed you; I have called you by name, you are mine.',
+		after: '',
+	},
+	{
+		key: 'son',
+		label: 'SON',
+		color: '#c8102e',
+		ref: 'John 10:27',
+		href: '/read/john/10/#v27',
+		before: '',
+		spoken: 'My sheep listen to my voice; I know them, and they follow me.',
+		after: '',
+	},
+	{
+		key: 'spirit',
+		label: 'SPIRIT',
+		color: '#6a3fa0',
+		ref: 'Acts 13:2',
+		href: '/read/acts/13/#v2',
+		before: 'While they worshiped our Lord Jesus and fasted, the Holy Spirit said, ',
+		spoken: '"Set apart for me Barnabas and Saul, for the work I\'ve called them to."',
+		after: '',
+	},
+];
 ---
 
 <Layout
   title={fitTitle("Father's Heart Bible™ on YouVersion — Every Language")}
   description={fitDescription(`Welcome, YouVersion readers. Read Father's Heart Bible™ in Divine Voice™ Color in ${YV_COUNT} languages in the Bible App, free online, and as a free audio Bible.`)}
+  youversionBanner={false}
   jsonLd={{
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -43,110 +84,258 @@ const btnStyle = 'font-family: var(--font-sans); background-color: #FFD9E0; colo
     ]
   }}
 >
-  <main id="main-content" style="padding-top: 80px; background-color: var(--color-surface-low);">
-    <section class="py-8 md:py-12 lg:py-16" style="background-color: var(--color-surface-low);">
-      <div class="max-w-3xl mx-auto px-4 md:px-6" style="font-family: var(--font-sans);">
-        <p class="text-xs font-semibold tracking-widest uppercase mb-4" style="color: var(--color-brand);">Welcome, YouVersion readers</p>
-        <h1 class="text-4xl md:text-5xl font-light mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">Father&rsquo;s Heart Bible&trade; on YouVersion</h1>
-        <p class={P} style="color: var(--color-ink);">Thank you for reading with us in the Bible App. We are glad you are here.</p>
-        <p class={P} style="color: var(--color-muted);">Father&rsquo;s Heart Bible&trade; is a complete translation of the Bible, 66 books and 31,087 verses, from the original Hebrew, Aramaic and Greek. Where other Bibles use &ldquo;God&rdquo; to say what He is, the Father&rsquo;s Heart Bible&trade; uses &ldquo;our Father&rdquo; to show who He has been all along.</p>
-        <div class="flex flex-wrap gap-3 mt-6">
-          <a href="#languages" class={btn} style={btnStyle}>Choose your language</a>
-          <a href="/read/" class={btn} style="font-family: var(--font-sans); border: 2px solid var(--color-ink); color: var(--color-ink);">Read free online</a>
+  <main id="main-content" class="yvp">
+    <!-- HERO: co-branded lockup on FHB plum flowing into YouVersion red -->
+    <section class="yvp-hero">
+      <div class="yvp-hero-inner">
+        <div class="yvp-lockup" aria-label="Father's Heart Bible on YouVersion">
+          <span class="yvp-lockup-fhb">
+            <svg class="yvp-flame" viewBox="0 0 32 32" width="56" height="56" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#5B2A55"/><g transform="translate(16 16) scale(1.2) translate(-16 -16)"><g fill="#F7F3EE" fill-rule="evenodd"><path d="M16 23.6 C 10.3 20.1, 3.5 20.9, 1.5 22.5 L 1.5 26.0 C 4.5 24.6, 11 24.7, 16 26.7 C 21 24.7, 27.5 24.6, 30.5 26.0 L 30.5 22.5 C 28.5 20.9, 21.7 20.1, 16 23.6 Z"/> <path transform="translate(9.779 1.4) scale(0.06689) translate(0.000000,299.000000) scale(0.100000,-0.100000)" d="M810 2986 c0 -4 13 -38 29 -74 88 -200 78 -435 -25 -633 -69 -131 -159 -228 -414 -445 -247 -211 -353 -368 -390 -581 -16 -88 -8 -274 15 -358 22 -79 82 -208 134 -283 85 -126 141 -174 435 -374 154 -105 292 -199 306 -208 l25 -18 300 204 c165 113 326 230 358 262 344 336 367 879 56 1327 -51 75 -136 175 -147 175 -4 0 -4 -42 -1 -92 7 -106 -4 -259 -21 -303 -39 -102 -131 -98 -176 7 -15 36 -19 87 -25 318 -7 295 -14 342 -75 510 -50 141 -136 288 -251 430 -64 79 -133 149 -133 136z m-36 -1805 c26 -13 70 -45 99 -71 l52 -48 48 44 c26 23 73 55 105 71 50 25 68 28 147 28 77 -1 97 -5 140 -27 172 -90 214 -291 103 -486 -80 -141 -234 -291 -440 -429 l-98 -65 -37 23 c-175 105 -366 269 -449 385 -135 190 -151 375 -42 499 38 43 91 77 148 96 47 16 173 4 224 -20z"/></g></g></svg>
+            <span class="yvp-lockup-name">Father&rsquo;s Heart Bible&trade;</span>
+          </span>
+          <span class="yvp-lockup-on">on</span>
+          <span class="yvp-lockup-yv">
+            <img src={YV_ICON} alt="" width="56" height="56" loading="eager" fetchpriority="high" decoding="async" class="yvp-yv-icon" />
+            <img src={YV_WORDMARK} alt="YouVersion" width="182" height="28" decoding="async" class="yvp-wordmark" />
+          </span>
+        </div>
+
+        <p class="yvp-eyebrow">Welcome, YouVersion readers</p>
+        <h1 class="yvp-h1">Father&rsquo;s Heart Bible&trade; on YouVersion</h1>
+        <p class="yvp-lede">Thank you for reading with us in the Bible App. We are glad you are here.</p>
+        <p class="yvp-hero-p">Father&rsquo;s Heart Bible&trade; is a complete translation of the Bible, 66 books and 31,087 verses, from the original Hebrew, Aramaic and Greek. Where other Bibles use &ldquo;God&rdquo; to say what He is, the Father&rsquo;s Heart Bible&trade; uses &ldquo;our Father&rdquo; to show who He has been all along.</p>
+        <div class="yvp-hero-ctas">
+          <a href="#languages" class="yvp-btn yvp-btn-white">Choose your language <span aria-hidden="true">&darr;</span></a>
+          <a href="/read/" class="yvp-btn yvp-btn-ghost">Read free online</a>
         </div>
       </div>
     </section>
+    <YouVersionBanner />
 
-    <Section variant="light">
-      <div class="max-w-3xl mx-auto text-center" style="font-family: var(--font-sans);">
-        <h2 class="text-3xl md:text-4xl font-light mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">His voice in Divine Voice&trade; Color</h2>
-        <VoiceChips size="1.25rem" class="mb-6" />
-        <p class={P} style="color: var(--color-muted);">For a hundred and twenty-five years, red letters have shown you the Son speaking. Our Father speaks more than three times as often. Father&rsquo;s Heart Bible is, to our knowledge, the first Bible in print where you can see who is speaking.</p>
-        <p class={P} style="color: var(--color-muted);">Our Father&rsquo;s words in <strong style="color:#2563eb">BLUE</strong>. The Son&rsquo;s in <strong style="color:#c8102e">RED</strong>. The Spirit&rsquo;s in <strong style="color:#6a3fa0">PURPLE</strong>.</p>
-        <p class="text-base leading-relaxed" style="color: var(--color-muted);"><a href="/who-speaks-in-scripture/" class="hover:underline" style="color: var(--color-brand);">See who speaks in every book</a></p>
+    <!-- DIVINE VOICE COLOR -->
+    <section class="yvp-dvc">
+      <div class="yvp-wrap">
+        <p class="yvp-kicker" style="color: #b60057;">Divine Voice&trade; Color</p>
+        <h2 class="yvp-h2">See who is speaking</h2>
+        <p class="yvp-sub">For a hundred and twenty-five years, red letters have shown you the Son speaking. Our Father speaks more than three times as often. Father&rsquo;s Heart Bible is, to our knowledge, the first Bible in print where you can see who is speaking.</p>
+        <div class="yvp-voices">
+          {samples.map((s) => (
+            <figure class="yvp-voice" style={`--vc: ${s.color};`}>
+              <figcaption class="yvp-voice-tag">{s.label}</figcaption>
+              <p class="yvp-voice-text">
+                {s.before}<span style={`color: ${s.color}; font-weight: 600;`}>{s.spoken}</span>{s.after}
+              </p>
+              <a href={s.href} class="yvp-voice-ref">{s.ref} <span aria-hidden="true">&rarr;</span></a>
+            </figure>
+          ))}
+        </div>
+        <p class="yvp-sub yvp-sub-center">Our Father&rsquo;s words in <strong style="color:#2563eb">BLUE</strong>. The Son&rsquo;s in <strong style="color:#c8102e">RED</strong>. The Spirit&rsquo;s in <strong style="color:#6a3fa0">PURPLE</strong>. <a href="/who-speaks-in-scripture/" class="yvp-link">See who speaks in every book</a></p>
       </div>
-    </Section>
+    </section>
 
-    <Section variant="soft" id="languages">
-      <div class="max-w-5xl mx-auto" style="font-family: var(--font-sans);">
-        <h2 class="text-3xl md:text-4xl font-light mb-4 text-center" style="font-family: var(--font-serif); color: var(--color-ink);">Read the FHB in your language on YouVersion</h2>
-        <p class="text-lg leading-relaxed mb-8 text-center max-w-3xl mx-auto" style="color: var(--color-muted);">{YV_COUNT} editions are on YouVersion now, and more are coming, until all {ROSTER_COUNT} languages are there. Tap your language to open it in the Bible App.</p>
-        <ul class="yv-grid" role="list">
+    <!-- LANGUAGES -->
+    <section class="yvp-langs" id="languages">
+      <div class="yvp-wrap">
+        <div class="yvp-langs-head">
+          <img src={YV_ICON} alt="" width="64" height="64" loading="lazy" decoding="async" class="yvp-langs-icon" />
+          <h2 class="yvp-h2">Read the FHB in your language on <img src={YV_WORDMARK} alt="YouVersion" width="208" height="32" loading="lazy" decoding="async" class="yvp-wordmark-inline" /></h2>
+        </div>
+        <p class="yvp-count"><span class="yvp-count-num">{YV_COUNT}</span> editions are on YouVersion now, and more are coming, until all {ROSTER_COUNT} languages are there. Tap your language to open it in the Bible App.</p>
+        <ul class="yvp-grid" role="list">
           {editions.map((e) => (
             <li>
-              <a href={e.url} target="_blank" rel="noopener" class="yv-lang" lang={e.code} dir={e.dir}>
-                <span class="yv-local">{e.local}</span>
-                {e.local !== e.english && <span class="yv-eng" lang="en" dir="ltr">{e.english}</span>}
+              <a href={e.url} target="_blank" rel="noopener" class="yvp-card">
+                <img src={YV_ICON} alt="" width="32" height="32" loading="lazy" decoding="async" class="yvp-card-icon" />
+                <span class="yvp-card-text" lang={e.code} dir={e.dir}>
+                  <span class="yvp-card-local">{e.local}</span>
+                  {e.local !== e.english && <span class="yvp-card-eng" lang="en" dir="ltr">{e.english}</span>}
+                </span>
+                <span class="yvp-card-arrow" aria-hidden="true">&rarr;</span>
               </a>
             </li>
           ))}
         </ul>
-        <p class="text-sm leading-relaxed mt-8 text-center" style="color: var(--color-muted);">
-          All our editions in the Bible App: <a href={YOUVERSION_ORG} target="_blank" rel="noopener" class="hover:underline" style="color: var(--color-brand);">Father’s Heart Bible on YouVersion</a>
-        </p>
+        <p class="yvp-org">All our editions in the Bible App: <a href={YOUVERSION_ORG} target="_blank" rel="noopener" class="yvp-link">Spirit Media Publishing on YouVersion</a></p>
       </div>
-    </Section>
+    </section>
 
-    <Section variant="light">
-      <div class="max-w-3xl mx-auto text-center" style="font-family: var(--font-sans);">
-        <p class="text-xs font-semibold tracking-widest uppercase mb-4" style="color: var(--color-gold);">Read &amp; Listen</p>
-        <h2 class="text-3xl md:text-4xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">Always FREE</h2>
-        <p class={P} style="color: var(--color-muted);">The whole Father&rsquo;s Heart Bible&trade;, Genesis to Revelation, is free to read online and free to hear as an audio Bible.</p>
-        <div class="flex flex-wrap justify-center gap-3 mt-6">
-          <a href="/read/" class={btn} style={btnStyle}>Read Online</a>
-          <a href={`${AUDIO.page}/`} class={btn} style="font-family: var(--font-sans); border: 2px solid var(--color-ink); color: var(--color-ink);">Audio Bible</a>
+    <!-- READ & LISTEN -->
+    <section class="yvp-band-plum">
+      <div class="yvp-wrap">
+        <p class="yvp-kicker" style="color: #f5d0cc;">Read &amp; Listen</p>
+        <h2 class="yvp-h2" style="color: #fff;">Always FREE</h2>
+        <p class="yvp-sub" style="color: #f5f0e8;">The whole Father&rsquo;s Heart Bible&trade;, Genesis to Revelation, is free to read online and free to hear as an audio Bible.</p>
+        <div class="yvp-two">
+          <a href="/read/" class="yvp-tile">
+            <span class="yvp-tile-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z"/><path d="M22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"/></svg>
+            </span>
+            <span class="yvp-tile-title">Read Online</span>
+            <span class="yvp-tile-text">Free to read online, Genesis to Revelation.</span>
+          </a>
+          <a href={`${AUDIO.page}/`} class="yvp-tile">
+            <span class="yvp-tile-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
+            </span>
+            <span class="yvp-tile-title">Audio Bible</span>
+            <span class="yvp-tile-text">Free to hear as an audio Bible.</span>
+          </a>
         </div>
-        <p class="text-sm leading-relaxed mt-4" style="color: var(--color-muted);">
-          Also on <a href={AUDIO.spotify} target="_blank" rel="noopener" class="hover:underline" style="color: var(--color-brand);">Spotify</a>,
-          <a href={AUDIO.apple} target="_blank" rel="noopener" class="hover:underline" style="color: var(--color-brand);">Apple Podcasts</a> and
-          <a href={AUDIO.youtube} target="_blank" rel="noopener" class="hover:underline" style="color: var(--color-brand);">YouTube</a>.
+        <p class="yvp-also">Also on
+          <a href={AUDIO.spotify} target="_blank" rel="noopener">Spotify</a>,
+          <a href={AUDIO.apple} target="_blank" rel="noopener">Apple Podcasts</a> and
+          <a href={AUDIO.youtube} target="_blank" rel="noopener">YouTube</a>.
         </p>
       </div>
-    </Section>
+    </section>
 
-    <Section variant="soft">
-      <div class="max-w-3xl mx-auto text-center" style="font-family: var(--font-sans);">
-        <h2 class="text-3xl md:text-4xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">Join the Father&rsquo;s Heart Family</h2>
-        <p class={P} style="color: var(--color-muted);">Connect with beloved sons and daughters around the world.</p>
-        <a href={JOIN_URL} class={btn} style={btnStyle}>Join the Family</a>
-        <p class="text-sm mt-3" style="color: var(--color-muted);">Free to join — one tap, no password.</p>
+    <!-- COMMUNITY -->
+    <section class="yvp-join">
+      <div class="yvp-wrap yvp-join-card">
+        <h2 class="yvp-h2">Join the Father&rsquo;s Heart Family</h2>
+        <p class="yvp-sub">Connect with beloved sons and daughters around the world.</p>
+        <a href={JOIN_URL} class="yvp-btn yvp-btn-brand">Join the Family</a>
+        <p class="yvp-free">Free to join — one tap, no password.</p>
       </div>
-    </Section>
+    </section>
   </main>
 </Layout>
 
 <style>
-  .yv-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  @media (min-width: 640px) {
-    .yv-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  }
-  @media (min-width: 1024px) {
-    .yv-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  }
-  .yv-lang {
+  .yvp { background: #fff; font-family: var(--font-sans); }
+  .yvp-wrap { max-width: 72rem; margin: 0 auto; padding: 0 16px; }
+  @media (min-width: 768px) { .yvp-wrap { padding: 0 24px; } }
+
+  /* HERO */
+  .yvp-hero {
+    min-height: 420px;
+    background:
+      radial-gradient(circle at 85% 15%, rgba(255, 61, 77, 0.35), transparent 45%),
+      linear-gradient(125deg, #3d1a39 0%, #5b2b55 38%, #7f2429 70%, #c13b34 100%);
+    color: #fff;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 64px;
-    height: 100%;
-    padding: 0.625rem 0.875rem;
-    background: var(--color-surface, #fff);
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    border-radius: 8px;
-    text-decoration: none;
-    color: var(--color-ink);
-    overflow-wrap: anywhere;
-    transition: border-color 0.12s;
+    align-items: center;
   }
-  .yv-lang:hover,
-  .yv-lang:focus-visible { border-color: var(--color-brand); }
-  .yv-local { font-weight: 700; font-size: 1rem; line-height: 1.3; }
-  .yv-eng { font-size: 0.8125rem; line-height: 1.3; color: var(--color-muted); margin-top: 0.125rem; }
+  @media (min-width: 768px) { .yvp-hero { min-height: 560px; } }
+  .yvp-hero-inner { max-width: 56rem; margin: 0 auto; padding: 40px 16px 48px; text-align: center; }
+  @media (min-width: 768px) { .yvp-hero-inner { padding: 64px 24px; } }
+  .yvp-lockup {
+    display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: 14px 18px; padding: 18px 26px; margin-bottom: 28px;
+    background: #fff; border-radius: 18px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  }
+  .yvp-lockup-fhb, .yvp-lockup-yv { display: inline-flex; align-items: center; gap: 12px; }
+  .yvp-flame { width: 56px; height: 56px; flex-shrink: 0; display: block; }
+  .yvp-lockup-name { font-family: var(--font-serif); font-size: 1.25rem; color: #5b2b55; font-weight: 600; white-space: nowrap; }
+  .yvp-lockup-on { font-size: 0.875rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #5b3f46; }
+  .yvp-yv-icon { width: 56px; height: 56px; border-radius: 13px; display: block; flex-shrink: 0; }
+  .yvp-wordmark { width: 182px; height: 28px; display: block; }
+  @media (max-width: 480px) {
+    .yvp-lockup { flex-direction: column; padding: 16px 20px; gap: 8px; }
+    .yvp-lockup-name { font-size: 1.05rem; }
+    .yvp-flame, .yvp-yv-icon { width: 44px; height: 44px; }
+    .yvp-yv-icon { border-radius: 10px; }
+    .yvp-wordmark { width: 143px; height: 22px; }
+  }
+  .yvp-eyebrow { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #ffd9e0; margin: 0 0 12px; }
+  .yvp-h1 { font-family: var(--font-serif); font-weight: 400; font-size: 2.25rem; line-height: 1.12; margin: 0 0 18px; color: #fff; }
+  @media (min-width: 768px) { .yvp-h1 { font-size: 3.5rem; } }
+  .yvp-lede { font-size: 1.2rem; line-height: 1.6; margin: 0 0 12px; color: #fff; font-weight: 600; }
+  .yvp-hero-p { font-size: 1.05rem; line-height: 1.7; margin: 0 auto 28px; max-width: 44rem; color: #fff; }
+  .yvp-hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .yvp-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 28px; border-radius: 999px; font-weight: 700; font-size: 1rem; text-decoration: none;
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+  .yvp-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18); }
+  .yvp-btn-white { background: #fff; color: #a32a24; }
+  .yvp-btn-ghost { border: 2px solid #fff; color: #fff; }
+  .yvp-btn-brand { background: #b60057; color: #fff; }
+
+  /* SHARED TYPE */
+  .yvp-kicker { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; margin: 0 0 10px; text-align: center; }
+  .yvp-h2 { font-family: var(--font-serif); font-weight: 400; font-size: 2rem; line-height: 1.2; color: var(--color-ink); margin: 0 0 14px; text-align: center; }
+  @media (min-width: 768px) { .yvp-h2 { font-size: 2.6rem; } }
+  .yvp-sub { font-size: 1.1rem; line-height: 1.7; color: #5b3f46; max-width: 44rem; margin: 0 auto 28px; text-align: center; }
+  .yvp-sub-center { margin-top: 28px; margin-bottom: 0; }
+  .yvp-link { color: #b60057; font-weight: 600; text-decoration: none; white-space: nowrap; }
+  .yvp-link:hover { text-decoration: underline; }
+
+  /* DIVINE VOICE COLOR */
+  .yvp-dvc { padding: 56px 0; background: #fff; }
+  @media (min-width: 768px) { .yvp-dvc { padding: 80px 0; } }
+  .yvp-voices { display: grid; gap: 16px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .yvp-voices { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
+  .yvp-voice {
+    margin: 0; background: #fff; border-radius: 14px; overflow: hidden;
+    border: 2px solid var(--vc); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    display: flex; flex-direction: column;
+  }
+  .yvp-voice-tag { background: var(--vc); color: #fff; font-weight: 800; letter-spacing: 0.14em; font-size: 1.05rem; padding: 12px 18px; }
+  .yvp-voice-text { margin: 0; padding: 18px 18px 8px; font-family: var(--font-serif); font-size: 1.15rem; line-height: 1.6; color: #1a1c1c; flex: 1; }
+  .yvp-voice-ref { padding: 6px 18px 16px; font-size: 0.9rem; font-weight: 700; color: var(--vc); text-decoration: none; }
+  .yvp-voice-ref:hover { text-decoration: underline; }
+
+  /* LANGUAGES */
+  .yvp-langs { padding: 56px 0; background: linear-gradient(180deg, #fff6f4 0%, #fdeceb 100%); border-top: 6px solid #c13b34; }
+  @media (min-width: 768px) { .yvp-langs { padding: 80px 0; } }
+  .yvp-langs-head { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .yvp-langs-icon { width: 64px; height: 64px; border-radius: 15px; box-shadow: 0 8px 20px rgba(127, 36, 41, 0.25); }
+  .yvp-wordmark-inline { display: inline-block; width: 156px; height: 24px; vertical-align: -0.05em; margin-left: 6px; }
+  @media (min-width: 768px) { .yvp-wordmark-inline { width: 208px; height: 32px; } }
+  .yvp-count { font-size: 1.1rem; line-height: 1.7; color: #5b3f46; max-width: 44rem; margin: 0 auto 32px; text-align: center; }
+  .yvp-count-num { display: inline-block; background: #c13b34; color: #fff; font-weight: 800; border-radius: 999px; padding: 0 12px; margin-right: 2px; }
+  .yvp-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; list-style: none; margin: 0; padding: 0; }
+  @media (min-width: 480px) { .yvp-grid { gap: 10px; } }
+  @media (min-width: 900px) { .yvp-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; } }
+  @media (min-width: 1200px) { .yvp-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .yvp-card {
+    display: flex; align-items: center; gap: 12px; height: 100%; min-height: 68px;
+    padding: 12px 14px; background: #fff; border-radius: 12px; text-decoration: none;
+    border: 1px solid #f1d3d0; border-left: 5px solid #c13b34;
+    box-shadow: 0 2px 6px rgba(127, 36, 41, 0.06);
+    transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+  }
+  .yvp-card:hover, .yvp-card:focus-visible { border-color: #c13b34; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(127, 36, 41, 0.15); }
+  .yvp-card-icon { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; }
+  .yvp-card-text { display: flex; flex-direction: column; min-width: 0; flex: 1; overflow-wrap: anywhere; }
+  .yvp-card-local { font-weight: 700; font-size: 1.05rem; line-height: 1.3; color: #1a1c1c; }
+  .yvp-card-eng { font-size: 0.85rem; line-height: 1.3; color: #5b3f46; margin-top: 2px; }
+  .yvp-card-text[dir='rtl'] .yvp-card-eng { text-align: right; }
+  .yvp-card-arrow { color: #c13b34; font-weight: 700; flex-shrink: 0; }
+  @media (max-width: 479px) {
+    .yvp-card { gap: 8px; padding: 10px 8px 10px 10px; min-height: 60px; border-left-width: 4px; }
+    .yvp-card-icon { width: 26px; height: 26px; border-radius: 6px; }
+    .yvp-card-local { font-size: 0.95rem; }
+    .yvp-card-eng { font-size: 0.78rem; }
+    .yvp-card-arrow { display: none; }
+  }
+  .yvp-org { margin: 32px 0 0; text-align: center; font-size: 0.95rem; color: #5b3f46; }
+
+  /* READ & LISTEN */
+  .yvp-band-plum { padding: 56px 0; background: linear-gradient(135deg, #3d1a39 0%, #5b2b55 100%); }
+  @media (min-width: 768px) { .yvp-band-plum { padding: 80px 0; } }
+  .yvp-two { display: grid; gap: 16px; grid-template-columns: 1fr; max-width: 48rem; margin: 0 auto; }
+  @media (min-width: 640px) { .yvp-two { grid-template-columns: 1fr 1fr; } }
+  .yvp-tile {
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
+    padding: 28px 22px; background: #fff; border-radius: 16px; text-decoration: none;
+    border-top: 6px solid #ffd9e0; transition: transform 0.12s, box-shadow 0.12s;
+  }
+  .yvp-tile:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25); }
+  .yvp-tile-icon { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background: #b60057; color: #fff; }
+  .yvp-tile-title { font-family: var(--font-serif); font-size: 1.5rem; color: #5b2b55; }
+  .yvp-tile-text { font-size: 0.95rem; line-height: 1.5; color: #5b3f46; }
+  .yvp-also { text-align: center; margin: 24px 0 0; color: #f5f0e8; font-size: 0.95rem; }
+  .yvp-also a { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* COMMUNITY */
+  .yvp-join { padding: 56px 16px; background: radial-gradient(circle at 15% 20%, rgba(255, 217, 224, 0.25), transparent 40%), linear-gradient(135deg, #b60057 0%, #8a1f4a 100%); }
+  @media (min-width: 768px) { .yvp-join { padding: 80px 24px; } }
+  .yvp-join-card {
+    max-width: 44rem; text-align: center; background: #fff; border-radius: 20px;
+    padding: 40px 20px; box-shadow: 0 20px 44px rgba(0, 0, 0, 0.25);
+  }
+  .yvp-free { margin: 12px 0 0; font-size: 0.9rem; color: #5b3f46; }
 </style>
