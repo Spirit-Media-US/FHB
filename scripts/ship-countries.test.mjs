@@ -21,6 +21,22 @@ test('config: live rows are complete, pending rows are not live and do not overl
 	for (const code of pendingCodes) assert.ok(!SHIP_CODES.includes(code), `${code} is both live and pending`);
 	assert.equal(new Set(SHIP_CODES).size, SHIP_CODES.length, 'duplicate live country');
 });
+test('pending data: ISO alpha-2, unique, zoned, sited, no charge model filled in', () => {
+	const zones = ['Europe+UK', 'Middle East', 'Americas (non-US)', 'Asia-Pacific', 'Africa'];
+	assert.equal(new Set(pendingCodes).size, pendingCodes.length, 'duplicate pending code');
+	for (const c of PENDING_COUNTRIES) {
+		assert.match(c.code, /^[A-Z]{2}$/, c.code);
+		assert.ok(zones.includes(c.zone), `${c.code} zone`);
+		assert.ok(['US', 'UK', 'AU'].includes(c.printSite), `${c.code} printSite`);
+		assert.ok(['MEASURED', 'INFERRED'].includes(c.printSiteBasis), `${c.code} basis`);
+		assert.equal(c.shippingRate, null, `${c.code} must have no charge yet`);
+		assert.equal(c.handlingDays, null);
+		assert.equal(c.transitDays, null);
+		assert.equal(c.ingram_cost_status === 'MEASURED', c.ingram_cost_hc != null && c.ingram_cost_pb != null, `${c.code} cost/status mismatch`);
+		assert.ok(validateRow({ ...c, shippingRate: { value: '0', currency: 'USD' }, handlingDays: [1, 2], transitDays: [1, 2] }).length === 0, `${c.code} row shape`);
+	}
+	for (const bad of ['AQ', 'BV', 'HM', 'CU', 'IR', 'KP', 'SY', 'US']) assert.ok(!pendingCodes.includes(bad), `${bad} must not be pending`);
+});
 test('failure path: an incomplete live row is rejected', () => {
 	assert.ok(validateRow({ code: 'GB', name: 'United Kingdom', printSite: null, shippingRate: null }).length >= 3);
 	assert.ok(validateRow({ ...LIVE_COUNTRIES[0], printSite: 'MARS' }).length);

@@ -17,6 +17,15 @@ export interface PendingCountry {
 	name: string;
 	printSite: string | null;
 	shippingRate: null;
+	handlingDays?: null;
+	transitDays?: null;
+	/** Zone for pricing: Europe+UK | Middle East | Americas (non-US) | Asia-Pacific | Africa. */
+	zone?: string;
+	printSiteBasis?: 'MEASURED' | 'INFERRED';
+	/** Measured IngramSpark qty-1 cost at the chosen site (hardcover EN / paperback ES), null = UNMEASURED. */
+	ingram_cost_hc?: Record<string, unknown> | null;
+	ingram_cost_pb?: Record<string, unknown> | null;
+	ingram_cost_status?: 'MEASURED' | 'UNMEASURED';
 	note?: string;
 }
 
