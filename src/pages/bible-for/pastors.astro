@@ -4,6 +4,10 @@
 // so they carry the declaration: "You are a beloved son or daughter — not a
 // slave, not a servant, not a tool, not a performer." Mirrors worship-leaders.
 import GroupBible from '../../components/GroupBible.astro';
+import { catalogRows } from '../../data/print-catalog';
+
+const GEN = catalogRows.find((r) => r.category === 'general');
+const GENERAL_PB = (GEN?.pb ?? 79.99).toFixed(2);
 
 const verses = [
 	{
@@ -72,6 +76,10 @@ const verses = [
 ];
 
 const faqs = [
+	{
+		question: `What is the best Bible to give a pastor?`,
+		answer: `Give a pastor a clear modern translation they will actually open, ideally one they can also hear. Father's Heart Bible™ is free to read and listen to online on any device with no account (paperback $${GENERAL_PB}, on our print editions page) and reveals God as a Father wherever Scripture does. The NLT is very readable and the NIV is widely used in churches, so either is a sound alternative. A good place to begin is Psalm 23.`,
+	},
 	{
 		question: 'What are good Bible verses for discouraged or burned-out pastors?',
 		answer:
@@ -197,6 +205,14 @@ const faqs = [
 	]}
 	galleryBottomCreditHtml={`Photos via <a href=\"https://www.pexels.com/\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Pexels</a>.`}
 	keepReadingHtml={`Begin with the <a href=\"https://fathersheartbible.com/read/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">whole Bible free online with audio</a>, learn <a href=\"/the-fathers-heart-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">why Father&rsquo;s Heart Bible&trade; exists</a>, or get oriented with our <a href=\"/guides/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">Bible reading guides</a> &mdash; including <a href=\"/guides/how-to-pray/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">how to pray</a> and <a href=\"/guides/where-to-start-reading-the-bible/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">where to start</a>. Or meet fellow workers in <a href=\"/bible-for/worship-leaders/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">the Bible for worship leaders</a> and <a href=\"/bible-for/student-ministry/\" style=\"color: var(--color-brand);\" class=\"hover:underline\">student ministry</a>.`}
+	whichBibleHeading={`What is the best Bible to give a pastor?`}
+	whichBibleIntroHtml={`A pastor already owns many Bibles, so a gift works best when it adds something new: a different rendering to read, hear or compare. Give a pastor a clear modern translation they will actually open, and one they can also <em>hear</em>. Father&rsquo;s Heart Bible&trade; (FHB), which we publish, is free to read and listen to online on any device with no account, and the paperback is $${GENERAL_PB} on our <a href="/print/" style="color: var(--color-brand);" class="hover:underline">print editions page</a>. It reveals God as a <em>Father</em> wherever Scripture does. A good place to begin is <a href="https://fathersheartbible.com/read/psalms/23/" style="color: var(--color-brand);" class="hover:underline">Psalm 23</a>. The comparison below sets FHB beside other common choices.`}
+	whichBibleRows={[
+		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `A gift they can read or hear free, and a Bible that shows God as Father`, style: `Translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free online with audio, no account; paperback $${GENERAL_PB}` },
+		{ edition: `NLT (New Living Translation, Tyndale)`, bestFor: `Easy, natural everyday English`, style: `Thought-for-thought, very readable`, access: `Many editions from retailers` },
+		{ edition: `NIV (New International Version, Zondervan)`, bestFor: `The translation most churches and study guides use`, style: `A balance of word-for-word and thought-for-thought`, access: `Many editions from retailers` },
+	]}
+	whichBibleNoteHtml={`Give it as encouragement for them as a person, not as a tool for the pulpit. Whichever you choose, the gift matters more than the edition.`}
 	faqs={faqs}
 	ctaBottomHeading="Be fathered before you shepherd"
 	ctaBottomBodyHtml={`Watch the story behind Father&rsquo;s Heart Bible&trade; &mdash; the translation that lets you meet the One you preach as Father. Then come and be fed, so what you give your people overflows from what you&rsquo;ve received.`}
