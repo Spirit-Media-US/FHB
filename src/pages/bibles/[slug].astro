@@ -135,7 +135,7 @@ const langCode = isLang ? (ed.coverImage ?? '').replace(/^lang-/, '') : '';
 const hasCover = !isLang || hasLangCard(langCode);
 const coverUrl = hasCover
 	? cardUrl(ed.coverImage ?? `dvc-${ed.slug}`, 1200)
-	: 'https://assets.spiritmediapublishing.com/FHB/share/v3/fhb-og-default.jpg';
+	: 'https://assets.spiritmediapublishing.com/FHB/share/v4/fhb-og-default.jpg';
 // THE ORDER FORM under the header, on EVERY edition (Kevin 2026-10-05; language pages since
 // 2026-10-03). It sells this edition's catalog row(s) from print-catalog.ts — the same record
 // /print's rows and dvc-checkout.ts use: lang-<code> for a language, the slug itself for an
@@ -281,6 +281,8 @@ if (pillars.length) {
 }
 
 const url = `${SITE}/bibles/${ed.slug}-bible/`;
+// Visible Bible.com link (Kevin 2026-11-08): only when this language has a line in youversion-versions.json.
+const yvUrl = ed.lang ? (youversion.versions as Record<string, string>)[ed.lang] : undefined;
 
 // ONE PRODUCT PER BINDING, for Google's free merchant listings (Kevin 2026-10-22, master plan W5).
 // Each binding is its own book with its own ISBN and price, so each gets its own Product +
@@ -489,6 +491,9 @@ const faqSchema = {
 					<div class="flex flex-wrap items-center gap-3">
 						<a href="#order" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Order</a>
 						<LookInside slug={ed.lookInsideKey ?? ed.slug} title={ed.name} size="lg" />
+						{yvUrl && (
+							<a href={yvUrl} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 2px solid #3f3f46; padding: 0.7rem 1.6rem; text-decoration: none; font-size: 1rem;">Read on Bible.com</a>
+						)}
 					</div>
 				</div>
 			</div>

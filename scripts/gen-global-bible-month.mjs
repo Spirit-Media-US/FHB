@@ -30,7 +30,8 @@ export async function buildRows(stateRows, committed, read200) {
 		const code = cleanCode(r);
 		let status = 'scheduled';
 		if (code) {
-			if (committed[r.public_day] === 'readable') status = 'readable';
+			// keyed by CODE, not date: several languages can share a date once Kevin scrubbed the 1-per-day schedule (2026-11-07)
+			if (committed[code] === 'readable') status = 'readable';
 			else if (r.public === true && (await read200(code))) {
 				status = 'readable';
 				flipped.push({ name: r.name, code });
@@ -50,7 +51,7 @@ export function render(header, rows) {
 
 export function parseCommitted(text) {
 	const m = {};
-	for (const b of text.matchAll(/date: '([\d-]+)',[\s\S]*?status: '(\w+)'/g)) m[b[1]] = b[2];
+	for (const b of text.matchAll(/code: '([^']+)',\s*status: '(\w+)'/g)) m[b[1]] = b[2];
 	return m;
 }
 
