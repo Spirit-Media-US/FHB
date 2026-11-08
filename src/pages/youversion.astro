@@ -138,12 +138,14 @@ const homeVoices: VoiceGroup[] = [
       headingClass="sr-only"
     />
     <section style="background-color: var(--color-canvas); padding: 2rem 1rem 3rem;">
-      <div style="max-width: 42rem; margin: 0 auto; text-align: center;">
-        <p class="yvp-title" aria-hidden="true">
-          <span>Father&rsquo;s Heart Bible&trade; on</span>
+      <p class="yvp-title" aria-hidden="true">
+        <span>Father&rsquo;s Heart Bible&trade; on</span>
+        <span class="yvp-title-logo">
           <img src={YV_ICON} alt="" width="48" height="48" loading="eager" fetchpriority="high" decoding="async" class="yvp-title-icon" />
           <img src={YV_WORDMARK} alt="" width="208" height="32" loading="eager" decoding="async" class="yvp-title-wordmark" />
-        </p>
+        </span>
+      </p>
+      <div style="max-width: 42rem; margin: 0 auto; text-align: center;">
         <p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.2rem; line-height: 1.7; margin: 0 0 1rem;">
           Welcome, YouVersion readers. Thank you for reading with us in the Bible App. We are glad you are here.
         </p>
@@ -200,6 +202,8 @@ const homeVoices: VoiceGroup[] = [
   /* TITLE: said once, with the YouVersion logo once (Kevin 2026-11-08) */
   .yvp-title { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 14px; margin: 0 0 1.75rem; font-family: var(--font-serif); font-weight: 300; font-size: 2rem; line-height: 1.2; color: var(--color-ink); }
   @media (min-width: 768px) { .yvp-title { font-size: 2.75rem; } }
+  .yvp-title { max-width: 64rem; margin-left: auto; margin-right: auto; }
+  .yvp-title-logo { display: inline-flex; align-items: center; gap: 12px; white-space: nowrap; }
   .yvp-title-icon { width: 48px; height: 48px; border-radius: 11px; }
   .yvp-title-wordmark { width: 208px; height: auto; }
 
