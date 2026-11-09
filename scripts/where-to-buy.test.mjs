@@ -25,6 +25,8 @@ const HOSTS = {
 	bn: /^https:\/\/www\.barnesandnoble\.com\/w\//,
 	google: /^https:\/\/play\.google\.com\/store\/(books|audiobooks)\/details\?id=/,
 	apple: /^https:\/\/books\.apple\.com\/us\/(book|audiobook)\//,
+	walmart: /^https:\/\/www\.walmart\.com\/ip\/[^?#]+\/\d+$/,
+	kobo: /^https:\/\/www\.kobo\.com\/[a-z-]+\/[a-z]{2}\/(ebook|audiobook)\/[^?#]+$/,
 };
 
 // Every rule about the data in ONE function, so the failure path can feed it a bad copy.
@@ -69,14 +71,14 @@ test('FAILURE PATH: a bad ISBN in the data fails the test', () => {
 	wrongEan.print[id].bn.hardback = wrongEan.print[id].bn.hardback.replace(/ean=\d+/, 'ean=9790000000000');
 	assert.ok(problems(isbns, wrongEan).some((p) => /URL is not ISBN/.test(p)));
 	const walled = structuredClone(links);
-	walled.print['journaling'] = { ...walled.print['journaling'], walmart: { hardback: 'https://www.walmart.com/ip/x/1' } };
-	assert.ok(problems(isbns, walled).some((p) => /walmart link kept/.test(p)));
+	walled.print['journaling'] = { ...walled.print['journaling'], walmart: { hardback: 'https://www.walmart.com/search?q=9798893073164' } };
+	assert.ok(problems(isbns, walled).some((p) => /walmart hardback: unexpected URL/.test(p)));
 });
 
-test('verification records: B&N all verified; Walmart/Kobo documented as blocked; Apple counted; Amazon sample matches', () => {
+test('verification records: B&N all verified; Walmart/Kobo found via Google results (product pages are behind a human check); Apple counted; Amazon sample matches', () => {
 	const v = links.verification;
 	assert.equal(v.bn.ok, v.bn.checked);
-	for (const rt of ['walmart', 'kobo']) assert.equal(v[rt].status, 'blocked', rt);
+	for (const rt of ['walmart', 'kobo']) assert.equal(v[rt].status, 'google-verified', rt);
 	const apple = Object.values(links.digital).flatMap((m) => Object.values(m)).filter((r) => r.apple).length;
 	assert.equal(v.apple.links, apple);
 	const catalog = buildCatalog(isbns);
@@ -144,10 +146,10 @@ test('built cards: cover left with size + lazy + alt, ISBNs under binding column
 			assert.ok(rows[0][2].includes('15% off 1st order + Free Shipping'));
 			const keys = rows.slice(1).map((r) => r[1]);
 			for (const [, k, body] of rows.slice(1)) assert.match(body, /<a href="https:\/\//, `${id}: ${k} row without a link`);
-			assert.deepEqual(keys, order.filter((k) => k === 'walmart' || Object.keys(links.print[id]?.[k] ?? {}).length > 0), `${id}: rows = stores with links (+ Walmart ISBN search)`);
-			// Walmart (Kevin 11-09): each binding searches Walmart for its OWN ISBN.
-			const wm = rows.find((r) => r[1] === 'walmart')[2];
-			assert.ok(wm.includes(`walmart.com/search?q=${e.hb.replace(/\D/g, '')}`) && wm.includes(`walmart.com/search?q=${e.pb.replace(/\D/g, '')}`), `${id}: Walmart searches its own ISBNs`);
+			assert.deepEqual(keys, order.filter((k) => Object.keys(links.print[id]?.[k] ?? {}).length > 0), `${id}: rows = stores with verified links`);
+			// Walmart rows exist only where a verified product link exists.
+			const wm = rows.find((r) => r[1] === 'walmart');
+			assert.equal(!!wm, Object.keys(links.print[id]?.walmart ?? {}).length > 0, `${id}: Walmart row iff verified Walmart link`);
 		}
 		const code = id === 'digital-en' || id.startsWith('general-') ? 'en' : id.startsWith('lang-') ? id.slice(5) : null;
 		const hasDigital = code && ['ebook', 'listening', 'audiobook'].some((k) => links.digital[k]?.[code]);
@@ -168,9 +170,21 @@ test('built cards: cover left with size + lazy + alt, ISBNs under binding column
 	const buttons = [...html.matchAll(/<button type="button" data-rt="([a-z]+)"/g)].map((m) => m[1]);
 	assert.deepEqual(buttons.slice(0, 2), ['direct', 'all'], 'Buy direct first, marked Preferred');
 	assert.match(html, /data-rt="direct"[^>]*class="wtb-pref">Buy direct <span class="wtb-badge">Preferred<\/span>/);
-	assert.ok(!buttons.includes('kobo'), 'no button for a store with 0 links');
+	const hasKobo = Object.values(links.digital).some((m) => Object.values(m).some((r) => r.kobo));
+	assert.equal(buttons.includes('kobo'), hasKobo, 'Kobo button iff a Kobo link exists');
 	for (const k of ['amazon', 'bn', 'walmart', 'apple', 'google']) assert.ok(buttons.includes(k), `${k} button`);
 	// the filter's card list: a card advertises exactly the stores it has links for
 	const es = cards.find((c) => c.includes('data-edition="lang-es"'));
 	assert.match(es, /data-stores="[^"]*\bgoogle\b/);
+});
+
+test('no href on the built page is a search page, and every Walmart href is a product page', () => {
+	if (!existsSync(new URL('dist/where-to-buy/index.html', root))) return;
+	const html = read('dist/where-to-buy/index.html');
+	const hrefs = [...html.matchAll(/href="(https?:\/\/[^"]+)"/g)].map((m) => m[1].replace(/&amp;/g, '&'));
+	assert.ok(hrefs.length > 100);
+	for (const h of hrefs) assert.ok(!h.includes('/search?'), `search link: ${h}`);
+	const wm = hrefs.filter((h) => h.includes('walmart.com'));
+	assert.ok(wm.length > 0, 'Walmart links present');
+	for (const h of wm) assert.match(h, /^https:\/\/www\.walmart\.com\/ip\/[^?#]+\/\d+$/);
 });

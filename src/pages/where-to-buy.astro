@@ -200,18 +200,9 @@ const digitalStores = (code: string) =>
 const printLinkSets = Object.values(printLinks);
 const digitalLinkSets = Object.values(digitalLinks).flatMap((m) => Object.values(m));
 const storeHasLinks = (key: string) =>
-	key === 'walmart' ||
 	printLinkSets.some((rl) => Object.keys(rl[key] ?? {}).length > 0) ||
 	digitalLinkSets.some((r) => key in r);
 const toggleStores = retailers.filter((r) => storeHasLinks(r.key));
-// Walmart (Kevin 2026-11-09: "Why can't you add walmart as I gave you the link"): Walmart's product pages sit
-// behind a bot check, so each binding links to a Walmart search for its own ISBN, worded "Search at Walmart".
-const walmartSearch = (isbn: string) =>
-	`https://www.walmart.com/search?q=${isbn.replace(/\D/g, '')}`;
-const withWalmart = (r: Row, rl: Record<string, Partial<Record<Fmt, string>>>) =>
-	r.hb && r.pb && !rl.walmart
-		? { ...rl, walmart: { hardback: walmartSearch(r.hb), paperback: walmartSearch(r.pb) } }
-		: rl;
 const rowStores = (rl: Record<string, unknown>) =>
 	retailers.filter((r) => rl[r.key] && Object.keys(rl[r.key] as object).length > 0);
 
@@ -317,7 +308,7 @@ const books = groups.flatMap((g) =>
 						<h3>{g.title} <span>{g.note}</span></h3>
 						<div class="wtb-cards">
 							{g.rows.map((r) => {
-								const rl = withWalmart(r, printLinks[r.id] ?? {});
+								const rl = printLinks[r.id] ?? {};
 								const dcode = codeOf(r);
 								const dslots = dcode ? digitalCols(dcode) : [];
 								const dstores = dcode ? digitalStores(dcode) : [];
@@ -359,7 +350,7 @@ const books = groups.flatMap((g) =>
 																<tr class="rt" data-rt={rt.key}>
 																	<th scope="row">{rt.name}</th>
 																	{(['hardback', 'paperback'] as Fmt[]).map((f) => (
-																		<td data-label={f === 'hardback' ? 'Hardback' : 'Paperback'}>{m[f] ? <a href={m[f]} rel="noopener" target="_blank" aria-label={`${r.title}, ${f === 'hardback' ? 'Hardback' : 'Paperback'} at ${rt.name}`}>{rt.key === 'walmart' ? 'Search at Walmart' : `View at ${rt.name}`}</a> : <span class="rt-na">—</span>}</td>
+																		<td data-label={f === 'hardback' ? 'Hardback' : 'Paperback'}>{m[f] ? <a href={m[f]} rel="noopener" target="_blank" aria-label={`${r.title}, ${f === 'hardback' ? 'Hardback' : 'Paperback'} at ${rt.name}`}>View at {rt.name}</a> : <span class="rt-na">—</span>}</td>
 																	))}
 																</tr>
 															);
