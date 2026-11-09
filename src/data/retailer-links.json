@@ -11,10 +11,6 @@
 			"name": "Barnes & Noble"
 		},
 		{
-			"key": "google",
-			"name": "Google Play"
-		},
-		{
 			"key": "walmart",
 			"name": "Walmart"
 		},
@@ -25,6 +21,10 @@
 		{
 			"key": "apple",
 			"name": "Apple Books"
+		},
+		{
+			"key": "google",
+			"name": "Google Play"
 		}
 	],
 	"print": {
@@ -794,7 +794,8 @@
 		"ebook": {
 			"en": {
 				"amazon": "https://www.amazon.com/dp/B0H8R2YP66",
-				"google": "https://play.google.com/store/books/details?id=qY4BEgAAQBAJ"
+				"google": "https://play.google.com/store/books/details?id=qY4BEgAAQBAJ",
+				"apple": "https://books.apple.com/us/book/fhb-holy-bible-red-letter-divine-voice-color-ebook/id6828146004"
 			}
 		}
 	},
@@ -843,15 +844,21 @@
 		},
 		"walmart": {
 			"status": "blocked",
-			"note": "walmart.com serves a 'Robot or human?' wall to automated requests; nothing collected, shown as Not listed"
+			"note": "walmart.com answers every automated request, including a real browser (Playwright, 2026-11-09), with a 'Robot or human?' press-and-hold check. Not bypassed, so presence at Walmart is UNKNOWN, not 'not listed'. A web search of walmart.com found no FHB listing (an index, not proof)."
 		},
 		"kobo": {
 			"status": "blocked",
-			"note": "kobo.com answers 403 to automated requests; the English eBook listing Kevin opened by hand on 2026-10-10 is not shown because it cannot be machine-verified"
+			"note": "kobo.com answers automated requests, including a real browser, with a Cloudflare 'Verify you are human' check. Not bypassed. The English eBook Kevin opened by hand on 2026-10-10 cannot be machine-verified and is not shown."
 		},
 		"apple": {
-			"status": "none",
-			"note": "Apple iTunes lookup by ISBN returned 0 results; Apple Books listings were removed 2026-10-10 (404)"
+			"status": "ok",
+			"links": 1,
+			"source": "iTunes lookup by ISBN-13 9798893072976 (the English eBook) returned Spirit Media Publishing's listing; page returned HTTP 200",
+			"note": "Apple sells no print: iTunes lookup by ISBN for the print ISBNs returns 0 results; lookups of the artist's catalog return exactly 1 eBook and 0 audiobooks."
+		},
+		"googleBooks": {
+			"status": "quota",
+			"note": "Google Books API returned 429 (daily quota exceeded) again on 2026-11-09; no print listings confirmed."
 		}
 	}
 }
