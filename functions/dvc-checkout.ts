@@ -19,6 +19,15 @@
 // NB: path is /dvc-checkout, not /api/* — the apex router proxies /api/* to the community
 // app, so this marketing function must live off that prefix.
 
+import { BULK_QUOTE_COPY, bulkQuoteRequired, tierPctFor } from '../src/lib/farBand.ts';
+import {
+	allowCheck,
+	answerBody,
+	constantTime,
+	emailTag,
+	type FirstStatus,
+	sameOrigin,
+} from '../src/lib/firstOrderGuard.ts';
 import {
 	handlingFeeCents,
 	handlingLabel,
@@ -32,14 +41,6 @@ import {
 	packBreakdown,
 	unitAfter,
 } from '../src/lib/order-pricing.ts';
-import {
-	allowCheck,
-	answerBody,
-	constantTime,
-	emailTag,
-	type FirstStatus,
-	sameOrigin,
-} from '../src/lib/firstOrderGuard.ts';
 import { checkoutShippingForm, countryFor } from '../src/lib/shipCountries.ts';
 
 interface Env {
@@ -1420,6 +1421,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		);
 	}
 
+	// FAR-BAND BULK QUOTE (unit 2kx, Kevin 2026-11-09): 10+ physical copies to a far_band country
+	// are never sold here. Refused before any Stripe call, whatever the client sent.
+	const destCode = String(payload.country ?? 'US').toUpperCase();
+	const dest = countryFor(destCode);
+	const copies = Object.entries(counts).reduce((s, [slug, n]) => s + n * volumesFor(slug), 0);
+	if (bulkQuoteRequired(dest?.farBand, copies)) {
+		return json({ error: 'bulk_quote_required', message: BULK_QUOTE_COPY.error }, 400);
+	}
+
 	if (!env.STRIPE_FHB_SECRET_KEY) {
 		return json({ disabled: true, message: 'Checkout is not enabled yet.' });
 	}
@@ -1437,8 +1447,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	// before international shipping). A country that is not in the LIVE list (pending, unknown,
 	// malformed) is refused, never passed to Stripe. US is outside the guard and shows no fee; every
 	// other country needs a landed cost, or the sale cannot be sized and is refused (fail closed).
-	const destCode = String(payload.country ?? 'US').toUpperCase();
-	const dest = countryFor(destCode);
 	const intl = destCode !== 'US';
 	if (dest && intl && !dest.landed_cost_usd) {
 		return json(
@@ -1453,7 +1461,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	// 1A (Kevin 2026-11-08): WELCOME15 is offered to EVERYONE, every country. The margin check is
 	// now only the backstop (handling is sized to the floor, so it drops a discount only when the
 	// fee cannot reach it, or the landed cost is unknown).
-	if (validEmail && FIRST_ORDER_PCT > tier.pct) {
+	// Far band: no volume ladder at all, so the first-order 15% is the only discount on offer.
+	const tierPctNow = tierPctFor(dest?.farBand, tier.pct);
+	if (validEmail && FIRST_ORDER_PCT > tierPctNow) {
 		const m = marginCheck(lines, FIRST_ORDER_PCT, destCode);
 		if (!m.ok) {
 			console.log(`margin-guard: dropped ${FIRST_ORDER_CODE}: ${m.reason}`);
@@ -1461,7 +1471,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 			promo = await firstOrderPromo(env.STRIPE_FHB_SECRET_KEY);
 		}
 	}
-	let pct = promo ? 0 : tier.pct;
+	let pct = promo ? 0 : tierPctNow;
 	if (!promo && pct > 0) {
 		const m = marginCheck(lines, pct, destCode);
 		if (!m.ok) {
@@ -1491,7 +1501,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	const unitPctFinal = intl && promo ? FIRST_ORDER_PCT : pct;
 	const useCode = Boolean(promo) && !intl;
 	// `copies` = physical volumes (a Large Print set is three), which scales the expedited price.
-	const copies = Object.entries(counts).reduce((s, [slug, n]) => s + n * volumesFor(slug), 0);
 	const shipForm = checkoutShippingForm(payload.country ?? 'US', copies);
 	if (!shipForm) {
 		return json(

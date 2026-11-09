@@ -19,7 +19,7 @@ import { CATALOG_CATEGORIES, catalogPrices, catalogRows } from '../data/print-ca
 import { PRINT_TIERS } from '../data/print-tiers';
 import { handlingTable } from '../lib/marginGuard';
 import { FIRST_ORDER_PCT } from '../lib/order-pricing';
-import { shipsLine, shipsToSentence } from '../lib/shipCountries';
+import { LIVE_COUNTRIES, shipsLine, shipsToSentence } from '../lib/shipCountries';
 import OrderRow from './OrderRow.astro';
 import OrderSummary from './OrderSummary.astro';
 
@@ -44,6 +44,8 @@ const config = JSON.stringify({
 	prices: catalogPrices(),
 	tiers: PRINT_TIERS,
 	returnPath,
+	// Far-band countries (unit 2kx): no volume ladder, and 10+ copies go to a bulk quote, not checkout.
+	farBand: LIVE_COUNTRIES.filter((c) => c.farBand).map((c) => c.code),
 	// International handling per country (Kevin 2026-11-08), shown beside each price before checkout.
 	intl: handlingTable(
 		Object.fromEntries(Object.entries(catalogPrices()).map(([k, v]) => [k, Math.round(v * 100)])),

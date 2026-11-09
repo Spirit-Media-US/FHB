@@ -10,6 +10,9 @@
 //     edits whichever binding is pressed, and each binding keeps its own count
 // Every catalog row keeps its own counts, so a buyer builds the order edition by edition and
 // nothing resets; /print's cards ([data-pick-edition]) pre-fill a row without touching the rest.
+
+import { BULK_QUOTE_COPY, bulkQuoteMailto, bulkQuoteRequired } from '../lib/farBand';
+import { firstStateFrom } from '../lib/firstOrderGuard';
 import {
 	FIRST_ORDER_LABEL,
 	FIRST_ORDER_PCT,
@@ -19,8 +22,8 @@ import {
 	quote,
 	type Tier,
 	unitAfter,
+	volumesFor,
 } from '../lib/order-pricing';
-import { firstStateFrom } from '../lib/firstOrderGuard';
 
 interface Config {
 	prices: Record<string, number>;
@@ -28,6 +31,8 @@ interface Config {
 	returnPath?: string;
 	/** per-country international handling fee, embedded at build (Kevin 2026-11-08); US has no entry */
 	intl?: Record<string, IntlRow>;
+	/** far_band country codes (unit 2kx): no volume ladder; 10+ copies are a bulk quote, not checkout */
+	farBand?: string[];
 }
 
 const UNKNOWN_OFFER = `First order? ${FIRST_ORDER_PCT}% off at checkout.`;
@@ -211,17 +216,46 @@ function init(root: HTMLElement) {
 		for (const el of qa('[data-offer]')) el.hidden = firstState === 'repeat';
 		set('[data-offer-label]', firstState === 'first' ? FIRST_ORDER_LABEL : UNKNOWN_OFFER);
 	}
+	const isFar = () => (cfg.farBand ?? []).includes(countryRow().code);
+	// Physical copies (a Large Print set is three volumes) - the same count the server uses.
+	const volumes = () => lines().reduce((s, l) => s + l.qty * volumesFor(l.slug), 0);
+	const titleOf = (sku: string) => {
+		const id = sku.replace(/-(hb|pb)$/, '');
+		const name = q(`[data-row][data-id="${id}"] .orow__name`)?.textContent?.trim() ?? id;
+		return `${name} (${sku.endsWith('-pb') ? 'Paperback' : 'Hardback'})`;
+	};
+	// Far band + 10 or more copies: Checkout steps aside for "Request a bulk quote" (mailto,
+	// prefilled from the form). The server refuses the same order, so this is a courtesy, not the gate.
+	function paintQuote() {
+		const need = bulkQuoteRequired(isFar(), volumes());
+		for (const el of qa('[data-checkout]')) el.hidden = need;
+		for (const el of qa('[data-quote]')) el.hidden = !need;
+		for (const el of qa('[data-tiers-line]')) el.hidden = isFar();
+		if (!need) return;
+		const countrySel = q<HTMLSelectElement>('[data-country]');
+		const link = q<HTMLAnchorElement>('[data-quote-link]');
+		if (link)
+			link.href = bulkQuoteMailto({
+				name: q<HTMLInputElement>('[data-quote-name]')?.value.trim() ?? '',
+				email: email?.value.trim() ?? '',
+				country: countrySel?.selectedOptions[0]?.textContent ?? countryRow().code,
+				editions: lines().map((l) => ({ title: titleOf(l.slug), qty: l.qty })),
+				copies: volumes(),
+			});
+	}
 	function render() {
 		// 1A: the first-order 15% is offered everywhere. Outside the US it comes off each unit
 		// (the server does the same), so it rounds per unit.
 		const { code, row } = countryRow();
-		const r = quote(lines(), cfg.tiers, code !== 'US', firstState === 'first');
+		const far = isFar();
+		const r = quote(lines(), far ? [] : cfg.tiers, code !== 'US', firstState === 'first');
 		const base = r.best === 'first' ? r.firstTotal : r.bulkTotal;
 		const appliedPct = r.best === 'first' ? FIRST_ORDER_PCT : r.best === 'bulk' ? r.bulkPct : 0;
 		const h = handlingFor(lines(), appliedPct, row);
 		const total = base + h.total;
 		paintFees();
 		paintOffer();
+		paintQuote();
 		for (const n of qa('[data-expedited-note]')) n.hidden = !row;
 		for (const d of qa('[data-sum-fee]')) d.hidden = h.total <= 0;
 		set('[data-sum-fee-label]', row ? `${row.label} (${row.name})` : '');
@@ -243,6 +277,7 @@ function init(root: HTMLElement) {
 	}
 
 	q<HTMLSelectElement>('[data-country]')?.addEventListener('change', render);
+	q<HTMLInputElement>('[data-quote-name]')?.addEventListener('input', render);
 
 	// ── checkout ──
 	const email = q<HTMLInputElement>('[data-email]');
@@ -269,6 +304,7 @@ function init(root: HTMLElement) {
 		}
 		render();
 	}
+	email?.addEventListener('input', paintQuote);
 	email?.addEventListener('input', () => {
 		askId++;
 		window.clearTimeout(askTimer);
@@ -309,9 +345,15 @@ function init(root: HTMLElement) {
 					returnPath: cfg.returnPath,
 				}),
 			});
-			const d = (await res.json()) as { url?: string; disabled?: boolean };
+			const d = (await res.json()) as { url?: string; disabled?: boolean; error?: string };
 			if (d.url) {
 				window.location.href = d.url;
+				return;
+			}
+			if (d.error === 'bulk_quote_required') {
+				render();
+				say(BULK_QUOTE_COPY.error);
+				btn.disabled = false;
 				return;
 			}
 			say(
