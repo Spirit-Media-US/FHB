@@ -12,6 +12,8 @@
 // LIVE source: https://assets.spiritmediapublishing.com/FHB/youversion/stats.json (R2). The script fetches it
 // once the banner is near view and counts up to the FRESH numbers; fetch fails -> the build-time numbers.
 // Refresh = replace that one R2 file (see evidence file); no deploy.
+// CSS is is:inline ON PURPOSE: site CSS loads async (media=print swap), so scoped banner CSS arrived late and the
+// unstyled list reflowed everything below it (CLS 0.21 desktop / 0.12 mobile, 2026-11-09, unit 2mw).
 import stats from '../data/youversion-stats.json';
 
 const YOUVERSION_URL = 'https://www.bible.com/organizations/89162c01-3892-4c7b-a462-239df0931522';
@@ -77,7 +79,7 @@ const items = [
 	});
 </script>
 
-<style>
+<style is:inline>
 	.fhb-yv-wrap { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; column-gap: 1.5rem; background: #1a1714; color: #f5f5f4; font-family: var(--font-body); font-size: 0.875rem; line-height: 1.25rem; }
 	.fhb-yv-banner { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; text-align: center; text-decoration: none; color: inherit; }
 	.fhb-yv-banner:hover { color: #fff; }
