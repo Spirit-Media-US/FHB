@@ -1,0 +1,503 @@
+---
+// /where-to-buy/ — Kevin 2026-11-09 (ruling "1 A"): a "Where to find it" page, laid out like /isbn/, with a link
+// to each edition at every retailer and a toggle between retailers. FHB is its own retailer (Kevin 2026-11-08,
+// "We will stop pointing people to Amazon"), so the buy-direct banner leads and every other retailer is
+// secondary. This is the ONLY page that carries retailer links. Every link is server-rendered (works with no
+// JavaScript); the toggle only filters. Links come from src/data/retailer-links.json and appear only where
+// verified; a card shows only the retailers that have a verified listing for it (plus Buy direct) — never a guessed URL, no "Not listed" rows.
+// Editions + ISBNs come from src/data/isbn-list.json (the business master snapshot), never typed here.
+import Section from '../components/Section.astro';
+import VideoHeroInner from '../components/VideoHeroInner.astro';
+import { cardUrl } from '../data/card-art';
+import isbns from '../data/isbn-list.json' with { type: 'json' };
+import { allLanguageEditions, langSlug } from '../data/language-editions';
+import links from '../data/retailer-links.json' with { type: 'json' };
+import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+
+type Fmt = 'hardback' | 'paperback';
+interface Row {
+	id: string;
+	cover: string;
+	title: string;
+	name: string;
+	href?: string;
+	hb: string;
+	pb: string;
+	/** English: its eBook/audiobook have no single print card, so the card carries the digital table only. */
+	printless?: boolean;
+	/** Buy direct target when it is not /print/ (the Large Print set orders on its own page). */
+	direct?: string;
+	/** Digital formats shown on this card (language code), when it is not a language card. */
+	digital?: string;
+}
+interface Group {
+	id: string;
+	title: string;
+	note: string;
+	rows: Row[];
+}
+
+const retailers = links.retailers as { key: string; name: string }[];
+const DIRECT = '15% off 1st order + Free Shipping';
+const printLinks = links.print as Record<string, Record<string, Partial<Record<Fmt, string>>>>;
+const digitalLinks = links.digital as Record<string, Record<string, Record<string, string>>>;
+
+const langByCode = new Map(allLanguageEditions.map((l) => [l.code, l]));
+const langHref = (code?: string) => {
+	const l = code ? langByCode.get(code) : undefined;
+	return l && !l.soon ? `/bibles/${langSlug(l)}-bible/` : undefined;
+};
+
+const T = "Father's Heart Bible™";
+const groups: Group[] = [
+	{
+		id: 'regular-print',
+		title: 'Regular Print',
+		note: '6 × 9 · Complete Bible',
+		rows: isbns.general.map((g) => ({
+			id: `general-${g.colour.toLowerCase()}`,
+			cover: `general-regular-${g.colour.toLowerCase()}`,
+			title: `${T} — ${g.colour}`,
+			name: g.colour,
+			href: '/print/',
+			hb: g.hb,
+			pb: g.pb,
+			// Kevin 2026-11-09: "our English general has ebooks and audiobooks available. Please add those links."
+			digital: 'en',
+		})),
+	},
+	{
+		id: 'large-print',
+		title: 'Large Print',
+		note: '6 × 9 · Three-volume set',
+		rows: isbns.largePrint
+			.map((v) => ({
+				id: `lp-vol${v.vol}`,
+				cover: `lp-vol${v.vol}`,
+				title: `${T} Large Print — Vol. ${v.vol} ${v.range} · ${v.colour}`,
+				name: `Vol. ${v.vol} ${v.range} · ${v.colour}`,
+				href: '/bibles/lp-set-bible/',
+				hb: v.hb,
+				pb: v.pb,
+			}))
+			.concat([
+				// Kevin 2026-11-09: "add buy direct options for our large print bundle". The set is sold direct only
+				// (no set ISBN; retailers list the volumes), so its card carries the Buy direct row alone.
+				{
+					id: 'lp-set',
+					cover: 'lp-set',
+					title: `${T} Large Print — Complete three-volume set`,
+					name: 'Complete three-volume set',
+					href: '/bibles/lp-set-bible/',
+					hb: '',
+					pb: '',
+					direct: '/bibles/lp-set-bible/#order',
+				},
+			]),
+	},
+	{
+		id: 'journaling',
+		title: 'Journaling Edition',
+		note: '8 × 10',
+		rows: [
+			{
+				id: 'journaling',
+				cover: 'dvc-journaling',
+				title: isbns.journaling.title,
+				name: isbns.journaling.title,
+				href: '/bibles/journaling-bible/',
+				hb: isbns.journaling.hb,
+				pb: isbns.journaling.pb,
+			},
+		],
+	},
+	{
+		id: 'audience-editions',
+		title: 'Audience Editions',
+		note: '6 × 9',
+		rows: isbns.audience.map((a) => ({
+			id: `audience-${a.slug}`,
+			cover: `dvc-${a.slug}`,
+			title: a.title,
+			name: a.title,
+			href: `/bibles/${a.slug}-bible/`,
+			hb: a.hb,
+			pb: a.pb,
+		})),
+	},
+	{
+		id: 'language-editions',
+		title: 'Language Editions',
+		note: 'In print now',
+		rows: isbns.languages
+			.filter((l) => l.onSale)
+			.map((l) => ({
+				id: `lang-${l.code}`,
+				cover: `lang-${l.code}`,
+				title: `${T} — ${l.name}`,
+				name: l.name,
+				href: langHref(l.code),
+				hb: l.hb,
+				pb: l.pb,
+			})),
+	},
+];
+// Cover art = the same card art /print and /bibles/<slug>/ use (src/data/card-art.ts), the 600w WebP, shown small.
+// The journaling card is 8×10 (600×725); every other card is 600×764.
+const coverH = (key: string) => (key === 'dvc-journaling' ? 725 : 764);
+
+const digitalName = new Map<string, string>([
+	...isbns.audiobooks.map((r) => [r.code, r.name] as [string, string]),
+	...isbns.listeningEbooks.map((r) => [r.code, r.name] as [string, string]),
+]);
+// One card per language, columns only for the digital formats that language has.
+const DIGITAL_COLS = [
+	{ key: 'ebook', label: 'eBook' },
+	{ key: 'listening', label: 'Listening eBook' },
+	{ key: 'audiobook', label: 'Audiobook' },
+];
+// A language's digital formats go ON its own card (Kevin 2026-11-09), IN the print columns: the eBook column
+// (eBook, or the Listening eBook where that is the eBook) sits under Hardback, Audiobook under Paperback.
+const digitalCols = (code: string) => DIGITAL_COLS.filter((c) => digitalLinks[c.key]?.[code]);
+const SLOTS = [{ keys: ['ebook', 'listening'] }, { keys: ['audiobook'] }];
+const FMT_NAME: Record<string, string> = {
+	ebook: 'eBook',
+	listening: 'Listening eBook',
+	audiobook: 'Audiobook',
+};
+const slotLabel = (sl: { keys: string[] }, code: string) => {
+	const has = sl.keys.filter((k) => digitalLinks[k]?.[code]);
+	return has.length === 1 ? FMT_NAME[has[0]] : FMT_NAME[sl.keys[0]];
+};
+// English eBook + audiobook links sit on the General colour cards (Kevin 2026-11-09 "4 B": no separate English card).
+const langGroup = groups.find((g) => g.id === 'language-editions')!;
+const sortKey = (n: string) => n.replace(/\s*\(.*\)/, '');
+langGroup.rows.sort((x, y) => sortKey(x.name).localeCompare(sortKey(y.name)));
+langGroup.note = 'Print, eBook and audiobook';
+const codeOf = (r: Row) =>
+	r.digital
+		? r.digital
+		: r.id === 'digital-en'
+			? 'en'
+			: r.id.startsWith('lang-')
+				? r.id.slice(5)
+				: '';
+const digitalStores = (code: string) =>
+	retailers.filter((rt) => digitalCols(code).some((c) => digitalLinks[c.key]?.[code]?.[rt.key]));
+
+// A store button / row exists only where at least one verified link exists for it (Kevin 2026-11-09: no 'Not listed' rows).
+const printLinkSets = Object.values(printLinks);
+const digitalLinkSets = Object.values(digitalLinks).flatMap((m) => Object.values(m));
+const storeHasLinks = (key: string) =>
+	printLinkSets.some((rl) => Object.keys(rl[key] ?? {}).length > 0) ||
+	digitalLinkSets.some((r) => key in r);
+const toggleStores = retailers.filter((r) => storeHasLinks(r.key));
+const rowStores = (rl: Record<string, unknown>) =>
+	retailers.filter((r) => rl[r.key] && Object.keys(rl[r.key] as object).length > 0);
+
+const seoTitle = "Where to Find Father's Heart Bible™ — Every Edition";
+const seoDescription = `Order Father's Heart Bible™ (FHB) direct for 15% off your first order and free shipping, or find every print edition, eBook and audiobook at Amazon, Barnes & Noble and Google Play, with its ISBN.`;
+const URL = 'https://fathersheartbible.com/where-to-buy/';
+
+// One Book per ISBN — what a bookstore or an answer engine looks up. No Offer/Product markup for other retailers.
+const books = groups.flatMap((g) =>
+	g.rows
+		.filter((r) => !r.printless && r.hb && r.pb)
+		.flatMap((r) => {
+			const name =
+				g.id === 'regular-print' || g.id === 'language-editions'
+					? `Father's Heart Bible™ — ${r.name}`
+					: g.id === 'large-print'
+						? `Father's Heart Bible™ Large Print — ${r.name}`
+						: r.name;
+			return [
+				{ name, isbn: r.hb, format: 'https://schema.org/Hardcover' },
+				{ name, isbn: r.pb, format: 'https://schema.org/Paperback' },
+			];
+		}),
+);
+---
+
+<Layout
+	title={fitTitle(seoTitle)}
+	description={fitDescription(seoDescription)}
+	image="https://assets.spiritmediapublishing.com/FHB/share/v4/fhb-og-default.jpg"
+	imageAlt="Father's Heart Bible print editions"
+	darkHero={true}
+	jsonLd={{
+		'@context': 'https://schema.org',
+		'@graph': [
+			{ '@type': 'WebPage', name: seoTitle, description: seoDescription, url: URL },
+			{
+				'@type': 'BreadcrumbList',
+				itemListElement: [
+					{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+					{ '@type': 'ListItem', position: 2, name: 'In Print', item: 'https://fathersheartbible.com/print/' },
+					{ '@type': 'ListItem', position: 3, name: 'Where to Find It', item: URL },
+				],
+			},
+			{
+				'@type': 'ItemList',
+				name: "Father's Heart Bible™ print editions",
+				numberOfItems: books.length,
+				itemListElement: books.map((b, i) => ({
+					'@type': 'ListItem',
+					position: i + 1,
+					item: {
+						'@type': 'Book',
+						name: b.name,
+						isbn: b.isbn,
+						bookFormat: b.format,
+						publisher: { '@type': 'Organization', '@id': 'https://spiritmediapublishing.com/#organization', name: 'Spirit Media Publishing' },
+					},
+				})),
+			},
+		],
+	}}
+>
+	<main>
+		<VideoHeroInner
+			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/isbn-hero.webp"
+			imageSrcMobile="https://assets.spiritmediapublishing.com/FHB/print/isbn-hero-960.webp"
+			imageWidth={1902}
+			imageHeight={1070}
+			imagePosition="50% 30%"
+			stackOnMobile={true}
+			href="/print/"
+			heading="Where to Find Father’s Heart Bible™"
+			headingBelow
+		/>
+
+		<div id="buy-direct-banner" class="wtb-banner">
+			<p class="wtb-banner-kicker">Preferred · best way to get your copy</p>
+			<h2>Order direct from Father’s Heart Bible</h2>
+			<a class="wtb-banner-btn" href="/print/">{DIRECT}</a>
+			<p class="wtb-banner-note">Every edition below is also at other retailers.</p>
+		</div>
+
+		<Section variant="light">
+			<div class="wtb-wrap" id="wtb" data-show="all">
+				<div class="text-center" style="margin-bottom: 1.5rem;">
+					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Find an edition at a retailer</h2>
+					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.95rem; margin: 0.6rem 0 0;">Each edition with its ISBNs and a link to each binding at each store that sells it. Only confirmed listings are shown.</p>
+				</div>
+
+				<div class="wtb-toggle" id="wtb-toggle" role="group" aria-label="Show one retailer" hidden>
+					<button type="button" data-rt="direct" aria-pressed="false" title={DIRECT} class="wtb-pref">Buy direct <span class="wtb-badge">Preferred</span></button>
+					<button type="button" data-rt="all" aria-pressed="true">All retailers</button>
+					{toggleStores.map((r) => <button type="button" data-rt={r.key} aria-pressed="false">{r.name}</button>)}
+				</div>
+
+				<nav class="wtb-jump" aria-label="Edition groups">
+					{groups.map((g) => <a href={`#${g.id}`}>{g.title}</a>)}
+				</nav>
+
+				{groups.map((g) => (
+					<section id={g.id} class="wtb-group">
+						<h3>{g.title} <span>{g.note}</span></h3>
+						<div class="wtb-cards">
+							{g.rows.map((r) => {
+								const rl = printLinks[r.id] ?? {};
+								const dcode = codeOf(r);
+								const dslots = dcode ? digitalCols(dcode) : [];
+								const dstores = dcode ? digitalStores(dcode) : [];
+								const have = [...new Set([...rowStores(rl).map((x) => x.key), ...dstores.map((x) => x.key)])];
+								return (
+									<article class="ed" data-edition={r.id} data-stores={have.join(' ')}>
+										<div class="ed-cover">
+											<img src={cardUrl(r.cover)} width="600" height={coverH(r.cover)} loading="lazy" decoding="async" alt={r.title} />
+										</div>
+										<div class="ed-head">
+											<h4>{r.href ? <a href={r.href}>{r.name}</a> : r.name}</h4>
+											{!r.printless && r.hb && <p class="ed-isbn"><span>Hardback ISBN {r.hb}</span><span>Paperback ISBN {r.pb}</span></p>}
+										</div>
+										<div class="ed-scroll">
+											{/* ONE table per card, ONE column grid (Kevin 2026-11-09: "Use the same columns from HB and PB for the
+											     digital print columns"): eBook sits under Hardback, Audiobook under Paperback, fixed widths, so every
+											     column lines up top to bottom on every card. */}
+											<table class="ed-table">
+												<colgroup><col class="c-rt" /><col class="c-a" /><col class="c-b" /></colgroup>
+												{!r.printless && (
+													<thead>
+														<tr>
+															<th scope="col">Retailer</th>
+															<th scope="col">Hardback{r.hb && <span class="th-isbn">ISBN {r.hb}</span>}</th>
+															<th scope="col">Paperback{r.pb && <span class="th-isbn">ISBN {r.pb}</span>}</th>
+														</tr>
+													</thead>
+												)}
+												{!r.printless && (
+													<tbody>
+														<tr class="rt rt-direct" data-rt="direct">
+															<th scope="row">Buy direct <span class="wtb-badge">Preferred</span></th>
+															<td data-label="Hardback"><a href={r.direct ?? '/print/'}>{DIRECT}</a></td>
+															<td data-label="Paperback"><a href={r.direct ?? '/print/'}>{DIRECT}</a></td>
+														</tr>
+														{rowStores(rl).map((rt) => {
+															const m = rl[rt.key] ?? {};
+															return (
+																<tr class="rt" data-rt={rt.key}>
+																	<th scope="row">{rt.name}</th>
+																	{(['hardback', 'paperback'] as Fmt[]).map((f) => (
+																		<td data-label={f === 'hardback' ? 'Hardback' : 'Paperback'}>{m[f] ? <a href={m[f]} rel="noopener" target="_blank" aria-label={`${r.title}, ${f === 'hardback' ? 'Hardback' : 'Paperback'} at ${rt.name}`}>View at {rt.name}</a> : <span class="rt-na">—</span>}</td>
+																	))}
+																</tr>
+															);
+														})}
+													</tbody>
+												)}
+												{dslots.length > 0 && (
+													<tbody class="ed-dig">
+														<tr class="ed-subhead">
+															<th scope="col">Digital editions</th>
+															{SLOTS.map((sl) => <th scope="col">{slotLabel(sl, dcode)}</th>)}
+														</tr>
+														{dcode === 'en' && (
+															<tr class="rt rt-direct" data-rt="direct">
+																<th scope="row">Buy direct <span class="wtb-badge">Preferred</span></th>
+																{SLOTS.map((sl) => <td data-label={slotLabel(sl, dcode)}>{sl.keys.includes('ebook') ? <a href="/print/#ebook">{DIRECT}</a> : <span class="rt-na">—</span>}</td>)}
+															</tr>
+														)}
+														{dstores.map((rt) => (
+															<tr class="rt" data-rt={rt.key}>
+																<th scope="row">{rt.name}</th>
+																{SLOTS.map((sl) => {
+																	const got = sl.keys.filter((k) => digitalLinks[k]?.[dcode]?.[rt.key]);
+																	return (
+																		<td data-label={slotLabel(sl, dcode)}>
+																			{got.length ? (
+																				<span class="cell-links">
+																					{got.map((k) => (
+																						<a href={digitalLinks[k][dcode][rt.key]} rel="noopener" target="_blank" aria-label={`${r.name} ${FMT_NAME[k]} at ${rt.name}`}>{got.length > 1 ? `${FMT_NAME[k]} at ${rt.name}` : `View at ${rt.name}`}</a>
+																					))}
+																				</span>
+																			) : (
+																				<span class="rt-na">—</span>
+																			)}
+																		</td>
+																	);
+																})}
+															</tr>
+														))}
+													</tbody>
+												)}
+											</table>
+										</div>
+									</article>
+								);
+							})}
+						</div>
+					</section>
+				))}
+
+				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin: 2.5rem 0 0;">
+					Looking for a number only? See every <a href="/isbn/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">ISBN</a>. Published by Spirit Media Publishing.
+				</p>
+			</div>
+		</Section>
+	</main>
+</Layout>
+
+<script is:inline>
+	(function () {
+		var wrap = document.getElementById('wtb');
+		var bar = document.getElementById('wtb-toggle');
+		if (!wrap || !bar) return;
+		bar.hidden = false;
+		var btns = bar.querySelectorAll('button');
+		function show(key) {
+			wrap.setAttribute('data-show', key);
+			var cards = wrap.querySelectorAll('article.ed');
+			for (var c = 0; c < cards.length; c++) { var st = ' ' + cards[c].getAttribute('data-stores') + ' '; cards[c].hidden = !(key === 'all' || key === 'direct' || st.indexOf(' ' + key + ' ') > -1); }
+			var secs = wrap.querySelectorAll('section.wtb-group');
+			for (var g = 0; g < secs.length; g++) secs[g].hidden = !secs[g].querySelector('article.ed:not([hidden])');
+			for (var i = 0; i < btns.length; i++) btns[i].setAttribute('aria-pressed', btns[i].getAttribute('data-rt') === key ? 'true' : 'false');
+		}
+		for (var i = 0; i < btns.length; i++) btns[i].addEventListener('click', function (e) { var k = e.currentTarget.getAttribute('data-rt'); show(k); try { history.replaceState(null, '', k === 'all' ? location.pathname : '#show-' + k); } catch (_) {} });
+		var m = /^#show-(\w+)$/.exec(location.hash);
+		if (m && bar.querySelector('[data-rt="' + m[1] + '"]')) show(m[1]);
+	})();
+</script>
+
+<style>
+	.wtb-banner { background: var(--color-ink); color: #fff; text-align: center; padding: 1.75rem 1rem 2rem; }
+	.wtb-banner h2 { font-family: var(--font-headline); font-size: 1.75rem; font-weight: 600; margin: 0.3rem 0 1rem; color: #fff; }
+	.wtb-banner-kicker { font-family: var(--font-sans); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; margin: 0; opacity: 0.8; }
+	.wtb-banner-btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0.6rem 1.6rem; border-radius: 999px; background: var(--color-brand); color: #fff; font-family: var(--font-sans); font-weight: 700; text-decoration: none; }
+	.wtb-banner-btn:hover { text-decoration: underline; text-underline-offset: 0.15em; }
+	.wtb-banner-note { font-family: var(--font-sans); font-size: 0.85rem; margin: 1rem 0 0; opacity: 0.8; }
+	.wtb-wrap { max-width: 56rem; margin: 0 auto; }
+	.wtb-toggle { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin: 0 0 1.5rem; }
+	.wtb-toggle[hidden] { display: none; }
+	.wtb-toggle button { min-height: 44px; padding: 0.4rem 1rem; border-radius: 999px; border: 1px solid var(--color-hairline); background: #fff; color: var(--color-ink); font-family: var(--font-sans); font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+	.wtb-toggle button[aria-pressed='true'] { background: var(--color-brand); border-color: var(--color-brand); color: #fff; }
+	.wtb-jump { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.25rem; margin: 0 0 2.5rem; font-family: var(--font-sans); font-size: 0.9rem; }
+	.wtb-jump a { color: var(--color-brand); font-weight: 600; text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+	.wtb-group { margin: 0 0 2.75rem; scroll-margin-top: 6rem; }
+	.wtb-group h3 { font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.75rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; }
+	.wtb-group h3 span { font-family: var(--font-sans); font-size: 0.85rem; font-weight: 400; color: var(--color-muted); }
+	.wtb-pref { border-color: var(--color-brand) !important; }
+	.wtb-badge { display: inline-block; margin-left: 0.35rem; padding: 0.05rem 0.45rem; border-radius: 999px; background: var(--color-brand); color: #fff; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; vertical-align: middle; }
+	.wtb-toggle button[aria-pressed='true'] .wtb-badge { background: #fff; color: var(--color-brand); }
+	.wtb-cards { display: grid; gap: 1rem; }
+	/* Desktop: cover 200px on the left (column 12.5rem), table on the right. */
+	.ed { display: grid; grid-template-columns: 12.5rem minmax(0, 1fr); grid-template-areas: 'cover head' 'cover table'; column-gap: 1.5rem; background: #fff; border: 1px solid var(--color-hairline); border-radius: 12px; padding: 1.1rem 1.25rem; font-family: var(--font-sans); }
+	.ed-cover { grid-area: cover; align-self: start; }
+	.ed-cover img { display: block; width: 100%; max-width: 12.5rem; height: auto; border-radius: 4px; }
+	.ed-head { grid-area: head; margin-bottom: 0.6rem; }
+	.ed-head h4 { margin: 0; font-size: 1.15rem; font-weight: 600; color: var(--color-ink); }
+	.ed-head h4 a { color: var(--color-brand); text-decoration: none; }
+	.ed-head h4 a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
+	.ed-isbn { display: none; margin: 0.3rem 0 0; font-size: 0.8rem; color: var(--color-muted); font-variant-numeric: tabular-nums; }
+	.ed-isbn span { display: block; }
+	.ed-scroll { grid-area: table; }
+	/* One fixed grid for every card: Retailer | Hardback-or-eBook | Paperback-or-Audiobook, same widths everywhere. */
+	.ed-table { table-layout: fixed; }
+	.ed-table col.c-rt { width: 34%; }
+	.ed-table col.c-a, .ed-table col.c-b { width: 33%; }
+	/* Header rows bold and in ink (Kevin 2026-11-09: "the header rows need to be bold"). */
+	.ed-subhead th { padding-top: 1rem; font-size: 0.72rem; font-weight: 800 !important; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink) !important; }
+	.cell-links { display: flex; flex-direction: column; }
+	.ed[hidden], .wtb-group[hidden] { display: none; }
+	.ed-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+	.ed-table th, .ed-table td { text-align: left; padding: 0.4rem 0.6rem 0.4rem 0; border-top: 1px solid var(--color-hairline); vertical-align: middle; }
+	.ed-table thead th { border-top: 0; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink); }
+	.th-isbn { display: block; margin-top: 0.15rem; font-size: 0.72rem; font-weight: 400; letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
+	.ed-table tbody th { font-weight: 600; color: var(--color-ink); }
+	.ed-table td a { color: var(--color-brand); font-weight: 600; text-decoration: none; min-height: 36px; display: inline-flex; align-items: center; }
+	.ed-table td a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
+	.rt-direct th, .rt-direct td { background: var(--color-canvas); }
+	.rt-na { color: var(--color-muted); }
+	/* toggle: show one row type only (every link stays in the HTML) */
+	#wtb[data-show='direct'] .rt:not([data-rt='direct']),
+	#wtb[data-show='amazon'] .rt:not([data-rt='amazon']):not([data-rt='direct']),
+	#wtb[data-show='bn'] .rt:not([data-rt='bn']):not([data-rt='direct']),
+	#wtb[data-show='google'] .rt:not([data-rt='google']):not([data-rt='direct']),
+	#wtb[data-show='walmart'] .rt:not([data-rt='walmart']):not([data-rt='direct']),
+	#wtb[data-show='kobo'] .rt:not([data-rt='kobo']):not([data-rt='direct']),
+	#wtb[data-show='apple'] .rt:not([data-rt='apple']):not([data-rt='direct']) { display: none; }
+	/* MOBILE FIRST (<= 640px): cover on top (centred, 60% wide), then each retailer is a block with Hardback / Paperback under it */
+	@media (max-width: 640px) {
+		.ed { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'cover' 'head' 'table'; padding: 1rem 0.9rem; }
+		.ed-cover { justify-self: center; width: 60%; max-width: 15rem; margin-bottom: 0.75rem; }
+		.ed-cover img { max-width: none; }
+		.ed-head { text-align: center; }
+		.ed-isbn { display: block; }
+		.ed-subhead th:not(:first-child) { display: none; }
+		.ed-subhead th { padding-top: 0.75rem; }
+		.cell-links { align-items: flex-end; }
+		.ed-table, .ed-table tbody, .ed-table tr, .ed-table th, .ed-table td { display: block; }
+		.ed-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+		.ed-table tr { border-top: 1px solid var(--color-hairline); padding: 0.55rem 0; }
+		.ed-table th, .ed-table td { border-top: 0; padding: 0; }
+		.ed-table tbody th { font-size: 1rem; margin-bottom: 0.25rem; }
+		.ed-table td { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; min-height: 44px; }
+		.ed-table td::before { content: attr(data-label); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-muted); flex: 0 0 5.5rem; }
+		.ed-table td a { min-height: 44px; flex: 1; justify-content: flex-end; text-align: right; }
+		.rt-direct { background: var(--color-canvas); padding-left: 0.5rem; padding-right: 0.5rem; border-radius: 8px; }
+		.rt-direct th, .rt-direct td { background: transparent; }
+		.wtb-toggle { justify-content: flex-start; }
+		.wtb-jump a { min-height: 44px; }
+	}
+</style>
