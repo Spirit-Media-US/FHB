@@ -112,7 +112,7 @@ test('built cards: cover left with size + lazy + alt, ISBNs under binding column
 	assert.ok(!/id="digital"/.test(html) && !/Digital editions<\/span>/.test(html.replace(/<caption>.*?<\/caption>/g, '')), 'no separate digital section');
 	const catalog = buildCatalog(isbns);
 	const cards = html.match(/<article class="ed" [\s\S]*?<\/article>/g) ?? [];
-	assert.equal(cards.length, catalog.size + 2, 'one card per print edition + the English eBook/audiobook card + the Large Print set');
+	assert.equal(cards.length, catalog.size + 1, 'one card per print edition + the Large Print set');
 	const order = links.retailers.map((r) => r.key);
 	const rowsOf = (t) => [...t.matchAll(/<tr class="rt[^"]*" data-rt="([a-z]+)">([\s\S]*?)<\/tr>/g)];
 	for (const c of cards) {
@@ -158,7 +158,7 @@ test('built cards: cover left with size + lazy + alt, ISBNs under binding column
 	}
 	// every digital link in the data is on its language's own card
 	for (const [kind, m] of Object.entries(links.digital)) for (const [code, row] of Object.entries(m)) {
-		const ids = code === 'en' ? ['digital-en', ...isbns.general.map((g) => `general-${g.colour.toLowerCase()}`)] : [`lang-${code}`];
+		const ids = code === 'en' ? [...isbns.general.map((g) => `general-${g.colour.toLowerCase()}`)] : [`lang-${code}`];
 		for (const eid of ids) {
 			const card = cards.find((c) => c.includes(`data-edition="${eid}"`));
 			assert.ok(card, `${kind} ${code}: no card ${eid}`);
@@ -166,7 +166,8 @@ test('built cards: cover left with size + lazy + alt, ISBNs under binding column
 		}
 	}
 	const langOrder = (html.match(/data-edition="(?:lang-[\w-]+|digital-en)"/g) ?? []).length;
-	assert.equal(langOrder, isbns.languages.filter((l) => l.onSale).length + 1);
+	assert.equal(langOrder, isbns.languages.filter((l) => l.onSale).length);
+	assert.ok(!html.includes('data-edition="digital-en"'), 'no separate English card (Kevin 4 B)');
 	const buttons = [...html.matchAll(/<button type="button" data-rt="([a-z]+)"/g)].map((m) => m[1]);
 	assert.deepEqual(buttons.slice(0, 2), ['direct', 'all'], 'Buy direct first, marked Preferred');
 	assert.match(html, /data-rt="direct"[^>]*class="wtb-pref">Buy direct <span class="wtb-badge">Preferred<\/span>/);

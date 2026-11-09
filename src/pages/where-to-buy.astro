@@ -170,18 +170,8 @@ const slotLabel = (sl: { keys: string[] }, code: string) => {
 	const has = sl.keys.filter((k) => digitalLinks[k]?.[code]);
 	return has.length === 1 ? FMT_NAME[has[0]] : FMT_NAME[sl.keys[0]];
 };
-// English has eBook + audiobook but no single print card (its print editions are the colours/audiences above),
-// so it gets a card of its own in the language catalog, alphabetically, with the English cover used on /print.
+// English eBook + audiobook links sit on the General colour cards (Kevin 2026-11-09 "4 B": no separate English card).
 const langGroup = groups.find((g) => g.id === 'language-editions')!;
-langGroup.rows.push({
-	id: 'digital-en',
-	cover: 'general-regular-plum',
-	title: `${T} — English eBook and audiobook`,
-	name: 'English',
-	hb: '',
-	pb: '',
-	printless: true,
-});
 const sortKey = (n: string) => n.replace(/\s*\(.*\)/, '');
 langGroup.rows.sort((x, y) => sortKey(x.name).localeCompare(sortKey(y.name)));
 langGroup.note = 'Print, eBook and audiobook';
