@@ -26,6 +26,10 @@ interface Row {
 	pb: string;
 	/** English: its eBook/audiobook have no single print card, so the card carries the digital table only. */
 	printless?: boolean;
+	/** Buy direct target when it is not /print/ (the Large Print set orders on its own page). */
+	direct?: string;
+	/** Digital formats shown on this card (language code), when it is not a language card. */
+	digital?: string;
 }
 interface Group {
 	id: string;
@@ -59,21 +63,38 @@ const groups: Group[] = [
 			href: '/print/',
 			hb: g.hb,
 			pb: g.pb,
+			// Kevin 2026-11-09: "our English general has ebooks and audiobooks available. Please add those links."
+			digital: 'en',
 		})),
 	},
 	{
 		id: 'large-print',
 		title: 'Large Print',
 		note: '6 × 9 · Three-volume set',
-		rows: isbns.largePrint.map((v) => ({
-			id: `lp-vol${v.vol}`,
-			cover: `lp-vol${v.vol}`,
-			title: `${T} Large Print — Vol. ${v.vol} ${v.range} · ${v.colour}`,
-			name: `Vol. ${v.vol} ${v.range} · ${v.colour}`,
-			href: '/bibles/lp-set-bible/',
-			hb: v.hb,
-			pb: v.pb,
-		})),
+		rows: isbns.largePrint
+			.map((v) => ({
+				id: `lp-vol${v.vol}`,
+				cover: `lp-vol${v.vol}`,
+				title: `${T} Large Print — Vol. ${v.vol} ${v.range} · ${v.colour}`,
+				name: `Vol. ${v.vol} ${v.range} · ${v.colour}`,
+				href: '/bibles/lp-set-bible/',
+				hb: v.hb,
+				pb: v.pb,
+			}))
+			.concat([
+				// Kevin 2026-11-09: "add buy direct options for our large print bundle". The set is sold direct only
+				// (no set ISBN; retailers list the volumes), so its card carries the Buy direct row alone.
+				{
+					id: 'lp-set',
+					cover: 'lp-set',
+					title: `${T} Large Print — Complete three-volume set`,
+					name: 'Complete three-volume set',
+					href: '/bibles/lp-set-bible/',
+					hb: '',
+					pb: '',
+					direct: '/bibles/lp-set-bible/#order',
+				},
+			]),
 	},
 	{
 		id: 'journaling',
@@ -136,8 +157,19 @@ const DIGITAL_COLS = [
 	{ key: 'listening', label: 'Listening eBook' },
 	{ key: 'audiobook', label: 'Audiobook' },
 ];
-// A language's digital formats go ON its own card (Kevin 2026-11-09): columns only for the formats it has.
+// A language's digital formats go ON its own card (Kevin 2026-11-09), IN the print columns: the eBook column
+// (eBook, or the Listening eBook where that is the eBook) sits under Hardback, Audiobook under Paperback.
 const digitalCols = (code: string) => DIGITAL_COLS.filter((c) => digitalLinks[c.key]?.[code]);
+const SLOTS = [{ keys: ['ebook', 'listening'] }, { keys: ['audiobook'] }];
+const FMT_NAME: Record<string, string> = {
+	ebook: 'eBook',
+	listening: 'Listening eBook',
+	audiobook: 'Audiobook',
+};
+const slotLabel = (sl: { keys: string[] }, code: string) => {
+	const has = sl.keys.filter((k) => digitalLinks[k]?.[code]);
+	return has.length === 1 ? FMT_NAME[has[0]] : FMT_NAME[sl.keys[0]];
+};
 // English has eBook + audiobook but no single print card (its print editions are the colours/audiences above),
 // so it gets a card of its own in the language catalog, alphabetically, with the English cover used on /print.
 const langGroup = groups.find((g) => g.id === 'language-editions')!;
@@ -154,7 +186,13 @@ const sortKey = (n: string) => n.replace(/\s*\(.*\)/, '');
 langGroup.rows.sort((x, y) => sortKey(x.name).localeCompare(sortKey(y.name)));
 langGroup.note = 'Print, eBook and audiobook';
 const codeOf = (r: Row) =>
-	r.id === 'digital-en' ? 'en' : r.id.startsWith('lang-') ? r.id.slice(5) : '';
+	r.digital
+		? r.digital
+		: r.id === 'digital-en'
+			? 'en'
+			: r.id.startsWith('lang-')
+				? r.id.slice(5)
+				: '';
 const digitalStores = (code: string) =>
 	retailers.filter((rt) => digitalCols(code).some((c) => digitalLinks[c.key]?.[code]?.[rt.key]));
 
@@ -175,7 +213,7 @@ const URL = 'https://fathersheartbible.com/where-to-buy/';
 // One Book per ISBN — what a bookstore or an answer engine looks up. No Offer/Product markup for other retailers.
 const books = groups.flatMap((g) =>
 	g.rows
-		.filter((r) => !r.printless)
+		.filter((r) => !r.printless && r.hb && r.pb)
 		.flatMap((r) => {
 			const name =
 				g.id === 'regular-print' || g.id === 'language-editions'
@@ -272,7 +310,7 @@ const books = groups.flatMap((g) =>
 							{g.rows.map((r) => {
 								const rl = printLinks[r.id] ?? {};
 								const dcode = codeOf(r);
-								const dcols = dcode ? digitalCols(dcode) : [];
+								const dslots = dcode ? digitalCols(dcode) : [];
 								const dstores = dcode ? digitalStores(dcode) : [];
 								const have = [...new Set([...rowStores(rl).map((x) => x.key), ...dstores.map((x) => x.key)])];
 								return (
@@ -282,23 +320,29 @@ const books = groups.flatMap((g) =>
 										</div>
 										<div class="ed-head">
 											<h4>{r.href ? <a href={r.href}>{r.name}</a> : r.name}</h4>
-											{!r.printless && <p class="ed-isbn"><span>Hardback ISBN {r.hb}</span><span>Paperback ISBN {r.pb}</span></p>}
+											{!r.printless && r.hb && <p class="ed-isbn"><span>Hardback ISBN {r.hb}</span><span>Paperback ISBN {r.pb}</span></p>}
 										</div>
 										<div class="ed-scroll">
-											{!r.printless && (
-												<table class="ed-table">
+											{/* ONE table per card, ONE column grid (Kevin 2026-11-09: "Use the same columns from HB and PB for the
+											     digital print columns"): eBook sits under Hardback, Audiobook under Paperback, fixed widths, so every
+											     column lines up top to bottom on every card. */}
+											<table class="ed-table">
+												<colgroup><col class="c-rt" /><col class="c-a" /><col class="c-b" /></colgroup>
+												{!r.printless && (
 													<thead>
 														<tr>
 															<th scope="col">Retailer</th>
-															<th scope="col">Hardback<span class="th-isbn">ISBN {r.hb}</span></th>
-															<th scope="col">Paperback<span class="th-isbn">ISBN {r.pb}</span></th>
+															<th scope="col">Hardback{r.hb && <span class="th-isbn">ISBN {r.hb}</span>}</th>
+															<th scope="col">Paperback{r.pb && <span class="th-isbn">ISBN {r.pb}</span>}</th>
 														</tr>
 													</thead>
+												)}
+												{!r.printless && (
 													<tbody>
 														<tr class="rt rt-direct" data-rt="direct">
 															<th scope="row">Buy direct <span class="wtb-badge">Preferred</span></th>
-															<td data-label="Hardback"><a href="/print/">{DIRECT}</a></td>
-															<td data-label="Paperback"><a href="/print/">{DIRECT}</a></td>
+															<td data-label="Hardback"><a href={r.direct ?? '/print/'}>{DIRECT}</a></td>
+															<td data-label="Paperback"><a href={r.direct ?? '/print/'}>{DIRECT}</a></td>
 														</tr>
 														{rowStores(rl).map((rt) => {
 															const m = rl[rt.key] ?? {};
@@ -312,33 +356,43 @@ const books = groups.flatMap((g) =>
 															);
 														})}
 													</tbody>
-												</table>
-											)}
-											{dcols.length > 0 && (
-												<table class="ed-table ed-digital-table">
-													<caption>Digital editions</caption>
-													<thead>
-														<tr><th scope="col">Retailer</th>{dcols.map((col) => <th scope="col">{col.label}</th>)}</tr>
-													</thead>
-													<tbody>
+												)}
+												{dslots.length > 0 && (
+													<tbody class="ed-dig">
+														<tr class="ed-subhead">
+															<th scope="col">Digital editions</th>
+															{SLOTS.map((sl) => <th scope="col">{slotLabel(sl, dcode)}</th>)}
+														</tr>
 														{dcode === 'en' && (
 															<tr class="rt rt-direct" data-rt="direct">
 																<th scope="row">Buy direct <span class="wtb-badge">Preferred</span></th>
-																{dcols.map((col) => <td data-label={col.label}>{col.key === 'ebook' ? <a href="/print/#ebook">{DIRECT}</a> : <span class="rt-na">—</span>}</td>)}
+																{SLOTS.map((sl) => <td data-label={slotLabel(sl, dcode)}>{sl.keys.includes('ebook') ? <a href="/print/#ebook">{DIRECT}</a> : <span class="rt-na">—</span>}</td>)}
 															</tr>
 														)}
 														{dstores.map((rt) => (
 															<tr class="rt" data-rt={rt.key}>
 																<th scope="row">{rt.name}</th>
-																{dcols.map((col) => {
-																	const u = digitalLinks[col.key]?.[dcode]?.[rt.key];
-																	return <td data-label={col.label}>{u ? <a href={u} rel="noopener" target="_blank" aria-label={`${r.name} ${col.label} at ${rt.name}`}>View at {rt.name}</a> : <span class="rt-na">—</span>}</td>;
+																{SLOTS.map((sl) => {
+																	const got = sl.keys.filter((k) => digitalLinks[k]?.[dcode]?.[rt.key]);
+																	return (
+																		<td data-label={slotLabel(sl, dcode)}>
+																			{got.length ? (
+																				<span class="cell-links">
+																					{got.map((k) => (
+																						<a href={digitalLinks[k][dcode][rt.key]} rel="noopener" target="_blank" aria-label={`${r.name} ${FMT_NAME[k]} at ${rt.name}`}>{got.length > 1 ? `${FMT_NAME[k]} at ${rt.name}` : `View at ${rt.name}`}</a>
+																					))}
+																				</span>
+																			) : (
+																				<span class="rt-na">—</span>
+																			)}
+																		</td>
+																	);
 																})}
 															</tr>
 														))}
 													</tbody>
-												</table>
-											)}
+												)}
+											</table>
 										</div>
 									</article>
 								);
@@ -399,7 +453,6 @@ const books = groups.flatMap((g) =>
 	.wtb-cards { display: grid; gap: 1rem; }
 	/* Desktop: cover 200px on the left (column 12.5rem), table on the right. */
 	.ed { display: grid; grid-template-columns: 12.5rem minmax(0, 1fr); grid-template-areas: 'cover head' 'cover table'; column-gap: 1.5rem; background: #fff; border: 1px solid var(--color-hairline); border-radius: 12px; padding: 1.1rem 1.25rem; font-family: var(--font-sans); }
-	.ed-digital { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'head' 'table'; }
 	.ed-cover { grid-area: cover; align-self: start; }
 	.ed-cover img { display: block; width: 100%; max-width: 12.5rem; height: auto; border-radius: 4px; }
 	.ed-head { grid-area: head; margin-bottom: 0.6rem; }
@@ -409,8 +462,12 @@ const books = groups.flatMap((g) =>
 	.ed-isbn { display: none; margin: 0.3rem 0 0; font-size: 0.8rem; color: var(--color-muted); font-variant-numeric: tabular-nums; }
 	.ed-isbn span { display: block; }
 	.ed-scroll { grid-area: table; }
-	.ed-digital-table { margin-top: 1rem; }
-	.ed-digital-table caption { text-align: left; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-muted); padding-bottom: 0.3rem; }
+	/* One fixed grid for every card: Retailer | Hardback-or-eBook | Paperback-or-Audiobook, same widths everywhere. */
+	.ed-table { table-layout: fixed; }
+	.ed-table col.c-rt { width: 34%; }
+	.ed-table col.c-a, .ed-table col.c-b { width: 33%; }
+	.ed-subhead th { padding-top: 1rem; font-size: 0.68rem; font-weight: 700 !important; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-muted) !important; }
+	.cell-links { display: flex; flex-direction: column; }
 	.ed[hidden], .wtb-group[hidden] { display: none; }
 	.ed-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 	.ed-table th, .ed-table td { text-align: left; padding: 0.4rem 0.6rem 0.4rem 0; border-top: 1px solid var(--color-hairline); vertical-align: middle; }
@@ -431,12 +488,14 @@ const books = groups.flatMap((g) =>
 	#wtb[data-show='apple'] .rt:not([data-rt='apple']):not([data-rt='direct']) { display: none; }
 	/* MOBILE FIRST (<= 640px): cover on top (centred, 60% wide), then each retailer is a block with Hardback / Paperback under it */
 	@media (max-width: 640px) {
-		.ed, .ed-digital { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'cover' 'head' 'table'; padding: 1rem 0.9rem; }
+		.ed { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'cover' 'head' 'table'; padding: 1rem 0.9rem; }
 		.ed-cover { justify-self: center; width: 60%; max-width: 15rem; margin-bottom: 0.75rem; }
 		.ed-cover img { max-width: none; }
 		.ed-head { text-align: center; }
 		.ed-isbn { display: block; }
-		.ed-digital-table caption { display: block; }
+		.ed-subhead th:not(:first-child) { display: none; }
+		.ed-subhead th { padding-top: 0.75rem; }
+		.cell-links { align-items: flex-end; }
 		.ed-table, .ed-table tbody, .ed-table tr, .ed-table th, .ed-table td { display: block; }
 		.ed-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 		.ed-table tr { border-top: 1px solid var(--color-hairline); padding: 0.55rem 0; }
