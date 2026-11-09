@@ -1,6 +1,6 @@
 // /print language cards — the two data-driven decisions every card makes, in one place so a test
 // can prove them (Kevin 2026-10-30: "The look inside can be added as print artifacts are built and
-// published. ... All cards can have Buy Direct & Save + Free Shipping linked at the bottom NOW").
+// published. ... All cards can have 15% off 1st order + Free Shipping linked at the bottom NOW").
 
 /**
  * Look inside shows once the edition's sample pages are in src/data/lookinside.json under its slug.
@@ -13,7 +13,7 @@ export function hasLookInside(manifest, slug) {
 }
 
 /**
- * Where a card's "Buy Direct & Save + Free Shipping" goes. Never a dead link:
+ * Where a card's "15% off 1st order + Free Shipping" goes. Never a dead link:
  *  - sold by our checkout (an ISBN + a catalog row, or a PRE-ORDER with no ISBN yet — Kevin 2026-10-30,
  *    Buy now on all 80): the /print catalog form, row pre-filled;
  *  - no ISBN yet but an edition page: that page's #order block (reserve by email) — the

@@ -12,7 +12,6 @@ import YouVersionBanner from '../components/YouVersionBanner.astro';
 // the bookstore is the one master for an Amazon link and no ASIN is typed into this page.
 // An edition absent from this file keeps its "coming soon" state, so a listing appearing
 // later needs a re-run of the sync, not an edit here.
-import bnData from '../data/bn-links.json';
 import { cardUrl } from '../data/card-art';
 import digital from '../data/digital-listings-public';
 import { AUDIENCE_EDITION_TOTAL, dvcEditions as dvcEditionList } from '../data/dvc-editions';
@@ -59,9 +58,6 @@ const AUDIENCE_TOTAL = AUDIENCE_EDITION_TOTAL;
 // (2026-10-10). The English eBook is also sold direct here ($7.49, our own fulfillment). Apple
 // Books and Nook were removed 2026-10-10: both listings 404 since D2D refused distribution.
 const digitalEn = digital.en;
-// Barnes & Noble print listings, one master (src/data/bn-links.json): an entry exists only where
-// a B&N search by the binding's ISBN-13 opened that edition's own product page (2026-10-10).
-const bnLinks = bnData.links as Record<string, { hardback?: string; paperback?: string }>;
 const EBOOK_COVER =
 	'https://assets.spiritmediapublishing.com/FHB/print/fhb-ebook-cover-2026-6-600.webp';
 const EBOOK_COVER_2X =
@@ -261,36 +257,10 @@ const langSearch = (l: RosterLanguage) =>
 		.filter(Boolean)
 		.join(' ');
 /** Sold by our own checkout: an ISBN and on_sale/direct_sale, or a PRE-ORDER (no ISBN yet). Kevin
- *  2026-10-30: "All languages cards can offer a Buy now · free shipping button" — all 80 (generated). */
+ *  2026-10-30: "All languages cards can offer a Buy now button" — all 80 (generated). */
 const langSold = (l: RosterLanguage) => l.sellable && (Boolean(l.isbn) || Boolean(l.preorder));
-// THE THREE STORE PILLS ON ALL 80 CARDS (Kevin 2026-10-30: "We know all will be in googleplay ebook so
-// add that but fade it until live. Same with B&N keep fade until live. Add Audiobook for all but no
-// price until live."). Live = the listing is in src/data/digital-listings.json (Google Play) or
-// bn-links.json (B&N), each entry added only after its store page verified; absent = the same pill
-// FADED, not a link, aria-disabled, no price. A listing landing in the data turns it live on the next
-// build — never typed per language here.
-const langStores = (code: string) => {
-	const d = (
-		digital as unknown as Record<string, { ebook?: DigitalLink[]; audiobook?: DigitalLink[] }>
-	)[code];
-	const gp = (xs?: DigitalLink[]) => xs?.find((x) => x.store === 'Google Play');
-	const eb = gp(d?.ebook);
-	const au = gp(d?.audiobook);
-	return [
-		eb
-			? { key: 'gp-ebook', logo: 'google' as const, label: 'eBook', price: eb.price, href: eb.url }
-			: { key: 'gp-ebook', logo: 'google' as const, label: 'eBook', price: '', off: true },
-		au
-			? {
-					key: 'gp-audio',
-					logo: 'google' as const,
-					label: 'Audiobook',
-					price: au.price,
-					href: au.url,
-				}
-			: { key: 'gp-audio', logo: 'google' as const, label: 'Audiobook', price: '', off: true },
-	];
-};
+// Language cards show PRINT ONLY (Kevin 2026-11-09: "at languages remove google play for ebooks and
+// audiobooks (let the print page show print)") — no eBook / audiobook store pills on them.
 /** Every card's Buy Direct (Kevin 2026-10-30): the catalog form when sold, else the edition page's reserve block. */
 const langDirect = (l: RosterLanguage) =>
 	directTarget({
@@ -315,7 +285,7 @@ const printFaq = [
 		// He wrote "follow Amazon's return policy" at 21:52 and replaced it two minutes later
 		// with "follow THEIR return policy" (A1a, J1). The sentence's own subject is the
 		// reason: it already says "or other retailers", so naming Amazon in the predicate
-		// contradicts it — a Barnes & Noble buyer does not follow Amazon's policy.
+		// contradicts it — a buyer from any other retailer does not follow Amazon's policy.
 		// This shipped wrong once because it was checked against the superseded sentence
 		// quoted in an earlier brief, found present, and read as confirmation. Matching the
 		// wrong authority returns a true answer to the wrong question. The task register
@@ -605,7 +575,7 @@ const dvcVerses = [
 						<div class="flex flex-col gap-2 w-full mt-auto">
 							<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.2rem;">
 								{builtPages.has(`${e.slug}-bible`) && (
-									<a href={`/bibles/${e.slug}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
+									<a href={`/bibles/${e.slug}-bible/`} class="card-link">Full details</a>
 								)}
 								{builtPages.has(`${e.slug}-bible`) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 								<LookInside slug={e.slug} title={e.title} variant="link" label="Look inside" />
@@ -617,8 +587,6 @@ const dvcVerses = [
 								buyNowHref={builtPages.has(`${e.slug}-bible`) ? `/bibles/${e.slug}-bible/#order` : null}
 								tightDirect={e.slug === 'journaling'}
 								pick={e.slug}
-								bn={bnLinks[e.slug]}
-								reserveBn
 							/>
 						</div>
 					</div>
@@ -682,7 +650,7 @@ const dvcVerses = [
 									<>
 										<a
 											href="/bibles/fathers-heart-bible/"
-											style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;"
+											class="card-link"
 										>Full details</a>
 										<span aria-hidden="true" style="color: #a1a1aa;">·</span>
 									</>
@@ -704,8 +672,6 @@ const dvcVerses = [
 									pbPrice={l.pb}
 									buyNowHref={builtPages.has('fathers-heart-bible') ? '/bibles/fathers-heart-bible/#order' : null}
 									pick={`general-${l.line}-${c.key}`}
-									bn={bnLinks[`general-${l.line}-${c.key}`]}
-									reserveBn
 								/>
 							</div>
 						</div>
@@ -810,7 +776,7 @@ const dvcVerses = [
 								<>
 									<a
 										href={`/bibles/${v.key}-bible/`}
-										style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;"
+										class="card-link"
 									>Full details</a>
 									<span aria-hidden="true" style="color: #a1a1aa;">·</span>
 								</>
@@ -836,8 +802,6 @@ const dvcVerses = [
 								pbPrice={v.pb}
 								buyNowHref={builtPages.has(`${v.key}-bible`) ? `/bibles/${v.key}-bible/#order` : null}
 								pick={v.key}
-								bn={bnLinks[v.key]}
-								reserveBn
 							/>
 						</div>
 					</div>
@@ -872,7 +836,7 @@ const dvcVerses = [
 				     without the missing link rather than link to nothing. */}
 				{builtPages.has('lp-set-bible') && (
 					<p style="font-family: var(--font-sans); font-size: 0.82rem; margin: 0.9rem 0 0;">
-						<a href="/bibles/lp-set-bible/" style="font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
+						<a href="/bibles/lp-set-bible/" class="card-link">Full details</a>
 					</p>
 				)}
 				{/* NO "a set counts as three books" LINE HERE (Kevin 2026-09-17: "This is NOT
@@ -908,7 +872,7 @@ const dvcVerses = [
 			    edition the chain lists). World regions (the language's primary country), Worldwide/English last,
 			    A–Z by English name inside each, a jump bar and a filter that matches the English name, the
 			    edition's own name, the language's own name and the country. Same card, frame and button set
-			    as before: an Amazon / B&N / Google Play button is live only once its link is in the data (D184),
+			    as before: a Google Play button is live only once its link is in the data (D184),
 			    faded until then; Buy now and Buy Direct on all 80 (no ISBN yet = a pre-order); the cover is
 			    the card cut from the BUILT case, else LangCover's cover-pending tile. */}
 			<div class="lang-finder max-w-6xl mx-auto" style="margin: 0 auto 1.5rem;">
@@ -936,7 +900,7 @@ const dvcVerses = [
 									<div class="flex flex-col gap-2 w-full mt-auto">
 										<div class="lang-links flex items-center justify-center gap-2 flex-nowrap whitespace-nowrap" style="margin: 0 0 0.2rem;">
 											{builtPages.has('fathers-heart-bible') && (
-												<a href="/bibles/fathers-heart-bible/" style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
+												<a href="/bibles/fathers-heart-bible/" class="card-link">Full details</a>
 											)}
 											{builtPages.has('fathers-heart-bible') && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 											<LookInside slug="general" title="FHB — Father’s Heart Bible — English" variant="link" label="Look inside" reuse />
@@ -946,11 +910,7 @@ const dvcVerses = [
 											pbPrice={enLine.pb}
 											buyNowHref={builtPages.has('fathers-heart-bible') ? '/bibles/fathers-heart-bible/#order' : null}
 											pick={EN_KEY}
-											bn={bnLinks[EN_KEY]}
-											fadeBn
-											reserveSlots={4}
 											tightDirect
-											stores={langStores('en')}
 										/>
 									</div>
 								</div>
@@ -963,7 +923,7 @@ const dvcVerses = [
 									<div class="flex flex-col gap-2 w-full mt-auto">
 										<div class="lang-links flex items-center justify-center gap-2 flex-nowrap whitespace-nowrap" style="margin: 0 0 0.2rem;">
 											{builtPages.has(`${langSlug(l)}-bible`) && (
-												<a href={`/bibles/${langSlug(l)}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
+												<a href={`/bibles/${langSlug(l)}-bible/`} class="card-link">Full details</a>
 											)}
 											{builtPages.has(`${langSlug(l)}-bible`) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 											<LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" />
@@ -977,11 +937,7 @@ const dvcVerses = [
 											showDirect={Boolean(langDirect(l))}
 											directHref={langDirect(l) ?? undefined}
 											pick={`lang-${l.code}`}
-											bn={bnLinks[`lang-${l.code}`]}
-											fadeBn
-											reserveSlots={4}
 											tightDirect
-											stores={langStores(l.code)}
 										/>
 									</div>
 								</div>
@@ -1028,7 +984,7 @@ const dvcVerses = [
 
 		<!-- ═══════════════ CATALOG ORDER FORM ═══════════════ -->
 		<Section variant="soft">
-			{/* The anchor every card's "Buy Direct & Save + Free Shipping" link points at. Since Kevin
+			{/* The anchor every card's "15% off 1st order + Free Shipping" link points at. Since Kevin
 			    2026-10-04 this is the SAME catalog order form /print/order/ shows ("it does what we
 			    need"), replacing the quick order box: every edition keeps its own counts, so a buyer
 			    builds the order edition by edition. A card's Buy Direct pre-fills its row here. */}
@@ -1117,15 +1073,23 @@ const dvcVerses = [
 	:global(.lang-card .buy-direct) {
 		margin-top: auto;
 	}
+	/* ONE card-link style (Kevin 2026-11-08: all links on the /print cards look the same): the
+	   Look inside trigger's own style, the most used. Full details and the Save 15% link share it. */
+	.card-link {
+		font-family: var(--font-sans);
+		font-size: 0.82rem;
+		font-weight: 700;
+		color: #3f3f46;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+		cursor: pointer;
+	}
+	.card-link:hover {
+		color: var(--color-ink);
+	}
 	@media (max-width: 640px) {
-		/* On a phone (~133px content box) a pill wraps to two lines when its label is long (Buy
-		   now, a Google Audio price, the B&N pair), so blocks differed by up to 76px (measured at
-		   390px: 398-474). One reserved height for the block = every card the same height; 476px
-		   is the tallest measured block (474) rounded up. 2026-10-30: every card now carries the
-		   Google Play eBook + Audiobook and B&N pills (live or faded), tallest measured 491 -> 494px. */
-		:global(.lang-card > .mt-auto) {
-			min-height: 494px;
-		}
+		/* The per-card reserved block height was sized for the Google Play pills, which language cards
+		   no longer carry (Kevin 2026-11-09); it is dropped so the block collapses to its content. */
 		:global(.lang-card-title) {
 			min-height: calc(3 * 1.3em);
 			-webkit-line-clamp: 3;

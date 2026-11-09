@@ -10,8 +10,8 @@
 //
 // THE SHAPE, fixed for every card:
 //   Hardback $x.xx · Paperback $y.yy    ← our own FHB prices, plain text
-//   Buy now · free shipping             ← this edition's own FHB order form
-//   Store buttons, then Buy Direct & Save + Free Shipping
+//   Buy now                             ← this edition's own FHB order form
+//   Store buttons, then 15% off 1st order + Free Shipping
 //
 // FHB is the seller (Kevin 2026-11-08): no third-party retailer button that points away from us
 // except faith-aligned ones listed in the data once live. Unlisted stores render a faded pill.
@@ -23,7 +23,7 @@ interface Props {
 	pbPrice?: number;
 	/**
 	 * Store buttons BEFORE Buy Direct (Kevin 2026-10-10:
-	 * "all store buttons come before Buy Direct & Save"). Same pill, logo first, then
+	 * "all store buttons come before Buy Direct"). Same pill, logo first, then
 	 * label + price. `ebookDirect` renders the direct eBook checkout
 	 * button the page script binds to ([data-ebook-buy]) instead of a link.
 	 */
@@ -47,7 +47,7 @@ interface Props {
 	 * Shrink the direct link so it holds ONE line in a narrower content box (Kevin
 	 * 2026-09-17: "make this fit on one line ... even if it has to be little smaller").
 	 * Only the journaling card needs it: its 3px frame takes 4px off the inner width,
-	 * which is exactly enough to wrap "Buy Direct & Save + Free Shipping".
+	 * which is exactly enough to wrap "15% off 1st order + Free Shipping".
 	 */
 	tightDirect?: boolean;
 	/** /print: the catalog id ("teen", "lang-es") the catalog order form pre-fills when the
@@ -58,15 +58,6 @@ interface Props {
 	/** Pad the button set with invisible slots up to this many, so cards with fewer stores line up
 	 *  with the rest (Kevin 2026-10-10: keep space for eBook + audiobook to be added later). */
 	reserveSlots?: number;
-	/** Barnes & Noble listing URLs per binding (src/data/bn-links.json — verified only). One
-	 *  compact pill: the B&N mark, then a link per binding (Kevin 2026-10-10). */
-	bn?: { hardback?: string; paperback?: string };
-	/** Keep an invisible B&N-sized slot when this card has no verified B&N listing, so the
-	 *  Buy Direct line still lines up across the row. */
-	reserveBn?: boolean;
-	/** No verified B&N listing: show the B&N pill FADED (not linked, aria-disabled) instead of an
-	 *  invisible slot (Kevin 2026-10-30: "Same with B&N keep fade until live"). */
-	fadeBn?: boolean;
 	/** "Buy now" (Kevin 2026-10-22): this edition's OWN order form, /bibles/<slug>-bible/#order
 	 *  (EditionOrder.astro). `null` = the card has no edition page yet: an invisible slot of the
 	 *  same size keeps the row lined up. Omitted = no Buy now on this card at all. */
@@ -82,15 +73,8 @@ const {
 	stores = [],
 	compact = false,
 	reserveSlots = 0,
-	bn,
-	reserveBn = false,
-	fadeBn = false,
 	buyNowHref,
 } = Astro.props;
-const bnLinks = [
-	{ label: 'Hardback', href: bn?.hardback },
-	{ label: 'Paperback', href: bn?.paperback },
-].filter((x) => x.href);
 
 // Store logos, self-hosted on R2 (never hotlinked). Google Play: Google's
 // own horizontal lockup from gstatic (play_prism_hlock_2x.png), the same mark as the 2016 logo
@@ -103,8 +87,6 @@ const LOGOS = {
 		h: 58,
 	},
 	kobo: { src: 'https://assets.spiritmediapublishing.com/FHB/print/kobo-logo.webp', w: 144, h: 58 },
-	// B&N's own "B&N" mark from barnesandnoble.com's CDN.
-	bn: { src: 'https://assets.spiritmediapublishing.com/FHB/print/bn-logo.webp', w: 165, h: 58 },
 	// Free listening (Kevin 2026-10-10): Spotify's full logo from its newsroom brand files,
 	// YouTube's logo from YouTube's gstatic branding, Apple Podcasts' app icon from apple.com.
 	spotify: {
@@ -127,16 +109,16 @@ const LOGOS = {
 const STORE_NAMES = {
 	google: 'Google Play Books',
 	kobo: 'Kobo',
-	bn: 'Barnes & Noble',
 	spotify: 'Listen on Spotify',
 	youtube: 'Watch on YouTube',
 	applepodcasts: 'Listen on Apple Podcasts',
 } as const;
 
-const priceBits = [
-	hbPrice !== undefined ? `Hardback $${hbPrice.toFixed(2)}` : '',
-	pbPrice !== undefined ? `Paperback $${pbPrice.toFixed(2)}` : '',
-].filter(Boolean);
+// Stacked, label left and price right (Kevin 2026-11-08). Prices come from the props (the data).
+const priceRows = [
+	hbPrice !== undefined ? { label: 'Hardback', price: `$${hbPrice.toFixed(2)}` } : null,
+	pbPrice !== undefined ? { label: 'Paperback', price: `$${pbPrice.toFixed(2)}` } : null,
+].filter((r): r is { label: string; price: string } => r !== null);
 const btnClass = compact ? 'buy-btn buy-btn-compact' : 'buy-btn';
 const spare = Math.max(0, reserveSlots - stores.length);
 ---
@@ -145,11 +127,22 @@ const spare = Math.max(0, reserveSlots - stores.length);
     the existing brand token --color-primary-fixed rather than a new colour invented for this
     page. Ink on light pink is a strong contrast; the disabled placeholder drops to a muted
     pink with grey text so it reads as unavailable without becoming pink-on-pink. */}
-{priceBits.length > 0 && <p class="buy-prices">{priceBits.join(' · ')}</p>}
+{
+	priceRows.length > 0 && (
+		<div class="buy-prices">
+			{priceRows.map((r) => (
+				<p class="buy-price-row">
+					<span>{r.label}</span>
+					<span>{r.price}</span>
+				</p>
+			))}
+		</div>
+	)
+}
 {
 	buyNowHref ? (
 		<a href={buyNowHref} class="buy-btn buy-now" style="text-decoration: none;" data-buy-now>
-			<span>Buy now · free shipping</span>
+			<span>Buy now</span>
 		</a>
 	) : (
 		buyNowHref === null && (
@@ -193,38 +186,9 @@ const spare = Math.max(0, reserveSlots - stores.length);
 	))
 }
 {
-	bnLinks.length > 0 ? (
-		<span class="buy-btn buy-btn-bn" data-store="bn">
-			<img src={LOGOS.bn.src} alt="Barnes & Noble" width={LOGOS.bn.w} height={LOGOS.bn.h} loading="lazy" decoding="async" class="store-logo" />
-			{bnLinks.map((x) => (
-				<>
-					<span aria-hidden="true">·</span>
-					<a href={x.href} target="_blank" rel="noopener" class="bn-link">
-						{x.label}
-					</a>
-				</>
-			))}
-		</span>
-	) : fadeBn ? (
-		<span class="buy-btn buy-btn-bn buy-btn-off" aria-disabled="true" data-store="bn" data-store-off>
-			<img src={LOGOS.bn.src} alt="Barnes & Noble" width={LOGOS.bn.w} height={LOGOS.bn.h} loading="lazy" decoding="async" class="store-logo store-logo-off" />
-			<span aria-hidden="true">·</span>
-			<span>Hardback</span>
-			<span aria-hidden="true">·</span>
-			<span>Paperback</span>
-		</span>
-	) : (
-		reserveBn && (
-			<span class="buy-btn buy-btn-slot" aria-hidden="true">
-				<span>&nbsp;</span>
-			</span>
-		)
-	)
-}
-{
 	showDirect && (
 		<a href={directHref} class={tightDirect ? 'buy-direct buy-direct-tight' : 'buy-direct'} data-pick-edition={pick}>
-			Buy Direct &amp; Save + Free Shipping
+			15% off 1st order + Free Shipping
 		</a>
 	)
 }
@@ -235,8 +199,16 @@ const spare = Math.max(0, reserveSlots - stores.length);
 		font-size: 0.82rem;
 		font-weight: 700;
 		color: var(--color-ink);
-		text-align: center;
 		margin: 0;
+	}
+	.buy-price-row {
+		display: flex;
+		justify-content: space-between;
+		gap: 0.5rem;
+		margin: 0;
+	}
+	.buy-direct:hover {
+		color: var(--color-ink);
 	}
 	/* NO `white-space: nowrap` HERE. It was the actual cause of the spill Kevin saw: the logo
 	   plus "· Hardback $99.99" needs about 199px and a card is 133px wide at phone width, so
@@ -304,16 +276,6 @@ const spare = Math.max(0, reserveSlots - stores.length);
 			white-space: nowrap;
 		}
 	}
-	/* B&N: one pill, two links (a pill cannot be one link to two pages). */
-	.buy-btn-bn {
-		cursor: default;
-		gap: 0.3rem;
-	}
-	.bn-link {
-		color: inherit;
-		text-decoration: underline;
-		text-underline-offset: 2px;
-	}
 	/* A reserved, invisible slot: same box as a button, so every card's controls line up. */
 	.buy-btn-slot {
 		visibility: hidden;
@@ -340,9 +302,9 @@ const spare = Math.max(0, reserveSlots - stores.length);
 		font-family: var(--font-sans);
 		font-size: 0.82rem;
 		font-weight: 700;
-		color: var(--color-primary, #b60057);
+		color: #3f3f46;
 		text-decoration: underline;
-		text-underline-offset: 3px;
+		text-underline-offset: 2px;
 		text-align: center;
 		padding: 0.15rem 0;
 	}
@@ -350,16 +312,16 @@ const spare = Math.max(0, reserveSlots - stores.length);
 	   possible, not because it was not asked for.
 	   Kevin asked for this link to hold one line on the journaling card, "even if it has to
 	   be little smaller". On a phone the targeted cards are two-across and the content box is
-	   133px; "Buy Direct & Save + Free Shipping" needs about 200px at 12px type, so one line
+	   133px; "15% off 1st order + Free Shipping" needs about 200px at 12px type, so one line
 	   there means roughly an 8px font — unreadable, and below any sensible minimum. I shipped
 	   `white-space: nowrap` unconditionally first and MEASURED the result: the link did not
 	   shrink to fit, it ran straight out of the card and put a horizontal scrollbar on the
 	   whole page at 400px. Exactly the .buy-btn spill again, one element over.
 	   So: nowrap + a size step where the box can hold it, and ordinary wrapping below that. */
 	@media (min-width: 641px) {
+		/* Kevin 2026-11-08: every card link is ONE style, so no size step here; the link wraps. */
 		.buy-direct-tight {
-			font-size: 0.72rem;
-			white-space: nowrap;
+			white-space: normal;
 		}
 	}
 </style>
