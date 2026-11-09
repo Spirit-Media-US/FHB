@@ -31,6 +31,7 @@ import youversion from '../../data/youversion-versions.json';
 //   src/data/editions/frontmatter.json — extracted from the shipping interiors: the audience
 //                                     page and the three pillar pages. Read, never retyped.
 import Layout from '../../layouts/Layout.astro';
+import { alternatesFrom, bcp47 } from '../../lib/bibles-hreflang.mjs';
 import { FHB_ORG_ID } from '../../lib/fhb-org';
 import { shippingDetailsFor } from '../../lib/marginGuard';
 import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
@@ -104,7 +105,11 @@ type Edition = {
 	 *  will be published"). The order form sells lang-<code>; fulfilled on publication. Still no ISBN,
 	 *  date, GTIN or Offer in the structured data (a merchant Offer needs a GTIN). */
 	preorder?: boolean;
-	seo?: { title?: string; description?: string };
+	seo?: {
+		title?: string;
+		description?: string /** description is the edition's own language (2jw) */;
+		native?: boolean;
+	};
 };
 
 export async function getStaticPaths() {
@@ -117,10 +122,16 @@ export async function getStaticPaths() {
 		.filter(([path]) => /\/[a-z0-9-]+\.json$/.test(path))
 		.map(([, mod]) => mod.default)
 		.filter((e) => e && typeof e.slug === 'string' && e.listing && e.hook);
-	return editions.map((ed) => ({ params: { slug: `${ed.slug}-bible` }, props: { ed } }));
+	return editions.map((ed) => ({
+		params: { slug: `${ed.slug}-bible` },
+		props: { ed, alternates: alternatesFrom(editions, ed.slug) },
+	}));
 }
 
-const { ed } = Astro.props as { ed: Edition };
+const { ed, alternates } = Astro.props as {
+	ed: Edition;
+	alternates: { hreflang: string; href: string }[];
+};
 
 const fm = (frontmatter as Record<string, { pages?: number; pillars?: Pillar[] }>)[
 	ed.frontmatterKey ?? FM_ALIAS[ed.slug] ?? ed.slug
@@ -208,7 +219,14 @@ const datePublished =
 // `title` is the long JSON-LD name ("Father's Heart Bible — Dad's Bible"); `name` is the h1.
 // Tolerate a data file that set them equal rather than emitting a Book whose name and
 // alternateName are the same string.
-const schemaName = ed.title === ed.name ? `Father’s Heart Bible — ${ed.name}` : ed.title;
+const englishSchemaName = ed.title === ed.name ? `Father’s Heart Bible — ${ed.name}` : ed.title;
+// 2jw: a language edition whose metadata is native (seo.native, from build_language_pages.py
+// --native-meta) names itself by its own edition title in structured data; the English long title
+// stays as an alternateName so the entity still resolves. html lang is NOT changed — the body is English.
+const nativeMeta = isLang && ed.seo?.native === true && !!ed.lang;
+const schemaName = nativeMeta ? ed.name : englishSchemaName;
+// BCP-47 casing for schema.org inLanguage (zh-hans -> zh-Hans); en for non-language editions.
+const inLang = ed.lang ? bcp47(ed.lang) : 'en';
 
 // "Also known as" is a READER-FACING list, not the keyword field (Kevin 2026-09-18). The
 // sheet's 500-byte Ingram line opens with fhb;fhb bible;father's heart bible fhb — correct
@@ -375,7 +393,7 @@ const productSchema = {
 	// to be TEACHABLE to an engine: the Book entity declares both the edition name and the
 	// abbreviation as alternate names (Kevin approved 2026-09-18). Other pages already do
 	// this; the 22 edition pages — the ones carrying the SKUs — did not.
-	alternateName: [ed.name, 'FHB'],
+	alternateName: nativeMeta ? [englishSchemaName, 'FHB'] : [ed.name, 'FHB'],
 	...commerce,
 	...(pages ? { numberOfPages: pages } : {}),
 	brand: { '@type': 'Brand', name: "Father's Heart Bible" },
@@ -383,7 +401,7 @@ const productSchema = {
 	// lp-set.json's _isbnNote records. An empty string is not an ISBN, so the property is
 	// omitted rather than emitted blank, which is invalid structured data.
 	...(ed.isbn ? { isbn: ed.isbn } : {}),
-	inLanguage: ed.lang ?? 'en',
+	inLanguage: nativeMeta ? inLang : (ed.lang ?? 'en'),
 	...(datePublished ? { datePublished } : {}),
 	description: productDescription,
 	image: coverUrl,
@@ -420,7 +438,7 @@ const productSchema = {
 		sku: v.sku,
 		description: productDescription,
 		image: coverUrl,
-		inLanguage: ed.lang ?? 'en',
+		inLanguage: nativeMeta ? inLang : (ed.lang ?? 'en'),
 		brand: { '@type': 'Brand', name: "Father's Heart Bible" },
 		offers: offerFor(v),
 	})),
@@ -447,6 +465,9 @@ const faqSchema = {
 
 <Layout
 	pageType="book"
+	alternates={alternates}
+	ogAlternates={false}
+	ogLang={nativeMeta ? ed.lang : undefined}
 	bookIsbn={ed.isbn || undefined}
 	bookReleaseDate={datePublished}
 	title={fitTitle(ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`)}
