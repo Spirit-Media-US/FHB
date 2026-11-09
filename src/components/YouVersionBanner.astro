@@ -8,7 +8,10 @@
 // Counters (Kevin 2026-11-09: "The counters need to move but land on the current number. ALL need to
 // fit on 1 row on desktop, stack on mobile. As concise as possible."). Numbers come from
 // src/data/youversion-stats.json (YouVersion Connect, all-time, bible.com app excluded), are
-// server-rendered, and the script only counts UP TO that same text. Refresh = edit the JSON + ship.
+// server-rendered (build-time copy of the ONE live source, refreshed by scripts/sync-youversion-stats.mjs).
+// LIVE source: https://assets.spiritmediapublishing.com/FHB/youversion/stats.json (R2). The script fetches it
+// once the banner is near view and counts up to the FRESH numbers; fetch fails -> the build-time numbers.
+// Refresh = replace that one R2 file (see evidence file); no deploy.
 import stats from '../data/youversion-stats.json';
 
 const YOUVERSION_URL = 'https://www.bible.com/organizations/89162c01-3892-4c7b-a462-239df0931522';
@@ -16,10 +19,10 @@ const YOUVERSION_URL = 'https://www.bible.com/organizations/89162c01-3892-4c7b-a
 // chapters round to the nearest hundred. Highlights removed (same ruling).
 const fmt = (n: number) => n.toLocaleString('en-US');
 const items = [
-	{ n: stats.people, label: 'users' },
-	{ n: stats.languages, label: 'languages' },
-	{ n: stats.countries, label: 'countries' },
-	{ n: Math.round(stats.chapters / 100) * 100, label: 'chapters' },
+	{ n: stats.users, label: 'users', key: 'users' },
+	{ n: stats.languages, label: 'languages', key: 'languages' },
+	{ n: stats.countries, label: 'countries', key: 'countries' },
+	{ n: Math.round(stats.chapters / 100) * 100, label: 'chapters', key: 'chapters' },
 ];
 ---
 
@@ -30,27 +33,45 @@ const items = [
 	</a>
 	<ul class="fhb-yv-stats" aria-label="FHB on YouVersion, all time">
 		{items.map((i) => (
-			<li><b data-to={i.n}>{fmt(i.n)}</b> {i.label}</li>
+			<li><b data-to={i.n} data-key={i.key}>{fmt(i.n)}</b> {i.label}</li>
 		))}
 	</ul>
 </div>
 
 <script>
-	// Count-up to the server-rendered value; never alters the final text.
+	// Count-up. Server-rendered text = build-time copy; once the banner is near view fetch the live R2 JSON
+	// and count up to THAT. Any failure -> count to the build-time text (never 0, never blank).
+	const STATS_URL = 'https://assets.spiritmediapublishing.com/FHB/youversion/stats.json';
 	const fmt = (n: number) => n.toLocaleString('en-US');
+	const KEYS = ['users', 'languages', 'countries', 'chapters'];
+	const live = (j: any) => KEYS.every((k) => Number.isFinite(j?.[k]) && j[k] > 0);
+	let pending: Promise<any> | null = null;
+	const fetchLive = () => (pending ||= (async () => {
+		try {
+			const r = await fetch(STATS_URL, { signal: AbortSignal.timeout(3000) });
+			const j = r.ok ? await r.json() : null;
+			return live(j) ? { ...j, chapters: Math.round(j.chapters / 100) * 100 } : null;
+		} catch { return null; }
+	})());
 	document.querySelectorAll<HTMLElement>('[data-yv-counters]').forEach((root) => {
 		const els = [...root.querySelectorAll<HTMLElement>('b[data-to]')];
-		if (!els.length || matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
-		const finals = els.map((e) => e.textContent || '');
-		const run = () => {
+		if (!els.length || !('IntersectionObserver' in window)) return;
+		const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const run = async () => {
+			const fresh = await fetchLive();
+			const to = els.map((e) => (fresh && fresh[e.dataset.key!]) || Number(e.dataset.to));
+			if (reduced) { els.forEach((el, i) => { el.textContent = fmt(to[i]); }); return; }
 			const t0 = performance.now(), D = 1200;
 			const tick = (now: number) => {
 				const p = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - p, 3);
-				els.forEach((el, i) => { el.textContent = p >= 1 ? finals[i] : fmt(Math.round(Number(el.dataset.to) * e)); });
+				els.forEach((el, i) => { el.textContent = fmt(p >= 1 ? to[i] : Math.round(to[i] * e)); });
 				if (p < 1) requestAnimationFrame(tick);
 			};
 			requestAnimationFrame(tick);
 		};
+		// Warm the fetch when the banner is within ~400px of view; animate once it is mostly visible.
+		const warm = new IntersectionObserver((en) => { if (en.some((x) => x.isIntersecting)) { warm.disconnect(); fetchLive(); } }, { rootMargin: '400px' });
+		warm.observe(root);
 		const io = new IntersectionObserver((en) => { if (en.some((x) => x.isIntersecting)) { io.disconnect(); run(); } }, { threshold: 0.6 });
 		io.observe(root);
 	});
@@ -63,10 +84,10 @@ const items = [
 	.fhb-yv-banner img { width: 20px; height: 20px; border-radius: 0.25rem; flex-shrink: 0; }
 	.fhb-yv-stats { display: flex; flex-wrap: nowrap; gap: 1.25rem; margin: 0; padding: 0.5rem 1rem; list-style: none; white-space: nowrap; color: #d6d3d1; }
 	.fhb-yv-stats b { font-weight: 700; color: var(--color-primary-container, #e4006f); font-variant-numeric: tabular-nums; display: inline-block; min-width: var(--w, 0); text-align: right; }
-	.fhb-yv-stats li:nth-child(1) b { min-width: 4.2ch; } /* 7,302 */
+	.fhb-yv-stats li:nth-child(1) b { min-width: 6ch; } /* 7,302; room for 12,345 */
 	.fhb-yv-stats li:nth-child(2) b { min-width: 2ch; }
 	.fhb-yv-stats li:nth-child(3) b { min-width: 3ch; }
-	.fhb-yv-stats li:nth-child(4) b { min-width: 6ch; } /* 84,700 */
+	.fhb-yv-stats li:nth-child(4) b { min-width: 7ch; } /* 84,700; room for 100,000 */
 	/* Under 1100px the one-row layout would crowd: stack the stats under the link, then one per line on phones. */
 	@media (max-width: 1100px) { .fhb-yv-wrap { flex-direction: column; } .fhb-yv-banner { padding-bottom: 0; } }
 	@media (max-width: 640px) {
