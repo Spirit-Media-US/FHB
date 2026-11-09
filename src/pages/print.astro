@@ -579,6 +579,8 @@ const dvcVerses = [
 						}`}
 						style={`background: var(--color-soft, #faf6f2); border: ${e.slug === 'journaling' ? '3px solid var(--color-primary, #b60057)' : '1px solid var(--color-hairline)'};`}
 					>
+						{builtPages.has(`${e.slug}-bible`) ? (
+							<a href={`/bibles/${e.slug}-bible/`} aria-label={`${e.title} edition: full details`} class="cover-link" style="display: flex; justify-content: center; width: 100%;">
 						<img
 							src={cardUrl(`dvc-${e.slug}`)}
 							srcset={`${cardUrl(`dvc-${e.slug}`)} 600w, ${cardUrl(`dvc-${e.slug}`, 1200)} 1200w`}
@@ -587,6 +589,17 @@ const dvcVerses = [
 							width="600" height="764" loading="lazy" decoding="async"
 							class="block w-full h-auto" style="max-width: 220px;"
 						/>
+							</a>
+						) : (
+						<img
+							src={cardUrl(`dvc-${e.slug}`)}
+							srcset={`${cardUrl(`dvc-${e.slug}`)} 600w, ${cardUrl(`dvc-${e.slug}`, 1200)} 1200w`}
+							sizes="(min-width: 1024px) 260px, 44vw"
+							alt={`Father's Heart Bible (FHB) — ${e.title}, Divine Voice™ Color`}
+							width="600" height="764" loading="lazy" decoding="async"
+							class="block w-full h-auto" style="max-width: 220px;"
+						/>
+						)}
 						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{e.title}</h3>
 						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">{e.sub}</p>
 						<div class="flex flex-col gap-2 w-full mt-auto">
@@ -646,6 +659,8 @@ const dvcVerses = [
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
 					{generalColors.map((c) => (
 						<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+							{builtPages.has('fathers-heart-bible') ? (
+								<a href="/bibles/fathers-heart-bible/" aria-label={`${l.label}, ${c.name} cover: full details`} class="cover-link" style="display: flex; justify-content: center; width: 100%;">
 							<img
 								src={cardUrl(`general-${l.line}-${c.key}`)}
 								srcset={`${cardUrl(`general-${l.line}-${c.key}`)} 600w, ${cardUrl(`general-${l.line}-${c.key}`, 1200)} 1200w`}
@@ -654,6 +669,17 @@ const dvcVerses = [
 								width="600" height="764" loading="lazy" decoding="async"
 								class="block w-full h-auto" style="max-width: 220px;"
 							/>
+								</a>
+							) : (
+							<img
+								src={cardUrl(`general-${l.line}-${c.key}`)}
+								srcset={`${cardUrl(`general-${l.line}-${c.key}`)} 600w, ${cardUrl(`general-${l.line}-${c.key}`, 1200)} 1200w`}
+								sizes="(min-width: 640px) 240px, 60vw"
+								alt={`Father's Heart Bible (FHB) — ${l.label}, ${c.name} cover`}
+								width="600" height="764" loading="lazy" decoding="async"
+								class="block w-full h-auto" style="max-width: 220px;"
+							/>
+							)}
 							<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{c.name}</h3>
 							{/* Uniform with every other card (Kevin 2026-10-03). The general sheet has no For
 							    box; its subtitle reads "Holy Bible for Everyone", so that is the line. */}
@@ -770,6 +796,8 @@ const dvcVerses = [
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
 				{lpVolumes.map((v) => (
 					<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+						{builtPages.has(`${v.key}-bible`) ? (
+							<a href={`/bibles/${v.key}-bible/`} aria-label={`Large Print Volume ${v.vol}, ${v.color} cover: full details`} class="cover-link" style="display: flex; justify-content: center; width: 100%;">
 						<img
 							src={`${LP_CARDS}/${v.key}-600.webp`}
 							srcset={`${LP_CARDS}/${v.key}-600.webp 600w, ${LP_CARDS}/${v.key}-1200.webp 1200w`}
@@ -778,6 +806,17 @@ const dvcVerses = [
 							width="600" height="764" loading="lazy" decoding="async"
 							class="block w-full h-auto" style="max-width: 220px;"
 						/>
+							</a>
+						) : (
+						<img
+							src={`${LP_CARDS}/${v.key}-600.webp`}
+							srcset={`${LP_CARDS}/${v.key}-600.webp 600w, ${LP_CARDS}/${v.key}-1200.webp 1200w`}
+							sizes="(min-width: 640px) 240px, 60vw"
+							alt={`Father's Heart Bible (FHB) — Large Print Volume ${v.vol}, ${v.range}, ${v.color} cover`}
+							width="600" height="764" loading="lazy" decoding="async"
+							class="block w-full h-auto" style="max-width: 220px;"
+						/>
+						)}
 						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.15rem;">Volume {v.vol} · {v.color}</h3>
 						<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; margin: 0 0 0.6rem;">{v.range}</p>
 						{/* Each volume has its OWN sample pages — they are different books, and a
@@ -910,7 +949,13 @@ const dvcVerses = [
 						{g.langs.map((l) => (
 							l.code === 'en' ? (
 								<div class="lang-card flex flex-col items-center text-center rounded-2xl p-4 md:p-5" data-lang-card="en" data-search={langSearch(l)} style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+									{builtPages.has('fathers-heart-bible') ? (
+									<a href="/bibles/fathers-heart-bible/" aria-label="Father's Heart Bible, English edition: full details" class="cover-link" style="display: flex; justify-content: center; width: 100%;">
+										<img src={cardUrl(EN_KEY)} srcset={`${cardUrl(EN_KEY)} 600w, ${cardUrl(EN_KEY, 1200)} 1200w`} sizes="(min-width: 1024px) 260px, 44vw" alt="Father's Heart Bible (FHB) — the English General edition, Plum cover" width="600" height="764" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 220px;" />
+									</a>
+								) : (
 									<img src={cardUrl(EN_KEY)} srcset={`${cardUrl(EN_KEY)} 600w, ${cardUrl(EN_KEY, 1200)} 1200w`} sizes="(min-width: 1024px) 260px, 44vw" alt="Father's Heart Bible (FHB) — the English General edition, Plum cover" width="600" height="764" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 220px;" />
+								)}
 									<h3 lang="en" class="lang-card-title" style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">Father’s Heart Bible™</h3>
 									<p class="lang-card-english" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">English</p>
 									<p class="lang-card-sub" style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">For everyone — General, Large Print, Journaling and the audience editions are all on this page.</p>
@@ -933,7 +978,7 @@ const dvcVerses = [
 								</div>
 							) : (
 								<div class="lang-card flex flex-col items-center text-center rounded-2xl p-4 md:p-5" data-lang-card={l.code} data-search={langSearch(l)} style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
-									<LangCover code={l.code} name={l.name} english={l.english} rtl={l.rtl} />
+									<LangCover code={l.code} name={l.name} english={l.english} rtl={l.rtl} href={builtPages.has(`${langSlug(l)}-bible`) ? `/bibles/${langSlug(l)}-bible/` : undefined} />
 									<h3 lang={l.code} dir={l.rtl ? 'rtl' : undefined} class="lang-card-title" style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{l.name}</h3>
 									<p class="lang-card-english" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">{l.english}</p>
 									<p class="lang-card-sub" style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">{l.sub}</p>
