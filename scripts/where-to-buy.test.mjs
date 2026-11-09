@@ -92,7 +92,7 @@ test('the buy-direct banner comes first: before every card and every retailer li
 	const src = read('src/pages/where-to-buy.astro');
 	const banner = src.indexOf('id="buy-direct-banner"');
 	assert.ok(banner > 0 && src.indexOf('id="wtb"') > banner);
-	assert.match(src.slice(banner, src.indexOf('id="wtb"')), /href="\/print\/"[^>]*>15% off 1st order \+ Free Shipping</);
+	assert.match(src.slice(banner, src.indexOf('id="wtb"')), /href="\/print\/"[^>]*>\{DIRECT\}</);
 	if (!existsSync(new URL('dist/where-to-buy/index.html', root))) return;
 	const html = read('dist/where-to-buy/index.html').replace(/ data-astro-cid-\w+/g, '');
 	const b = html.indexOf('id="buy-direct-banner"');
@@ -103,22 +103,38 @@ test('the buy-direct banner comes first: before every card and every retailer li
 	assert.ok(!/<meta[^>]*noindex/i.test(html));
 });
 
-test('built cards: cover left with size + lazy + alt, Retailer|Hardback|Paperback table, Buy direct row first', () => {
+test('built cards: cover left with size + lazy + alt, ISBNs under the binding columns, Buy direct first, only stores with links', () => {
 	if (!existsSync(new URL('dist/where-to-buy/index.html', root))) return;
 	const html = read('dist/where-to-buy/index.html').replace(/ data-astro-cid-\w+/g, '');
+	assert.ok(!/Not listed/.test(html), 'no "Not listed" rows');
+	const catalog = buildCatalog(isbns);
 	const cards = html.match(/<article class="ed" [\s\S]*?<\/article>/g) ?? [];
-	assert.equal(cards.length, buildCatalog(isbns).size, 'one card per edition, both bindings in it');
+	assert.equal(cards.length, catalog.size, 'one card per edition, both bindings in it');
+	const order = links.retailers.map((r) => r.key);
 	for (const c of cards) {
+		const id = c.match(/data-edition="([^"]+)"/)[1];
+		const e = catalog.get(id);
 		const img = c.match(/<img [^>]*>/)?.[0] ?? '';
 		assert.match(img, /src="https:\/\/assets\.spiritmediapublishing\.com\/FHB\/print\//, 'cover from the existing card art');
 		assert.match(img, /width="600"/);
 		assert.match(img, /height="\d+"/);
 		assert.match(img, /loading="lazy"/);
 		assert.match(img, /alt="[^"]{8,}"/);
-		assert.ok(c.indexOf('class="ed-cover"') < c.indexOf('class="ed-head"'), 'cover first (left)');
-		assert.match(c, /<th scope="col">Retailer<\/th><th scope="col">Hardback<\/th><th scope="col">Paperback<\/th>/);
-		const rows = [...c.matchAll(/<tr class="rt[^"]*" data-rt="([a-z]+)"/g)].map((m) => m[1]);
-		assert.deepEqual(rows, ['direct', 'amazon', 'bn', 'walmart', 'kobo', 'apple', 'google']);
+		assert.ok(c.indexOf('class="ed-cover"') < c.indexOf('class="ed-head"'), 'cover first');
+		assert.ok(c.includes(`Hardback<span class="th-isbn">ISBN ${e.hb}</span>`), `${id}: hardback ISBN under its column header`);
+		assert.ok(c.includes(`Paperback<span class="th-isbn">ISBN ${e.pb}</span>`), `${id}: paperback ISBN under its column header`);
+		const rows = [...c.matchAll(/<tr class="rt[^"]*" data-rt="([a-z]+)">([\s\S]*?)<\/tr>/g)];
+		assert.equal(rows[0][1], 'direct', 'Buy direct row first');
+		assert.ok(rows[0][2].includes('15% off 1st order + Free Shipping'));
+		const keys = rows.slice(1).map((r) => r[1]);
+		assert.deepEqual(keys, order.filter((k) => keys.includes(k)), 'retailer order');
+		for (const [, k, body] of rows.slice(1)) assert.match(body, /<a href="https:\/\//, `${id}: ${k} row without a link`);
+		assert.deepEqual(keys, order.filter((k) => Object.keys(links.print[id]?.[k] ?? {}).length > 0), `${id}: rows = stores with links`);
 	}
 	assert.ok(html.split('class="ed ed-digital"').length > 20, 'digital cards present');
+	const buttons = [...html.matchAll(/<button type="button" data-rt="([a-z]+)"/g)].map((m) => m[1]);
+	assert.deepEqual(buttons.slice(0, 2), ['direct', 'all'], 'Buy direct first, marked Preferred');
+	assert.match(html, /data-rt="direct"[^>]*class="wtb-pref">Buy direct <span class="wtb-badge">Preferred<\/span>/);
+	assert.ok(!buttons.includes('walmart') && !buttons.includes('kobo'), 'no button for a store with 0 links');
+	for (const k of ['amazon', 'bn', 'apple', 'google']) assert.ok(buttons.includes(k), `${k} button`);
 });
