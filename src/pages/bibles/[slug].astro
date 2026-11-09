@@ -150,7 +150,7 @@ const langCode = isLang ? (ed.coverImage ?? '').replace(/^lang-/, '') : '';
 const hasCover = !isLang || hasLangCard(langCode);
 const coverUrl = hasCover
 	? cardUrl(ed.coverImage ?? `dvc-${ed.slug}`, 1200)
-	: 'https://assets.spiritmediapublishing.com/FHB/share/v4/fhb-og-default.jpg';
+	: 'https://assets.spiritmediapublishing.com/FHB/share/v5/fhb-og-family.jpg';
 // THE ORDER FORM under the header, on EVERY edition (Kevin 2026-10-05; language pages since
 // 2026-10-03). It sells this edition's catalog row(s) from print-catalog.ts — the same record
 // /print's rows and dvc-checkout.ts use: lang-<code> for a language, the slug itself for an
@@ -495,11 +495,13 @@ const faqSchema = {
 				     on a phone, where most of this traffic lands. -->
 				<div class="flex flex-col items-center">
 					<div style="max-width: 340px; width: 100%;">
+						<a href="#order" aria-label={`Order ${ed.name}`} class="cover-link" style="display: block;">
 						{isLang ? (
 							<LangCover code={langCode} name={ed.name} english={ed.english ?? ''} rtl={ed.dir === 'rtl'} variant="page" />
 						) : (
 							<img id="cover-main" src={coverUrl} alt={ed.name.startsWith('Father') ? `${ed.name} in Divine Voice™ Color` : `${ed.name} — Father's Heart Bible (FHB) in Divine Voice™ Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
 						)}
+						</a>
 					</div>
 				</div>
 				<div>

@@ -4,23 +4,103 @@
 // under the hero on every page."). Same look as SMP's live one (spirit-media-publishing
 // CoverMarquee .fhbm-yv). Layout renders it under the top bar; a page whose first section is a hero
 // sets youversionBanner={false} on Layout and places this right after that hero.
+//
+// Counters (Kevin 2026-11-09: "The counters need to move but land on the current number. ALL need to
+// fit on 1 row on desktop, stack on mobile. As concise as possible."). Numbers come from
+// src/data/youversion-stats.json (YouVersion Connect, all-time, bible.com app excluded), are
+// server-rendered (build-time copy of the ONE live source, refreshed by scripts/sync-youversion-stats.mjs).
+// LIVE source: https://assets.spiritmediapublishing.com/FHB/youversion/stats.json (R2). The script fetches it
+// once the banner is near view and counts up to the FRESH numbers; fetch fails -> the build-time numbers.
+// Refresh = replace that one R2 file (see evidence file); no deploy.
+// CSS is is:inline ON PURPOSE: site CSS loads async (media=print swap), so scoped banner CSS arrived late and the
+// unstyled list reflowed everything below it (CLS 0.21 desktop / 0.12 mobile, 2026-11-09, unit 2mw).
+import stats from '../data/youversion-stats.json';
+
 const YOUVERSION_URL = 'https://www.bible.com/organizations/89162c01-3892-4c7b-a462-239df0931522';
+// Full numbers with commas (Kevin 2026-11-09: "7,302 users 51 languages 157 countries 84,700 chapters");
+// chapters round to the nearest hundred. Highlights removed (same ruling).
+const fmt = (n: number) => n.toLocaleString('en-US');
+const items = [
+	{ n: stats.users, label: 'users', key: 'users' },
+	{ n: stats.languages, label: 'languages', key: 'languages' },
+	{ n: stats.countries, label: 'countries', key: 'countries' },
+	{ n: Math.round(stats.chapters / 100) * 100, label: 'chapters', key: 'chapters' },
+];
 ---
 
-<a class="fhb-yv-banner" href={YOUVERSION_URL} target="_blank" rel="noopener">
-	<img src="https://assets.spiritmediapublishing.com/FHB/partners/youversion-icon-96.webp" alt="" width="20" height="20" decoding="async" loading="lazy" />
-	<span>Now on YouVersion &mdash; read free in the Bible App <span aria-hidden="true">&rarr;</span></span>
-</a>
+<div class="fhb-yv-wrap" data-yv-counters>
+	<a class="fhb-yv-banner" href={YOUVERSION_URL} target="_blank" rel="noopener">
+		<img src="https://assets.spiritmediapublishing.com/FHB/partners/youversion-icon-96.webp" alt="" width="20" height="20" decoding="async" loading="lazy" />
+		<span>Now on YouVersion &mdash; read free in the Bible App <span aria-hidden="true">&rarr;</span></span>
+	</a>
+	<ul class="fhb-yv-stats" aria-label="FHB on YouVersion, all time">
+		{items.map((i) => (
+			<li><b data-to={i.n} data-key={i.key}>{fmt(i.n)}</b> {i.label}</li>
+		))}
+	</ul>
+</div>
 
-<style>
-	.fhb-yv-banner { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; text-align: center; text-decoration: none; background: #1a1714; color: #f5f5f4; font-family: var(--font-body); font-size: 0.875rem; line-height: 1.25rem; }
+<script>
+	// Count-up. Server-rendered text = build-time copy; once the banner is near view fetch the live R2 JSON
+	// and count up to THAT. Any failure -> count to the build-time text (never 0, never blank).
+	const STATS_URL = 'https://assets.spiritmediapublishing.com/FHB/youversion/stats.json';
+	const fmt = (n: number) => n.toLocaleString('en-US');
+	const KEYS = ['users', 'languages', 'countries', 'chapters'];
+	const live = (j: any) => KEYS.every((k) => Number.isFinite(j?.[k]) && j[k] > 0);
+	let pending: Promise<any> | null = null;
+	const fetchLive = () => (pending ||= (async () => {
+		try {
+			const r = await fetch(STATS_URL, { signal: AbortSignal.timeout(3000) });
+			const j = r.ok ? await r.json() : null;
+			return live(j) ? { ...j, chapters: Math.round(j.chapters / 100) * 100 } : null;
+		} catch { return null; }
+	})());
+	document.querySelectorAll<HTMLElement>('[data-yv-counters]').forEach((root) => {
+		const els = [...root.querySelectorAll<HTMLElement>('b[data-to]')];
+		if (!els.length || !('IntersectionObserver' in window)) return;
+		const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const run = async () => {
+			const fresh = await fetchLive();
+			const to = els.map((e) => (fresh && fresh[e.dataset.key!]) || Number(e.dataset.to));
+			if (reduced) { els.forEach((el, i) => { el.textContent = fmt(to[i]); }); return; }
+			const t0 = performance.now(), D = 1200;
+			const tick = (now: number) => {
+				const p = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - p, 3);
+				els.forEach((el, i) => { el.textContent = fmt(p >= 1 ? to[i] : Math.round(to[i] * e)); });
+				if (p < 1) requestAnimationFrame(tick);
+			};
+			requestAnimationFrame(tick);
+		};
+		// Warm the fetch when the banner is within ~400px of view; animate once it is mostly visible.
+		const warm = new IntersectionObserver((en) => { if (en.some((x) => x.isIntersecting)) { warm.disconnect(); fetchLive(); } }, { rootMargin: '400px' });
+		warm.observe(root);
+		const io = new IntersectionObserver((en) => { if (en.some((x) => x.isIntersecting)) { io.disconnect(); run(); } }, { threshold: 0.6 });
+		io.observe(root);
+	});
+</script>
+
+<style is:inline>
+	.fhb-yv-wrap { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; column-gap: 1.5rem; background: #1a1714; color: #f5f5f4; font-family: var(--font-body); font-size: 0.875rem; line-height: 1.25rem; }
+	.fhb-yv-banner { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; text-align: center; text-decoration: none; color: inherit; }
 	.fhb-yv-banner:hover { color: #fff; }
 	.fhb-yv-banner img { width: 20px; height: 20px; border-radius: 0.25rem; flex-shrink: 0; }
+	.fhb-yv-stats { display: flex; flex-wrap: nowrap; gap: 1.25rem; margin: 0; padding: 0.5rem 1rem; list-style: none; white-space: nowrap; color: #d6d3d1; }
+	.fhb-yv-stats b { font-weight: 700; color: var(--color-primary-container, #e4006f); font-variant-numeric: tabular-nums; display: inline-block; min-width: var(--w, 0); text-align: right; }
+	.fhb-yv-stats li:nth-child(1) b { min-width: 6ch; } /* 7,302; room for 12,345 */
+	.fhb-yv-stats li:nth-child(2) b { min-width: 2ch; }
+	.fhb-yv-stats li:nth-child(3) b { min-width: 3ch; }
+	.fhb-yv-stats li:nth-child(4) b { min-width: 7ch; } /* 84,700; room for 100,000 */
+	/* Under 1100px the one-row layout would crowd: stack the stats under the link, then one per line on phones. */
+	@media (max-width: 1100px) { .fhb-yv-wrap { flex-direction: column; } .fhb-yv-banner { padding-bottom: 0; } }
+	@media (max-width: 640px) {
+		.fhb-yv-stats { display: grid; grid-template-columns: repeat(2, max-content); justify-content: center; gap: 0.125rem 1.25rem; padding: 0.375rem 0.5rem 0.5rem; }
+	}
 	/* Stay one thin line on phones: at 14px it wrapped to two lines at 390px. */
 	@media (max-width: 480px) {
 		/* nowrap alone overflowed the page by 6px at 360/390px; clip the text instead. */
-		.fhb-yv-banner { gap: 0.375rem; padding: 0.5rem 0.5rem; font-size: 0.71875rem; white-space: nowrap; overflow: hidden; }
+		.fhb-yv-banner { gap: 0.375rem; padding: 0.5rem 0.5rem 0; font-size: 0.71875rem; white-space: nowrap; overflow: hidden; max-width: 100%; }
 		.fhb-yv-banner > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 		.fhb-yv-banner img { width: 18px; height: 18px; }
+		.fhb-yv-stats { font-size: 0.8125rem; }
 	}
 </style>

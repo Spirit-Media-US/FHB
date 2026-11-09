@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "node scripts/sync-chrome.mjs && astro dev",
-		"prebuild": "sh -c 'if [ -f /home/deploy/bin/navfooter-lock.mjs ]; then node /home/deploy/bin/navfooter-lock.mjs check; else echo navfooter-lock-absent-skip; fi' && node scripts/sync-digital-listings.mjs",
+		"prebuild": "sh -c 'if [ -f /home/deploy/bin/navfooter-lock.mjs ]; then node /home/deploy/bin/navfooter-lock.mjs check; else echo navfooter-lock-absent-skip; fi' && node scripts/sync-digital-listings.mjs && node scripts/sync-youversion-stats.mjs",
 		"test:native-meta": "node --test scripts/native-meta.test.mjs",
 		"test:hreflang": "node --test scripts/bibles-hreflang.test.mjs",
 		"test:where-to-buy": "node --test scripts/where-to-buy.test.mjs",
