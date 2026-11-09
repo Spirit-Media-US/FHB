@@ -27,8 +27,8 @@ interface Props {
 const { id, title, native, lang, rtl, trim, img, hb, pb, search, bare = false } = Astro.props;
 const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const bindings = [
-	{ key: 'hb', label: 'Hardback', cents: Math.round(hb * 100) },
-	{ key: 'pb', label: 'Paperback', cents: Math.round(pb * 100) },
+	{ key: 'hb', label: 'Hardback', tkey: 'p.hardback', cents: Math.round(hb * 100) },
+	{ key: 'pb', label: 'Paperback', tkey: 'p.paperback', cents: Math.round(pb * 100) },
 ].map((b) => ({ ...b, first: firstOrderUnit(b.cents) }));
 const name = native ? `${native} (${title})` : title;
 ---
@@ -41,18 +41,19 @@ const name = native ? `${native} (${title})` : title;
 			<span class="orow__trim">{trim}</span>
 		</p>}
 		<div class="orow__ctl">
-			<div class="orow__seg" role="group" aria-label={bare ? 'Binding' : `${name}: binding`}>
+			<div class="orow__seg" role="group" aria-label={bare ? 'Binding' : `${name}: binding`} data-t-aria-label={bare ? undefined : 'c.rowBinding'} data-vars={bare ? undefined : JSON.stringify({ name })}>
 				{bindings.map((b) => (
 					<button type="button" class="orow__bind" data-bind={b.key} aria-pressed={b.key === 'hb' ? 'true' : 'false'}>
-						<span class="orow__bname">{b.label} <span class="orow__count" data-seg-count hidden></span></span>
+						<span class="orow__bname"><span data-t={b.tkey}>{b.label}</span> <span class="orow__count" data-seg-count hidden></span></span>
 						<span class="orow__price"><s data-list={b.key}>{money(b.cents)}</s> <b data-first={b.key}>{money(b.first)}</b></span>
+						<span class="orow__fee" data-fee-sku={`${id}-${b.key}`} hidden></span>
 					</button>
 				))}
 			</div>
 			<div class="orow__qty">
-				<button type="button" class="orow__step" data-step="-1" aria-label={bare ? 'Fewer' : `Fewer, ${name}, selected binding`}>−</button>
-				<input class="orow__in" type="number" value="0" min="0" step="1" inputmode="numeric" data-qty aria-label={bare ? 'Quantity' : `Quantity, ${name}, selected binding`} />
-				<button type="button" class="orow__step" data-step="1" aria-label={bare ? 'More' : `More, ${name}, selected binding`}>+</button>
+				<button type="button" class="orow__step" data-step="-1" aria-label={bare ? 'Fewer' : `Fewer, ${name}, selected binding`} data-t-aria-label={bare ? undefined : 'c.rowFewer'} data-vars={bare ? undefined : JSON.stringify({ name })}>−</button>
+				<input class="orow__in" type="number" value="0" min="0" step="1" inputmode="numeric" data-qty aria-label={bare ? 'Quantity' : `Quantity, ${name}, selected binding`} data-t-aria-label={bare ? undefined : 'c.rowQty'} data-vars={bare ? undefined : JSON.stringify({ name })} />
+				<button type="button" class="orow__step" data-step="1" aria-label={bare ? 'More' : `More, ${name}, selected binding`} data-t-aria-label={bare ? undefined : 'c.rowMore'} data-vars={bare ? undefined : JSON.stringify({ name })}>+</button>
 			</div>
 		</div>
 	</div>
@@ -110,6 +111,8 @@ const name = native ? `${native} (${title})` : title;
 	.orow__count { font-weight: 700; color: var(--color-primary, #b60057); }
 	.orow__price { font-size: 0.8rem; white-space: nowrap; }
 	.orow__price s { color: var(--color-muted); }
+	.orow__fee { display: block; font-size: 0.72rem; color: var(--color-muted); }
+	.orow__fee[hidden] { display: none; }
 	.orow__qty {
 		display: inline-flex;
 		align-items: center;

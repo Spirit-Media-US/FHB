@@ -13,6 +13,7 @@
 // the community app, so this marketing function lives off that prefix.
 
 import { readBreakdown } from '../src/lib/order-pricing';
+import { countryFor } from '../src/lib/shipCountries';
 
 interface Env {
 	STRIPE_PRINT_WEBHOOK_SECRET?: string;
@@ -64,16 +65,15 @@ async function verify(raw: string, header: string, secret: string): Promise<bool
 	return !!v1 && timingSafeEqual(sig, v1);
 }
 
+// Localized: US keeps "City, ST 12345"; elsewhere print only the parts the country has (many
+// have no state, some no postal code) in the order Stripe collected them, never a stray ", ".
 function fmtAddr(a: Record<string, string> | null | undefined): string {
 	if (!a) return '(no address)';
-	return [
-		a.line1,
-		a.line2,
-		`${a.city ?? ''}, ${a.state ?? ''} ${a.postal_code ?? ''}`.trim(),
-		a.country,
-	]
-		.filter(Boolean)
-		.join('\n');
+	const place =
+		a.country === 'US'
+			? `${a.city ?? ''}, ${a.state ?? ''} ${a.postal_code ?? ''}`.trim()
+			: [a.postal_code, a.city, a.state].filter(Boolean).join(' ');
+	return [a.line1, a.line2, place, a.country].filter(Boolean).join('\n');
 }
 
 // metadata.breakdown is the raw SKU tally dvc-checkout writes ("dads:1",
@@ -223,6 +223,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 			})
 		: '$0.00';
 	const m = s.metadata ?? {};
+	const phone: string | undefined = s.customer_details?.phone || undefined;
+	const destCode: string | undefined = ship.address?.country;
+	const site = countryFor(destCode);
 
 	// Stamp the session once its emails are away. This is what makes an un-notified
 	// order *findable*: fhb-order-reconcile.py sweeps paid sessions missing
@@ -318,7 +321,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		`Editions:\n${fmtOrder(readBreakdown(m))}\n\n` +
 		`Ship to:\n${name}\n${fmtAddr(ship.address)}\n\n` +
 		`Customer email: ${email}\n` +
-		`Phone: ${s.customer_details?.phone ?? '(none)'}\n` +
+		`Phone (pass to the Ingram order, carriers call international buyers): ${phone ?? '*** MISSING: email the buyer before placing the order ***'}\n` +
+		`Ingram print site for ${destCode ?? '?'}: ${site ? `${site.printSite} (${site.name}, config rate ${site.shippingRate.value} ${site.shippingRate.currency})` : '*** country not in the live ship list: check before ordering ***'}\n` +
 		`Stripe session: ${s.id ?? '?'}\n`;
 	// The buyer's own confirmation. Until 2026-09-03 we sent the customer NOTHING —
 	// Stripe's payment receipt was the only thing they ever received, so a buyer had
@@ -328,7 +332,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		`What you ordered:\n${fmtOrder(readBreakdown(m))}\n\n` +
 		`Total paid: ${amount}\n` +
 		`Order reference: ${s.id ?? '?'}\n\n` +
-		`Shipping to:\n${name}\n${fmtAddr(ship.address)}\n\n` +
+		`Shipping to:\n${name}\n${fmtAddr(ship.address)}\n` +
+		`Phone for the delivery carrier: ${phone ?? '(none on file, please reply with one)'}\n\n` +
 		(Number(m.total) > 9
 			? `Shipping is free. Larger bulk orders take about 3–4 weeks to reach you.\n\n`
 			: `Shipping is free, and most orders arrive within 7–10 days.\n\n`) +
