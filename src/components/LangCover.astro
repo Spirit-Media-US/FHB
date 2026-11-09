@@ -13,14 +13,27 @@ interface Props {
 	rtl?: boolean;
 	/** 'card' = /print grid (lazy, 600/1200 srcset); 'page' = the edition page hero (1200, eager) */
 	variant?: 'card' | 'page';
+	/** card variant: when the edition's own page is built, the cover links to it */
+	href?: string;
 }
-const { code, name, english, rtl, variant = 'card' } = Astro.props;
+const { code, name, english, rtl, variant = 'card', href } = Astro.props;
 const has = hasLangCard(code);
 const alt = `Father's Heart Bible (FHB) — ${name}, the ${english} edition`;
 ---
 {has ? (
 	variant === 'page' ? (
 		<img id="cover-main" src={cardUrl(`lang-${code}`, 1200)} alt={`${name} — Father's Heart Bible (FHB) in Divine Voice™ Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
+	) : href ? (
+		<a href={href} aria-label={`${name} (${english}) edition: full details`} class="cover-link" style="display: flex; justify-content: center; width: 100%;">
+			<img
+				src={cardUrl(`lang-${code}`)}
+				srcset={`${cardUrl(`lang-${code}`)} 600w, ${cardUrl(`lang-${code}`, 1200)} 1200w`}
+				sizes="(min-width: 1024px) 260px, 44vw"
+				alt={alt}
+				width="600" height="764" loading="lazy" decoding="async"
+				class="block w-full h-auto" style="max-width: 220px;"
+			/>
+		</a>
 	) : (
 		<img
 			src={cardUrl(`lang-${code}`)}
