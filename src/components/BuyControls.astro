@@ -11,7 +11,7 @@
 // THE SHAPE, fixed for every card:
 //   Hardback $x.xx · Paperback $y.yy    ← our own FHB prices, plain text
 //   Buy now                             ← this edition's own FHB order form
-//   Store buttons, then Save 15% + Free Shipping on first order
+//   Store buttons, then 15% off 1st order + Free Shipping
 //
 // FHB is the seller (Kevin 2026-11-08): no third-party retailer button that points away from us
 // except faith-aligned ones listed in the data once live. Unlisted stores render a faded pill.
@@ -47,7 +47,7 @@ interface Props {
 	 * Shrink the direct link so it holds ONE line in a narrower content box (Kevin
 	 * 2026-09-17: "make this fit on one line ... even if it has to be little smaller").
 	 * Only the journaling card needs it: its 3px frame takes 4px off the inner width,
-	 * which is exactly enough to wrap "Save 15% + Free Shipping on first order".
+	 * which is exactly enough to wrap "15% off 1st order + Free Shipping".
 	 */
 	tightDirect?: boolean;
 	/** /print: the catalog id ("teen", "lang-es") the catalog order form pre-fills when the
@@ -188,7 +188,7 @@ const spare = Math.max(0, reserveSlots - stores.length);
 {
 	showDirect && (
 		<a href={directHref} class={tightDirect ? 'buy-direct buy-direct-tight' : 'buy-direct'} data-pick-edition={pick}>
-			Save 15% + Free Shipping on first order
+			15% off 1st order + Free Shipping
 		</a>
 	)
 }
@@ -312,7 +312,7 @@ const spare = Math.max(0, reserveSlots - stores.length);
 	   possible, not because it was not asked for.
 	   Kevin asked for this link to hold one line on the journaling card, "even if it has to
 	   be little smaller". On a phone the targeted cards are two-across and the content box is
-	   133px; "Save 15% + Free Shipping on first order" needs about 200px at 12px type, so one line
+	   133px; "15% off 1st order + Free Shipping" needs about 200px at 12px type, so one line
 	   there means roughly an 8px font — unreadable, and below any sensible minimum. I shipped
 	   `white-space: nowrap` unconditionally first and MEASURED the result: the link did not
 	   shrink to fit, it ran straight out of the card and put a horizontal scrollbar on the

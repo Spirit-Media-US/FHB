@@ -259,33 +259,8 @@ const langSearch = (l: RosterLanguage) =>
 /** Sold by our own checkout: an ISBN and on_sale/direct_sale, or a PRE-ORDER (no ISBN yet). Kevin
  *  2026-10-30: "All languages cards can offer a Buy now button" — all 80 (generated). */
 const langSold = (l: RosterLanguage) => l.sellable && (Boolean(l.isbn) || Boolean(l.preorder));
-// THE THREE STORE PILLS ON ALL 80 CARDS (Kevin 2026-10-30: "We know all will be in googleplay ebook so
-// add that but fade it until live. Add Audiobook for all but no
-// price until live."). Live = the listing is in src/data/digital-listings.json (Google Play), each entry added only after its store page verified; absent = the same pill
-// FADED, not a link, aria-disabled, no price. A listing landing in the data turns it live on the next
-// build — never typed per language here.
-const langStores = (code: string) => {
-	const d = (
-		digital as unknown as Record<string, { ebook?: DigitalLink[]; audiobook?: DigitalLink[] }>
-	)[code];
-	const gp = (xs?: DigitalLink[]) => xs?.find((x) => x.store === 'Google Play');
-	const eb = gp(d?.ebook);
-	const au = gp(d?.audiobook);
-	return [
-		eb
-			? { key: 'gp-ebook', logo: 'google' as const, label: 'eBook', price: eb.price, href: eb.url }
-			: { key: 'gp-ebook', logo: 'google' as const, label: 'eBook', price: '', off: true },
-		au
-			? {
-					key: 'gp-audio',
-					logo: 'google' as const,
-					label: 'Audiobook',
-					price: au.price,
-					href: au.url,
-				}
-			: { key: 'gp-audio', logo: 'google' as const, label: 'Audiobook', price: '', off: true },
-	];
-};
+// Language cards show PRINT ONLY (Kevin 2026-11-09: "at languages remove google play for ebooks and
+// audiobooks (let the print page show print)") — no eBook / audiobook store pills on them.
 /** Every card's Buy Direct (Kevin 2026-10-30): the catalog form when sold, else the edition page's reserve block. */
 const langDirect = (l: RosterLanguage) =>
 	directTarget({
@@ -935,9 +910,7 @@ const dvcVerses = [
 											pbPrice={enLine.pb}
 											buyNowHref={builtPages.has('fathers-heart-bible') ? '/bibles/fathers-heart-bible/#order' : null}
 											pick={EN_KEY}
-											reserveSlots={4}
 											tightDirect
-											stores={langStores('en')}
 										/>
 									</div>
 								</div>
@@ -964,9 +937,7 @@ const dvcVerses = [
 											showDirect={Boolean(langDirect(l))}
 											directHref={langDirect(l) ?? undefined}
 											pick={`lang-${l.code}`}
-											reserveSlots={4}
 											tightDirect
-											stores={langStores(l.code)}
 										/>
 									</div>
 								</div>
@@ -1013,7 +984,7 @@ const dvcVerses = [
 
 		<!-- ═══════════════ CATALOG ORDER FORM ═══════════════ -->
 		<Section variant="soft">
-			{/* The anchor every card's "Save 15% + Free Shipping on first order" link points at. Since Kevin
+			{/* The anchor every card's "15% off 1st order + Free Shipping" link points at. Since Kevin
 			    2026-10-04 this is the SAME catalog order form /print/order/ shows ("it does what we
 			    need"), replacing the quick order box: every edition keeps its own counts, so a buyer
 			    builds the order edition by edition. A card's Buy Direct pre-fills its row here. */}
@@ -1117,14 +1088,8 @@ const dvcVerses = [
 		color: var(--color-ink);
 	}
 	@media (max-width: 640px) {
-		/* On a phone (~133px content box) a pill wraps to two lines when its label is long (Buy
-		   now, a Google Audio price), so blocks differed by up to 76px (measured at
-		   390px: 398-474). One reserved height for the block = every card the same height; 476px
-		   is the tallest measured block (474) rounded up. 2026-10-30: every card now carries the
-		   Google Play eBook + Audiobook pills (live or faded), tallest measured 491 -> 494px. */
-		:global(.lang-card > .mt-auto) {
-			min-height: 494px;
-		}
+		/* The per-card reserved block height was sized for the Google Play pills, which language cards
+		   no longer carry (Kevin 2026-11-09); it is dropped so the block collapses to its content. */
 		:global(.lang-card-title) {
 			min-height: calc(3 * 1.3em);
 			-webkit-line-clamp: 3;
