@@ -24,6 +24,8 @@ interface Row {
 	href?: string;
 	hb: string;
 	pb: string;
+	/** English: its eBook/audiobook have no single print card, so the card carries the digital table only. */
+	printless?: boolean;
 }
 interface Group {
 	id: string;
@@ -134,20 +136,27 @@ const DIGITAL_COLS = [
 	{ key: 'listening', label: 'Listening eBook' },
 	{ key: 'audiobook', label: 'Audiobook' },
 ];
-const digitalCodes = [
-	...new Set(DIGITAL_COLS.flatMap((c) => Object.keys(digitalLinks[c.key] ?? {}))),
-].sort((x, y) =>
-	x === 'en'
-		? -1
-		: y === 'en'
-			? 1
-			: (digitalName.get(x) ?? x).localeCompare(digitalName.get(y) ?? y),
-);
-const digitalCards = digitalCodes.map((code) => ({
-	code,
-	name: digitalName.get(code) ?? code,
-	cols: DIGITAL_COLS.filter((c) => digitalLinks[c.key]?.[code]),
-}));
+// A language's digital formats go ON its own card (Kevin 2026-11-09): columns only for the formats it has.
+const digitalCols = (code: string) => DIGITAL_COLS.filter((c) => digitalLinks[c.key]?.[code]);
+// English has eBook + audiobook but no single print card (its print editions are the colours/audiences above),
+// so it gets a card of its own in the language catalog, alphabetically, with the English cover used on /print.
+const langGroup = groups.find((g) => g.id === 'language-editions')!;
+langGroup.rows.push({
+	id: 'digital-en',
+	cover: 'general-regular-plum',
+	title: `${T} — English eBook and audiobook`,
+	name: 'English',
+	hb: '',
+	pb: '',
+	printless: true,
+});
+const sortKey = (n: string) => n.replace(/\s*\(.*\)/, '');
+langGroup.rows.sort((x, y) => sortKey(x.name).localeCompare(sortKey(y.name)));
+langGroup.note = 'Print, eBook and audiobook';
+const codeOf = (r: Row) =>
+	r.id === 'digital-en' ? 'en' : r.id.startsWith('lang-') ? r.id.slice(5) : '';
+const digitalStores = (code: string) =>
+	retailers.filter((rt) => digitalCols(code).some((c) => digitalLinks[c.key]?.[code]?.[rt.key]));
 
 // A store button / row exists only where at least one verified link exists for it (Kevin 2026-11-09: no 'Not listed' rows).
 const printLinkSets = Object.values(printLinks);
@@ -165,18 +174,20 @@ const URL = 'https://fathersheartbible.com/where-to-buy/';
 
 // One Book per ISBN — what a bookstore or an answer engine looks up. No Offer/Product markup for other retailers.
 const books = groups.flatMap((g) =>
-	g.rows.flatMap((r) => {
-		const name =
-			g.id === 'regular-print' || g.id === 'language-editions'
-				? `Father's Heart Bible™ — ${r.name}`
-				: g.id === 'large-print'
-					? `Father's Heart Bible™ Large Print — ${r.name}`
-					: r.name;
-		return [
-			{ name, isbn: r.hb, format: 'https://schema.org/Hardcover' },
-			{ name, isbn: r.pb, format: 'https://schema.org/Paperback' },
-		];
-	}),
+	g.rows
+		.filter((r) => !r.printless)
+		.flatMap((r) => {
+			const name =
+				g.id === 'regular-print' || g.id === 'language-editions'
+					? `Father's Heart Bible™ — ${r.name}`
+					: g.id === 'large-print'
+						? `Father's Heart Bible™ Large Print — ${r.name}`
+						: r.name;
+			return [
+				{ name, isbn: r.hb, format: 'https://schema.org/Hardcover' },
+				{ name, isbn: r.pb, format: 'https://schema.org/Paperback' },
+			];
+		}),
 );
 ---
 
@@ -252,7 +263,6 @@ const books = groups.flatMap((g) =>
 
 				<nav class="wtb-jump" aria-label="Edition groups">
 					{groups.map((g) => <a href={`#${g.id}`}>{g.title}</a>)}
-					<a href="#digital">eBooks &amp; Audiobooks</a>
 				</nav>
 
 				{groups.map((g) => (
@@ -261,43 +271,74 @@ const books = groups.flatMap((g) =>
 						<div class="wtb-cards">
 							{g.rows.map((r) => {
 								const rl = printLinks[r.id] ?? {};
+								const dcode = codeOf(r);
+								const dcols = dcode ? digitalCols(dcode) : [];
+								const dstores = dcode ? digitalStores(dcode) : [];
+								const have = [...new Set([...rowStores(rl).map((x) => x.key), ...dstores.map((x) => x.key)])];
 								return (
-									<article class="ed" data-edition={r.id}>
+									<article class="ed" data-edition={r.id} data-stores={have.join(' ')}>
 										<div class="ed-cover">
 											<img src={cardUrl(r.cover)} width="600" height={coverH(r.cover)} loading="lazy" decoding="async" alt={r.title} />
 										</div>
 										<div class="ed-head">
 											<h4>{r.href ? <a href={r.href}>{r.name}</a> : r.name}</h4>
-											<p class="ed-isbn"><span>Hardback ISBN {r.hb}</span><span>Paperback ISBN {r.pb}</span></p>
+											{!r.printless && <p class="ed-isbn"><span>Hardback ISBN {r.hb}</span><span>Paperback ISBN {r.pb}</span></p>}
 										</div>
 										<div class="ed-scroll">
-											<table class="ed-table">
-												<thead>
-													<tr>
-														<th scope="col">Retailer</th>
-														<th scope="col">Hardback<span class="th-isbn">ISBN {r.hb}</span></th>
-														<th scope="col">Paperback<span class="th-isbn">ISBN {r.pb}</span></th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr class="rt rt-direct" data-rt="direct">
-														<th scope="row">Buy direct <span class="wtb-badge">Preferred</span></th>
-														<td data-label="Hardback"><a href="/print/">{DIRECT}</a></td>
-														<td data-label="Paperback"><a href="/print/">{DIRECT}</a></td>
-													</tr>
-													{rowStores(rl).map((rt) => {
-														const m = rl[rt.key] ?? {};
-														return (
+											{!r.printless && (
+												<table class="ed-table">
+													<thead>
+														<tr>
+															<th scope="col">Retailer</th>
+															<th scope="col">Hardback<span class="th-isbn">ISBN {r.hb}</span></th>
+															<th scope="col">Paperback<span class="th-isbn">ISBN {r.pb}</span></th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr class="rt rt-direct" data-rt="direct">
+															<th scope="row">Buy direct <span class="wtb-badge">Preferred</span></th>
+															<td data-label="Hardback"><a href="/print/">{DIRECT}</a></td>
+															<td data-label="Paperback"><a href="/print/">{DIRECT}</a></td>
+														</tr>
+														{rowStores(rl).map((rt) => {
+															const m = rl[rt.key] ?? {};
+															return (
+																<tr class="rt" data-rt={rt.key}>
+																	<th scope="row">{rt.name}</th>
+																	{(['hardback', 'paperback'] as Fmt[]).map((f) => (
+																		<td data-label={f === 'hardback' ? 'Hardback' : 'Paperback'}>{m[f] ? <a href={m[f]} rel="noopener" target="_blank" aria-label={`${r.title}, ${f === 'hardback' ? 'Hardback' : 'Paperback'} at ${rt.name}`}>View at {rt.name}</a> : <span class="rt-na">—</span>}</td>
+																	))}
+																</tr>
+															);
+														})}
+													</tbody>
+												</table>
+											)}
+											{dcols.length > 0 && (
+												<table class="ed-table ed-digital-table">
+													<caption>Digital editions</caption>
+													<thead>
+														<tr><th scope="col">Retailer</th>{dcols.map((col) => <th scope="col">{col.label}</th>)}</tr>
+													</thead>
+													<tbody>
+														{dcode === 'en' && (
+															<tr class="rt rt-direct" data-rt="direct">
+																<th scope="row">Buy direct <span class="wtb-badge">Preferred</span></th>
+																{dcols.map((col) => <td data-label={col.label}>{col.key === 'ebook' ? <a href="/print/#ebook">{DIRECT}</a> : <span class="rt-na">—</span>}</td>)}
+															</tr>
+														)}
+														{dstores.map((rt) => (
 															<tr class="rt" data-rt={rt.key}>
 																<th scope="row">{rt.name}</th>
-																{(['hardback', 'paperback'] as Fmt[]).map((f) => (
-																	<td data-label={f === 'hardback' ? 'Hardback' : 'Paperback'}>{m[f] ? <a href={m[f]} rel="noopener" target="_blank" aria-label={`${r.title}, ${f === 'hardback' ? 'Hardback' : 'Paperback'} at ${rt.name}`}>View at {rt.name}</a> : <span class="rt-na">—</span>}</td>
-																))}
+																{dcols.map((col) => {
+																	const u = digitalLinks[col.key]?.[dcode]?.[rt.key];
+																	return <td data-label={col.label}>{u ? <a href={u} rel="noopener" target="_blank" aria-label={`${r.name} ${col.label} at ${rt.name}`}>View at {rt.name}</a> : <span class="rt-na">—</span>}</td>;
+																})}
 															</tr>
-														);
-													})}
-												</tbody>
-											</table>
+														))}
+													</tbody>
+												</table>
+											)}
 										</div>
 									</article>
 								);
@@ -305,43 +346,6 @@ const books = groups.flatMap((g) =>
 						</div>
 					</section>
 				))}
-
-				<section id="digital" class="wtb-group">
-					<h3>eBooks &amp; Audiobooks <span>Digital editions</span></h3>
-					<div class="wtb-cards">
-						{digitalCards.map((c) => (
-							<article class="ed ed-digital" data-edition={`digital-${c.code}`}>
-								<div class="ed-head">
-									<h4>{c.name}</h4>
-								</div>
-								<div class="ed-scroll">
-									<table class="ed-table">
-										<thead>
-											<tr><th scope="col">Retailer</th>{c.cols.map((col) => <th scope="col">{col.label}</th>)}</tr>
-										</thead>
-										<tbody>
-											{c.code === 'en' && (
-												<tr class="rt rt-direct" data-rt="direct">
-													<th scope="row">Buy direct <span class="wtb-badge">Preferred</span></th>
-													{c.cols.map((col) => <td data-label={col.label}>{col.key === 'ebook' ? <a href="/print/#ebook">{DIRECT}</a> : <span class="rt-na">—</span>}</td>)}
-												</tr>
-											)}
-											{retailers.filter((rt) => c.cols.some((col) => digitalLinks[col.key]?.[c.code]?.[rt.key])).map((rt) => (
-												<tr class="rt" data-rt={rt.key}>
-													<th scope="row">{rt.name}</th>
-													{c.cols.map((col) => {
-														const u = digitalLinks[col.key]?.[c.code]?.[rt.key];
-														return <td data-label={col.label}>{u ? <a href={u} rel="noopener" target="_blank" aria-label={`${c.name} ${col.label} at ${rt.name}`}>View at {rt.name}</a> : <span class="rt-na">—</span>}</td>;
-													})}
-												</tr>
-											))}
-										</tbody>
-									</table>
-								</div>
-							</article>
-						))}
-					</div>
-				</section>
 
 				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin: 2.5rem 0 0;">
 					Looking for a number only? See every <a href="/isbn/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">ISBN</a>. Published by Spirit Media Publishing.
@@ -360,6 +364,10 @@ const books = groups.flatMap((g) =>
 		var btns = bar.querySelectorAll('button');
 		function show(key) {
 			wrap.setAttribute('data-show', key);
+			var cards = wrap.querySelectorAll('article.ed');
+			for (var c = 0; c < cards.length; c++) { var st = ' ' + cards[c].getAttribute('data-stores') + ' '; cards[c].hidden = !(key === 'all' || key === 'direct' || st.indexOf(' ' + key + ' ') > -1); }
+			var secs = wrap.querySelectorAll('section.wtb-group');
+			for (var g = 0; g < secs.length; g++) secs[g].hidden = !secs[g].querySelector('article.ed:not([hidden])');
 			for (var i = 0; i < btns.length; i++) btns[i].setAttribute('aria-pressed', btns[i].getAttribute('data-rt') === key ? 'true' : 'false');
 		}
 		for (var i = 0; i < btns.length; i++) btns[i].addEventListener('click', function (e) { var k = e.currentTarget.getAttribute('data-rt'); show(k); try { history.replaceState(null, '', k === 'all' ? location.pathname : '#show-' + k); } catch (_) {} });
@@ -401,6 +409,9 @@ const books = groups.flatMap((g) =>
 	.ed-isbn { display: none; margin: 0.3rem 0 0; font-size: 0.8rem; color: var(--color-muted); font-variant-numeric: tabular-nums; }
 	.ed-isbn span { display: block; }
 	.ed-scroll { grid-area: table; }
+	.ed-digital-table { margin-top: 1rem; }
+	.ed-digital-table caption { text-align: left; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-muted); padding-bottom: 0.3rem; }
+	.ed[hidden], .wtb-group[hidden] { display: none; }
 	.ed-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 	.ed-table th, .ed-table td { text-align: left; padding: 0.4rem 0.6rem 0.4rem 0; border-top: 1px solid var(--color-hairline); vertical-align: middle; }
 	.ed-table thead th { border-top: 0; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-muted); }
@@ -425,6 +436,7 @@ const books = groups.flatMap((g) =>
 		.ed-cover img { max-width: none; }
 		.ed-head { text-align: center; }
 		.ed-isbn { display: block; }
+		.ed-digital-table caption { display: block; }
 		.ed-table, .ed-table tbody, .ed-table tr, .ed-table th, .ed-table td { display: block; }
 		.ed-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 		.ed-table tr { border-top: 1px solid var(--color-hairline); padding: 0.55rem 0; }

@@ -103,17 +103,18 @@ test('the buy-direct banner comes first: before every card and every retailer li
 	assert.ok(!/<meta[^>]*noindex/i.test(html));
 });
 
-test('built cards: cover left with size + lazy + alt, ISBNs under the binding columns, Buy direct first, only stores with links', () => {
+test('built cards: cover left with size + lazy + alt, ISBNs under binding columns, Buy direct first, only stores with links, digital on the language card', () => {
 	if (!existsSync(new URL('dist/where-to-buy/index.html', root))) return;
 	const html = read('dist/where-to-buy/index.html').replace(/ data-astro-cid-\w+/g, '');
 	assert.ok(!/Not listed/.test(html), 'no "Not listed" rows');
+	assert.ok(!/id="digital"/.test(html) && !/Digital editions<\/span>/.test(html.replace(/<caption>.*?<\/caption>/g, '')), 'no separate digital section');
 	const catalog = buildCatalog(isbns);
 	const cards = html.match(/<article class="ed" [\s\S]*?<\/article>/g) ?? [];
-	assert.equal(cards.length, catalog.size, 'one card per edition, both bindings in it');
+	assert.equal(cards.length, catalog.size + 1, 'one card per print edition + the English eBook/audiobook card');
 	const order = links.retailers.map((r) => r.key);
+	const rowsOf = (t) => [...t.matchAll(/<tr class="rt[^"]*" data-rt="([a-z]+)">([\s\S]*?)<\/tr>/g)];
 	for (const c of cards) {
 		const id = c.match(/data-edition="([^"]+)"/)[1];
-		const e = catalog.get(id);
 		const img = c.match(/<img [^>]*>/)?.[0] ?? '';
 		assert.match(img, /src="https:\/\/assets\.spiritmediapublishing\.com\/FHB\/print\//, 'cover from the existing card art');
 		assert.match(img, /width="600"/);
@@ -121,20 +122,40 @@ test('built cards: cover left with size + lazy + alt, ISBNs under the binding co
 		assert.match(img, /loading="lazy"/);
 		assert.match(img, /alt="[^"]{8,}"/);
 		assert.ok(c.indexOf('class="ed-cover"') < c.indexOf('class="ed-head"'), 'cover first');
-		assert.ok(c.includes(`Hardback<span class="th-isbn">ISBN ${e.hb}</span>`), `${id}: hardback ISBN under its column header`);
-		assert.ok(c.includes(`Paperback<span class="th-isbn">ISBN ${e.pb}</span>`), `${id}: paperback ISBN under its column header`);
-		const rows = [...c.matchAll(/<tr class="rt[^"]*" data-rt="([a-z]+)">([\s\S]*?)<\/tr>/g)];
-		assert.equal(rows[0][1], 'direct', 'Buy direct row first');
-		assert.ok(rows[0][2].includes('15% off 1st order + Free Shipping'));
-		const keys = rows.slice(1).map((r) => r[1]);
-		assert.deepEqual(keys, order.filter((k) => keys.includes(k)), 'retailer order');
-		for (const [, k, body] of rows.slice(1)) assert.match(body, /<a href="https:\/\//, `${id}: ${k} row without a link`);
-		assert.deepEqual(keys, order.filter((k) => Object.keys(links.print[id]?.[k] ?? {}).length > 0), `${id}: rows = stores with links`);
+		const tables = c.match(/<table [\s\S]*?<\/table>/g) ?? [];
+		const printT = tables.find((t) => !t.includes('ed-digital-table'));
+		const digT = tables.find((t) => t.includes('ed-digital-table'));
+		if (id === 'digital-en') assert.ok(!printT, 'English eBook card has no print table');
+		else {
+			const e = catalog.get(id);
+			assert.ok(printT.includes(`Hardback<span class="th-isbn">ISBN ${e.hb}</span>`), `${id}: hardback ISBN under its header`);
+			assert.ok(printT.includes(`Paperback<span class="th-isbn">ISBN ${e.pb}</span>`), `${id}: paperback ISBN under its header`);
+			const rows = rowsOf(printT);
+			assert.equal(rows[0][1], 'direct', 'Buy direct row first');
+			assert.ok(rows[0][2].includes('15% off 1st order + Free Shipping'));
+			const keys = rows.slice(1).map((r) => r[1]);
+			for (const [, k, body] of rows.slice(1)) assert.match(body, /<a href="https:\/\//, `${id}: ${k} row without a link`);
+			assert.deepEqual(keys, order.filter((k) => Object.keys(links.print[id]?.[k] ?? {}).length > 0), `${id}: rows = stores with links`);
+		}
+		const code = id === 'digital-en' ? 'en' : id.startsWith('lang-') ? id.slice(5) : null;
+		const hasDigital = code && ['ebook', 'listening', 'audiobook'].some((k) => links.digital[k]?.[code]);
+		assert.equal(!!digT, !!hasDigital, `${id}: digital table iff the language has digital editions`);
+		if (digT) for (const [, k, body] of rowsOf(digT).filter((r) => r[1] !== 'direct')) assert.match(body, /<a href="https:\/\//, `${id} digital ${k} row without a link`);
 	}
-	assert.ok(html.split('class="ed ed-digital"').length > 20, 'digital cards present');
+	// every digital link in the data is on its language's own card
+	for (const [kind, m] of Object.entries(links.digital)) for (const [code, row] of Object.entries(m)) {
+		const card = cards.find((c) => c.includes(`data-edition="${code === 'en' ? 'digital-en' : `lang-${code}`}"`));
+		assert.ok(card, `${kind} ${code}: no card`);
+		for (const u of Object.values(row)) assert.ok(card.includes(u), `${kind} ${code}: ${u} not on its card`);
+	}
+	const langOrder = (html.match(/data-edition="(?:lang-[\w-]+|digital-en)"/g) ?? []).length;
+	assert.equal(langOrder, isbns.languages.filter((l) => l.onSale).length + 1);
 	const buttons = [...html.matchAll(/<button type="button" data-rt="([a-z]+)"/g)].map((m) => m[1]);
 	assert.deepEqual(buttons.slice(0, 2), ['direct', 'all'], 'Buy direct first, marked Preferred');
 	assert.match(html, /data-rt="direct"[^>]*class="wtb-pref">Buy direct <span class="wtb-badge">Preferred<\/span>/);
 	assert.ok(!buttons.includes('walmart') && !buttons.includes('kobo'), 'no button for a store with 0 links');
 	for (const k of ['amazon', 'bn', 'apple', 'google']) assert.ok(buttons.includes(k), `${k} button`);
+	// the filter's card list: a card advertises exactly the stores it has links for
+	const es = cards.find((c) => c.includes('data-edition="lang-es"'));
+	assert.match(es, /data-stores="[^"]*\bgoogle\b/);
 });
