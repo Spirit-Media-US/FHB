@@ -26,10 +26,14 @@ export type OrderLang = (typeof ORDER_LANGS)[number];
 
 export const ORDER_STRINGS: Record<OrderLang, Strings> = { en, de, fr, es, it, nl, pt, ja };
 
-/** An edition/page language code (or ?lang= value) to a supported order language; English otherwise. */
+/** Languages a visitor actually sees. Kevin 2026-11-09 "1 A": international checkout opens in English
+ *  now; a language joins this list once its strings pass native review (_meta.json review=reviewed). */
+export const LIVE_ORDER_LANGS: readonly OrderLang[] = ['en'];
+
+/** An edition/page language code (or ?lang= value) to a live order language; English otherwise. */
 export function orderLangFor(code: string | null | undefined): OrderLang {
 	const c = (code ?? '').toLowerCase().split(/[-_]/)[0];
-	return (ORDER_LANGS as readonly string[]).includes(c) ? (c as OrderLang) : 'en';
+	return (LIVE_ORDER_LANGS as readonly string[]).includes(c) ? (c as OrderLang) : 'en';
 }
 
 /** Look a string up and fill {placeholders}. A missing key falls back to English, never undefined. */

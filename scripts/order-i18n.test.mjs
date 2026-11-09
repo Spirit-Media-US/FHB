@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ORDER_LANGS, ORDER_STRINGS, orderLangFor, tr, shipsText } from '../src/lib/orderStrings.ts';
+import { LIVE_ORDER_LANGS, ORDER_LANGS, ORDER_STRINGS, orderLangFor, tr, shipsText } from '../src/lib/orderStrings.ts';
 import { EXPEDITED_DISCLAIMER, FIRST_ORDER_FINE, FIRST_ORDER_LABEL, FIRST_ORDER_PCT } from '../src/lib/order-pricing.ts';
 import { BULK_QUOTE_COPY } from '../src/lib/farBand.ts';
 import { shipsLine, shipsParts, shipsToSentence } from '../src/lib/shipCountries.ts';
@@ -39,8 +39,9 @@ function problems(lang, table) {
 
 test('the wave is the 7 languages of the opening countries, plus English', () => {
 	assert.deepEqual([...ORDER_LANGS], ['en', 'de', 'fr', 'es', 'it', 'nl', 'pt', 'ja']);
-	assert.equal(orderLangFor('de'), 'de');
-	assert.equal(orderLangFor('pt-BR'), 'pt');
+	// A wave language reaches visitors only once it is LIVE (native review; Kevin 2026-11-09 "1 A": English now).
+	for (const l of ORDER_LANGS) assert.equal(orderLangFor(l), LIVE_ORDER_LANGS.includes(l) ? l : 'en', l);
+	assert.equal(orderLangFor('pt-BR'), LIVE_ORDER_LANGS.includes('pt') ? 'pt' : 'en');
 	assert.equal(orderLangFor('nb'), 'en'); // Norway: no edition or reviewed strings yet -> English
 	assert.equal(orderLangFor('xx'), 'en');
 	assert.equal(orderLangFor(null), 'en');
@@ -115,8 +116,12 @@ test('the shipping line is rebuilt from facts; English is NOT routed through it 
 const dist = (f) => path.join(root, 'dist', f);
 const built = fs.existsSync(dist('bibles/german-bible/index.html'));
 for (const [slug, lang] of [['german-bible', 'de'], ['french-bible', 'fr'], ['spanish-bible', 'es'], ['italian-bible', 'it'], ['dutch-bible', 'nl'], ['portuguese-bible', 'pt'], ['japanese-bible', 'ja']]) {
-	test(`built /bibles/${slug}/: order block in ${lang}, html lang and canonical untouched`, { skip: !built && 'no dist' }, () => {
+	test(`built /bibles/${slug}/: order block in ${lang} once live (English until then), html lang and canonical untouched`, { skip: !built && 'no dist' }, () => {
 		const h = fs.readFileSync(dist(`bibles/${slug}/index.html`), 'utf8');
+		if (!LIVE_ORDER_LANGS.includes(lang)) {
+			assert.ok(h.includes('Order direct') && !h.includes(`data-lang="${lang}"`), `${lang} not live: block must stay English`);
+			return;
+		}
 		const S = ORDER_STRINGS[lang];
 		const start = h.indexOf('id="order"');
 		const block = h.slice(start, h.indexOf('data-msg', start) + 120); // the order block only, not the page's English body below it
