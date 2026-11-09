@@ -1,0 +1,366 @@
+---
+// /where-to-buy/ — Kevin 2026-11-09 (ruling "1 A"): a "Where to find it" page, laid out like /isbn/, with a link
+// to each edition at every retailer and a toggle between retailers. FHB is its own retailer (Kevin 2026-11-08,
+// "We will stop pointing people to Amazon"), so the buy-direct banner leads and every other retailer is
+// secondary. This is the ONLY page that carries retailer links. Every link is server-rendered (works with no
+// JavaScript); the toggle only filters. Links come from src/data/retailer-links.json and appear only where
+// verified; an edition with no verified listing at a retailer says "Not listed" — never a guessed URL.
+// Editions + ISBNs come from src/data/isbn-list.json (the business master snapshot), never typed here.
+import Section from '../components/Section.astro';
+import VideoHeroInner from '../components/VideoHeroInner.astro';
+import isbns from '../data/isbn-list.json' with { type: 'json' };
+import { allLanguageEditions, langSlug } from '../data/language-editions';
+import links from '../data/retailer-links.json' with { type: 'json' };
+import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+
+type Fmt = 'hardback' | 'paperback';
+interface Row {
+	id: string;
+	name: string;
+	href?: string;
+	hb: string;
+	pb: string;
+}
+interface Group {
+	id: string;
+	title: string;
+	note: string;
+	rows: Row[];
+}
+
+const retailers = links.retailers as { key: string; name: string }[];
+const printLinks = links.print as Record<string, Record<string, Partial<Record<Fmt, string>>>>;
+const digitalLinks = links.digital as Record<string, Record<string, Record<string, string>>>;
+
+const langByCode = new Map(allLanguageEditions.map((l) => [l.code, l]));
+const langHref = (code?: string) => {
+	const l = code ? langByCode.get(code) : undefined;
+	return l && !l.soon ? `/bibles/${langSlug(l)}-bible/` : undefined;
+};
+
+const groups: Group[] = [
+	{
+		id: 'regular-print',
+		title: 'Regular Print',
+		note: '6 × 9 · Complete Bible',
+		rows: isbns.general.map((g) => ({
+			id: `general-${g.colour.toLowerCase()}`,
+			name: g.colour,
+			href: '/print/',
+			hb: g.hb,
+			pb: g.pb,
+		})),
+	},
+	{
+		id: 'large-print',
+		title: 'Large Print',
+		note: '6 × 9 · Three-volume set',
+		rows: isbns.largePrint.map((v) => ({
+			id: `lp-vol${v.vol}`,
+			name: `Vol. ${v.vol} ${v.range} · ${v.colour}`,
+			href: '/bibles/lp-set-bible/',
+			hb: v.hb,
+			pb: v.pb,
+		})),
+	},
+	{
+		id: 'journaling',
+		title: 'Journaling Edition',
+		note: '8 × 10',
+		rows: [
+			{
+				id: 'journaling',
+				name: isbns.journaling.title,
+				href: '/bibles/journaling-bible/',
+				hb: isbns.journaling.hb,
+				pb: isbns.journaling.pb,
+			},
+		],
+	},
+	{
+		id: 'audience-editions',
+		title: 'Audience Editions',
+		note: '6 × 9',
+		rows: isbns.audience.map((a) => ({
+			id: `audience-${a.slug}`,
+			name: a.title,
+			href: `/bibles/${a.slug}-bible/`,
+			hb: a.hb,
+			pb: a.pb,
+		})),
+	},
+	{
+		id: 'language-editions',
+		title: 'Language Editions',
+		note: 'In print now',
+		rows: isbns.languages
+			.filter((l) => l.onSale)
+			.map((l) => ({
+				id: `lang-${l.code}`,
+				name: l.name,
+				href: langHref(l.code),
+				hb: l.hb,
+				pb: l.pb,
+			})),
+	},
+];
+
+const digitalGroups = [
+	{ id: 'ebook', title: 'eBook', note: 'English', rows: Object.keys(digitalLinks.ebook ?? {}) },
+	{
+		id: 'listening-ebooks',
+		title: 'Listening eBooks',
+		note: 'Reads along with the audio',
+		rows: Object.keys(digitalLinks.listening ?? {}),
+	},
+	{
+		id: 'audiobooks',
+		title: 'Audiobooks',
+		note: 'Narrated',
+		rows: Object.keys(digitalLinks.audiobook ?? {}),
+	},
+];
+const digitalKey = {
+	ebook: 'ebook',
+	'listening-ebooks': 'listening',
+	audiobooks: 'audiobook',
+} as Record<string, string>;
+const digitalName = new Map<string, string>([
+	...isbns.audiobooks.map((r) => [r.code, r.name] as [string, string]),
+	...isbns.listeningEbooks.map((r) => [r.code, r.name] as [string, string]),
+]);
+
+const seoTitle = "Where to Find Father's Heart Bible — Every Edition";
+const seoDescription = `Order Father's Heart Bible™ (FHB) direct for 15% off your first order and free shipping, or find every print edition, eBook and audiobook at Amazon, Barnes & Noble and Google Play, with its ISBN.`;
+const URL = 'https://fathersheartbible.com/where-to-buy/';
+
+// One Book per ISBN — what a bookstore or an answer engine looks up. No Offer/Product markup for other retailers.
+const books = groups.flatMap((g) =>
+	g.rows.flatMap((r) => {
+		const name =
+			g.id === 'regular-print' || g.id === 'language-editions'
+				? `Father's Heart Bible™ — ${r.name}`
+				: g.id === 'large-print'
+					? `Father's Heart Bible™ Large Print — ${r.name}`
+					: r.name;
+		return [
+			{ name, isbn: r.hb, format: 'https://schema.org/Hardcover' },
+			{ name, isbn: r.pb, format: 'https://schema.org/Paperback' },
+		];
+	}),
+);
+const fmtLabel: Record<Fmt, string> = { hardback: 'Hardcover', paperback: 'Paperback' };
+---
+
+<Layout
+	title={fitTitle(seoTitle)}
+	description={fitDescription(seoDescription)}
+	image="https://assets.spiritmediapublishing.com/FHB/share/v4/fhb-og-default.jpg"
+	imageAlt="Father's Heart Bible print editions"
+	darkHero={true}
+	jsonLd={{
+		'@context': 'https://schema.org',
+		'@graph': [
+			{ '@type': 'WebPage', name: seoTitle, description: seoDescription, url: URL },
+			{
+				'@type': 'BreadcrumbList',
+				itemListElement: [
+					{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+					{ '@type': 'ListItem', position: 2, name: 'In Print', item: 'https://fathersheartbible.com/print/' },
+					{ '@type': 'ListItem', position: 3, name: 'Where to Find It', item: URL },
+				],
+			},
+			{
+				'@type': 'ItemList',
+				name: "Father's Heart Bible™ print editions",
+				numberOfItems: books.length,
+				itemListElement: books.map((b, i) => ({
+					'@type': 'ListItem',
+					position: i + 1,
+					item: {
+						'@type': 'Book',
+						name: b.name,
+						isbn: b.isbn,
+						bookFormat: b.format,
+						publisher: { '@type': 'Organization', '@id': 'https://spiritmediapublishing.com/#organization', name: 'Spirit Media Publishing' },
+					},
+				})),
+			},
+		],
+	}}
+>
+	<main>
+		<VideoHeroInner
+			imageSrc="https://assets.spiritmediapublishing.com/FHB/print/isbn-hero.webp"
+			imageSrcMobile="https://assets.spiritmediapublishing.com/FHB/print/isbn-hero-960.webp"
+			imageWidth={1902}
+			imageHeight={1070}
+			imagePosition="50% 30%"
+			stackOnMobile={true}
+			href="/print/"
+			heading="Where to Find Father’s Heart Bible"
+			headingBelow
+		/>
+
+		<div id="buy-direct-banner" class="wtb-banner">
+			<p class="wtb-banner-kicker">Best way to get your copy</p>
+			<h2>Order direct from Father’s Heart Bible</h2>
+			<a class="wtb-banner-btn" href="/print/">15% off 1st order + Free Shipping</a>
+			<p class="wtb-banner-note">Every edition below is also at other retailers.</p>
+		</div>
+
+		<Section variant="light">
+			<div class="wtb-wrap" id="wtb" data-show="all">
+				<div class="text-center" style="margin-bottom: 1.5rem;">
+					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Find an edition at a retailer</h2>
+					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.95rem; margin: 0.6rem 0 0;">Each edition with its ISBN and a link to its listing. “Not listed” means we have not confirmed a listing there.</p>
+				</div>
+
+				<div class="wtb-toggle" id="wtb-toggle" role="group" aria-label="Show one retailer" hidden>
+					<button type="button" data-rt="all" aria-pressed="true">All retailers</button>
+					{retailers.map((r) => <button type="button" data-rt={r.key} aria-pressed="false">{r.name}</button>)}
+				</div>
+
+				<nav class="wtb-jump" aria-label="Edition groups">
+					{groups.map((g) => <a href={`#${g.id}`}>{g.title}</a>)}
+					<a href="#digital">eBooks &amp; Audiobooks</a>
+				</nav>
+
+				{groups.map((g) => (
+					<section id={g.id} class="wtb-group">
+						<h3>{g.title} <span>{g.note}</span></h3>
+						<div class="wtb-table">
+							{g.rows.map((r) => {
+								const rl = printLinks[r.id] ?? {};
+								return (
+									<div class="wtb-row" data-edition={r.id}>
+										<div class="wtb-ed">
+											<span class="wtb-name">{r.href ? <a href={r.href}>{r.name}</a> : r.name}</span>
+											<span class="wtb-isbn">Hardcover {r.hb} · Paperback {r.pb}</span>
+										</div>
+										<div class="wtb-rts">
+											{retailers.map((rt) => {
+												const m = rl[rt.key] ?? {};
+												const have = (Object.keys(fmtLabel) as Fmt[]).filter((f) => m[f]);
+												return (
+													<div class={`rt${have.length ? '' : ' rt-none'}`} data-rt={rt.key}>
+														<span class="rt-name">{rt.name}</span>
+														{have.length ? (
+															<span class="rt-links">
+																{have.map((f) => <a href={m[f]} rel="noopener" target="_blank" aria-label={`${r.name} ${fmtLabel[f]} at ${rt.name}`}>{fmtLabel[f]}</a>)}
+															</span>
+														) : (
+															<span class="rt-na">Not listed</span>
+														)}
+													</div>
+												);
+											})}
+										</div>
+									</div>
+								);
+							})}
+						</div>
+					</section>
+				))}
+
+				<div id="digital">
+					{digitalGroups.map((g) => (
+						<section id={g.id} class="wtb-group">
+							<h3>{g.title} <span>{g.note}</span></h3>
+							<div class="wtb-table">
+								{g.rows.map((code) => {
+									const dl = digitalLinks[digitalKey[g.id]][code];
+									return (
+										<div class="wtb-row" data-edition={`${digitalKey[g.id]}-${code}`}>
+											<div class="wtb-ed"><span class="wtb-name">{digitalName.get(code) ?? code}</span></div>
+											<div class="wtb-rts">
+												{retailers.map((rt) => (
+													<div class={`rt${dl[rt.key] ? '' : ' rt-none'}`} data-rt={rt.key}>
+														<span class="rt-name">{rt.name}</span>
+														{dl[rt.key] ? (
+															<span class="rt-links"><a href={dl[rt.key]} rel="noopener" target="_blank" aria-label={`${digitalName.get(code) ?? code} ${g.title} at ${rt.name}`}>{g.title}</a></span>
+														) : (
+															<span class="rt-na">Not listed</span>
+														)}
+													</div>
+												))}
+											</div>
+										</div>
+									);
+								})}
+							</div>
+						</section>
+					))}
+				</div>
+
+				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin: 2.5rem 0 0;">
+					Looking for a number only? See every <a href="/isbn/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">ISBN</a>. Published by Spirit Media Publishing.
+				</p>
+			</div>
+		</Section>
+	</main>
+</Layout>
+
+<script is:inline>
+	(function () {
+		var wrap = document.getElementById('wtb');
+		var bar = document.getElementById('wtb-toggle');
+		if (!wrap || !bar) return;
+		bar.hidden = false;
+		var btns = bar.querySelectorAll('button');
+		function show(key) {
+			wrap.setAttribute('data-show', key);
+			for (var i = 0; i < btns.length; i++) btns[i].setAttribute('aria-pressed', btns[i].getAttribute('data-rt') === key ? 'true' : 'false');
+		}
+		for (var i = 0; i < btns.length; i++) btns[i].addEventListener('click', function (e) { var k = e.currentTarget.getAttribute('data-rt'); show(k); try { history.replaceState(null, '', k === 'all' ? location.pathname : '#show-' + k); } catch (_) {} });
+		var m = /^#show-(\w+)$/.exec(location.hash);
+		if (m && bar.querySelector('[data-rt="' + m[1] + '"]')) show(m[1]);
+	})();
+</script>
+
+<style>
+	.wtb-banner { background: var(--color-ink); color: #fff; text-align: center; padding: 1.75rem 1rem 2rem; }
+	.wtb-banner h2 { font-family: var(--font-headline); font-size: 1.75rem; font-weight: 600; margin: 0.3rem 0 1rem; color: #fff; }
+	.wtb-banner-kicker { font-family: var(--font-sans); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; margin: 0; opacity: 0.8; }
+	.wtb-banner-btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0.6rem 1.6rem; border-radius: 999px; background: var(--color-brand); color: #fff; font-family: var(--font-sans); font-weight: 700; text-decoration: none; }
+	.wtb-banner-btn:hover { text-decoration: underline; text-underline-offset: 0.15em; }
+	.wtb-banner-note { font-family: var(--font-sans); font-size: 0.85rem; margin: 1rem 0 0; opacity: 0.8; }
+	.wtb-wrap { max-width: 56rem; margin: 0 auto; }
+	.wtb-toggle { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin: 0 0 1.5rem; }
+	.wtb-toggle[hidden] { display: none; }
+	.wtb-toggle button { min-height: 44px; padding: 0.4rem 1rem; border-radius: 999px; border: 1px solid var(--color-hairline); background: #fff; color: var(--color-ink); font-family: var(--font-sans); font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+	.wtb-toggle button[aria-pressed='true'] { background: var(--color-brand); border-color: var(--color-brand); color: #fff; }
+	.wtb-jump { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.25rem; margin: 0 0 2.5rem; font-family: var(--font-sans); font-size: 0.9rem; }
+	.wtb-jump a { color: var(--color-brand); font-weight: 600; text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+	.wtb-group { margin: 0 0 2.75rem; scroll-margin-top: 6rem; }
+	.wtb-group h3 { font-family: var(--font-headline); color: var(--color-ink); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.75rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; }
+	.wtb-group h3 span { font-family: var(--font-sans); font-size: 0.85rem; font-weight: 400; color: var(--color-muted); }
+	.wtb-table { background: #fff; border: 1px solid var(--color-hairline); border-radius: 12px; overflow: hidden; }
+	.wtb-row { padding: 0.85rem 1.1rem; border-top: 1px solid var(--color-hairline); font-family: var(--font-sans); }
+	.wtb-row:first-child { border-top: 0; }
+	.wtb-ed { display: flex; flex-direction: column; gap: 0.15rem; margin-bottom: 0.55rem; }
+	.wtb-name { color: var(--color-ink); font-weight: 600; font-size: 0.98rem; }
+	.wtb-name a { color: var(--color-brand); text-decoration: none; }
+	.wtb-name a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
+	.wtb-isbn { color: var(--color-muted); font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+	.wtb-rts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem 1rem; }
+	.rt { display: flex; flex-direction: column; font-size: 0.85rem; min-width: 0; }
+	.rt-name { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-muted); }
+	.rt-links { display: flex; flex-wrap: wrap; gap: 0.15rem 0.75rem; }
+	.rt-links a { color: var(--color-brand); font-weight: 600; text-decoration: none; min-height: 28px; display: inline-flex; align-items: center; }
+	.rt-links a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
+	.rt-na { color: var(--color-muted); }
+	/* toggle: show one retailer only (all links stay in the HTML) */
+	#wtb[data-show='amazon'] .rt:not([data-rt='amazon']),
+	#wtb[data-show='bn'] .rt:not([data-rt='bn']),
+	#wtb[data-show='google'] .rt:not([data-rt='google']),
+	#wtb[data-show='walmart'] .rt:not([data-rt='walmart']),
+	#wtb[data-show='kobo'] .rt:not([data-rt='kobo']),
+	#wtb[data-show='apple'] .rt:not([data-rt='apple']) { display: none; }
+	#wtb:not([data-show='all']) .wtb-rts { grid-template-columns: minmax(0, 1fr); }
+	@media (max-width: 639px) {
+		.wtb-rts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+		.wtb-row { padding: 0.8rem 0.9rem; }
+	}
+</style>
