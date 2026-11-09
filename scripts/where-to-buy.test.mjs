@@ -144,7 +144,10 @@ test('built cards: cover left with size + lazy + alt, ISBNs under binding column
 			assert.ok(rows[0][2].includes('15% off 1st order + Free Shipping'));
 			const keys = rows.slice(1).map((r) => r[1]);
 			for (const [, k, body] of rows.slice(1)) assert.match(body, /<a href="https:\/\//, `${id}: ${k} row without a link`);
-			assert.deepEqual(keys, order.filter((k) => Object.keys(links.print[id]?.[k] ?? {}).length > 0), `${id}: rows = stores with links`);
+			assert.deepEqual(keys, order.filter((k) => k === 'walmart' || Object.keys(links.print[id]?.[k] ?? {}).length > 0), `${id}: rows = stores with links (+ Walmart ISBN search)`);
+			// Walmart (Kevin 11-09): each binding searches Walmart for its OWN ISBN.
+			const wm = rows.find((r) => r[1] === 'walmart')[2];
+			assert.ok(wm.includes(`walmart.com/search?q=${e.hb.replace(/\D/g, '')}`) && wm.includes(`walmart.com/search?q=${e.pb.replace(/\D/g, '')}`), `${id}: Walmart searches its own ISBNs`);
 		}
 		const code = id === 'digital-en' || id.startsWith('general-') ? 'en' : id.startsWith('lang-') ? id.slice(5) : null;
 		const hasDigital = code && ['ebook', 'listening', 'audiobook'].some((k) => links.digital[k]?.[code]);
@@ -165,8 +168,8 @@ test('built cards: cover left with size + lazy + alt, ISBNs under binding column
 	const buttons = [...html.matchAll(/<button type="button" data-rt="([a-z]+)"/g)].map((m) => m[1]);
 	assert.deepEqual(buttons.slice(0, 2), ['direct', 'all'], 'Buy direct first, marked Preferred');
 	assert.match(html, /data-rt="direct"[^>]*class="wtb-pref">Buy direct <span class="wtb-badge">Preferred<\/span>/);
-	assert.ok(!buttons.includes('walmart') && !buttons.includes('kobo'), 'no button for a store with 0 links');
-	for (const k of ['amazon', 'bn', 'apple', 'google']) assert.ok(buttons.includes(k), `${k} button`);
+	assert.ok(!buttons.includes('kobo'), 'no button for a store with 0 links');
+	for (const k of ['amazon', 'bn', 'walmart', 'apple', 'google']) assert.ok(buttons.includes(k), `${k} button`);
 	// the filter's card list: a card advertises exactly the stores it has links for
 	const es = cards.find((c) => c.includes('data-edition="lang-es"'));
 	assert.match(es, /data-stores="[^"]*\bgoogle\b/);
