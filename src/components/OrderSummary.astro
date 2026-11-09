@@ -7,63 +7,72 @@
  * nothing else. The email is asked for here because a first order can only be recognised by
  * it; the server checks it before applying WELCOME15, and Stripe receives it pre-filled.
  */
-import { BULK_QUOTE_COPY } from '../lib/farBand';
+import { BULK_QUOTE_COPY, BULK_QUOTE_MIN } from '../lib/farBand';
 import {
 	EXPEDITED_DISCLAIMER,
 	FIRST_ORDER_FINE,
 	FIRST_ORDER_PCT,
 	type Tier,
 } from '../lib/order-pricing';
+import { ORDER_STRINGS, orderLangFor, regionName, tr } from '../lib/orderStrings';
 import { allFreeShipping, LIVE_COUNTRIES } from '../lib/shipCountries';
 
 interface Props {
 	tiers: Tier[];
 	/** a stable prefix for this form's element ids */
 	idp: string;
+	/** page language (src/lib/orderStrings.ts); English when absent */
+	lang?: string;
 }
-const { tiers, idp } = Astro.props;
+const { tiers, idp, lang: pageLang } = Astro.props;
+const lang = orderLangFor(pageLang);
+const S = ORDER_STRINGS[lang];
+const t = (k: string, v?: Record<string, string | number>) => tr(S, k, v);
 // Runtime consts: biome cannot see .astro template use and would turn template-only imports
 // into `import type` (a production ReferenceError). Keep these lines.
 const multiCountry = LIVE_COUNTRIES.length > 1;
-const shipNote = allFreeShipping() ? 'Free standard shipping' : 'Shipping added at checkout';
-const offerLabel = `First order? ${FIRST_ORDER_PCT}% off at checkout.`;
-const offerFine = FIRST_ORDER_FINE;
-const expeditedNote = EXPEDITED_DISCLAIMER;
-const quoteTitle = BULK_QUOTE_COPY.title;
-const quoteNote = BULK_QUOTE_COPY.note;
+const shipKey = allFreeShipping() ? 's.shipFree' : 's.shipAdded';
+// English stays the single-source constants the server and tests share; the string table's en.json
+// is asserted equal to them (scripts/order-i18n.test.mjs).
+const en = lang === 'en';
+const offerLabel = t('s.offerUnknown', { pct: FIRST_ORDER_PCT });
+const offerFine = en ? FIRST_ORDER_FINE : t('s.fine');
+const expeditedNote = en ? EXPEDITED_DISCLAIMER : t('s.expedited');
+const quoteTitle = en ? BULK_QUOTE_COPY.title : t('q.title');
+const quoteNote = en ? BULK_QUOTE_COPY.note : t('q.note', { min: BULK_QUOTE_MIN });
 const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min);
 ---
 <div class="osum" data-summary>
 	<p class="osum__offer" data-offer data-offer-label>{offerLabel}</p>
-	<p class="osum__fine" data-offer data-offer-fine>{offerFine}</p>
+	<p class="osum__fine" data-offer data-offer-fine data-t="s.fine">{offerFine}</p>
 	<p class="osum__tiers" data-tiers-line>
-		<span>Volume:</span>
-		{ladder.map((t) => <span class="osum__tier" data-tier={t.pct}>{t.pct}% off {t.min}+</span>)}
+		<span data-t="s.volume">{t('s.volume')}</span>
+		{ladder.map((tier) => <span class="osum__tier" data-tier={tier.pct} data-min={tier.min}>{t('s.tier', { pct: tier.pct, min: tier.min })}</span>)}
 	</p>
 	<dl class="osum__lines">
-		<div><dt><span data-sum-copies>0</span> <span data-sum-copies-word>copies</span></dt><dd data-sum-subtotal>$0.00</dd></div>
+		<div><dt><span data-sum-copies>0</span> <span data-sum-copies-word>{t('s.copies')}</span></dt><dd data-sum-subtotal>$0.00</dd></div>
 		<div data-sum-disc hidden><dt data-sum-disc-label></dt><dd data-sum-disc-amt></dd></div>
 		<div data-sum-fee hidden><dt data-sum-fee-label></dt><dd data-sum-fee-amt></dd></div>
-		<div class="osum__total"><dt>Total</dt><dd data-sum-total>$0.00</dd></div>
+		<div class="osum__total"><dt data-t="s.total">{t('s.total')}</dt><dd data-sum-total>$0.00</dd></div>
 	</dl>
-	<p class="osum__note">{shipNote} · tax calculated at checkout</p>
-	{multiCountry && <p class="osum__note" data-fee-note>Outside the United States, any international handling fee for your country is added per copy and shown above before you check out.</p>}
-	{multiCountry && <p class="osum__note" data-expedited-note hidden>{expeditedNote} The price of Expedited delivery is shown when you choose it at checkout.</p>}
+	<p class="osum__note"><span data-t={shipKey}>{t(shipKey)}</span> · <span data-t="s.tax">{t('s.tax')}</span></p>
+	{multiCountry && <p class="osum__note" data-fee-note data-t="s.feeNote">{t('s.feeNote')}</p>}
+	{multiCountry && <p class="osum__note" data-expedited-note hidden><span data-t="s.expedited">{expeditedNote}</span> <span data-t="s.expeditedPrice">{t('s.expeditedPrice')}</span></p>}
 	{multiCountry && (<>
-	<label class="osum__label" for={`${idp}-country`}>Ship to</label>
+	<label class="osum__label" for={`${idp}-country`} data-t="s.shipTo">{t('s.shipTo')}</label>
 	<select id={`${idp}-country`} class="osum__email" name="country" autocomplete="country" data-country>
-		{LIVE_COUNTRIES.map((c) => <option value={c.code}>{c.name}</option>)}
+		{LIVE_COUNTRIES.map((c) => <option value={c.code}>{en ? c.name : regionName(lang, c.code)}</option>)}
 	</select>
 	</>)}
-	<label class="osum__label" for={`${idp}-email`}>Email</label>
+	<label class="osum__label" for={`${idp}-email`} data-t="s.email">{t('s.email')}</label>
 	<input id={`${idp}-email`} class="osum__email" type="email" name="email" autocomplete="email" inputmode="email" required data-email />
-	<button type="button" class="osum__checkout" data-checkout>Checkout →</button>
+	<button type="button" class="osum__checkout" data-checkout data-t="s.checkout">{t('s.checkout')}</button>
 	{multiCountry && (
 	<div class="osum__quote" data-quote hidden>
-		<p class="osum__note" data-quote-note>{quoteNote}</p>
-		<label class="osum__label" for={`${idp}-qname`}>Your name</label>
+		<p class="osum__note" data-quote-note data-t="q.note">{quoteNote}</p>
+		<label class="osum__label" for={`${idp}-qname`} data-t="q.name">{t('q.name')}</label>
 		<input id={`${idp}-qname`} class="osum__email" type="text" name="quote-name" autocomplete="name" data-quote-name />
-		<a class="osum__checkout osum__quote-btn" href={`mailto:hello@spiritmediapublishing.com`} data-quote-link>{quoteTitle}</a>
+		<a class="osum__checkout osum__quote-btn" href={`mailto:hello@spiritmediapublishing.com`} data-quote-link data-t="q.title">{quoteTitle}</a>
 	</div>
 	)}
 	<p class="osum__msg" data-msg hidden role="status"></p>

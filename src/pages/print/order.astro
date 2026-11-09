@@ -15,6 +15,7 @@
  */
 import CatalogOrderForm from '../../components/CatalogOrderForm.astro';
 import Layout from '../../layouts/Layout.astro';
+import { ORDER_LANGS, ORDER_STRINGS } from '../../lib/orderStrings';
 import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const breadcrumb = {
@@ -45,12 +46,14 @@ const breadcrumb = {
 	<main id="main-content" class="cat" style="margin-top: 80px;">
 		<div class="cat__wrap">
 			<header class="cat__head">
-				<p class="cat__crumb"><a href="/print/">Print</a> / Catalog order form</p>
-				<h1 class="cat__h1">Catalog Order Form</h1>
-				<p class="cat__lede">Every print edition, hardback or paperback. All copies in the order count together toward volume pricing. <a href="/returns/">30-day returns, full refund</a>.</p>
+				<p class="cat__crumb"><a href="/print/" data-t="c.crumbPrint">Print</a> / <span data-t="c.crumbHere">Catalog order form</span></p>
+				<h1 class="cat__h1" data-t="c.h1">Catalog Order Form</h1>
+				<p class="cat__lede"><span data-t="c.lede">Every print edition, hardback or paperback. All copies in the order count together toward volume pricing.</span> <a href="/returns/" data-t="p.returns">30-day returns, full refund</a>.</p>
 			</header>
 
 			<CatalogOrderForm returnPath="/print/order/" />
+			{/* Every wave language's strings, applied by src/scripts/order-form.ts only when ?lang= asks. */}
+			<script type="application/json" id="order-strings" is:inline set:html={JSON.stringify(Object.fromEntries(ORDER_LANGS.filter((l) => l !== 'en').map((l) => [l, ORDER_STRINGS[l]])))}></script>
 		</div>
 	</main>
 </Layout>

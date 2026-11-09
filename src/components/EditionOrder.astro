@@ -18,7 +18,14 @@ import type { CatalogRow } from '../data/print-catalog';
 import { PRINT_TIERS } from '../data/print-tiers';
 import { handlingTable } from '../lib/marginGuard';
 import { FIRST_ORDER_LABEL, FIRST_ORDER_PCT, firstOrderUnit } from '../lib/order-pricing';
-import { allFreeShipping, LIVE_COUNTRIES, shipsLine, shipsToSentence } from '../lib/shipCountries';
+import { ORDER_STRINGS, type OrderLang, orderLangFor, shipsText, tr } from '../lib/orderStrings';
+import {
+	allFreeShipping,
+	LIVE_COUNTRIES,
+	shipsLine,
+	shipsParts,
+	shipsToSentence,
+} from '../lib/shipCountries';
 import BindingQty from './BindingQty.astro';
 import OrderSummary from './OrderSummary.astro';
 
@@ -31,8 +38,13 @@ interface Props {
 	returnPath: string;
 	/** one line under the price, e.g. a pre-order's "ships when published" (no ISBN yet, Kevin 2026-10-30) */
 	note?: string;
+	/** the page's language (src/lib/orderStrings.ts); English when absent or unsupported */
+	lang?: string;
 }
-const { rows, heading, returnPath, note } = Astro.props;
+const { rows, heading, returnPath, note, lang: pageLang } = Astro.props;
+const lang: OrderLang = orderLangFor(pageLang);
+const S = ORDER_STRINGS[lang];
+const t = (k: string, v?: Record<string, string | number>) => tr(S, k, v);
 const multi = rows.length > 1;
 const freeShip = allFreeShipping();
 // Runtime const: biome cannot see .astro template use (keep this line).
@@ -44,6 +56,7 @@ const skuPrices: Record<string, number> = Object.fromEntries(
 	]),
 );
 const config = JSON.stringify({
+	...(lang === 'en' ? {} : { lang, s: S }),
 	prices: skuPrices,
 	tiers: PRINT_TIERS,
 	returnPath,
@@ -62,38 +75,38 @@ const config = JSON.stringify({
 const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const lead = rows[0];
 const priceLine = [
-	{ binding: 'Paperback', sku: `${lead.id}-pb`, usd: lead.pb },
-	{ binding: 'Hardback', sku: `${lead.id}-hb`, usd: lead.hb },
+	{ binding: t('p.paperback'), sku: `${lead.id}-pb`, usd: lead.pb },
+	{ binding: t('p.hardback'), sku: `${lead.id}-hb`, usd: lead.hb },
 ].map((l) => {
 	const list = Math.round(l.usd * 100);
 	return { ...l, first: money(firstOrderUnit(list)), reg: money(list) };
 });
 const idp = `eo-${lead.id}`;
 ---
-<div id="order" class="lqo" data-order={config}>
+<div id="order" class="lqo" data-order={config} data-lang={lang}>
 	{/* Kevin 2026-10-04: the same line on every single-edition form, at its top. */}
-	<p class="lqo__catalog"><a href="/print/order/">Need to order multiple editions? Use the catalog order form →</a></p>
-	<p class="lqo__eyebrow">Order direct{freeShip ? ' · free shipping' : ''}</p>
-	<h2 class="lqo__title">Order {heading}</h2>
+	<p class="lqo__catalog"><a href={lang === 'en' ? '/print/order/' : `/print/order/?lang=${lang}`}>{t('o.catalogLink')}</a></p>
+	<p class="lqo__eyebrow">{t('o.eyebrow')}{freeShip ? ` · ${t('o.freeShipping')}` : ''}</p>
+	<h2 class="lqo__title">{t('o.title', { heading })}</h2>
 	<div class="eo-price" data-price-line>
 		{priceLine.map((l) => (
 			<p class="eo-price__row" data-line-sku={l.sku}>
-				<span class="eo-price__binding">{l.binding}</span> <b data-first>{l.first}</b> <span class="eo-price__reg">(reg. <s data-reg>{l.reg}</s>)</span> <span class="eo-price__fee" data-fee-sku={l.sku} data-fee-full hidden></span>
+				<span class="eo-price__binding">{l.binding}</span> <b data-first>{l.first}</b> <span class="eo-price__reg">({t('p.reg')} <s data-reg>{l.reg}</s>)</span> <span class="eo-price__fee" data-fee-sku={l.sku} data-fee-full hidden></span>
 			</p>
 		))}
-		<p class="eo-price__note">{FIRST_ORDER_LABEL}{freeShip ? ' · free shipping' : ''}</p>
+		<p class="eo-price__note">{lang === 'en' ? FIRST_ORDER_LABEL : t('p.firstOrder', { pct: FIRST_ORDER_PCT })}{freeShip ? ` · ${t('o.freeShipping')}` : ''}</p>
 		{note && <p class="eo-price__note" data-preorder-note>{note}</p>}
-		<p class="eo-price__note"><a href="/returns/">30-day returns, full refund</a></p>
-		<p class="eo-price__note" data-ships-line>{shipsLine()} {shipsToSentence()}</p>
+		<p class="eo-price__note"><a href="/returns/">{t('p.returns')}</a></p>
+		<p class="eo-price__note" data-ships-line>{lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts())}</p>
 	</div>
 	{rows.map((r) => (
 		<div class={multi ? 'eo-variant' : undefined}>
 			{multi && <p class="eo-variant__name">{r.title.replace(/^.*—\s*/, '')}</p>}
-			<BindingQty hbSlug={`${r.id}-hb`} pbSlug={`${r.id}-pb`} hb={r.hb} pb={r.pb} label={r.native ? `${r.native} (${r.title})` : r.title} />
+			<BindingQty hbSlug={`${r.id}-hb`} pbSlug={`${r.id}-pb`} hb={r.hb} pb={r.pb} label={r.native ? `${r.native} (${r.title})` : r.title} lang={lang} />
 		</div>
 	))}
 	<div class="lqo__foot">
-		<OrderSummary tiers={tiers} idp={idp} />
+		<OrderSummary tiers={tiers} idp={idp} lang={lang} />
 	</div>
 </div>
 

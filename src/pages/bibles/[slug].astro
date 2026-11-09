@@ -35,6 +35,7 @@ import { alternatesFrom, bcp47 } from '../../lib/bibles-hreflang.mjs';
 import { FHB_ORG_ID } from '../../lib/fhb-org';
 import { shippingDetailsFor } from '../../lib/marginGuard';
 import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
+import { ORDER_STRINGS, orderLangFor, tr as trOrder } from '../../lib/orderStrings';
 import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
@@ -178,7 +179,14 @@ if (!orderRows.length && !reserveOnly)
 	throw new Error(
 		`/bibles/${ed.slug}-bible/: no print-catalog row for [${orderIds.join(', ')}] — this edition page would have no order form`,
 	);
-const orderHeading = langEd ? `the ${ed.english ?? langEd.english} Edition` : ed.name;
+// The order flow speaks the edition's language when we have it (unit 2kz; 'en' otherwise).
+const orderLang = isLang ? orderLangFor(langEd?.code ?? ed.lang) : 'en';
+const orderT = (k: string) => trOrder(ORDER_STRINGS[orderLang], k);
+const orderHeading = langEd
+	? orderLang === 'en'
+		? `the ${ed.english ?? langEd.english} Edition`
+		: ed.name
+	: ed.name;
 // A language edition whose interior is still being built has NO page count yet: never fall
 // back to the English 888 for it.
 const pages = isLang ? (ed.pages ?? null) : (ed.pages ?? fm?.pages ?? 888);
@@ -505,9 +513,9 @@ const faqSchema = {
 					</div>
 					{/* No price up here (Kevin 2026-10-05, B14a): it is the first thing a phone shows. The
 					     price line leads the order form below, which "Order" jumps to. */}
-					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">Free shipping — a $15 value.</p>
+					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">{orderT('hero.freeShipValue')}</p>
 					<div class="flex flex-wrap items-center gap-3">
-						<a href="#order" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Order</a>
+						<a href="#order" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">{orderT('hero.order')}</a>
 						<LookInside slug={ed.lookInsideKey ?? ed.slug} title={ed.name} size="lg" />
 						{yvUrl && (
 							<a href={yvUrl} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 2px solid #3f3f46; padding: 0.7rem 1.6rem; text-decoration: none; font-size: 1rem;">Read on Bible.com</a>
@@ -522,7 +530,7 @@ const faqSchema = {
 					<a href={RESERVE_MAIL} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; padding: 0.75rem 1.6rem; text-decoration: none; font-size: 0.95rem;">Reserve a copy by email</a>
 				</div>
 			) : (
-				<EditionOrder rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} note={preorder ? 'Pre-order: this edition ships as soon as it is published.' : undefined} />
+				<EditionOrder rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} lang={orderLang} note={preorder ? orderT('o.preorder') : undefined} />
 			)}
 		</Section>
 		<Section variant="warm">

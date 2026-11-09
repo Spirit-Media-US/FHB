@@ -282,6 +282,16 @@ export function shipsLine(): string {
 		: '';
 	return `Free standard shipping worldwide from print sites in ${list}.${fee}${fast}`;
 }
+/** The raw facts behind shipsLine()/shipsToSentence(), so a page in another language can rebuild them
+ *  from its own string table (src/lib/orderStrings.ts shipsText). Emitted as data-ships. */
+export const shipsParts = () => ({
+	sites: [...new Set(LIVE_COUNTRIES.map((c) => c.printSite))].map((s) =>
+		s === 'UK' ? 'GB' : s === 'UAE' ? 'AE' : s,
+	),
+	countries: LIVE_COUNTRIES.map((c) => c.code),
+	fee: LIVE_COUNTRIES.some((c) => c.code !== 'US'),
+	fast: LIVE_COUNTRIES.some((c) => c.fast),
+});
 export const shipsToList = (): string => LIVE_COUNTRIES.map((c) => c.name).join(', ');
 /** True when every live country ships free (today: US). Drives "Free shipping" wording. */
 export const allFreeShipping = (): boolean =>

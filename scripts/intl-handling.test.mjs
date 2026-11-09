@@ -260,7 +260,9 @@ test('copy: no "duty paid" promise, the fee is disclosed, never Amazon or Barnes
 });
 
 // ---- built output: the fee is on the page BEFORE checkout ----
-const DIST_PAGE = 'dist/bibles/spanish-bible/index.html';
+// An ENGLISH edition page: language editions now render their order block in their own language (unit 2kz,
+// scripts/order-i18n.test.mjs covers those).
+const DIST_PAGE = 'dist/bibles/fathers-heart-bible/index.html';
 test('dist: edition order block carries the fee table, the per-price fee slots and the fee summary line', () => {
 	assert.ok(fs.existsSync(DIST_PAGE), 'dist/ missing: run the build first');
 	const h = fs.readFileSync(DIST_PAGE, 'utf8');
@@ -288,7 +290,7 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	try { ({ JSDOM } = await import('jsdom')); ({ build } = await import('esbuild')); } catch { return t.skip('jsdom/esbuild not installed'); }
 	const out = await build({ entryPoints: ['src/scripts/order-form.ts'], bundle: true, write: false, format: 'iife', platform: 'browser' });
 	const html = fs.readFileSync(DIST_PAGE, 'utf8').replace(/<script[\s\S]*?<\/script>/g, '');
-	const dom = new JSDOM(html, { runScripts: 'outside-only', url: 'https://fathersheartbible.com/bibles/spanish-bible/' });
+	const dom = new JSDOM(html, { runScripts: 'outside-only', url: 'https://fathersheartbible.com/bibles/fathers-heart-bible/' });
 	const w = dom.window, d = w.document;
 	w.eval(out.outputFiles[0].text);
 	const root = d.querySelector('[data-order]');
