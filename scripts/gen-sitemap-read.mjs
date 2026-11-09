@@ -39,6 +39,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { HUB_LASTMOD_LANGS, hubLastmods } from './lib/hub-lastmod.mjs';
 import { loadLiveCache, saveLiveCache, probeWithCache, DEFAULT_PATH as LIVE_CACHE_PATH } from './lib/live-cache.mjs';
 
 // Shared 24h cache of URLs production already served 200 (unit 2cr). Only 200s are cached, so the
@@ -431,8 +432,12 @@ parts.push(
 // each other language's hub goes in its own segment. A language whose every book the live
 // guard dropped has no chapters here and gets no hub either (never list a page we cannot
 // vouch for).
-const hubEntry = (u) =>
-	`<url><loc>${esc(u)}</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>`;
+// 2ll-B pilot: treated languages only carry a truthful <lastmod> on the hub and book entries
+// (scripts/lib/hub-lastmod.mjs). Controls and every other language are emitted exactly as before.
+const HUB_LM = new Map(HUB_LASTMOD_LANGS.map((l) => [l, hubLastmods(BIBLE_DATA, l)]));
+const lmTag = (d) => (d ? `<lastmod>${d}</lastmod>` : '');
+const hubEntry = (u, lang) =>
+	`<url><loc>${esc(u)}</loc>${lmTag(HUB_LM.get(lang)?.hub)}<changefreq>weekly</changefreq><priority>0.9</priority></url>`;
 const hubsFor = (lang) =>
 	lang === 'en'
 		? [`${SITE}/read/`, `${SITE}/read/en/`, `${SITE}/read/verse-of-the-day/`] // VOTD: one page, plan W2 2026-10-21
@@ -440,7 +445,7 @@ const hubsFor = (lang) =>
 			? [`${SITE}/read/${lang}/`]
 			: [];
 const allHubs = LIVE_LANGS.flatMap(hubsFor);
-for (const hub of allHubs) parts.push(hubEntry(hub));
+for (const l of LIVE_LANGS) for (const hub of hubsFor(l)) parts.push(hubEntry(hub, l));
 
 // VERSE PAGES (plan W2 verse pilot, Kevin 2026-10-22 "1 yes"). /read/<book>/<chapter>/<verse>/ exists
 // ONLY for a row in community's src/data/verse-pages.json (each with its own written meaning), so the
@@ -473,18 +478,17 @@ try {
 // whose chapters it lists, so no page is advertised that production does not serve.
 const bookUrl = (lang, key) =>
 	lang === 'en' ? `${SITE}/read/${urlSlug(lang, key)}/` : `${SITE}/read/${lang}/${urlSlug(lang, key)}/`;
-const bookEntry = (u) =>
-	`<url><loc>${esc(u)}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`;
+const bookEntry = (u, lang, key) =>
+	`<url><loc>${esc(u)}</loc>${lmTag(HUB_LM.get(lang)?.books.get(key))}<changefreq>weekly</changefreq><priority>0.7</priority></url>`;
 // Only books holding chapters: English's raw tree also lists the language folders (drafts/<lang>/),
 // which hold no chapter files, so an empty set is never a book.
 const booksFor = (lang) =>
 	[...(byLang.get(lang) ?? [])]
 		.filter(([, ch]) => ch.size > 0)
 		.map(([k]) => k)
-		.sort()
-		.map((k) => bookUrl(lang, k));
+		.sort();
 const allBooks = LIVE_LANGS.flatMap(booksFor);
-for (const b of allBooks) parts.push(bookEntry(b));
+for (const l of LIVE_LANGS) for (const k of booksFor(l)) parts.push(bookEntry(bookUrl(l, k), l, k));
 
 // Deterministic order: canonical book order would need bible_structure.json; slug
 // A→Z + numeric chapter is stable and adequate (order carries no ranking weight).
@@ -510,8 +514,8 @@ const segs = new Map(LIVE_LANGS.map((l) => [l, []]));
 // segments together hold EVERY URL of the combined file (nothing lost when a console reads
 // only the index).
 if (SPLIT) {
-	for (const l of LIVE_LANGS) for (const hub of hubsFor(l)) segs.get(l)?.push(hubEntry(hub));
-	for (const l of LIVE_LANGS) for (const b of booksFor(l)) segs.get(l)?.push(bookEntry(b));
+	for (const l of LIVE_LANGS) for (const hub of hubsFor(l)) segs.get(l)?.push(hubEntry(hub, l));
+	for (const l of LIVE_LANGS) for (const k of booksFor(l)) segs.get(l)?.push(bookEntry(bookUrl(l, k), l, k));
 	segs.get('en')?.push(...VERSE_ENTRIES);
 }
 for (const key of keys) {
