@@ -21,6 +21,7 @@
  * pricing one.
  */
 import { firstOrderUnit } from '../lib/order-pricing';
+import { ORDER_STRINGS, orderLangFor, tr } from '../lib/orderStrings';
 
 interface Props {
 	hbSlug: string;
@@ -28,14 +29,17 @@ interface Props {
 	hb: number;
 	pb: number;
 	label: string; // the product name, for accessible labels only
+	/** page language (src/lib/orderStrings.ts) */
+	lang?: string;
 }
-const { hbSlug, pbSlug, hb, pb, label } = Astro.props;
+const { hbSlug, pbSlug, hb, pb, label, lang } = Astro.props;
+const S = ORDER_STRINGS[orderLangFor(lang)];
 // The list price struck through and the first-order price beside it (Kevin 2026-10-03).
 const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const first = (usd: number) => money(firstOrderUnit(Math.round(usd * 100)));
 const rows = [
-	{ slug: hbSlug, price: hb, binding: 'Hardback' },
-	{ slug: pbSlug, price: pb, binding: 'Paperback' },
+	{ slug: hbSlug, price: hb, binding: tr(S, 'p.hardback') },
+	{ slug: pbSlug, price: pb, binding: tr(S, 'p.paperback') },
 ];
 ---
 {/* Stacks under the title on a phone and sits alongside it from sm up. The prices live
@@ -47,11 +51,12 @@ const rows = [
 			<span class="binding-qty__label">
 				<span class="binding-qty__binding">{r.binding}</span>
 				<span class="binding-qty__price"><s>${r.price.toFixed(2)}</s> <b>{first(r.price)}</b></span>
+				<span class="binding-qty__fee" data-fee-sku={r.slug} hidden></span>
 			</span>
 			<div class="binding-qty__ctl">
-				<button type="button" class="qty-step" data-slug={r.slug} data-dir="-1" aria-label={`Fewer ${label} ${r.binding}`}>−</button>
-				<input type="number" class="qty-in" data-slug={r.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={`${label} ${r.binding} quantity`} />
-				<button type="button" class="qty-step" data-slug={r.slug} data-dir="1" aria-label={`More ${label} ${r.binding}`}>+</button>
+				<button type="button" class="qty-step" data-slug={r.slug} data-dir="-1" aria-label={tr(S, 'a.fewer', { label, binding: r.binding })}>−</button>
+				<input type="number" class="qty-in" data-slug={r.slug} value="0" min="0" step="1" inputmode="numeric" aria-label={tr(S, 'a.qty', { label, binding: r.binding })} />
+				<button type="button" class="qty-step" data-slug={r.slug} data-dir="1" aria-label={tr(S, 'a.more', { label, binding: r.binding })}>+</button>
 			</div>
 		</div>
 	))}
@@ -81,6 +86,8 @@ const rows = [
 	}
 	.binding-qty__binding { color: var(--color-muted); }
 	.binding-qty__price { color: var(--color-ink); }
+	.binding-qty__fee { display: block; font-size: 0.78rem; color: var(--color-muted); }
+	.binding-qty__fee[hidden] { display: none; }
 	.binding-qty__price s { color: var(--color-muted); font-weight: 400; }
 	.binding-qty__price b { font-weight: 700; }
 	.binding-qty__ctl {

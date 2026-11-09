@@ -15,6 +15,12 @@ export const FIRST_ORDER_CODE = 'WELCOME15';
 export const FIRST_ORDER_LABEL = `${FIRST_ORDER_PCT}% off your first order`;
 export const FIRST_ORDER_FINE = 'Can’t be combined with other discounts. Best discount applies.';
 
+/** Buyer-facing label and disclaimer for the paid faster option (Kevin 2026-11-08). The price itself is
+ *  only ever the final amount, in Stripe's option and nowhere on the page; delivery times are estimates. */
+export const EXPEDITED_LABEL = 'Expedited delivery';
+export const EXPEDITED_DISCLAIMER =
+	"Expedited delivery: your order is printed and dispatched sooner, with faster shipping where available. Delivery dates are estimates from our printer and carriers and can't be guaranteed, as delays outside our control can occur.";
+
 export interface Tier {
 	min: number;
 	pct: number;
@@ -45,16 +51,77 @@ export interface Quote {
 export function quote(
 	lines: { cents: number; qty: number; books?: number }[],
 	tiers: Tier[],
+	/**
+	 * true for an international destination: the first-order discount is then taken off each unit
+	 * (the server does the same, because Stripe's coupon would also discount the handling line),
+	 * so it rounds per unit instead of once on the subtotal.
+	 */
+	firstPerUnit = false,
+	/** false until the buyer's email is known to belong to a first order: never show a total the buyer will not pay (no-drip rule) */
+	firstAvailable = true,
 ): Quote {
 	const copies = lines.reduce((s, l) => s + l.qty * (l.books ?? 1), 0);
 	const subtotal = lines.reduce((s, l) => s + l.cents * l.qty, 0);
 	const bulkPct = tierPct(tiers, copies);
 	const bulkTotal = lines.reduce((s, l) => s + unitAfter(l.cents, bulkPct) * l.qty, 0);
 	// Stripe applies the percent-off coupon to the order subtotal and rounds the discount once.
-	const firstTotal = subtotal - Math.round((subtotal * FIRST_ORDER_PCT) / 100);
+	const firstTotal = firstPerUnit
+		? lines.reduce((s, l) => s + unitAfter(l.cents, FIRST_ORDER_PCT) * l.qty, 0)
+		: subtotal - Math.round((subtotal * FIRST_ORDER_PCT) / 100);
 	const best =
-		copies < 1 ? 'none' : FIRST_ORDER_PCT > bulkPct ? 'first' : bulkPct > 0 ? 'bulk' : 'none';
+		copies < 1
+			? 'none'
+			: firstAvailable && FIRST_ORDER_PCT > bulkPct
+				? 'first'
+				: bulkPct > 0
+					? 'bulk'
+					: 'none';
 	return { copies, subtotal, bulkPct, bulkTotal, firstTotal, best };
+}
+
+// INTERNATIONAL HANDLING (Kevin 2026-11-08): a per-COPY fee outside the US, sized on the server by
+// src/lib/marginGuard.ts so every copy nets the floor after the discount and Stripe's fee. The
+// form must show it BEFORE checkout, so the build embeds a small table of the fee in cents (never
+// the landed costs behind it) keyed by binding, volumes and the unit price actually paid. Pure
+// data and arithmetic here: nothing in this file may import the country list or its costs.
+
+/** Physical copies shipped for one SKU: the Large Print set is three volumes in one box. */
+export const volumesFor = (slug: string): number => (slug.includes('-set-') ? 3 : 1);
+/** Binding from the SKU key (<slug>-hb | <slug>-pb). */
+export const bindingFor = (slug: string): 'hc' | 'pb' => (slug.endsWith('-hb') ? 'hc' : 'pb');
+/** Key into IntlRow.fees: the fee depends on binding, volumes in the box and the paid unit price. */
+export const feeKey = (slug: string, paidCents: number): string =>
+	`${bindingFor(slug)}${volumesFor(slug)}:${paidCents}`;
+
+export interface IntlRow {
+	name: string;
+	/** "International handling", or "Import & handling" in the EU */
+	label: string;
+	/** feeKey -> fee in cents PER SKU UNIT (0 = none) */
+	fees: Record<string, number>;
+}
+export interface Handling {
+	/** total handling in cents for the whole basket */
+	total: number;
+	/** per SKU, for the price line: fee in cents per unit */
+	perSku: Record<string, number>;
+}
+/** lines carry the LIST price; `pct` is the discount actually applied to the unit price. */
+export function handlingFor(
+	lines: { slug: string; cents: number; qty: number }[],
+	pct: number,
+	row: IntlRow | undefined,
+): Handling {
+	const perSku: Record<string, number> = {};
+	let total = 0;
+	if (row)
+		for (const l of lines) {
+			const fee = row.fees[feeKey(l.slug, unitAfter(l.cents, pct))];
+			if (fee == null) throw new Error(`no handling fee for ${l.slug} at ${pct}%`);
+			perSku[l.slug] = fee;
+			total += fee * l.qty;
+		}
+	return { total, perSku };
 }
 
 // THE ORDER TALLY ON THE STRIPE SESSION ("sku:qty,sku:qty"). Stripe caps EACH metadata value at

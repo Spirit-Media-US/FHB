@@ -18,6 +18,7 @@
 // the community app, so this marketing function must live off that prefix.
 
 import { packBreakdown } from '../src/lib/order-pricing';
+import { checkoutShippingForm } from '../src/lib/shipCountries';
 
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
@@ -113,6 +114,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		return json({ disabled: true, message: 'Bulk checkout is not enabled yet.' });
 	}
 
+	// Retired 25-copy path: US only. Fails closed if US is ever removed from the live list.
+	const shipForm = checkoutShippingForm('US');
+	if (!shipForm) return json({ error: 'country_not_served' }, 400);
 	const origin = new URL(request.url).origin;
 	const form: Record<string, string | number> = {
 		mode: 'payment',
@@ -122,8 +126,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		'automatic_tax[enabled]': 'true',
 		// Free shipping (baked into the per-unit price); address still collected
 		// for tax calculation + fulfillment.
-		'shipping_address_collection[allowed_countries][0]': 'US',
-		'phone_number_collection[enabled]': 'true',
+		...shipForm,
 		'metadata[kind]': 'print_bulk',
 		'metadata[total]': total,
 		'metadata[pct_off]': tier.pct,
