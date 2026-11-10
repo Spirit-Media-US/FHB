@@ -1,0 +1,154 @@
+---
+// /translation-progress/ — open data page (unit 2nh, 2026-11-10). Every language of the 80-language roster:
+// name, native name, script, ISO code, status, link into /read. Rows, counts and the downloads all come from
+// src/lib/translation-progress.ts (build time, from the generated roster / reader / edition-registry files);
+// nothing on this page is a typed count. Downloads: /data/fhb-languages.json and /data/fhb-languages.csv
+// (endpoints under src/pages/data/, same rows). No per-language launch date is recorded in the sources, so none is shown.
+import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+import {
+	CSV_URL,
+	counts,
+	dateModified,
+	JSON_URL,
+	PAGE_URL,
+	rows,
+} from '../lib/translation-progress';
+
+const TITLE = fitTitle('Bible Translation Progress: Languages and Scripts');
+const DESCRIPTION = fitDescription(
+	`Father's Heart Bible™ is being published in ${counts.roster} languages: ${counts.readOnline} readable free online now, ${counts.printEditions} in print. Every language, script and ISO code, with free JSON and CSV.`,
+);
+const CITE = `Spirit Media Publishing. “Father’s Heart Bible™ translation progress: languages, scripts and editions.” ${PAGE_URL} (data: ${JSON_URL}), data as of ${dateModified}.`;
+const ORG = {
+	'@type': 'Organization',
+	name: 'Spirit Media Publishing',
+	url: 'https://spiritmediapublishing.com/',
+};
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'Dataset',
+		name: 'Father’s Heart Bible language editions: language, script, ISO code and edition status',
+		description: `One row for each of the ${counts.roster} languages in the Father’s Heart Bible publishing roster: English and native name, script, ISO code, region, whether it can be read free online and whether it has a print edition, and the link to read it. ${counts.readOnline} readable online and ${counts.printEditions} in print as of ${dateModified}.`,
+		url: PAGE_URL,
+		dateModified,
+		inLanguage: 'en',
+		isAccessibleForFree: true,
+		citation: CITE,
+		creator: ORG,
+		publisher: { '@id': 'https://spiritmediapublishing.com/#organization' },
+		keywords: [
+			'Bible translation languages',
+			'Bible translation progress',
+			'Bible in many languages',
+			'Bible scripts',
+			'Father’s Heart Bible',
+		],
+		variableMeasured: [
+			'language',
+			'native_name',
+			'script',
+			'iso_code',
+			'region',
+			'status',
+			'read_online',
+			'print_edition',
+		],
+		distribution: [
+			{ '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: JSON_URL },
+			{ '@type': 'DataDownload', encodingFormat: 'text/csv', contentUrl: CSV_URL },
+		],
+		isPartOf: {
+			'@type': 'WebSite',
+			name: "Father's Heart Bible™",
+			url: 'https://fathersheartbible.com/',
+		},
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{ '@type': 'ListItem', position: 2, name: 'Translation progress', item: PAGE_URL },
+		],
+	},
+];
+const N = (n: number) => n.toLocaleString('en-US');
+const P = 'font-family: var(--font-sans); color: var(--color-muted);';
+const H2 = 'font-family: var(--font-serif); color: var(--color-ink);';
+const LINK = 'color: var(--color-brand);';
+---
+
+<Layout title={TITLE} description={DESCRIPTION} jsonLd={jsonLd}>
+	<main id="main-content">
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style={P}>
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Translation progress</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Open data &middot; as of {dateModified}</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style={H2}>Translation Progress</h1>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style={P}>
+					<strong style="color: var(--color-ink);">Father&rsquo;s Heart Bible&trade; is being published in {counts.roster} languages.</strong> {N(counts.readOnline)} can be read free online today, {N(counts.printEditions)} have a print edition, and {N(counts.inPreparation)} are in preparation. They are written in {counts.scripts} scripts. Below is every language, with its native name, script, ISO code and status, and a link into our <a href="/read/" style={LINK} class="hover:underline">free online reader</a>. Download the same table as <a href="/data/fhb-languages.json" style={LINK} class="hover:underline" download>JSON</a> or <a href="/data/fhb-languages.csv" style={LINK} class="hover:underline" download>CSV</a>.
+				</p>
+
+				<h2 id="counts" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>The counts, and why they differ</h2>
+				<ul class="text-lg leading-relaxed mb-5 list-disc pl-6 space-y-2" style={P}>
+					<li><strong style="color: var(--color-ink);">{counts.roster} languages</strong> is the whole commitment: every language in the publishing roster, live or not.</li>
+					<li><strong style="color: var(--color-ink);">{N(counts.readOnline)} readable online</strong> are live in the reader at fathersheartbible.com/read/. A language goes live only when the whole text has passed our checks.</li>
+					<li><strong style="color: var(--color-ink);">{N(counts.printEditions)} print editions</strong> are languages whose print files have been submitted to our printer. Print and reading online are separate steps, so a language can be in one and not the other ({N(counts.both)} are in both).</li>
+					<li><strong style="color: var(--color-ink);">{N(counts.inPreparation)} in preparation</strong> are neither yet.</li>
+				</ul>
+				<p class="text-base leading-relaxed mb-5" style={P}>
+					These figures are computed from the same data as the table each time the site is built, so they move when a language goes live. Translated by Spirit Media Publishing, edited by Kevin White. The table does not give a launch date per language because we do not record one.
+				</p>
+
+				<h2 id="table" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>Every language</h2>
+				<div style="overflow-x:auto;" tabindex="0" role="region" aria-label="Father's Heart Bible languages">
+					<table class="tp-table">
+						<thead>
+							<tr><th scope="col">Language</th><th scope="col">Native name</th><th scope="col">Script</th><th scope="col">ISO code</th><th scope="col">Status</th><th scope="col">Read</th></tr>
+						</thead>
+						<tbody>
+							{rows.map((r) => (
+								<tr>
+									<th scope="row">{r.name}</th>
+									<td lang={r.code} dir="auto">{r.native_name}</td>
+									<td>{r.script}</td>
+									<td><code>{r.code}</code></td>
+									<td>{r.status}</td>
+									<td>{r.read_url ? <a href={r.read_url.replace('https://fathersheartbible.com', '')} style={LINK} class="hover:underline" aria-label={`Read Father’s Heart Bible in ${r.name}`}>Read</a> : <span aria-label="Not yet available">&mdash;</span>}</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+
+				<h2 id="using" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>Using this data</h2>
+				<p class="text-base leading-relaxed mb-5" style={P}>
+					Download <a href="/data/fhb-languages.json" style={LINK} class="hover:underline" download>fhb-languages.json</a> or <a href="/data/fhb-languages.csv" style={LINK} class="hover:underline" download>fhb-languages.csv</a>. Each has one row per language ({counts.roster} rows) with these fields: code, name, native_name, script, region, status, read_online, print_edition, read_url. The codes are ISO 639 language codes; Chinese uses a script suffix (zh-hans, zh-hant). Please link to this page when citing.
+				</p>
+				<h2 id="cite" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How to cite</h2>
+				<p class="text-base leading-relaxed mb-5 p-4" style="font-family: var(--font-sans); color: var(--color-ink); background: var(--color-surface-low); border-radius: 0.5rem; user-select: all;">{CITE}</p>
+				<p class="text-base leading-relaxed" style={P}>
+					To cite the Bible text itself, see <a href="/copyright/#how-to-cite" style={LINK} class="hover:underline">how to cite Father&rsquo;s Heart Bible</a>. For how many chapters, verses and words it has, see <a href="/bible-by-the-numbers/" style={LINK} class="hover:underline">the Bible by the numbers</a>.
+				</p>
+			</div>
+		</section>
+	</main>
+</Layout>
+
+<style>
+	.tp-table { border-collapse: collapse; width: 100%; min-width: 640px; font-family: var(--font-sans); font-size: 0.95rem; color: var(--color-ink); }
+	.tp-table th, .tp-table td { padding: 0.45rem 0.6rem; text-align: left; border-bottom: 1px solid var(--color-hairline); }
+	.tp-table thead th { font-size: 0.8rem; font-weight: 600; vertical-align: bottom; }
+	.tp-table tbody th { font-weight: 500; }
+	.tp-table code { font-size: 0.85rem; }
+</style>
