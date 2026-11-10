@@ -395,6 +395,16 @@ const books = groups.flatMap((g) =>
 					</section>
 				))}
 
+				{/* Kevin 2026-11-10 "1 A yes": a Listen row with the channels the homepage store row links. */}
+				<section id="listen" class="wtb-listen" aria-labelledby="listen-h">
+					<h2 id="listen-h">Listen free</h2>
+					<ul>
+						<li><a href="https://podcasts.apple.com/us/podcast/id6818374650" target="_blank" rel="noopener noreferrer" aria-label="Father's Heart Bible on Apple Podcasts"><img src="/logos/stores/apple.svg" alt="Apple Podcasts" width="82" height="28" loading="lazy" decoding="async" /></a></li>
+						<li><a href="https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY" target="_blank" rel="noopener noreferrer" aria-label="Father's Heart Bible on Spotify"><img src="/logos/stores/spotify.svg" alt="Spotify" width="93" height="28" loading="lazy" decoding="async" /></a></li>
+						<li><a href="https://www.youtube.com/@FathersHeartBible" target="_blank" rel="noopener noreferrer" aria-label="Father's Heart Bible on YouTube"><img src="/logos/stores/youtube.svg" alt="YouTube" width="125" height="28" loading="lazy" decoding="async" /></a></li>
+					</ul>
+				</section>
+
 				<p class="text-center" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin: 2.5rem 0 0;">
 					Looking for a number only? See every <a href="/isbn/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">ISBN</a>. Published by Spirit Media Publishing.
 				</p>
@@ -431,6 +441,12 @@ const books = groups.flatMap((g) =>
 	.wtb-banner-btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0.6rem 1.6rem; border-radius: 999px; background: var(--color-brand); color: #fff; font-family: var(--font-sans); font-weight: 700; text-decoration: none; }
 	.wtb-banner-btn:hover { text-decoration: underline; text-underline-offset: 0.15em; }
 	.wtb-banner-note { font-family: var(--font-sans); font-size: 0.85rem; margin: 1rem 0 0; opacity: 0.8; }
+	.wtb-listen { text-align: center; margin: 3rem 0 0; }
+	.wtb-listen h2 { font-family: var(--font-serif); font-weight: 300; font-size: 1.5rem; color: var(--color-ink); margin: 0; }
+	.wtb-listen ul { list-style: none; margin: 1.25rem 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1.5rem 2.25rem; }
+	.wtb-listen a { display: inline-flex; align-items: center; min-height: 44px; transition: opacity 0.2s; }
+	.wtb-listen a:hover { opacity: 0.75; }
+	.wtb-listen img { height: 28px; width: auto; }
 	.wtb-wrap { max-width: 56rem; margin: 0 auto; }
 	.wtb-toggle { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin: 0 0 1.5rem; }
 	.wtb-toggle[hidden] { display: none; }
