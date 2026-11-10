@@ -10,7 +10,7 @@
 // PRICE: one list price. No volume ladder, no first-order 15% (order-pricing.ts DISCOUNT_EXEMPT), so
 // this page offers no discount and its total is exactly what Stripe charges.
 // DESCRIPTION: the book's spec-sheet long description, verbatim (the Sanity book doc carries none).
-// COVER: the R2 original, explicit width/height (no pre-sized WebP exists on R2).
+// COVER: 600w/300w WebP srcset on R2 (FHB/print/books/), explicit width/height; JSON-LD keeps the full JPG.
 import Section from '../../components/Section.astro';
 import Layout from '../../layouts/Layout.astro';
 import { BULK_QUOTE_COPY } from '../../lib/farBand';
@@ -25,6 +25,11 @@ const SHORT =
 	'Hear your Heavenly Father speak in His own words from Scripture, and learn to live as His beloved child instead of an orphan in heart.';
 const COVER =
 	'https://assets.spiritmediapublishing.com/SPM.com/assets/covers/fathers-heart-beloved-identity.jpg?v=2';
+// Pre-sized WebPs cut locally (PIL, q82) from that JPG; new R2 keys, the original is untouched.
+const COVER_600 =
+	'https://assets.spiritmediapublishing.com/FHB/print/books/beloved-identity-600.webp';
+const COVER_300 =
+	'https://assets.spiritmediapublishing.com/FHB/print/books/beloved-identity-300.webp';
 const ISBN13 = BOOK_SKUS[BELOVED_SKU].isbn;
 const LIST_CENTS = 999;
 
@@ -111,7 +116,7 @@ const jsonLd = [
 		<Section variant="soft">
 			<div class="bi">
 				<div class="bi__cover">
-					<img src={COVER} width="320" height="512" alt="Cover of Father's Heart - Beloved Identity by Kevin White" fetchpriority="high" decoding="async" />
+					<img src={COVER_600} srcset={`${COVER_300} 300w, ${COVER_600} 600w`} sizes="(min-width: 768px) 320px, 300px" width="320" height="512" alt="Cover of Father's Heart - Beloved Identity by Kevin White" fetchpriority="high" decoding="async" />
 				</div>
 				<div class="bi__main">
 					<h1 class="bi__title">Father's Heart - Beloved Identity</h1>
