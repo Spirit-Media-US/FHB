@@ -87,4 +87,11 @@ export const GUIDES: GuideEntry[] = [
 			'Ephesians 6:10-18 piece by piece — belt of truth, breastplate, shield of faith, helmet of salvation and the sword of the Spirit, in our Father’s words.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
+	{
+		slug: 'noahs-ark',
+		title: 'Noah’s Ark',
+		blurb:
+			'Genesis 6-9 in our Father’s words — why the flood came, the size of the ark, how long the waters lasted, where it landed and the rainbow covenant.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
 ];
