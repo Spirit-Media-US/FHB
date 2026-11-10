@@ -23,5 +23,7 @@ export const FHB_ORG_CORE = {
 		'https://www.instagram.com/fathersheartbible/',
 		'https://www.facebook.com/1176654175531729',
 		'https://www.linkedin.com/company/130004384',
+		// English FHB version record on YouVersion (unit 2jk): our own structured data, not a link request.
+		'https://www.bible.com/versions/4926-FHB',
 	],
 };

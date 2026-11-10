@@ -4,8 +4,11 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "node scripts/sync-chrome.mjs && astro dev",
-		"prebuild": "sh -c 'if [ -f /home/deploy/bin/navfooter-lock.mjs ]; then node /home/deploy/bin/navfooter-lock.mjs check; else echo navfooter-lock-absent-skip; fi' && node scripts/sync-digital-listings.mjs",
-		"build": "rm -rf public/studio && sanity build public/studio --yes && node scripts/sync-translations.mjs && node scripts/sync-chrome.mjs && node scripts/gen-sitemap-read.mjs && astro build && node scripts/gen-edition-links.mjs && node scripts/async-css.mjs && node scripts/100club-verify.mjs && node scripts/aeo-validate.mjs && node scripts/pricing-verify.mjs",
+		"prebuild": "sh -c 'if [ -f /home/deploy/bin/navfooter-lock.mjs ]; then node /home/deploy/bin/navfooter-lock.mjs check; else echo navfooter-lock-absent-skip; fi' && node scripts/sync-digital-listings.mjs && node scripts/sync-youversion-stats.mjs",
+		"test:native-meta": "node --test scripts/native-meta.test.mjs",
+		"test:hreflang": "node --test scripts/bibles-hreflang.test.mjs",
+		"test:where-to-buy": "node --test scripts/where-to-buy.test.mjs",
+		"build": "rm -rf public/studio && sanity build public/studio --yes && node scripts/sync-translations.mjs && node scripts/sync-chrome.mjs && node scripts/gen-sitemap-read.mjs && astro build && node scripts/gen-edition-links.mjs && node scripts/gen-merchant-feed.mjs && node scripts/async-css.mjs && node scripts/100club-verify.mjs && node scripts/aeo-validate.mjs && node scripts/pricing-verify.mjs && node --test scripts/merchant-return-policy.test.mjs scripts/ship-countries.test.mjs scripts/intl-decisions.test.mjs scripts/margin-guard.test.mjs scripts/intl-handling.test.mjs scripts/first-order-guard.test.mjs scripts/far-band-quote.test.mjs scripts/order-i18n.test.mjs scripts/where-to-buy.test.mjs scripts/beloved-identity.test.mjs",
 		"preview": "astro preview",
 		"check": "biome check --write",
 		"prepare": "lefthook install",

@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs';
 import Layout from '../layouts/Layout.astro';
 import AuthorBio from './AuthorBio.astro';
 import FeatureChapter from './FeatureChapter.astro';
+import NamedAnswer from './NamedAnswer.astro';
 import RelatedTopics from './RelatedTopics.astro';
 import ReviewLink from './ReviewLink.astro';
 import YouVersionBanner from './YouVersionBanner.astro';
@@ -52,6 +53,11 @@ interface Props {
 		intro: string;
 	};
 	faqs: Faq[];
+	namedAnswer?: {
+		question: string;
+		answer: string;
+		verses: { ref: string; slug: string; ch: number; text: string }[];
+	};
 	relatedHtml: string;
 	ctaMidHeading: string;
 	ctaMidBodyHtml: string;
@@ -74,7 +80,8 @@ const {
 	keyTakeaway,
 	themes,
 	featured,
-	faqs,
+	faqs: faqsIn,
+	namedAnswer,
 	relatedHtml,
 	ctaMidHeading,
 	ctaMidBodyHtml,
@@ -206,10 +213,21 @@ const breadcrumbSchema = {
 		{ '@type': 'ListItem', position: 3, name: h1, item: PAGE_URL },
 	],
 };
+const _nq = (t: string) =>
+	t
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, ' ')
+		.trim();
+const faqs = namedAnswer
+	? faqsIn.filter((f) => _nq(f.question) !== _nq(namedAnswer.question))
+	: faqsIn;
+const faqSchemaList = namedAnswer
+	? [{ question: namedAnswer.question, answer: namedAnswer.answer }, ...faqs]
+	: faqs;
 const faqSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'FAQPage',
-	mainEntity: faqs.map((f) => ({
+	mainEntity: faqSchemaList.map((f) => ({
 		'@type': 'Question',
 		name: f.question,
 		acceptedAnswer: { '@type': 'Answer', text: f.answer },
@@ -270,6 +288,8 @@ const TOC = [
 					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
 					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">{keyTakeaway}</p>
 				</aside>
+
+				{namedAnswer && <NamedAnswer question={namedAnswer.question} answer={namedAnswer.answer} verses={namedAnswer.verses} />}
 
 				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
 					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>

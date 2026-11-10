@@ -31,6 +31,11 @@ import youversion from '../../data/youversion-versions.json';
 //   src/data/editions/frontmatter.json — extracted from the shipping interiors: the audience
 //                                     page and the three pillar pages. Read, never retyped.
 import Layout from '../../layouts/Layout.astro';
+import { alternatesFrom, bcp47 } from '../../lib/bibles-hreflang.mjs';
+import { FHB_ORG_ID } from '../../lib/fhb-org';
+import { shippingDetailsFor } from '../../lib/marginGuard';
+import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
+import { ORDER_STRINGS, orderLangFor, tr as trOrder } from '../../lib/orderStrings';
 import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
@@ -101,7 +106,11 @@ type Edition = {
 	 *  will be published"). The order form sells lang-<code>; fulfilled on publication. Still no ISBN,
 	 *  date, GTIN or Offer in the structured data (a merchant Offer needs a GTIN). */
 	preorder?: boolean;
-	seo?: { title?: string; description?: string };
+	seo?: {
+		title?: string;
+		description?: string /** description is the edition's own language (2jw) */;
+		native?: boolean;
+	};
 };
 
 export async function getStaticPaths() {
@@ -114,10 +123,16 @@ export async function getStaticPaths() {
 		.filter(([path]) => /\/[a-z0-9-]+\.json$/.test(path))
 		.map(([, mod]) => mod.default)
 		.filter((e) => e && typeof e.slug === 'string' && e.listing && e.hook);
-	return editions.map((ed) => ({ params: { slug: `${ed.slug}-bible` }, props: { ed } }));
+	return editions.map((ed) => ({
+		params: { slug: `${ed.slug}-bible` },
+		props: { ed, alternates: alternatesFrom(editions, ed.slug) },
+	}));
 }
 
-const { ed } = Astro.props as { ed: Edition };
+const { ed, alternates } = Astro.props as {
+	ed: Edition;
+	alternates: { hreflang: string; href: string }[];
+};
 
 const fm = (frontmatter as Record<string, { pages?: number; pillars?: Pillar[] }>)[
 	ed.frontmatterKey ?? FM_ALIAS[ed.slug] ?? ed.slug
@@ -135,7 +150,7 @@ const langCode = isLang ? (ed.coverImage ?? '').replace(/^lang-/, '') : '';
 const hasCover = !isLang || hasLangCard(langCode);
 const coverUrl = hasCover
 	? cardUrl(ed.coverImage ?? `dvc-${ed.slug}`, 1200)
-	: 'https://assets.spiritmediapublishing.com/FHB/share/v4/fhb-og-default.jpg';
+	: 'https://assets.spiritmediapublishing.com/FHB/share/v5/fhb-og-family.jpg';
 // THE ORDER FORM under the header, on EVERY edition (Kevin 2026-10-05; language pages since
 // 2026-10-03). It sells this edition's catalog row(s) from print-catalog.ts — the same record
 // /print's rows and dvc-checkout.ts use: lang-<code> for a language, the slug itself for an
@@ -164,7 +179,14 @@ if (!orderRows.length && !reserveOnly)
 	throw new Error(
 		`/bibles/${ed.slug}-bible/: no print-catalog row for [${orderIds.join(', ')}] — this edition page would have no order form`,
 	);
-const orderHeading = langEd ? `the ${ed.english ?? langEd.english} Edition` : ed.name;
+// The order flow speaks the edition's language when we have it (unit 2kz; 'en' otherwise).
+const orderLang = isLang ? orderLangFor(langEd?.code ?? ed.lang) : 'en';
+const orderT = (k: string) => trOrder(ORDER_STRINGS[orderLang], k);
+const orderHeading = langEd
+	? orderLang === 'en'
+		? `the ${ed.english ?? langEd.english} Edition`
+		: ed.name
+	: ed.name;
 // A language edition whose interior is still being built has NO page count yet: never fall
 // back to the English 888 for it.
 const pages = isLang ? (ed.pages ?? null) : (ed.pages ?? fm?.pages ?? 888);
@@ -205,7 +227,14 @@ const datePublished =
 // `title` is the long JSON-LD name ("Father's Heart Bible — Dad's Bible"); `name` is the h1.
 // Tolerate a data file that set them equal rather than emitting a Book whose name and
 // alternateName are the same string.
-const schemaName = ed.title === ed.name ? `Father’s Heart Bible — ${ed.name}` : ed.title;
+const englishSchemaName = ed.title === ed.name ? `Father’s Heart Bible — ${ed.name}` : ed.title;
+// 2jw: a language edition whose metadata is native (seo.native, from build_language_pages.py
+// --native-meta) names itself by its own edition title in structured data; the English long title
+// stays as an alternateName so the entity still resolves. html lang is NOT changed — the body is English.
+const nativeMeta = isLang && ed.seo?.native === true && !!ed.lang;
+const schemaName = nativeMeta ? ed.name : englishSchemaName;
+// BCP-47 casing for schema.org inLanguage (zh-hans -> zh-Hans); en for non-language editions.
+const inLang = ed.lang ? bcp47(ed.lang) : 'en';
 
 // "Also known as" is a READER-FACING list, not the keyword field (Kevin 2026-09-18). The
 // sheet's 500-byte Ingram line opens with fhb;fhb bible;father's heart bible fhb — correct
@@ -335,24 +364,18 @@ const offerFor = (v: (typeof variants)[number]) => ({
 	itemCondition: 'https://schema.org/NewCondition',
 	url,
 	sku: v.sku,
+	hasMerchantReturnPolicy: merchantReturnPolicy,
 	...(v.isbn ? { gtin13: v.isbn.replace(/-/g, '') } : {}),
+	// FHB sells its own Bibles (Kevin 2026-11-08): the seller is Father's Heart Bible itself.
 	seller: {
 		'@type': 'Organization',
-		'@id': 'https://spiritmediapublishing.com/#organization',
-		name: 'Spirit Media Publishing',
+		'@id': FHB_ORG_ID,
+		name: "Father's Heart Bible",
+		url: 'https://fathersheartbible.com/',
 	},
-	shippingDetails: {
-		'@type': 'OfferShippingDetails',
-		shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'USD' },
-		shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'US' },
-		// /print promises "most orders arrive in 7–10 days"; Google wants it split into handling +
-		// transit. 2–3 + 5–7 business days sums to that promise (PM ruling 2026-10-27).
-		deliveryTime: {
-			'@type': 'ShippingDeliveryTime',
-			handlingTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 3, unitCode: 'DAY' },
-			transitTime: { '@type': 'QuantitativeValue', minValue: 5, maxValue: 7, unitCode: 'DAY' },
-		},
-	},
+	// One OfferShippingDetails per live country, from src/data/ship-countries.json (unit 2js).
+	// US today: free, 2–3 + 5–7 business days = /print's "7–10 days" promise (PM ruling 2026-10-27).
+	shippingDetails: shippingDetailsFor({ slug: v.sku, listUsd: v.price }),
 });
 // The page's own Book node is the binding its ISBN names (hardback for every edition today);
 // the other binding(s) hang off it as workExample editions, each a Product with its own offer.
@@ -378,7 +401,7 @@ const productSchema = {
 	// to be TEACHABLE to an engine: the Book entity declares both the edition name and the
 	// abbreviation as alternate names (Kevin approved 2026-09-18). Other pages already do
 	// this; the 22 edition pages — the ones carrying the SKUs — did not.
-	alternateName: [ed.name, 'FHB'],
+	alternateName: nativeMeta ? [englishSchemaName, 'FHB'] : [ed.name, 'FHB'],
 	...commerce,
 	...(pages ? { numberOfPages: pages } : {}),
 	brand: { '@type': 'Brand', name: "Father's Heart Bible" },
@@ -386,7 +409,7 @@ const productSchema = {
 	// lp-set.json's _isbnNote records. An empty string is not an ISBN, so the property is
 	// omitted rather than emitted blank, which is invalid structured data.
 	...(ed.isbn ? { isbn: ed.isbn } : {}),
-	inLanguage: ed.lang ?? 'en',
+	inLanguage: nativeMeta ? inLang : (ed.lang ?? 'en'),
 	...(datePublished ? { datePublished } : {}),
 	description: productDescription,
 	image: coverUrl,
@@ -423,7 +446,7 @@ const productSchema = {
 		sku: v.sku,
 		description: productDescription,
 		image: coverUrl,
-		inLanguage: ed.lang ?? 'en',
+		inLanguage: nativeMeta ? inLang : (ed.lang ?? 'en'),
 		brand: { '@type': 'Brand', name: "Father's Heart Bible" },
 		offers: offerFor(v),
 	})),
@@ -450,6 +473,9 @@ const faqSchema = {
 
 <Layout
 	pageType="book"
+	alternates={alternates}
+	ogAlternates={false}
+	ogLang={nativeMeta ? ed.lang : undefined}
 	bookIsbn={ed.isbn || undefined}
 	bookReleaseDate={datePublished}
 	title={fitTitle(ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`)}
@@ -469,11 +495,13 @@ const faqSchema = {
 				     on a phone, where most of this traffic lands. -->
 				<div class="flex flex-col items-center">
 					<div style="max-width: 340px; width: 100%;">
+						<a href="#order" aria-label={`Order ${ed.name}`} class="cover-link" style="display: block;">
 						{isLang ? (
 							<LangCover code={langCode} name={ed.name} english={ed.english ?? ''} rtl={ed.dir === 'rtl'} variant="page" />
 						) : (
 							<img id="cover-main" src={coverUrl} alt={ed.name.startsWith('Father') ? `${ed.name} in Divine Voice™ Color` : `${ed.name} — Father's Heart Bible (FHB) in Divine Voice™ Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
 						)}
+						</a>
 					</div>
 				</div>
 				<div>
@@ -487,9 +515,9 @@ const faqSchema = {
 					</div>
 					{/* No price up here (Kevin 2026-10-05, B14a): it is the first thing a phone shows. The
 					     price line leads the order form below, which "Order" jumps to. */}
-					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">Free shipping — a $15 value.</p>
+					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">{orderT('hero.freeShipValue')}</p>
 					<div class="flex flex-wrap items-center gap-3">
-						<a href="#order" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">Order</a>
+						<a href="#order" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">{orderT('hero.order')}</a>
 						<LookInside slug={ed.lookInsideKey ?? ed.slug} title={ed.name} size="lg" />
 						{yvUrl && (
 							<a href={yvUrl} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 2px solid #3f3f46; padding: 0.7rem 1.6rem; text-decoration: none; font-size: 1rem;">Read on Bible.com</a>
@@ -504,7 +532,7 @@ const faqSchema = {
 					<a href={RESERVE_MAIL} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; padding: 0.75rem 1.6rem; text-decoration: none; font-size: 0.95rem;">Reserve a copy by email</a>
 				</div>
 			) : (
-				<EditionOrder rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} note={preorder ? 'Pre-order: this edition ships as soon as it is published.' : undefined} />
+				<EditionOrder rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} lang={orderLang} note={preorder ? orderT('o.preorder') : undefined} />
 			)}
 		</Section>
 		<Section variant="warm">
@@ -625,7 +653,7 @@ const faqSchema = {
 				</div>
 			</div>
 		</Section>
-		<!-- The full listing — the same copy the Ingram/Amazon record carries, not a summary
+		<!-- The full listing — the same copy the Ingram record carries, not a summary
 		     of it. Kevin 2026-08-23: "you have a full page to describe this bible, but you are
 		     only given 10% of what we gave Ingram." -->
 		<Section variant="light">

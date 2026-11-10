@@ -136,7 +136,14 @@ function renderPortableText(blocks: any[]): string {
 		const markDefs = Array.isArray(block.markDefs) ? block.markDefs : [];
 		const linkByKey: Record<string, string> = {};
 		for (const md of markDefs) {
-			if (md && md._type === 'link' && md._key && md.href) linkByKey[md._key] = canonHref(md.href);
+			if (
+				md &&
+				md._type === 'link' &&
+				md._key &&
+				md.href &&
+				!/(^|\.|\/\/)(amazon\.|amzn\.|a\.co\/)/i.test(String(md.href))
+			)
+				linkByKey[md._key] = canonHref(md.href);
 		}
 		const textContent = children
 			.map((child: any) => {
@@ -341,7 +348,6 @@ const KEVIN_WHITE_AUTHOR = {
 		'https://www.linkedin.com/in/kevinwhiteus/',
 		'https://www.youtube.com/@KevinWhiteus',
 		'https://thekevinwhiteshow.podbean.com/',
-		'https://www.amazon.com/stores/author/B08LZYTR2B',
 	],
 };
 

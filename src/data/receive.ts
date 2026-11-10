@@ -8,7 +8,7 @@
 // store links from digital-listings.json. What IS typed here is the generic search phrase for
 // each audience edition ("Bible for men") and the audience page that goes with it.
 import { FIRST_ORDER_PCT } from '../lib/order-pricing';
-import digital from './digital-listings.json' with { type: 'json' };
+import digital from './digital-listings-public';
 import { dvcEditions } from './dvc-editions';
 import { allLanguageEditions, LANGUAGE_EDITION_TOTAL, langSlug } from './language-editions';
 import { hasSpeakers, speakersOf } from './language-speakers';

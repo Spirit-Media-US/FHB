@@ -3,6 +3,10 @@
 // Generated from a verified draft (stats cited, verses slug-checked, images & voice
 // headshots sourced/verified by hand).
 import GroupBible from '../../components/GroupBible.astro';
+import { catalogRows } from '../../data/print-catalog';
+
+const GEN = catalogRows.find((r) => r.category === 'general');
+const GENERAL_PB = (GEN?.pb ?? 79.99).toFixed(2);
 ---
 
 <GroupBible
@@ -105,7 +109,16 @@ import GroupBible from '../../components/GroupBible.astro';
 		{ label: `SAMHSA National Helpline — 1-800-662-4357`, url: `https://www.samhsa.gov/find-help/national-helpline` },
 	]}
 	keepReadingHtml={`Start with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father's Heart Bible™ exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> — including <a href="/guides/how-to-pray/" style="color: var(--color-brand);" class="hover:underline">how to pray</a> and <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">verses by topic</a>. Or meet the Father in another season of life across the <a href="/bible-for/" style="color: var(--color-brand);" class="hover:underline">A Father For series</a>.`}
+	whichBibleHeading={`What is the best Bible to give a service member?`}
+	whichBibleIntroHtml={`Someone in uniform needs a Bible they can carry in a pocket, on a phone, anywhere in the world. Give a service member a clear modern translation they will actually open, and one they can also <em>hear</em>. Father&rsquo;s Heart Bible&trade; (FHB), which we publish, is free to read and listen to online on any device with no account, and the paperback is $${GENERAL_PB} on our <a href="/print/" style="color: var(--color-brand);" class="hover:underline">print editions page</a>. It reveals God as a <em>Father</em> wherever Scripture does. A good place to begin is <a href="https://fathersheartbible.com/read/psalms/91/" style="color: var(--color-brand);" class="hover:underline">Psalm 91</a>. The comparison below sets FHB beside other common choices.`}
+	whichBibleRows={[
+		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `A gift they can read or hear free, and a Bible that shows God as Father`, style: `Translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free online with audio, no account; paperback $${GENERAL_PB}` },
+		{ edition: `NLT (New Living Translation, Tyndale)`, bestFor: `Easy, natural everyday English`, style: `Thought-for-thought, very readable`, access: `Many editions from retailers` },
+		{ edition: `NIV (New International Version, Zondervan)`, bestFor: `The translation most churches and study guides use`, style: `A balance of word-for-word and thought-for-thought`, access: `Many editions from retailers` },
+	]}
+	whichBibleNoteHtml={`A phone-ready edition travels with them; the paperback can wait on a shelf at home. Whichever you choose, the gift matters more than the edition.`}
 	faqs={[
+		{ question: `What is the best Bible to give a service member?`, answer: `Give a service member a clear modern translation they will actually open, ideally one they can also hear. Father's Heart Bible™ is free to read and listen to online on any device with no account (paperback $${GENERAL_PB}, on our print editions page) and reveals God as a Father wherever Scripture does. The NLT is very readable and the NIV is widely used in churches, so either is a sound alternative. A good place to begin is Psalm 91.` },
 		{ question: `What are good Bible verses for soldiers and service members?`, answer: `Joshua 1:9 (be strong and courageous, I am with you wherever you go), Deuteronomy 31:6 (He will never leave you nor forsake you), Isaiah 41:10 (fear not, I will uphold you), Psalm 91 (my refuge and my fortress), Psalm 23:4 (though I walk through the darkest valley), Psalm 121 (He will watch over your coming and going), Isaiah 43:2 (through the waters and the fire I am with you), and 2 Timothy 1:7 (a spirit of power, not fear) all speak straight to what service members carry. Read and hear them free in Father's Heart Bible™ at fathersheartbible.com/read.` },
 		{ question: `What does the Bible say about courage in danger and combat?`, answer: `Scripture meets fear head-on. Joshua 1:9 commands, "Be strong and courageous; do not be afraid, for the Lord your God is with you wherever you go," and 2 Timothy 1:7 says God gave you a spirit of power, love, and a sound mind — not fear. Father's Heart Bible™ reveals God as a Father who goes with you into the danger, not a distant figure watching from far off. Read those passages free, with audio, at fathersheartbible.com/read.` },
 		{ question: `What Bible verses help with being deployed far from family?`, answer: `The distance never puts you outside God's reach. Psalm 139 says there is nowhere you can go from His presence, Deuteronomy 31:6 promises He will never leave you nor forsake you, and Psalm 121 says He watches over your coming and your going. In Father's Heart Bible™ you meet God as a Father who deploys with you and holds the family waiting at home, too. Read and listen free at fathersheartbible.com/read.` },

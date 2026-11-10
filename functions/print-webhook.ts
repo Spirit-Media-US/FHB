@@ -12,7 +12,8 @@
 // NB: path is /print-webhook, not /api/* — the apex router proxies /api/* to
 // the community app, so this marketing function lives off that prefix.
 
-import { readBreakdown } from '../src/lib/order-pricing';
+import { BOOK_SKUS, readBreakdown } from '../src/lib/order-pricing.ts';
+import { countryFor } from '../src/lib/shipCountries.ts';
 
 interface Env {
 	STRIPE_PRINT_WEBHOOK_SECRET?: string;
@@ -64,16 +65,15 @@ async function verify(raw: string, header: string, secret: string): Promise<bool
 	return !!v1 && timingSafeEqual(sig, v1);
 }
 
+// Localized: US keeps "City, ST 12345"; elsewhere print only the parts the country has (many
+// have no state, some no postal code) in the order Stripe collected them, never a stray ", ".
 function fmtAddr(a: Record<string, string> | null | undefined): string {
 	if (!a) return '(no address)';
-	return [
-		a.line1,
-		a.line2,
-		`${a.city ?? ''}, ${a.state ?? ''} ${a.postal_code ?? ''}`.trim(),
-		a.country,
-	]
-		.filter(Boolean)
-		.join('\n');
+	const place =
+		a.country === 'US'
+			? `${a.city ?? ''}, ${a.state ?? ''} ${a.postal_code ?? ''}`.trim()
+			: [a.postal_code, a.city, a.state].filter(Boolean).join(' ');
+	return [a.line1, a.line2, place, a.country].filter(Boolean).join('\n');
 }
 
 // metadata.breakdown is the raw SKU tally dvc-checkout writes ("dads:1",
@@ -141,6 +141,7 @@ const LANG_TITLES: Record<string, string> = {
 };
 
 function skuTitle(sku: string): string {
+	if (BOOK_SKUS[sku]) return BOOK_SKUS[sku].title;
 	if (TITLES[sku]) return `${TITLES[sku]} — Divine Voice Color`;
 	// Every SKU carries its binding (<slug>-hb / -pb, since 2026-09-17); the map is keyed by
 	// edition, so read the binding off the end rather than printing the raw SKU.
@@ -154,6 +155,18 @@ function skuTitle(sku: string): string {
 	const [, size, colour, binding] = m;
 	const c = colour.charAt(0).toUpperCase() + colour.slice(1);
 	return `Father’s Heart Bible — ${size === 'largeprint' ? 'Large Print' : 'Regular Print'}, ${c}, ${binding === 'hb' ? 'Hardback' : 'Paperback'}`;
+}
+
+// What the Ingram order needs for any non-Bible book in the cart: the ISBN-13 to type in, the
+// quantity, and the spec to check it against. Empty when the order has none.
+function ingramLines(breakdown: string | undefined): string {
+	const out: string[] = [];
+	for (const part of (breakdown ?? '').split(/[,\s]+/).filter(Boolean)) {
+		const i = part.lastIndexOf(':');
+		const book = i < 0 ? undefined : BOOK_SKUS[part.slice(0, i)];
+		if (book) out.push(`  ISBN ${book.isbn} × ${part.slice(i + 1)}  (${book.title}; ${book.spec})`);
+	}
+	return out.length ? `Ingram order lines (non-Bible books):\n${out.join('\n')}\n` : '';
 }
 
 function fmtOrder(breakdown: string | undefined): string {
@@ -223,6 +236,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 			})
 		: '$0.00';
 	const m = s.metadata ?? {};
+	const phone: string | undefined = s.customer_details?.phone || undefined;
+	const destCode: string | undefined = ship.address?.country;
+	const site = countryFor(destCode);
 
 	// Stamp the session once its emails are away. This is what makes an un-notified
 	// order *findable*: fhb-order-reconcile.py sweeps paid sessions missing
@@ -298,7 +314,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 				'Your Father’s Heart Bible eBook',
 				`Thank you — your eBook is ready.\n\n` +
 					`Download it here (the link stays valid, so keep this email):\n${link}\n\n` +
-					`It's a DRM-free EPUB — open it in Apple Books, Google Play Books, Kindle,\n` +
+					`It's a DRM-free EPUB — open it in Apple Books, Google Play Books,\n` +
 					`or any reader. Total paid: ${amount}\n\n` +
 					`Order reference: ${s.id ?? '?'}\n\n` +
 					`Trouble opening it? Just reply to this email.\n\nSpirit Media Publishing\n`,
@@ -315,10 +331,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		`New print order — Father's Heart Bible\n\n` +
 		`Total: ${amount} (incl. tax ${tax})\n` +
 		`Copies: ${m.total ?? '?'}  ·  Discount: ${m.pct_off ?? '?'}% off${m.offer === 'first_order' ? ' (first order, WELCOME15)' : m.offer === 'volume' ? ' (volume)' : ''}\n` +
-		`Editions:\n${fmtOrder(readBreakdown(m))}\n\n` +
+		`Editions:\n${fmtOrder(readBreakdown(m))}\n` +
+		`${ingramLines(readBreakdown(m))}\n` +
 		`Ship to:\n${name}\n${fmtAddr(ship.address)}\n\n` +
 		`Customer email: ${email}\n` +
-		`Phone: ${s.customer_details?.phone ?? '(none)'}\n` +
+		`Phone (pass to the Ingram order, carriers call international buyers): ${phone ?? '*** MISSING: email the buyer before placing the order ***'}\n` +
+		`Ingram print site for ${destCode ?? '?'}: ${site ? `${site.printSite} (${site.name}, config rate ${site.shippingRate.value} ${site.shippingRate.currency})` : '*** country not in the live ship list: check before ordering ***'}\n` +
 		`Stripe session: ${s.id ?? '?'}\n`;
 	// The buyer's own confirmation. Until 2026-09-03 we sent the customer NOTHING —
 	// Stripe's payment receipt was the only thing they ever received, so a buyer had
@@ -328,7 +346,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		`What you ordered:\n${fmtOrder(readBreakdown(m))}\n\n` +
 		`Total paid: ${amount}\n` +
 		`Order reference: ${s.id ?? '?'}\n\n` +
-		`Shipping to:\n${name}\n${fmtAddr(ship.address)}\n\n` +
+		`Shipping to:\n${name}\n${fmtAddr(ship.address)}\n` +
+		`Phone for the delivery carrier: ${phone ?? '(none on file, please reply with one)'}\n\n` +
 		(Number(m.total) > 9
 			? `Shipping is free. Larger bulk orders take about 3–4 weeks to reach you.\n\n`
 			: `Shipping is free, and most orders arrive within 7–10 days.\n\n`) +

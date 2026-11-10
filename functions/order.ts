@@ -16,7 +16,7 @@
 // NB: path is /order, not /api/* — the apex router proxies /api/* to the
 // community app, so this marketing function must live off that prefix.
 
-import { readBreakdown } from '../src/lib/order-pricing';
+import { BOOK_SKUS, readBreakdown } from '../src/lib/order-pricing';
 
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
@@ -86,6 +86,7 @@ const LANG_TITLES: Record<string, string> = {
 };
 
 function skuTitle(sku: string): string {
+	if (BOOK_SKUS[sku]) return BOOK_SKUS[sku].title;
 	if (TITLES[sku]) return `${TITLES[sku]} — Divine Voice Color`;
 	// Every SKU carries its binding (<slug>-hb / -pb, since 2026-09-17); the map is keyed by
 	// edition, so read the binding off the end rather than printing the raw SKU.
@@ -186,7 +187,14 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
 	const addr = a
 		? esc(
-				[a.line1, a.line2, `${a.city ?? ''}, ${a.state ?? ''} ${a.postal_code ?? ''}`.trim()]
+				[
+					a.line1,
+					a.line2,
+					a.country === 'US'
+						? `${a.city ?? ''}, ${a.state ?? ''} ${a.postal_code ?? ''}`.trim()
+						: [a.postal_code, a.city, a.state].filter(Boolean).join(' '),
+					a.country,
+				]
 					.filter(Boolean)
 					.join('\n'),
 			)
@@ -207,6 +215,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 <dt>What you ordered</dt><dd><ul>${items || '<li>Father’s Heart Bible</li>'}</ul></dd>
 <dt>Total paid</dt><dd>${esc(amount)}</dd>
 ${addr ? `<dt>Shipping to</dt><dd><address>${esc(ship.name ?? '')}\n${addr}</address></dd>` : ''}
+${s.customer_details?.phone ? `<dt>Phone for the delivery carrier</dt><dd>${esc(s.customer_details.phone)}</dd>` : ''}
 ${shippedBlock}
 <dt>Order reference</dt><dd><code>${esc(sid)}</code></dd>
 </dl>

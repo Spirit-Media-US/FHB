@@ -1,6 +1,7 @@
 ---
 // /verses/christmas — unit 2fi 2026-10-29. Demand: Bing GetKeywordStats (us/en-US, 2026-04-01..10-29) 'christmas bible verses' = 812 weekly impressions over 23 weeks (biggest truthful phrasing; 'bible verses about christmas' unmeasured/0, 'christmas verses' 44).
 // Coverage map (regen.py --fetch --curl 2026-10-29): covered_by() = [] for christmas / new year phrasings. /verses/advent exists (different intent: Advent readings, 0 Bing); this page is the Christmas story + meaning and links to it.
+// Unit 2mn 2026-11-09: Bing 1,045 impr (last wk 187), GSC 0, Googlebot 0 fetches; title/meta carry "Scriptures", added hope/peace/joy theme + Christmas Eve and birth-of-Jesus FAQs. Evidence aeo-state/fhb-seasonal-2mn-20261109.json.
 // Verses are VERBATIM from src/content/bible (generated from the locked canon, not typed). Christmas 25 Dec 2026.
 import VerseCollection from '../../components/VerseCollection.astro';
 
@@ -133,6 +134,38 @@ const themes = [
 			},
 		],
 	},
+	{
+		id: 'hope-peace-joy',
+		heading: 'Hope, peace and joy at Christmas',
+		intro:
+			'The words Christmas cards carry, in the verses that first gave them: light for those in darkness, the way of peace, and hope that overflows.',
+		verses: [
+			{
+				ref: 'Isaiah 9:2',
+				slug: 'isaiah',
+				ch: 9,
+				text: 'The people walking in darkness have seen a great light; on those who lived in a land of deep darkness, a light has shone.',
+			},
+			{
+				ref: 'Luke 1:78–79',
+				slug: 'luke',
+				ch: 1,
+				text: 'because of the tender mercy of our Father, by which the sunrise from on high will visit us, to give light to those who sit in darkness and in the shadow of death, to guide our feet into the way of peace."',
+			},
+			{
+				ref: 'John 14:27',
+				slug: 'john',
+				ch: 14,
+				text: "Peace I leave you; my own peace I give you. Not as the world gives, I give it. Don't let your hearts be troubled or afraid.",
+			},
+			{
+				ref: 'Romans 15:13',
+				slug: 'romans',
+				ch: 15,
+				text: "May our Father, the source of hope, fill you with all joy and peace through faith, so by the Holy Spirit's power you overflow with hope.",
+			},
+		],
+	},
 ];
 
 const faqs = [
@@ -152,6 +185,16 @@ const faqs = [
 			'John 3:16 says why Christmas happened: our Father gave his one and only Son. For the announcement itself, read Luke 2:11, which the angel spoke to the shepherds: “Today in the city of David, a Savior was born to you—Christ the Lord.”',
 	},
 	{
+		question: 'What Scripture is read on Christmas Eve?',
+		answer:
+			'Luke 2:1–14 is the reading most often heard on Christmas Eve: the decree, the manger, the shepherds and the angels. It is the featured chapter on this page, with audio, and Isaiah 9:2–7 and Matthew 1:18–25 are the readings that usually sit beside it.',
+	},
+	{
+		question: 'What does the Bible say about the birth of Jesus?',
+		answer:
+			'Two Gospels tell it. Luke 2:4–7 gives the journey to Bethlehem and the manger, and Matthew 1:20–21 gives Joseph’s dream and the name Jesus. The prophets had named the place and the sign long before: Micah 5:2 and Isaiah 7:14.',
+	},
+	{
 		question: 'What does Immanuel mean at Christmas?',
 		answer:
 			'Matthew 1:23 gives the meaning of Immanuel: “our Father with us.” Christmas is our Father coming near, not staying far off.',
@@ -167,13 +210,13 @@ const faqs = [
 <VerseCollection
 	slug="christmas"
 	topic="Christmas"
-	title="Christmas Bible Verses (with Audio) | Father's Heart Bible™"
-	description="Christmas Bible verses in Father's Heart Bible™: the promise, the birth in Bethlehem, the wise men and what it means. Free to read, with audio."
+	title="Christmas Bible Verses & Scriptures | Father's Heart Bible™"
+	description="Christmas Bible verses and scriptures in Father's Heart Bible™: the birth of Jesus in Bethlehem, Luke 2 for Christmas Eve, the wise men, and hope, peace and joy. Free, with audio."
 	h1="Christmas Bible Verses"
 	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg"
 	heroAlt="An open Bible with morning light across its pages"
 	published="2026-10-29"
-	directAnswerHtml={`<strong style="color: var(--color-ink);">The Christmas story is in Luke 2 and Matthew 1&ndash;2, promised in Isaiah 9:6 and Micah 5:2, and its meaning is in John 3:16.</strong> Below are 16 Christmas Bible passages in four parts: the promise, the birth, the wise men, and what it all means. In Father&rsquo;s Heart Bible&trade; the angels praise &ldquo;our Father&rdquo; in Luke 2:13&ndash;14, Immanuel means &ldquo;our Father with us&rdquo; (Matthew 1:23), and John 3:16 begins &ldquo;For our Father so loved the world.&rdquo; Each verse links into its chapter, so you can <a href="https://fathersheartbible.com/read/luke/2/" style="color: var(--color-brand);" class="hover:underline">read Luke 2 free</a> and hear it.`}
+	directAnswerHtml={`<strong style="color: var(--color-ink);">The Christmas story is in Luke 2 and Matthew 1&ndash;2, promised in Isaiah 9:6 and Micah 5:2, and its meaning is in John 3:16.</strong> Below are 20 Christmas Bible passages in five parts: the promise, the birth, the wise men, what it all means, and hope, peace and joy. Luke 2 is the Christmas Eve reading. In Father&rsquo;s Heart Bible&trade; the angels praise &ldquo;our Father&rdquo; in Luke 2:13&ndash;14, Immanuel means &ldquo;our Father with us&rdquo; (Matthew 1:23), and John 3:16 begins &ldquo;For our Father so loved the world.&rdquo; Each verse links into its chapter, so you can <a href="https://fathersheartbible.com/read/luke/2/" style="color: var(--color-brand);" class="hover:underline">read Luke 2 free</a> and hear it.`}
 	keyTakeaway="Christmas is our Father coming near: promised through the prophets, born in Bethlehem, and given because he so loved the world."
 	themes={themes}
 	featured={{ book: 'Luke', slug: 'luke', chapter: 2, verseLimit: 14, heading: 'The Christmas story: Luke 2:1–14', intro: 'Luke 2 is the chapter read aloud on Christmas Eve. Read or hear the first fourteen verses below, then continue into the whole chapter.' }}

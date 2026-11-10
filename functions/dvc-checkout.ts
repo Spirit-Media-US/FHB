@@ -19,13 +19,31 @@
 // NB: path is /dvc-checkout, not /api/* — the apex router proxies /api/* to the community
 // app, so this marketing function must live off that prefix.
 
+import { BULK_QUOTE_COPY, bulkQuoteRequired, tierPctFor } from '../src/lib/farBand.ts';
 import {
+	allowCheck,
+	answerBody,
+	constantTime,
+	emailTag,
+	type FirstStatus,
+	sameOrigin,
+} from '../src/lib/firstOrderGuard.ts';
+import {
+	handlingFeeCents,
+	handlingLabel,
+	marginCheck,
+	volumesFor,
+} from '../src/lib/marginGuard.ts';
+import {
+	BELOVED_SKU,
 	FIRST_ORDER_CODE,
 	FIRST_ORDER_PCT,
+	isDiscountExempt,
 	MAX_LINE_ITEMS,
 	packBreakdown,
-	unitAfter,
-} from '../src/lib/order-pricing';
+	paidUnit,
+} from '../src/lib/order-pricing.ts';
+import { checkoutShippingForm, countryFor } from '../src/lib/shipCountries.ts';
 
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
@@ -51,7 +69,18 @@ const CARDS = `${ASSETS}/cards/v2`;
 // sets count as twelve books and reach the 10% tier that four of anything else would not.
 // Kept as a field rather than deleted: it is the place any future multi-item SKU would say
 // so, and the comment is the record of why the answer is one.
-const EDITIONS: Record<string, { title: string; retail: number; img: string; books?: number }> = {
+const EDITIONS: Record<
+	string,
+	{
+		title: string;
+		retail: number;
+		img: string;
+		books?: number;
+		/** Stripe line name and description when the SKU is not a Father's Heart Bible edition. */
+		name?: string;
+		desc?: string;
+	}
+> = {
 	// EVERY EDITION IS SOLD IN BOTH BINDINGS (Kevin 2026-09-17), so each one is TWO SKUs,
 	// keyed <slug>-hb / <slug>-pb exactly like the Large Print volumes. A bare slug is no
 	// longer sellable: a single key could not say which binding the buyer chose, and the
@@ -1226,6 +1255,31 @@ for (const [sku, e] of Object.entries(CATALOG_LANG_EDITIONS))
 	if (!(sku in EDITIONS)) EDITIONS[sku] = e;
 // END CATALOG LANGUAGE EDITIONS
 
+// BOOKS THAT ARE NOT BIBLES, sold through this same checkout (Kevin 2026-11-10: "point Beloved Identity to
+// FHB too. Build a checkout page to be fulfilled through ingram"). Kept in its own block, outside EDITIONS,
+// so pricing-verify (which proves every EDITIONS SKU is on the Bible order forms, weighs one product on the
+// ladder, and matches ISBNS.json) is not asked to treat a $9.99 book as a Bible.
+//   `books: 0`  = it adds NOTHING to the Bible volume ladder (Kevin: no volume discount, and it does not
+//                 count toward the Bible tiers). It is still a physical copy: far-band quotes, expedited
+//                 shipping and the fulfilment count use volumesFor, which is 1.
+//   Discounts   = none. order-pricing.ts DISCOUNT_EXEMPT keeps it at list price under every offer.
+// Beloved Identity: paperback only, 96pp, 5 x 8 in, perfect bound, ISBN 979-8-89307-239-6, list $9.99
+// (spec sheet price_record). Cover is the R2 original (no pre-sized WebP exists).
+const BOOK_EDITIONS: Record<
+	string,
+	{ title: string; retail: number; img: string; books: number; name: string; desc: string }
+> = {
+	[BELOVED_SKU]: {
+		title: 'Beloved Identity — Paperback',
+		name: 'Father’s Heart - Beloved Identity: What Your Heavenly Father Thinks of You',
+		desc: 'Paperback · 96 pages · by Kevin White · free shipping',
+		retail: 999,
+		books: 0,
+		img: 'https://assets.spiritmediapublishing.com/SPM.com/assets/covers/fathers-heart-beloved-identity.jpg?v=2',
+	},
+};
+for (const [sku, e] of Object.entries(BOOK_EDITIONS)) EDITIONS[sku] = e;
+
 // The SET MUST NEVER COST MORE than the same three volumes bought separately, in either
 // binding. Kevin's prices satisfy it today (299.99 < 329.97 HB, 249.99 < 279.97 PB), but a
 // later edit to one volume's price could silently invert it, and a "set" that costs more
@@ -1331,11 +1385,51 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	const json = (body: unknown, status = 200) =>
 		new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
-	let payload: { counts?: Record<string, number>; returnPath?: string; email?: string };
+	let payload: {
+		counts?: Record<string, number>;
+		returnPath?: string;
+		email?: string;
+		country?: string;
+		/** the order form asks: is this email a first order? (no session is created) */
+		firstOrderCheck?: boolean;
+	};
 	try {
 		payload = await request.json();
 	} catch {
 		return json({ error: 'bad_request' }, 400);
+	}
+
+	// The order form asks before checkout whether this email gets WELCOME15, so the total it shows is
+	// the total the buyer will pay (no understated totals). Same check checkout itself uses; fails
+	// to "not first", never to a discount. Answers only yes/no, and creates nothing.
+	if (payload.firstOrderCheck) {
+		const headers = { 'content-type': 'application/json', 'cache-control': 'no-store' };
+		const reply = (status: FirstStatus) => new Response(answerBody(status), { headers });
+		// Same-origin only: the order form on our own pages is the sole legitimate caller.
+		if (!sameOrigin(request.headers)) {
+			return new Response(JSON.stringify({ error: 'forbidden' }), { status: 403, headers });
+		}
+		return constantTime(async () => {
+			const em = String(payload.email ?? '')
+				.trim()
+				.toLowerCase();
+			if (!env.STRIPE_FHB_SECRET_KEY || em.length > 254 || !EMAIL_RE.test(em)) {
+				return reply('unknown');
+			}
+			const tag = await emailTag(em);
+			const ip = request.headers.get('cf-connecting-ip') ?? '';
+			// No cache to count in = no way to limit = fail closed to "unknown" (list price).
+			const cache = (globalThis as unknown as { caches?: { default?: Cache } }).caches?.default;
+			const ok = cache ? await allowCheck(cache, ip, tag) : false;
+			if (!ok) {
+				console.log(`first-order-check limited tag=${tag}`);
+				return reply('unknown');
+			}
+			const first =
+				(await isFirstOrder(em, env.STRIPE_FHB_SECRET_KEY)) &&
+				(await firstOrderPromo(env.STRIPE_FHB_SECRET_KEY)) !== null;
+			return reply(first ? 'first' : 'repeat');
+		});
 	}
 
 	const counts: Record<string, number> = {};
@@ -1351,9 +1445,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		(s, [slug, n]) => s + n * (EDITIONS[slug].books ?? 1),
 		0,
 	);
-	const tier = tierFor(total);
+	// A discount-exempt book adds nothing to the ladder (books: 0), so a cart of only that book has a
+	// Bible total of 0: it is a real order with no tier and nothing the discounts can apply to.
+	const exemptQty = Object.entries(counts).reduce(
+		(s, [slug, n]) => s + (isDiscountExempt(slug) ? n : 0),
+		0,
+	);
+	const tier = total < 1 && exemptQty > 0 ? { min: 0, pct: 0 } : tierFor(total);
 	// tierFor covers everything from 1 upward, so a null here means an empty order.
-	if (total < 1 || tier === null) return json({ error: 'empty' }, 400);
+	if ((total < 1 && exemptQty < 1) || tier === null) return json({ error: 'empty' }, 400);
 	// One line item per SKU, and Stripe refuses a session with more than 100 of them.
 	if (Object.values(counts).filter((n) => n > 0).length > MAX_LINE_ITEMS) {
 		return json(
@@ -1363,6 +1463,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 			},
 			400,
 		);
+	}
+
+	// FAR-BAND BULK QUOTE (unit 2kx, Kevin 2026-11-09): 10+ physical copies to a far_band country
+	// are never sold here. Refused before any Stripe call, whatever the client sent.
+	const destCode = String(payload.country ?? 'US').toUpperCase();
+	const dest = countryFor(destCode);
+	const copies = Object.entries(counts).reduce((s, [slug, n]) => s + n * volumesFor(slug), 0);
+	if (bulkQuoteRequired(dest?.farBand, copies)) {
+		return json({ error: 'bulk_quote_required', message: BULK_QUOTE_COPY.error }, 400);
 	}
 
 	if (!env.STRIPE_FHB_SECRET_KEY) {
@@ -1378,15 +1487,107 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	// larger AND this email has never paid before. Tie or larger tier → the tier, no lookup.
 	const email = String(payload.email ?? '').trim();
 	const validEmail = email.length <= 254 && EMAIL_RE.test(email);
-	let promo: string | null = null;
-	if (
-		validEmail &&
-		FIRST_ORDER_PCT > tier.pct &&
-		(await isFirstOrder(email, env.STRIPE_FHB_SECRET_KEY))
-	) {
-		promo = await firstOrderPromo(env.STRIPE_FHB_SECRET_KEY);
+	// MARGIN FLOOR + INTERNATIONAL HANDLING (units 2jz, 2kj). Destination: defaults to US (every form
+	// before international shipping). A country that is not in the LIVE list (pending, unknown,
+	// malformed) is refused, never passed to Stripe. US is outside the guard and shows no fee; every
+	// other country needs a landed cost, or the sale cannot be sized and is refused (fail closed).
+	const intl = destCode !== 'US';
+	if (dest && intl && !dest.landed_cost_usd) {
+		return json(
+			{ error: 'country_not_served', message: 'We do not ship to that country yet.' },
+			400,
+		);
 	}
-	const pct = promo ? 0 : tier.pct;
+	// Beloved Identity has its own measured landed cost per country (landed_cost_usd.bi). A country
+	// without one cannot be sized, so that book is refused there rather than priced off a Bible's cost.
+	if (intl && counts[BELOVED_SKU] > 0 && dest?.landed_cost_usd?.bi == null) {
+		return json(
+			{ error: 'country_not_served', message: 'We do not ship that book to that country yet.' },
+			400,
+		);
+	}
+	const lines = Object.entries(counts)
+		.filter(([, n]) => n > 0)
+		.map(([slug]) => ({ slug, retail: EDITIONS[slug].retail }));
+	// Only Bibles can take a discount; a cart of nothing else has none to apply.
+	const discountable = Object.entries(counts).some(([slug, n]) => n > 0 && !isDiscountExempt(slug));
+	// A cart holding an exempt book takes the first-order 15% per Bible unit instead of Stripe's
+	// order-wide coupon, exactly like international carts, because the coupon would discount the book.
+	const perUnitPromo = intl || exemptQty > 0;
+	let promo: string | null = null;
+	// 1A (Kevin 2026-11-08): WELCOME15 is offered to EVERYONE, every country. The margin check is
+	// now only the backstop (handling is sized to the floor, so it drops a discount only when the
+	// fee cannot reach it, or the landed cost is unknown).
+	// Far band: no volume ladder at all, so the first-order 15% is the only discount on offer.
+	const tierPctNow = tierPctFor(dest?.farBand, tier.pct);
+	if (discountable && validEmail && FIRST_ORDER_PCT > tierPctNow) {
+		const m = marginCheck(lines, FIRST_ORDER_PCT, destCode);
+		if (!m.ok) {
+			console.log(`margin-guard: dropped ${FIRST_ORDER_CODE}: ${m.reason}`);
+		} else if (await isFirstOrder(email, env.STRIPE_FHB_SECRET_KEY)) {
+			promo = await firstOrderPromo(env.STRIPE_FHB_SECRET_KEY);
+		}
+	}
+	let pct = promo ? 0 : discountable ? tierPctNow : 0;
+	if (!promo && pct > 0) {
+		const m = marginCheck(lines, pct, destCode);
+		if (!m.ok) {
+			console.log(`margin-guard: dropped ${pct}% volume tier: ${m.reason}`);
+			pct = 0;
+		}
+	}
+	// Outside the US the first-order discount is taken off each unit instead of by Stripe's coupon,
+	// because a percent-off coupon discounts EVERY line, and the handling line must not be discounted
+	// (the floor is sized on it). The buyer sees the same 15% as unit prices; the US is unchanged.
+	// Last guard, whatever happened above: the order as it will be charged, handling included, must
+	// net the floor. If it does not at the discounted price, charge list price; if still not, refuse.
+	if (intl) {
+		const last = marginCheck(lines, promo ? FIRST_ORDER_PCT : pct, destCode);
+		if (!last.ok) {
+			if (!marginCheck(lines, 0, destCode).ok) {
+				return json(
+					{ error: 'country_not_served', message: 'We cannot ship that order to that country.' },
+					400,
+				);
+			}
+			console.log(`margin-guard: backstop dropped discount: ${last.reason}`);
+			promo = null;
+			pct = 0;
+		}
+	}
+	const unitPctFinal = perUnitPromo && promo ? FIRST_ORDER_PCT : pct;
+	const useCode = Boolean(promo) && !perUnitPromo;
+	// `copies` = physical volumes (a Large Print set is three), which scales the expedited price.
+	const shipForm = checkoutShippingForm(payload.country ?? 'US', copies);
+	if (!shipForm) {
+		return json(
+			{ error: 'country_not_served', message: 'We do not ship to that country yet.' },
+			400,
+		);
+	}
+	// The per-copy handling lines: one Stripe line per (binding, fee) with quantity = units, named
+	// for the destination (EU: "Import & handling"). Zero where the floor is already met.
+	const handling: { binding: string; fee: number; qty: number }[] = [];
+	if (dest && intl) {
+		for (const [slug, qty] of Object.entries(counts)) {
+			if (qty <= 0) continue;
+			const fee = handlingFeeCents(slug, paidUnit(slug, EDITIONS[slug].retail, unitPctFinal), dest);
+			if (fee <= 0) continue;
+			const binding = slug.endsWith('-hb') ? 'hardback' : 'paperback';
+			const row = handling.find((h) => h.binding === binding && h.fee === fee);
+			if (row) row.qty += qty;
+			else handling.push({ binding, fee, qty });
+		}
+	}
+	if (Object.values(counts).filter((n) => n > 0).length + handling.length > MAX_LINE_ITEMS) {
+		return json(
+			{
+				error: 'too_many_items',
+				message: `One order can hold up to ${MAX_LINE_ITEMS} different editions. Please split it into two orders.`,
+			},
+			400,
+		);
+	}
 
 	const reqUrl = new URL(request.url);
 	const origin =
@@ -1406,15 +1607,21 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 			? `${origin}${payload.returnPath}?order=canceled#order`
 			: payload.returnPath === '/print/order/'
 				? `${origin}/print/order/?order=canceled`
-				: `${origin}/print/?order=canceled#bulk-order`,
+				: payload.returnPath === '/books/beloved-identity/'
+					? `${origin}/books/beloved-identity/?order=canceled#order`
+					: `${origin}/print/?order=canceled#bulk-order`,
 		'automatic_tax[enabled]': 'true',
-		// Free shipping is baked into the unit price; the address is still collected for
-		// tax calculation and fulfilment.
-		'shipping_address_collection[allowed_countries][0]': 'US',
-		'phone_number_collection[enabled]': 'true',
+		// Country, shipping rate + delivery estimate, REQUIRED phone and the address-form hint all
+		// come from src/data/ship-countries.json via checkoutShippingForm (unit 2js). US ships free
+		// (baked into the unit price); a country with a rate adds it as the Stripe shipping option.
+		...shipForm,
 		'metadata[kind]': 'dvc_print',
-		'metadata[total]': total,
+		// Physical copies, as the fulfilment email's subject and its "9+ copies" wording read it; the
+		// Bible ladder count (which a discount-exempt book does not touch) travels as ladder_total.
+		'metadata[total]': copies,
+		'metadata[ladder_total]': total,
 		'metadata[pct_off]': promo ? FIRST_ORDER_PCT : pct,
+		'metadata[handling_cents]': handling.reduce((t, h) => t + h.fee * h.qty, 0),
 		'metadata[offer]': promo ? 'first_order' : pct > 0 ? 'volume' : 'none',
 		// Split under Stripe's 500-char value cap (an 82-SKU cart was one 1,138-char value: 502).
 		...packBreakdown(counts),
@@ -1424,26 +1631,41 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	for (const [slug, qty] of Object.entries(counts)) {
 		if (qty <= 0) continue;
 		const e = EDITIONS[slug];
-		const unit = unitAfter(e.retail, pct);
+		const unit = paidUnit(slug, e.retail, unitPctFinal);
 		form[`line_items[${li}][quantity]`] = qty;
 		form[`line_items[${li}][price_data][currency]`] = 'usd';
 		form[`line_items[${li}][price_data][unit_amount]`] = unit;
 		form[`line_items[${li}][price_data][tax_behavior]`] = 'exclusive';
 		form[`line_items[${li}][price_data][product_data][name]`] =
-			`Father’s Heart Bible™ — ${e.title}`;
+			e.name ?? `Father’s Heart Bible™ — ${e.title}`;
 		form[`line_items[${li}][price_data][product_data][description]`] =
-			pct > 0
-				? `Divine Voice Color · Complete Bible · ${pct}% volume discount · free shipping`
-				: 'Divine Voice Color · Complete Bible · free shipping';
+			e.desc ??
+			(perUnitPromo && promo
+				? `Divine Voice Color · Complete Bible · ${FIRST_ORDER_PCT}% off your first order · free shipping`
+				: pct > 0
+					? `Divine Voice Color · Complete Bible · ${pct}% volume discount · free shipping`
+					: 'Divine Voice Color · Complete Bible · free shipping');
 		form[`line_items[${li}][price_data][product_data][images][0]`] = e.img;
 		form[`line_items[${li}][price_data][product_data][tax_code]`] = TAX_CODE;
+		li++;
+	}
+	// Handling lines come after the books and are never discounted (see the first-order note above).
+	for (const h of handling) {
+		form[`line_items[${li}][quantity]`] = h.qty;
+		form[`line_items[${li}][price_data][currency]`] = 'usd';
+		form[`line_items[${li}][price_data][unit_amount]`] = h.fee;
+		form[`line_items[${li}][price_data][tax_behavior]`] = 'exclusive';
+		form[`line_items[${li}][price_data][product_data][name]`] = handlingLabel(destCode);
+		form[`line_items[${li}][price_data][product_data][description]`] =
+			`Per ${h.binding} copy · ${dest?.name ?? destCode}`;
+		form[`line_items[${li}][price_data][product_data][tax_code]`] = 'txcd_92010001';
 		li++;
 	}
 
 	if (validEmail) form.customer_email = email;
 	// Pre-applied, so the buyer never types it; Stripe shows WELCOME15 on the summary and counts
 	// its redemptions. Units above are at list price when it applies — the two never stack.
-	if (promo) form['discounts[0][promotion_code]'] = promo;
+	if (promo && useCode) form['discounts[0][promotion_code]'] = promo;
 
 	const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
 		method: 'POST',

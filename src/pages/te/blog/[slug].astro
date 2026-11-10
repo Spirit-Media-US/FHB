@@ -74,7 +74,14 @@ function renderPortableText(blocks: any[]): string {
 		const markDefs = Array.isArray(block.markDefs) ? block.markDefs : [];
 		const linkByKey: Record<string, string> = {};
 		for (const md of markDefs) {
-			if (md && md._type === 'link' && md._key && md.href) linkByKey[md._key] = canonHref(md.href);
+			if (
+				md &&
+				md._type === 'link' &&
+				md._key &&
+				md.href &&
+				!/(^|\.|\/\/)(amazon\.|amzn\.|a\.co\/)/i.test(String(md.href))
+			)
+				linkByKey[md._key] = canonHref(md.href);
 		}
 		const inner = children
 			.map((child: any) => {
@@ -235,6 +242,20 @@ const jsonLd = [
 		dateModified: post.dateModified || post.publishDate,
 		inLanguage: 'te',
 		translationOfWork: { '@type': 'BlogPosting', '@id': enUrl },
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{
+				'@type': 'ListItem',
+				position: 2,
+				name: 'Blog',
+				item: 'https://fathersheartbible.com/blog/',
+			},
+			{ '@type': 'ListItem', position: 3, name: title, item: teUrl },
+		],
 	},
 	faqs.length > 0
 		? {

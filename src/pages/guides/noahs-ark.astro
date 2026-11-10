@@ -1,0 +1,241 @@
+---
+// Guide — /guides/noahs-ark (unit 2ov). Target: noah's ark, noah, noah and the ark, noah's ark story.
+// Quotes are verbatim FHB (Genesis 6-9, Matthew 24, 1 Peter 3, locked canon).
+import AuthorBio from '../../components/AuthorBio.astro';
+import ReviewLink from '../../components/ReviewLink.astro';
+import YouVersionBanner from '../../components/YouVersionBanner.astro';
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/guides/noahs-ark/';
+const TITLE = "Noah's Ark (Genesis 6-9) — The Story and What It Shows";
+const DESCRIPTION =
+	"Noah's ark in Genesis 6-9: why the flood came, how big the ark was, how long the flood lasted, where it landed and what the rainbow means, quoted from Father's Heart Bible.";
+const PUBLISHED = '2026-11-10';
+const MODIFIED = '2026-11-10';
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg';
+const HERO_ALT = 'An open Bible, ready to read';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: 'Founder & CEO, Spirit Media Publishing',
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+const FAQS = [
+	{
+		question: `How big was Noah's ark?`,
+		answer: `Father's Heart Bible gives the ark's size in Genesis 6:15 as about 450 feet long, seventy-five feet wide and forty-five feet high. Verse 16 adds a roof, a door in its side and lower, middle and upper decks, and verse 14 says it was made of cypress wood coated inside and out with pitch.`,
+	},
+	{
+		question: `How long was the flood?`,
+		answer: `The rain fell forty days and forty nights (Genesis 7:12), and the waters prevailed over the earth 150 days (7:24). The ark rested on the mountains of Ararat on the seventeenth day of the seventh month (8:4). By the twenty-seventh day of the second month of the next year, the earth was completely dry (8:14). Noah entered the ark in his 600th year, and the ground was dry in his 601st.`,
+	},
+	{
+		question: `How many animals were on Noah's ark?`,
+		answer: `Genesis 6:19 says to bring two of every living creature, a male and a female. Genesis 7:2-3 adds seven pairs of every clean animal and seven pairs of sky birds, with one pair of unclean animals. The Bible gives no total number. Eight people entered: Noah, his wife, his three sons and their wives (7:13; 1 Peter 3:20).`,
+	},
+	{
+		question: `Where did Noah's ark land?`,
+		answer: `Genesis 8:4 says the ark rested on the mountains of Ararat, on the seventeenth day of the seventh month. The mountaintops appeared on the first day of the tenth month (8:5). The text names the mountains of Ararat, not a single peak.`,
+	},
+	{
+		question: `What does the rainbow mean in the story of Noah?`,
+		answer: `The rainbow is the sign of our Father's covenant never again to destroy all flesh with floodwaters (Genesis 9:11-13). It is set in the clouds, and He says that when He sees it He will remember His everlasting covenant with every living creature (9:16).`,
+	},
+	{
+		question: `Why did our Father send the flood?`,
+		answer: `Genesis 6:5 says our Father saw how great human wickedness had become, and 6:6 says He was grieved and His heart filled with pain. The earth was corrupt and filled with violence (6:11). Yet Noah found favor in His eyes (6:8), and the Father kept him and his family safe.`,
+	},
+];
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: "Noah's Ark (Genesis 6-9): The Story and What It Shows",
+	description: DESCRIPTION,
+	image: OG_IMG,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: PUBLISHED,
+	dateModified: MODIFIED,
+	inLanguage: 'en-US',
+	articleSection: 'Bible Reading Guides',
+	keywords:
+		"noah's ark, noah and the ark, noah's ark story, Noah, Genesis 6-9, the flood, rainbow covenant",
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'Guides',
+			item: 'https://fathersheartbible.com/guides/',
+		},
+		{ '@type': 'ListItem', position: 3, name: "Noah's Ark", item: PAGE_URL },
+	],
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [articleSchema, breadcrumbSchema, faqSchema];
+
+const TOC = [
+	{ id: 'why', label: 'Why the flood' },
+	{ id: 'building', label: 'Building the ark' },
+	{ id: 'flood', label: 'The flood' },
+	{ id: 'remembered', label: 'He remembered Noah' },
+	{ id: 'sacrifice', label: 'The altar' },
+	{ id: 'rainbow', label: 'The rainbow' },
+	{ id: 'heart', label: 'The Father’s heart' },
+	{ id: 'jesus', label: 'Jesus and Noah' },
+	{ id: 'faq', label: 'FAQ' },
+];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={PUBLISHED}
+	articleSection="Bible Reading Guides"
+	articleTags={["Noah's ark", "Noah", "Genesis 6-9"]}
+	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
+			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
+		</section>
+		<YouVersionBanner />
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/guides/" class="hover:underline">Guides</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Noah&rsquo;s Ark</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Reading Guide</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Noah&rsquo;s Ark: The Story in Genesis 6-9</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; Editor, Father&rsquo;s Heart Bible&trade;</span>
+					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);"><strong style="color: var(--color-ink);">Noah&rsquo;s ark was the huge wooden boat our Father told Noah to build so that Noah&rsquo;s family and pairs of every kind of animal would survive the flood, as told in Genesis 6-9.</strong> It is a story of human wickedness, our Father&rsquo;s grief, His faithful care for Noah, and a covenant sealed with a rainbow. Below is the account in the words of Father&rsquo;s Heart Bible, with what it shows about the Father&rsquo;s heart.</p>
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">The flood is told as our Father&rsquo;s grief, His remembering and His covenant. He grieved over evil, He remembered Noah, and He promised never again.</p></aside>
+				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);"><p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p><ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}</ul></nav>
+
+				
+				<h2 id="why" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Why did our Father send the flood?</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The story begins with grief, not anger. Before any rain, Genesis 6 shows what our Father saw and how it affected Him.</p>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;Our Father saw how great human wickedness had become on the earth—every thought and desire of their hearts only evil all the time.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/genesis/6/" style="color: var(--color-brand);" class="hover:underline">Genesis 6:5</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;He was grieved he had made humanity on the earth, and his heart filled with pain.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/genesis/6/" style="color: var(--color-brand);" class="hover:underline">Genesis 6:6</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The text names the pain before it names the judgment. Then comes the turn: <a href="/read/genesis/6/" style="color: var(--color-brand);" class="hover:underline">Genesis 6:8</a> says &ldquo;Noah found favor in the eyes of our Father,&rdquo; and verse 9 describes him as righteous, blameless, a man who &ldquo;walked faithfully with our Father.&rdquo;</p>
+				<h2 id="building" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Building the ark: how big was it?</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Our Father gave Noah the plan, down to the materials and measurements.</p>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;Build yourself an ark of cypress wood; make rooms in it and coat it inside and out with pitch.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/genesis/6/" style="color: var(--color-brand);" class="hover:underline">Genesis 6:14</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;Make it like this: the ark about 450 feet long, seventy-five feet wide, forty-five feet high.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/genesis/6/" style="color: var(--color-brand);" class="hover:underline">Genesis 6:15</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Father&rsquo;s Heart Bible gives the size as about 450 feet long, seventy-five feet wide and forty-five feet high, with a door in its side and &ldquo;lower, middle, and upper decks&rdquo; (6:16). The same chapter ends with obedience: &ldquo;Noah did everything just as our Father commanded him&rdquo; (6:22).</p>
+				<h2 id="flood" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The flood</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Noah was 600 years old when the waters came (7:6). Our Father told him to enter the ark, and the animals came to him.</p>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;In Noah's six hundredth year, second month, day seventeen—that same day—all springs of the great deep burst open, and heaven's floodgates opened.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/genesis/7/" style="color: var(--color-brand);" class="hover:underline">Genesis 7:11</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;Male and female of all flesh entered, as our Father commanded him; then our Father shut him in.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/genesis/7/" style="color: var(--color-brand);" class="hover:underline">Genesis 7:16</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The rain fell forty days and forty nights (7:12), the waters rose until the ark floated above the earth, and the waters &ldquo;prevailed over the earth 150 days&rdquo; (7:24). Notice verse 16: it is our Father Himself who shuts Noah in. The one who judged is also the one who protects.</p>
+				<h2 id="remembered" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Our Father remembered Noah</h2>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;But our Father remembered Noah, all the living creatures, and all the livestock with him in the ark, and swept a wind over the earth so the waters began to recede.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/genesis/8/" style="color: var(--color-brand);" class="hover:underline">Genesis 8:1</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">This is the turning point of the whole account. Remembering in Scripture is never just recalling; it is acting for the people held in mind. The wind sweeps, the springs close, and the water goes down. The ark rested on the mountains of Ararat on the seventeenth day of the seventh month (8:4). Noah then sent out a raven and a dove, and the dove returned with a freshly plucked olive leaf (8:11). When the earth was completely dry, our Father told Noah to leave the ark (8:15-16).</p>
+				<h2 id="sacrifice" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Noah&rsquo;s altar and our Father&rsquo;s promise</h2>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;Our Father smelled the pleasing aroma and said in his heart, "I will never again curse the ground because of humanity, though the human heart's inclination is evil from youth, nor will I ever again strike down every living thing as I have done.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/genesis/8/" style="color: var(--color-brand);" class="hover:underline">Genesis 8:21</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Look at what has and has not changed. Human hearts are still inclined toward evil; that is the same diagnosis as in Genesis 6:5. Yet our Father, speaking &ldquo;in his heart,&rdquo; chooses mercy anyway. The promise rests on His character, not on people becoming better.</p>
+				<h2 id="rainbow" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The rainbow covenant</h2>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;I set my covenant with you: never again will all flesh be cut off by floodwaters; never again a flood to destroy the earth.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/genesis/9/" style="color: var(--color-brand);" class="hover:underline">Genesis 9:11</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;I have put my rainbow in the clouds as the sign of the covenant between me and the earth.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/genesis/9/" style="color: var(--color-brand);" class="hover:underline">Genesis 9:13</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;When the rainbow is in the clouds, I will see it and remember the everlasting covenant between me and every living creature of every kind on earth.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/genesis/9/" style="color: var(--color-brand);" class="hover:underline">Genesis 9:16</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The rainbow is our Father&rsquo;s sign, and He says <em>He</em> will see it and remember. The covenant is with Noah, his descendants &ldquo;and every living creature&rdquo; (9:9-10), and it is everlasting.</p>
+				<h2 id="heart" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">What Noah&rsquo;s ark shows about the Father&rsquo;s heart</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Read together, the account shows three things the text itself says: our Father is grieved by evil (6:6), He keeps and shuts in those who walk with Him (7:16), and He remembers (8:1; 9:15-16). Judgment is real, and so is His determination to preserve life and make a covenant with it. You can read all of it free, with audio, in <a href="/read/genesis/6/" style="color: var(--color-brand);" class="hover:underline">Genesis 6</a>, <a href="/read/genesis/7/" style="color: var(--color-brand);" class="hover:underline">7</a>, <a href="/read/genesis/8/" style="color: var(--color-brand);" class="hover:underline">8</a> and <a href="/read/genesis/9/" style="color: var(--color-brand);" class="hover:underline">9</a>.</p>
+				<h2 id="jesus" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Jesus and Noah&rsquo;s ark</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Jesus himself pointed back to Noah. In Matthew 24 He says:</p>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;As in Noah's days, so will be the Son of Man's coming.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/matthew/24/" style="color: var(--color-brand);" class="hover:underline">Matthew 24:37</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;For in the days before the flood, people ate and drank, married and gave in marriage, until the day Noah entered the ark;&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/matthew/24/" style="color: var(--color-brand);" class="hover:underline">Matthew 24:38</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Jesus treats the flood as real history and as a picture of how suddenly our Father&rsquo;s judgment can arrive when people are not watching; see the whole passage in <a href="/read/matthew/24/" style="color: var(--color-brand);" class="hover:underline">Matthew 24</a> and the parallel in <a href="/read/luke/17/" style="color: var(--color-brand);" class="hover:underline">Luke 17</a>. Jesus is the Son of Man, fully God and fully human, and the one who speaks with that authority. Peter adds a note about patience:</p>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;who disobeyed long ago, when our Father waited patiently in Noah's days as the ark was being built, in which a few—eight people—were brought safely through the water.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/1-peter/3/" style="color: var(--color-brand);" class="hover:underline">1 Peter 3:20</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">While the ark was being built, our Father waited patiently. Peter then connects the water to baptism and to &ldquo;Jesus Christ&rsquo;s resurrection&rdquo; (3:21), which is where the story points: safety through water, now found in Christ. See <a href="/read/1-peter/3/" style="color: var(--color-brand);" class="hover:underline">1 Peter 3</a>.</p>
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Read the whole story</p><p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Read and listen to Genesis 6-9 in Father&rsquo;s Heart Bible, free online.</p><a href="https://fathersheartbible.com/read/genesis/6/" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a></aside>
+
+<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="space-y-6">
+					{FAQS.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Keep going: read <a href="/guides/how-to-read-the-bible/" style="color: var(--color-brand);" class="hover:underline">How to Read the Bible</a>, <a href="/guides/how-to-study-the-bible/" style="color: var(--color-brand);" class="hover:underline">How to Study the Bible</a>, or open the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free with audio</a>.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Read the whole story. Read Father&rsquo;s Heart Bible free online with audio &mdash; a translation that reveals God as a loving Father on every page.</p>
+				<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<ReviewLink class="mb-10" />
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>

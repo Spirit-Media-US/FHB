@@ -15,8 +15,13 @@ import YouVersionBanner from '../components/YouVersionBanner.astro';
 interface Props {
 	/** Page language for <html lang> (default en). Translated pages pass their code. */
 	lang?: string;
+	/** og:locale language when it differs from <html lang> (2jw: a page whose metadata is native
+	 *  but whose body is still English keeps lang="en" and sets this). Default: `lang`. */
+	ogLang?: string;
 	/** hreflang alternate links [{hreflang, href}] — emitted when present. */
 	alternates?: { hreflang: string; href: string }[];
+	/** false = alternates feed hreflang only, not og:locale:alternate (2jx: 80-way language cluster). */
+	ogAlternates?: boolean;
 	title: string;
 	description?: string;
 	// Social/answer-engine share blurb. When set, og:description + twitter:description
@@ -80,7 +85,9 @@ const {
 	bookIsbn,
 	bookReleaseDate,
 	lang = 'en',
+	ogLang,
 	alternates = [],
+	ogAlternates = true,
 } = Astro.props;
 
 // Fetch siteName and ogImage from Sanity
@@ -126,7 +133,7 @@ const fhbFooterLegal = [
 ];
 
 // OG image — default to the branded 1200×630 share card, allow per-page override
-const ogImage = image || 'https://assets.spiritmediapublishing.com/FHB/share/v4/fhb-og-default.jpg';
+const ogImage = image || 'https://assets.spiritmediapublishing.com/FHB/share/v5/fhb-og-family.jpg';
 const ogImageAlt = imageAlt || "Father's Heart Bible (FHB) — Come home to Me as your Father";
 // Emit explicit dimensions/type only for known 1200×630 JPG cards (our share
 // cards + w=1200&h=630 Sanity crops); skip for arbitrary blog hero images.
@@ -358,10 +365,10 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		{ogSized && <meta property="og:image:height" content="630" />}
 		{ogSized && <meta property="og:image:type" content="image/jpeg" />}
 		<meta property="og:site_name" content={siteName} />
-		{ogLocale(lang) && <meta property="og:locale" content={ogLocale(lang)} />}
+		{ogLocale(ogLang ?? lang) && <meta property="og:locale" content={ogLocale(ogLang ?? lang)} />}
 		{ogLocaleAlternates(
-			lang,
-			alternates.filter((a) => a.hreflang !== 'x-default').map((a) => a.hreflang),
+			ogLang ?? lang,
+			ogAlternates ? alternates.filter((a) => a.hreflang !== 'x-default').map((a) => a.hreflang) : [],
 		).map((loc) => (
 			<meta property="og:locale:alternate" content={loc} />
 		))}

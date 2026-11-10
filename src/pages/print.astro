@@ -12,10 +12,8 @@ import YouVersionBanner from '../components/YouVersionBanner.astro';
 // the bookstore is the one master for an Amazon link and no ASIN is typed into this page.
 // An edition absent from this file keeps its "coming soon" state, so a listing appearing
 // later needs a re-run of the sync, not an edit here.
-import amazonLinks from '../data/amazon-links.json';
-import bnData from '../data/bn-links.json';
 import { cardUrl } from '../data/card-art';
-import digital from '../data/digital-listings.json';
+import digital from '../data/digital-listings-public';
 import { AUDIENCE_EDITION_TOTAL, dvcEditions as dvcEditionList } from '../data/dvc-editions';
 import {
 	allLanguageEditions,
@@ -28,9 +26,18 @@ import {
 	rosterLanguages,
 } from '../data/language-editions';
 import { reachPhrase } from '../data/language-speakers';
+import readerLanguages from '../data/reader-languages.json';
 import Layout from '../layouts/Layout.astro';
+import { FHB_ORG_ID } from '../lib/fhb-org';
+import { merchantReturnPolicy } from '../lib/merchantReturnPolicy';
 import { directTarget } from '../lib/print-cards.mjs';
 import { fitDescription, fitTitle } from '../lib/seoFit';
+import {
+	LIVE_COUNTRIES,
+	shippingDetailsForOffers,
+	shipsLine,
+	shipsToList,
+} from '../lib/shipCountries';
 
 // THE DIVINE VOICE™ COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
 // edition. Every subtitle in the trade metadata ends with the same tail ("Red Letter -
@@ -58,19 +65,11 @@ const AUDIENCE_TOTAL = AUDIENCE_EDITION_TOTAL;
 // (2026-10-10). The English eBook is also sold direct here ($7.49, our own fulfillment). Apple
 // Books and Nook were removed 2026-10-10: both listings 404 since D2D refused distribution.
 const digitalEn = digital.en;
-// Barnes & Noble print listings, one master (src/data/bn-links.json): an entry exists only where
-// a B&N search by the binding's ISBN-13 opened that edition's own product page (2026-10-10).
-const bnLinks = bnData.links as Record<string, { hardback?: string; paperback?: string }>;
 const EBOOK_COVER =
 	'https://assets.spiritmediapublishing.com/FHB/print/fhb-ebook-cover-2026-6-600.webp';
 const EBOOK_COVER_2X =
 	'https://assets.spiritmediapublishing.com/FHB/print/fhb-ebook-cover-2026-6-1200.webp';
-const storeLogo = (store: string) =>
-	store === 'Kindle'
-		? ('amazon' as const)
-		: store === 'Kobo'
-			? ('kobo' as const)
-			: ('google' as const);
+const storeLogo = (store: string) => (store === 'Kobo' ? ('kobo' as const) : ('google' as const));
 const EBOOK_DIRECT = '$7.49';
 
 // ───────────────────────── GENERAL AUDIENCE ─────────────────────────
@@ -208,6 +207,10 @@ const SAMPLE_LP =
 
 // Print FAQ — rendered as a no-JS <details> accordion + FAQPage JSON-LD (AEO).
 const READ_URL = '/read/';
+// Languages whose /read/<code>/ reader is live (generated list; English lives at /read/). A card
+// gets its "Read it free online" link by code lookup, so a newly live language needs no edit here.
+const liveReadCodes = new Set(readerLanguages.languages.map((x: { code: string }) => x.code));
+const readHref = (code: string) => (code === 'en' ? '/read/' : `/read/${code}/`);
 const CAMPAIGN_URL = '/legacy/';
 // Neutral: the only color between the header and the footer is the three voices and
 // the cover art (Kevin 2026-08-23).
@@ -265,36 +268,10 @@ const langSearch = (l: RosterLanguage) =>
 		.filter(Boolean)
 		.join(' ');
 /** Sold by our own checkout: an ISBN and on_sale/direct_sale, or a PRE-ORDER (no ISBN yet). Kevin
- *  2026-10-30: "All languages cards can offer a Buy now · free shipping button" — all 80 (generated). */
+ *  2026-10-30: "All languages cards can offer a Buy now button" — all 80 (generated). */
 const langSold = (l: RosterLanguage) => l.sellable && (Boolean(l.isbn) || Boolean(l.preorder));
-// THE THREE STORE PILLS ON ALL 80 CARDS (Kevin 2026-10-30: "We know all will be in googleplay ebook so
-// add that but fade it until live. Same with B&N keep fade until live. Add Audiobook for all but no
-// price until live."). Live = the listing is in src/data/digital-listings.json (Google Play) or
-// bn-links.json (B&N), each entry added only after its store page verified; absent = the same pill
-// FADED, not a link, aria-disabled, no price. A listing landing in the data turns it live on the next
-// build — never typed per language here.
-const langStores = (code: string) => {
-	const d = (
-		digital as unknown as Record<string, { ebook?: DigitalLink[]; audiobook?: DigitalLink[] }>
-	)[code];
-	const gp = (xs?: DigitalLink[]) => xs?.find((x) => x.store === 'Google Play');
-	const eb = gp(d?.ebook);
-	const au = gp(d?.audiobook);
-	return [
-		eb
-			? { key: 'gp-ebook', logo: 'google' as const, label: 'eBook', price: eb.price, href: eb.url }
-			: { key: 'gp-ebook', logo: 'google' as const, label: 'eBook', price: '', off: true },
-		au
-			? {
-					key: 'gp-audio',
-					logo: 'google' as const,
-					label: 'Audiobook',
-					price: au.price,
-					href: au.url,
-				}
-			: { key: 'gp-audio', logo: 'google' as const, label: 'Audiobook', price: '', off: true },
-	];
-};
+// Language cards show PRINT ONLY (Kevin 2026-11-09: "at languages remove google play for ebooks and
+// audiobooks (let the print page show print)") — no eBook / audiobook store pills on them.
 /** Every card's Buy Direct (Kevin 2026-10-30): the catalog form when sold, else the edition page's reserve block. */
 const langDirect = (l: RosterLanguage) =>
 	directTarget({
@@ -319,12 +296,12 @@ const printFaq = [
 		// He wrote "follow Amazon's return policy" at 21:52 and replaced it two minutes later
 		// with "follow THEIR return policy" (A1a, J1). The sentence's own subject is the
 		// reason: it already says "or other retailers", so naming Amazon in the predicate
-		// contradicts it — a Barnes & Noble buyer does not follow Amazon's policy.
+		// contradicts it — a buyer from any other retailer does not follow Amazon's policy.
 		// This shipped wrong once because it was checked against the superseded sentence
 		// quoted in an earlier brief, found present, and read as confirmation. Matching the
 		// wrong authority returns a true answer to the wrong question. The task register
 		// carries the quote WITH its timestamp; that is the authority, not a brief.
-		a: `Yes. For orders placed directly with us, <a href="${CONTACT}" style="${LINK}">reach out</a> and we'll make it right. Copies bought on Amazon or other retailers follow their return policy.`,
+		a: `Yes. For orders placed directly with us, <a href="${CONTACT}" style="${LINK}">reach out</a> and we'll make it right. Our <a href="/returns/" style="${LINK}">return policy</a> covers 30 days from delivery. Copies bought from other retailers follow their return policy.`,
 	},
 	{
 		q: 'How is Father’s Heart Bible™ different from other translations?',
@@ -332,8 +309,18 @@ const printFaq = [
 	},
 	{
 		q: 'How long does shipping take?',
-		a: `Order direct from us today and shipping is free — most orders arrive in 7–10 days, and larger bulk orders in 3–4 weeks. The Divine Voice™ Color editions are on Amazon now, and every card above links to its listing. Ordering direct from us includes free shipping. <a href="${CONTACT}" style="${LINK}">Reach out</a> if you need them by a particular date.`,
+		a: `Order direct from us today and shipping is free — most orders arrive in 7–10 days, and larger bulk orders in 3–4 weeks. Ordering direct from us includes free shipping. <a href="${CONTACT}" style="${LINK}">Reach out</a> if you need them by a particular date.`,
 	},
+	// International answer exists ONLY when more than one country is live (src/data/ship-countries.json);
+	// at US-only it would claim shipping we do not do. Built from the list, never typed.
+	...(LIVE_COUNTRIES.length > 1
+		? [
+				{
+					q: 'Do you ship outside the United States?',
+					a: `Yes. ${shipsLine()} We currently ship to: ${shipsToList()}. Your delivery estimate and any shipping charge appear in checkout once you choose your country, and the delivery carrier may call the phone number you give at checkout, so please include your country code. <a href="${CONTACT}" style="${LINK}">Reach out</a> if your country is not listed.`,
+				},
+			]
+		: []),
 	{
 		q: 'Is the color throughout the whole Bible?',
 		a: `Yes — Genesis to Revelation, every divine voice, in full color on every page. Not a red-letter New Testament with a black Old Testament, and not a study section at the back. You can see it for yourself free at <a href="${READ_URL}" style="${LINK}">fathersheartbible.com/read</a>.`,
@@ -408,15 +395,23 @@ const bookSchema = {
 		name: 'Spirit Media Publishing',
 		url: 'https://spiritmediapublishing.com',
 	},
-	image: 'https://assets.spiritmediapublishing.com/FHB/share/v4/fhb-og-default.jpg',
+	image: 'https://assets.spiritmediapublishing.com/FHB/share/v5/fhb-og-group.jpg',
 	offers: {
 		'@type': 'AggregateOffer',
+		hasMerchantReturnPolicy: merchantReturnPolicy,
+		shippingDetails: shippingDetailsForOffers(),
 		priceCurrency: 'USD',
 		lowPrice: '7.49',
 		highPrice: '124.99',
 		offerCount: 29,
 		availability: 'https://schema.org/InStock',
 		url: 'https://fathersheartbible.com/print/',
+		seller: {
+			'@type': 'Organization',
+			'@id': FHB_ORG_ID,
+			name: "Father's Heart Bible",
+			url: 'https://fathersheartbible.com/',
+		},
 	},
 };
 const breadcrumbSchema = {
@@ -517,9 +512,9 @@ const dvcVerses = [
 ---
 
 <Layout
-	title={fitTitle("Red Letter, Large Print & Journaling Bibles — Father's Heart Bible™")}
+	title={fitTitle("FHB Bible — Father's Heart Bible in Print: Order Direct")}
 	description={fitDescription(`Hardcover and paperback Bibles with our Father's words in blue and the Son's in red — for men, women and teens, in Large Print, journaling, and soon in 80 languages.`)}
-	image="https://assets.spiritmediapublishing.com/FHB/share/v4/fhb-og-default.jpg"
+	image="https://assets.spiritmediapublishing.com/FHB/share/v5/fhb-og-group.jpg"
 	imageAlt="Eight friends holding the Father's Heart Bible™ print edition in three colors and two bindings"
 	darkHero={true}
 	preloadImageMobile="https://assets.spiritmediapublishing.com/FHB/print/print-hero-a01-960.webp"
@@ -541,7 +536,7 @@ const dvcVerses = [
 			imagePosition="54% 30%"
 			headingLift="0"
 			contentPad="pt-0! pb-0 md:pb-4 lg:pb-5"
-			heading="Father's Heart Bible™ in Print"
+			heading="FHB Bible: Father's Heart Bible™ in Print"
 			headingClass="sr-only"
 		/>
 		<YouVersionBanner />
@@ -551,6 +546,7 @@ const dvcVerses = [
 			<div class="text-center mb-3">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2.1rem; font-weight: 600; margin: 0;">Father’s Heart Bible™ + Divine Voice™ Color Bibles</h2>
 				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 0.75rem auto 0; max-width: 40rem;">Where other Bibles use “God” to say what He is, the Father’s Heart Bible™ uses “our Father” to show who He has been all along.</p>
+				<p style="font-family: var(--font-sans); font-size: 0.9rem; margin: 0.6rem 0 0;"><a href={READ_URL} class="card-link">Read it free online &rarr;</a></p>
 			</div>
 			<!-- THE COLOR DEMO. Kevin 2026-08-23: "if we were selling color tvs this is our color
 			     tv demo." So the three voices are set large and are the ONLY saturated color on the
@@ -559,6 +555,7 @@ const dvcVerses = [
 			<VoiceChips />
 			<p class="text-center mb-10" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em;">{DVC_TAIL2}</p>
 			<p class="text-center mb-10" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; margin-top: -1.5rem;">Spirit Media Publishing is a registered Content Contributor to the Digital Bible Library (DBL).</p>
+			<p class="text-center mb-10" style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.9rem; margin-top: -1.5rem;">You can also see the <a href="https://spiritmediapublishing.com/bookstore/fathers-heart-bible-language-editions/" style="color: inherit; text-decoration: underline;">language editions</a> and <a href="https://spiritmediapublishing.com/bookstore/fathers-heart-bible-audience-editions/" style="color: inherit; text-decoration: underline;">audience editions</a> of the Father’s Heart Bible on our publisher’s bookstore.</p>
 
 			{/* Kevin 2026-10-10: below the title, chips and the two spec lines (his order); same eyebrow + heading as "Language Editions / In N Languages". The
 			    count is every card in the section (Kevin 2026-10-10: 23), computed so it cannot drift. */}
@@ -589,6 +586,8 @@ const dvcVerses = [
 						}`}
 						style={`background: var(--color-soft, #faf6f2); border: ${e.slug === 'journaling' ? '3px solid var(--color-primary, #b60057)' : '1px solid var(--color-hairline)'};`}
 					>
+						{builtPages.has(`${e.slug}-bible`) ? (
+							<a href={`/bibles/${e.slug}-bible/`} aria-label={`${e.title} edition: full details`} class="cover-link" style="display: flex; justify-content: center; width: 100%;">
 						<img
 							src={cardUrl(`dvc-${e.slug}`)}
 							srcset={`${cardUrl(`dvc-${e.slug}`)} 600w, ${cardUrl(`dvc-${e.slug}`, 1200)} 1200w`}
@@ -597,27 +596,34 @@ const dvcVerses = [
 							width="600" height="764" loading="lazy" decoding="async"
 							class="block w-full h-auto" style="max-width: 220px;"
 						/>
+							</a>
+						) : (
+						<img
+							src={cardUrl(`dvc-${e.slug}`)}
+							srcset={`${cardUrl(`dvc-${e.slug}`)} 600w, ${cardUrl(`dvc-${e.slug}`, 1200)} 1200w`}
+							sizes="(min-width: 1024px) 260px, 44vw"
+							alt={`Father's Heart Bible (FHB) — ${e.title}, Divine Voice™ Color`}
+							width="600" height="764" loading="lazy" decoding="async"
+							class="block w-full h-auto" style="max-width: 220px;"
+						/>
+						)}
 						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{e.title}</h3>
 						<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">{e.sub}</p>
 						<div class="flex flex-col gap-2 w-full mt-auto">
 							<div class="flex items-center justify-center gap-2 flex-wrap" style="margin: 0 0 0.2rem;">
 								{builtPages.has(`${e.slug}-bible`) && (
-									<a href={`/bibles/${e.slug}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
+									<a href={`/bibles/${e.slug}-bible/`} class="card-link">Full details</a>
 								)}
 								{builtPages.has(`${e.slug}-bible`) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 								<LookInside slug={e.slug} title={e.title} variant="link" label="Look inside" />
 							</div>
 							{/* One shared control set for every card on the page — see BuyControls. */}
 							<BuyControls
-								hbHref={amazonLinks[e.slug]?.formats?.hardback}
-								pbHref={amazonLinks[e.slug]?.formats?.paperback}
 								hbPrice={e.hb}
 								pbPrice={e.pb}
 								buyNowHref={builtPages.has(`${e.slug}-bible`) ? `/bibles/${e.slug}-bible/#order` : null}
 								tightDirect={e.slug === 'journaling'}
 								pick={e.slug}
-								bn={bnLinks[e.slug]}
-								reserveBn
 							/>
 						</div>
 					</div>
@@ -660,6 +666,8 @@ const dvcVerses = [
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
 					{generalColors.map((c) => (
 						<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+							{builtPages.has('fathers-heart-bible') ? (
+								<a href="/bibles/fathers-heart-bible/" aria-label={`${l.label}, ${c.name} cover: full details`} class="cover-link" style="display: flex; justify-content: center; width: 100%;">
 							<img
 								src={cardUrl(`general-${l.line}-${c.key}`)}
 								srcset={`${cardUrl(`general-${l.line}-${c.key}`)} 600w, ${cardUrl(`general-${l.line}-${c.key}`, 1200)} 1200w`}
@@ -668,6 +676,17 @@ const dvcVerses = [
 								width="600" height="764" loading="lazy" decoding="async"
 								class="block w-full h-auto" style="max-width: 220px;"
 							/>
+								</a>
+							) : (
+							<img
+								src={cardUrl(`general-${l.line}-${c.key}`)}
+								srcset={`${cardUrl(`general-${l.line}-${c.key}`)} 600w, ${cardUrl(`general-${l.line}-${c.key}`, 1200)} 1200w`}
+								sizes="(min-width: 640px) 240px, 60vw"
+								alt={`Father's Heart Bible (FHB) — ${l.label}, ${c.name} cover`}
+								width="600" height="764" loading="lazy" decoding="async"
+								class="block w-full h-auto" style="max-width: 220px;"
+							/>
+							)}
 							<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{c.name}</h3>
 							{/* Uniform with every other card (Kevin 2026-10-03). The general sheet has no For
 							    box; its subtitle reads "Holy Bible for Everyone", so that is the line. */}
@@ -681,7 +700,7 @@ const dvcVerses = [
 									<>
 										<a
 											href="/bibles/fathers-heart-bible/"
-											style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;"
+											class="card-link"
 										>Full details</a>
 										<span aria-hidden="true" style="color: #a1a1aa;">·</span>
 									</>
@@ -699,14 +718,10 @@ const dvcVerses = [
 							     hardback have no listing yet and render as placeholders. */}
 							<div class="flex flex-col gap-2 w-full mt-auto">
 								<BuyControls
-									hbHref={amazonLinks[`general-${l.line}-${c.key}`]?.formats?.hardback}
-									pbHref={amazonLinks[`general-${l.line}-${c.key}`]?.formats?.paperback}
 									hbPrice={l.hb}
 									pbPrice={l.pb}
 									buyNowHref={builtPages.has('fathers-heart-bible') ? '/bibles/fathers-heart-bible/#order' : null}
 									pick={`general-${l.line}-${c.key}`}
-									bn={bnLinks[`general-${l.line}-${c.key}`]}
-									reserveBn
 								/>
 							</div>
 						</div>
@@ -726,14 +741,14 @@ const dvcVerses = [
 							<div class="flex flex-col gap-2 w-full mt-auto">
 								<div class="flex flex-wrap justify-center gap-2 w-full">
 								<BuyControls compact showDirect={false} stores={[
-									...digitalEn.ebook.map((d) => ({ logo: storeLogo(d.store), label: d.store === 'Kindle' ? 'Kindle' : 'eBook', price: d.price, href: d.url })),
+									...digitalEn.ebook.map((d) => ({ logo: storeLogo(d.store), label: 'eBook', price: d.price, href: d.url })),
 									{ label: 'Buy Direct', price: EBOOK_DIRECT, ebookDirect: true },
 								]} />
 								</div>
 								<p data-ebook-msg style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.4rem 0 0; display: none;"></p>
 								<p style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-ink); font-weight: 600; margin: 0.7rem 0 0;">Listening Edition (for read-aloud apps)</p>
 								<div class="flex flex-wrap justify-center gap-2 w-full">
-								<BuyControls compact showDirect={false} stores={digitalEn.listening.map((d) => ({ logo: storeLogo(d.store), label: d.label ? `${d.store} ${d.label}` : d.store === 'Kindle' ? 'Kindle' : 'eBook', price: d.price, href: d.url }))} />
+								<BuyControls compact showDirect={false} stores={digitalEn.listening.map((d) => ({ logo: storeLogo(d.store), label: d.label ? `${d.store} ${d.label}` : 'eBook', price: d.price, href: d.url }))} />
 								</div>
 							</div>
 							<p style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-muted); margin: 0.6rem 0 0;">
@@ -780,6 +795,7 @@ const dvcVerses = [
 				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">General Audience</p>
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Large Print — Three Volumes</h2>
 				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 40rem;">The complete Bible set larger for easier reading. At this size the whole text does not fit one binding, so it comes as three volumes — {lpTotalPages.toLocaleString('en-US')} pages, nothing abridged. Take the set, or the volume you read most.</p>
+				<p style="font-family: var(--font-sans); font-size: 0.9rem; margin: 0.6rem 0 0;"><a href={READ_URL} class="card-link">Read it free online &rarr;</a></p>
 				<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em; margin: 0.9rem 0 0;">{LP_TAIL}</p>
 				<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em; margin: 0.35rem 0 0;">{DVC_TAIL2}</p>
 				<VoiceChips class="mt-5 mb-0" />
@@ -788,6 +804,8 @@ const dvcVerses = [
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
 				{lpVolumes.map((v) => (
 					<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+						{builtPages.has(`${v.key}-bible`) ? (
+							<a href={`/bibles/${v.key}-bible/`} aria-label={`Large Print Volume ${v.vol}, ${v.color} cover: full details`} class="cover-link" style="display: flex; justify-content: center; width: 100%;">
 						<img
 							src={`${LP_CARDS}/${v.key}-600.webp`}
 							srcset={`${LP_CARDS}/${v.key}-600.webp 600w, ${LP_CARDS}/${v.key}-1200.webp 1200w`}
@@ -796,6 +814,17 @@ const dvcVerses = [
 							width="600" height="764" loading="lazy" decoding="async"
 							class="block w-full h-auto" style="max-width: 220px;"
 						/>
+							</a>
+						) : (
+						<img
+							src={`${LP_CARDS}/${v.key}-600.webp`}
+							srcset={`${LP_CARDS}/${v.key}-600.webp 600w, ${LP_CARDS}/${v.key}-1200.webp 1200w`}
+							sizes="(min-width: 640px) 240px, 60vw"
+							alt={`Father's Heart Bible (FHB) — Large Print Volume ${v.vol}, ${v.range}, ${v.color} cover`}
+							width="600" height="764" loading="lazy" decoding="async"
+							class="block w-full h-auto" style="max-width: 220px;"
+						/>
+						)}
 						<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.15rem;">Volume {v.vol} · {v.color}</h3>
 						<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; margin: 0 0 0.6rem;">{v.range}</p>
 						{/* Each volume has its OWN sample pages — they are different books, and a
@@ -811,7 +840,7 @@ const dvcVerses = [
 								<>
 									<a
 										href={`/bibles/${v.key}-bible/`}
-										style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;"
+										class="card-link"
 									>Full details</a>
 									<span aria-hidden="true" style="color: #a1a1aa;">·</span>
 								</>
@@ -833,14 +862,10 @@ const dvcVerses = [
 						     hollow beside its siblings. */}
 						<div class="flex flex-col gap-2 w-full mt-auto">
 							<BuyControls
-								hbHref={amazonLinks[v.key]?.formats?.hardback}
-								pbHref={amazonLinks[v.key]?.formats?.paperback}
 								hbPrice={v.hb}
 								pbPrice={v.pb}
 								buyNowHref={builtPages.has(`${v.key}-bible`) ? `/bibles/${v.key}-bible/#order` : null}
 								pick={v.key}
-								bn={bnLinks[v.key]}
-								reserveBn
 							/>
 						</div>
 					</div>
@@ -875,13 +900,25 @@ const dvcVerses = [
 				     without the missing link rather than link to nothing. */}
 				{builtPages.has('lp-set-bible') && (
 					<p style="font-family: var(--font-sans); font-size: 0.82rem; margin: 0.9rem 0 0;">
-						<a href="/bibles/lp-set-bible/" style="font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
+						<a href="/bibles/lp-set-bible/" class="card-link">Full details</a>
 					</p>
 				)}
 				{/* NO "a set counts as three books" LINE HERE (Kevin 2026-09-17: "This is NOT
 				     true and should not have been added"). The code always agreed with him —
 				     dvc-checkout.ts:295/301 and the cart weights above both count a set as
 				     books: 1 — so the sentence promised a bulk tier the checkout never gave. */}
+			</div>
+			{/* Kevin White's book, one line near Large Print (Kevin 2026-11-10: add the links). Cover, alt and
+			    dimensions are the ones /books/beloved-identity/ uses. No retailer links. */}
+			<div class="rounded-2xl p-5 mt-8 mx-auto flex items-center gap-4 text-left" style="background: #fff; border: 1px solid var(--color-hairline); max-width: 44rem;">
+				<a href="/books/beloved-identity/" aria-label="Father's Heart - Beloved Identity by Kevin White: full details" style="flex: 0 0 96px;">
+					<img src="https://assets.spiritmediapublishing.com/FHB/print/books/beloved-identity-300.webp" srcset="https://assets.spiritmediapublishing.com/FHB/print/books/beloved-identity-300.webp 300w, https://assets.spiritmediapublishing.com/FHB/print/books/beloved-identity-600.webp 600w" sizes="96px" width="320" height="512" alt="Cover of Father's Heart - Beloved Identity by Kevin White" loading="lazy" decoding="async" class="block w-full h-auto" />
+				</a>
+				<div style="min-width: 0;">
+					<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0 0 0.15rem;">Father’s Heart — Beloved Identity</h3>
+					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; margin: 0 0 0.5rem;">By Kevin White · Paperback · $9.99</p>
+					<a href="/books/beloved-identity/" class="card-link">Full details &rarr;</a>
+				</div>
 			</div>
 			<p class="text-center mt-6" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600;">Direct from SMP includes free shipping — a $15 value.</p>
 		</Section>
@@ -911,7 +948,7 @@ const dvcVerses = [
 			    edition the chain lists). World regions (the language's primary country), Worldwide/English last,
 			    A–Z by English name inside each, a jump bar and a filter that matches the English name, the
 			    edition's own name, the language's own name and the country. Same card, frame and button set
-			    as before: an Amazon / B&N / Google Play button is live only once its link is in the data (D184),
+			    as before: a Google Play button is live only once its link is in the data (D184),
 			    faded until then; Buy now and Buy Direct on all 80 (no ISBN yet = a pre-order); the cover is
 			    the card cut from the BUILT case, else LangCover's cover-pending tile. */}
 			<div class="lang-finder max-w-6xl mx-auto" style="margin: 0 auto 1.5rem;">
@@ -932,43 +969,44 @@ const dvcVerses = [
 						{g.langs.map((l) => (
 							l.code === 'en' ? (
 								<div class="lang-card flex flex-col items-center text-center rounded-2xl p-4 md:p-5" data-lang-card="en" data-search={langSearch(l)} style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+									{builtPages.has('fathers-heart-bible') ? (
+									<a href="/bibles/fathers-heart-bible/" aria-label="Father's Heart Bible, English edition: full details" class="cover-link" style="display: flex; justify-content: center; width: 100%;">
+										<img src={cardUrl(EN_KEY)} srcset={`${cardUrl(EN_KEY)} 600w, ${cardUrl(EN_KEY, 1200)} 1200w`} sizes="(min-width: 1024px) 260px, 44vw" alt="Father's Heart Bible (FHB) — the English General edition, Plum cover" width="600" height="764" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 220px;" />
+									</a>
+								) : (
 									<img src={cardUrl(EN_KEY)} srcset={`${cardUrl(EN_KEY)} 600w, ${cardUrl(EN_KEY, 1200)} 1200w`} sizes="(min-width: 1024px) 260px, 44vw" alt="Father's Heart Bible (FHB) — the English General edition, Plum cover" width="600" height="764" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 220px;" />
+								)}
 									<h3 lang="en" class="lang-card-title" style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">Father’s Heart Bible™</h3>
 									<p class="lang-card-english" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">English</p>
 									<p class="lang-card-sub" style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">For everyone — General, Large Print, Journaling and the audience editions are all on this page.</p>
 									<div class="flex flex-col gap-2 w-full mt-auto">
 										<div class="lang-links flex items-center justify-center gap-2 flex-nowrap whitespace-nowrap" style="margin: 0 0 0.2rem;">
 											{builtPages.has('fathers-heart-bible') && (
-												<a href="/bibles/fathers-heart-bible/" style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
+												<a href="/bibles/fathers-heart-bible/" class="card-link">Full details</a>
 											)}
 											{builtPages.has('fathers-heart-bible') && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 											<LookInside slug="general" title="FHB — Father’s Heart Bible — English" variant="link" label="Look inside" reuse />
 										</div>
 										<BuyControls
-											hbHref={amazonLinks[EN_KEY]?.formats?.hardback}
-											pbHref={amazonLinks[EN_KEY]?.formats?.paperback}
 											hbPrice={enLine.hb}
 											pbPrice={enLine.pb}
 											buyNowHref={builtPages.has('fathers-heart-bible') ? '/bibles/fathers-heart-bible/#order' : null}
 											pick={EN_KEY}
-											bn={bnLinks[EN_KEY]}
-											fadeBn
-											reserveSlots={4}
 											tightDirect
-											stores={langStores('en')}
 										/>
+										<a href={readHref('en')} class="card-link read-free">Read it free online &rarr;</a>
 									</div>
 								</div>
 							) : (
 								<div class="lang-card flex flex-col items-center text-center rounded-2xl p-4 md:p-5" data-lang-card={l.code} data-search={langSearch(l)} style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
-									<LangCover code={l.code} name={l.name} english={l.english} rtl={l.rtl} />
+									<LangCover code={l.code} name={l.name} english={l.english} rtl={l.rtl} href={builtPages.has(`${langSlug(l)}-bible`) ? `/bibles/${langSlug(l)}-bible/` : undefined} />
 									<h3 lang={l.code} dir={l.rtl ? 'rtl' : undefined} class="lang-card-title" style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">{l.name}</h3>
 									<p class="lang-card-english" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">{l.english}</p>
 									<p class="lang-card-sub" style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">{l.sub}</p>
 									<div class="flex flex-col gap-2 w-full mt-auto">
 										<div class="lang-links flex items-center justify-center gap-2 flex-nowrap whitespace-nowrap" style="margin: 0 0 0.2rem;">
 											{builtPages.has(`${langSlug(l)}-bible`) && (
-												<a href={`/bibles/${langSlug(l)}-bible/`} style="font-family: var(--font-sans); font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-decoration: none;">Full details</a>
+												<a href={`/bibles/${langSlug(l)}-bible/`} class="card-link">Full details</a>
 											)}
 											{builtPages.has(`${langSlug(l)}-bible`) && <span aria-hidden="true" style="color: #a1a1aa;">·</span>}
 											<LookInside slug={langSlug(l)} title={l.name} variant="link" label="Look inside" />
@@ -976,20 +1014,17 @@ const dvcVerses = [
 										{/* Kevin 2026-10-10: the language's eBook and audiobook sit on its own card as store
 										    buttons in the Amazon shape, before Buy Direct (src/data/digital-listings.json). */}
 										<BuyControls
-											hbHref={l.amazon?.hardback}
-											pbHref={l.amazon?.paperback}
 											hbPrice={LANG_HB}
 											pbPrice={LANG_PB}
 											buyNowHref={langSold(l) && builtPages.has(`${langSlug(l)}-bible`) ? `/bibles/${langSlug(l)}-bible/#order` : null}
 											showDirect={Boolean(langDirect(l))}
 											directHref={langDirect(l) ?? undefined}
 											pick={`lang-${l.code}`}
-											bn={bnLinks[`lang-${l.code}`]}
-											fadeBn
-											reserveSlots={4}
 											tightDirect
-											stores={langStores(l.code)}
 										/>
+										{liveReadCodes.has(l.code) && (
+											<a href={readHref(l.code)} class="card-link read-free">Read it free online &rarr;</a>
+										)}
 									</div>
 								</div>
 							)
@@ -1035,7 +1070,7 @@ const dvcVerses = [
 
 		<!-- ═══════════════ CATALOG ORDER FORM ═══════════════ -->
 		<Section variant="soft">
-			{/* The anchor every card's "Buy Direct & Save + Free Shipping" link points at. Since Kevin
+			{/* The anchor every card's "15% off 1st order + Free Shipping" link points at. Since Kevin
 			    2026-10-04 this is the SAME catalog order form /print/order/ shows ("it does what we
 			    need"), replacing the quick order box: every edition keeps its own counts, so a buyer
 			    builds the order edition by edition. A card's Buy Direct pre-fills its row here. */}
@@ -1043,7 +1078,7 @@ const dvcVerses = [
 				<div class="text-center mb-6">
 					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Order Direct</p>
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Catalog Order Form</h2>
-					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.95rem; margin: 0.6rem auto 0; max-width: 40rem;">Every print edition, hardback or paperback. All copies in the order count together toward volume pricing. <br /><a href="/isbn/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">Available Worldwide in 200+ ISBNs &rarr;</a></p>
+					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.95rem; margin: 0.6rem auto 0; max-width: 40rem;">Every print edition, hardback or paperback. All copies in the order count together toward volume pricing. <br /><a href="/isbn/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">Available Worldwide in 200+ ISBNs &rarr;</a> · <a href="/where-to-buy/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">Where to find it &rarr;</a></p>
 				</div>
 				<CatalogOrderForm returnPath="/print/" idp="pcat" level={3} />
 			</div>
@@ -1124,15 +1159,29 @@ const dvcVerses = [
 	:global(.lang-card .buy-direct) {
 		margin-top: auto;
 	}
+	/* ONE card-link style (Kevin 2026-11-08: all links on the /print cards look the same): the
+	   Look inside trigger's own style, the most used. Full details and the Save 15% link share it. */
+	.card-link {
+		font-family: var(--font-sans);
+		font-size: 0.82rem;
+		font-weight: 700;
+		color: #3f3f46;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+		cursor: pointer;
+	}
+	.read-free {
+		display: block;
+		text-align: center;
+		white-space: normal;
+		margin-top: 0.15rem;
+	}
+	.card-link:hover {
+		color: var(--color-ink);
+	}
 	@media (max-width: 640px) {
-		/* On a phone (~133px content box) a pill wraps to two lines when its label is long (Buy
-		   now, a Google Audio price, the B&N pair), so blocks differed by up to 76px (measured at
-		   390px: 398-474). One reserved height for the block = every card the same height; 476px
-		   is the tallest measured block (474) rounded up. 2026-10-30: every card now carries the
-		   Google Play eBook + Audiobook and B&N pills (live or faded), tallest measured 491 -> 494px. */
-		:global(.lang-card > .mt-auto) {
-			min-height: 494px;
-		}
+		/* The per-card reserved block height was sized for the Google Play pills, which language cards
+		   no longer carry (Kevin 2026-11-09); it is dropped so the block collapses to its content. */
 		:global(.lang-card-title) {
 			min-height: calc(3 * 1.3em);
 			-webkit-line-clamp: 3;
@@ -1247,7 +1296,7 @@ const dvcVerses = [
 				const r = await fetch('/ebook-checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
 				const d = await r.json();
 				if (d.url) { window.location.href = d.url; return; }
-				if (msg) { msg.style.display = 'block'; msg.textContent = d.disabled ? 'Direct download is opening soon — grab it on Amazon meanwhile.' : 'Sorry, something went wrong. Please try again.'; }
+				if (msg) { msg.style.display = 'block'; msg.textContent = d.disabled ? 'Direct download is opening soon — please try again shortly or order the print edition direct from us.' : 'Sorry, something went wrong. Please try again.'; }
 			} catch {
 				if (msg) { msg.style.display = 'block'; msg.textContent = 'Network error — please try again.'; }
 			}

@@ -3,6 +3,10 @@
 // Generated from a verified draft (stats cited, verses slug-checked, images & voice
 // headshots sourced/verified by hand).
 import GroupBible from '../../components/GroupBible.astro';
+import { catalogRows } from '../../data/print-catalog';
+
+const GEN = catalogRows.find((r) => r.category === 'general');
+const GENERAL_PB = (GEN?.pb ?? 79.99).toFixed(2);
 ---
 
 <GroupBible
@@ -105,7 +109,16 @@ import GroupBible from '../../components/GroupBible.astro';
 		{ label: `SAMHSA National Helpline — 1-800-662-4357`, url: `https://www.samhsa.gov/find-help/national-helpline` },
 	]}
 	keepReadingHtml={`Start with the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free online with audio</a>, learn <a href="/the-fathers-heart-bible/" style="color: var(--color-brand);" class="hover:underline">why Father's Heart Bible™ exists</a>, or get oriented with our <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a> — including <a href="/guides/how-to-pray/" style="color: var(--color-brand);" class="hover:underline">how to pray</a> and <a href="/verses/" style="color: var(--color-brand);" class="hover:underline">verses by topic</a>. Or meet the Father in another season through the rest of the <a href="/bible-for/" style="color: var(--color-brand);" class="hover:underline">A Father For series</a>.`}
+	whichBibleHeading={`What is the best Bible to give a veteran?`}
+	whichBibleIntroHtml={`Someone home from service often reads late at night, in short stretches, with a lot on their mind. Give a veteran a clear modern translation they will actually open, and one they can also <em>hear</em>. Father&rsquo;s Heart Bible&trade; (FHB), which we publish, is free to read and listen to online on any device with no account, and the paperback is $${GENERAL_PB} on our <a href="/print/" style="color: var(--color-brand);" class="hover:underline">print editions page</a>. It reveals God as a <em>Father</em> wherever Scripture does. A good place to begin is <a href="https://fathersheartbible.com/read/psalms/34/" style="color: var(--color-brand);" class="hover:underline">Psalm 34</a>. The comparison below sets FHB beside other common choices.`}
+	whichBibleRows={[
+		{ edition: `Father's Heart Bible™ <span style="font-weight:400; color: var(--color-muted);">(the one we publish)</span>`, bestFor: `A gift they can read or hear free, and a Bible that shows God as Father`, style: `Translation from the original Hebrew, Aramaic &amp; Greek that reveals God as <em>Father</em> throughout`, access: `Free online with audio, no account; paperback $${GENERAL_PB}` },
+		{ edition: `NLT (New Living Translation, Tyndale)`, bestFor: `Easy, natural everyday English`, style: `Thought-for-thought, very readable`, access: `Many editions from retailers` },
+		{ edition: `NIV (New International Version, Zondervan)`, bestFor: `The translation most churches and study guides use`, style: `A balance of word-for-word and thought-for-thought`, access: `Many editions from retailers` },
+	]}
+	whichBibleNoteHtml={`Give it as a gift with no pressure, and let them open it when they are ready. Whichever you choose, the gift matters more than the edition.`}
 	faqs={[
+		{ question: `What is the best Bible to give a veteran?`, answer: `Give a veteran a clear modern translation they will actually open, ideally one they can also hear. Father's Heart Bible™ is free to read and listen to online on any device with no account (paperback $${GENERAL_PB}, on our print editions page) and reveals God as a Father wherever Scripture does. The NLT is very readable and the NIV is widely used in churches, so either is a sound alternative. A good place to begin is Psalm 34.` },
 		{ question: `What are good Bible verses for veterans?`, answer: `Deuteronomy 31:6 (He will never leave you nor forsake you), Psalm 34:18 (close to the brokenhearted), Isaiah 41:10 (I will strengthen you and uphold you), Psalm 147:3 (He heals the brokenhearted and binds up their wounds), Joshua 1:9 (be strong; your Father is with you wherever you go), Psalm 23:4 (through the darkest valley, He is with you), Isaiah 43:1 (I have called you by name, you are Mine), and John 14:27 (My peace I give to you) all speak straight to what veterans carry. Read and hear them free in Father's Heart Bible™ at fathersheartbible.com/read.` },
 		{ question: `What does the Bible say about PTSD and the wounds veterans carry?`, answer: `Scripture takes invisible wounds seriously and offers a real place to bring them. Psalm 147:3 says God heals the brokenhearted and binds up their wounds, and Psalm 34:18 promises He is close to the brokenhearted and saves the crushed in spirit. Father's Heart Bible™ reveals God as a Father you can actually hand the weight to — read those passages free, with audio, at fathersheartbible.com/read.` },
 		{ question: `What scripture helps with survivor's guilt or the loss of friends in service?`, answer: `Psalm 34:18 and Psalm 147:3 speak directly to grief and a crushed spirit — God draws near to the brokenhearted and binds up their wounds. Psalm 23:4 walks with you through the darkest valley, and John 14:27 offers a peace the world cannot give. In Father's Heart Bible™ you meet God as a Father who saw every loss and grieves with you — read and listen free at fathersheartbible.com/read.` },

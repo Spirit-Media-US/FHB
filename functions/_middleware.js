@@ -10,6 +10,8 @@
 // To embargo a post: add { slug, reveal } below. `reveal` is an ISO 8601 UTC
 // instant. To change a time after deploy, edit here and redeploy. Remove the
 // entry once a post is permanently live (harmless to leave; it just no-ops).
+import { pagesDevRedirectTarget } from './_lib/pagesdev-redirect.js';
+
 const GATED = [
 	// "The Father of Honor" — go live Wed 2026-06-24 09:00 ET (13:00 UTC)
 	{ slug: 'the-father-of-honor-starving-world', reveal: '2026-06-24T13:00:00Z' },
@@ -20,6 +22,9 @@ const GATED = [
 
 export async function onRequest(context) {
 	const { request, next } = context;
+	// 2mp: production alias (fathersheartbible.pages.dev) -> 301 to the real domain; preview aliases untouched.
+	const pd = pagesDevRedirectTarget(request.url, request.headers);
+	if (pd) return new Response(null, { status: 301, headers: { Location: pd, 'Cache-Control': 'public, max-age=3600' } });
 	const url = new URL(request.url);
 	const path = url.pathname;
 	const now = Date.now();

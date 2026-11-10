@@ -20,15 +20,23 @@
 // `telugu samethalu` (2,600) is Telugu FOLK PROVERBS, not the book of Proverbs —
 // the known trap in this language. Deliberately not served here.
 //
-// NO AUDIO CLAIM. src/lib/audio-reader.ts in the community app narrates English
-// only; Telugu has exactly one approved test chapter (Genesis 1). Saying "with
-// audio" here would be a claim of a feature this edition lacks.
+// AUDIO (2026-11-10, 2pu): community src/data/lang-audio.json lists te complete
+// (1,189 chapters) and the mp3s serve 200, so the FAQ says narration is available
+// at /read/te/. Re-check lang-audio.json before changing this claim.
 //
 // Canon figures (66 books / 1,189 chapters) are MEASURED from
 // /srv/sites/community/src/content/bible-te, not quoted from a note.
 import AuthorBio from '../components/AuthorBio.astro';
 import ReviewLink from '../components/ReviewLink.astro';
 import Layout from '../layouts/Layout.astro';
+
+// Telugu blog editions (2qb): data-driven from the same overlays /te/blog/[slug] builds from,
+// so a new overlay file appears here automatically. Titles are each post's own Telugu title.
+const teBlogModules = import.meta.glob('../data/te-blog/*.json', { eager: true });
+const TE_ARTICLES = Object.values(teBlogModules)
+	.map((m: any) => m.default)
+	.filter((p: any) => p?.slug && p?.title)
+	.sort((a: any, b: any) => a.slug.localeCompare(b.slug));
 
 const PAGE_URL = 'https://fathersheartbible.com/telugu-bible/'; // trailing slash = the canonical form Layout.astro emits
 const TITLE = "Telugu Bible — Read Father's Heart Bible Free Online";
@@ -167,7 +175,7 @@ const FAQS = [
 	{
 		question: 'Does the Telugu Bible have audio?',
 		answer:
-			"Not yet. Audio narration is currently available on the English edition of Father's Heart Bible™; the Telugu text is complete and free to read today, and Telugu narration is not yet published.",
+			"Yes. The complete Telugu text is free to read, and Telugu audio narration is available for the whole Bible. Open any chapter at fathersheartbible.com/read/te/ and press Listen to hear it read aloud. Narration is also available on the English edition of Father's Heart Bible™.",
 	},
 	{
 		question: 'Is the whole Bible available in Telugu, or only part of it?',
@@ -224,6 +232,7 @@ const TOC = [
 	{ id: 'psalms', label: 'Keerthanalu — the Psalms' },
 	{ id: 'beyond-psalms', label: 'Beyond the Psalms' },
 	{ id: 'find-a-chapter', label: 'Finding a chapter' },
+	{ id: 'articles-te', label: 'Articles in Telugu' },
 	{ id: 'faq', label: 'FAQ' },
 ];
 ---
@@ -308,6 +317,16 @@ const TOC = [
 					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">The whole Bible in Telugu, online and free &mdash; a translation revealing God as a loving Father to His sons and daughters.</p>
 					<a href={`${READ_TE}keerthanalu/23/`} class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Open <span lang="te">కీర్తనలు</span> 23<span aria-hidden="true">&rarr;</span></a>
 				</aside>
+
+				{TE_ARTICLES.length > 0 && (
+					<>
+						<h2 id="articles-te" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Articles in Telugu</h2>
+						<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Our Father&rsquo;s Heart Bible blog articles are also available in Telugu:</p>
+						<ul class="space-y-2 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: disc;">
+							{TE_ARTICLES.map((p: any) => (<li><a href={`/te/blog/${p.slug}/`} lang="te" style="color: var(--color-brand);" class="hover:underline">{p.title}</a></li>))}
+						</ul>
+					</>
+				)}
 
 				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
 				<div class="space-y-6">

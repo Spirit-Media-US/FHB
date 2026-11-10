@@ -1,0 +1,84 @@
+---
+import Section from '../components/Section.astro';
+import Layout from '../layouts/Layout.astro';
+import { RETURN_DAYS } from '../lib/merchantReturnPolicy';
+import { EXPEDITED_DISCLAIMER } from '../lib/order-pricing';
+---
+
+<Layout
+  title="Our Promise | Return Policy | FHB — Father's Heart Bible™"
+  description={`Our promise: your Father's Heart Bible™ purchase is guaranteed. If anything isn't right, tell us within ${RETURN_DAYS} days of delivery and we will make it right, with refunds to your original payment method.`}
+  jsonLd={{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fathersheartbible.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Return Policy", "item": "https://fathersheartbible.com/returns/" }
+    ]
+  }}
+>
+
+  <main id="main-content" style="margin-top: 80px;">
+    <Section variant="soft">
+      <div class="max-w-3xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-light mb-8" style="font-family: var(--font-serif); color: var(--color-ink);">Your Purchase Is Guaranteed</h1>
+        <p class="text-sm mb-8" style="color: var(--color-muted); font-family: var(--font-sans);">Last updated: November 9, 2026</p>
+
+        <div class="space-y-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Our Promise</h2>
+            <p class="leading-relaxed">If anything isn't right with your order, for any reason, let us know within <strong>{RETURN_DAYS} days of delivery</strong> and we will make it right. Email <strong>hello@spiritmediapublishing.com</strong> with your order number and a few words about what happened.</p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">What Happens Next</h2>
+            <p class="leading-relaxed">We will review your request and reply with the resolution: a replacement, a refund, or another fix. Please don't send anything back until we have replied; we will tell you exactly what to do. Refunds go to your original payment method, and your bank typically posts them within 5 to 10 business days.</p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">eBooks</h2>
+            <p class="leading-relaxed">If an eBook file cannot be opened, ask within {RETURN_DAYS} days of purchase and we will refund it in full.</p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Order Number Required</h2>
+            <p class="leading-relaxed">Refunds are made only against an order placed on fathersheartbible.com. Please have your order number ready, as it is in your confirmation email.</p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Fair Use of This Promise</h2>
+            <p class="leading-relaxed">We may decline repeated or abusive claims, so that we can keep this promise generous for everyone.</p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">How to Reach Us</h2>
+            <ol class="list-decimal pl-6 space-y-2 leading-relaxed">
+              <li>Email <strong>hello@spiritmediapublishing.com</strong> with your order number and the edition you ordered.</li>
+              <li>Tell us what is wrong. For a damaged or misprinted copy, a photo helps.</li>
+              <li>We reply by email with your resolution and any next steps.</li>
+            </ol>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Delivery Times and Expedited Delivery</h2>
+            <p class="leading-relaxed">{EXPEDITED_DISCLAIMER} Estimated delivery ranges are shown at checkout for your country.</p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">What This Covers</h2>
+            <p class="leading-relaxed">This policy covers print Bibles and eBooks bought directly from fathersheartbible.com and shipped to any country we ship to. Copies bought elsewhere follow the seller's return policy. Donations are described in our <a href="/terms/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">Terms of Use</a>.</p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Contact</h2>
+            <p class="leading-relaxed">Questions? Email <strong>hello@spiritmediapublishing.com</strong> or write to:</p>
+            <p class="leading-relaxed mt-2">Spirit Media Publishing<br/>205 Academy Street #3251<br/>Cary, NC 27519<br/>United States</p>
+          </div>
+
+        </div>
+      </div>
+    </Section>
+  </main>
+
+</Layout>
