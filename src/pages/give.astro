@@ -1,0 +1,34 @@
+---
+import DonationForm from '../components/donations/DonationForm.astro';
+import Section from '../components/Section.astro';
+import Layout from '../layouts/Layout.astro';
+
+// /give/ — the FHB giving page (Kevin 2026-11-10: "make a donation page like the youversion donation
+// page we made and add a give now button to the legacy page", with his giving message on the page).
+// Same SM Gives Stripe form as /legacy/youversion/; /legacy/ links here with a Give now button.
+---
+
+<Layout
+	title="Give | Father's Heart Bible"
+	description="When you give to Father's Heart Bible, you help accelerate Bible translation and Scripture access around the world."
+>
+	<main>
+		<Section variant="light">
+			<div class="max-w-xl mx-auto">
+				<p class="text-xs font-semibold tracking-widest uppercase mb-4" style="font-family: var(--font-sans); color: var(--color-brand);">
+					Give to Father&rsquo;s Heart Bible
+				</p>
+				<h1 class="text-3xl md:text-4xl mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">
+					Share Our Father with the World
+				</h1>
+				<p class="leading-relaxed mb-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+					When you give to Father&rsquo;s Heart Bible, you help accelerate Bible translation and Scripture access around the world inviting all people groups to receive the Father, hear his voice, and know his heart is for them.
+				</p>
+				<DonationForm />
+				<p class="text-sm mt-6" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<a href="/legacy/" style="color: var(--color-brand);">Read our story</a>
+				</p>
+			</div>
+		</Section>
+	</main>
+</Layout>
