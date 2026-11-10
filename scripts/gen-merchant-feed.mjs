@@ -12,6 +12,12 @@
  * Runs AFTER `astro build` (writes dist/merchant-feed.xml). Nothing is submitted anywhere:
  * the file is just served at /merchant-feed.xml; registering it in Merchant Center is a later,
  * Kevin-gated step. Validate with scripts/merchant-feed-verify.mjs.
+ * Unit 2ra: the SAME item list also emits dist/merchant-feed-openai.jsonl (OpenAI/ChatGPT merchant
+ * product feed, https://developers.openai.com/commerce/specs/feed, read 2026-11-10): one JSON object per
+ * line, the 9 required fields (item_id,title,description,url,brand,seller_name,image_url,availability,
+ * price) plus gtin, condition, group_id, product_category, target_countries, store_country. Same
+ * ids/prices/availability/links/images/GTINs as the XML by construction; scripts/openai-feed.test.mjs
+ * enforces parity. NOT submitted anywhere (application is unit 2rb).
  * Usage: node scripts/gen-merchant-feed.mjs [--out dist/merchant-feed.xml]
  */
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -103,4 +109,25 @@ ${rows.join('\n')}
 </rss>
 `;
 writeFileSync(OUT, xml);
+const OUT_JSONL = OUT.replace(/\.xml$/, '') + '-openai.jsonl';
+const AVAIL = (a) => (a.endsWith('InStock') ? 'in_stock' : 'out_of_stock');
+const jsonl = [...items.values()].map((i) => JSON.stringify({
+	item_id: String(i.id),
+	title: i.title,
+	description: i.description,
+	url: i.link,
+	brand: "Father's Heart Bible",
+	seller_name: 'Spirit Media Publishing',
+	image_url: i.image,
+	availability: AVAIL(i.availability),
+	price: `${i.price} ${i.currency}`,
+	gtin: String(i.gtin),
+	condition: 'new',
+	group_id: i.group,
+	product_category: 'Media > Books',
+	target_countries: ['US'],
+	store_country: 'US',
+})).join('\n') + '\n';
+writeFileSync(OUT_JSONL, jsonl);
+console.log(`merchant-feed: ${items.size} records -> ${OUT_JSONL}`);
 console.log(`merchant-feed: ${rows.length} items -> ${OUT}`);
