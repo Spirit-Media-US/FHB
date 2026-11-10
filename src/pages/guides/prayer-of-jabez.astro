@@ -1,0 +1,225 @@
+---
+// Guide — /guides/prayer-of-jabez (unit 2ow). Target: prayer of jabez.
+// Quotes are verbatim FHB (1 Chronicles 4, Matthew 6-7, Philippians 4, 1 John 5, locked canon).
+import AuthorBio from '../../components/AuthorBio.astro';
+import ReviewLink from '../../components/ReviewLink.astro';
+import YouVersionBanner from '../../components/YouVersionBanner.astro';
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/guides/prayer-of-jabez/';
+const TITLE = 'Prayer of Jabez (1 Chronicles 4:9-10) — Meaning and Context';
+const DESCRIPTION =
+	"The prayer of Jabez in 1 Chronicles 4:9-10: who Jabez was, what each line asks, why it sits in a genealogy and how it fits our Father's heart, quoted from Father's Heart Bible.";
+const PUBLISHED = '2026-11-10';
+const MODIFIED = '2026-11-10';
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg';
+const HERO_ALT = 'An open Bible, ready to read';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: 'Founder & CEO, Spirit Media Publishing',
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+const FAQS = [
+	{
+		question: `What is the prayer of Jabez?`,
+		answer: `The prayer of Jabez is the short prayer in 1 Chronicles 4:10. Jabez called out to our Father of Israel, asking Him to truly bless him, enlarge his territory, let His hand be with him and keep him from harm so that he suffered no pain. The verse ends: "And our Father granted his request."`,
+	},
+	{
+		question: `Where is the prayer of Jabez in the Bible?`,
+		answer: `It is in 1 Chronicles 4:9-10, in the middle of the family lines of Judah. Verse 9 introduces Jabez and verse 10 gives his prayer and our Father's answer. It is the only place Jabez is named as praying.`,
+	},
+	{
+		question: `Who was Jabez?`,
+		answer: `Jabez was a man of Judah who, in the words of Father's Heart Bible, "was more honored than his brothers." His mother named him Jabez, saying, "Because I bore him in pain." The text gives no other details about his life.`,
+	},
+	{
+		question: `What does the name Jabez mean?`,
+		answer: `Father's Heart Bible notes that the name Jabez sounds like the Hebrew word for "pain," the very word his mother spoke at his birth. His prayer's last line, asking to be kept from harm "so that I suffer no pain," echoes that word.`,
+	},
+	{
+		question: `Is the prayer of Jabez a formula we should repeat?`,
+		answer: `The Bible records what Jabez asked and that our Father granted it; it does not command us to repeat his words or promise the same outcome to everyone who does. For our own asking, 1 John 5:14 says, "whatever we ask according to his will, he hears us," and Matthew 7:11 says our Father in heaven gives good things to those who ask Him.`,
+	},
+];
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: 'Prayer of Jabez (1 Chronicles 4:9-10): Meaning and Context',
+	description: DESCRIPTION,
+	image: OG_IMG,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: PUBLISHED,
+	dateModified: MODIFIED,
+	inLanguage: 'en-US',
+	articleSection: 'Bible Reading Guides',
+	keywords:
+		'prayer of jabez, Jabez, 1 Chronicles 4:10, Jabez prayer meaning, what is the prayer of Jabez',
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'Guides',
+			item: 'https://fathersheartbible.com/guides/',
+		},
+		{ '@type': 'ListItem', position: 3, name: 'Prayer of Jabez', item: PAGE_URL },
+	],
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [articleSchema, breadcrumbSchema, faqSchema];
+
+const TOC = [
+	{ id: 'who', label: 'Who was Jabez' },
+	{ id: 'prayer', label: 'The prayer' },
+	{ id: 'lines', label: 'Each line' },
+	{ id: 'context', label: 'Context' },
+	{ id: 'heart', label: 'The Father’s heart' },
+	{ id: 'note', label: 'Not a formula' },
+	{ id: 'faq', label: 'FAQ' },
+];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={PUBLISHED}
+	articleSection="Bible Reading Guides"
+	articleTags={["Prayer of Jabez", "Jabez", "1 Chronicles 4"]}
+	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
+			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
+		</section>
+		<YouVersionBanner />
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/guides/" class="hover:underline">Guides</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Prayer of Jabez</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Reading Guide</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">The Prayer of Jabez: 1 Chronicles 4:9-10</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; Editor, Father&rsquo;s Heart Bible&trade;</span>
+					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);"><strong style="color: var(--color-ink);">The prayer of Jabez is the short prayer in 1 Chronicles 4:10, where Jabez, a man of Judah, called out to our Father of Israel for blessing, more land, His hand with him and protection from harm, and &ldquo;our Father granted his request.&rdquo;</strong> It is two verses long and sits inside a genealogy. Below is the text in Father&rsquo;s Heart Bible, what each line asks, and how it fits what the rest of Scripture shows about our Father.</p>
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">Jabez asked our Father plainly for good things, and our Father answered. The text records his prayer; it does not turn it into a formula.</p></aside>
+				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);"><p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p><ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}</ul></nav>
+
+				
+				<h2 id="who" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Who was Jabez?</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Jabez appears in the middle of a list of names. Nearly all of 1 Chronicles 4 is family lines, then one verse stops to tell us about a single man:</p>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;Jabez was more honored than his brothers; his mother named him Jabez, saying, "Because I bore him in pain."&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/1-chronicles/4/" style="color: var(--color-brand);" class="hover:underline">1 Chronicles 4:9</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Father&rsquo;s Heart Bible notes that the name Jabez sounds like the Hebrew word for &ldquo;pain,&rdquo; the very word his mother spoke at his birth. The text tells us two things only: he was more honored than his brothers, and his name carried his mother&rsquo;s pain. It does not tell us his father, his age or what he did.</p>
+				<h2 id="prayer" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The prayer of Jabez, 1 Chronicles 4:10</h2>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;Jabez called out to our Father of Israel: "Oh, that you would truly bless me and enlarge my territory! Let your hand be with me, and keep me from harm so that I suffer no pain." And our Father granted his request.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/1-chronicles/4/" style="color: var(--color-brand);" class="hover:underline">1 Chronicles 4:10</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The whole prayer is one sentence in the text, addressed to &ldquo;our Father of Israel.&rdquo; The verse that follows is the only comment on how it went: our Father granted his request.</p>
+				<h2 id="lines" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">What each line asks</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);"><strong style="color: var(--color-ink);">&ldquo;Oh, that you would truly bless me.&rdquo;</strong> He asks for blessing, and he asks it of our Father directly, not of anyone else.</p>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);"><strong style="color: var(--color-ink);">&ldquo;And enlarge my territory.&rdquo;</strong> Territory means land, the place a family lives and works. Here it is a request for more room to live.</p>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);"><strong style="color: var(--color-ink);">&ldquo;Let your hand be with me.&rdquo;</strong> He asks for our Father&rsquo;s presence and help, not only for gifts.</p>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);"><strong style="color: var(--color-ink);">&ldquo;Keep me from harm so that I suffer no pain.&rdquo;</strong> This line returns to his name, which sounds like &ldquo;pain.&rdquo; The man born in pain asks to be kept from it.</p>
+				<h2 id="context" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Why is this prayer in a genealogy?</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The Chronicles list the clans of Judah, and then the story of Jabez interrupts it, in the middle of the chapter in <a href="/read/1-chronicles/4/" style="color: var(--color-brand);" class="hover:underline">1 Chronicles 4</a>. Our Father is not only the God of famous names. One man in a long list of names speaks to Him plainly and is heard. The chapter then goes back to its lists, with Simeon&rsquo;s clans after Judah&rsquo;s.</p>
+				<h2 id="heart" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">The prayer and the Father&rsquo;s heart</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Jabez asks for good things, and the rest of Scripture shows our Father is glad to be asked. Jesus says:</p>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;So if you, being evil, know how to give your children good gifts, how much more will your Father in heaven give good things to those who ask him?&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/matthew/7/" style="color: var(--color-brand);" class="hover:underline">Matthew 7:11</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;Do not be like them, for your Father knows what you need before you ask him.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/matthew/6/" style="color: var(--color-brand);" class="hover:underline">Matthew 6:8</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Paul says the same thing to the church in Philippi:</p>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;Worry about nothing; instead, in everything, through prayer and petition with thanksgiving, make your requests known to our Father.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/philippians/4/" style="color: var(--color-brand);" class="hover:underline">Philippians 4:6</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Jabez does exactly this: he makes his requests known to our Father, and our Father answers. For more on how to bring your own requests, see our guide on <a href="/guides/how-to-pray/" style="color: var(--color-brand);" class="hover:underline">how to pray</a>.</p>
+				<h2 id="note" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">A prayer to read, not a formula</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The Bible records this prayer; it does not command anyone to repeat it, and it does not promise the same result for everyone who does. The text says what Jabez asked and that our Father granted it, and nothing more. John gives the steadier guide for our own asking:</p>
+				<figure class="my-6 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">&ldquo;This is our confidence before him: whatever we ask according to his will, he hears us.&rdquo;</p><figcaption class="mt-2 text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"><a href="/read/1-john/5/" style="color: var(--color-brand);" class="hover:underline">1 John 5:14</a>, Father&rsquo;s Heart Bible</figcaption></figure>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">So read Jabez as a picture of honest, direct prayer to a Father who listens, not as a wording that guarantees an outcome. Read the whole chapter free, with audio, at <a href="/read/1-chronicles/4/" style="color: var(--color-brand);" class="hover:underline">1 Chronicles 4</a>.</p>
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;"><p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Read the prayer in context</p><p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Read and listen to 1 Chronicles 4 in Father&rsquo;s Heart Bible, free online.</p><a href="https://fathersheartbible.com/read/1-chronicles/4/" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a></aside>
+
+<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="space-y-6">
+					{FAQS.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Keep going: read <a href="/guides/how-to-pray/" style="color: var(--color-brand);" class="hover:underline">How to Pray</a>, <a href="/guides/how-to-read-the-bible/" style="color: var(--color-brand);" class="hover:underline">How to Read the Bible</a>, <a href="/guides/how-to-study-the-bible/" style="color: var(--color-brand);" class="hover:underline">How to Study the Bible</a>, or open the <a href="https://fathersheartbible.com/read/" style="color: var(--color-brand);" class="hover:underline">whole Bible free with audio</a>.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Read Father&rsquo;s Heart Bible free online with audio &mdash; a translation that reveals God as a loving Father on every page.</p>
+				<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<ReviewLink class="mb-10" />
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>

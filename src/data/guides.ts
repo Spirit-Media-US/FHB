@@ -94,4 +94,11 @@ export const GUIDES: GuideEntry[] = [
 			'Genesis 6-9 in our Father’s words — why the flood came, the size of the ark, how long the waters lasted, where it landed and the rainbow covenant.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
+	{
+		slug: 'prayer-of-jabez',
+		title: 'Prayer of Jabez',
+		blurb:
+			'1 Chronicles 4:9-10 in our Father’s words — who Jabez was, what each line of his prayer asks, and how it fits the Father’s heart.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
 ];
