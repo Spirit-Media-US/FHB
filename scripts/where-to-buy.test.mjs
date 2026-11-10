@@ -27,6 +27,11 @@ const HOSTS = {
 	apple: /^https:\/\/books\.apple\.com\/us\/(book|audiobook)\//,
 	walmart: /^https:\/\/www\.walmart\.com\/ip\/[^?#]+\/\d+$/,
 	kobo: /^https:\/\/www\.kobo\.com\/[a-z-]+\/[a-z]{2}\/(ebook|audiobook)\/[^?#]+$/,
+	// 2026-11-10 (Kevin: the homepage stores belong on Where to Find It; product pages, never search):
+	abebooks: /^https:\/\/www\.abebooks\.com\/979\d{10}\/[^/?#]+\/plp$/,
+	booksamillion: /^https:\/\/www\.booksamillion\.com\/p\/979\d{10}$/,
+	bookshop: /^https:\/\/bookshop\.org\/p\/books\/[^?#]+/,
+	thriftbooks: /^https:\/\/www\.thriftbooks\.com\/w\/[^?#]+\/\d+\/?/,
 };
 
 // Every rule about the data in ONE function, so the failure path can feed it a bad copy.
@@ -46,6 +51,10 @@ function problems(isbnData, linkData) {
 			if (!HOSTS[rt]) out.push(`${id}: ${rt} link kept although that retailer is not verifiable`);
 			for (const [fmt, url] of Object.entries(m)) {
 				if (!HOSTS[rt]?.test(url)) out.push(`${id} ${rt} ${fmt}: unexpected URL ${url}`);
+				if (rt === 'abebooks' || rt === 'booksamillion') {
+					const want = digits(fmt === 'hardback' ? e.hb : e.pb);
+					if (!url.includes(want)) out.push(`${id} ${rt} ${fmt}: URL is not ISBN ${want}`);
+				}
 				if (rt === 'bn') {
 					const want = digits(fmt === 'hardback' ? e.hb : e.pb);
 					if (!url.includes(`ean=${want}`)) out.push(`${id} bn ${fmt}: URL is not ISBN ${want}`);
@@ -86,8 +95,8 @@ test('verification records: B&N all verified; Walmart/Kobo found via Google resu
 	for (const s of v.amazon.isbnReadBackSample) assert.equal(digits(s.isbn13), digits(want[s.matches_catalog]), s.matches_catalog);
 });
 
-test('retailer rows come in the order Amazon, B&N, Walmart, Kobo, Apple Books, Google Play', () => {
-	assert.deepEqual(links.retailers.map((r) => r.key), ['amazon', 'bn', 'walmart', 'kobo', 'apple', 'google']);
+test('retailer rows come in the order Amazon, B&N, Walmart, Kobo, Apple Books, Google Play, then the 2026-11-10 stores', () => {
+	assert.deepEqual(links.retailers.map((r) => r.key), ['amazon', 'bn', 'walmart', 'kobo', 'apple', 'google', 'abebooks', 'thriftbooks', 'booksamillion', 'bookshop']);
 });
 
 test('the buy-direct banner comes first: before every card and every retailer link', () => {
