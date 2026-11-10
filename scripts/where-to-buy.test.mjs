@@ -99,7 +99,7 @@ test('the buy-direct banner comes first: before every card and every retailer li
 	const html = read('dist/where-to-buy/index.html').replace(/ data-astro-cid-\w+/g, '');
 	const b = html.indexOf('id="buy-direct-banner"');
 	assert.ok(b > 0);
-	for (const host of ['amazon.com/dp/', 'barnesandnoble.com/w/', 'play.google.com/store', 'books.apple.com']) assert.ok(html.indexOf(host) > b, `${host} before the banner`);
+	for (const host of ['barnesandnoble.com/w/', 'play.google.com/store', 'books.apple.com']) assert.ok(html.indexOf(host) > b, `${host} before the banner`);
 	assert.ok(html.indexOf('class="ed"') > b, 'first card before the banner');
 	assert.ok(!/"@type":"(Offer|AggregateOffer|Product)"/.test(html));
 	assert.ok(!/<meta[^>]*noindex/i.test(html));
@@ -113,7 +113,7 @@ test('built cards: cover left with size + lazy + alt, ISBNs under binding column
 	const catalog = buildCatalog(isbns);
 	const cards = html.match(/<article class="ed" [\s\S]*?<\/article>/g) ?? [];
 	assert.equal(cards.length, catalog.size + 1, 'one card per print edition + the Large Print set');
-	const order = links.retailers.map((r) => r.key);
+	const order = links.retailers.map((r) => r.key).filter((k) => k !== 'amazon'); // Amazon never rendered (Kevin 2026-11-10)
 	const rowsOf = (t) => [...t.matchAll(/<tr class="rt[^"]*" data-rt="([a-z]+)">([\s\S]*?)<\/tr>/g)];
 	for (const c of cards) {
 		const id = c.match(/data-edition="([^"]+)"/)[1];
@@ -162,7 +162,7 @@ test('built cards: cover left with size + lazy + alt, ISBNs under binding column
 		for (const eid of ids) {
 			const card = cards.find((c) => c.includes(`data-edition="${eid}"`));
 			assert.ok(card, `${kind} ${code}: no card ${eid}`);
-			for (const u of Object.values(row)) assert.ok(card.includes(u), `${kind} ${code}: ${u} not on ${eid}`);
+			for (const [rk, u] of Object.entries(row)) if (rk !== 'amazon') assert.ok(card.includes(u), `${kind} ${code}: ${u} not on ${eid}`);
 		}
 	}
 	const langOrder = (html.match(/data-edition="(?:lang-[\w-]+|digital-en)"/g) ?? []).length;
@@ -173,7 +173,8 @@ test('built cards: cover left with size + lazy + alt, ISBNs under binding column
 	assert.match(html, /data-rt="direct"[^>]*class="wtb-pref">Buy direct <span class="wtb-badge">Preferred<\/span>/);
 	const hasKobo = Object.values(links.digital).some((m) => Object.values(m).some((r) => r.kobo));
 	assert.equal(buttons.includes('kobo'), hasKobo, 'Kobo button iff a Kobo link exists');
-	for (const k of ['amazon', 'bn', 'walmart', 'apple', 'google']) assert.ok(buttons.includes(k), `${k} button`);
+	for (const k of ['bn', 'walmart', 'apple', 'google']) assert.ok(buttons.includes(k), `${k} button`);
+	assert.ok(!buttons.includes('amazon'), 'no Amazon button (Kevin 2026-11-10)');
 	// the filter's card list: a card advertises exactly the stores it has links for
 	const es = cards.find((c) => c.includes('data-edition="lang-es"'));
 	assert.match(es, /data-stores="[^"]*\bgoogle\b/);
@@ -188,4 +189,10 @@ test('no href on the built page is a search page, and every Walmart href is a pr
 	const wm = hrefs.filter((h) => h.includes('walmart.com'));
 	assert.ok(wm.length > 0, 'Walmart links present');
 	for (const h of wm) assert.match(h, /^https:\/\/www\.walmart\.com\/ip\/[^?#]+\/\d+$/);
+});
+
+test('ZERO Amazon on the built page: no amazon link, no Amazon word, no amazon store key (Kevin 2026-11-10)', () => {
+	if (!existsSync(new URL('dist/where-to-buy/index.html', root))) return;
+	const html = read('dist/where-to-buy/index.html');
+	assert.ok(!/amazon/i.test(html), `Amazon still appears: ${(html.match(/.{0,40}amazon.{0,40}/i) ?? [''])[0]}`);
 });
