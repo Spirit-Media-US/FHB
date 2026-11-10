@@ -1,7 +1,7 @@
 ---
 // /where-to-buy/ — Kevin 2026-11-09 (ruling "1 A"): a "Where to find it" page, laid out like /isbn/, with a link
 // to each edition at every retailer and a toggle between retailers. FHB is its own retailer (Kevin 2026-11-08,
-// "We will stop pointing people to Amazon"), so the buy-direct banner leads and every other retailer is
+// "We will stop pointing people to Amazon"; 2026-11-10: no Amazon on this page at all), so the buy-direct banner leads and every other retailer is
 // secondary. This is the ONLY page that carries retailer links. Every link is server-rendered (works with no
 // JavaScript); the toggle only filters. Links come from src/data/retailer-links.json and appear only where
 // verified; a card shows only the retailers that have a verified listing for it (plus Buy direct) — never a guessed URL, no "Not listed" rows.
@@ -38,7 +38,11 @@ interface Group {
 	rows: Row[];
 }
 
-const retailers = links.retailers as { key: string; name: string }[];
+// Kevin 2026-11-10: ZERO Amazon links or references on this page. Amazon is dropped here, at the one place
+// retailers enter the page, so no row, toggle, label or link can bring it back.
+const retailers = (links.retailers as { key: string; name: string }[]).filter(
+	(r) => r.key !== 'amazon',
+);
 const DIRECT = '15% off 1st order + Free Shipping';
 const printLinks = links.print as Record<string, Record<string, Partial<Record<Fmt, string>>>>;
 const digitalLinks = links.digital as Record<string, Record<string, Record<string, string>>>;
@@ -197,7 +201,7 @@ const rowStores = (rl: Record<string, unknown>) =>
 	retailers.filter((r) => rl[r.key] && Object.keys(rl[r.key] as object).length > 0);
 
 const seoTitle = "Where to Find Father's Heart Bible™ — Every Edition";
-const seoDescription = `Order Father's Heart Bible™ (FHB) direct for 15% off your first order and free shipping, or find every print edition, eBook and audiobook at Amazon, Barnes & Noble and Google Play, with its ISBN.`;
+const seoDescription = `Order Father's Heart Bible™ (FHB) direct for 15% off your first order and free shipping, or find every print edition, eBook and audiobook at Barnes & Noble, Walmart, Apple Books and Google Play, with its ISBN.`;
 const URL = 'https://fathersheartbible.com/where-to-buy/';
 
 // One Book per ISBN — what a bookstore or an answer engine looks up. No Offer/Product markup for other retailers.
@@ -471,7 +475,6 @@ const books = groups.flatMap((g) =>
 	.rt-na { color: var(--color-muted); }
 	/* toggle: show one row type only (every link stays in the HTML) */
 	#wtb[data-show='direct'] .rt:not([data-rt='direct']),
-	#wtb[data-show='amazon'] .rt:not([data-rt='amazon']):not([data-rt='direct']),
 	#wtb[data-show='bn'] .rt:not([data-rt='bn']):not([data-rt='direct']),
 	#wtb[data-show='google'] .rt:not([data-rt='google']):not([data-rt='direct']),
 	#wtb[data-show='walmart'] .rt:not([data-rt='walmart']):not([data-rt='direct']),
