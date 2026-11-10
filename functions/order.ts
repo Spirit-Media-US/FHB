@@ -16,7 +16,7 @@
 // NB: path is /order, not /api/* — the apex router proxies /api/* to the
 // community app, so this marketing function must live off that prefix.
 
-import { readBreakdown } from '../src/lib/order-pricing';
+import { BOOK_SKUS, readBreakdown } from '../src/lib/order-pricing';
 
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
@@ -86,6 +86,7 @@ const LANG_TITLES: Record<string, string> = {
 };
 
 function skuTitle(sku: string): string {
+	if (BOOK_SKUS[sku]) return BOOK_SKUS[sku].title;
 	if (TITLES[sku]) return `${TITLES[sku]} — Divine Voice Color`;
 	// Every SKU carries its binding (<slug>-hb / -pb, since 2026-09-17); the map is keyed by
 	// edition, so read the binding off the end rather than printing the raw SKU.
