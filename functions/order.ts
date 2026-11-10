@@ -16,6 +16,7 @@
 // NB: path is /order, not /api/* — the apex router proxies /api/* to the
 // community app, so this marketing function must live off that prefix.
 
+import { buildOptIn, optInSnippet } from '../src/lib/customerReviews';
 import { BOOK_SKUS, readBreakdown } from '../src/lib/order-pricing';
 
 interface Env {
@@ -106,7 +107,8 @@ function skuTitle(sku: string): string {
 const esc = (s: string) =>
 	s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-const page = (body: string, status = 200) =>
+// `tail` lands just before </body>; only the paid-order view passes one (Google Customer Reviews, unit 2qy).
+const page = (body: string, status = 200, tail = '') =>
 	new Response(
 		`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Your order — Father's Heart Bible</title><style>
 body{font-family:system-ui,-apple-system,sans-serif;background:#faf6f2;color:#1a1c1c;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0;padding:1.5rem}
@@ -123,7 +125,7 @@ a.btn{display:inline-block;background:#b60057;color:#fff;text-decoration:none;fo
 input{width:100%;box-sizing:border-box;padding:.7rem .9rem;border:1.5px solid #e4bdc4;border-radius:.5rem;font-size:1rem;margin:.5rem 0 1rem}
 button{background:#b60057;color:#fff;border:0;font-weight:700;padding:.8rem 1.8rem;border-radius:999px;font-size:1rem;cursor:pointer}
 .badge{display:inline-block;background:#eef7ee;color:#1f6b30;border-radius:999px;padding:.3rem .8rem;font-size:.8rem;font-weight:700}
-</style></head><body><div class="card">${body}</div></body></html>`,
+</style></head><body><div class="card">${body}</div>${tail}</body></html>`,
 		{
 			status,
 			headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
@@ -152,9 +154,12 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 		);
 	}
 
-	const r = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sid)}`, {
-		headers: { Authorization: `Bearer ${env.STRIPE_FHB_SECRET_KEY}` },
-	});
+	const r = await fetch(
+		`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sid)}?expand[]=shipping_cost.shipping_rate`,
+		{
+			headers: { Authorization: `Bearer ${env.STRIPE_FHB_SECRET_KEY}` },
+		},
+	);
 	if (!r.ok) {
 		return lookupForm(
 			'We couldn’t find an order with that reference. Check it against your confirmation email.',
@@ -220,5 +225,12 @@ ${shippedBlock}
 <dt>Order reference</dt><dd><code>${esc(sid)}</code></dd>
 </dl>
 <p style="margin-top:1.5rem;font-size:.9rem">Need to change something? Email <a href="mailto:${SUPPORT}?subject=Order%20${encodeURIComponent(sid)}">${SUPPORT}</a> with your reference and we’ll sort it out.</p>`,
+		200,
+		// Google Customer Reviews opt-in: this page only, values from the verified session above.
+		// buildOptIn returns null (module omitted) for test-mode sessions or any unverifiable value.
+		(() => {
+			const o = buildOptIn(s);
+			return o ? optInSnippet(o) : '';
+		})(),
 	);
 };
