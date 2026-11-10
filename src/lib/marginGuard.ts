@@ -22,7 +22,14 @@
 // Pure functions, no I/O: functions/dvc-checkout.ts calls them, scripts/margin-guard.test.mjs
 // exercises them (with injected rows, because pending countries are never read by checkout).
 import raw from '../data/ship-countries.json' with { type: 'json' };
-import { bindingFor, type IntlRow, paidUnit, unitAfter, volumesFor } from './order-pricing.ts';
+import {
+	BOOK_SKUS,
+	bindingFor,
+	type IntlRow,
+	paidUnit,
+	unitAfter,
+	volumesFor,
+} from './order-pricing.ts';
 import { LIVE_COUNTRIES, offerShippingDetails, type ShipCountry } from './shipCountries.ts';
 
 export { bindingFor, volumesFor };
@@ -78,6 +85,10 @@ export const handlingLabel = (code: string): string =>
 export const floorFor = (c: Pick<ShipCountry, 'farBand'>): number =>
 	c.farBand === true ? MIN_NET_FAR_USD : MIN_NET_USD;
 
+/** The net floor for one SKU in a destination: the country's floor, except a book with its own (Beloved Identity: break-even). */
+export const floorForSku = (slug: string, c: Pick<ShipCountry, 'farBand'>): number =>
+	BOOK_SKUS[slug]?.floorUsd ?? floorFor(c);
+
 /** Net USD for ONE SKU unit charged at `priceCents` plus `feeCents` handling; null = landed cost unknown. */
 export function netPerItemUsd(
 	slug: string,
@@ -108,7 +119,7 @@ export function handlingFeeCents(
 	if (country.code?.toUpperCase() === 'US' || !country.landed_cost_usd) return 0;
 	const noFee = netPerItemUsd(slug, paidCents, country, 0);
 	if (noFee == null) return 0; // no cost for this SKU here: the caller refuses the sale (fail closed)
-	const short = floorFor(country) - noFee; // USD of net still missing
+	const short = floorForSku(slug, country) - noFee; // USD of net still missing
 	if (short <= 1e-9) return 0;
 	const needCents = (short / (1 - STRIPE_INTL_PCT)) * 100; // the fee itself is charged Stripe's cut too
 	return Math.max(0, Math.ceil((needCents - 99) / 100 - 1e-9)) * 100 + 99;
@@ -161,14 +172,19 @@ export function marginCheck(
 	if (code.toUpperCase() === 'US') return { ok: true, reason: '', worst: null };
 	const c = rows.find((r) => r.code === code.toUpperCase());
 	if (!c?.landed_cost_usd) return { ok: false, reason: `no landed cost for ${code}`, worst: null };
-	const need = floor ?? floorFor(c);
 	let worst: MarginResult['worst'] = null;
+	let need = floor ?? floorFor(c);
 	for (const l of lines) {
+		const lineNeed = floor ?? floorForSku(l.slug, c);
 		const paid = paidUnit(l.slug, l.retail, pct);
 		const net = netPerItemUsd(l.slug, paid, c, handlingFeeCents(l.slug, paid, c));
 		if (net == null)
 			return { ok: false, reason: `no landed cost for ${l.slug} to ${code}`, worst: null };
-		if (!worst || net < worst.net) worst = { slug: l.slug, net };
+		// worst = the line furthest BELOW its own floor (a break-even book and a $20-floor Bible differ)
+		if (!worst || net - lineNeed < worst.net - need) {
+			worst = { slug: l.slug, net };
+			need = lineNeed;
+		}
 	}
 	if (worst && worst.net < need - 1e-9)
 		return {

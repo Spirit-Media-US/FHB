@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import { onRequestPost } from '../functions/dvc-checkout.ts';
 import { onRequestPost as webhook } from '../functions/print-webhook.ts';
 import { LIVE_COUNTRIES } from '../src/lib/shipCountries.ts';
-import { handlingFeeCents, marginCheck } from '../src/lib/marginGuard.ts';
+import { handlingFeeCents, marginCheck, netPerItemUsd } from '../src/lib/marginGuard.ts';
 import { BELOVED_SKU, BOOK_SKUS, unitAfter } from '../src/lib/order-pricing.ts';
 
 const BI = BELOVED_SKU;
@@ -125,9 +125,9 @@ test('empty and bad carts still refused', async () => {
 	assert.equal((await post({ counts: { [BI]: -1 } })).json.error, 'invalid_selection');
 });
 
-const NEAR = LIVE_COUNTRIES.find((c) => !c.farBand && c.code !== 'US');
+const NEAR = LIVE_COUNTRIES.find((c) => c.code === 'DE');
 const FAR = LIVE_COUNTRIES.find((c) => c.farBand);
-test('international: the existing handling rule sizes a per-copy fee off the MEASURED book cost', async () => {
+test('international: a per-copy fee is sized off the MEASURED book cost', async () => {
 	const fee = handlingFeeCents(BI, 999, NEAR);
 	assert.ok(fee > 0);
 	const r = await post({ counts: { [BI]: 2 }, country: NEAR.code });
@@ -190,4 +190,75 @@ test('webhook: the fulfilment email carries ISBN, quantity, address, phone and t
 test('webhook: a Bible-only order has no Ingram book lines (unchanged)', async () => {
 	const { sent } = await fulfilment('teen-pb:1');
 	assert.ok(!sent[0].text.includes('Ingram order lines'));
+});
+
+// ── OVERSEAS = per-country BREAK-EVEN fee (Kevin 2026-11-10, kevin-decisions L1735 "2 A") ──
+const WANT = { GB: 0, AU: 199, SG: 299, NO: 399, CH: 399, BR: 399, CA: 499, MX: 499, JP: 499, DE: 599, FR: 599, IT: 599, ES: 699, NL: 699, IN: 699, PH: 699, ZA: 699, NZ: 699, IE: 899 };
+const byCode = (c) => LIVE_COUNTRIES.find((r) => r.code === c);
+test('break-even: the 1-copy fee per country is the agreed table', () => {
+	assert.deepEqual(Object.keys(WANT).sort(), LIVE_COUNTRIES.filter((c) => c.code !== 'US').map((c) => c.code).sort());
+	for (const [c, fee] of Object.entries(WANT)) assert.equal(handlingFeeCents(BI, 999, byCode(c)), fee, c);
+});
+test('break-even: with the fee every country nets >= $0 and the fee is the smallest x.99 that does', () => {
+	for (const c of LIVE_COUNTRIES.filter((r) => r.code !== 'US')) {
+		const f = handlingFeeCents(BI, 999, c);
+		assert.ok(netPerItemUsd(BI, 999, c, f) >= -1e-9, c.code);
+		if (f > 0) assert.ok(netPerItemUsd(BI, 999, c, f - 100) < 0, `${c.code}: one dollar less would lose money`);
+		assert.ok(f === 0 || f % 100 === 99, c.code);
+	}
+});
+test('checkout: 1 copy and 3 copies carry the break-even fee per copy', async () => {
+	for (const [c, fee] of Object.entries(WANT)) {
+		for (const qty of [1, 3]) {
+			const r = await post({ counts: { [BI]: qty }, country: c });
+			assert.equal(r.status, 200, `${c} ${JSON.stringify(r.json)}`);
+			const l = lines(r.s);
+			assert.deepEqual([l[0].unit, l[0].qty], [999, qty], c);
+			if (fee === 0) assert.equal(l.length, 1, `${c}: no handling line`);
+			else assert.deepEqual([l[1].unit, l[1].qty], [fee, qty], `${c} x${qty}`);
+		}
+	}
+});
+test('FAILURE PATH: a country with no measured book cost is refused with a message, not priced by the Bible rule', async () => {
+	const real = byCode('DE').landed_cost_usd;
+	const saved = real.bi;
+	delete real.bi;
+	try {
+		const r = await post({ counts: { [BI]: 1 }, country: 'DE' });
+		assert.equal(r.status, 400);
+		assert.equal(r.json.error, 'country_not_served');
+		assert.match(r.json.message, /book/i);
+		assert.equal(r.n, 0, 'no Stripe session');
+		assert.equal(handlingFeeCents(BI, 999, byCode('DE')), 0); // never a Bible-rule fee
+	} finally { real.bi = saved; }
+});
+test('Bible pricing and floor are byte-identical: fee/net numbers pinned', () => {
+	const pin = { GB: [3701, 2099], DE: [5020, 2999], PH: [6317, 1799] }; // [pb landed cents, expected fee at $79.99 list only if > 0]
+	for (const [c, [cents]] of Object.entries(pin)) assert.equal(Math.round(byCode(c).landed_cost_usd.pb * 100), cents);
+	for (const c of LIVE_COUNTRIES.filter((r) => r.code !== 'US')) {
+		const f = handlingFeeCents(BIBLE, BIBLE_LIST, c);
+		const floor = c.farBand ? 10 : 20;
+		assert.ok(netPerItemUsd(BIBLE, BIBLE_LIST, c, f) >= floor - 1e-9, c.code);
+		assert.ok(f === 0 || netPerItemUsd(BIBLE, BIBLE_LIST, c, f - 100) < floor, `${c.code}: Bible fee still the smallest that meets the floor`);
+	}
+});
+test('Bible-only cart overseas: unchanged (fee from the Bible floor, no book line)', async () => {
+	const r = await post({ counts: { [BIBLE]: 2 }, country: 'PH' });
+	const l = lines(r.s);
+	assert.equal(r.status, 200);
+	const fee = handlingFeeCents(BIBLE, unitAfter(BIBLE_LIST, 0), byCode('PH'));
+	assert.deepEqual([l[0].qty, l[0].unit], [2, BIBLE_LIST]);
+	if (fee > 0) assert.deepEqual([l[1].unit, l[1].qty], [fee, 2]);
+	assert.ok(!l.some(isBi));
+});
+test('mixed cart overseas: the Bible keeps its floor fee, the book its break-even fee', async () => {
+	const r = await post({ counts: { [BIBLE]: 1, [BI]: 2 }, country: 'DE' });
+	assert.equal(r.status, 200, JSON.stringify(r.json));
+	const l = lines(r.s);
+	const bibleFee = handlingFeeCents(BIBLE, BIBLE_LIST, byCode('DE'));
+	const bookFee = WANT.DE;
+	const handling = l.filter((x) => /handling/i.test(x.name));
+	assert.ok(handling.some((h) => h.unit === bookFee && h.qty === 2), 'book fee x2');
+	if (bibleFee > 0) assert.ok(handling.some((h) => h.unit === bibleFee && h.qty === 1), 'Bible fee x1');
+	assert.equal(l.find(isBi).unit, 999);
 });

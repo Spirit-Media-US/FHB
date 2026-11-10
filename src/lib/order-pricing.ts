@@ -94,8 +94,14 @@ export const volumesFor = (slug: string): number => (slug.includes('-set-') ? 3 
 export const BELOVED_SKU = 'beloved-identity-pb';
 /** SKUs charged at list price whatever discount the cart earns. */
 /** Plain ISBN-13 (no hyphens) for the Ingram order line, and the buyer-facing title, per non-Bible SKU. */
-export const BOOK_SKUS: Record<string, { title: string; isbn: string; spec: string }> = {
+export const BOOK_SKUS: Record<
+	string,
+	{ title: string; isbn: string; spec: string; floorUsd: number }
+> = {
 	[BELOVED_SKU]: {
+		// Overseas this book is sold at BREAK-EVEN shipping, not the Bibles' $20 net floor (Kevin 2026-11-10,
+		// kevin-decisions L1735 "2 A"): the handling fee is the smallest x.99 that nets >= floorUsd per copy.
+		floorUsd: 0,
 		title: 'Father’s Heart - Beloved Identity: What Your Heavenly Father Thinks of You',
 		isbn: '9798893072396',
 		spec: '96pp, 5 x 8 in, perfect-bound paperback',

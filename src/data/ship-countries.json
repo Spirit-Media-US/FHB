@@ -22,6 +22,7 @@
 	"landedCost": {
 		"_readme": "Per-copy IngramSpark LANDED cost in USD (print + handling + cheapest TRACKED, DUTY-PAID shipping, qty 1) for the 6x9 hardcover (hc) and paperback (pb). Drives the margin floor in functions/dvc-checkout.ts via src/lib/marginGuard.ts: a discount that would take net per item below MIN_NET_USD is dropped for that order. basis MEASURED = read from the IngramSpark calculator; ZONE_MAX = unmeasured, takes the highest measured cost in its zone (conservative). A live row WITHOUT landed_cost_usd gets no discount (fails closed), except US, which ships free inside the unit price and is outside the guard.",
 		"source": "/home/deploy/aeo-state/fhb-ingram-shipto-20261108.json",
+		"bi_source": "landed_cost_usd.bi on each live-wave row = Beloved Identity (ISBN 9798893072396, 96pp 5x8 B&W PB) per-copy landed USD: print + handling + cheapest tracked duty-paid shipping, qty 1. IngramSpark Print and Ship Calculator (SMP acct, read-only), measured 2026-11-10 by pmseoaeo; evidence /home/deploy/aeo-state/fhb-beloved-identity-checkout-20261110.json. The book is sold overseas at break-even (BOOK_SKUS floorUsd 0), Kevin 2026-11-10 kevin-decisions L1735.",
 		"fx": { "USD_GBP": 0.74711, "USD_EUR": 0.89566, "USD_AUD": 1.4554, "asOf": "ECB 2026-11-06" },
 		"zoneMax": {
 			"Asia-Pacific": { "hc": 73.34, "pb": 63.17 },
