@@ -1,0 +1,185 @@
+---
+// /press/ — fact sheet for journalists, researchers and AI answer engines (unit 2nk, 2026-11-10).
+// NO new claims: every "at a glance" line is copied from live FHB copy (source page named per line in
+// aeo-state/fhb-press-page-2nk-20261110.json) or computed at build time from the same data as
+// /translation-progress/ (counts) and /the-fathers-heart-bible/ (audience-edition total).
+// Verse totals are deliberately omitted: live pages disagree (31,087 vs 31,085). Contact route =
+// the one /partners/ and /overview/ already publish. Images = existing R2 covers (FATHER · SON · SPIRIT).
+import MailtoLink from '../components/MailtoLink.astro';
+import Section from '../components/Section.astro';
+import { AUDIENCE_EDITION_TOTAL, BOOK_ID } from '../data/receive';
+import Layout from '../layouts/Layout.astro';
+import { FHB_ORG_CORE, FHB_ORG_ID } from '../lib/fhb-org';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+import { counts } from '../lib/translation-progress';
+
+const PAGE_URL = 'https://fathersheartbible.com/press/';
+const N = (n: number) => n.toLocaleString('en-US');
+const R2 = 'https://assets.spiritmediapublishing.com/FHB/print';
+const covers = [
+	{
+		label: 'General edition, plum cover',
+		alt: "Father's Heart Bible™ General edition, plum cover, with FATHER, SON and SPIRIT in Divine Voice™ Color",
+		src: `${R2}/general-regular-plum-600.webp`,
+		full: `${R2}/general-regular-plum-1200.webp`,
+		w: 600,
+		h: 764,
+	},
+	{
+		label: 'eBook cover',
+		alt: "Father's Heart Bible™ eBook cover, with FATHER, SON and SPIRIT in Divine Voice™ Color",
+		src: `${R2}/fhb-ebook-cover-2026-6-600.webp`,
+		full: `${R2}/fhb-ebook-cover-2026-6-1200.webp`,
+		w: 600,
+		h: 900,
+	},
+];
+const logos = [
+	{ label: 'Logo', src: '/fhb-logo.png', file: 'PNG, 1024 × 1024, transparent' },
+	{
+		label: 'Square mark',
+		src: 'https://assets.spiritmediapublishing.com/FHB/partners/fhb-logo-square-1024.png',
+		file: 'PNG, 1024 × 1024',
+	},
+];
+
+const BOILER_50 =
+	"Father's Heart Bible™ (FHB) is a complete English translation of the Bible from the original Hebrew, Aramaic and Greek, first published in 2026, with Spirit Media Publishing as translator and publisher. Its Divine Voice™ Color prints our Father's words in blue, the Son's in red and the Spirit's in purple.";
+const BOILER_100 = `Father's Heart Bible™ (FHB) is a complete English translation of the Bible from the original Hebrew, Aramaic and Greek, first published in 2026, with Spirit Media Publishing as translator and publisher. It is a meaning-based translation, not a paraphrase, governed by 160 written translation rules. It reveals God as our Father wherever Scripture does, and its Divine Voice™ Color prints our Father's words in blue, the Son's in red and the Spirit's in purple. All 66 books and 1,189 chapters are free to read and hear online. It is being published in ${counts.roster} languages. Translated by Spirit Media Publishing, edited by Kevin White.`;
+const words = (s: string) => s.trim().split(/\s+/).length;
+
+const facts: [string, string][] = [
+	[
+		'What it is',
+		'A complete English translation of the Bible from the original Hebrew, Aramaic and Greek, first published in 2026.',
+	],
+	[
+		'Translator and publisher',
+		'Spirit Media Publishing is the translator of record. Kevin White is the editor. It is published by Spirit Media Publishing, the imprint of Spirit Media Inc.',
+	],
+	[
+		'Method',
+		'A meaning-based translation, not a paraphrase, and not an adaptation of any existing English Bible, governed by 160 written translation rules.',
+	],
+	[
+		'How it differs',
+		'It reveals God as our Father wherever Scripture does (the covenant name YHWH is rendered "our Father" by default, and "God" is kept where Scripture speaks of God as God).',
+	],
+	[
+		'Divine Voice™ Color',
+		"It prints our Father's words in blue, the Son's in red and the Spirit's in purple.",
+	],
+	['Size of the text', 'All 66 books and 1,189 chapters, free to read and hear online.'],
+	[
+		'Languages',
+		`Being published in ${counts.roster} languages: ${N(counts.readOnline)} readable free online now, ${N(counts.printEditions)} in print. The list is on the translation progress page.`,
+	],
+	[
+		'In print',
+		`${AUDIENCE_EDITION_TOTAL} audience editions as hardcover and paperback, plus an eBook and an audiobook.`,
+	],
+	[
+		'Trademarks',
+		"Father's Heart Bible™, FHB, the Father's Heart Bible logo, and ComfortLeather™ are trademarks of Spirit Media Inc.",
+	],
+];
+
+const jsonLd = [
+	{ '@context': 'https://schema.org', ...FHB_ORG_CORE },
+	{
+		'@context': 'https://schema.org',
+		'@type': 'WebPage',
+		'@id': `${PAGE_URL}#webpage`,
+		name: "Press and Media Fact Sheet: Father's Heart Bible™",
+		url: PAGE_URL,
+		inLanguage: 'en-US',
+		isPartOf: {
+			'@type': 'WebSite',
+			name: "Father's Heart Bible™",
+			url: 'https://fathersheartbible.com/',
+		},
+		about: { '@id': BOOK_ID },
+		mainEntity: { '@id': BOOK_ID },
+		publisher: { '@id': FHB_ORG_ID },
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{ '@type': 'ListItem', position: 2, name: 'Press', item: PAGE_URL },
+		],
+	},
+];
+const H = 'font-family: var(--font-serif); color: var(--color-ink);';
+const LINK = 'color: var(--color-brand);';
+const box = 'background: var(--color-surface-lowest, #f5f0e8); border-radius: 8px;';
+---
+
+<Layout
+  title={fitTitle("Press & Media Fact Sheet | FHB — Father's Heart Bible™")}
+  description={fitDescription("Press and media fact sheet for Father's Heart Bible™: what it is, who translated and published it, how it differs, languages, boilerplate text, cover images and contact.")}
+  jsonLd={jsonLd}
+>
+  <main id="main-content" style="margin-top: 80px;">
+    <Section variant="soft">
+      <div class="max-w-3xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-light mb-6" style={H}>Press &amp; Media Fact Sheet</h1>
+        <p class="text-base mb-4 leading-relaxed" style="color: var(--color-ink); font-family: var(--font-sans);">
+          Facts about Father&rsquo;s Heart Bible&trade; for journalists, researchers and anyone writing about it. Everything here is already published on this site; each line is copied from it, and the language counts are computed from the same data as our <a href="/translation-progress/" style={LINK} class="hover:underline">translation progress</a> page.
+        </p>
+
+        <div class="space-y-10 mt-8" style="font-family: var(--font-sans); color: var(--color-muted);">
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style={H}>At a glance</h2>
+            <dl class="space-y-3 leading-relaxed">
+              {facts.map(([k, v]) => (
+                <div><dt class="font-bold" style="color: var(--color-ink);">{k}</dt><dd>{v}</dd></div>
+              ))}
+            </dl>
+            <p class="leading-relaxed mt-3">Read the whole text free at <a href="/read/" style={LINK} class="hover:underline">fathersheartbible.com/read/</a>. How it was made and what we confess: <a href="/overview/" style={LINK} class="hover:underline">overview</a> and <a href="/the-fathers-heart-bible/" style={LINK} class="hover:underline">about the translation</a>. Editions and formats: <a href="/print/" style={LINK} class="hover:underline">print</a>. Citation and quotation terms: <a href="/copyright/" style={LINK} class="hover:underline">Copyright &amp; Permissions</a>.</p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style={H}>Boilerplate to copy</h2>
+            <p class="font-bold mb-2" style="color: var(--color-ink);">Short ({words(BOILER_50)} words)</p>
+            <p class="leading-relaxed p-4 mb-5" style={box}>{BOILER_50}</p>
+            <p class="font-bold mb-2" style="color: var(--color-ink);">Standard ({words(BOILER_100)} words)</p>
+            <p class="leading-relaxed p-4" style={box}>{BOILER_100}</p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style={H}>Cover images and logo</h2>
+            <p class="leading-relaxed mb-4">Official images, unaltered. Select an image to open the larger file.</p>
+            <div class="grid grid-cols-2 gap-6 mb-6">
+              {covers.map((c) => (
+                <a href={c.full} class="block text-center hover:underline" style={LINK}>
+                  <img src={c.src} alt={c.alt} width={c.w} height={c.h} loading="lazy" decoding="async" class="mx-auto mb-2 w-full" style={`max-width: 240px; height: auto; aspect-ratio: ${c.w} / ${c.h}; object-fit: contain;`} />
+                  <span class="block font-bold">{c.label}</span>
+                </a>
+              ))}
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+              {logos.map((l) => (
+                <a href={l.src} download class="block text-center hover:underline" style={LINK}>
+                  <img src={l.src} alt={`Father's Heart Bible ${l.label}`} width="160" height="160" loading="lazy" decoding="async" class="mx-auto mb-2" style="width: 160px; max-width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: contain;" />
+                  <span class="block font-bold">{l.label}</span>
+                  <span class="block text-sm" style="color: var(--color-muted);">{l.file}</span>
+                </a>
+              ))}
+            </div>
+            <p class="leading-relaxed mt-4">More logos, the required copyright notice and a reader link for every language are in the <a href="/partners/" style={LINK} class="hover:underline">Partner Kit</a>.</p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold mb-3" style={H}>Contact</h2>
+            <p class="leading-relaxed">Spirit Media Publishing, the imprint of Spirit Media Inc. &middot; 205 S Academy Street, Unit 3251, Cary, NC 27519 &middot; <MailtoLink email="hello@spiritmediapublishing.com" class="hover:underline" style={LINK}>hello@spiritmediapublishing.com</MailtoLink> &middot; <a href="tel:+18888003744" class="hover:underline" style={LINK}>+1 888 800 3744</a></p>
+            <p class="leading-relaxed mt-2">For permission beyond our quotation allowance, <MailtoLink email="publisher@spiritmediapublishing.com" class="hover:underline" style={LINK}>email the publisher</MailtoLink>.</p>
+          </div>
+
+        </div>
+      </div>
+    </Section>
+  </main>
+</Layout>
