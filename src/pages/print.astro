@@ -26,6 +26,7 @@ import {
 	rosterLanguages,
 } from '../data/language-editions';
 import { reachPhrase } from '../data/language-speakers';
+import readerLanguages from '../data/reader-languages.json';
 import Layout from '../layouts/Layout.astro';
 import { FHB_ORG_ID } from '../lib/fhb-org';
 import { merchantReturnPolicy } from '../lib/merchantReturnPolicy';
@@ -206,6 +207,10 @@ const SAMPLE_LP =
 
 // Print FAQ — rendered as a no-JS <details> accordion + FAQPage JSON-LD (AEO).
 const READ_URL = '/read/';
+// Languages whose /read/<code>/ reader is live (generated list; English lives at /read/). A card
+// gets its "Read it free online" link by code lookup, so a newly live language needs no edit here.
+const liveReadCodes = new Set(readerLanguages.languages.map((x: { code: string }) => x.code));
+const readHref = (code: string) => (code === 'en' ? '/read/' : `/read/${code}/`);
 const CAMPAIGN_URL = '/legacy/';
 // Neutral: the only color between the header and the footer is the three voices and
 // the cover art (Kevin 2026-08-23).
@@ -541,6 +546,7 @@ const dvcVerses = [
 			<div class="text-center mb-3">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2.1rem; font-weight: 600; margin: 0;">Father’s Heart Bible™ + Divine Voice™ Color Bibles</h2>
 				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 0.75rem auto 0; max-width: 40rem;">Where other Bibles use “God” to say what He is, the Father’s Heart Bible™ uses “our Father” to show who He has been all along.</p>
+				<p style="font-family: var(--font-sans); font-size: 0.9rem; margin: 0.6rem 0 0;"><a href={READ_URL} class="card-link">Read it free online &rarr;</a></p>
 			</div>
 			<!-- THE COLOR DEMO. Kevin 2026-08-23: "if we were selling color tvs this is our color
 			     tv demo." So the three voices are set large and are the ONLY saturated color on the
@@ -789,6 +795,7 @@ const dvcVerses = [
 				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">General Audience</p>
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Large Print — Three Volumes</h2>
 				<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1.05rem; line-height: 1.6; margin: 1rem auto 0; max-width: 40rem;">The complete Bible set larger for easier reading. At this size the whole text does not fit one binding, so it comes as three volumes — {lpTotalPages.toLocaleString('en-US')} pages, nothing abridged. Take the set, or the volume you read most.</p>
+				<p style="font-family: var(--font-sans); font-size: 0.9rem; margin: 0.6rem 0 0;"><a href={READ_URL} class="card-link">Read it free online &rarr;</a></p>
 				<p style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em; margin: 0.9rem 0 0;">{LP_TAIL}</p>
 				<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; letter-spacing: 0.02em; margin: 0.35rem 0 0;">{DVC_TAIL2}</p>
 				<VoiceChips class="mt-5 mb-0" />
@@ -901,6 +908,18 @@ const dvcVerses = [
 				     dvc-checkout.ts:295/301 and the cart weights above both count a set as
 				     books: 1 — so the sentence promised a bulk tier the checkout never gave. */}
 			</div>
+			{/* Kevin White's book, one line near Large Print (Kevin 2026-11-10: add the links). Cover, alt and
+			    dimensions are the ones /books/beloved-identity/ uses. No retailer links. */}
+			<div class="rounded-2xl p-5 mt-8 mx-auto flex items-center gap-4 text-left" style="background: #fff; border: 1px solid var(--color-hairline); max-width: 44rem;">
+				<a href="/books/beloved-identity/" aria-label="Father's Heart - Beloved Identity by Kevin White: full details" style="flex: 0 0 96px;">
+					<img src="https://assets.spiritmediapublishing.com/FHB/print/books/beloved-identity-300.webp" srcset="https://assets.spiritmediapublishing.com/FHB/print/books/beloved-identity-300.webp 300w, https://assets.spiritmediapublishing.com/FHB/print/books/beloved-identity-600.webp 600w" sizes="96px" width="320" height="512" alt="Cover of Father's Heart - Beloved Identity by Kevin White" loading="lazy" decoding="async" class="block w-full h-auto" />
+				</a>
+				<div style="min-width: 0;">
+					<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0 0 0.15rem;">Father’s Heart — Beloved Identity</h3>
+					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; margin: 0 0 0.5rem;">By Kevin White · Paperback · $9.99</p>
+					<a href="/books/beloved-identity/" class="card-link">Full details &rarr;</a>
+				</div>
+			</div>
 			<p class="text-center mt-6" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; font-weight: 600;">Direct from SMP includes free shipping — a $15 value.</p>
 		</Section>
 
@@ -975,6 +994,7 @@ const dvcVerses = [
 											pick={EN_KEY}
 											tightDirect
 										/>
+										<a href={readHref('en')} class="card-link read-free">Read it free online &rarr;</a>
 									</div>
 								</div>
 							) : (
@@ -1002,6 +1022,9 @@ const dvcVerses = [
 											pick={`lang-${l.code}`}
 											tightDirect
 										/>
+										{liveReadCodes.has(l.code) && (
+											<a href={readHref(l.code)} class="card-link read-free">Read it free online &rarr;</a>
+										)}
 									</div>
 								</div>
 							)
@@ -1146,6 +1169,12 @@ const dvcVerses = [
 		text-decoration: underline;
 		text-underline-offset: 2px;
 		cursor: pointer;
+	}
+	.read-free {
+		display: block;
+		text-align: center;
+		white-space: normal;
+		margin-top: 0.15rem;
 	}
 	.card-link:hover {
 		color: var(--color-ink);
