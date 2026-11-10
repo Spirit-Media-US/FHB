@@ -6,9 +6,18 @@ import Layout from '../layouts/Layout.astro';
 // /give/ — the FHB giving page (Kevin 2026-11-10: "make a donation page like the youversion donation
 // page we made and add a give now button to the legacy page", with his giving message on the page).
 // Same SM Gives Stripe form as /legacy/youversion/; /legacy/ links here with a Give now button.
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{ '@type': 'ListItem', position: 2, name: 'Give', item: 'https://fathersheartbible.com/give/' },
+	],
+};
 ---
 
 <Layout
+	jsonLd={jsonLd}
 	title="Give | Father's Heart Bible"
 	description="When you give to Father's Heart Bible, you help accelerate Bible translation and Scripture access around the world."
 >
