@@ -80,4 +80,11 @@ export const GUIDES: GuideEntry[] = [
 			'Five honest steps, each with the verses to read: tell the truth, relearn what a father is, receive a new identity, forgive, and don’t heal alone.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
 	},
+	{
+		slug: 'armor-of-god',
+		title: 'The Armor of God',
+		blurb:
+			'Ephesians 6:10-18 piece by piece — belt of truth, breastplate, shield of faith, helmet of salvation and the sword of the Spirit, in our Father’s words.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
 ];
