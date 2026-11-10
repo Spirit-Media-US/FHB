@@ -429,33 +429,7 @@ const breadcrumbSchema = {
 // FAQPage schema — only emitted when the post defines FAQ pairs in Sanity.
 // Each H2 Q&A in the SMP Gold-Level structure is a natural FAQ item; AI
 // engines (AI Overviews, Perplexity) extract these verbatim.
-// Schema must match the page: emit a FAQPage question only when its text is
-// actually rendered on the page (as its own heading/paragraph/list item of the
-// body or the post title). Google/AEO: structured data has to mirror visible
-// content. Old posts carry Sanity faqs that are never rendered -> no FAQPage.
-// Applies to posts published before the Gold standard (2026-07-12); Gold posts
-// (>= 2026-07-12) are governed by smp-blog-gold-audit and keep their FAQPage.
-const isPreGold = String(post.publishDate || '').slice(0, 10) < '2026-07-12';
-const normFaq = (s: string) =>
-	String(s || '')
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, ' ')
-		.trim();
-const visibleFaqText = new Set<string>(
-	[
-		post.title,
-		...(post.body || [])
-			.filter((b: any) => b?._type === 'block')
-			.map((b: any) =>
-				(Array.isArray(b.children) ? b.children : []).map((c: any) => c?.text || '').join(''),
-			),
-	]
-		.map(normFaq)
-		.filter(Boolean),
-);
-const faqs = (Array.isArray(post.faqs) ? post.faqs : []).filter(
-	(f: any) => f?.question && f?.answer && (!isPreGold || visibleFaqText.has(normFaq(f.question))),
-);
+const faqs = Array.isArray(post.faqs) ? post.faqs : [];
 const faqSchema =
 	faqs.length > 0
 		? {
