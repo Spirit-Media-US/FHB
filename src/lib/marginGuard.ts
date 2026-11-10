@@ -22,7 +22,7 @@
 // Pure functions, no I/O: functions/dvc-checkout.ts calls them, scripts/margin-guard.test.mjs
 // exercises them (with injected rows, because pending countries are never read by checkout).
 import raw from '../data/ship-countries.json' with { type: 'json' };
-import { bindingFor, type IntlRow, unitAfter, volumesFor } from './order-pricing.ts';
+import { bindingFor, type IntlRow, paidUnit, unitAfter, volumesFor } from './order-pricing.ts';
 import { LIVE_COUNTRIES, offerShippingDetails, type ShipCountry } from './shipCountries.ts';
 
 export { bindingFor, volumesFor };
@@ -90,7 +90,9 @@ export function netPerItemUsd(
 	const v = volumesFor(slug);
 	const charged = (priceCents + feeCents) / 100;
 	const duty = country.code && isEu(country.code) ? EU_DUTY_USD * v : 0;
-	return charged - (charged * STRIPE_INTL_PCT + STRIPE_FIXED_USD) - lc[bindingFor(slug)] * v - duty;
+	const unitCost = lc[bindingFor(slug)];
+	if (unitCost == null) return null; // e.g. Beloved Identity in a country with no measured cost
+	return charged - (charged * STRIPE_INTL_PCT + STRIPE_FIXED_USD) - unitCost * v - duty;
 }
 
 /**
@@ -104,7 +106,8 @@ export function handlingFeeCents(
 	country: Pick<ShipCountry, 'landed_cost_usd' | 'farBand'> & { code?: string },
 ): number {
 	if (country.code?.toUpperCase() === 'US' || !country.landed_cost_usd) return 0;
-	const noFee = netPerItemUsd(slug, paidCents, country, 0) as number;
+	const noFee = netPerItemUsd(slug, paidCents, country, 0);
+	if (noFee == null) return 0; // no cost for this SKU here: the caller refuses the sale (fail closed)
 	const short = floorFor(country) - noFee; // USD of net still missing
 	if (short <= 1e-9) return 0;
 	const needCents = (short / (1 - STRIPE_INTL_PCT)) * 100; // the fee itself is charged Stripe's cut too
@@ -128,7 +131,7 @@ export function handlingTable(
 		const fees: Record<string, number> = {};
 		for (const [slug, list] of Object.entries(skuCents))
 			for (const pct of new Set([0, ...pcts])) {
-				const paid = unitAfter(list, pct);
+				const paid = paidUnit(slug, list, pct);
 				fees[`${bindingFor(slug)}${volumesFor(slug)}:${paid}`] = handlingFeeCents(slug, paid, c);
 			}
 		out[c.code] = { name: c.name, label: handlingLabel(c.code), fees };
@@ -161,8 +164,10 @@ export function marginCheck(
 	const need = floor ?? floorFor(c);
 	let worst: MarginResult['worst'] = null;
 	for (const l of lines) {
-		const paid = unitAfter(l.retail, pct);
-		const net = netPerItemUsd(l.slug, paid, c, handlingFeeCents(l.slug, paid, c)) as number;
+		const paid = paidUnit(l.slug, l.retail, pct);
+		const net = netPerItemUsd(l.slug, paid, c, handlingFeeCents(l.slug, paid, c));
+		if (net == null)
+			return { ok: false, reason: `no landed cost for ${l.slug} to ${code}`, worst: null };
 		if (!worst || net < worst.net) worst = { slug: l.slug, net };
 	}
 	if (worst && worst.net < need - 1e-9)

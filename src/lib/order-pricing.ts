@@ -87,8 +87,28 @@ export function quote(
 
 /** Physical copies shipped for one SKU: the Large Print set is three volumes in one box. */
 export const volumesFor = (slug: string): number => (slug.includes('-set-') ? 3 : 1);
-/** Binding from the SKU key (<slug>-hb | <slug>-pb). */
-export const bindingFor = (slug: string): 'hc' | 'pb' => (slug.endsWith('-hb') ? 'hc' : 'pb');
+/** Kevin's own book "Father's Heart - Beloved Identity" (96pp, 5 x 8 in paperback, ISBN 979-8-89307-239-6),
+ *  sold through THIS checkout but not a Bible (Kevin 2026-11-10: "point Beloved Identity to FHB too. Build
+ *  a checkout page to be fulfilled through ingram"). One list price, NO discount of any kind: it is not on
+ *  the volume ladder, does not count toward a Bible tier, and the first-order 15% never touches it. */
+export const BELOVED_SKU = 'beloved-identity-pb';
+/** SKUs charged at list price whatever discount the cart earns. */
+/** Plain ISBN-13 (no hyphens) for the Ingram order line, and the buyer-facing title, per non-Bible SKU. */
+export const BOOK_SKUS: Record<string, { title: string; isbn: string; spec: string }> = {
+	[BELOVED_SKU]: {
+		title: 'Father’s Heart - Beloved Identity: What Your Heavenly Father Thinks of You',
+		isbn: '9798893072396',
+		spec: '96pp, 5 x 8 in, perfect-bound paperback',
+	},
+};
+export const DISCOUNT_EXEMPT: readonly string[] = [BELOVED_SKU];
+export const isDiscountExempt = (slug: string): boolean => DISCOUNT_EXEMPT.includes(slug);
+/** The unit price in cents actually charged for `slug` after the cart's `pct` off: exempt SKUs stay at list. */
+export const paidUnit = (slug: string, cents: number, pct: number): number =>
+	isDiscountExempt(slug) ? cents : unitAfter(cents, pct);
+/** Binding from the SKU key (<slug>-hb | <slug>-pb); 'bi' = Beloved Identity (its own 5 x 8 landed cost). */
+export const bindingFor = (slug: string): 'hc' | 'pb' | 'bi' =>
+	slug === BELOVED_SKU ? 'bi' : slug.endsWith('-hb') ? 'hc' : 'pb';
 /** Key into IntlRow.fees: the fee depends on binding, volumes in the box and the paid unit price. */
 export const feeKey = (slug: string, paidCents: number): string =>
 	`${bindingFor(slug)}${volumesFor(slug)}:${paidCents}`;
