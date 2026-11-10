@@ -6,6 +6,7 @@
 // direct-answer + key-takeaway, FHB framing, FeatureChapter anchor + audio,
 // Article+ItemList+BreadcrumbList+FAQPage JSON-LD, Read-FHB CTA, absolute reader links.
 import { readFileSync } from 'node:fs';
+import verseTopicLinks from '../data/verse-topic-links.json';
 import Layout from '../layouts/Layout.astro';
 import AuthorBio from './AuthorBio.astro';
 import FeatureChapter from './FeatureChapter.astro';
@@ -138,6 +139,19 @@ const versePageHref = (v: Verse) => {
 	const key = m ? `${v.slug}/${v.ch}/${m[1]}` : '';
 	return key in VERSE_PAGES ? `https://fathersheartbible.com/read/${key}/` : '';
 };
+// Unit 2nz: link-only "What <ref> means" row per topic (data/verse-topic-links.json). A link renders only
+// if the verse page exists in VERSE_PAGES at build time and the topic has no card for that verse already.
+const cardKeys = new Set(
+	themes.flatMap((t) =>
+		t.verses.map((v) => {
+			const m = v.ref.match(/:(\d+)/);
+			return m ? `${v.slug}/${v.ch}/${m[1]}` : '';
+		}),
+	),
+);
+const moreMeanings = (
+	(verseTopicLinks as { topics: Record<string, { key: string; ref: string }[]> }).topics[slug] || []
+).filter((l) => l.key in VERSE_PAGES && !cardKeys.has(l.key));
 const refLabel = (ref: string) => ref.split('–')[0].split(':')[0]; // "Romans 8:38–39" → "Romans 8"
 
 const KEVIN_WHITE_AUTHOR = {
@@ -294,6 +308,12 @@ const TOC = [
 						</div>
 					</>
 				))}
+
+				{moreMeanings.length > 0 && (
+					<ul class="flex flex-wrap gap-x-6 gap-y-2 list-none m-0 mt-8 p-0 text-sm" style="font-family: var(--font-sans);" data-verse-meanings>
+						{moreMeanings.map((l) => (<li><a href={`https://fathersheartbible.com/read/${l.key}/`} class="font-semibold hover:underline" style="color: #a04060;">What {l.ref} means <span aria-hidden="true">&rarr;</span></a></li>))}
+					</ul>
+				)}
 
 				<h2 id="featured" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">{featured.heading}</h2>
 				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">{featured.intro}</p>
