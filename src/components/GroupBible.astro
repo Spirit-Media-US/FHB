@@ -25,6 +25,7 @@ import Layout from '../layouts/Layout.astro';
 import { shippingDetailsFor } from '../lib/marginGuard';
 import { merchantReturnPolicy } from '../lib/merchantReturnPolicy';
 import AuthorBio from './AuthorBio.astro';
+import NamedAnswer from './NamedAnswer.astro';
 import RelatedTopics from './RelatedTopics.astro';
 import YouVersionBanner from './YouVersionBanner.astro';
 
@@ -144,6 +145,12 @@ export interface Props {
 	 *  verses, a Father for + offers, FAQ) with everything else under one 'More' H2 as H3s. */
 	layout?: 'classic' | 'five';
 	faqs: GroupFaq[];
+	/** 2pf named-answer block: one visible Q + short answer + FHB verses; feeds the FAQPage schema. */
+	namedAnswer?: {
+		question: string;
+		answer: string;
+		verses: { ref: string; slug: string; ch: number; text: string }[];
+	};
 	resourcesHeading?: string;
 	resourcesIntroHtml?: string;
 	resources?: GroupSource[];
@@ -213,7 +220,8 @@ const {
 	whichBibleIntroHtml,
 	whichBibleRows = [],
 	whichBibleNoteHtml,
-	faqs,
+	faqs: faqsIn,
+	namedAnswer,
 	resourcesHeading,
 	resourcesIntroHtml,
 	resources = [],
@@ -371,10 +379,21 @@ const collectionSchema = {
 		url: 'https://fathersheartbible.com/',
 	},
 };
+const _nq = (t: string) =>
+	t
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, ' ')
+		.trim();
+const faqs = namedAnswer
+	? faqsIn.filter((f) => _nq(f.question) !== _nq(namedAnswer.question))
+	: faqsIn;
+const faqSchemaList = namedAnswer
+	? [{ question: namedAnswer.question, answer: namedAnswer.answer }, ...faqs]
+	: faqs;
 const faqSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'FAQPage',
-	mainEntity: faqs.map((f) => ({
+	mainEntity: faqSchemaList.map((f) => ({
 		'@type': 'Question',
 		name: f.question,
 		acceptedAnswer: { '@type': 'Answer', text: f.answer },
@@ -540,6 +559,8 @@ const relatedGroups: Group[] = _sibSlugs
 				</nav>
 			</div>
 		</section>
+
+		{namedAnswer && <NamedAnswer question={namedAnswer.question} answer={namedAnswer.answer} verses={namedAnswer.verses} />}
 
 		{five && (<>
 		<!-- Which Bible for this reader — honest edition comparison (gift/product intent) -->
