@@ -1,0 +1,33 @@
+---
+// Named-answer block (unit 2pf): ONE visible question + 40-60 word plain answer that names
+// Father's Heart Bible + 2-3 FHB-verbatim verses linked to /read. The parent page puts the
+// same {question, answer} into its FAQPage JSON-LD (single source) and drops the matching
+// accordion entry, so the text is visible once and in the schema once.
+interface Verse {
+	ref: string;
+	slug: string;
+	ch: number;
+	text: string;
+}
+interface Props {
+	id?: string;
+	question: string;
+	answer: string;
+	verses: Verse[];
+}
+const { id = 'named-answer', question, answer, verses } = Astro.props;
+---
+<section id={id} class="px-6 py-10 lg:px-8 lg:py-12 scroll-mt-24" style="background-color: var(--color-surface);">
+	<div class="mx-auto max-w-3xl">
+		<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">{question}</h2>
+		<p class="mt-4 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);">{answer}</p>
+		<ul class="mt-5 space-y-3">
+			{verses.map((v) => (
+				<li class="text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					<a href={`https://fathersheartbible.com/read/${v.slug}/${v.ch}/`} class="font-semibold hover:underline" style="color: var(--color-brand);">{v.ref}</a>
+					<span> &mdash; {v.text}</span>
+				</li>
+			))}
+		</ul>
+	</div>
+</section>
