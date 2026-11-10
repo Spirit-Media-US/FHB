@@ -5,6 +5,7 @@ import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import VoiceChips from '../components/VoiceChips.astro';
 import YouVersionBanner from '../components/YouVersionBanner.astro';
+import roster from '../data/language-roster.json';
 // /overview (formerly the scholars page; 301 in public/_redirects, Kevin 2026-10-27) — the Scholar's Packet as a web page (Kevin 2026-10-22: "2 Yes 3A" = share by link, plan Doc
 // 1VqrO4JWS0Crvwjql1AIVliZs8HJ7lmfRf3bcOd9COAE W1). The text below is the packet's OWN wording
 // (Doc 1xwdIBGQPGWfmJQzpCx8vghhEWoca08fTqujwVWPkaFs, Kevin: "we state same everywhere"), not a rewrite.
@@ -23,6 +24,29 @@ const UPDATED = '2026-10-27';
 const EDITION = '2026.6';
 const R2 = 'https://assets.spiritmediapublishing.com/FHB/scholars';
 const REVIEW_EMAIL = 'kevin@spiritmediapublishing.com';
+
+// The 80 languages, GENERATED from src/data/language-roster.json (fhb-chain.py edition-roster; Kevin
+// 2026-11-10: "We have committed to 80. Get this aligned everywhere."). Nothing typed: the count and
+// every name come from the roster, grouped by its own `region`. Tangkhul and Italian keep their pages.
+const ROSTER_COUNT = roster.languages.length;
+const ROSTER_LINKS: Record<string, string> = {
+	tangkhul: '/tangkhul-bible/',
+	italian: '/italian-bible/',
+};
+const LANG_GROUPS: { label: string; regions: string[] }[] = [
+	{ label: 'Languages of India and South Asia', regions: ['south-asia'] },
+	{ label: 'East and Southeast Asia', regions: ['east-asia'] },
+	{ label: 'Africa', regions: ['africa'] },
+	{ label: 'The Middle East and Central Asia', regions: ['middle-east'] },
+	{ label: 'Europe and the Americas', regions: ['europe', 'americas', 'worldwide'] },
+];
+const langGroups = LANG_GROUPS.map((g) => ({
+	label: g.label,
+	items: (roster.languages as { roster?: string; english: string; slug: string; region: string }[])
+		.filter((l) => g.regions.includes(l.region))
+		.map((l) => ({ name: l.roster ?? l.english, href: ROSTER_LINKS[l.slug] ?? null }))
+		.sort((a, b) => a.name.localeCompare(b.name)),
+}));
 
 const DOCS = [
 	{
@@ -610,14 +634,12 @@ const P = 'text-lg leading-relaxed mb-4';
 				<p class={P}>Each edition carries the whole Bible: 66 books and 1,189 chapters, with the footnotes, the book names and the reader interface in its own language. Each carries the Divine Voice&trade; Color: the words of the Father, the Son and the Holy Spirit marked to follow the English, so that a reader in any language hears who is speaking.</p>
 				<p class={P}>Before an edition is first published, it must pass the same set of checks: every chapter of every book present and complete; the Divine Voice&trade; Color matching the English, verse by verse; every quotation closed; the language&rsquo;s own script rendered correctly throughout; the statement of provenance and the translator credit present. An edition that fails a check is not published until it is fixed.</p>
 				<p class={P}>The checks above prove the form of an edition. Native-speaker review is part of each edition&rsquo;s ongoing care.</p>
-				<p class={P}>Father&rsquo;s Heart Bible is being published in these 80 languages, chosen together to cover the world:</p>
-				{/* Kevin 2026-10-27 (addendum AN): all 80 by region, typed (fixed target); set checked against /legacy's deduplicated roster (src/data/language-roster.ts). */}
+				<p class={P}>Father&rsquo;s Heart Bible is being published in these {ROSTER_COUNT} languages, chosen together to cover the world:</p>
+				{/* Kevin 2026-11-10: generated from language-roster.json (the 80), grouped by its region; see the frontmatter. */}
 				<ul class="list-disc pl-6 space-y-2 mb-5 text-lg leading-relaxed">
-					<li><strong>Languages of India and South Asia:</strong> Bengali, Chokri Naga, Gujarati, Hindi, Inpui Naga, Kannada, Malayalam, Marathi, Nagamese, Nepali, Odia, Punjabi, Sindhi, Tamil, <a href="/tangkhul-bible/" style="color: var(--color-brand);" class="hover:underline">Tangkhul</a>, Telugu, Urdu.</li>
-					<li><strong>East and Southeast Asia:</strong> Burmese, Cantonese, Cebuano, Chinese (Simplified), Chinese (Traditional), Filipino, Hiligaynon, Ilocano, Indonesian, Japanese, Javanese, Korean, Malay, Sundanese, Thai, Vietnamese.</li>
-					<li><strong>Africa:</strong> Afrikaans, Akan (Twi), Amharic, Anaang, Chichewa, Gikuyu, Hausa, Igbo, Izon, Kinyarwanda, Kipsigis, Kirundi, Kituba, Malagasy, Mangbetu, Nigerian Pidgin, Oromo, Sena, Shona, Somali, Swahili, Tigrinya, Xhosa, Yaka, Yoruba, Zulu.</li>
-					<li><strong>The Middle East and Central Asia:</strong> Arabic, Azerbaijani, Kurdish, Pashto, Persian, Turkish, Uzbek.</li>
-					<li><strong>Europe and the Americas:</strong> Dutch, English, French, German, Greek, Haitian Creole, Hungarian, <a href="/italian-bible/" style="color: var(--color-brand);" class="hover:underline">Italian</a>, Polish, Portuguese, Romanian, Russian, Spanish, Ukrainian.</li>
+					{langGroups.map((g) => (
+						<li><strong>{g.label}:</strong> {g.items.map((l, i) => (<>{l.href ? <a href={l.href} style="color: var(--color-brand);" class="hover:underline">{l.name}</a> : l.name}{i < g.items.length - 1 ? ', ' : '.'}</>))}</li>
+					))}
 				</ul>
 				<p class={P}>Country guides for some of these languages: <a href="/bible-in/ukraine/" style="color: var(--color-brand);" class="hover:underline">the Bible in Ukraine</a>, <a href="/bible-in/poland/" style="color: var(--color-brand);" class="hover:underline">Poland</a>, <a href="/bible-in/romania/" style="color: var(--color-brand);" class="hover:underline">Romania</a>, <a href="/bible-in/greece/" style="color: var(--color-brand);" class="hover:underline">Greece</a>, <a href="/bible-in/hungary/" style="color: var(--color-brand);" class="hover:underline">Hungary</a>, <a href="/bible-in/netherlands/" style="color: var(--color-brand);" class="hover:underline">the Netherlands</a> <a href="/bible-in/bangladesh/" style="color: var(--color-brand);" class="hover:underline">Bangladesh</a>, <a href="/bible-in/haiti/" style="color: var(--color-brand);" class="hover:underline">Haiti</a>, <a href="/bible-in/malawi/" style="color: var(--color-brand);" class="hover:underline">Malawi</a>, <a href="/bible-in/malaysia/" style="color: var(--color-brand);" class="hover:underline">Malaysia</a>, <a href="/bible-in/mozambique/" style="color: var(--color-brand);" class="hover:underline">Mozambique</a>, <a href="/bible-in/myanmar/" style="color: var(--color-brand);" class="hover:underline">Myanmar</a>, <a href="/bible-in/nepal/" style="color: var(--color-brand);" class="hover:underline">Nepal</a>, <a href="/bible-in/uzbekistan/" style="color: var(--color-brand);" class="hover:underline">Uzbekistan</a>, <a href="/bible-in/zimbabwe/" style="color: var(--color-brand);" class="hover:underline">Zimbabwe</a>, and <a href="/bible-in/south-africa/" style="color: var(--color-brand);" class="hover:underline">South Africa</a>. All countries are on <a href="/bible-in/" style="color: var(--color-brand);" class="hover:underline">the Bible around the world</a>.</p>
 				<p class="mb-4">

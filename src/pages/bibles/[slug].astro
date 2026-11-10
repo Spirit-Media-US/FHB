@@ -10,6 +10,7 @@ import isbnList from '../../data/isbn-list.json';
 import { langSlug, orderableLanguages } from '../../data/language-editions';
 import { catalogRows } from '../../data/print-catalog';
 import readerEntry from '../../data/reader-entry-links.json';
+import readerLanguages from '../../data/reader-languages.json';
 import youversion from '../../data/youversion-versions.json';
 // /bibles/<slug>-bible — the PRODUCT page for every Divine Voice™ Color edition.
 //
@@ -133,6 +134,12 @@ const { ed, alternates } = Astro.props as {
 	ed: Edition;
 	alternates: { hreflang: string; href: string }[];
 };
+// FAQ answers may carry {{READ_COUNT}}: the number of languages live in the /read reader, from the
+// generated reader-languages.json, so no typed count goes stale (Kevin 2026-11-10: 80 everywhere).
+const faqList = ed.faq.map((f) => ({
+	...f,
+	a: f.a.replaceAll('{{READ_COUNT}}', String(readerLanguages.languages.length)),
+}));
 
 const fm = (frontmatter as Record<string, { pages?: number; pillars?: Pillar[] }>)[
 	ed.frontmatterKey ?? FM_ALIAS[ed.slug] ?? ed.slug
@@ -463,7 +470,7 @@ const breadcrumbSchema = {
 const faqSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'FAQPage',
-	mainEntity: ed.faq.map((f) => ({
+	mainEntity: faqList.map((f) => ({
 		'@type': 'Question',
 		name: f.q,
 		acceptedAnswer: { '@type': 'Answer', text: f.a },
@@ -719,7 +726,7 @@ const faqSchema = {
 			<div class="max-w-3xl mx-auto">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1.2rem;">Questions</h2>
 				<div class="space-y-3">
-					{ed.faq.map((f) => (
+					{faqList.map((f) => (
 						<details class="faq-item rounded-2xl" style="background-color: #fff; border: 1px solid var(--color-hairline);">
 							<summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">
 								<span>{f.q}</span>
