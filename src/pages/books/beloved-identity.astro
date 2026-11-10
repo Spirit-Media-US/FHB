@@ -1,0 +1,237 @@
+---
+// /books/beloved-identity/ — order page for Kevin White's "Father's Heart - Beloved Identity: What Your
+// Heavenly Father Thinks of You" (Kevin 2026-11-10: "point Beloved Identity to FHB too. Build a checkout
+// page to be fulfilled through ingram"). It is NOT a new checkout: the button posts to the same
+// /dvc-checkout the Bibles use (SKU beloved-identity-pb, functions/dvc-checkout.ts BOOK_EDITIONS), the
+// same webhook turns the paid session into the Ingram fulfilment email, and /order names it.
+//
+// FACTS (measured 2026-11-10): paperback only, ISBN 979-8-89307-239-6, list $9.99 (spec sheet
+// price_record), 96 pages, 5 x 8 in, perfect bound, live on IngramSpark (SMP account). No hardback.
+// PRICE: one list price. No volume ladder, no first-order 15% (order-pricing.ts DISCOUNT_EXEMPT), so
+// this page offers no discount and its total is exactly what Stripe charges.
+// DESCRIPTION: the book's spec-sheet long description, verbatim (the Sanity book doc carries none).
+// COVER: 600w/300w WebP srcset on R2 (FHB/print/books/), explicit width/height; JSON-LD keeps the full JPG.
+import Section from '../../components/Section.astro';
+import Layout from '../../layouts/Layout.astro';
+import { BULK_QUOTE_COPY } from '../../lib/farBand';
+import { handlingFeeCents, handlingLabel, shippingDetailsFor } from '../../lib/marginGuard';
+import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
+import { BELOVED_SKU, BOOK_SKUS } from '../../lib/order-pricing';
+import { LIVE_COUNTRIES } from '../../lib/shipCountries';
+
+const URL_ = 'https://fathersheartbible.com/books/beloved-identity/';
+const TITLE = "Father's Heart - Beloved Identity: What Your Heavenly Father Thinks of You";
+const SHORT =
+	'Hear your Heavenly Father speak in His own words from Scripture, and learn to live as His beloved child instead of an orphan in heart.';
+const COVER =
+	'https://assets.spiritmediapublishing.com/SPM.com/assets/covers/fathers-heart-beloved-identity.jpg?v=2';
+// Pre-sized WebPs cut locally (PIL, q82) from that JPG; new R2 keys, the original is untouched.
+const COVER_600 =
+	'https://assets.spiritmediapublishing.com/FHB/print/books/beloved-identity-600.webp';
+const COVER_300 =
+	'https://assets.spiritmediapublishing.com/FHB/print/books/beloved-identity-300.webp';
+const ISBN13 = BOOK_SKUS[BELOVED_SKU].isbn;
+const LIST_CENTS = 999;
+
+const LONG_HTML = `<p><strong>WHO AM I? AND DOES ANYONE WANT ME?</strong></p><p>From the moment we are born, we begin asking that question. Until it is answered, we move through life restless and searching. It pressures us to strive, hide, and perform. The world is filled with grown adults still asking: Do I matter? Does anyone love the real me? Is it all up to me?</p><p>There is only one voice in the universe that can answer. And He has been speaking all along.</p><p><br></p><p><strong>THE WAY TO THE FATHER</strong></p><p>Jesus said, "No one can come to the Father except through Me." For centuries the church has heard "way to heaven." He said "way to the Father." The destination was never merely forgiveness or heaven. The destination has always been the Father Himself. Millions have believed in the way but missed the destination. They are spiritually emancipated yet experientially enslaved: sons and daughters on paper, but orphans in heart. They can serve a Master. They cannot rest in a Father.</p><p><br></p><p><strong>IN YOUR FATHER'S VOICE</strong></p><p><em>Father's Heart - Beloved Identity</em> is a short, concise collection of the Father's words, in the Father's voice, revealing the Father's heart. Nothing has been put in God's mouth. His Word is complete. These passages have simply been gathered and arranged so you can hear Him speak directly to you. Each section follows one pattern: your Father speaks to you from His Word, and you respond with My Confession, declarations meant to be spoken out loud, because faith comes by hearing.</p><p><br></p><p><strong>INSIDE YOU WILL FIND</strong></p><p><strong>Part One: The Invitation.</strong> A fatherless world, the wound every human carries (the fear of abandonment), and a fresh look at the Fall through the Father's eyes rather than the accuser's. Not anger, but mercy. Not condemning, but covering.</p><p>The world gives that wound many names: anxiety, codependency, rejection, trust issues, control. But the Father sees something deeper. He does not see a disorder to be managed. He sees a lie to be replaced and a child to be brought home.</p><p><strong>Part Two: The Father Speaks.</strong> Eighteen short sections, including Who Do You Say That I Am?, I Am Your Father, My Heart for You, My Son, My Spirit, What Was Lost, What I Am Giving You, What I Am Restoring, What I Am Calling You To, The Enemy, My Family, Marriage &amp; Family, Where This Ends, and My Answer.</p><p><strong>Part Three: Believe &amp; Receive.</strong> A statement of faith that makes the Father's heart central, daily affirmations of faith and identity, and guidance for living in the Father's heart.</p><p><br></p><p><strong>HEAR THE DIFFERENCE</strong></p><p>This book is a forerunner to the Father's Heart Bible (FHB), a forthcoming translation that restores the emphasis Scripture already places on God as Father. Where the FHB rendering reveals something a standard translation does not, the New Living Translation and the FHB appear side by side so you can hear the difference for yourself.</p><p><br></p><p><strong>FROM INTIMACY TO INHERITANCE</strong></p><p>The historic confessions told us what we are saved from, but not fully to whom we are saved. Standing in the legacy of the creeds, this book declares who God is as Father and who you are as His beloved child. Intimacy with the Father results in identity as His beloved. Identity results in inheritance, not wages earned, but the full rights of sons and daughters.</p><p>Believe it and receive it. Daily. Now hear your Father's whisper.</p>`;
+const LONG_TEXT = LONG_HTML.replace(/<p><br><\/p>/g, '')
+	.replace(/<\/p>/g, '\n')
+	.replace(/<[^>]+>/g, '')
+	.replace(/&amp;/g, '&')
+	.trim();
+
+// Where this book ships: the US, plus every live country with a MEASURED Beloved Identity landed cost
+// (ship-countries.json landed_cost_usd.bi). The per-copy handling fee is the checkout's own rule
+// (marginGuard.ts), computed here from the same function so the page shows what Stripe will charge.
+const dests = LIVE_COUNTRIES.filter((c) => c.code === 'US' || c.landed_cost_usd?.bi != null).map(
+	(c) => ({
+		code: c.code,
+		name: c.name,
+		far: c.farBand === true,
+		fee: c.code === 'US' ? 0 : handlingFeeCents(BELOVED_SKU, LIST_CENTS, c),
+		label: c.code === 'US' ? '' : handlingLabel(c.code),
+	}),
+);
+const config = JSON.stringify({
+	list: LIST_CENTS,
+	dests,
+	sku: BELOVED_SKU,
+	quote: BULK_QUOTE_COPY.error,
+});
+const offerCountries = LIVE_COUNTRIES.filter((c) => dests.some((d) => d.code === c.code));
+
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': ['Book', 'Product'],
+		'@id': `${URL_}#book`,
+		url: URL_,
+		name: TITLE,
+		sku: BELOVED_SKU,
+		isbn: ISBN13,
+		gtin13: ISBN13,
+		bookFormat: 'https://schema.org/Paperback',
+		numberOfPages: 96,
+		inLanguage: 'en',
+		image: COVER,
+		description: LONG_TEXT,
+		author: { '@type': 'Person', name: 'Kevin White', url: 'https://kevinwhite.us' },
+		publisher: {
+			'@type': 'Organization',
+			name: 'Spirit Media Publishing',
+			url: 'https://spiritmediapublishing.com',
+		},
+		brand: { '@type': 'Brand', name: 'Spirit Media Publishing' },
+		offers: {
+			'@type': 'Offer',
+			url: URL_,
+			price: '9.99',
+			priceCurrency: 'USD',
+			availability: 'https://schema.org/InStock',
+			itemCondition: 'https://schema.org/NewCondition',
+			seller: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+			hasMerchantReturnPolicy: merchantReturnPolicy,
+			shippingDetails: shippingDetailsFor({ slug: BELOVED_SKU, listUsd: 9.99 }, offerCountries),
+		},
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{ '@type': 'ListItem', position: 2, name: 'Beloved Identity', item: URL_ },
+		],
+	},
+];
+---
+
+<Layout
+	title="Father's Heart - Beloved Identity — Order the Paperback"
+	description={SHORT}
+	image={COVER}
+	imageAlt="Cover of Father's Heart - Beloved Identity by Kevin White"
+	jsonLd={jsonLd}
+>
+	<main id="main-content" style="margin-top: 80px;">
+		<Section variant="soft">
+			<div class="bi">
+				<div class="bi__cover">
+					<img src={COVER_600} srcset={`${COVER_300} 300w, ${COVER_600} 600w`} sizes="(min-width: 768px) 320px, 300px" width="320" height="512" alt="Cover of Father's Heart - Beloved Identity by Kevin White" fetchpriority="high" decoding="async" />
+				</div>
+				<div class="bi__main">
+					<h1 class="bi__title">Father's Heart - Beloved Identity</h1>
+					<p class="bi__sub">What Your Heavenly Father Thinks of You</p>
+					<p class="bi__by">By Kevin White · Spirit Media Publishing</p>
+					<p class="bi__facts">Paperback · 96 pages · 5 × 8 in · ISBN 979-8-89307-239-6</p>
+
+					<div id="order" class="bi__order" data-bi={config}>
+						<p class="bi__price">$9.99 <span>per copy · free shipping in the United States</span></p>
+						<div class="bi__row">
+							<label for="bi-qty">Copies</label>
+							<input id="bi-qty" type="number" inputmode="numeric" min="1" max="99" value="1" data-qty />
+						</div>
+						<div class="bi__row">
+							<label for="bi-country">Ship to</label>
+							<select id="bi-country" data-country>
+								{dests.map((d) => <option value={d.code} selected={d.code === 'US'}>{d.name}</option>)}
+							</select>
+						</div>
+						<p class="bi__fee" data-fee hidden></p>
+						<p class="bi__total">Total <b data-total>$9.99</b> <span>plus tax where it applies</span></p>
+						<button type="button" class="bi__btn" data-order-btn>Order now</button>
+						<p class="bi__msg" data-msg role="status" hidden></p>
+						<p class="bi__fine"><a href="/returns/">Your purchase is guaranteed</a> · Printed and shipped to you by our printer, IngramSpark.</p>
+					</div>
+				</div>
+			</div>
+			<div class="bi__desc" set:html={LONG_HTML} />
+		</Section>
+	</main>
+</Layout>
+
+<style>
+	.bi { display: grid; gap: 2rem; max-width: 60rem; margin: 0 auto; grid-template-columns: 1fr; }
+	@media (min-width: 768px) { .bi { grid-template-columns: 320px 1fr; align-items: start; } }
+	.bi__cover img { width: 100%; max-width: 320px; height: auto; border-radius: 0.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18); display: block; margin: 0 auto; }
+	.bi__title { font-family: var(--font-serif); color: var(--color-ink); font-size: 2.2rem; font-weight: 300; line-height: 1.15; margin: 0 0 0.4rem; }
+	.bi__sub { font-family: var(--font-serif); color: var(--color-ink); font-size: 1.2rem; margin: 0 0 0.6rem; }
+	.bi__by, .bi__facts { font-family: var(--font-sans); color: #3f3f46; font-size: 0.95rem; margin: 0 0 0.25rem; }
+	.bi__order { margin-top: 1.4rem; padding: 1.25rem; background: #fff; border: 1px solid var(--color-hairline); border-radius: 1rem; max-width: 30rem; font-family: var(--font-sans); }
+	.bi__price { margin: 0 0 0.9rem; font-size: 1.5rem; font-weight: 800; color: var(--color-ink); }
+	.bi__price span { font-size: 0.85rem; font-weight: 600; color: #3f3f46; }
+	.bi__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 0 0 0.7rem; }
+	.bi__row label { font-weight: 600; color: var(--color-ink); }
+	.bi__row input, .bi__row select { min-height: 44px; border: 1px solid #a1a1aa; border-radius: 0.5rem; padding: 0 0.6rem; font-size: 1rem; background: #fff; color: var(--color-ink); }
+	.bi__row input { width: 6rem; }
+	.bi__row select { max-width: 16rem; }
+	.bi__fee { margin: 0 0 0.6rem; font-size: 0.9rem; font-weight: 600; color: #3f3f46; }
+	.bi__total { margin: 0.4rem 0 0.9rem; font-size: 1.1rem; color: var(--color-ink); }
+	.bi__total span { font-size: 0.8rem; color: #3f3f46; }
+	.bi__btn { width: 100%; min-height: 48px; border: 0; border-radius: 0.6rem; background: var(--color-primary); color: #fff; font-size: 1.05rem; font-weight: 700; cursor: pointer; }
+	.bi__btn:disabled { opacity: 0.6; cursor: wait; }
+	.bi__msg { margin: 0.7rem 0 0; font-size: 0.9rem; font-weight: 600; color: #7f1d1d; }
+	.bi__fine { margin: 0.8rem 0 0; font-size: 0.8rem; color: #3f3f46; }
+	.bi__fine a { text-decoration: underline; }
+	.bi__desc { max-width: 44rem; margin: 2.5rem auto 0; font-family: var(--font-sans); color: #27272a; line-height: 1.7; }
+	.bi__desc :global(p) { margin: 0 0 0.9rem; }
+	.bi__desc :global(strong) { color: var(--color-ink); }
+</style>
+
+<script>
+	const root = document.querySelector<HTMLElement>('[data-bi]');
+	if (root) {
+		const cfg = JSON.parse(root.dataset.bi ?? '{}') as {
+			list: number;
+			sku: string;
+			quote: string;
+			dests: { code: string; name: string; far: boolean; fee: number; label: string }[];
+		};
+		const qty = root.querySelector<HTMLInputElement>('[data-qty]')!;
+		const sel = root.querySelector<HTMLSelectElement>('[data-country]')!;
+		const feeEl = root.querySelector<HTMLElement>('[data-fee]')!;
+		const totalEl = root.querySelector<HTMLElement>('[data-total]')!;
+		const btn = root.querySelector<HTMLButtonElement>('[data-order-btn]')!;
+		const msg = root.querySelector<HTMLElement>('[data-msg]')!;
+		const money = (c: number) => `$${(c / 100).toFixed(2)}`;
+		const say = (t: string) => {
+			msg.textContent = t;
+			msg.hidden = !t;
+		};
+		const n = () => Math.max(1, Math.min(99, Math.floor(Number(qty.value) || 1)));
+		const dest = () => cfg.dests.find((d) => d.code === sel.value) ?? cfg.dests[0];
+		function render() {
+			const d = dest();
+			feeEl.hidden = d.fee <= 0;
+			feeEl.textContent = d.fee > 0 ? `+ ${money(d.fee)} per copy, ${d.label.toLowerCase()} (${d.name})` : '';
+			totalEl.textContent = money(n() * (cfg.list + d.fee));
+		}
+		qty.addEventListener('input', render);
+		sel.addEventListener('change', render);
+		render();
+		btn.addEventListener('click', async () => {
+			if (dest().far && n() >= 10) return say(cfg.quote);
+			say('Opening secure checkout…');
+			btn.disabled = true;
+			try {
+				const res = await fetch('/dvc-checkout', {
+					method: 'POST',
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify({
+						counts: { [cfg.sku]: n() },
+						country: sel.value,
+						returnPath: '/books/beloved-identity/',
+					}),
+				});
+				const d = (await res.json()) as { url?: string; disabled?: boolean; error?: string; message?: string };
+				if (d.url) {
+					window.location.href = d.url;
+					return;
+				}
+				say(d.disabled ? 'Checkout is not enabled yet.' : (d.message ?? 'Something went wrong. Please try again.'));
+			} catch {
+				say('Something went wrong. Please try again.');
+			}
+			btn.disabled = false;
+		});
+	}
+</script>
