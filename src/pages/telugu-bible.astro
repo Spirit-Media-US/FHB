@@ -30,6 +30,14 @@ import AuthorBio from '../components/AuthorBio.astro';
 import ReviewLink from '../components/ReviewLink.astro';
 import Layout from '../layouts/Layout.astro';
 
+// Telugu blog editions (2qb): data-driven from the same overlays /te/blog/[slug] builds from,
+// so a new overlay file appears here automatically. Titles are each post's own Telugu title.
+const teBlogModules = import.meta.glob('../data/te-blog/*.json', { eager: true });
+const TE_ARTICLES = Object.values(teBlogModules)
+	.map((m: any) => m.default)
+	.filter((p: any) => p?.slug && p?.title)
+	.sort((a: any, b: any) => a.slug.localeCompare(b.slug));
+
 const PAGE_URL = 'https://fathersheartbible.com/telugu-bible/'; // trailing slash = the canonical form Layout.astro emits
 const TITLE = "Telugu Bible — Read Father's Heart Bible Free Online";
 const DESCRIPTION =
@@ -224,6 +232,7 @@ const TOC = [
 	{ id: 'psalms', label: 'Keerthanalu — the Psalms' },
 	{ id: 'beyond-psalms', label: 'Beyond the Psalms' },
 	{ id: 'find-a-chapter', label: 'Finding a chapter' },
+	{ id: 'articles-te', label: 'Articles in Telugu' },
 	{ id: 'faq', label: 'FAQ' },
 ];
 ---
@@ -308,6 +317,16 @@ const TOC = [
 					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">The whole Bible in Telugu, online and free &mdash; a translation revealing God as a loving Father to His sons and daughters.</p>
 					<a href={`${READ_TE}keerthanalu/23/`} class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Open <span lang="te">కీర్తనలు</span> 23<span aria-hidden="true">&rarr;</span></a>
 				</aside>
+
+				{TE_ARTICLES.length > 0 && (
+					<>
+						<h2 id="articles-te" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Articles in Telugu</h2>
+						<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Our Father&rsquo;s Heart Bible blog articles are also available in Telugu:</p>
+						<ul class="space-y-2 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: disc;">
+							{TE_ARTICLES.map((p: any) => (<li><a href={`/te/blog/${p.slug}/`} lang="te" style="color: var(--color-brand);" class="hover:underline">{p.title}</a></li>))}
+						</ul>
+					</>
+				)}
 
 				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
 				<div class="space-y-6">
