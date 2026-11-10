@@ -25,5 +25,8 @@ export const FHB_ORG_CORE = {
 		'https://www.linkedin.com/company/130004384',
 		// English FHB version record on YouVersion (unit 2jk): our own structured data, not a link request.
 		'https://www.bible.com/versions/4926-FHB',
+		// Podcast show pages (unit 2qv): our own show, same URLs the footer uses.
+		'https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY',
+		'https://podcasts.apple.com/us/podcast/fathers-heart-bible%E2%84%A2-%E2%80%94-audio-bible/id6818374650',
 	],
 };
