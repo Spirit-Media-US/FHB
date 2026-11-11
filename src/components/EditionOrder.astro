@@ -19,6 +19,7 @@ import { PRINT_TIERS } from '../data/print-tiers';
 import { handlingTable } from '../lib/marginGuard';
 import { FIRST_ORDER_LABEL, FIRST_ORDER_PCT, firstOrderUnit } from '../lib/order-pricing';
 import {
+	formatCount,
 	formatUsd,
 	ORDER_STRINGS,
 	type OrderLang,
@@ -107,7 +108,7 @@ const idp = `eo-${lead.id}`;
 		{(() => { const shipsFull = lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts()); return (<>
 		<p class="eo-price__note eo-ships--wide" data-ships-line>{shipsFull}</p>
 		<details class="eo-price__note eo-ships--narrow" data-ships-details>
-			<summary>{t('o.shipsSummary')}</summary>
+			<summary>{t('o.shipsSummary', { n: formatCount(lang, LIVE_COUNTRIES.length) })}</summary>
 			<p>{shipsFull}</p>
 		</details>
 		</>); })()}
