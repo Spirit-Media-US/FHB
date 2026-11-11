@@ -72,6 +72,15 @@ export function feeLabelInline(lang: string, label: string): string {
 	return label.charAt(0).toLocaleLowerCase(lang) + label.slice(1);
 }
 
+/** A whole number in the page's language (the ships-to count in the mobile summary). */
+export function formatCount(lang: string, n: number): string {
+	try {
+		return new Intl.NumberFormat(lang === 'en' ? 'en-US' : lang).format(n);
+	} catch {
+		return String(n);
+	}
+}
+
 /** A displayed USD price in the page's language (we charge USD; only the formatting localizes).
  *  English is pinned to en-US so it reads exactly "$34.00". */
 export function formatUsd(lang: string, cents: number): string {

@@ -165,3 +165,20 @@ test('feeLabelInline: de keeps the noun capital, English lowercases as before, o
 	assert.equal(feeLabelInline('fr', feeLabel(ORDER_STRINGS.fr, 'International handling')), 'frais de traitement internationaux');
 	assert.equal(feeLabelInline('ja', feeLabel(ORDER_STRINGS.ja, 'International handling')), '国際取扱手数料');
 });
+
+// Unit 2sd: the mobile ships-summary must carry the LIVE ship-country count (data-driven), never an unqualified "worldwide".
+test('shipsSummary: {n} placeholder in all 8 tables; rendered count equals LIVE_COUNTRIES.length; no worldwide claim', async () => {
+	const { LIVE_COUNTRIES } = await import('../src/lib/shipCountries.ts');
+	const { formatCount } = await import('../src/lib/orderStrings.ts');
+	for (const l of ORDER_LANGS) {
+		const raw = ORDER_STRINGS[l]['o.shipsSummary'];
+		assert.equal(ph(raw), 'n', `${l}: summary needs exactly {n}`);
+		const out = tr(ORDER_STRINGS[l], 'o.shipsSummary', { n: formatCount(l, LIVE_COUNTRIES.length) });
+		assert.ok(out.includes(formatCount(l, LIVE_COUNTRIES.length)), `${l}: rendered summary carries the live count`);
+		assert.ok(!/\{n\}/.test(out), `${l}: placeholder filled`);
+	}
+	const en = tr(ORDER_STRINGS.en, 'o.shipsSummary', { n: formatCount('en', LIVE_COUNTRIES.length) });
+	assert.equal(en, `Free standard shipping to ${LIVE_COUNTRIES.length} countries · details`);
+	assert.ok(!/worldwide|world/i.test(en), 'en summary makes no worldwide claim');
+	for (const l of WAVE) assert.ok(!/worldwide|wereldwijd|weltweit|monde entier|todo el mundo|todo o mundo|mondo|世界/i.test(ORDER_STRINGS[l]['o.shipsSummary']), `${l}: no worldwide-equivalent`);
+});
