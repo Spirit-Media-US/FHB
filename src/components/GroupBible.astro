@@ -18,6 +18,7 @@
 //
 // FHB COLOR SCHEME ONLY — no per-group colors. Links/accents = --color-brand
 // (magenta), dividers = --color-gold, buttons = the homepage #FFD9E0/#4A4A4A.
+import { filmNode } from '../data/film-schema';
 import { FAITH_GROUPS, GROUPS, type Group, SECTIONS } from '../data/groups';
 import { catalogRows } from '../data/print-catalog';
 import { editionForAudiencePage } from '../data/receive';
@@ -402,19 +403,10 @@ const faqSchema = {
 // VideoObject — the FHB intro film embedded in the closing CTA (video rich results + indexing).
 const filmSchema = {
 	'@context': 'https://schema.org',
-	'@type': 'VideoObject',
-	name: "Father's Heart Bible — Introduction",
-	description:
-		"An introduction to Father's Heart Bible — an English translation that reveals God as a loving Father throughout Scripture.",
+	...filmNode,
 	thumbnailUrl: `https://i.ytimg.com/vi/${ctaVideoId}/hqdefault.jpg`,
-	uploadDate: '2026-06-11',
 	contentUrl: `https://youtu.be/${ctaVideoId}`,
 	embedUrl: `https://www.youtube.com/embed/${ctaVideoId}`,
-	publisher: {
-		'@type': 'Organization',
-		name: "Father's Heart Bible",
-		url: 'https://fathersheartbible.com/',
-	},
 };
 // Book schema with real offers — the product entity AI engines cite publishers on
 // (the Zondervan/Tyndale pattern). Audience-aware per page; publisher links to the

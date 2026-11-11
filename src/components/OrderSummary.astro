@@ -14,7 +14,7 @@ import {
 	FIRST_ORDER_PCT,
 	type Tier,
 } from '../lib/order-pricing';
-import { ORDER_STRINGS, orderLangFor, regionName, tr } from '../lib/orderStrings';
+import { formatUsd, ORDER_STRINGS, orderLangFor, regionName, tr } from '../lib/orderStrings';
 import { allFreeShipping, LIVE_COUNTRIES } from '../lib/shipCountries';
 
 interface Props {
@@ -50,10 +50,10 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 		{ladder.map((tier) => <span class="osum__tier" data-tier={tier.pct} data-min={tier.min}>{t('s.tier', { pct: tier.pct, min: tier.min })}</span>)}
 	</p>
 	<dl class="osum__lines">
-		<div><dt><span data-sum-copies>0</span> <span data-sum-copies-word>{t('s.copies')}</span></dt><dd data-sum-subtotal>$0.00</dd></div>
+		<div><dt><span data-sum-copies>0</span> <span data-sum-copies-word>{t('s.copies')}</span></dt><dd data-sum-subtotal>{formatUsd(lang, 0)}</dd></div>
 		<div data-sum-disc hidden><dt data-sum-disc-label></dt><dd data-sum-disc-amt></dd></div>
 		<div data-sum-fee hidden><dt data-sum-fee-label></dt><dd data-sum-fee-amt></dd></div>
-		<div class="osum__total"><dt data-t="s.total">{t('s.total')}</dt><dd data-sum-total>$0.00</dd></div>
+		<div class="osum__total"><dt data-t="s.total">{t('s.total')}</dt><dd data-sum-total>{formatUsd(lang, 0)}</dd></div>
 	</dl>
 	<p class="osum__note"><span data-t={shipKey}>{t(shipKey)}</span> · <span data-t="s.tax">{t('s.tax')}</span></p>
 	{multiCountry && <p class="osum__note" data-fee-note data-t="s.feeNote">{t('s.feeNote')}</p>}

@@ -18,7 +18,14 @@ import type { CatalogRow } from '../data/print-catalog';
 import { PRINT_TIERS } from '../data/print-tiers';
 import { handlingTable } from '../lib/marginGuard';
 import { FIRST_ORDER_LABEL, FIRST_ORDER_PCT, firstOrderUnit } from '../lib/order-pricing';
-import { ORDER_STRINGS, type OrderLang, orderLangFor, shipsText, tr } from '../lib/orderStrings';
+import {
+	formatUsd,
+	ORDER_STRINGS,
+	type OrderLang,
+	orderLangFor,
+	shipsText,
+	tr,
+} from '../lib/orderStrings';
 import {
 	allFreeShipping,
 	LIVE_COUNTRIES,
@@ -72,7 +79,7 @@ const config = JSON.stringify({
 // first-order unit price with the regular price struck through. Read from the first row; the
 // General colours share one price. pricing-verify reads data-line-sku and the two figures back
 // out of the built page and checks them against the server.
-const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+const money = (cents: number) => formatUsd(lang, cents);
 const lead = rows[0];
 const priceLine = [
 	{ binding: t('p.paperback'), sku: `${lead.id}-pb`, usd: lead.pb },

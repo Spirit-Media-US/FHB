@@ -27,6 +27,8 @@ import {
 import {
 	applyLang,
 	feeLabel,
+	feeLabelInline,
+	formatUsd,
 	type OrderLang,
 	orderLangFor,
 	regionName,
@@ -57,14 +59,12 @@ interface Config {
 	s?: Strings;
 }
 
-const money = (cents: number) =>
-	`$${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
 function init(root: HTMLElement) {
 	const cfg = JSON.parse(root.dataset.order ?? '{}') as Config;
 	const counts: Record<string, number> = {};
 	let S: Strings = cfg.s ?? en;
 	let lang: OrderLang = cfg.lang ?? 'en';
+	const money = (cents: number) => formatUsd(lang, cents);
 	const t = (key: string, v: Record<string, string | number> = {}) =>
 		tr(S, key, { pct: FIRST_ORDER_PCT, min: BULK_QUOTE_MIN, ...v });
 	const firstLabel = () => t('p.firstOrder');
@@ -229,7 +229,7 @@ function init(root: HTMLElement) {
 			el.hidden = !(row && fee > 0);
 			el.textContent =
 				row && fee > 0
-					? `+ ${money(fee)} ${feeLabel(S, row.label).toLowerCase()}${el.hasAttribute('data-fee-full') ? ` (${countryName(code, row)})` : ''}`
+					? `+ ${money(fee)} ${feeLabelInline(lang, feeLabel(S, row.label))}${el.hasAttribute('data-fee-full') ? ` (${countryName(code, row)})` : ''}`
 					: '';
 		}
 	}
