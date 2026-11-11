@@ -158,6 +158,26 @@ const hasCover = !isLang || hasLangCard(langCode);
 const coverUrl = hasCover
 	? cardUrl(ed.coverImage ?? `dvc-${ed.slug}`, 1200)
 	: 'https://assets.spiritmediapublishing.com/FHB/share/v5/fhb-og-family.jpg';
+const coverAlt = ed.name.startsWith('Father')
+	? `${ed.name} in Divine Voice™ Color`
+	: `${ed.name} — Father's Heart Bible (FHB) in Divine Voice™ Color`;
+// Image search (unit 2rl): the cover is an ImageObject, not a bare URL, so Google Images can show
+// creator / credit / copyright. copyrightNotice is the site footer's own line (Footer.astro, wired in
+// Layout.astro) verbatim; width/height are omitted because cover files differ (1200x1528, one 1200x1451,
+// and the og-family fallback) — never guess. No license/acquireLicensePage (2rm).
+const coverImageObject = {
+	'@type': 'ImageObject',
+	url: coverUrl,
+	contentUrl: coverUrl,
+	caption: coverAlt,
+	creator: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	creditText: 'Spirit Media Publishing',
+	copyrightNotice: `© ${new Date().getFullYear()} Spirit Media Publishing, the imprint of Spirit Media Inc. All rights reserved.`,
+};
 // THE ORDER FORM under the header, on EVERY edition (Kevin 2026-10-05; language pages since
 // 2026-10-03). It sells this edition's catalog row(s) from print-catalog.ts — the same record
 // /print's rows and dvc-checkout.ts use: lang-<code> for a language, the slug itself for an
@@ -419,7 +439,7 @@ const productSchema = {
 	inLanguage: nativeMeta ? inLang : (ed.lang ?? 'en'),
 	...(datePublished ? { datePublished } : {}),
 	description: productDescription,
-	image: coverUrl,
+	image: coverImageObject,
 	url,
 	// The same edition on YouVersion, when fhb-partner-link-watch has FOUND it (one map, one line per language).
 	...(ed.lang && (youversion.versions as Record<string, string>)[ed.lang]
@@ -452,7 +472,7 @@ const productSchema = {
 		...(v.isbn ? { isbn: v.isbn, gtin13: v.isbn.replace(/-/g, '') } : {}),
 		sku: v.sku,
 		description: productDescription,
-		image: coverUrl,
+		image: coverImageObject,
 		inLanguage: nativeMeta ? inLang : (ed.lang ?? 'en'),
 		brand: { '@type': 'Brand', name: "Father's Heart Bible" },
 		offers: offerFor(v),
@@ -506,7 +526,7 @@ const faqSchema = {
 						{isLang ? (
 							<LangCover code={langCode} name={ed.name} english={ed.english ?? ''} rtl={ed.dir === 'rtl'} variant="page" />
 						) : (
-							<img id="cover-main" src={coverUrl} alt={ed.name.startsWith('Father') ? `${ed.name} in Divine Voice™ Color` : `${ed.name} — Father's Heart Bible (FHB) in Divine Voice™ Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
+							<img id="cover-main" src={coverUrl} alt={coverAlt} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
 						)}
 						</a>
 					</div>

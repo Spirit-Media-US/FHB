@@ -28,6 +28,8 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const BIND = { 'https://schema.org/Hardcover': 'Hardcover', 'https://schema.org/Paperback': 'Paperback' };
 
 const items = new Map();
+// image may be a bare URL or an ImageObject (unit 2rl): the feed needs the URL string.
+const imgUrl = (i) => (i && typeof i === 'object' ? i.contentUrl || i.url : i);
 const walk = (n, ctx) => {
 	if (Array.isArray(n)) return n.forEach((x) => walk(x, ctx));
 	if (!n || typeof n !== 'object') return;
@@ -40,7 +42,7 @@ const walk = (n, ctx) => {
 				title: `${n.name.replace(/ \((Hardcover|Paperback)\)$/, '')}${fmt ? ` (${fmt})` : ''}`,
 				description: (n.description || ctx.desc || n.name).replace(/\s+/g, ' ').trim().slice(0, 4900),
 				link: offer.url,
-				image: n.image || ctx.image,
+				image: imgUrl(n.image) || ctx.image,
 				price: offer.price,
 				currency: offer.priceCurrency,
 				availability: offer.availability,
@@ -60,7 +62,7 @@ for (const d of readdirSync(`${DIST}/bibles`).sort()) {
 	for (const m of html.matchAll(/<script type="application\/ld\+json"[^>]*>(.*?)<\/script>/gs)) {
 		let j;
 		try { j = JSON.parse(m[1]); } catch { continue; }
-		walk(j, { slug: d, desc: j.description, image: j.image });
+		walk(j, { slug: d, desc: j.description, image: imgUrl(j.image) });
 	}
 }
 
