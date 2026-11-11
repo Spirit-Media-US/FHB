@@ -104,7 +104,13 @@ const idp = `eo-${lead.id}`;
 		<p class="eo-price__note">{lang === 'en' ? FIRST_ORDER_LABEL : t('p.firstOrder', { pct: FIRST_ORDER_PCT })}{freeShip ? ` · ${t('o.freeShipping')}` : ''}</p>
 		{note && <p class="eo-price__note" data-preorder-note>{note}</p>}
 		<p class="eo-price__note"><a href="/returns/">{t('p.returns')}</a></p>
-		<p class="eo-price__note" data-ships-line>{lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts())}</p>
+		{(() => { const shipsFull = lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts()); return (<>
+		<p class="eo-price__note eo-ships--wide" data-ships-line>{shipsFull}</p>
+		<details class="eo-price__note eo-ships--narrow" data-ships-details>
+			<summary>{t('o.shipsSummary')}</summary>
+			<p>{shipsFull}</p>
+		</details>
+		</>); })()}
 	</div>
 	{rows.map((r) => (
 		<div class={multi ? 'eo-variant' : undefined}>
@@ -134,6 +140,14 @@ const idp = `eo-${lead.id}`;
 		color: #3f3f46;
 		font-size: 0.85rem;
 		font-weight: 600;
+	}
+	/* Phones: the long ships-to paragraph folds behind a native disclosure (full text stays in the DOM). */
+	.eo-ships--narrow { display: none; }
+	.eo-ships--narrow summary { cursor: pointer; line-height: 1.25; }
+	.eo-ships--narrow p { margin: 0.35rem 0 0; font-weight: 500; }
+	@media (max-width: 640px) {
+		.eo-ships--wide { display: none; }
+		.eo-ships--narrow { display: block; }
 	}
 	.eo-variant + .eo-variant { margin-top: 0.7rem; }
 	.eo-variant__name {
