@@ -36,6 +36,7 @@ import {
 } from '../lib/shipCountries';
 import BindingQty from './BindingQty.astro';
 import OrderSummary from './OrderSummary.astro';
+import ShipsDisclosure from './ShipsDisclosure.astro';
 
 interface Props {
 	/** the edition's catalog row(s) — one, except the General edition, sold in three colours */
@@ -105,13 +106,7 @@ const idp = `eo-${lead.id}`;
 		<p class="eo-price__note">{lang === 'en' ? FIRST_ORDER_LABEL : t('p.firstOrder', { pct: FIRST_ORDER_PCT })}{freeShip ? ` · ${t('o.freeShipping')}` : ''}</p>
 		{note && <p class="eo-price__note" data-preorder-note>{note}</p>}
 		<p class="eo-price__note"><a href="/returns/">{t('p.returns')}</a></p>
-		{(() => { const shipsFull = lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts()); return (<>
-		<p class="eo-price__note eo-ships--wide" data-ships-line>{shipsFull}</p>
-		<details class="eo-price__note eo-ships--narrow" data-ships-details>
-			<summary>{t('o.shipsSummary', { n: formatCount(lang, LIVE_COUNTRIES.length) })}</summary>
-			<p>{shipsFull}</p>
-		</details>
-		</>); })()}
+		<ShipsDisclosure cls="eo-price__note" full={lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts())} summary={t('o.shipsSummary', { n: formatCount(lang, LIVE_COUNTRIES.length) })} />
 	</div>
 	{rows.map((r) => (
 		<div class={multi ? 'eo-variant' : undefined}>
@@ -136,19 +131,13 @@ const idp = `eo-${lead.id}`;
 	.eo-price__reg { color: #71717a; font-size: 0.9rem; }
 	.eo-price__fee { color: #3f3f46; font-size: 0.9rem; font-weight: 600; }
 	.eo-price__fee[hidden] { display: none; }
-	.eo-price__note {
+	.eo-price__note,
+	.eo-price :global(.ships-d--wide),
+	.eo-price :global(.ships-d--narrow) {
 		margin: 0.35rem 0 0;
 		color: #3f3f46;
 		font-size: 0.85rem;
 		font-weight: 600;
-	}
-	/* Phones: the long ships-to paragraph folds behind a native disclosure (full text stays in the DOM). */
-	.eo-ships--narrow { display: none; }
-	.eo-ships--narrow summary { cursor: pointer; line-height: 1.25; }
-	.eo-ships--narrow p { margin: 0.35rem 0 0; font-weight: 500; }
-	@media (max-width: 640px) {
-		.eo-ships--wide { display: none; }
-		.eo-ships--narrow { display: block; }
 	}
 	.eo-variant + .eo-variant { margin-top: 0.7rem; }
 	.eo-variant__name {
