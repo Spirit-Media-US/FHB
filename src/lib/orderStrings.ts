@@ -154,6 +154,10 @@ export function applyLang(
 		});
 	for (const el of root.querySelectorAll<HTMLElement>('[data-ships]'))
 		el.textContent = shipsText(lang, s, JSON.parse(el.dataset.ships as string) as ShipsParts);
+	for (const el of root.querySelectorAll<HTMLElement>('[data-ships-n]'))
+		el.textContent = tr(s, 'o.shipsSummary', {
+			n: formatCount(lang, Number(el.dataset.shipsN)),
+		});
 	for (const o of root.querySelectorAll<HTMLOptionElement>('select[data-country] option'))
 		o.textContent = regionName(lang, o.value);
 }
