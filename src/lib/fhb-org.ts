@@ -4,13 +4,20 @@
 export const FHB_ORG_ID = 'https://fathersheartbible.com/#organization';
 export const SMP_ORG_ID = 'https://spiritmediapublishing.com/#organization';
 
+// Real spelling variants people search (unit 2sy, 2026-11-11): no-apostrophe and "FHB Bible".
+// ONE list; every Organization/WebSite/Book alternateName on the marketing site is built with withBrandVariants().
+export const FHB_BRAND_VARIANTS = ['Fathers Heart Bible', 'FHB Bible'];
+export function withBrandVariants(names: string[]): string[] {
+	return [...new Set([...names, ...FHB_BRAND_VARIANTS])];
+}
+
 export const FHB_ORG_REF = { '@id': FHB_ORG_ID };
 
 export const FHB_ORG_CORE = {
 	'@type': 'Organization',
 	'@id': FHB_ORG_ID,
 	name: "Father's Heart Bible",
-	alternateName: ["Father's Heart Bible™", 'FHB'],
+	alternateName: withBrandVariants(["Father's Heart Bible™", 'FHB']),
 	url: 'https://fathersheartbible.com',
 	logo: 'https://fathersheartbible.com/fhb-logo.png',
 	parentOrganization: { '@id': SMP_ORG_ID },

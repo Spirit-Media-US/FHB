@@ -16,6 +16,7 @@ import {
 	topLanguages,
 } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
+import { withBrandVariants } from '../lib/fhb-org';
 import { sanityClient, urlFor } from '../lib/sanity';
 import { fitDescription, fitTitle } from '../lib/seoFit';
 
@@ -116,6 +117,11 @@ const faqs = [
 		a: "Father's Heart Bible™ (FHB) is the complete Bible — 66 books, 1,189 chapters, 31,087 verses — in a translation from the original Hebrew, Aramaic, and Greek, governed by 160 written translation rules. To our knowledge, it is the first Bible in print to show which words a divine person spoke, and which person spoke them: our Father's words in blue, the Son's in red, the Spirit's in purple.",
 	},
 	{
+		// Spelling-variant question (unit 2sz): people search the no-apostrophe form; one factual answer, no new claims.
+		q: 'Is it Fathers Heart Bible or Father\u2019s Heart Bible?',
+		a: 'The name is Father\u2019s Heart Bible\u2122, the Bible that reveals the heart of our Father. \u201CFathers Heart Bible\u201D and \u201CFHB\u201D refer to the same Bible.',
+	},
+	{
 		// The abbreviation needs its own QUESTION, not just a mention inside another answer
 		// (Kevin 2026-09-18). NIV, ESV and KJV carry their own search demand; FHB does not yet,
 		// so the pairing has to be stated in the form an engine can lift and a person can ask.
@@ -198,11 +204,11 @@ const formatDate = (dateString: string) => {
 			// node in community/src/lib/reader-seo.ts MUST stay identical to this, since
 			// two values for one @id is precisely the conflict this pass removed.
 			"name": "Father's Heart Bible™",
-			"alternateName": [
+			"alternateName": withBrandVariants([
 				"Father's Heart Bible",
 				"Father's Heart Bible: An Intimate Translation",
 				"FHB"
-			],
+			]),
 			"bookEdition": "An Intimate Translation",
 			"description": "A Bible translation from the original Hebrew, Aramaic, and Greek that reveals God as your Father. Come home to your Father. His heart is for you.",
 			"inLanguage": "en",
