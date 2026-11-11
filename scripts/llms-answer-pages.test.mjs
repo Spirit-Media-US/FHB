@@ -19,12 +19,89 @@ test('covered types are non-empty and include the named 6ae pages', () => {
 test('every src/pages folder of a covered type is registered', () => {
 	// a NEW folder like src/pages/<type>/ with 3+ pages must be added to TYPES or consciously exempted
 	const registered = new Set(TYPES.map((t) => t.dir).filter(Boolean));
-	const exempt = new Set(['blog', 'bibles', 'print', 'read', 'the-fathers-heart-bible', 'te', 'words', 'glossary-review']);
+	// 2sq: the old "<3 pages passes" loophole is gone; a folder is registered, or exempt WITH a reason. (Individual pages
+	// inside non-registered folders are checked one by one by the sitemap-parity test below.)
+	const exempt = {
+		blog: 'posts come from Sanity at build (no src/pages file per post); the /blog/ index is listed by the parity test',
+		bibles: 'one dynamic route; every edition page is listed by editionGroup() (2sr, tested below)',
+		print: 'print/order is registered as a page; the /print/ hub is hand-listed',
+		read: 'the reader is owned by the community app and /sitemap-read.xml',
+		'the-fathers-heart-bible': 'two long-form pages, checked individually by the parity test',
+		te: 'Telugu blog mirror, dynamic route over Sanity posts',
+		words: 'legacy folder, no pages',
+		books: 'book pages are registered individually',
+		data: 'CSV/JSON endpoints (.ts), not pages; the CSV downloads are listed via DATA_FILES',
+		legacy: 'noindex redirect shims',
+		'glossary-review': 'noindex native-reviewer pages, excluded from the sitemap',
+	};
 	for (const d of fs.readdirSync('src/pages', { withFileTypes: true }).filter((x) => x.isDirectory())) {
-		if (registered.has(d.name) || exempt.has(d.name)) continue;
-		const n = fs.readdirSync(`src/pages/${d.name}`).filter((f) => f.endsWith('.astro') && !f.startsWith('[')).length;
-		assert.ok(n < 3, `src/pages/${d.name}/ has ${n} pages but is not in TYPES (or the exempt list)`);
+		if (registered.has(d.name)) continue;
+		assert.ok(exempt[d.name], `src/pages/${d.name}/ is not in TYPES and not in the exempt list (give a reason)`);
 	}
+});
+
+// ---- 2sq (2026-11-11): SITEMAP PARITY. Every marketing page is in the generated llms.txt or EXEMPT with a reason. ----
+const generated = apply(fs.readFileSync('public/llms.txt', 'utf8'), render(groups));
+// url -> reason. Only pages a visitor/AI engine would not look for in an answer index, or noindex/legal boilerplate.
+export const PAGE_EXEMPT = {
+	'/404/': 'error page, not in the sitemap',
+	'/glossary-review/': 'noindex reviewer hub, filtered out of the sitemap',
+	'/legacy/youversion/': 'noindex legacy shim',
+	'/review/': 'noindex internal review page',
+	'/privacy/': 'legal boilerplate, linked from every footer',
+	'/terms/': 'legal boilerplate, linked from every footer',
+	'/returns/': 'policy boilerplate, linked from every footer',
+};
+function staticRoutes(dir = 'src/pages', rel = '') {
+	const out = [];
+	for (const f of fs.readdirSync(dir, { withFileTypes: true })) {
+		if (f.name.startsWith('[')) continue; // dynamic routes: bibles/ (listed from data), blog/ (Sanity), te/blog
+		if (f.isDirectory()) out.push(...staticRoutes(`${dir}/${f.name}`, `${rel}${f.name}/`));
+		else if (f.name.endsWith('.astro')) {
+			const r = (rel + f.name.replace(/\.astro$/, '')).replace(/(^|\/)index$/, '');
+			out.push(`/${r}${r ? '/' : ''}`);
+		}
+	}
+	return out;
+}
+const listed = (u) => new RegExp(`(^|[\\s(\`])${u.replace(/\/$/, '')}/?(?=[\\s).,:\`]|$)`, 'm').test(generated);
+
+test('sitemap parity: every marketing page is listed in llms.txt or exempt with a reason', () => {
+	const routes = staticRoutes();
+	assert.ok(routes.length > 30, 'route walk found too few pages');
+	const missing = routes.filter((u) => !listed(u) && !PAGE_EXEMPT[u]);
+	assert.deepEqual(missing, [], `${missing.length} page(s) neither listed in llms.txt nor exempt: ${missing.join(', ')}`);
+	for (const [u, why] of Object.entries(PAGE_EXEMPT)) assert.ok(why.length > 10, `${u} exempt without a reason`);
+	assert.ok(routes.includes('/books/beloved-identity/') && listed('/books/beloved-identity/'), 'beloved-identity not listed');
+});
+
+test('sitemap parity: the exempt list holds no stale or already-listed page', () => {
+	const routes = new Set(staticRoutes());
+	for (const u of Object.keys(PAGE_EXEMPT)) assert.ok(routes.has(u), `exempt ${u} is not a page any more`);
+});
+
+test("hand-written 'Reader home' line points at /read/ (the canonical URL, /read is a 301)", () => {
+	assert.match(generated, /Reader home: \/read\/(\s|$)/m);
+	assert.doesNotMatch(generated, /Reader home: \/read(\s|$)/m);
+});
+
+// ---- 2sr: every /bibles/<slug>-bible/ edition page is listed (generated from the edition data) ----
+import { editionGroup } from './llms-answer-pages.mjs';
+test('every /bibles edition page is in llms.txt (hand-written audience list or generated group)', () => {
+	const eds = [];
+	for (const f of fs.readdirSync('src/data/editions').filter((x) => /^[a-z0-9-]+\.json$/.test(x))) {
+		const e = JSON.parse(fs.readFileSync(`src/data/editions/${f}`, 'utf8'));
+		if (e && typeof e.slug === 'string' && e.listing && e.hook) eds.push(`/bibles/${e.slug}-bible/`);
+	}
+	assert.ok(eds.length > 90, `expected ~100 edition pages, found ${eds.length}`);
+	const missing = eds.filter((u) => !generated.includes(u));
+	assert.deepEqual(missing, [], `${missing.length} /bibles page(s) not in generated llms.txt`);
+	const g = editionGroup();
+	assert.ok(g.entries.length > 70 && g.entries.every((e) => e.title && e.description));
+});
+
+test('generated llms.txt stays under 70 KB', () => {
+	assert.ok(Buffer.byteLength(generated) < 70000, `llms.txt would be ${Buffer.byteLength(generated)} bytes`);
 });
 
 // 2hm (2026-11-01): these assert on GENERATOR OUTPUT (apply(committed file, render(groups)) is exactly what

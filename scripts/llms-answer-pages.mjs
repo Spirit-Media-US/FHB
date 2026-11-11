@@ -23,6 +23,22 @@ export const TYPES = [
 	{ label: 'Bible months and campaigns', pages: ['global-bible-month'] },
 	// Original data (2gm, 2026-10-31): per-book words of the Father, Son and Spirit from the locked Divine Voice Color tags.
 	// 2hi (2026-11-01): + the read-the-Bible-in-a-year plan. 2hh (2026-11-01): + the by-the-numbers page. 2he (2026-11-01): + the names page; each page's CSV downloads are listed too (DATA_FILES below).
+	// 2sq (2026-11-11): key pages that no type reached (sitemap-parity test found them missing). `overrides` fills a title or
+	// description ONLY where the page file cannot be read statically (data-driven or template-built copy).
+	{
+		label: 'Books, ordering and publisher pages',
+		pages: ['books/beloved-identity', 'where-to-buy', 'print/order', 'translation-progress', 'partners', 'press', 'give', 'family', 'youversion', 'verse-of-the-day-widget'],
+		overrides: {
+			'books/beloved-identity': {
+				title: "Father's Heart - Beloved Identity: What Your Heavenly Father Thinks of You",
+				description: 'The paperback book on what our Father thinks of you, with ordering.',
+			},
+			'where-to-buy': { title: "Where to Buy Father's Heart Bible", description: 'Every print edition, regular and large print, with buy links by retailer.' },
+			'translation-progress': { description: 'One row for every language in the publishing roster: script, region, and whether it can be read free online.' },
+		},
+	},
+	// 2sq: the per-language free-reading landing pages and the Spanish prayer-verses page.
+	{ label: 'Free reading pages by language', pages: ['italian-bible', 'marathi-bible', 'telugu-bible', 'tangkhul-bible', 'versiculos-sobre-oracao'] },
 	{ label: 'Original data', pages: ['who-speaks-in-scripture', 'names-of-god-the-father', 'bible-by-the-numbers', 'read-the-bible-in-a-year'] },
 ];
 
@@ -105,6 +121,12 @@ export function meta(file, root = process.cwd(), nth = 0, objectKeys = false) {
 			const v = m.slice(1).find(Boolean);
 			return clean(/\$\{/.test(v) ? fromTemplate(v, resolve) : v);
 		}
+		// Attribute wrapped in the seoFit helper, e.g. title={fitTitle("...")} / description={fitDescription(`...`)} (2sq).
+		const w = src.match(new RegExp('^\\s*' + name + '=\\{' + fit + '\\(\\s*' + lit, 'm'));
+		if (w) {
+			const v = w.slice(1).find(Boolean);
+			return clean(/\$\{/.test(v) ? fromTemplate(v, resolve) : v);
+		}
 		// JSON-string expression form, e.g. title={"2 Timothy 1:7 Meaning"} (verse-meaning pages, 2br).
 		const j = src.match(new RegExp('^\\s*' + name + '=\\{("(?:[^"\\\\\\n]|\\\\.)*")\\}', 'm'));
 		if (j) {
@@ -117,6 +139,38 @@ export function meta(file, root = process.cwd(), nth = 0, objectKeys = false) {
 		return '';
 	};
 	return { title: pick('title', 'TITLE', 'fitTitle'), description: pick('description', 'DESCRIPTION', 'fitDescription') };
+}
+
+// 2sr (2026-11-11): the /bibles/<slug>-bible/ edition pages, DERIVED from src/data/editions/*.json by the same filter
+// bibles/[slug].astro uses for getStaticPaths (slug + listing + hook). Editions already named in the hand-written part of
+// public/llms.txt (the audience list) are skipped so no page is listed twice. One short line each: the edition's own name
+// and its English name from the title's parenthetical, never typed here.
+export function editionGroup(root = process.cwd()) {
+	const dir = path.resolve(root, 'src/data/editions');
+	let hand = '';
+	try {
+		const t = fs.readFileSync(path.resolve(root, 'public/llms.txt'), 'utf8');
+		const a = t.indexOf(BEGIN);
+		const b = t.indexOf(END);
+		hand = a !== -1 && b > a ? t.slice(0, a) + t.slice(b) : t;
+	} catch {
+		/* no llms.txt: nothing to dedupe against */
+	}
+	const entries = [];
+	for (const f of fs.readdirSync(dir).filter((x) => /^[a-z0-9-]+\.json$/.test(x)).sort()) {
+		const e = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
+		if (!e || typeof e.slug !== 'string' || !e.listing || !e.hook) continue;
+		const url = `/bibles/${e.slug}-bible/`;
+		if (hand.includes(url)) continue;
+		const en = (e.title || '').match(/\(([^()]+)\)\s*$/);
+		entries.push({
+			url,
+			slug: e.slug,
+			title: e.name + (en && !e.name.includes(en[1]) ? ` (${en[1]})` : ''),
+			description: 'Print edition page, ISBN and ordering.',
+		});
+	}
+	return { label: 'Print editions by language and volume', entries };
 }
 
 // Returns [{label, entries:[{url, slug, title, description}]}]
@@ -137,15 +191,17 @@ export function collect(root = process.cwd()) {
 			const m = cm
 				? meta(path.resolve(root, cm[0]), root, cm[1], true)
 				: meta(path.join(pagesDir, `${rel}.astro`), root);
+			const ov = t.overrides?.[slug] || {};
 			return {
 				url: `/${rel}/`,
 				slug,
-				title: (m.title || humanize(slug)).replace(/\s*\|\s*Father.s Heart Bible.*$/, ''),
-				description: m.description,
+				title: (ov.title || m.title || humanize(slug)).replace(/\s*\|\s*Father.s Heart Bible.*$/, ''),
+				description: ov.description || m.description,
 			};
 		});
 		groups.push({ label: t.label, entries });
 	}
+	groups.push(editionGroup(root));
 	// CSV downloads: one line each, described from the file itself (row count + column names), never typed.
 	const csvEntries = DATA_FILES.map((f) => {
 		const lines = fs.readFileSync(path.resolve(root, f), 'utf8').trim().split('\n');
@@ -174,6 +230,8 @@ export function render(groups) {
 
 // Replace the block in `text`, or insert it before "## Contact" (llms.txt) or "## Publisher" (llms-full.txt) the first time.
 export function apply(text, block) {
+	// 2sq: /read 301s to /read/ — the hand-written 'Reader home' line must carry the canonical URL (idempotent).
+	text = text.replace(/(Reader home: )\/read(?=\s|$)/g, '$1/read/');
 	const a = text.indexOf(BEGIN);
 	const b = text.indexOf(END);
 	if (a !== -1 && b > a) return text.slice(0, a) + block + text.slice(b + END.length);
