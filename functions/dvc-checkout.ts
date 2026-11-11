@@ -1593,6 +1593,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	}
 
 	if (validEmail) form.customer_email = email;
+	// Abandoned-checkout recovery (Kevin 2026-11-11 "1 C"): an expired session gets a recovery URL.
+	// consent_collection[promotions] (which lets Stripe email it) is refused until the Stripe
+	// dashboard's Checkout terms are accepted — tested 2026-11-11, so it is not set here.
+	form['after_expiration[recovery][enabled]'] = 'true';
 	// Pre-applied, so the buyer never types it; Stripe shows WELCOME15 on the summary and counts
 	// its redemptions. Units above are at list price when it applies — the two never stack.
 	if (promo && useCode) form['discounts[0][promotion_code]'] = promo;
