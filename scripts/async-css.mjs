@@ -41,6 +41,7 @@ const SYNC_CSS_PAGES = new Set([
 	'blog/index.html',
 	'read/index.html',
 	'nations/index.html', // minor CLS + the country grid reflows from deferred CSS
+	'legacy/index.html', // 2ut: section below the hero reflowed when async CSS landed (desktop CLS 0.056-0.201)
 	'family/index.html', // text-LCP hero + card grid; deferred CSS would reflow the hero
 ]);
 
@@ -55,7 +56,7 @@ const SYNC_CSS_PREFIXES = [
 // Exceptions to the no-hero rule: measured fine with async CSS (2hk, 2026-11-01).
 const ASYNC_OK_PREFIXES = [
 	'bibles/', // 107 edition pages: PSI desktop 100, CLS 0.006, mobile 91-99
-	'glossary-review/', // internal review pages
+	// glossary-review/ REMOVED 2026-11-12 (2ut): async CSS reflowed the page, mobile CLS 0.23-0.24 (tr, id), desktop CLS 0.567 (tr). No hero, so it now falls to render-blocking CSS.
 	'the-fathers-heart-bible/', // desktop 100 / mobile 99, CLS 0.005-0.026
 ];
 
