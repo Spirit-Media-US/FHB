@@ -63,6 +63,28 @@ function listOf(lang: string, items: string[]): string {
 export const feeLabel = (s: Strings, englishLabel: string): string =>
 	englishLabel === 'Import & handling' ? tr(s, 'fee.import') : tr(s, 'fee.international');
 
+/** The fee label as it reads mid-line after "+ $x.xx". English lowercases the whole label (as always);
+ *  German keeps its noun capitals (Bearbeitungsgebühr); the other languages lowercase only the first
+ *  letter (Japanese has no case, so it is unchanged). */
+export function feeLabelInline(lang: string, label: string): string {
+	if (lang === 'en') return label.toLowerCase();
+	if (lang === 'de') return label;
+	return label.charAt(0).toLocaleLowerCase(lang) + label.slice(1);
+}
+
+/** A displayed USD price in the page's language (we charge USD; only the formatting localizes).
+ *  English is pinned to en-US so it reads exactly "$34.00". */
+export function formatUsd(lang: string, cents: number): string {
+	try {
+		return new Intl.NumberFormat(lang === 'en' ? 'en-US' : lang, {
+			style: 'currency',
+			currency: 'USD',
+		}).format(cents / 100);
+	} catch {
+		return `$${(cents / 100).toFixed(2)}`;
+	}
+}
+
 /** What the shipping lines are built from (emitted as data-ships by the order components). */
 export interface ShipsParts {
 	/** ISO region codes of the print sites (US, GB, AU, AE) */

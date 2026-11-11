@@ -21,7 +21,7 @@
  * pricing one.
  */
 import { firstOrderUnit } from '../lib/order-pricing';
-import { ORDER_STRINGS, orderLangFor, tr } from '../lib/orderStrings';
+import { formatUsd, ORDER_STRINGS, orderLangFor, tr } from '../lib/orderStrings';
 
 interface Props {
 	hbSlug: string;
@@ -35,7 +35,7 @@ interface Props {
 const { hbSlug, pbSlug, hb, pb, label, lang } = Astro.props;
 const S = ORDER_STRINGS[orderLangFor(lang)];
 // The list price struck through and the first-order price beside it (Kevin 2026-10-03).
-const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+const money = (cents: number) => formatUsd(orderLangFor(lang), cents);
 const first = (usd: number) => money(firstOrderUnit(Math.round(usd * 100)));
 const rows = [
 	{ slug: hbSlug, price: hb, binding: tr(S, 'p.hardback') },
@@ -50,7 +50,7 @@ const rows = [
 		<div class="binding-qty__row">
 			<span class="binding-qty__label">
 				<span class="binding-qty__binding">{r.binding}</span>
-				<span class="binding-qty__price"><s>${r.price.toFixed(2)}</s> <b>{first(r.price)}</b></span>
+				<span class="binding-qty__price"><s>{money(Math.round(r.price * 100))}</s> <b>{first(r.price)}</b></span>
 				<span class="binding-qty__fee" data-fee-sku={r.slug} hidden></span>
 			</span>
 			<div class="binding-qty__ctl">
