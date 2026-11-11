@@ -491,15 +491,18 @@ function editionPageErrs(pages, srv) {
 			);
 			continue;
 		}
+		// A live order language formats the figure locally ("67,99 $", "US$ 67,99", "67,99 USD"), so compare
+		// the AMOUNT in cents, and require a US-dollar marker so a wrong currency still fails.
+		const cents = (t) => (/\$|USD/.test(t) ? Number(t.replace(/[^0-9]/g, '')) : Number.NaN);
 		for (const r of rows) {
 			const sv = srv[r.sku];
 			if (sv == null) {
 				errs.push(`${f}: price line names ${r.sku}, which the server does not sell`);
 				continue;
 			}
-			if (r.reg !== usd(sv.cents))
+			if (cents(r.reg) !== sv.cents)
 				errs.push(`${f}: ${r.sku} regular shows ${r.reg}, server charges ${usd(sv.cents)}`);
-			if (r.first !== usd(firstUnit(sv.cents)))
+			if (cents(r.first) !== firstUnit(sv.cents))
 				errs.push(
 					`${f}: ${r.sku} first-order shows ${r.first}, rule gives ${usd(firstUnit(sv.cents))}`,
 				);
