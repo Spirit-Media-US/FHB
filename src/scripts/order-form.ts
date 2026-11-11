@@ -12,6 +12,7 @@
 // nothing resets; /print's cards ([data-pick-edition]) pre-fill a row without touching the rest.
 
 import en from '../data/order-strings/en.json';
+import { buildCheckoutEvent, sendCheckoutEvent } from '../lib/checkoutEvent';
 import { BULK_QUOTE_MIN, bulkQuoteMailto, bulkQuoteRequired } from '../lib/farBand';
 import { firstStateFrom } from '../lib/firstOrderGuard';
 import {
@@ -362,6 +363,13 @@ function init(root: HTMLElement) {
 		}
 		say(t('m.opening'));
 		btn.disabled = true;
+		sendCheckoutEvent(
+			buildCheckoutEvent(counts, {
+				path: window.location.pathname,
+				dest: q<HTMLSelectElement>('[data-country]')?.value,
+				lang,
+			}),
+		);
 		try {
 			const res = await fetch('/dvc-checkout', {
 				method: 'POST',
