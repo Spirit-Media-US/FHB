@@ -18,12 +18,20 @@
  * price) plus gtin, condition, group_id, product_category, target_countries, store_country. Same
  * ids/prices/availability/links/images/GTINs as the XML by construction; scripts/openai-feed.test.mjs
  * enforces parity. NOT submitted anywhere (application is unit 2rb).
- * Usage: node scripts/gen-merchant-feed.mjs [--out dist/merchant-feed.xml]
+ * Usage: node scripts/gen-merchant-feed.mjs [--out dist/merchant-feed.xml] [--country <cc>]
  */
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 
 const DIST = 'dist';
-const OUT = process.argv.includes('--out') ? process.argv[process.argv.indexOf('--out') + 1] : `${DIST}/merchant-feed.xml`;
+// Unit 2qs: `--country <cc>` writes ONE country's feed (dist/merchant-feed-<cc>.xml): the same items, but
+// only that country's <g:shipping> block, taken from the page JSON-LD, which is built from
+// src/data/ship-countries.json (live + liveWave, deliveryRoutes). No flag = the multi-country feed,
+// byte-identical to before (the US Merchant Center source fetches it). The country must be live in
+// that data; a country not in it is an error, never a default. The OpenAI jsonl is NOT written in
+// country mode (it keeps its own US targeting).
+const CC = process.argv.includes('--country') ? String(process.argv[process.argv.indexOf('--country') + 1] ?? '').toUpperCase() : null;
+if (process.argv.includes('--country') && !/^[A-Z]{2}$/.test(CC)) throw new Error('merchant-feed: --country needs an ISO alpha-2 code');
+const OUT = process.argv.includes('--out') ? process.argv[process.argv.indexOf('--out') + 1] : `${DIST}/merchant-feed${CC ? `-${CC.toLowerCase()}` : ''}.xml`;
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const BIND = { 'https://schema.org/Hardcover': 'Hardcover', 'https://schema.org/Paperback': 'Paperback' };
 
@@ -71,7 +79,10 @@ const rows = [...items.values()].map((i) => {
 	// One <g:shipping> per OfferShippingDetails, i.e. one per LIVE country in
 	// src/data/ship-countries.json (the page JSON-LD is built from it). No shipping in the page = no
 	// shipping in the feed: fail loudly rather than invent a US default.
-	const details = [].concat(i.ship ?? []);
+	const all = [].concat(i.ship ?? []);
+	const cc0 = (d) => [].concat(d.shippingDestination)[0]?.addressCountry;
+	const details = CC ? all.filter((d) => cc0(d) === CC) : all;
+	if (CC && !details.length) throw new Error(`merchant-feed: ${i.id} has no shippingDetails for ${CC} (not a live country in ship-countries.json)`);
 	if (!details.length) throw new Error(`merchant-feed: ${i.id} has no shippingDetails in its page JSON-LD`);
 	const ship = details
 		.map((d) => {
@@ -111,6 +122,10 @@ ${rows.join('\n')}
 </rss>
 `;
 writeFileSync(OUT, xml);
+if (CC) {
+	console.log(`merchant-feed[${CC}]: ${rows.length} items -> ${OUT}`);
+	process.exit(0);
+}
 const OUT_JSONL = OUT.replace(/\.xml$/, '') + '-openai.jsonl';
 const AVAIL = (a) => (a.endsWith('InStock') ? 'in_stock' : 'out_of_stock');
 const jsonl = [...items.values()].map((i) => JSON.stringify({
