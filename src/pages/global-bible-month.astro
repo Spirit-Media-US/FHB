@@ -165,7 +165,7 @@ const LINK = 'color: var(--color-brand);';
 					{ROWS.map((r) => (
 						<li class="flex items-baseline justify-between gap-4 py-3 text-lg" style="border-color: var(--color-hairline); font-family: var(--font-sans);">
 							<span style="color: var(--color-muted); min-width: 9.5rem;">{fmt(r.date)}</span>
-							<span class="flex-1" style="color: var(--color-ink);">
+							<span class="flex-1 min-w-0 [overflow-wrap:anywhere]" style="color: var(--color-ink);">
 								{r.status === 'readable' && r.code ? (
 									<a href={`/read/${r.code}/`} style={LINK} class="font-semibold hover:underline">{r.name}</a>
 								) : (

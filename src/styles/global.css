@@ -277,6 +277,11 @@ section:has([data-reveal^="slide"]) {
 	overflow-x: clip;
 }
 
+/* Inline code (URLs, paths) has no break opportunity; let it wrap rather than widen the page on phones. */
+code {
+	overflow-wrap: anywhere;
+}
+
 /* ── Staggered grid children ── */
 [data-stagger] > * {
 	opacity: 0;
