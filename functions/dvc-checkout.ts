@@ -29,9 +29,9 @@ import {
 	sameOrigin,
 } from '../src/lib/firstOrderGuard.ts';
 import {
-	handlingFeeCents,
 	handlingLabel,
 	marginCheck,
+	perCopyHandlingCents,
 	volumesFor,
 } from '../src/lib/marginGuard.ts';
 import {
@@ -1501,7 +1501,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	if (dest && intl) {
 		for (const [slug, qty] of Object.entries(counts)) {
 			if (qty <= 0) continue;
-			const fee = handlingFeeCents(slug, paidUnit(slug, EDITIONS[slug].retail, unitPctFinal), dest);
+			const fee = perCopyHandlingCents(slug, EDITIONS[slug].retail, unitPctFinal, dest);
 			if (fee <= 0) continue;
 			const binding = slug.endsWith('-hb') ? 'hardback' : 'paperback';
 			const row = handling.find((h) => h.binding === binding && h.fee === fee);

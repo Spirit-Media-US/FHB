@@ -126,6 +126,21 @@ export function handlingFeeCents(
 }
 
 /**
+ * The per-copy handling fee checkout charges for ONE SKU at a discount level: `pct` off the retail
+ * price (0 = list), via paidUnit (discount-exempt SKUs stay at list) and handlingFeeCents. This is the
+ * ONE call site for the number: dvc-checkout's handling lines use it with the order's final unit pct,
+ * and the Merchant feed / Offer JSON-LD (shippingDetailsFor) use it at pct 0. Unit 2sw.
+ */
+export function perCopyHandlingCents(
+	slug: string,
+	retailCents: number,
+	pct: number,
+	country: Pick<ShipCountry, 'landed_cost_usd' | 'farBand'> & { code?: string },
+): number {
+	return handlingFeeCents(slug, paidUnit(slug, retailCents, pct), country);
+}
+
+/**
  * The fee table the order forms embed so the fee shows BEFORE checkout. For each live non-US
  * country: feeKey (binding, volumes, paid unit price) -> fee cents, for every SKU price at every
  * discount level a buyer can reach (none, the first-order 15%, each volume tier). Costs stay on
@@ -209,7 +224,7 @@ export function shippingDetailsFor(
 	const l = countries.map((c) =>
 		offerShippingDetails(
 			c,
-			item ? handlingFeeCents(item.slug, Math.round(item.listUsd * 100), c) : 0,
+			item ? perCopyHandlingCents(item.slug, Math.round(item.listUsd * 100), 0, c) : 0,
 		),
 	);
 	return l.length === 1 ? l[0] : l;
