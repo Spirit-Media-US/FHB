@@ -37,6 +37,7 @@ import { FHB_ORG_ID } from '../../lib/fhb-org';
 import { shippingDetailsFor } from '../../lib/marginGuard';
 import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
 import { ORDER_STRINGS, orderLangFor, tr as trOrder } from '../../lib/orderStrings';
+import { priceValidUntil } from '../../lib/priceValidUntil.mjs';
 import { fitDescription, fitTitle } from '../../lib/seoFit';
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
@@ -383,10 +384,13 @@ const variants = (preorder ? [] : orderRows).flatMap((r) => {
 		title: orderRows.length > 1 ? r.title : schemaName,
 	}));
 });
+// Rolling validity (unit 2qr): build date + 12 months, computed once per build, never typed.
+const PRICE_VALID_UNTIL = priceValidUntil();
 const offerFor = (v: (typeof variants)[number]) => ({
 	'@type': 'Offer',
 	price: v.price.toFixed(2),
 	priceCurrency: 'USD',
+	priceValidUntil: PRICE_VALID_UNTIL,
 	availability: 'https://schema.org/InStock',
 	itemCondition: 'https://schema.org/NewCondition',
 	url,
