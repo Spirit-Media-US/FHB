@@ -146,13 +146,11 @@ export default defineConfig({
 				// Served by the fhb-podcast Worker (route fathersheartbible.com/audio-bible*) — Kevin 2026-10-02.
 				`${SITE}/audio-bible`,
 			],
-			// Exclude /privacy + /terms (low-value), and /blog/preview/* — the latter
-			// are noindex draft-preview duplicates of the real posts; advertising them
-			// in the sitemap makes GSC report "Submitted URL marked noindex" and inflates
-			// the not-indexed count. They still exist (noindex), just not advertised.
+			// Exclude /blog/preview/* — noindex draft-preview duplicates of the real posts;
+			// advertising them in the sitemap makes GSC report "Submitted URL marked noindex"
+			// and inflates the not-indexed count. They still exist (noindex), just not advertised.
+			// /privacy/ + /terms/ are indexable and listed since 2yq (pmseoaeo 2026-11-12, as SMP 2yc).
 			filter: (page) =>
-				!page.includes('/privacy') &&
-				!page.includes('/terms') &&
 				!page.includes('/blog/preview') &&
 				!page.includes('/join') &&
 				!page.includes('/glossary-review') &&
