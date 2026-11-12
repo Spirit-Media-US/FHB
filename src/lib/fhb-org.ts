@@ -18,6 +18,8 @@ export const FHB_ORG_CORE = {
 	'@id': FHB_ORG_ID,
 	name: "Father's Heart Bible",
 	alternateName: withBrandVariants(["Father's Heart Bible™", 'FHB']),
+	// Spirit Media Inc. is the legal company behind the imprint (Kevin 2026-07-13, 2026-10-25); 2xz.
+	legalName: 'Spirit Media Inc.',
 	url: 'https://fathersheartbible.com',
 	logo: 'https://fathersheartbible.com/fhb-logo.png',
 	parentOrganization: { '@id': SMP_ORG_ID },

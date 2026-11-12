@@ -193,8 +193,10 @@ const LARGE_IMAGE_EXCLUDE = new Set([
 	'/blog/greek-bible-septuagint-new-testament-modern-greek',
 ]);
 const _p = Astro.url.pathname.replace(/\/+$/, '');
+// 2xz: the /bibles/ edition hub is a NEW page (in no arm or readout), so it carries it from day one.
 const robotsContent =
-	/^\/(blog|guides|meaning|bible-in)\/[^/]+$/.test(_p) && !LARGE_IMAGE_EXCLUDE.has(_p)
+	(/^\/(blog|guides|meaning|bible-in)\/[^/]+$/.test(_p) || _p === '/bibles') &&
+	!LARGE_IMAGE_EXCLUDE.has(_p)
 		? 'index, follow, max-image-preview:large'
 		: 'index, follow';
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -259,6 +261,7 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=4" />
 		<link rel="manifest" href="/site.webmanifest" />
 		<link rel="canonical" href={canonicalURL} />
+		<link rel="alternate" type="application/rss+xml" title="Father's Heart Bible Blog" href="/rss.xml" />
 		{alternates.map((a) => (
 			<link rel="alternate" hreflang={a.hreflang} href={a.href} />
 		))}
