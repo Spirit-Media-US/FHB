@@ -22,8 +22,11 @@ const editions = fs
 	.filter((f) => f.endsWith('.json'))
 	.map((f) => JSON.parse(fs.readFileSync(path.join(root, 'src/data/editions', f), 'utf8')))
 	.filter((e) => e.kind === 'language');
+// An edition's lang code -> the community i18n file that holds its native text, where the two differ
+// (twi.json is "ak"; the community reads it as "tw", same AKCB Bible — pmlanguage 2026-11-12).
+const I18N_ALIAS = { ak: 'tw' };
 const nativeSource = (code) => {
-	const p = path.join(I18N, `${code}.json`);
+	const p = path.join(I18N, `${I18N_ALIAS[code] ?? code}.json`);
 	if (!fs.existsSync(p)) return null;
 	const d = JSON.parse(fs.readFileSync(p, 'utf8')).seoLanding?.description;
 	return typeof d === 'string' && d.trim() ? d.trim() : null;
