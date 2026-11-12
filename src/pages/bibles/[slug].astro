@@ -33,6 +33,7 @@ import youversion from '../../data/youversion-versions.json';
 //                                     page and the three pillar pages. Read, never retyped.
 import Layout from '../../layouts/Layout.astro';
 import { alternatesFrom, bcp47 } from '../../lib/bibles-hreflang.mjs';
+import { faqTokenValues, fillFaqTokens } from '../../lib/faq-tokens.mjs';
 import { FHB_ORG_ID } from '../../lib/fhb-org';
 import { shippingDetailsFor } from '../../lib/marginGuard';
 import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
@@ -136,9 +137,12 @@ const { ed, alternates } = Astro.props as {
 };
 // FAQ answers may carry {{READ_COUNT}}: the number of languages live in the /read reader, from the
 // generated reader-languages.json, so no typed count goes stale (Kevin 2026-11-10: 80 everywhere).
+// {{AUDIO_COUNT}} is the languages with a complete narration (lang-audio.json, via the same file).
+// fillFaqTokens throws on any token left unfilled, so a stale source fails the build (unit 2pv).
+const faqTokens = faqTokenValues(readerLanguages);
 const faqList = ed.faq.map((f) => ({
 	...f,
-	a: f.a.replaceAll('{{READ_COUNT}}', String(readerLanguages.languages.length)),
+	a: fillFaqTokens(f.a, faqTokens, `${ed.slug} faq`),
 }));
 
 const fm = (frontmatter as Record<string, { pages?: number; pillars?: Pillar[] }>)[
