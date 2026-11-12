@@ -1,10 +1,12 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 import { sitemapLinksFor } from './src/lib/bibles-hreflang-fs.mjs';
+import { addIndexLastmod, editionFilesBySlug, editionLastmod, maxLastmod } from './scripts/lib/sitemap-lastmod.mjs';
 
 const SITE = 'https://fathersheartbible.com';
 
@@ -30,10 +32,10 @@ const builtHtml = (url) => {
 };
 const isNoindex = (url) => /<meta name="robots" content="[^"]*noindex/i.test(builtHtml(url));
 const GIT_DATES = (() => {
-	// One git pass: newest commit date per file under src/pages.
+	// One git pass: newest commit date per file under src/pages and src/data/editions (2xw).
 	const m = new Map();
 	try {
-		const out = execFileSync('git', ['log', '--format=@%cI', '--name-only', '--', 'src/pages'], {
+		const out = execFileSync('git', ['log', '--format=@%cI', '--name-only', '--', 'src/pages', 'src/data/editions'], {
 			encoding: 'utf8',
 			maxBuffer: 64 * 1024 * 1024,
 		});
@@ -47,13 +49,42 @@ const GIT_DATES = (() => {
 	}
 	return m;
 })();
+const EDITION_FILES = editionFilesBySlug('src/data/editions');
+// The community-app pages listed as customPages are not built here, so their only truthful change date is
+// the git date of their page file in the community repo (2xw). No repo / no file: no lastmod, never a guess.
+const COMMUNITY_REPO = process.env.COMMUNITY_REPO || '/srv/sites/community';
+const COMMUNITY_PAGES = new Set(['contributors', 'groups', 'library', 'map', 'shareables', 'events']);
+const COMMUNITY_DATES = (() => {
+	const m = new Map();
+	try {
+		const out = execFileSync('git', ['-C', COMMUNITY_REPO, 'log', '--format=@%cI', '--name-only', '--', 'src/pages'], {
+			encoding: 'utf8',
+			maxBuffer: 64 * 1024 * 1024,
+		});
+		let date = '';
+		for (const line of out.split('\n')) {
+			if (line.startsWith('@')) date = line.slice(1, 11);
+			else if (line && !m.has(line)) m.set(line, date);
+		}
+	} catch {
+		/* no community repo: no dates */
+	}
+	return m;
+})();
 function lastmodFor(url) {
 	const dates = [];
 	const html = builtHtml(url);
 	const dm = html.match(/"dateModified":"(\d{4}-\d{2}-\d{2})/);
 	if (dm) dates.push(dm[1]);
 	try {
+		// /bibles/<slug>-bible/ is one dynamic route over src/data/editions/*.json: the real change
+		// date of a product page is the git date of ITS OWN edition data file (2xw; 100 pages had none).
+		const ed = editionLastmod(new URL(url).pathname, EDITION_FILES, GIT_DATES);
+		if (ed) dates.push(ed);
 		const p = new URL(url).pathname.replace(/^\/|\/$/g, '');
+		if (COMMUNITY_PAGES.has(p))
+			for (const f of [`src/pages/${p}.astro`, `src/pages/${p}/index.astro`])
+				if (COMMUNITY_DATES.has(f)) dates.push(COMMUNITY_DATES.get(f));
 		for (const f of p
 			? [`src/pages/${p}.astro`, `src/pages/${p}/index.astro`]
 			: ['src/pages/index.astro']) {
@@ -89,6 +120,9 @@ export default defineConfig({
 	build: { inlineStylesheets: 'auto' },
 	integrations: [
 		sitemap({
+			// 2xw: only declare the namespaces this file actually uses. xhtml carries the /bibles/ hreflang
+			// alternates; news/image/video were declared with zero entries (audit item 12).
+			namespaces: { news: false, xhtml: true, image: false, video: false },
 			// Option A: fold the community app's PUBLIC pages (served under the apex
 			// via the fhb-apex-router Worker) into the unified apex sitemap. These
 			// aren't built by this repo, so they're added as customPages. EXCLUDED:
@@ -159,6 +193,27 @@ export default defineConfig({
 				return { ...item, changefreq: 'monthly', priority: 0.7 };
 			},
 		}),
+		// 2xw: <lastmod> on the sitemap INDEX entry = the newest TRUE lastmod inside that child file.
+		// @astrojs/sitemap can only stamp one build-time date on every index entry, so we derive it
+		// after the sitemap integration has written dist/ (integrations run in order).
+		{
+			name: 'sitemap-index-lastmod',
+			hooks: {
+				'astro:build:done': ({ dir }) => {
+					const root = fileURLToPath(dir);
+					const idx = path.join(root, 'sitemap-index.xml');
+					if (!fs.existsSync(idx)) return;
+					const next = addIndexLastmod(fs.readFileSync(idx, 'utf8'), (loc) => {
+						try {
+							return maxLastmod(fs.readFileSync(path.join(root, new URL(loc).pathname), 'utf8'));
+						} catch {
+							return undefined;
+						}
+					});
+					fs.writeFileSync(idx, next);
+				},
+			},
+		},
 	],
 	vite: {
 		server: { allowedHosts: true },
