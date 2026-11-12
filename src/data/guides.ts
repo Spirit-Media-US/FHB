@@ -46,6 +46,13 @@ export const GUIDES: GuideEntry[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/a06de2cfda461dee4850c71666ad2502a503c166-6720x4480.jpg',
 	},
 	{
+		slug: 'how-to-hear-gods-voice',
+		title: 'How to Hear God’s Voice',
+		blurb:
+			'A biblical guide: start with Scripture, ask, be still and test what you hear, because our Father speaks to His children.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/a06de2cfda461dee4850c71666ad2502a503c166-6720x4480.jpg',
+	},
+	{
 		slug: 'what-is-the-gospel',
 		title: 'What Is the Gospel?',
 		blurb:
