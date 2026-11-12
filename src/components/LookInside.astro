@@ -102,7 +102,7 @@ const ph = pages[0]?.h ?? 1400;
 )}
 {
 	total > 0 && !reuse && (
-		<div class={`lookinside li-${variant} li-size-${size}`} data-lookinside data-li-slug={slug} data-total={total}>
+		<div class={`lookinside li-${variant} li-size-${size}`} data-lookinside data-li-slug={slug} data-total={total} data-count={entry.count} data-title={title} data-pw={pw} data-ph={ph} data-rtl={rtl ? 'true' : undefined}>
 			<button type="button" class="li-trigger" data-li-open aria-haspopup="dialog">
 				{variant === 'button' && (
 					<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -119,58 +119,9 @@ const ph = pages[0]?.h ?? 1400;
 			{/* perf (2uw): the manifest is no longer inlined (85 copies were ~700KB of /print's HTML);
 			    it is fetched from /print/lookinside-data/<slug>.json the first time the viewer opens. */}
 
-			{/* A dialog over the page, not a takeover: a dimmed backdrop with the
-			    page still visible around a contained panel. Backdrop click closes. */}
-			<div class="li-modal" data-li-modal hidden style={`--pw: ${pw}; --pw2: ${pw * 2}; --ph: ${ph};`}>
-			<div class="li-panel" data-li-panel role="dialog" aria-modal="true" aria-label={`Look inside — ${title}`}>
-				<div class="li-bar">
-					<div class="li-bar-text">
-						<span class="li-title">{title}</span>
-						<span class="li-readout" data-li-readout />
-					</div>
-
-					<div class="li-bar-tools">
-						<div class="li-modes" role="group" aria-label="Reading mode">
-							<button type="button" data-li-mode="flip" aria-pressed="true">Flip</button>
-							<button type="button" data-li-mode="scroll" aria-pressed="false">Scroll</button>
-						</div>
-						<label class="li-jump">
-							<span class="li-jump-label">Jump to</span>
-							<select data-li-jump aria-label="Jump to a page">
-								{/* Options are built from the manifest the first time the viewer opens (perf: ~4,700 static options were most of the /print DOM). */}
-							</select>
-						</label>
-						<button type="button" class="li-close" data-li-close aria-label="Close the viewer">
-							<svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
-						</button>
-					</div>
-				</div>
-
-				{/* FLIP — the book. Slots hold the spread you are on; a leaf is built
-				    on demand for each turn and thrown away when it lands. */}
-				<div class="li-stage" data-li-stage data-rtl={rtl ? 'true' : undefined}>
-					<div class="li-book" data-li-book>
-						<div class="li-slot li-slot-l" data-li-slot-l><img alt="" draggable="false" decoding="async" /></div>
-						<div class="li-slot li-slot-r" data-li-slot-r><img alt="" draggable="false" decoding="async" /></div>
-						<div class="li-gutter" aria-hidden="true" />
-						<div class="li-shield" aria-hidden="true" />
-					</div>
-					<button type="button" class="li-turn li-turn-prev" data-li-prev aria-label="Previous page">
-						<svg aria-hidden="true" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-8 7 8 7" /></svg>
-					</button>
-					<button type="button" class="li-turn li-turn-next" data-li-next aria-label="Next page">
-						<svg aria-hidden="true" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l8 7-8 7" /></svg>
-					</button>
-				</div>
-
-				{/* SCROLL — the continuous column, hidden while flipping so its
-				    lazy images are never requested in the other mode. */}
-				<div class="li-scroll" data-li-scroll tabindex="0" hidden>
-					{/* Page figures are built from the manifest on first open (perf: ~4,650 static figure+img were most of /print's DOM). Created with no src and width/height set, exactly as before. */}
-					<p class="li-end">End of the sample — {total} of {entry.count} pages shown.</p>
-				</div>
-			</div>
-			</div>
+			{/* perf (2ux): the viewer's dialog markup (~2.9KB x 80 instances = 239KB of /print's HTML) is no longer
+			    repeated per edition. The script builds the identical dialog once, on first open, from the
+			    data-* attributes on this root. */}
 		</div>
 	)
 }
@@ -451,12 +402,68 @@ const ph = pages[0]?.h ?? 1400;
 	// of this block. Module scope, so it is per page load, not per root.
 	const CLAIMED = new Set();
 
+	// The viewer dialog, built once per edition on first open (it used to be ~2.9KB of static markup
+	// per edition on the page). Same elements, classes and attributes as before; Astro's scope
+	// attribute is copied onto every element so the component's scoped CSS applies unchanged.
+	const CHEV_L = '<svg aria-hidden="true" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-8 7 8 7"></path></svg>';
+	const CHEV_R = '<svg aria-hidden="true" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l8 7-8 7"></path></svg>';
+	const SHELL = '<div class="li-panel" data-li-panel role="dialog" aria-modal="true">'
+		+ '<div class="li-bar"><div class="li-bar-text"><span class="li-title"></span><span class="li-readout" data-li-readout></span></div>'
+		+ '<div class="li-bar-tools"><div class="li-modes" role="group" aria-label="Reading mode">'
+		+ '<button type="button" data-li-mode="flip" aria-pressed="true">Flip</button>'
+		+ '<button type="button" data-li-mode="scroll" aria-pressed="false">Scroll</button></div>'
+		+ '<label class="li-jump"><span class="li-jump-label">Jump to</span><select data-li-jump aria-label="Jump to a page"></select></label>'
+		+ '<button type="button" class="li-close" data-li-close aria-label="Close the viewer"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div></div>'
+		+ '<div class="li-stage" data-li-stage><div class="li-book" data-li-book>'
+		+ '<div class="li-slot li-slot-l" data-li-slot-l><img alt="" draggable="false" decoding="async"></div>'
+		+ '<div class="li-slot li-slot-r" data-li-slot-r><img alt="" draggable="false" decoding="async"></div>'
+		+ '<div class="li-gutter" aria-hidden="true"></div><div class="li-shield" aria-hidden="true"></div></div>'
+		+ '<button type="button" class="li-turn li-turn-prev" data-li-prev aria-label="Previous page">' + CHEV_L + '</button>'
+		+ '<button type="button" class="li-turn li-turn-next" data-li-next aria-label="Next page">' + CHEV_R + '</button></div>'
+		+ '<div class="li-scroll" data-li-scroll tabindex="0" hidden><p class="li-end"></p></div></div>';
+	function buildShell(root) {
+		const scope = Array.from(root.attributes).map((a) => a.name).find((n) => n.startsWith('data-astro-cid-'));
+		const modal = document.createElement('div');
+		modal.className = 'li-modal';
+		modal.setAttribute('data-li-modal', '');
+		modal.hidden = true;
+		const d = root.dataset;
+		modal.setAttribute('style', `--pw: ${d.pw}; --pw2: ${Number(d.pw) * 2}; --ph: ${d.ph};`);
+		modal.innerHTML = SHELL;
+		const title = d.title || '';
+		modal.querySelector('[data-li-panel]').setAttribute('aria-label', `Look inside \u2014 ${title}`);
+		modal.querySelector('.li-title').textContent = title;
+		if (d.rtl === 'true') modal.querySelector('[data-li-stage]').setAttribute('data-rtl', 'true');
+		modal.querySelector('.li-end').textContent = `End of the sample \u2014 ${d.total} of ${d.count} pages shown.`;
+		if (scope) { modal.setAttribute(scope, ''); modal.querySelectorAll('*').forEach((el) => el.setAttribute(scope, '')); }
+		root.appendChild(modal);
+		return modal;
+	}
+
 	document.querySelectorAll('[data-lookinside]').forEach((root) => {
 		if (root.hasAttribute('data-li-ready')) return;
 		root.setAttribute('data-li-ready', '');
 
 		const total = parseInt(root.getAttribute('data-total') || '0', 10);
 		if (!total) return;
+
+		// The viewer is set up on first use, so page load carries no per-edition viewer work.
+		let api = null;
+		const lazyOpen = () => { api ||= setup(); return api.open(); };
+		root.querySelector('[data-li-open]')?.addEventListener('click', lazyOpen);
+		// REMOTE TRIGGERS — a `reuse` button anywhere on the page opens THIS viewer, so an
+		// edition appearing more than once (its product card, plus its two rows in the bulk
+		// form) ships ONE viewer instead of three. Claimed by slug, first root wins, so a
+		// duplicate full instance can never leave two viewers fighting over one button.
+		const slug = root.getAttribute('data-li-slug');
+		if (slug && !CLAIMED.has(slug)) {
+			CLAIMED.add(slug);
+			document
+				.querySelectorAll(`[data-li-open-ref="${CSS.escape(slug)}"]`)
+				.forEach((btn) => btn.addEventListener('click', lazyOpen));
+		}
+
+		function setup() {
 		let pages = [];
 		let manifestP = null;
 		const loadManifest = () => (manifestP ||= fetch(`/print/lookinside-data/${root.getAttribute('data-li-slug')}.json`)
@@ -464,6 +471,7 @@ const ph = pages[0]?.h ?? 1400;
 			.then((j) => { pages = j; views = buildViews(); })
 			.catch((e) => { manifestP = null; throw e; }));
 
+		buildShell(root);
 		const modal = root.querySelector('[data-li-modal]');
 		const stage = root.querySelector('[data-li-stage]');
 		const book = root.querySelector('[data-li-book]');
@@ -476,7 +484,7 @@ const ph = pages[0]?.h ?? 1400;
 		const nextBtn = root.querySelector('[data-li-next]');
 		const modeBtns = Array.from(root.querySelectorAll('[data-li-mode]'));
 		let figures = [];
-		if (!modal || !book) return;
+		if (!modal || !book) return { open() {} };
 
 		const TURN = 720;
 		let mode = 'flip';
@@ -791,20 +799,6 @@ const ph = pages[0]?.h ?? 1400;
 		// Clicking the dimmed backdrop closes, alongside Escape and the close button.
 		modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
 
-		root.querySelector('[data-li-open]')?.addEventListener('click', open);
-		// REMOTE TRIGGERS — a `reuse` button anywhere on the page opens THIS viewer, so an
-		// edition appearing more than once (its product card, plus its two rows in the bulk
-		// form) ships ONE copy of the manifest and modal instead of three. Measured on
-		// /print: 46 extra FULL instances took the page from 1.16MB to 3.03MB.
-		// Claimed by slug, first root wins, so a duplicate full instance can never leave two
-		// viewers fighting over one button.
-		const slug = root.getAttribute('data-li-slug');
-		if (slug && !CLAIMED.has(slug)) {
-			CLAIMED.add(slug);
-			document
-				.querySelectorAll(`[data-li-open-ref="${CSS.escape(slug)}"]`)
-				.forEach((btn) => btn.addEventListener('click', open));
-		}
 		root.querySelector('[data-li-close]')?.addEventListener('click', close);
 		prevBtn.addEventListener('click', () => turn(-1));
 		nextBtn.addEventListener('click', () => turn(1));
@@ -819,5 +813,7 @@ const ph = pages[0]?.h ?? 1400;
 		// captured; this only removes the convenient paths.
 		modal.addEventListener('contextmenu', (e) => e.preventDefault());
 		modal.addEventListener('dragstart', (e) => e.preventDefault());
+		return { open };
+		}
 	});
 </script>
