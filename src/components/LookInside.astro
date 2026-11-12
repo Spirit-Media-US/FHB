@@ -144,9 +144,7 @@ const ph = pages[0]?.h ?? 1400;
 						<label class="li-jump">
 							<span class="li-jump-label">Jump to</span>
 							<select data-li-jump aria-label="Jump to a page">
-								{items.map((p) => (
-									<option value={p.n}>{p.n}. {p.label}</option>
-								))}
+								{/* Options are built from the manifest the first time the viewer opens (perf: ~4,700 static options were most of the /print DOM). */}
 							</select>
 						</label>
 						<button type="button" class="li-close" data-li-close aria-label="Close the viewer">
@@ -175,27 +173,7 @@ const ph = pages[0]?.h ?? 1400;
 				{/* SCROLL — the continuous column, hidden while flipping so its
 				    lazy images are never requested in the other mode. */}
 				<div class="li-scroll" data-li-scroll tabindex="0" hidden>
-					{items.map((p) => (
-						<figure
-							class="li-page"
-							data-li-page={p.n}
-							style={`width: min(100%, calc((100dvh - var(--chrome)) * ${p.w} / ${p.h}));`}
-						>
-							{/* No src until scroll mode is first entered, so flip mode never
-							    requests a single image from this column. width/height still
-							    reserve the box, so nothing shifts when they do arrive. */}
-							<img
-								data-src={p.src}
-								alt={`${p.label} — sample page ${p.n} of ${total}`}
-								width={p.w}
-								height={p.h}
-								loading="lazy"
-								decoding="async"
-								draggable="false"
-							/>
-							<div class="li-shield" aria-hidden="true" />
-						</figure>
-					))}
+					{/* Page figures are built from the manifest on first open (perf: ~4,650 static figure+img were most of /print's DOM). Created with no src and width/height set, exactly as before. */}
 					<p class="li-end">End of the sample — {total} of {entry.count} pages shown.</p>
 				</div>
 			</div>
@@ -499,7 +477,7 @@ const ph = pages[0]?.h ?? 1400;
 		const prevBtn = root.querySelector('[data-li-prev]');
 		const nextBtn = root.querySelector('[data-li-next]');
 		const modeBtns = Array.from(root.querySelectorAll('[data-li-mode]'));
-		const figures = Array.from(root.querySelectorAll('[data-li-page]'));
+		let figures = [];
 		if (!modal || !book) return;
 
 		const total = pages.length;
@@ -516,6 +494,41 @@ const ph = pages[0]?.h ?? 1400;
 		// while its WAAPI transform still runs, which looks like a turn but is not.
 		const SCOPE = Array.from(book.attributes).map((a) => a.name).find((n) => n.startsWith('data-astro-cid-'));
 		const scoped = (el) => { if (SCOPE) el.setAttribute(SCOPE, ''); return el; };
+
+		// The jump menu and the scroll column are built from the manifest on first open,
+		// not shipped as static markup for every edition on the page.
+		let built = false;
+		function ensureBuilt() {
+			if (built) return;
+			built = true;
+			const frag = document.createDocumentFragment();
+			pages.forEach((p, i) => {
+				const o = scoped(document.createElement('option'));
+				o.value = String(i + 1);
+				o.textContent = `${i + 1}. ${p.label}`;
+				frag.appendChild(o);
+			});
+			jump.appendChild(frag);
+			const ff = document.createDocumentFragment();
+			pages.forEach((p, i) => {
+				const fig = scoped(document.createElement('figure'));
+				fig.className = 'li-page';
+				fig.setAttribute('data-li-page', String(i + 1));
+				fig.style.width = `min(100%, calc((100dvh - var(--chrome)) * ${p.w} / ${p.h}))`;
+				const im = scoped(document.createElement('img'));
+				im.dataset.src = p.src;
+				im.alt = `${p.label} — sample page ${i + 1} of ${total}`;
+				im.width = p.w; im.height = p.h;
+				im.loading = 'lazy'; im.decoding = 'async'; im.draggable = false;
+				const sh = scoped(document.createElement('div'));
+				sh.className = 'li-shield';
+				sh.setAttribute('aria-hidden', 'true');
+				fig.append(im, sh);
+				ff.appendChild(fig);
+			});
+			scroll.insertBefore(ff, scroll.querySelector('.li-end'));
+			figures = Array.from(scroll.querySelectorAll('[data-li-page]'));
+		}
 
 		const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		const single = () => window.matchMedia('(max-width: 767px)').matches;
@@ -756,6 +769,7 @@ const ph = pages[0]?.h ?? 1400;
 		function open() {
 			opener = document.activeElement;
 			if (!portalled) { document.body.appendChild(modal); portalled = true; }
+			ensureBuilt();
 			modal.hidden = false;
 			document.body.style.overflow = 'hidden';
 			wasSingle = single();
