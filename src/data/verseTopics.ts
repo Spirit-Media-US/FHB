@@ -54,6 +54,12 @@ export const VERSE_TOPICS: VerseTopic[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg',
 	},
 	{
+		slug: 'identity',
+		title: 'Identity in Christ: Bible Verses About Who You Are',
+		blurb: 'Made on purpose, called by name, and a child of our Father: who God says you are.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg',
+	},
+	{
 		slug: 'thanksgiving',
 		title: 'Thanksgiving Bible Verses',
 		blurb: 'Give thanks, for our Father is good: verses for the table, every season and worship.',
