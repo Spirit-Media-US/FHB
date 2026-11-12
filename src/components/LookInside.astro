@@ -73,14 +73,6 @@ const total = pages.length;
 // original location and a rebuild of the others cannot touch it.
 const dir = entry?.dir ?? slug;
 
-const items = pages.map((p, i) => ({
-	src: `${ASSETS}/${dir}/${p.file}`,
-	label: p.label,
-	w: p.w,
-	h: p.h,
-	n: i + 1,
-}));
-
 // Page proportions drive every size in here; they come from the manifest, so a
 // box is always reserved at the right shape and nothing shifts as images land.
 const pw = pages[0]?.w ?? 928;
@@ -124,7 +116,8 @@ const ph = pages[0]?.h ?? 1400;
 			{/* The manifest, read by the flip renderer. No markup per page in flip
 			    mode: images are requested only for the spread you are on and the
 			    one next to it, which is what keeps opening cheap. */}
-			<script type="application/json" data-li-pages set:html={JSON.stringify(items)} />
+			{/* perf (2uw): the manifest is no longer inlined (85 copies were ~700KB of /print's HTML);
+			    it is fetched from /print/lookinside-data/<slug>.json the first time the viewer opens. */}
 
 			{/* A dialog over the page, not a takeover: a dimmed backdrop with the
 			    page still visible around a contained panel. Backdrop click closes. */}
@@ -462,9 +455,14 @@ const ph = pages[0]?.h ?? 1400;
 		if (root.hasAttribute('data-li-ready')) return;
 		root.setAttribute('data-li-ready', '');
 
+		const total = parseInt(root.getAttribute('data-total') || '0', 10);
+		if (!total) return;
 		let pages = [];
-		try { pages = JSON.parse(root.querySelector('[data-li-pages]')?.textContent || '[]'); } catch { return; }
-		if (!pages.length) return;
+		let manifestP = null;
+		const loadManifest = () => (manifestP ||= fetch(`/print/lookinside-data/${root.getAttribute('data-li-slug')}.json`)
+			.then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+			.then((j) => { pages = j; views = buildViews(); })
+			.catch((e) => { manifestP = null; throw e; }));
 
 		const modal = root.querySelector('[data-li-modal]');
 		const stage = root.querySelector('[data-li-stage]');
@@ -480,7 +478,6 @@ const ph = pages[0]?.h ?? 1400;
 		let figures = [];
 		if (!modal || !book) return;
 
-		const total = pages.length;
 		const TURN = 720;
 		let mode = 'flip';
 		let view = 0;
@@ -539,7 +536,7 @@ const ph = pages[0]?.h ?? 1400;
 		// odd tail page stands alone the way the first one does, so fourteen pages
 		// never leave a broken half-spread at the end.
 		function buildViews() {
-			if (single()) return pages.map((_, i) => ({ l: null, r: i }));
+			if (single()) return Array.from({ length: total }, (_, i) => ({ l: null, r: i }));
 			const v = [{ l: null, r: 0 }];
 			for (let i = 1; i < total; i += 2) v.push({ l: i, r: i + 1 < total ? i + 1 : null });
 			return v;
@@ -766,8 +763,9 @@ const ph = pages[0]?.h ?? 1400;
 			else if (e.key === 'End') { e.preventDefault(); figures[total - 1]?.scrollIntoView({ block: 'start' }); }
 		}
 
-		function open() {
+		async function open() {
 			opener = document.activeElement;
+			if (!pages.length) { try { await loadManifest(); } catch { return; } }
 			if (!portalled) { document.body.appendChild(modal); portalled = true; }
 			ensureBuilt();
 			modal.hidden = false;
