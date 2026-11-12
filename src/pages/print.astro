@@ -635,7 +635,7 @@ const dvcVerses = [
 
 		<!-- ═══════════════ GENERAL AUDIENCE — REGULAR PRINT, THEN LARGE PRINT ═══════════════ -->
 		{generalLines.map((l, i) => (
-			<Section variant={i === 0 ? 'warm' : 'light'}>
+			<Section variant={i === 0 ? 'warm' : 'light'} class="cv-auto">
 				<div class="text-center mb-8">
 					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">General Audience</p>
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">{l.label}</h2>
@@ -791,7 +791,7 @@ const dvcVerses = [
 		{/* Sold as three volumes AND as a set. The set card comes last and is the one that
 		    carries a struck-through price, because the saving only exists against buying all
 		    three — showing a strike on a single volume would be untrue. */}
-		<Section variant="light">
+		<Section variant="light" class="cv-auto">
 			<div class="text-center mb-8">
 				<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">General Audience</p>
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 2rem; font-weight: 600; margin: 0;">Large Print — Three Volumes</h2>
@@ -964,7 +964,7 @@ const dvcVerses = [
 			</div>
 
 			{langRegions.map((g) => (
-				<section id={`region-${g.key}`} data-region={g.key} class="lang-region max-w-6xl mx-auto" style="scroll-margin-top: 90px; margin: 0 auto 2.5rem;">
+				<section id={`region-${g.key}`} data-region={g.key} class="lang-region cv-auto max-w-6xl mx-auto" style="scroll-margin-top: 90px; margin: 0 auto 2.5rem;">
 					<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.4rem; font-weight: 600; margin: 0 0 1rem; text-align: center;">{g.label}</h3>
 					<div class="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7">
 						{g.langs.map((l) => (
@@ -1070,7 +1070,7 @@ const dvcVerses = [
 		<HearTheFather groups={dvcVerses} />
 
 		<!-- ═══════════════ CATALOG ORDER FORM ═══════════════ -->
-		<Section variant="soft">
+		<Section variant="soft" class="cv-auto">
 			{/* The anchor every card's "15% off 1st order + Free Shipping" link points at. Since Kevin
 			    2026-10-04 this is the SAME catalog order form /print/order/ shows ("it does what we
 			    need"), replacing the quick order box: every edition keeps its own counts, so a buyer
@@ -1086,7 +1086,7 @@ const dvcVerses = [
 		</Section>
 
 			<!-- ═══════════════ FAQ ═══════════════ -->
-			<Section variant="soft">
+			<Section variant="soft" class="cv-auto">
 				<div class="max-w-3xl mx-auto">
 					<div class="text-center mb-8">
 						<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">Frequently Asked Questions</p>
@@ -1121,6 +1121,8 @@ const dvcVerses = [
 </Layout>
 
 <style>
+	/* perf (2ux): below-the-fold sections skip style/layout/paint until near the viewport (the 1MB DOM spent ~0.8s of simulated main thread in layout before the hero image could paint). "auto" remembers each section's real height once rendered. */
+	:global(.cv-auto) { content-visibility: auto; contain-intrinsic-size: auto 1200px; }
 	/* ALL 80 LANGUAGE CARDS THE SAME (Kevin 2026-10-30: "All cards should be aligned the same").
 	   Each text block gets a FIXED number of lines (reserved by min-height, capped by line-clamp),
 	   so every card has the same height and its links and buttons sit at the same place; the
