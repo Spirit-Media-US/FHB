@@ -164,7 +164,8 @@ const coverAlt = ed.name.startsWith('Father')
 // Image search (unit 2rl): the cover is an ImageObject, not a bare URL, so Google Images can show
 // creator / credit / copyright. copyrightNotice is the site footer's own line (Footer.astro, wired in
 // Layout.astro) verbatim; width/height are omitted because cover files differ (1200x1528, one 1200x1451,
-// and the og-family fallback) — never guess. No license/acquireLicensePage (2rm).
+// and the og-family fallback) — never guess. license + acquireLicensePage (unit 2rm, Kevin 2026-11-12 delegated to pmseoaeo, option A) point at the
+// existing Copyright & Permissions page, which states all rights reserved and how to request permission.
 const coverImageObject = {
 	'@type': 'ImageObject',
 	url: coverUrl,
@@ -176,6 +177,8 @@ const coverImageObject = {
 		name: 'Spirit Media Publishing',
 	},
 	creditText: 'Spirit Media Publishing',
+	license: 'https://fathersheartbible.com/copyright/',
+	acquireLicensePage: 'https://fathersheartbible.com/copyright/',
 	copyrightNotice: `© ${new Date().getFullYear()} Spirit Media Publishing, the imprint of Spirit Media Inc. All rights reserved.`,
 };
 // THE ORDER FORM under the header, on EVERY edition (Kevin 2026-10-05; language pages since
