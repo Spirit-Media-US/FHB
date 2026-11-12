@@ -51,6 +51,7 @@ export const PAGE_EXEMPT = {
 	'/privacy/': 'legal boilerplate, linked from every footer',
 	'/terms/': 'legal boilerplate, linked from every footer',
 	'/returns/': 'policy boilerplate, linked from every footer',
+	'/bibles/': 'edition hub (2xz): only a directory of the /bibles/<slug>-bible/ pages that llms.txt already names one by one; llms.txt sits at its 70 KB cap',
 };
 function staticRoutes(dir = 'src/pages', rel = '') {
 	const out = [];
