@@ -1,6 +1,6 @@
 // node --test scripts/bibles-image-object.test.mjs  (unit 2rl; DIST=<dir> to point elsewhere)
 // Every /bibles/*-bible/ Book/Product (and its workExample bindings) must carry image as an ImageObject
-// with contentUrl + creator + copyrightNotice (Google Images licensable-metadata). Skips if dist absent.
+// with contentUrl + creator + copyrightNotice + license + acquireLicensePage (Google Images licensable-metadata). Skips if dist absent.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -13,6 +13,8 @@ export function imageProblems(node) {
 	if (!i.contentUrl) p.push('no contentUrl');
 	if (!i.creator || !i.creator.name) p.push('no creator');
 	if (!i.copyrightNotice) p.push('no copyrightNotice');
+	if (!i.license) p.push('no license');
+	if (!i.acquireLicensePage) p.push('no acquireLicensePage');
 	return p;
 }
 function* nodes(o) { if (Array.isArray(o)) for (const x of o) yield* nodes(x); else if (o && typeof o === 'object') { const t = [].concat(o['@type']); if (t.includes('Book') && 'image' in o) yield o; for (const v of Object.values(o)) yield* nodes(v); } }
@@ -32,6 +34,7 @@ test('every /bibles/*-bible/ Book/Product image is a complete ImageObject', { sk
 });
 test('failure path: bare URL / missing fields rejected', () => {
 	assert.equal(imageProblems({ image: 'https://x/y.webp' }).length, 1);
-	assert.equal(imageProblems({ image: { '@type': 'ImageObject', contentUrl: 'u' } }).length, 2);
-	assert.equal(imageProblems({ image: { '@type': 'ImageObject', contentUrl: 'u', creator: { name: 'a' }, copyrightNotice: 'c' } }).length, 0);
+	assert.equal(imageProblems({ image: { '@type': 'ImageObject', contentUrl: 'u' } }).length, 4);
+	assert.equal(imageProblems({ image: { '@type': 'ImageObject', contentUrl: 'u', creator: { name: 'a' }, copyrightNotice: 'c', license: 'l', acquireLicensePage: 'a' } }).length, 0);
+	assert.equal(imageProblems({ image: { '@type': 'ImageObject', contentUrl: 'u', creator: { name: 'a' }, copyrightNotice: 'c' } }).length, 2);
 });
