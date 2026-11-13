@@ -291,3 +291,17 @@ test('3es F1/F3: Who Am I? title + offers InStock + no future datePublished', ()
 	for (const [, d] of html.matchAll(/"datePublished":"([^"]+)"/g))
 		assert.ok(new Date(d) <= new Date(), `future datePublished ${d}`);
 });
+
+// SMP STORE (Kevin 2026-11-13 L1990 "transfer the store"; contract 3fe): a Father Heart book is bought on its SMP
+// checkout page. The FHB book page links there (followed, utm-tagged) and never calls a checkout itself.
+test('SMP store: every live book page Orders via spiritmediapublishing.com/books/<slug>/buy/ with utm, no on-page checkout', () => {
+	for (const slug of ['beloved-identity', 'who-am-i']) {
+		const html = fs.readFileSync(new URL(`../dist/books/${slug}/index.html`, import.meta.url), 'utf8');
+		const want = `href="https://spiritmediapublishing.com/books/${slug}/buy/?utm_source=fathersheartbible.com&utm_medium=referral&utm_campaign=buy-button&utm_content=book-page"`;
+		assert.ok(
+			html.includes(want) || html.includes(want.replaceAll('&', '&amp;')),
+			`${slug}: Order now must link to its SMP buy page`,
+		);
+		assert.doesNotMatch(html, /data-bi=|data-order-btn/, `${slug}: no on-page checkout widget`);
+	}
+});

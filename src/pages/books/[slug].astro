@@ -14,7 +14,6 @@ import bookSkus from '../../data/book-skus.json';
 import catalog from '../../data/books.json';
 import lookinside from '../../data/lookinside.json';
 import Layout from '../../layouts/Layout.astro';
-import { BULK_QUOTE_COPY } from '../../lib/farBand';
 import { handlingFeeCents, handlingLabel, shippingDetailsFor } from '../../lib/marginGuard';
 import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
 import { LIVE_COUNTRIES } from '../../lib/shipCountries';
@@ -114,11 +113,6 @@ const formats = (book.formats as unknown as string[])
 		}));
 		return { ...f, dests };
 	});
-const config = JSON.stringify({
-	formats: formats.map((f) => ({ sku: f.sku, list: f.list_cents, dests: f.dests })),
-	quote: BULK_QUOTE_COPY.error,
-	returnPath: `/books/${book.slug}/`,
-});
 const first = formats[0];
 
 const offerFor = (f: (typeof formats)[number]) => ({
@@ -229,30 +223,11 @@ const jsonLd = [
 
 					<div style="margin-top: 1.4rem;"><BiblesBooksToggle current="books" /></div>
 					{live ? (
-						<div id="order" class="bi__order" data-bi={config}>
-							{formats.length > 1 && (
-								<div class="bi__row">
-									<label for="bk-format">Format</label>
-									<select id="bk-format" data-format>
-										{formats.map((f, i) => <option value={String(i)}>{f.format} · {money(f.list_cents)}</option>)}
-									</select>
-								</div>
-							)}
-							<p class="bi__price"><span data-price>{money(first.list_cents)}</span> <span>per copy · free shipping in the United States</span></p>
-							<div class="bi__row">
-								<label for="bi-qty">Copies</label>
-								<input id="bi-qty" type="number" inputmode="numeric" min="1" max="99" value="1" data-qty />
-							</div>
-							<div class="bi__row">
-								<label for="bi-country">Ship to</label>
-								<select id="bi-country" data-country>
-									{first.dests.map((d) => <option value={d.code} selected={d.code === 'US'}>{d.name}</option>)}
-								</select>
-							</div>
-							<p class="bi__fee" data-fee hidden></p>
-							<p class="bi__total">Total <b data-total>{money(first.list_cents)}</b> <span>plus tax where it applies</span></p>
-							<button type="button" class="bi__btn" data-order-btn>Order now</button>
-							<p class="bi__msg" data-msg role="status" hidden></p>
+						// SMP STORE (Kevin 2026-11-13 "SMP is the engine", L1990; contract 3fe): a Father Heart book is bought
+						// on its SMP checkout page. A plain followed link with utm, never a cross-origin call from this page.
+						<div id="order" class="bi__order">
+							<p class="bi__price">{formats.map((f) => `${f.format} ${money(f.list_cents)}`).join(' · ')} <span>per copy · free shipping in the United States</span></p>
+							<a class="bi__btn bi__btn--link" href={`https://spiritmediapublishing.com/books/${book.slug}/buy/?utm_source=fathersheartbible.com&utm_medium=referral&utm_campaign=buy-button&utm_content=book-page`}>Order now</a>
 							<p class="bi__fine"><a href="/returns/">Your purchase is guaranteed</a> · Printed and shipped to you by our printer, IngramSpark.</p>
 						</div>
 					) : (
@@ -314,81 +289,8 @@ const jsonLd = [
 	.bi__msg { margin: 0.7rem 0 0; font-size: 0.9rem; font-weight: 600; color: #7f1d1d; }
 	.bi__fine { margin: 0.8rem 0 0; font-size: 0.8rem; color: #3f3f46; }
 	.bi__fine a { text-decoration: underline; }
+	.bi__btn--link { display: flex; align-items: center; justify-content: center; text-decoration: none; }
 	.bi__desc { max-width: 44rem; margin: 2.5rem auto 0; font-family: var(--font-sans); color: #27272a; line-height: 1.7; }
 	.bi__desc :global(p) { margin: 0 0 0.9rem; }
 	.bi__desc :global(strong) { color: var(--color-ink); }
 </style>
-
-<script>
-	const root = document.querySelector<HTMLElement>('[data-bi]');
-	if (root) {
-		type Dest = { code: string; name: string; far: boolean; fee: number; label: string };
-		const cfg = JSON.parse(root.dataset.bi ?? '{}') as {
-			formats: { sku: string; list: number; dests: Dest[] }[];
-			quote: string;
-			returnPath: string;
-		};
-		const fmtSel = root.querySelector<HTMLSelectElement>('[data-format]');
-		const qty = root.querySelector<HTMLInputElement>('[data-qty]')!;
-		const sel = root.querySelector<HTMLSelectElement>('[data-country]')!;
-		const priceEl = root.querySelector<HTMLElement>('[data-price]')!;
-		const feeEl = root.querySelector<HTMLElement>('[data-fee]')!;
-		const totalEl = root.querySelector<HTMLElement>('[data-total]')!;
-		const btn = root.querySelector<HTMLButtonElement>('[data-order-btn]')!;
-		const msg = root.querySelector<HTMLElement>('[data-msg]')!;
-		const money = (c: number) => `$${(c / 100).toFixed(2)}`;
-		const say = (t: string) => {
-			msg.textContent = t;
-			msg.hidden = !t;
-		};
-		const fmt = () => cfg.formats[Number(fmtSel?.value ?? 0)] ?? cfg.formats[0];
-		const n = () => Math.max(1, Math.min(99, Math.floor(Number(qty.value) || 1)));
-		const dest = () => fmt().dests.find((d) => d.code === sel.value) ?? fmt().dests[0];
-		function fillCountries() {
-			const keep = sel.value;
-			sel.innerHTML = '';
-			for (const d of fmt().dests) {
-				const o = document.createElement('option');
-				o.value = d.code;
-				o.textContent = d.name;
-				sel.append(o);
-			}
-			sel.value = fmt().dests.some((d) => d.code === keep) ? keep : 'US';
-		}
-		function render() {
-			const d = dest();
-			priceEl.textContent = money(fmt().list);
-			feeEl.hidden = d.fee <= 0;
-			feeEl.textContent = d.fee > 0 ? `+ ${money(d.fee)} per copy, ${d.label.toLowerCase()} (${d.name})` : '';
-			totalEl.textContent = money(n() * (fmt().list + d.fee));
-		}
-		fmtSel?.addEventListener('change', () => {
-			fillCountries();
-			render();
-		});
-		qty.addEventListener('input', render);
-		sel.addEventListener('change', render);
-		render();
-		btn.addEventListener('click', async () => {
-			if (dest().far && n() >= 10) return say(cfg.quote);
-			say('Opening secure checkout…');
-			btn.disabled = true;
-			try {
-				const res = await fetch('/dvc-checkout', {
-					method: 'POST',
-					headers: { 'content-type': 'application/json' },
-					body: JSON.stringify({ counts: { [fmt().sku]: n() }, country: sel.value, returnPath: cfg.returnPath }),
-				});
-				const d = (await res.json()) as { url?: string; disabled?: boolean; error?: string; message?: string };
-				if (d.url) {
-					window.location.href = d.url;
-					return;
-				}
-				say(d.disabled ? 'Checkout is not enabled yet.' : (d.message ?? 'Something went wrong. Please try again.'));
-			} catch {
-				say('Something went wrong. Please try again.');
-			}
-			btn.disabled = false;
-		});
-	}
-</script>
