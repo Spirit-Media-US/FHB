@@ -1,0 +1,36 @@
+---
+// BiblesBooksToggle — the Bibles | Books switch on every print checkout (Kevin 2026-11-13, kevin-decisions L1959:
+// "ALL checkouts should offer easy to navigate toggle of bibles and books ... without making the checkout too busy").
+// Two links, one line, above the order form: Bibles -> /print/ (the editions, always first), Books -> /books/.
+// The current side is marked aria-current and not a link. The books are English, so a non-English order surface
+// does not show it (the caller passes lang).
+interface Props {
+	current: 'bibles' | 'books';
+	lang?: string;
+}
+const { current, lang = 'en' } = Astro.props;
+const show = lang === 'en';
+---
+
+{show && (
+	<nav class="bbt" aria-label="Shop Bibles or books">
+		{current === 'bibles' ? (
+			<span class="bbt__on" aria-current="page">Bibles</span>
+		) : (
+			<a class="bbt__off" href="/print/">Bibles</a>
+		)}
+		{current === 'books' ? (
+			<span class="bbt__on" aria-current="page">Books</span>
+		) : (
+			<a class="bbt__off" href="/books/">Books</a>
+		)}
+	</nav>
+)}
+
+<style>
+	.bbt { display: inline-flex; gap: 0.25rem; padding: 0.25rem; margin: 0 auto 1rem; border: 1px solid var(--color-hairline); border-radius: 999px; background: #fff; font-family: var(--font-sans); font-size: 0.9rem; font-weight: 700; }
+	.bbt__on, .bbt__off { display: inline-flex; align-items: center; min-height: 36px; padding: 0 1.1rem; border-radius: 999px; }
+	.bbt__on { background: var(--color-primary); color: #fff; }
+	.bbt__off { color: var(--color-ink); text-decoration: none; }
+	.bbt__off:hover { background: var(--color-surface-low, #f4f4f5); }
+</style>

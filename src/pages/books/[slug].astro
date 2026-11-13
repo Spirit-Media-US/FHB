@@ -1,4 +1,5 @@
 ---
+import BiblesBooksToggle from '../../components/BiblesBooksToggle.astro';
 // /books/<slug>/ — one page per Father Heart book (Kevin 2026-11-13, kevin-decisions L1959: "each book needs to be
 // treated like each bible edition given it's own page and easy check out ... declare who this book is for ... full
 // details and look inside"). DATA-DRIVEN: every fact and every sentence comes from src/data/books.json (sourced from
@@ -200,6 +201,7 @@ const jsonLd = [
 						<p class="bi__facts">{f.format} · {f.pages} pages · {f.trim} · ISBN {f.isbn_display}</p>
 					))}
 
+					<div style="margin-top: 1.4rem;"><BiblesBooksToggle current="books" /></div>
 					{live ? (
 						<div id="order" class="bi__order" data-bi={config}>
 							{formats.length > 1 && (
