@@ -222,12 +222,34 @@ export function collect(root = process.cwd()) {
 // a word boundary. llms-full.txt keeps every description whole. renderFor() is the one place both files and the
 // tests take their block from, so the size test measures exactly what the build writes.
 export const LLMS_TXT_DESC_MAX = 120;
-function clip(s, max) {
+// 3cn (pmseoaeo 2026-11-13): 135 of 179 clipped descriptions stopped mid-sentence, 49 on a stop word. Prefer the
+// last SENTENCE end inside the cap (no ellipsis needed), else the last clause end, else a word boundary; then never
+// end on a stop word or a bare "(FHB)".
+const CLIP_STOP = new Set(['a', 'an', 'and', 'as', 'at', 'by', 'for', 'from', 'in', 'into', 'is', 'its', 'of', 'on', 'or', 'our', 'reveals', 'that', 'the', 'their', 'to', 'with', 'your', '(fhb)']);
+export function clip(s, max) {
 	if (!max || [...s].length <= max) return s;
 	const cut = [...s].slice(0, max - 1).join('');
-	const sp = cut.lastIndexOf(' ');
-	return `${(sp > max * 0.6 ? cut.slice(0, sp) : cut).replace(/[\s,;:—-]+$/, '')}…`;
+	let sentence = -1;
+	for (const m of cut.matchAll(/[.!?](?=\s)/g)) sentence = m.index;
+	if (sentence >= max * 0.4) return cut.slice(0, sentence + 1);
+	let clause = -1;
+	for (const m of cut.matchAll(/[,;:—](?=\s)/g)) clause = m.index;
+	let body;
+	if (clause >= max * 0.6) body = cut.slice(0, clause);
+	else {
+		const sp = cut.lastIndexOf(' ');
+		body = sp > max * 0.6 ? cut.slice(0, sp) : cut;
+	}
+	body = body.replace(/[\s,;:—-]+$/, '');
+	for (;;) {
+		const words = body.split(' ');
+		if (words.length < 3 || !CLIP_STOP.has(words[words.length - 1].toLowerCase())) break;
+		body = words.slice(0, -1).join(' ').replace(/[\s,;:—-]+$/, '');
+	}
+	return `${body}…`;
 }
+// 3cn: "Title?" + ". " printed "Bible?." — a title that already ends a sentence is followed by a space only.
+const join = (title) => (/[.!?…]$/.test(title) ? `${title} ` : `${title}. `);
 export function renderFor(file, groups) {
 	return render(groups, /(^|\/)llms\.txt$/.test(file) ? LLMS_TXT_DESC_MAX : 0);
 }
@@ -236,7 +258,7 @@ export function render(groups, maxDesc = 0) {
 	const out = [BEGIN, '## Answer pages (every page, generated from the site on each build)', ''];
 	for (const g of groups) {
 		out.push(`### ${g.label}`, '');
-		for (const e of g.entries) out.push(`- ${e.url} — ${e.title}${e.description ? `. ${clip(e.description, maxDesc)}` : ''}`);
+		for (const e of g.entries) out.push(`- ${e.url} — ${e.description ? `${join(e.title)}${clip(e.description, maxDesc)}` : e.title}`);
 		out.push('');
 	}
 	out.push(END);
