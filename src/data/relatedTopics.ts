@@ -31,6 +31,8 @@ export const RELATED: Record<string, string[]> = {
 	'v:identity': ['v:god-as-father', 'm:abba-father', 'v:salvation', 'v:faith'],
 	'v:advent': ['v:christmas', 'm:begotten', 'v:hope'],
 	'v:christmas': ['v:advent', 'm:begotten', 'v:joy'],
+	'v:new-beginnings': ['v:hope', 'v:peace', 'v:gratitude', 'v:god-as-father'],
+	'v:lent': ['v:forgiveness', 'v:prayer', 'v:salvation', 'v:god-as-father'],
 	'v:anger': ['m:meek', 'v:patience', 'v:forgiveness', 'b:men'],
 	'v:anxiety': ['v:fear', 'v:peace', 'v:trust', 'v:death', 'b:financial-hardship', 'b:cancer'],
 	'v:comfort': ['v:death', 'v:encouragement', 'b:grief', 'b:widows', 'b:cancer', 'm:forsake'],
