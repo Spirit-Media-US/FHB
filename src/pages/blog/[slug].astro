@@ -268,14 +268,30 @@ function renderBlogTable(b: any): string {
 	if (b?.caption) {
 		out += `<caption class="mb-2 text-left text-sm font-semibold" style="caption-side: top; color: var(--color-muted);">${cell(b.caption)}</caption>`;
 	}
+	// 3cf (a11y td-has-header): header cells carry scope="col"; when the header row's first cell is
+	// empty, column 1 holds row labels, so each body row's first cell is a <th scope="row"> with the
+	// body cell's look (no visual change).
+	const firstHead = Array.isArray(rows[0]?.cells) ? rows[0].cells[0] : undefined;
+	const rowLabels = hasHeader && String(firstHead ?? '').trim() === '';
 	rows.forEach((r: any, i: number) => {
 		const cells = Array.isArray(r?.cells) ? r.cells : [];
 		const isHead = hasHeader && i === 0;
-		const tag = isHead ? 'th' : 'td';
 		const style = isHead
 			? 'border-bottom: 2px solid var(--color-hairline); color: var(--color-ink); text-align: left;'
 			: 'border-bottom: 1px solid var(--color-hairline); color: var(--color-ink);';
-		out += `<tr>${cells.map((c: any) => `<${tag} class="px-3 py-2 align-top" style="${style}">${cell(c)}</${tag}>`).join('')}</tr>`;
+		const bodyThStyle = `${style} text-align: left; font-weight: inherit;`;
+		out += `<tr>${cells
+			.map((c: any, j: number) => {
+				if (isHead) {
+					return j === 0 && rowLabels
+						? `<td class="px-3 py-2 align-top" style="${style}"></td>`
+						: `<th scope="col" class="px-3 py-2 align-top" style="${style}">${cell(c)}</th>`;
+				}
+				return j === 0 && rowLabels
+					? `<th scope="row" class="px-3 py-2 align-top" style="${bodyThStyle}">${cell(c)}</th>`
+					: `<td class="px-3 py-2 align-top" style="${style}">${cell(c)}</td>`;
+			})
+			.join('')}</tr>`;
 	});
 	out += '</table></div>';
 	return out;
@@ -325,6 +341,15 @@ const bodySegments = segmentBody(post.body || []);
 // the browser) and inlined. Absent/old sidecar → no highlight, audio still works.
 const audioBase = `https://media.spiritmediapublishing.com/audio/blog/en/${post.slug.current}`;
 let audioTimings: { id: string; t: number }[] = [];
+// 3cf: render the player only when the narration file exists. The player used to probe optimistically
+// and hide on error, which logged a blocked/404 request on posts not yet narrated (console error, BP 96).
+// A post narrated later gets its player on the next FHB build.
+let hasAudio = false;
+try {
+	hasAudio = (await fetch(`${audioBase}.mp3`, { method: 'HEAD' })).ok;
+} catch {
+	hasAudio = false;
+}
 try {
 	const meta = await fetch(`${audioBase}.json`).then((r) => (r.ok ? r.json() : null));
 	if (meta && Array.isArray(meta.segments)) audioTimings = meta.segments;
@@ -533,7 +558,7 @@ const alternates = hasTe
     <!-- POST CONTENT -->
     <section class="px-6 py-10 lg:px-8 lg:py-16" style="background-color: var(--color-surface);">
       <div class="mx-auto max-w-3xl space-y-4">
-        <BlogAudioPlayer src={`${audioBase}.mp3`} timings={audioTimings} />
+        {hasAudio && <BlogAudioPlayer src={`${audioBase}.mp3`} timings={audioTimings} />}
         {bodySegments.map((seg) =>
           seg.kind === 'chapter'
             ? (seg.slug
