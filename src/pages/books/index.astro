@@ -1,4 +1,5 @@
 ---
+import BiblesBooksToggle from '../../components/BiblesBooksToggle.astro';
 // /books/ — the Father Heart books catalogue (Kevin 2026-11-13, kevin-decisions L1959: "Perhaps we start a separate
 // page like our current /print page for /books that get's linked on /print but builds a listing of books ... our FHB
 // is #1 priority"). Every card comes from src/data/books.json; adding a book is a data row. The Father's Heart Bible
@@ -70,6 +71,7 @@ const bookPriceLine = (skus: string[]) =>
 			<div class="bks">
 				<nav aria-label="Breadcrumb" class="bks__crumb"><a href="/">Home</a><span aria-hidden="true">/</span><span>Books</span></nav>
 				<h1 class="bks__h1">Father Heart Books</h1>
+				<BiblesBooksToggle current="books" />
 				<p class="bks__lead">Looking for the Bible? <a href="/print/">See every Father's Heart Bible edition</a>.</p>
 				<div class="bks__grid">
 					{books.map((b) => (
