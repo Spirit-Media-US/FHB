@@ -13,6 +13,8 @@ export const END = '<!-- /GENERATED:answer-pages -->';
 
 // dir = a src/pages folder whose every page is listed; page = one top-level page.
 export const TYPES = [
+	// FHB-BOOKS (Kevin 2026-11-13 L1959): /books/ + one line per src/data/books.json row (adding a book = data).
+	{ label: 'Father Heart books', books: true },
 	{ label: 'Bible words and what they mean', dir: 'meaning' },
 	{ label: 'Bible verses by topic and season', dir: 'verses' },
 	{ label: 'The Bible country by country', dir: 'bible-in' },
@@ -31,7 +33,6 @@ export const TYPES = [
 	{
 		label: 'Books, ordering and publisher pages',
 		pages: [
-			'books/beloved-identity',
 			'where-to-buy',
 			'print/order',
 			'translation-progress',
@@ -43,10 +44,6 @@ export const TYPES = [
 			'verse-of-the-day-widget',
 		],
 		overrides: {
-			'books/beloved-identity': {
-				title: "Father's Heart - Beloved Identity: What Your Heavenly Father Thinks of You",
-				description: 'The paperback book on what our Father thinks of you, with ordering.',
-			},
 			'where-to-buy': {
 				title: "Where to Buy Father's Heart Bible",
 				description: 'Every print edition, regular and large print, with buy links by retailer.',
@@ -235,6 +232,19 @@ export function collect(root = process.cwd()) {
 	const pagesDir = path.resolve(root, 'src/pages');
 	const groups = [];
 	for (const t of TYPES) {
+		if (t.books) {
+			const cat = JSON.parse(fs.readFileSync(path.resolve(root, 'src/data/books.json'), 'utf8'));
+			const rows = (cat.books || []).slice().sort((x, y) => (x.order ?? 0) - (y.order ?? 0));
+			const idx = meta(path.join(pagesDir, 'books/index.astro'), root);
+			groups.push({
+				label: t.label,
+				entries: [
+					{ url: '/books/', slug: 'books', title: idx.title.replace(/\s*\|\s*(Father.s Heart Bible.*|FHB)$/, ''), description: idx.description },
+					...rows.map((b) => ({ url: `/books/${b.slug}/`, slug: b.slug, title: b.full_title, description: b.short })),
+				],
+			});
+			continue;
+		}
 		const slugs = t.pages
 			? t.pages
 			: fs

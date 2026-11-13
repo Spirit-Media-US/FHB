@@ -1,0 +1,359 @@
+---
+// /books/<slug>/ — one page per Father Heart book (Kevin 2026-11-13, kevin-decisions L1959: "each book needs to be
+// treated like each bible edition given it's own page and easy check out ... declare who this book is for ... full
+// details and look inside"). DATA-DRIVEN: every fact and every sentence comes from src/data/books.json (sourced from
+// spec sheets / the pmpublish data pack, never written here). Adding a book = a books.json row.
+// Replaces the hand-built /books/beloved-identity/ page (Kevin 2026-11-10) at the same URL with the same markup,
+// order widget and JSON-LD; it posts to the same /dvc-checkout the Bibles use.
+// A format whose SKU the checkout does not sell yet (status != "live") shows "ordering opens soon", never a
+// button that fails.
+import LookInside from '../../components/LookInside.astro';
+import Section from '../../components/Section.astro';
+import catalog from '../../data/books.json';
+import lookinside from '../../data/lookinside.json';
+import Layout from '../../layouts/Layout.astro';
+import { BULK_QUOTE_COPY } from '../../lib/farBand';
+import { handlingFeeCents, handlingLabel, shippingDetailsFor } from '../../lib/marginGuard';
+import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
+import { LIVE_COUNTRIES } from '../../lib/shipCountries';
+
+type Format = {
+	sku: string;
+	format: string;
+	schema_format: string;
+	isbn: string;
+	isbn_display: string;
+	list_cents: number;
+	pages: number;
+	trim: string;
+	binding: string;
+	landed_key: string;
+};
+type Book = {
+	slug: string;
+	status: string;
+	title: string;
+	subtitle?: string;
+	full_title: string;
+	author: { name: string; url?: string };
+	author_bio?: string;
+	age?: string;
+	page_title: string;
+	short: string;
+	who_for: string[];
+	long_html: string;
+	cover: { jpg: string; w600: string; w300: string; width: number; height: number; alt: string };
+	formats: Format[];
+	language: string;
+	look_inside: string | null;
+};
+
+export function getStaticPaths() {
+	return (catalog.books as Book[]).map((b) => ({ params: { slug: b.slug }, props: { book: b } }));
+}
+
+const { book } = Astro.props as { book: Book };
+const URL_ = `https://fathersheartbible.com/books/${book.slug}/`;
+const live = book.status === 'live';
+const money = (c: number) => `$${(c / 100).toFixed(2)}`;
+const LONG_TEXT = book.long_html
+	.replace(/<p><br><\/p>/g, '')
+	.replace(/<\/p>/g, '\n')
+	.replace(/<[^>]+>/g, '')
+	.replace(/&amp;/g, '&')
+	.trim();
+const hasLook = !!(book.look_inside && (lookinside as Record<string, unknown>)[book.look_inside]);
+
+// Destinations per format: the US, plus every live country with a MEASURED landed cost for that format
+// (ship-countries.json landed_cost_usd.<landed_key>), fee from the checkout's own rule (marginGuard.ts).
+const formats = book.formats.map((f) => {
+	const dests = LIVE_COUNTRIES.filter(
+		(c) =>
+			c.code === 'US' ||
+			(c.landed_cost_usd as Record<string, unknown> | undefined)?.[f.landed_key] != null,
+	).map((c) => ({
+		code: c.code,
+		name: c.name,
+		far: c.farBand === true,
+		fee: c.code === 'US' ? 0 : handlingFeeCents(f.sku, f.list_cents, c),
+		label: c.code === 'US' ? '' : handlingLabel(c.code),
+	}));
+	return { ...f, dests };
+});
+const config = JSON.stringify({
+	formats: formats.map((f) => ({ sku: f.sku, list: f.list_cents, dests: f.dests })),
+	quote: BULK_QUOTE_COPY.error,
+	returnPath: `/books/${book.slug}/`,
+});
+const first = formats[0];
+
+const offerFor = (f: (typeof formats)[number]) => ({
+	'@type': 'Offer',
+	url: URL_,
+	price: (f.list_cents / 100).toFixed(2),
+	priceCurrency: 'USD',
+	availability: 'https://schema.org/InStock',
+	itemCondition: 'https://schema.org/NewCondition',
+	seller: { '@type': 'Organization', name: 'Spirit Media Publishing' },
+	hasMerchantReturnPolicy: merchantReturnPolicy,
+	shippingDetails: shippingDetailsFor(
+		{ slug: f.sku, listUsd: f.list_cents / 100 },
+		LIVE_COUNTRIES.filter((c) => f.dests.some((d) => d.code === c.code)),
+	),
+});
+// ONE format: the same ['Book','Product'] node with a top-level Offer the hand-built Beloved Identity page carried
+// (merchant-listing shape). SEVERAL formats: a Book whose workExample holds one Book+Product per format.
+const single = formats.length === 1;
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': single ? ['Book', 'Product'] : 'Book',
+		'@id': `${URL_}#book`,
+		url: URL_,
+		name: book.full_title,
+		inLanguage: book.language,
+		image: book.cover.jpg,
+		description: LONG_TEXT,
+		author: {
+			'@type': 'Person',
+			name: book.author.name,
+			...(book.author.url ? { url: book.author.url } : {}),
+		},
+		publisher: {
+			'@type': 'Organization',
+			name: 'Spirit Media Publishing',
+			url: 'https://spiritmediapublishing.com',
+		},
+		...(book.who_for.length
+			? { audience: { '@type': 'Audience', audienceType: book.who_for.join(', ') } }
+			: {}),
+		...(single
+			? {
+					sku: first.sku,
+					isbn: first.isbn,
+					gtin13: first.isbn,
+					bookFormat: first.schema_format,
+					numberOfPages: first.pages,
+					brand: { '@type': 'Brand', name: 'Spirit Media Publishing' },
+					...(live ? { offers: offerFor(first) } : {}),
+				}
+			: {}),
+		...(single
+			? {}
+			: {
+					workExample: formats.map((f) => ({
+						'@type': ['Book', 'Product'],
+						'@id': `${URL_}#${f.sku}`,
+						name: `${book.full_title} (${f.format})`,
+						sku: f.sku,
+						isbn: f.isbn,
+						gtin13: f.isbn,
+						bookFormat: f.schema_format,
+						numberOfPages: f.pages,
+						image: book.cover.jpg,
+						brand: { '@type': 'Brand', name: 'Spirit Media Publishing' },
+						...(live ? { offers: offerFor(f) } : {}),
+					})),
+				}),
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{
+				'@type': 'ListItem',
+				position: 2,
+				name: 'Books',
+				item: 'https://fathersheartbible.com/books/',
+			},
+			{ '@type': 'ListItem', position: 3, name: book.title, item: URL_ },
+		],
+	},
+];
+---
+
+<Layout title={book.page_title} description={book.short} image={book.cover.jpg} imageAlt={book.cover.alt} jsonLd={jsonLd}>
+	<main id="main-content" style="margin-top: 80px;">
+		<Section variant="soft">
+			<nav aria-label="Breadcrumb" class="bk__crumb">
+				<a href="/">Home</a><span aria-hidden="true">/</span><a href="/books/">Books</a><span aria-hidden="true">/</span><span>{book.title}</span>
+			</nav>
+			<div class="bi">
+				<div class="bi__cover">
+					<img src={book.cover.w600} srcset={`${book.cover.w300} 300w, ${book.cover.w600} 600w`} sizes="(min-width: 768px) 320px, 300px" width={book.cover.width} height={book.cover.height} alt={book.cover.alt} fetchpriority="high" decoding="async" />
+					{hasLook && <div class="bk__look"><LookInside slug={book.look_inside!} title={book.title} size="lg" /></div>}
+				</div>
+				<div class="bi__main">
+					<h1 class="bi__title">{book.title}</h1>
+					{book.subtitle && <p class="bi__sub">{book.subtitle}</p>}
+					<p class="bi__by">By {book.author.name} · Spirit Media Publishing</p>
+					{book.age && <p class="bi__facts">{book.age}</p>}
+					{formats.map((f) => (
+						<p class="bi__facts">{f.format} · {f.pages} pages · {f.trim} · ISBN {f.isbn_display}</p>
+					))}
+
+					{live ? (
+						<div id="order" class="bi__order" data-bi={config}>
+							{formats.length > 1 && (
+								<div class="bi__row">
+									<label for="bk-format">Format</label>
+									<select id="bk-format" data-format>
+										{formats.map((f, i) => <option value={String(i)}>{f.format} · {money(f.list_cents)}</option>)}
+									</select>
+								</div>
+							)}
+							<p class="bi__price"><span data-price>{money(first.list_cents)}</span> <span>per copy · free shipping in the United States</span></p>
+							<div class="bi__row">
+								<label for="bi-qty">Copies</label>
+								<input id="bi-qty" type="number" inputmode="numeric" min="1" max="99" value="1" data-qty />
+							</div>
+							<div class="bi__row">
+								<label for="bi-country">Ship to</label>
+								<select id="bi-country" data-country>
+									{first.dests.map((d) => <option value={d.code} selected={d.code === 'US'}>{d.name}</option>)}
+								</select>
+							</div>
+							<p class="bi__fee" data-fee hidden></p>
+							<p class="bi__total">Total <b data-total>{money(first.list_cents)}</b> <span>plus tax where it applies</span></p>
+							<button type="button" class="bi__btn" data-order-btn>Order now</button>
+							<p class="bi__msg" data-msg role="status" hidden></p>
+							<p class="bi__fine"><a href="/returns/">Your purchase is guaranteed</a> · Printed and shipped to you by our printer, IngramSpark.</p>
+						</div>
+					) : (
+						<div id="order" class="bi__order">
+							<p class="bi__price">{formats.map((f, i) => <>{i ? ' · ' : ''}{f.format} {money(f.list_cents)}</>)}</p>
+							<p class="bi__fine">Ordering on this site opens soon.</p>
+						</div>
+					)}
+				</div>
+			</div>
+
+			{book.who_for.length > 0 && (
+				<div class="bk__who">
+					<h2 class="bk__h2">Who this book is for</h2>
+					<ul>{book.who_for.map((w) => <li>{w}</li>)}</ul>
+				</div>
+			)}
+			<div class="bi__desc" set:html={book.long_html} />
+			{book.author_bio && (
+				<div class="bk__who">
+					<h2 class="bk__h2">About the author</h2>
+					<p style="line-height: 1.7;">{book.author_bio}</p>
+				</div>
+			)}
+			<p class="bk__more"><a href="/books/">More Father Heart books</a> · <a href="/print/">Father's Heart Bible editions</a></p>
+		</Section>
+	</main>
+</Layout>
+
+<style>
+	.bk__crumb { max-width: 60rem; margin: 0 auto 1.2rem; font-family: var(--font-sans); font-size: 0.85rem; color: #3f3f46; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+	.bk__crumb a { text-decoration: underline; }
+	.bk__look { margin-top: 1rem; text-align: center; }
+	.bk__who { max-width: 44rem; margin: 2.5rem auto 0; font-family: var(--font-sans); color: #27272a; }
+	.bk__h2 { font-family: var(--font-serif); color: var(--color-ink); font-size: 1.5rem; font-weight: 400; margin: 0 0 0.8rem; }
+	.bk__who ul { margin: 0; padding-left: 1.2rem; columns: 2; column-gap: 2rem; line-height: 1.8; }
+	@media (max-width: 520px) { .bk__who ul { columns: 1; } }
+	.bk__more { max-width: 44rem; margin: 2rem auto 0; font-family: var(--font-sans); font-size: 0.95rem; }
+	.bk__more a { text-decoration: underline; color: var(--color-brand); }
+	.bi { display: grid; gap: 2rem; max-width: 60rem; margin: 0 auto; grid-template-columns: 1fr; }
+	@media (min-width: 768px) { .bi { grid-template-columns: 320px 1fr; align-items: start; } }
+	.bi__cover img { width: 100%; max-width: 320px; height: auto; border-radius: 0.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18); display: block; margin: 0 auto; }
+	.bi__title { font-family: var(--font-serif); color: var(--color-ink); font-size: 2.2rem; font-weight: 300; line-height: 1.15; margin: 0 0 0.4rem; }
+	.bi__sub { font-family: var(--font-serif); color: var(--color-ink); font-size: 1.2rem; margin: 0 0 0.6rem; }
+	.bi__by, .bi__facts { font-family: var(--font-sans); color: #3f3f46; font-size: 0.95rem; margin: 0 0 0.25rem; }
+	.bi__order { margin-top: 1.4rem; padding: 1.25rem; background: #fff; border: 1px solid var(--color-hairline); border-radius: 1rem; max-width: 30rem; font-family: var(--font-sans); }
+	.bi__price { margin: 0 0 0.9rem; font-size: 1.5rem; font-weight: 800; color: var(--color-ink); }
+	.bi__price span + span { font-size: 0.85rem; font-weight: 600; color: #3f3f46; }
+	.bi__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 0 0 0.7rem; }
+	.bi__row label { font-weight: 600; color: var(--color-ink); }
+	.bi__row input, .bi__row select { min-height: 44px; border: 1px solid #a1a1aa; border-radius: 0.5rem; padding: 0 0.6rem; font-size: 1rem; background: #fff; color: var(--color-ink); }
+	.bi__row input { width: 6rem; }
+	.bi__row select { max-width: 16rem; }
+	.bi__fee { margin: 0 0 0.6rem; font-size: 0.9rem; font-weight: 600; color: #3f3f46; }
+	.bi__total { margin: 0.4rem 0 0.9rem; font-size: 1.1rem; color: var(--color-ink); }
+	.bi__total span { font-size: 0.8rem; color: #3f3f46; }
+	.bi__btn { width: 100%; min-height: 48px; border: 0; border-radius: 0.6rem; background: var(--color-primary); color: #fff; font-size: 1.05rem; font-weight: 700; cursor: pointer; }
+	.bi__btn:disabled { opacity: 0.6; cursor: wait; }
+	.bi__msg { margin: 0.7rem 0 0; font-size: 0.9rem; font-weight: 600; color: #7f1d1d; }
+	.bi__fine { margin: 0.8rem 0 0; font-size: 0.8rem; color: #3f3f46; }
+	.bi__fine a { text-decoration: underline; }
+	.bi__desc { max-width: 44rem; margin: 2.5rem auto 0; font-family: var(--font-sans); color: #27272a; line-height: 1.7; }
+	.bi__desc :global(p) { margin: 0 0 0.9rem; }
+	.bi__desc :global(strong) { color: var(--color-ink); }
+</style>
+
+<script>
+	const root = document.querySelector<HTMLElement>('[data-bi]');
+	if (root) {
+		type Dest = { code: string; name: string; far: boolean; fee: number; label: string };
+		const cfg = JSON.parse(root.dataset.bi ?? '{}') as {
+			formats: { sku: string; list: number; dests: Dest[] }[];
+			quote: string;
+			returnPath: string;
+		};
+		const fmtSel = root.querySelector<HTMLSelectElement>('[data-format]');
+		const qty = root.querySelector<HTMLInputElement>('[data-qty]')!;
+		const sel = root.querySelector<HTMLSelectElement>('[data-country]')!;
+		const priceEl = root.querySelector<HTMLElement>('[data-price]')!;
+		const feeEl = root.querySelector<HTMLElement>('[data-fee]')!;
+		const totalEl = root.querySelector<HTMLElement>('[data-total]')!;
+		const btn = root.querySelector<HTMLButtonElement>('[data-order-btn]')!;
+		const msg = root.querySelector<HTMLElement>('[data-msg]')!;
+		const money = (c: number) => `$${(c / 100).toFixed(2)}`;
+		const say = (t: string) => {
+			msg.textContent = t;
+			msg.hidden = !t;
+		};
+		const fmt = () => cfg.formats[Number(fmtSel?.value ?? 0)] ?? cfg.formats[0];
+		const n = () => Math.max(1, Math.min(99, Math.floor(Number(qty.value) || 1)));
+		const dest = () => fmt().dests.find((d) => d.code === sel.value) ?? fmt().dests[0];
+		function fillCountries() {
+			const keep = sel.value;
+			sel.innerHTML = '';
+			for (const d of fmt().dests) {
+				const o = document.createElement('option');
+				o.value = d.code;
+				o.textContent = d.name;
+				sel.append(o);
+			}
+			sel.value = fmt().dests.some((d) => d.code === keep) ? keep : 'US';
+		}
+		function render() {
+			const d = dest();
+			priceEl.textContent = money(fmt().list);
+			feeEl.hidden = d.fee <= 0;
+			feeEl.textContent = d.fee > 0 ? `+ ${money(d.fee)} per copy, ${d.label.toLowerCase()} (${d.name})` : '';
+			totalEl.textContent = money(n() * (fmt().list + d.fee));
+		}
+		fmtSel?.addEventListener('change', () => {
+			fillCountries();
+			render();
+		});
+		qty.addEventListener('input', render);
+		sel.addEventListener('change', render);
+		render();
+		btn.addEventListener('click', async () => {
+			if (dest().far && n() >= 10) return say(cfg.quote);
+			say('Opening secure checkout…');
+			btn.disabled = true;
+			try {
+				const res = await fetch('/dvc-checkout', {
+					method: 'POST',
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify({ counts: { [fmt().sku]: n() }, country: sel.value, returnPath: cfg.returnPath }),
+				});
+				const d = (await res.json()) as { url?: string; disabled?: boolean; error?: string; message?: string };
+				if (d.url) {
+					window.location.href = d.url;
+					return;
+				}
+				say(d.disabled ? 'Checkout is not enabled yet.' : (d.message ?? 'Something went wrong. Please try again.'));
+			} catch {
+				say('Something went wrong. Please try again.');
+			}
+			btn.disabled = false;
+		});
+	}
+</script>
