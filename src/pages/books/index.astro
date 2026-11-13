@@ -1,0 +1,103 @@
+---
+// /books/ — the Father Heart books catalogue (Kevin 2026-11-13, kevin-decisions L1959: "Perhaps we start a separate
+// page like our current /print page for /books that get's linked on /print but builds a listing of books ... our FHB
+// is #1 priority"). Every card comes from src/data/books.json; adding a book is a data row. The Father's Heart Bible
+// editions lead the page, so the Bibles stay first.
+import Section from '../../components/Section.astro';
+import catalog from '../../data/books.json';
+import Layout from '../../layouts/Layout.astro';
+
+type Book = {
+	slug: string;
+	order: number;
+	title: string;
+	subtitle?: string;
+	full_title: string;
+	author: { name: string };
+	short: string;
+	who_for: string[];
+	cover: { w600: string; w300: string; width: number; height: number; alt: string; jpg: string };
+	formats: { format: string; list_cents: number; isbn: string }[];
+};
+const books = (catalog.books as Book[]).slice().sort((a, b) => a.order - b.order);
+const URL_ = 'https://fathersheartbible.com/books/';
+const money = (c: number) => `$${(c / 100).toFixed(2)}`;
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'CollectionPage',
+		'@id': `${URL_}#page`,
+		url: URL_,
+		name: 'Father Heart Books',
+		isPartOf: { '@id': 'https://fathersheartbible.com/#website' },
+		mainEntity: {
+			'@type': 'ItemList',
+			itemListElement: books.map((b, i) => ({
+				'@type': 'ListItem',
+				position: i + 1,
+				url: `${URL_}${b.slug}/`,
+				name: b.full_title,
+			})),
+		},
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{ '@type': 'ListItem', position: 2, name: 'Books', item: URL_ },
+		],
+	},
+];
+---
+
+<Layout
+	title="Father Heart Books for Children and Adults | FHB"
+	description="Books from the Father's Heart Bible family, for children and adults: each one about who our Heavenly Father is and who you are to Him."
+	jsonLd={jsonLd}
+>
+	<main id="main-content" style="margin-top: 80px;">
+		<Section variant="soft">
+			<div class="bks">
+				<nav aria-label="Breadcrumb" class="bks__crumb"><a href="/">Home</a><span aria-hidden="true">/</span><span>Books</span></nav>
+				<h1 class="bks__h1">Father Heart Books</h1>
+				<p class="bks__lead">Looking for the Bible? <a href="/print/">See every Father's Heart Bible edition</a>.</p>
+				<div class="bks__grid">
+					{books.map((b) => (
+						<article class="bks__card">
+							<a href={`/books/${b.slug}/`} class="bks__cover" aria-label={`${b.title}: full details`}>
+								<img src={b.cover.w300} srcset={`${b.cover.w300} 300w, ${b.cover.w600} 600w`} sizes="160px" width={b.cover.width} height={b.cover.height} alt={b.cover.alt} loading="lazy" decoding="async" />
+							</a>
+							<div>
+								<h2 class="bks__title"><a href={`/books/${b.slug}/`}>{b.title}</a></h2>
+								{b.subtitle && <p class="bks__sub">{b.subtitle}</p>}
+								<p class="bks__by">By {b.author.name}</p>
+								<p class="bks__short">{b.short}</p>
+								<p class="bks__price">{b.formats.map((f) => `${f.format} ${money(f.list_cents)}`).join(' · ')}</p>
+								<a href={`/books/${b.slug}/`} class="bks__link">Full details &rarr;</a>
+							</div>
+						</article>
+					))}
+				</div>
+			</div>
+		</Section>
+	</main>
+</Layout>
+
+<style>
+	.bks { max-width: 60rem; margin: 0 auto; font-family: var(--font-sans); }
+	.bks__crumb { font-size: 0.85rem; color: #3f3f46; display: flex; gap: 0.4rem; margin-bottom: 1rem; }
+	.bks__crumb a { text-decoration: underline; }
+	.bks__h1 { font-family: var(--font-serif); color: var(--color-ink); font-size: 2.4rem; font-weight: 300; margin: 0 0 0.6rem; }
+	.bks__lead { color: #3f3f46; font-size: 1.05rem; margin: 0 0 2rem; }
+	.bks__lead a, .bks__link { color: var(--color-brand); text-decoration: underline; font-weight: 600; }
+	.bks__grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
+	@media (min-width: 900px) { .bks__grid { grid-template-columns: 1fr 1fr; } }
+	.bks__card { display: grid; grid-template-columns: 120px 1fr; gap: 1.1rem; background: #fff; border: 1px solid var(--color-hairline); border-radius: 1rem; padding: 1.1rem; align-items: start; }
+	.bks__cover img { width: 100%; height: auto; border-radius: 0.35rem; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); display: block; }
+	.bks__title { font-family: var(--font-serif); color: var(--color-ink); font-size: 1.3rem; font-weight: 400; line-height: 1.2; margin: 0 0 0.2rem; }
+	.bks__sub { color: var(--color-ink); font-size: 0.95rem; margin: 0 0 0.3rem; }
+	.bks__by { color: #3f3f46; font-size: 0.85rem; margin: 0 0 0.5rem; }
+	.bks__short { color: #27272a; font-size: 0.92rem; line-height: 1.55; margin: 0 0 0.5rem; }
+	.bks__price { color: var(--color-ink); font-weight: 700; font-size: 0.95rem; margin: 0 0 0.4rem; }
+</style>

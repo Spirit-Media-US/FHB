@@ -111,10 +111,11 @@ test('sitemap parity: every marketing page is listed in llms.txt or exempt with 
 	);
 	for (const [u, why] of Object.entries(PAGE_EXEMPT))
 		assert.ok(why.length > 10, `${u} exempt without a reason`);
-	assert.ok(
-		routes.includes('/books/beloved-identity/') && listed('/books/beloved-identity/'),
-		'beloved-identity not listed',
-	);
+	// FHB-BOOKS: book pages are one [slug] route per src/data/books.json row (no page file each); every one,
+	// Beloved Identity included, and the /books/ catalogue must be listed.
+	const bookRows = JSON.parse(fs.readFileSync('src/data/books.json', 'utf8')).books;
+	assert.ok(bookRows.some((b) => b.slug === 'beloved-identity'), 'beloved-identity missing from books.json');
+	for (const u of ['/books/', ...bookRows.map((b) => `/books/${b.slug}/`)]) assert.ok(listed(u), `${u} not listed`);
 });
 
 test('sitemap parity: the exempt list holds no stale or already-listed page', () => {
