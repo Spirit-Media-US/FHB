@@ -34,7 +34,7 @@ test('mailto goes to hello@, prefilled with name, email, country, editions, quan
 
 // ── the real handler, with Stripe stubbed ──
 const slug = (() => {
-	const src = fs.readFileSync(new URL('../functions/dvc-checkout.ts', import.meta.url), 'utf8');
+	const src = fs.readFileSync(new URL('../src/lib/storeEngine.ts', import.meta.url), 'utf8'); // the catalogue lives in the store engine (3fb)
 	return /'([a-z0-9-]+-pb)':\s*\{/.exec(src)?.[1];
 })();
 

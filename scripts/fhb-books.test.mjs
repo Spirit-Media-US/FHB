@@ -166,7 +166,7 @@ test('bookSaleMetadata: net measured where a landed cost exists; nothing for a B
 
 // ── 3ee-1 (pmseoaeo 2026-11-13): BIBLE sales carry the same sale fields as books ─────────────────────────
 test('3ee-1: every sellable Bible SKU resolves to an ISBN (Large Print set alone = none)', () => {
-	const src = fs.readFileSync(new URL('../functions/dvc-checkout.ts', import.meta.url), 'utf8');
+	const src = fs.readFileSync(new URL('../src/lib/storeEngine.ts', import.meta.url), 'utf8'); // catalogue: store engine (3fb)
 	const all = [...src.matchAll(/^\t'([a-z0-9-]+-(?:hb|pb))': \{\n\t\ttitle: '([^']*)'/gm)];
 	assert.ok(all.length >= 200, `found ${all.length} SKUs`);
 	// A PRE-ORDER language has no ISBN in the publisher's master yet (2026-11-13: nri nkf sgc ktu yaf); it records
@@ -208,7 +208,7 @@ test('3ee-1: a Bible session carries bible_1 with the book field names; books ke
 });
 
 test('3ee-1: a 100-SKU cart stays within 50 keys and 500 chars, and COUNTS what did not fit', () => {
-	const src = fs.readFileSync(new URL('../functions/dvc-checkout.ts', import.meta.url), 'utf8');
+	const src = fs.readFileSync(new URL('../src/lib/storeEngine.ts', import.meta.url), 'utf8'); // catalogue: store engine (3fb)
 	const skus = [...src.matchAll(/^\t'(lang-[a-z0-9-]+-(?:hb|pb))': \{/gm)]
 		.map((m) => m[1])
 		.slice(0, 100);

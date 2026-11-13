@@ -58,12 +58,12 @@ test('checkout: allowed_countries, rate and phone come from the list; pending/un
 	for (const bad of [...pendingCodes, 'ZZ', '', undefined, null, 'US,GB', ['US']]) assert.equal(checkoutShippingForm(bad), null, String(bad));
 });
 test('checkout functions use the list, no hard-coded country', () => {
-	for (const f of ['functions/dvc-checkout.ts', 'functions/print-checkout.ts']) {
+	for (const f of ['src/lib/storeEngine.ts', 'functions/print-checkout.ts']) {
 		const src = fs.readFileSync(f, 'utf8');
 		assert.match(src, /checkoutShippingForm\(/, f);
 		assert.doesNotMatch(src, /allowed_countries\]\[0\]'\s*:\s*'[A-Z]{2}'/, `${f} hard-codes a country`);
 	}
-	assert.match(fs.readFileSync('functions/dvc-checkout.ts', 'utf8'), /country_not_served/);
+	assert.match(fs.readFileSync('src/lib/storeEngine.ts', 'utf8'), /country_not_served/);
 });
 test('schema: one OfferShippingDetails per live country; return policy uses the same list', () => {
 	const d = [].concat(shippingDetailsForOffers());
