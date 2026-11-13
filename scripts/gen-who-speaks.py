@@ -14,6 +14,7 @@ moved since the lock). Refuses to write unless the book sums equal the locked `d
   python3 scripts/gen-who-speaks.py --selftest-names  prove the names reconcile REFUSES an altered count
   python3 scripts/gen-who-speaks.py --selftest-stats  prove the by-the-numbers reconcile REFUSES an altered count
   python3 scripts/gen-who-speaks.py --selftest-plan   prove the 365-day plan reconcile REFUSES a tampered plan (unit 2hi)
+  python3 scripts/gen-who-speaks.py --selftest-trivia prove the trivia reconcile REFUSES an answer that is not its source (3co-1)
 
 Unit 2gz (2026-11-01) adds measure_names(): how the locked English text NAMES the Father (/names-of-god-the-father/).
 Same locked tree, same refusal pattern. METHOD (documented on the page too, reproducible from this file):
@@ -634,6 +635,237 @@ def selftest_plan():
     print(f"selftest-plan: untouched passes; {n}/6 tampered plans refused")
 
 
+# ── 3co-1 (pmseoaeo 2026-11-13): /bible-trivia/ — count-based questions answered ONLY from the three measured,
+# lock-reconciled JSONs above (by-the-numbers, who-speaks, names). No typed number: every answer carries the JSON
+# path it came from, and reconcile_trivia() re-reads each path and refuses if any answer is not exactly its source.
+# Speaker-voice and naming facts follow the same locked figures as their own pages. language-reach.json is NOT used:
+# speaker estimates are not a count of the locked text.
+TRIVIA_JSON = os.path.join(ROOT, "src/data/bible-trivia.json")
+TRIVIA_CSV = os.path.join(ROOT, "public/data/bible-trivia.csv")
+TRIVIA_MIN, TRIVIA_MAX = 60, 100
+
+
+def _get(srcs, path):
+    """srcs = {"stats": {...}, "who": {...}, "names": {...}}; path "stats:totals.books" / "who:rows[Genesis].father_words"."""
+    name, _, rest = path.partition(":")
+    cur = srcs[name]
+    for part in re.findall(r"[^.\[\]]+|\[[^\]]+\]", rest):
+        if part.startswith("["):
+            key = part[1:-1]
+            if isinstance(cur, list):
+                if key.isdigit():
+                    cur = cur[int(key)]
+                else:
+                    k, _, v = key.partition("=")
+                    cur = next(x for x in cur if str(x.get(k)) == v)
+            else:
+                cur = cur[key]
+        else:
+            cur = cur[part]
+    return cur
+
+
+def _n(x):
+    return f"{x:,}"
+
+
+def measure_trivia(stats_json, who_json, names_json):
+    st, wh, nm = json.loads(stats_json), json.loads(who_json), json.loads(names_json)
+    srcs = {"stats": st, "who": wh, "names": nm}
+    for d in (wh, nm):
+        if d["locked_commit"] != st["locked_commit"]:
+            sys.exit(f"trivia REFUSED: sources at different lock commits {d['locked_commit']} vs {st['locked_commit']}")
+    items = []
+
+    def add(cat, q, path, fmt=_n, read=None, answer=None):
+        fig = _get(srcs, path)
+        items.append({"category": cat, "q": q, "a": answer if answer is not None else fmt(fig), "figure": fig,
+                      "shows": answer is None and fmt is _n,
+                      "source": path, "read_url": read or "https://fathersheartbible.com/read/"})
+
+    T = "Books, chapters and verses"
+    add(T, "How many books are in the Bible?", "stats:totals.books")
+    add(T, "How many books are in the Old Testament?", "stats:totals.ot.books")
+    add(T, "How many books are in the New Testament?", "stats:totals.nt.books")
+    add(T, "How many chapters are in the Bible?", "stats:totals.chapters")
+    add(T, "How many chapters are in the Old Testament?", "stats:totals.ot.chapters")
+    add(T, "How many chapters are in the New Testament?", "stats:totals.nt.chapters")
+    add(T, "How many verses are in the Bible?", "stats:totals.verses")
+    add(T, "How many verses are in the Old Testament?", "stats:totals.ot.verses")
+    add(T, "How many verses are in the New Testament?", "stats:totals.nt.verses")
+    add(T, "How many words are in the Bible (Father's Heart Bible, English)?", "stats:totals.words")
+    add(T, "How many words are in the Old Testament?", "stats:totals.ot.words")
+    add(T, "How many words are in the New Testament?", "stats:totals.nt.words")
+    dup = st["totals"]["verses"] - st["totals"]["distinct_verse_texts"]
+    items.append({"category": T, "q": "How many verses repeat another verse word for word?", "a": _n(dup), "figure": dup,
+                  "source": "stats:totals.verses - stats:totals.distinct_verse_texts", "read_url": "https://fathersheartbible.com/read/"})
+    add(T, "In how many chapters does the verse numbering skip a number?", "stats:skipped_numbers", fmt=lambda v: _n(len(v)))
+    items[-1]["figure"] = len(st["skipped_numbers"]); items[-1]["shows"] = True
+
+    E = "Longest and shortest"
+    ex = st["extremes"]
+    c = ex["chapter_by_verses"]["longest"][0]
+    add(E, "What is the longest chapter in the Bible?", "stats:extremes.chapter_by_verses.longest[0].verses",
+        answer=f"{c['book']} {c['chapter']}", read=c["read_url"])
+    add(E, f"How many verses are in {c['book']} {c['chapter']}?", "stats:extremes.chapter_by_verses.longest[0].verses", read=c["read_url"])
+    add(E, f"How many words are in {c['book']} {c['chapter']}?", "stats:extremes.chapter_by_verses.longest[0].words", read=c["read_url"])
+    c = ex["chapter_by_verses"]["shortest"][0]
+    add(E, "What is the shortest chapter in the Bible?", "stats:extremes.chapter_by_verses.shortest[0].verses",
+        answer=f"{c['book']} {c['chapter']}", read=c["read_url"])
+    add(E, f"How many verses are in {c['book']} {c['chapter']}?", "stats:extremes.chapter_by_verses.shortest[0].verses", read=c["read_url"])
+    add(E, f"How many words are in {c['book']} {c['chapter']}?", "stats:extremes.chapter_by_verses.shortest[0].words", read=c["read_url"])
+    v = ex["verse_by_words"]["longest"][0]
+    add(E, "Which verse is the longest in words?", "stats:extremes.verse_by_words.longest[0].words",
+        answer=f"{v['book']} {v['chapter']}:{v['verse']}", read=v.get("read_url"))
+    add(E, f"How many words are in {v['book']} {v['chapter']}:{v['verse']}?", "stats:extremes.verse_by_words.longest[0].words", read=v.get("read_url"))
+    add(E, "How many words are in the shortest verses?", "stats:extremes.verse_by_words.shortest[0].words")
+    for key, label in (("book_by_words", "in words"), ("book_by_verses", "in verses"), ("book_by_chapters", "in chapters")):
+        b = ex[key]["longest"][0]
+        add(E, f"Which book of the Bible is the longest {label}?", f"stats:extremes.{key}.longest[0].book", fmt=str,
+            read=next(x["read_url"] for x in st["books"] if x["book"] == b["book"]))
+    b = ex["book_by_words"]["shortest"][0]
+    add(E, "Which book of the Bible is the shortest in words?", "stats:extremes.book_by_words.shortest[0].book", fmt=str,
+        read=next(x["read_url"] for x in st["books"] if x["book"] == b["book"]))
+    add(E, f"How many words are in {b['book']}?", "stats:extremes.book_by_words.shortest[0].words",
+        read=next(x["read_url"] for x in st["books"] if x["book"] == b["book"]))
+    ones = [x["book"] for x in ex["book_by_chapters"]["shortest"]]
+    items.append({"category": E, "q": "How many books of the Bible have only one chapter?", "a": f"{len(ones)} ({', '.join(ones)})",
+                  "figure": len(ones), "source": "stats:extremes.book_by_chapters.shortest", "read_url": "https://fathersheartbible.com/read/"})
+    # middle chapter, by canon order (books[] is canon order)
+    order = {x["book"]: i for i, x in enumerate(st["books"])}
+    chs = sorted(st["chapters"], key=lambda r: (order[r["book"]], r["chapter"]))
+    mid = chs[(len(chs) - 1) // 2] if len(chs) % 2 else None
+    if mid:
+        items.append({"category": E, "q": "What is the middle chapter of the Bible?", "a": f"{mid['book']} {mid['chapter']}",
+                      "figure": (len(chs) + 1) // 2, "shows": False, "source": "stats:chapters (canon order, chapter (n+1)/2)", "read_url": mid["read_url"]})
+
+    B = "Book by book"
+    by_words = sorted(st["books"], key=lambda r: -r["words"])
+    for r in by_words[:5]:
+        i = st["books"].index(r)
+        add(B, f"How many chapters are in {r['book']}?", f"stats:books[{i}].chapters", read=r["read_url"])
+        add(B, f"How many verses are in {r['book']}?", f"stats:books[{i}].verses", read=r["read_url"])
+    top5 = {r["book"] for r in by_words[:5]}
+    for name in ("Genesis", "Matthew", "John", "Romans", "Revelation"):
+        if name in top5:
+            continue
+        i = order[name]
+        r = st["books"][i]
+        add(B, f"How many chapters are in {name}?", f"stats:books[{i}].chapters", read=r["read_url"])
+        add(B, f"How many verses are in {name}?", f"stats:books[{i}].verses", read=r["read_url"])
+
+    F = "Fear not"
+    fn = st["fear_not"]
+    add(F, "How many times does the Bible say “fear not” or “do not be afraid” as a command?", "stats:fear_not.occurrences")
+    add(F, "In how many verses does the Bible say “fear not” or “do not be afraid” as a command?", "stats:fear_not.verses")
+    add(F, "In how many books does the Bible say “fear not” or “do not be afraid” as a command?", "stats:fear_not.books")
+    for ph in fn["by_phrase"]:
+        add(F, f"How many times is the exact phrase “{ph}” used?", f"stats:fear_not.by_phrase[{ph}]")
+
+    W = "Who speaks"
+    for who, label in (("father", "our Father"), ("son", "the Son"), ("spirit", "the Holy Spirit")):
+        add(W, f"How many words does {label} speak in the Bible?", f"who:totals.{who}.words")
+        add(W, f"In how many verses does {label} speak?", f"who:totals.{who}.verses")
+        books = [r for r in wh["rows"] if r[f"{who}_verses"] > 0]
+        items.append({"category": W, "q": f"In how many books does {label} speak?", "a": _n(len(books)), "figure": len(books),
+                      "source": f"who:rows (count where {who}_verses > 0)", "read_url": "https://fathersheartbible.com/who-speaks-in-scripture/"})
+        if who != "spirit":
+            top = max(wh["rows"], key=lambda r: r[f"{who}_words"])
+            add(W, f"In which book does {label} speak the most words?", f"who:rows[book={top['book']}].book", fmt=str, read=top["read_url"])
+            add(W, f"How many words does {label} speak in {top['book']}?", f"who:rows[book={top['book']}].{who}_words", read=top["read_url"])
+
+    N = "How our Father is named"
+    add(N, "How many times is our Father named “Father” in the Bible (Father's Heart Bible)?", "names:totals.tokens")
+    add(N, "How many verses name our Father?", "names:totals.verses_naming")
+    add(N, "How many different ways is our Father named?", "names:totals.terms")
+    add(N, "How many times does “Abba” appear?", "names:totals.abba")
+    for t in nm["terms"][:6]:
+        i = nm["terms"].index(t)
+        add(N, f"How many times does the Bible say “{t['term']}”?", f"names:terms[{i}].count")
+    add(N, "What is the most common way our Father is named?", "names:terms[0].term", fmt=str)
+    for ep in list(nm["epithets"])[:4]:
+        add(N, f"How many times does the word “{ep}” come right before “Father” (any determiner: our, the, your…)?", f"names:epithets[{ep}]")
+    top = max(nm["books"], key=lambda r: r["tokens"])
+    add(N, "Which book names our Father most often?", f"names:books[book={top['book']}].book", fmt=str, read=top["read_url"])
+    add(N, f"How many times does {top['book']} name our Father?", f"names:books[book={top['book']}].tokens", read=top["read_url"])
+    none = [r["book"] for r in nm["books"] if r["tokens"] == 0]
+    items.append({"category": N, "q": "How many books never name our Father as “Father”?", "a": _n(len(none)) + (f" ({', '.join(none)})" if none else ""),
+                  "figure": len(none), "source": "names:books (count where tokens == 0)", "read_url": "https://fathersheartbible.com/names-of-god-the-father/"})
+    o = nm["overlay"][0]
+    add(N, f"How many times does the text say “{o['term']}”?", "names:overlay[0].count")
+
+    for k, it in enumerate(items, 1):
+        it["n"] = k
+    reconcile_trivia(items, srcs)
+    data = {"edition": st["edition"], "locked_commit": st["locked_commit"],
+            "measured_from": "src/data/bible-by-the-numbers.json, who-speaks.json, names-of-the-father.json (each reconciled to the lock)",
+            "count": len(items), "items": items}
+    cb = io.StringIO()
+    w = csv.writer(cb, lineterminator="\n")
+    w.writerow(["n", "category", "question", "answer", "figure", "source", "read_url"])
+    for it in items:
+        w.writerow([it["n"], it["category"], it["q"], it["a"], it["figure"], it["source"], it["read_url"]])
+    return json.dumps(data, indent="\t", ensure_ascii=False) + "\n", cb.getvalue()
+
+
+def reconcile_trivia(items, srcs):
+    if not TRIVIA_MIN <= len(items) <= TRIVIA_MAX:
+        sys.exit(f"trivia REFUSED: {len(items)} questions, need {TRIVIA_MIN}-{TRIVIA_MAX}")
+    if len({it["q"] for it in items}) != len(items):
+        sys.exit("trivia REFUSED: duplicate question")
+    for it in items:
+        src = it["source"]
+        if src.startswith(("stats:totals.verses - ", "stats:chapters (", "who:rows (count", "names:books (count")):   # derived: re-derive
+            if src.startswith("stats:totals.verses - "):
+                want = srcs["stats"]["totals"]["verses"] - srcs["stats"]["totals"]["distinct_verse_texts"]
+            elif src.startswith("stats:chapters (canon order"):
+                want = (len(srcs["stats"]["chapters"]) + 1) // 2
+            elif src.startswith("who:rows (count where "):
+                f = src.split("where ")[1].split(" ")[0]
+                want = sum(1 for r in srcs["who"]["rows"] if r[f] > 0)
+            elif src.startswith("names:books (count where tokens == 0)"):
+                want = sum(1 for r in srcs["names"]["books"] if r["tokens"] == 0)
+            else:
+                sys.exit(f"trivia REFUSED: unknown derived source {src!r}")
+        else:
+            want = _get(srcs, src)
+            if src == "stats:skipped_numbers" or src == "stats:extremes.book_by_chapters.shortest":
+                want = len(want)
+        if it["figure"] != want:
+            sys.exit(f"trivia REFUSED: Q{it.get('n')} {it['q']!r} figure {it['figure']!r} != source {src} = {want!r}")
+        if it.get("shows", True) and isinstance(want, int) and not it["a"].startswith(_n(want)):
+            sys.exit(f"trivia REFUSED: Q{it.get('n')} answer {it['a']!r} does not show {want}")
+
+
+def selftest_trivia():
+    """Failure path: a changed figure, answer or count MUST be refused."""
+    import copy
+    sj, wj, nj = measure_stats()[0], measure()[0], measure_names()[0]
+    tj, _c = measure_trivia(sj, wj, nj)
+    items = json.loads(tj)["items"]
+    srcs = {"stats": json.loads(sj), "who": json.loads(wj), "names": json.loads(nj)}
+    reconcile_trivia(items, srcs)
+    def fig():
+        i = copy.deepcopy(items); i[0]["figure"] += 1; return i
+    def ans():
+        i = copy.deepcopy(items); k = next(n for n, x in enumerate(i) if x.get("shows", True) and isinstance(x["figure"], int) and x["figure"] > 9)
+        i[k]["a"] = "1"; return i
+    def few():
+        return copy.deepcopy(items)[:TRIVIA_MIN - 1]
+    def dup():
+        i = copy.deepcopy(items); i[1]["q"] = i[0]["q"]; return i
+    def src():
+        i = copy.deepcopy(items); i[3]["source"] = "stats:totals.books"; return i
+    n = 0
+    for name, fn in (("figure +1", fig), ("answer text wrong", ans), ("too few", few), ("duplicate q", dup), ("source swapped", src)):
+        try:
+            reconcile_trivia(fn(), srcs)
+        except SystemExit as e:
+            print("REFUSED as required:", name, "->", str(e)[:110]); n += 1; continue
+        print("NOT REFUSED (selftest FAILS):", name); sys.exit(1)
+    print(f"selftest-trivia: untouched passes ({len(items)} questions); {n}/5 tampered sets refused")
+
+
 if __name__ == "__main__":
     if "--selftest-names" in sys.argv:
         selftest_names()
@@ -644,15 +876,20 @@ if __name__ == "__main__":
     if "--selftest-plan" in sys.argv:
         selftest_plan()
         sys.exit(0)
+    if "--selftest-trivia" in sys.argv:
+        selftest_trivia()
+        sys.exit(0)
     nj, nt, nb = measure_names()[:3]
     sj, sb, sc_ = measure_stats()[:3]
     pj, pc = measure_plan(sj)
     j, c = measure()
+    tj, tc = measure_trivia(sj, j, nj)
     if "--check" in sys.argv:
         ok = (open(JSON_OUT).read() == j and open(CSV_OUT).read() == c and open(NAMES_JSON).read() == nj
               and open(NAMES_CSV).read() == nt and open(NAMES_BOOK_CSV).read() == nb
               and open(STATS_JSON).read() == sj and open(STATS_BOOK_CSV).read() == sb and open(STATS_CHAPTER_CSV).read() == sc_
-              and open(PLAN_JSON).read() == pj and open(PLAN_CSV).read() == pc)
+              and open(PLAN_JSON).read() == pj and open(PLAN_CSV).read() == pc
+              and os.path.exists(TRIVIA_JSON) and open(TRIVIA_JSON).read() == tj and open(TRIVIA_CSV).read() == tc)
         print("who-speaks data " + ("current" if ok else "DRIFTED: rerun scripts/gen-who-speaks.py"))
         sys.exit(0 if ok else 1)
     open(JSON_OUT, "w").write(j)
@@ -665,5 +902,7 @@ if __name__ == "__main__":
     open(STATS_CHAPTER_CSV, "w").write(sc_)
     open(PLAN_JSON, "w").write(pj)
     open(PLAN_CSV, "w").write(pc)
+    open(TRIVIA_JSON, "w").write(tj)
+    open(TRIVIA_CSV, "w").write(tc)
     t = json.loads(j)["totals"]
     print("wrote", JSON_OUT, CSV_OUT, {k: v for k, v in t.items()})
