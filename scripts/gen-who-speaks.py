@@ -337,6 +337,54 @@ def reconcile_stats(data, fig, raw_words_by_book, raw_chapters_by_book, struct_c
         raise SystemExit("gen-who-speaks: total words != independent recount")
 
 
+# ---- unit 3ad (pmseoaeo 2026-11-13, decision B): how often the text tells someone not to be afraid.
+# RULE (published on the page): count every "fear not", "do not fear", "do not be afraid" and "don't be afraid"
+# that is a COMMAND; leave out the places where the same words DESCRIBE people ("they do not fear God").
+# No grammar guess decides that: the statements are NAMED below, and the reconcile refuses when (a) a named
+# statement no longer holds the phrase, or (b) any occurrence follows a WORD other than the reviewed joiners
+# (so / and) and is not named. A new edition that moves a phrase therefore stops the build for a human read.
+FEAR_RE = re.compile(r"\b(fear not|do not fear|do not be afraid|don[\u2019']t be afraid)\b", re.I)
+FEAR_STATEMENTS = {("Exodus", 9, 30), ("Ecclesiastes", 8, 13), ("Isaiah", 63, 17), ("Malachi", 3, 5)}
+FEAR_JOINERS = {"so", "and"}
+
+
+def _fear_key(m):
+    p = m.group(1).lower().replace("\u2019", "'")
+    return "don't be afraid" if p.startswith("don") else p
+
+
+def measure_fear_not(vrows):
+    by_phrase, by_book, verses, excluded, unreviewed, raw = collections.Counter(), collections.Counter(), set(), [], [], 0
+    for r_ in vrows:
+        ref = (r_["book"], r_["chapter"], r_["verse"])
+        for m in FEAR_RE.finditer(r_["text"]):
+            raw += 1
+            if ref in FEAR_STATEMENTS:
+                excluded.append({"book": ref[0], "chapter": ref[1], "verse": ref[2], "phrase": _fear_key(m)})
+                continue
+            w = re.findall(r"[A-Za-z]+$", r_["text"][:m.start()].rstrip())
+            if w and w[0].lower() not in FEAR_JOINERS:
+                unreviewed.append(f"{ref[0]} {ref[1]}:{ref[2]} ('{w[0]} {m.group(1)}')")
+            by_phrase[_fear_key(m)] += 1
+            by_book[ref[0]] += 1
+            verses.add(ref)
+    return {"rule": "Every \u201cfear not\u201d, \u201cdo not fear\u201d, \u201cdo not be afraid\u201d and \u201cdon\u2019t be afraid\u201d said as a command, counted in the locked English text; the places where the same words describe people are left out and listed.",
+            "occurrences": sum(by_phrase.values()), "verses": len(verses),
+            "by_phrase": dict(sorted(by_phrase.items(), key=lambda kv: -kv[1])),
+            "books": len(by_book), "excluded_statements": excluded,
+            "_raw_matches": raw, "_unreviewed": unreviewed}
+
+
+def reconcile_fear_not(f):
+    if f["_unreviewed"]:
+        raise SystemExit("gen-who-speaks: fear-not: unreviewed phrase after a word (command or statement? read it, then name it): " + "; ".join(f["_unreviewed"]))
+    hit = {(e["book"], e["chapter"], e["verse"]) for e in f["excluded_statements"]}
+    if hit != FEAR_STATEMENTS:
+        raise SystemExit(f"gen-who-speaks: fear-not: named statements without the phrase: {sorted(FEAR_STATEMENTS - hit)}")
+    if f["occurrences"] + len(f["excluded_statements"]) != f["_raw_matches"] or sum(f["by_phrase"].values()) != f["occurrences"]:
+        raise SystemExit("gen-who-speaks: fear-not: counted + excluded != raw matches")
+
+
 def measure_stats():
     st = json.load(open(STATE, encoding="utf-8"))
     if st.get("state") != "locked":
@@ -393,6 +441,9 @@ def measure_stats():
         for _v, t in vs:
             raw_w[book] += len(re.findall(r"\S+", t))
     reconcile_stats(data, fig, dict(raw_w), dict(raw_c), struct["chapters"])
+    fear = measure_fear_not(vrows)
+    reconcile_fear_not(fear)
+    data["fear_not"] = {k: v for k, v in fear.items() if not k.startswith("_")}
     bb = io.StringIO()
     w = csv.writer(bb, lineterminator="\n")
     w.writerow(["book", "testament", "chapters", "verses", "words", "longest_chapter", "longest_chapter_words", "read_url"])
@@ -428,7 +479,25 @@ def selftest_stats():
             continue
         print("NOT REFUSED (selftest FAILS):", name)
         sys.exit(1)
-    print("selftest-stats: untouched passes; 4/4 altered copies refused")
+    # 3ad fear-not: a statement read as a command, a named statement gone, and a broken sum must each refuse.
+    base = measure_fear_not([{"book": "Isaiah", "chapter": 41, "verse": 10, "text": "Fear not, for I am with you."},
+                             {"book": "Exodus", "chapter": 9, "verse": 30, "text": "you still do not fear our Father"},
+                             {"book": "Ecclesiastes", "chapter": 8, "verse": 13, "text": "since they do not fear God."},
+                             {"book": "Isaiah", "chapter": 63, "verse": 17, "text": "so that we do not fear you?"},
+                             {"book": "Malachi", "chapter": 3, "verse": 5, "text": "and do not fear me"}])
+    reconcile_fear_not(base)
+    fd = {"unnamed statement ('they do not fear')": measure_fear_not([{"book": "Job", "chapter": 1, "verse": 1, "text": "they do not fear"}]),
+          "named statement missing": dict(base, excluded_statements=base["excluded_statements"][1:]),
+          "sum broken": dict(base, occurrences=base["occurrences"] + 1)}
+    for name, f in fd.items():
+        try:
+            reconcile_fear_not(f)
+        except SystemExit as e:
+            print("REFUSED as required: fear-not", name, "->", str(e)[:90])
+            continue
+        print("NOT REFUSED (selftest FAILS): fear-not", name)
+        sys.exit(1)
+    print("selftest-stats: untouched passes; 4/4 altered copies + 3/3 fear-not defects refused")
 
 
 # ---------------------------------------------------------------- unit 2hi: read the Bible in a year, balanced by words
