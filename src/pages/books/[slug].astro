@@ -222,7 +222,7 @@ const jsonLd = [
 						</div>
 					) : (
 						<div id="order" class="bi__order">
-							<p class="bi__price">{formats.map((f, i) => <>{i ? ' · ' : ''}{f.format} {money(f.list_cents)}</>)}</p>
+							<p class="bi__price">{formats.map((f) => `${f.format} ${money(f.list_cents)}`).join(' · ')}</p>
 							<p class="bi__fine">Ordering on this site opens soon.</p>
 						</div>
 					)}
