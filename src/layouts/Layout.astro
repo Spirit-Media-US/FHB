@@ -7,6 +7,7 @@ import Header from '../chrome/Header.astro';
 import globalNav from '../chrome/nav.generated.json';
 import MailtoLink from '../components/MailtoLink.astro';
 import WelcomeTour from '../components/WelcomeTour.astro';
+import { clampDescription } from '../lib/clamp-description';
 import { ogLocale, ogLocaleAlternates } from '../lib/og-locale';
 import { sanityClient } from '../lib/sanity';
 import '../styles/global.css';
@@ -409,7 +410,7 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		</style>
 
 		<title>{title}</title>
-		<meta name="description" content={description} />
+		<meta name="description" content={clampDescription(description)} />
 		{!noindex && <meta name="robots" content={robotsContent} />}
 		{/* Publisher/imprint AND by-line are both "Spirit Media Publishing" per the Metadata &
 		    Messaging Guidelines — Spirit Media Inc. is the parent company, never the publisher
