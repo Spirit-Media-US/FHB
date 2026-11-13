@@ -27,8 +27,14 @@ import {
 	type FirstStatus,
 	sameOrigin,
 } from '../src/lib/firstOrderGuard.ts';
-import { FIRST_ORDER_CODE, FIRST_ORDER_PCT } from '../src/lib/order-pricing.ts';
-import { checkoutForm, EMAIL_RE, encodeForm, type OrderPayload } from '../src/lib/storeEngine.ts';
+import {
+	checkoutForm,
+	EMAIL_RE,
+	encodeForm,
+	firstOrderPromo,
+	isFirstOrder,
+	type OrderPayload,
+} from '../src/lib/storeEngine.ts';
 
 // The catalogue, prices and sale metadata live in the SMP store engine (plan 3fb Phase 2); re-exported so every
 // existing importer of this file keeps working.
@@ -52,52 +58,6 @@ interface Env {
 // a Customer with this email, means it is not a first order. The session-list email filter is
 // case-sensitive, so the address is tried as typed and lowercased. Any lookup failure answers
 // "not first" — the buyer still gets the volume tier; we never give the offer on a guess.
-async function isFirstOrder(email: string, key: string): Promise<boolean> {
-	const get = async (path: string) => {
-		const r = await fetch(`https://api.stripe.com/v1/${path}`, {
-			headers: { authorization: `Bearer ${key}` },
-		});
-		if (!r.ok) throw new Error(`stripe ${r.status}`);
-		return (await r.json()) as { data: Record<string, unknown>[] };
-	};
-	try {
-		for (const e of new Set([email, email.toLowerCase()])) {
-			const s = await get(
-				`checkout/sessions?status=complete&limit=10&customer_details[email]=${encodeURIComponent(e)}`,
-			);
-			if (s.data.some((x) => x.payment_status === 'paid')) return false;
-		}
-		const c = await get(
-			`customers/search?limit=10&query=${encodeURIComponent(`email:'${email.toLowerCase()}'`)}`,
-		);
-		for (const cust of c.data) {
-			const ch = await get(`charges?limit=10&customer=${cust.id}`);
-			if (ch.data.some((x) => x.paid === true && x.status === 'succeeded')) return false;
-		}
-		return true;
-	} catch {
-		return false;
-	}
-}
-
-/** The live WELCOME15 promotion code, only if its coupon still says FIRST_ORDER_PCT. */
-async function firstOrderPromo(key: string): Promise<string | null> {
-	try {
-		const r = await fetch(
-			`https://api.stripe.com/v1/promotion_codes?active=true&limit=1&code=${FIRST_ORDER_CODE}`,
-			{ headers: { authorization: `Bearer ${key}` } },
-		);
-		if (!r.ok) return null;
-		const d = (await r.json()) as {
-			data: { id: string; coupon?: { percent_off?: number; valid?: boolean } }[];
-		};
-		const p = d.data[0];
-		return p && p.coupon?.valid && p.coupon.percent_off === FIRST_ORDER_PCT ? p.id : null;
-	} catch {
-		return null;
-	}
-}
-
 // ── 3ef-1 (pmseoaeo 2026-11-13; evidence aeo-state/checkout-expiry-3ef-20261113.json) ──────────────────────────────
 // The browser's checkout_start beacon counted 3 starts on days Stripe created 13 sessions: 57 of 94 expired sessions
 // were scripted bursts, probes or tests, and 20 POSTs that died with a 502 left no trace at all. Every POST that is

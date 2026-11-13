@@ -1405,6 +1405,54 @@ export function encodeForm(obj: Record<string, string | number>): string {
 		.join('&');
 }
 
+// The Stripe-backed first-order lookups (moved verbatim from functions/dvc-checkout.ts, Phase 3: one copy for
+// every checkout that uses the engine). Read-only GETs against the store's Stripe account.
+export async function isFirstOrder(email: string, key: string): Promise<boolean> {
+	const get = async (path: string) => {
+		const r = await fetch(`https://api.stripe.com/v1/${path}`, {
+			headers: { authorization: `Bearer ${key}` },
+		});
+		if (!r.ok) throw new Error(`stripe ${r.status}`);
+		return (await r.json()) as { data: Record<string, unknown>[] };
+	};
+	try {
+		for (const e of new Set([email, email.toLowerCase()])) {
+			const s = await get(
+				`checkout/sessions?status=complete&limit=10&customer_details[email]=${encodeURIComponent(e)}`,
+			);
+			if (s.data.some((x) => x.payment_status === 'paid')) return false;
+		}
+		const c = await get(
+			`customers/search?limit=10&query=${encodeURIComponent(`email:'${email.toLowerCase()}'`)}`,
+		);
+		for (const cust of c.data) {
+			const ch = await get(`charges?limit=10&customer=${cust.id}`);
+			if (ch.data.some((x) => x.paid === true && x.status === 'succeeded')) return false;
+		}
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+/** The live WELCOME15 promotion code, only if its coupon still says FIRST_ORDER_PCT. */
+export async function firstOrderPromo(key: string): Promise<string | null> {
+	try {
+		const r = await fetch(
+			`https://api.stripe.com/v1/promotion_codes?active=true&limit=1&code=${FIRST_ORDER_CODE}`,
+			{ headers: { authorization: `Bearer ${key}` } },
+		);
+		if (!r.ok) return null;
+		const d = (await r.json()) as {
+			data: { id: string; coupon?: { percent_off?: number; valid?: boolean } }[];
+		};
+		const p = d.data[0];
+		return p && p.coupon?.valid && p.coupon.percent_off === FIRST_ORDER_PCT ? p.id : null;
+	} catch {
+		return null;
+	}
+}
+
 /** What the order form posts. */
 export type OrderPayload = {
 	counts?: Record<string, number>;
@@ -1612,9 +1660,12 @@ export async function checkoutForm(
 			? `${origin}${payload.returnPath}?order=canceled#order`
 			: payload.returnPath === '/print/order/'
 				? `${origin}/print/order/?order=canceled`
-				: /^\/books\/[a-z0-9-]+\/$/.test(String(payload.returnPath ?? '')) &&
+				: /^\/books\/[a-z0-9-]+\/(buy\/)?$/.test(String(payload.returnPath ?? '')) &&
 						(booksCatalog.books as { slug: string }[]).some(
-							(b) => payload.returnPath === `/books/${b.slug}/`,
+							// the book page, or its SMP checkout page /books/<slug>/buy/ (plan 3fb Phase 3)
+							(b) =>
+								payload.returnPath === `/books/${b.slug}/` ||
+								payload.returnPath === `/books/${b.slug}/buy/`,
 						)
 					? `${origin}${payload.returnPath}?order=canceled#order`
 					: `${origin}/print/?order=canceled#bulk-order`,
