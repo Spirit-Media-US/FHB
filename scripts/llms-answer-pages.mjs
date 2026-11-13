@@ -217,11 +217,26 @@ export function collect(root = process.cwd()) {
 	return groups;
 }
 
-export function render(groups) {
+// 3bo (pmseoaeo 2026-11-13): llms.txt sat at 69,995 of its 70,000-byte cap (the test below), so the next listed page
+// would fail the build. llms.txt is the INDEX: each answer-page description is cut to LLMS_TXT_DESC_MAX characters on
+// a word boundary. llms-full.txt keeps every description whole. renderFor() is the one place both files and the
+// tests take their block from, so the size test measures exactly what the build writes.
+export const LLMS_TXT_DESC_MAX = 120;
+function clip(s, max) {
+	if (!max || [...s].length <= max) return s;
+	const cut = [...s].slice(0, max - 1).join('');
+	const sp = cut.lastIndexOf(' ');
+	return `${(sp > max * 0.6 ? cut.slice(0, sp) : cut).replace(/[\s,;:—-]+$/, '')}…`;
+}
+export function renderFor(file, groups) {
+	return render(groups, /(^|\/)llms\.txt$/.test(file) ? LLMS_TXT_DESC_MAX : 0);
+}
+
+export function render(groups, maxDesc = 0) {
 	const out = [BEGIN, '## Answer pages (every page, generated from the site on each build)', ''];
 	for (const g of groups) {
 		out.push(`### ${g.label}`, '');
-		for (const e of g.entries) out.push(`- ${e.url} — ${e.title}${e.description ? `. ${e.description}` : ''}`);
+		for (const e of g.entries) out.push(`- ${e.url} — ${e.title}${e.description ? `. ${clip(e.description, maxDesc)}` : ''}`);
 		out.push('');
 	}
 	out.push(END);
@@ -242,12 +257,11 @@ export function apply(text, block) {
 
 export function generate(root = process.cwd()) {
 	const groups = collect(root);
-	const block = render(groups);
 	const res = {};
 	for (const name of ['llms.txt', 'llms-full.txt']) {
 		const f = path.resolve(root, 'public', name);
 		const cur = fs.readFileSync(f, 'utf8');
-		const next = apply(cur, block);
+		const next = apply(cur, renderFor(name, groups));
 		if (next !== cur) fs.writeFileSync(f, next);
 		res[name] = groups.reduce((n, g) => n + g.entries.length, 0);
 	}

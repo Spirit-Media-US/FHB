@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { collect, TYPES, render, apply } from './llms-answer-pages.mjs';
+import { collect, TYPES, render, renderFor, apply, LLMS_TXT_DESC_MAX } from './llms-answer-pages.mjs';
 
 const groups = collect();
 const all = groups.flatMap((g) => g.entries);
@@ -41,7 +41,7 @@ test('every src/pages folder of a covered type is registered', () => {
 });
 
 // ---- 2sq (2026-11-11): SITEMAP PARITY. Every marketing page is in the generated llms.txt or EXEMPT with a reason. ----
-const generated = apply(fs.readFileSync('public/llms.txt', 'utf8'), render(groups));
+const generated = apply(fs.readFileSync('public/llms.txt', 'utf8'), renderFor('public/llms.txt', groups));
 // url -> reason. Only pages a visitor/AI engine would not look for in an answer index, or noindex/legal boilerplate.
 export const PAGE_EXEMPT = {
 	'/404/': 'error page, not in the sitemap',
@@ -104,6 +104,21 @@ test('every /bibles edition page is in llms.txt (hand-written audience list or g
 test('generated llms.txt stays under 70 KB', () => {
 	assert.ok(Buffer.byteLength(generated) < 70000, `llms.txt would be ${Buffer.byteLength(generated)} bytes`);
 });
+// 3bo: llms.txt descriptions are cut to LLMS_TXT_DESC_MAX; llms-full.txt keeps them whole (failure path: an uncut
+// description in llms.txt, or a cut one in llms-full.txt, fails here).
+test('llms.txt descriptions are capped, llms-full.txt descriptions are whole', () => {
+	const long = all.filter((e) => e.description && [...e.description].length > LLMS_TXT_DESC_MAX);
+	assert.ok(long.length > 0, 'fixture: some answer page has a long description');
+	const idx = renderFor('public/llms.txt', groups), full = renderFor('public/llms-full.txt', groups);
+	for (const e of long) {
+		assert.ok(!idx.includes(e.description), `${e.url}: full description still in llms.txt`);
+		assert.ok(full.includes(e.description), `${e.url}: description cut in llms-full.txt`);
+	}
+	for (const l of idx.split('\n').filter((x) => x.startsWith('- '))) {
+		const d = l.split(' — ').slice(1).join(' — ').split('. ').slice(1).join('. ');
+		assert.ok([...d].length <= LLMS_TXT_DESC_MAX, `over cap: ${l.slice(0, 80)}`);
+	}
+});
 
 // 2hm (2026-11-01): these assert on GENERATOR OUTPUT (apply(committed file, render(groups)) is exactly what
 // the build writes), NOT on the committed file's current contents. The committed public/llms*.txt are refreshed
@@ -111,7 +126,7 @@ test('generated llms.txt stays under 70 KB', () => {
 // failure), so a test on the committed copy fails on every clean dev checkout whenever a page merges.
 for (const file of ['public/llms.txt', 'public/llms-full.txt']) {
 	test(`generator output for ${file} lists every answer page`, () => {
-		const text = apply(fs.readFileSync(file, 'utf8'), render(groups));
+		const text = apply(fs.readFileSync(file, 'utf8'), renderFor(file, groups));
 		const missing = all.filter((e) => !text.includes(`- ${e.url} `)).map((e) => e.url);
 		assert.deepEqual(missing, [], `${missing.length} answer page(s) missing from generated ${file}: ${missing.join(', ')}`);
 	});
