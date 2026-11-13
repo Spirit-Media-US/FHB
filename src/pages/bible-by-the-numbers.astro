@@ -34,6 +34,7 @@ const wept: any = verseShortTies.find(
 );
 const bookLong = X.book_by_words.longest[0];
 const bookShort = X.book_by_words.shortest[0];
+const psalms: any = data.books.find((b: any) => b.book === 'Psalms');
 const oneChapter: any[] = X.book_by_chapters.shortest;
 const skippedN = data.skipped_numbers.reduce((a: number, s: any) => a + s.numbers.length, 0);
 const TRADITIONAL = 31102;
@@ -73,6 +74,11 @@ const FAQS = [
 	{
 		q: 'What is the longest book of the Bible, and the shortest?',
 		a: `${bookLong.book} is longest on every measure: ${bookLong.chapters} chapters, ${N(bookLong.verses)} verses, ${N(bookLong.words)} words. The shortest by verses and words is ${bookShort.book} (${bookShort.verses} verses, ${bookShort.words} words). ${oneChapter.map((b: any) => b.book).join(', ')} are the books with a single chapter.`,
+	},
+	{
+		// 3ad: counted from the same locked data (books[] row), no Scripture retyped.
+		q: 'How many psalms are in the Bible?',
+		a: `There are ${psalms.chapters} psalms: the book of Psalms has ${psalms.chapters} chapters, one psalm each, with ${N(psalms.verses)} verses and ${N(psalms.words)} words in Father’s Heart Bible. The longest is Psalm ${psalms.longest_chapter} (${N(psalms.longest_chapter_words)} words).`,
 	},
 	{
 		q: 'Can I use these numbers?',
