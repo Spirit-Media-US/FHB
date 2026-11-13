@@ -310,3 +310,17 @@ test('every live book page has its order form ON the page: per-format price line
 	assert.match(src, /https:\/\/spiritmediapublishing\.com'/, 'production orders on the SMP store');
 	assert.match(src, /\/store-checkout`/, 'posts to SMP /store-checkout');
 });
+
+// The on-page book form calls the SMP store cross-origin; the CSP must allow it on /books/* and ONLY there
+// (2026-11-13: the first live test was blocked by the site-wide connect-src).
+test('CSP: /books/* may connect to the SMP store; the site-wide policy may not', () => {
+	const h = fs.readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
+	const blocks = Object.fromEntries(
+		h.split(/\n(?=\S)/).map((b) => [b.split('\n')[0].trim(), b]),
+	);
+	const connect = (b) => (b.match(/connect-src([^;]*)/) ?? [, ''])[1];
+	assert.ok(blocks['/books/*'], '/books/* block exists');
+	assert.match(blocks['/books/*'], /! Content-Security-Policy/);
+	assert.match(connect(blocks['/books/*']), /https:\/\/spiritmediapublishing\.com/);
+	assert.doesNotMatch(connect(blocks['/*']), /https:\/\/spiritmediapublishing\.com|spirit-media-publishing\.pages\.dev/);
+});
