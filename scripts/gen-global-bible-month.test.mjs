@@ -1,7 +1,7 @@
 // node --test scripts/gen-global-bible-month.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildRows, render, parseCommitted } from './gen-global-bible-month.mjs';
+import { buildRows, render, parseCommitted, parseCommittedDates } from './gen-global-bible-month.mjs';
 
 const st = (o) => ({ public_day: '2026-11-02', name: 'Chichewa', code: 'ny', code_confirmed: true, public: true, ...o });
 const yes = async () => true;
@@ -45,4 +45,13 @@ test('render/parse round trip', async () => {
 	const { rows } = await buildRows([st({})], {}, yes);
 	const text = render('// h\n', rows);
 	assert.deepEqual(parseCommitted(text), { ny: 'readable' });
+});
+
+test('a state row without public_day keeps the committed date, and never writes undefined', async () => {
+	const text = "\t{\n\t\tdate: 'Nov 4',\n\t\tname: 'Chichewa',\n\t\tcode: 'ny',\n\t\tstatus: 'readable',\n\t},\n";
+	const dates = parseCommittedDates(text);
+	assert.deepEqual(dates, { Chichewa: 'Nov 4' });
+	const { rows } = await buildRows([{ name: 'Chichewa', code: 'ny', code_confirmed: true, public: true }], { ny: 'readable' }, no, dates);
+	assert.equal(rows[0].date, 'Nov 4');
+	await assert.rejects(buildRows([{ name: 'Nowhere', code: 'xx', code_confirmed: true }], {}, no, dates), /no date for Nowhere/);
 });
