@@ -73,6 +73,18 @@ export const VERSE_TOPICS: VerseTopic[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/60c23b6e3673d0eaa80c7c7883e4670368ee8f32-6016x4016.jpg',
 	},
 	{
+		slug: 'new-beginnings',
+		title: 'Bible Verses About New Beginnings',
+		blurb: 'A new heart, new mercies every morning, and a blessing for the year ahead.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg',
+	},
+	{
+		slug: 'lent',
+		title: 'Ash Wednesday and Lent Bible Verses',
+		blurb: 'Returning to our Father, fasting in secret, the wilderness and the road to the cross.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/13aa1dad19131ca6a30fc703cc787aeda97adc73-3504x2336.jpg',
+	},
+	{
 		slug: 'advent',
 		title: 'Advent Scripture Readings',
 		blurb: 'The light, the promise and the coming of our Father near, from Isaiah 9 to Luke 2.',
