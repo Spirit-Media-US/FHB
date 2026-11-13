@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { collect, TYPES, render, renderFor, apply, LLMS_TXT_DESC_MAX } from './llms-answer-pages.mjs';
+import { collect, TYPES, render, renderFor, apply, clip, LLMS_TXT_DESC_MAX } from './llms-answer-pages.mjs';
 
 const groups = collect();
 const all = groups.flatMap((g) => g.entries);
@@ -168,4 +168,26 @@ test('original-data pages and their 6 CSVs are listed, with the page title and d
 	const out = render(groups);
 	assert.equal((out.match(/- \/names-of-god-the-father\/ /g) || []).length, 1);
 	assert.equal((out.match(/\.csv /g) || []).length, 6);
+});
+
+// 3cn: a clipped llms.txt line never ends on a stop word or a bare "(FHB)", and a title ending in "?" is not
+// followed by ".". Checked on every real line the build writes, plus fixtures that prove each check fires.
+const STOP_END = /\b(a|an|and|as|at|by|for|from|in|into|is|its|of|on|or|our|reveals|that|the|their|to|with|your)…$|\(FHB\)…$/i;
+test('clipped llms.txt descriptions never end on a stop word or bare (FHB)', () => {
+	const lines = renderFor('public/llms.txt', groups).split('\n').filter((l) => l.endsWith('…'));
+	const bad = lines.filter((l) => STOP_END.test(l));
+	assert.deepEqual(bad, [], `${bad.length} line(s) end on a stop word`);
+	assert.ok(STOP_END.test('x and…') && STOP_END.test('x (FHB)…'), 'the check itself must fire');
+});
+test('no "?." / "!." after a title', () => {
+	const txt = renderFor('public/llms.txt', groups) + renderFor('public/llms-full.txt', groups);
+	assert.equal((txt.match(/[?!]\. /g) || []).length, 0);
+	const one = render([{ label: 'T', entries: [{ url: '/meaning/x/', title: 'What is reproof in the Bible?', description: 'D' }] }]);
+	assert.ok(one.includes('Bible? D') && !one.includes('Bible?.'));
+});
+test('clip prefers a sentence end, then a clause, and drops trailing stop words', () => {
+	assert.equal(clip('One full sentence here that is long enough. Then a second sentence that runs on and on.', 60), 'One full sentence here that is long enough.');
+	assert.equal(clip('Words words words words words words words words and the rest of it keeps going on', 50).endsWith('…'), true);
+	assert.ok(!/\b(and|the)…$/.test(clip('Words words words words words words words words and the rest of it keeps going on', 50)));
+	assert.ok(!/\(FHB\)…$/.test(clip('Read the whole Father heart Bible translation online free today (FHB) with audio and more', 64)));
 });
