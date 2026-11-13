@@ -1,5 +1,6 @@
 ---
 import BiblesBooksToggle from '../../components/BiblesBooksToggle.astro';
+import BookOrder from '../../components/BookOrder.astro';
 // /books/<slug>/ — one page per Father Heart book (Kevin 2026-11-13, kevin-decisions L1959: "each book needs to be
 // treated like each bible edition given it's own page and easy check out ... declare who this book is for ... full
 // details and look inside"). DATA-DRIVEN: every fact and every sentence comes from src/data/books.json (sourced from
@@ -221,20 +222,18 @@ const jsonLd = [
 						<p class="bi__facts">{f.format} · {f.pages} pages · {f.trim} · ISBN {f.isbn_display}</p>
 					))}
 
-					<div style="margin-top: 1.4rem;"><BiblesBooksToggle current="books" /></div>
 					{live ? (
-						// SMP STORE (Kevin 2026-11-13 "SMP is the engine", L1990; contract 3fe): a Father Heart book is bought
-						// on its SMP checkout page. A plain followed link with utm, never a cross-origin call from this page.
-						<div id="order" class="bi__order">
-							<p class="bi__price">{formats.map((f) => `${f.format} ${money(f.list_cents)}`).join(' · ')} <span>per copy · free shipping in the United States</span></p>
-							<a class="bi__btn bi__btn--link" href={`https://spiritmediapublishing.com/books/${book.slug}/buy/?utm_source=fathersheartbible.com&utm_medium=referral&utm_campaign=buy-button&utm_content=book-page`}>Order now</a>
-							<p class="bi__fine"><a href="/returns/">Your purchase is guaranteed</a> · Printed and shipped to you by our printer, IngramSpark.</p>
-						</div>
+						// THE ORDER FORM ON THE PAGE (Kevin 2026-11-13 ~22:53Z, L1999: "put the order form on the page" like
+						// /bibles/grandparents-bible/). It orders on the SMP store (L1990 "SMP is the engine"; contract 3fe).
+						<BookOrder slug={book.slug} title={book.title} formats={formats} />
 					) : (
-						<div id="order" class="bi__order">
-							<p class="bi__price">{formats.map((f) => `${f.format} ${money(f.list_cents)}`).join(' · ')}</p>
-							<p class="bi__fine">Ordering on this site opens soon.</p>
-						</div>
+						<>
+							<div style="margin-top: 1.4rem;"><BiblesBooksToggle current="books" /></div>
+							<div id="order" class="bi__order">
+								{formats.map((f) => <p class="bi__price">{f.format} {money(f.list_cents)}</p>)}
+								<p class="bi__fine">Ordering on this site opens soon.</p>
+							</div>
+						</>
 					)}
 				</div>
 			</div>

@@ -1,0 +1,298 @@
+---
+/* THE ORDER FORM ON A FATHER HEART BOOK PAGE (/books/<slug>/), anchored #order.
+ *
+ * Kevin 2026-11-13 ~22:53Z (kevin-decisions L1999): "/books/who-am-i/ - no. Look at
+ * https://fathersheartbible.com/bibles/grandparents-bible/ put the order form on the page. This doesn't look best:
+ * Paperback $15.99 · Hardback $24.99 per copy · free shipping in the United States -- Make sure all new pages look
+ * best in mobile as most users use mobile."
+ *
+ * So this is the edition order card (EditionOrder.astro) in the book's terms: the same card, eyebrow, title, one
+ * price per line, the same pill counters and the same pink Checkout. What differs is commerce, and none of it is
+ * invented here: books take NO first-order 15% and NO volume ladder (every book is discount-exempt in the store
+ * engine), so there is no struck price and no tier line. Per-country handling and the far-band bulk-quote rule are
+ * the checkout's own (marginGuard.ts / farBand.ts), passed in by the page.
+ *
+ * The order is placed on the SMP store (Kevin L1990 "SMP is the engine"; contract 3fe): the form POSTs to SMP's
+ * /store-checkout, which allowlists this origin, records site=fhb, and returns the buyer here (cancel) or to this
+ * site's /order (paid). The server prices every order; the total shown is only the same arithmetic.
+ */
+import { BULK_QUOTE_COPY } from '../lib/farBand';
+import BiblesBooksToggle from './BiblesBooksToggle.astro';
+
+type Dest = { code: string; name: string; far: boolean; fee: number; label: string };
+interface Props {
+	slug: string;
+	title: string;
+	formats: { sku: string; format: string; list_cents: number; dests: Dest[] }[];
+}
+const { slug, title, formats } = Astro.props;
+const money = (c: number) => `$${(c / 100).toFixed(2)}`;
+// a country is offered only when EVERY format can ship there (US always)
+const countries = formats[0].dests
+	.filter((d) => formats.every((f) => f.dests.some((x) => x.code === d.code)))
+	.map((d) => ({ code: d.code, name: d.name, far: d.far, label: d.label }));
+const abroad = countries.filter((c) => c.code !== 'US');
+const config = JSON.stringify({
+	slug,
+	formats: formats.map((f) => ({
+		sku: f.sku,
+		format: f.format,
+		list: f.list_cents,
+		fee: Object.fromEntries(f.dests.map((d) => [d.code, d.fee])),
+	})),
+	far: countries.filter((c) => c.far).map((c) => c.code),
+	label: Object.fromEntries(countries.map((c) => [c.code, c.label])),
+	quote: BULK_QUOTE_COPY.error,
+	returnPath: `/books/${slug}/`,
+});
+---
+<div id="order" class="bko" data-book-order={config}>
+	<BiblesBooksToggle current="books" />
+	<p class="bko__eyebrow">Order direct · free US shipping</p>
+	<h2 class="bko__title">Order {title}</h2>
+	<div class="bko__prices">
+		{formats.map((f) => (
+			<p class="bko__price" data-line-sku={f.sku}><span>{f.format}</span> <b>{money(f.list_cents)}</b> <span class="bko__fee" data-fee-sku={f.sku} hidden></span></p>
+		))}
+		<p class="bko__note">Free shipping in the United States</p>
+		<p class="bko__note"><a href="/returns/">Your purchase is guaranteed</a></p>
+		{abroad.length > 0 && (
+			<details class="bko__note bko__ships">
+				<summary>Also ships to {abroad.length} more countries · details</summary>
+				<p>{abroad.map((c) => c.name).join(', ')}. Outside the United States a handling fee per copy is added for your country and shown here before you check out.</p>
+			</details>
+		)}
+	</div>
+	<div class="bko__qty">
+		{formats.map((f) => (
+			<div class="bko__row">
+				<span class="bko__label">{f.format} <b>{money(f.list_cents)}</b></span>
+				<div class="bko__ctl">
+					<button type="button" class="bko__step" data-sku={f.sku} data-dir="-1" aria-label={`Fewer ${title} ${f.format}`}>−</button>
+					<input type="number" class="bko__in" data-sku={f.sku} value={formats.length === 1 ? '1' : '0'} min="0" max="99" step="1" inputmode="numeric" aria-label={`${title} ${f.format} quantity`} />
+					<button type="button" class="bko__step" data-sku={f.sku} data-dir="1" aria-label={`More ${title} ${f.format}`}>+</button>
+				</div>
+			</div>
+		))}
+	</div>
+	<div class="bko__foot">
+		<dl class="bko__lines">
+			<div><dt data-copies>0 copies</dt><dd data-sub>$0.00</dd></div>
+			<div data-fee-line hidden><dt data-fee-label>Handling</dt><dd data-fee-total>$0.00</dd></div>
+			<div class="bko__total"><dt>Total</dt><dd data-total>$0.00</dd></div>
+		</dl>
+		<p class="bko__fine">Tax calculated at checkout. Printed and shipped to you by our printer, IngramSpark.</p>
+		<label class="bko__lbl" for={`bko-country-${slug}`}>Ship to</label>
+		<select id={`bko-country-${slug}`} class="bko__select" data-country>
+			{countries.map((c) => <option value={c.code} selected={c.code === 'US'}>{c.name}</option>)}
+		</select>
+		<button type="button" class="bko__checkout" data-checkout>Checkout →</button>
+		<p class="bko__msg" data-msg role="status" hidden></p>
+	</div>
+</div>
+
+<style>
+	.bko {
+		max-width: 34rem;
+		margin: 1.6rem 0 0;
+		padding: 1.25rem 1.25rem 1.1rem;
+		background: #fff;
+		border: 1px solid var(--color-hairline);
+		border-radius: 1rem;
+		scroll-margin-top: 90px;
+		font-family: var(--font-sans);
+		color: var(--color-ink);
+	}
+	.bko__eyebrow {
+		color: #71717a;
+		font-size: 0.72rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		margin: 1rem 0 0.25rem;
+	}
+	.bko__title { font-family: var(--font-headline); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.9rem; }
+	.bko__prices { margin: 0 0 1rem; }
+	.bko__price { margin: 0 0 0.15rem; font-size: 1.05rem; }
+	.bko__price > span:first-child { font-weight: 600; }
+	.bko__price b { font-weight: 800; }
+	.bko__fee { color: #3f3f46; font-size: 0.9rem; font-weight: 600; }
+	.bko__fee[hidden] { display: none; }
+	.bko__note { margin: 0.35rem 0 0; color: #3f3f46; font-size: 0.85rem; font-weight: 600; }
+	.bko__note a { text-decoration: underline; text-underline-offset: 3px; }
+	.bko__ships summary { cursor: pointer; }
+	.bko__ships p { margin: 0.4rem 0 0; font-weight: 400; line-height: 1.5; }
+	.bko__qty { display: flex; gap: 0.75rem; }
+	.bko__row { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+	.bko__label { font-size: 0.85rem; color: var(--color-muted); }
+	.bko__label b { color: var(--color-ink); font-weight: 700; }
+	.bko__ctl { display: flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden; }
+	.bko__step {
+		width: 44px;
+		height: 44px;
+		flex-shrink: 0;
+		border: 0;
+		background: var(--color-primary-fixed, #ffd9e0);
+		color: var(--color-ink);
+		font-size: 1.15rem;
+		cursor: pointer;
+	}
+	.bko__in {
+		flex: 1 1 auto;
+		min-width: 0;
+		height: 44px;
+		text-align: center;
+		border: 0;
+		background: #fff;
+		font: inherit;
+		font-size: 1rem;
+		color: var(--color-ink);
+		-moz-appearance: textfield;
+	}
+	.bko__in::-webkit-outer-spin-button,
+	.bko__in::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+	.bko__foot { margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--color-hairline); }
+	.bko__lines { margin: 0; }
+	.bko__lines > div { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.9rem; line-height: 1.7; }
+	.bko__lines > div[hidden] { display: none; }
+	.bko__lines dt, .bko__lines dd { margin: 0; }
+	.bko__total { font-weight: 700; }
+	.bko__total dd { font-family: var(--font-headline); font-size: 1.5rem; line-height: 1.3; }
+	.bko__fine { color: var(--color-muted); font-size: 0.78rem; margin: 0.2rem 0 0; }
+	.bko__lbl { display: block; font-size: 0.85rem; font-weight: 600; margin: 0.9rem 0 0.3rem; }
+	.bko__select {
+		box-sizing: border-box;
+		width: 100%;
+		min-height: 44px;
+		padding: 0.55rem 0.8rem;
+		border: 1.5px solid var(--color-hairline);
+		border-radius: 0.6rem;
+		font: inherit;
+		font-size: 1rem;
+		background: #fff;
+	}
+	/* the same pink Checkout as every edition order form (Kevin 2026-09-17, B1) */
+	.bko__checkout {
+		width: 100%;
+		margin-top: 0.75rem;
+		min-height: 48px;
+		padding: 0.7rem 1.8rem;
+		border-radius: 999px;
+		background: var(--color-primary, #b60057);
+		color: #fff;
+		border: 2px solid var(--color-primary, #b60057);
+		font-weight: 600;
+		font-size: 1rem;
+		cursor: pointer;
+	}
+	.bko__checkout:disabled { opacity: 0.6; cursor: wait; }
+	.bko__msg { color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0.6rem 0 0; }
+	.bko__msg[hidden] { display: none; }
+	@media (max-width: 640px) {
+		.bko { padding: 1rem 0.9rem 0.95rem; margin-left: auto; margin-right: auto; }
+	}
+</style>
+
+<script>
+	// SMP is the store (contract 3fe). Production FHB orders on spiritmediapublishing.com; any FHB preview
+	// (*.fathersheartbible.pages.dev) orders on the SMP store PREVIEW so a test never touches production.
+	const STORE =
+		location.hostname.endsWith('.pages.dev') && location.hostname !== 'fathersheartbible.pages.dev'
+			? 'https://feat-smp-store.spirit-media-publishing.pages.dev'
+			: 'https://spiritmediapublishing.com';
+	for (const root of document.querySelectorAll<HTMLElement>('[data-book-order]')) {
+		const cfg = JSON.parse(root.dataset.bookOrder ?? '{}') as {
+			slug: string;
+			formats: { sku: string; format: string; list: number; fee: Record<string, number> }[];
+			far: string[];
+			label: Record<string, string>;
+			quote: string;
+			returnPath: string;
+		};
+		const $ = <T extends Element>(s: string) => root.querySelector<T>(s) as T;
+		const inputs = [...root.querySelectorAll<HTMLInputElement>('.bko__in')];
+		const sel = $<HTMLSelectElement>('[data-country]');
+		const btn = $<HTMLButtonElement>('[data-checkout]');
+		const msg = $<HTMLElement>('[data-msg]');
+		const money = (c: number) => `$${(c / 100).toFixed(2)}`;
+		const qty = (sku: string) => {
+			const i = inputs.find((x) => x.dataset.sku === sku);
+			return Math.max(0, Math.min(99, Math.floor(Number(i?.value) || 0)));
+		};
+		const say = (t: string) => {
+			msg.textContent = t;
+			msg.hidden = !t;
+		};
+		function render() {
+			const c = sel.value;
+			let n = 0;
+			let sub = 0;
+			let fees = 0;
+			for (const f of cfg.formats) {
+				const q = qty(f.sku);
+				const fee = c === 'US' ? 0 : (f.fee[c] ?? 0);
+				n += q;
+				sub += q * f.list;
+				fees += q * fee;
+				const el = root.querySelector<HTMLElement>(`[data-fee-sku="${f.sku}"]`);
+				if (el) {
+					el.hidden = fee <= 0;
+					el.textContent = fee > 0 ? `+ ${money(fee)} ${(cfg.label[c] || 'handling').toLowerCase()}` : '';
+				}
+			}
+			$<HTMLElement>('[data-copies]').textContent = `${n} ${n === 1 ? 'copy' : 'copies'}`;
+			$<HTMLElement>('[data-sub]').textContent = money(sub);
+			const feeLine = $<HTMLElement>('[data-fee-line]');
+			feeLine.hidden = fees <= 0;
+			$<HTMLElement>('[data-fee-label]').textContent = `${cfg.label[c] || 'Handling'} (${sel.selectedOptions[0]?.textContent ?? c})`;
+			$<HTMLElement>('[data-fee-total]').textContent = money(fees);
+			$<HTMLElement>('[data-total]').textContent = money(sub + fees);
+		}
+		for (const b of root.querySelectorAll<HTMLButtonElement>('.bko__step')) {
+			b.addEventListener('click', () => {
+				const i = inputs.find((x) => x.dataset.sku === b.dataset.sku);
+				if (!i) return;
+				i.value = String(Math.max(0, Math.min(99, qty(b.dataset.sku ?? '') + Number(b.dataset.dir))));
+				say('');
+				render();
+			});
+		}
+		for (const i of inputs) i.addEventListener('input', render);
+		sel.addEventListener('change', render);
+		render();
+		btn.addEventListener('click', async () => {
+			const counts = Object.fromEntries(cfg.formats.map((f) => [f.sku, qty(f.sku)]).filter(([, n]) => Number(n) > 0));
+			const total = Object.values(counts).reduce((a, b) => a + Number(b), 0);
+			if (!total) return say('Choose at least one copy.');
+			if (cfg.far.includes(sel.value) && total >= 10) return say(cfg.quote);
+			say('Opening secure checkout…');
+			btn.disabled = true;
+			(window as unknown as { gtag?: (...a: unknown[]) => void }).gtag?.('event', 'begin_checkout', {
+				currency: 'USD',
+				items: Object.entries(counts).map(([id, quantity]) => ({ item_id: id, quantity })),
+			});
+			try {
+				const res = await fetch(`${STORE}/store-checkout`, {
+					method: 'POST',
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify({
+						counts,
+						country: sel.value,
+						returnPath: cfg.returnPath,
+						site: 'fhb',
+						utm: { source: 'fathersheartbible.com', medium: 'referral', campaign: 'book-order-form', content: cfg.slug },
+					}),
+				});
+				const d = (await res.json()) as { url?: string; disabled?: boolean; message?: string };
+				if (d.url) {
+					window.location.href = d.url;
+					return;
+				}
+				say(d.disabled ? 'Checkout is not open yet.' : (d.message ?? 'Something went wrong. Please try again.'));
+			} catch {
+				say('Something went wrong. Please try again.');
+			}
+			btn.disabled = false;
+		});
+	}
+</script>

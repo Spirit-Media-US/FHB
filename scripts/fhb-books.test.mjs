@@ -292,16 +292,21 @@ test('3es F1/F3: Who Am I? title + offers InStock + no future datePublished', ()
 		assert.ok(new Date(d) <= new Date(), `future datePublished ${d}`);
 });
 
-// SMP STORE (Kevin 2026-11-13 L1990 "transfer the store"; contract 3fe): a Father Heart book is bought on its SMP
-// checkout page. The FHB book page links there (followed, utm-tagged) and never calls a checkout itself.
-test('SMP store: every live book page Orders via spiritmediapublishing.com/books/<slug>/buy/ with utm, no on-page checkout', () => {
+// ORDER FORM ON THE PAGE (Kevin 2026-11-13 ~22:53Z L1999, "put the order form on the page" like
+// /bibles/grandparents-bible/), ordering on the SMP store (L1990; contract 3fe). Every live book page carries the
+// #order card with one price line and one counter per format, no one-line "per copy" price, and no off-site link.
+test('every live book page has its order form ON the page: per-format price lines + counters, posting to SMP', () => {
 	for (const slug of ['beloved-identity', 'who-am-i']) {
 		const html = fs.readFileSync(new URL(`../dist/books/${slug}/index.html`, import.meta.url), 'utf8');
-		const want = `href="https://spiritmediapublishing.com/books/${slug}/buy/?utm_source=fathersheartbible.com&utm_medium=referral&utm_campaign=buy-button&utm_content=book-page"`;
-		assert.ok(
-			html.includes(want) || html.includes(want.replaceAll('&', '&amp;')),
-			`${slug}: Order now must link to its SMP buy page`,
-		);
-		assert.doesNotMatch(html, /data-bi=|data-order-btn/, `${slug}: no on-page checkout widget`);
+		assert.match(html, /id="order"[^>]*data-book-order=/, `${slug}: order card on the page`);
+		const lines = [...html.matchAll(/data-line-sku="([a-z0-9-]+)"/g)].map((m) => m[1]);
+		const counters = new Set([...html.matchAll(/class="bko__in"[^>]*data-sku="([a-z0-9-]+)"/g)].map((m) => m[1]));
+		assert.ok(lines.length >= 1, `${slug}: a price line per format`);
+		for (const sku of lines) assert.ok(counters.has(sku), `${slug}: ${sku} has a counter`);
+		assert.doesNotMatch(html, /per copy · free shipping in the United States/, `${slug}: the rejected one-line price`);
+		assert.doesNotMatch(html, /spiritmediapublishing\.com\/books\/[a-z0-9-]+\/buy\//, `${slug}: no hand-off to the SMP buy page`);
 	}
+	const src = fs.readFileSync(new URL('../src/components/BookOrder.astro', import.meta.url), 'utf8');
+	assert.match(src, /https:\/\/spiritmediapublishing\.com'/, 'production orders on the SMP store');
+	assert.match(src, /\/store-checkout`/, 'posts to SMP /store-checkout');
 });
