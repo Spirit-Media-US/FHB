@@ -1,5 +1,6 @@
 import bookSkus from '../src/data/book-skus.json' with { type: 'json' };
 import booksCatalog from '../src/data/books.json' with { type: 'json' };
+import isbnList from '../src/data/isbn-list.json' with { type: 'json' };
 // /dvc-checkout — Divine Voice Color print orders (Cloudflare Pages Function).
 //
 //   POST /dvc-checkout  { counts: { teen: 2, dads: 1, journaling: 1, … } }
@@ -43,6 +44,7 @@ import {
 	FIRST_ORDER_PCT,
 	isDiscountExempt,
 	MAX_LINE_ITEMS,
+	META_VALUE_MAX,
 	packBreakdown,
 	paidUnit,
 } from '../src/lib/order-pricing.ts';
@@ -1247,6 +1249,115 @@ export function bookSaleMetadata(
 	return out;
 }
 
+// 3ee-1 (pmseoaeo 2026-11-13): BIBLE sales carry the same fields as book sales. ISBNs come from
+// src/data/isbn-list.json, GENERATED from the publisher's ISBN master (projects/fhb-isbn-list/build.py); nothing
+// is typed here. Server-only on purpose: order-pricing.ts is in the browser bundle and this table is not.
+type IsbnPair = { hb: string; pb: string };
+const ISBN_LIST = isbnList as unknown as {
+	general: (IsbnPair & { colour: string })[];
+	audience: (IsbnPair & { slug: string })[];
+	journaling: IsbnPair;
+	largePrint: (IsbnPair & { vol: number })[];
+	languages: (IsbnPair & { code?: string })[];
+};
+const ISBN_BY_STEM: Record<string, IsbnPair> = {
+	...Object.fromEntries(
+		ISBN_LIST.general.map((g) => [`general-regular-${g.colour.toLowerCase()}`, g]),
+	),
+	...Object.fromEntries(ISBN_LIST.audience.map((a) => [a.slug, a])),
+	journaling: ISBN_LIST.journaling,
+	...Object.fromEntries(ISBN_LIST.largePrint.map((v) => [`lp-vol${v.vol}`, v])),
+	...Object.fromEntries(
+		ISBN_LIST.languages.filter((l) => l.code).map((l) => [`lang-${l.code}`, l]),
+	),
+};
+
+/** ISBN + format of a Bible SKU (<stem>-hb|pb). The Large Print SET has no ISBN of its own: 'none'.
+ *  null = unmappable (the caller writes isbn=unresolved; scripts/bible-sale-metadata.test.mjs fails the build). */
+export function bibleSkuIsbn(
+	slug: string,
+): { isbn: string; format: 'Hardback' | 'Paperback' } | null {
+	const m = /^(.+)-(hb|pb)$/.exec(slug);
+	if (!m) return null;
+	const format = m[2] === 'hb' ? 'Hardback' : 'Paperback';
+	if (m[1] === 'lp-set') return { isbn: 'none', format };
+	const isbn = ISBN_BY_STEM[m[1]]?.[m[2] as 'hb' | 'pb'];
+	return isbn ? { isbn, format } : null;
+}
+
+/** Stripe allows 50 metadata keys per session. */
+export const STRIPE_META_KEYS_MAX = 50;
+
+/** 3ee-1: one line per Bible SKU, the book fields (title|isbn|format|qty|unit_cents|fee_cents|country|date|
+ *  net_usd), lines joined by ';' and PACKED into bible_1, bible_2… each under Stripe's 500-char value cap, never
+ *  past `keyBudget` keys (a 100-SKU cart must not break the 50-key limit). Lines that do not fit are COUNTED in
+ *  bible_unrecorded, never silently lost, and never fail the checkout. net_usd: measured landed cost for the
+ *  country (same figure as the margin floor); the US has no measured Bible cost, so US = unmeasured. */
+export function bibleSaleMetadata(
+	counts: Record<string, number>,
+	destCode: string,
+	dest: Parameters<typeof netPerItemUsd>[2] | null,
+	pct: number,
+	keyBudget: number,
+	now = new Date(),
+): Record<string, string> {
+	const lines: string[] = [];
+	for (const [slug, qty] of Object.entries(counts)) {
+		if (qty <= 0 || BOOK_SKUS[slug] || !EDITIONS[slug]) continue;
+		const unit = paidUnit(slug, EDITIONS[slug].retail, pct);
+		const fee = dest ? handlingFeeCents(slug, unit, dest) : 0;
+		const per = dest ? netPerItemUsd(slug, unit, dest, fee) : null;
+		const id = bibleSkuIsbn(slug);
+		lines.push(
+			[
+				`title=${EDITIONS[slug].title.replace(/[;|]/g, ',').slice(0, 90)}`,
+				`isbn=${id?.isbn ?? 'unresolved'}`,
+				`format=${id?.format ?? 'unknown'}`,
+				`qty=${qty}`,
+				`unit_cents=${unit}`,
+				`fee_cents=${fee}`,
+				`country=${destCode}`,
+				`date=${now.toISOString().slice(0, 10)}`,
+				`net_usd=${per == null ? 'unmeasured' : (per * qty).toFixed(2)}`,
+			].join('|'),
+		);
+	}
+	const out: Record<string, string> = {};
+	if (!lines.length) return out;
+	// Reserve bible_lines + bible_unrecorded so the count keys always fit.
+	const maxChunks = Math.max(0, keyBudget - 2);
+	const chunks: string[] = [];
+	let cur = '';
+	let inCur = 0; // lines in `cur`
+	let stored = 0; // lines in pushed chunks
+	for (const l of lines) {
+		if (cur && cur.length + 1 + l.length <= META_VALUE_MAX) {
+			cur = `${cur};${l}`;
+			inCur++;
+			continue;
+		}
+		if (cur) {
+			chunks.push(cur);
+			stored += inCur;
+		}
+		cur = '';
+		inCur = 0;
+		if (chunks.length >= maxChunks) break;
+		cur = l.slice(0, META_VALUE_MAX);
+		inCur = 1;
+	}
+	if (cur && chunks.length < maxChunks) {
+		chunks.push(cur);
+		stored += inCur;
+	}
+	chunks.forEach((c, i) => {
+		out[`metadata[bible_${i + 1}]`] = c;
+	});
+	out['metadata[bible_lines]'] = String(lines.length);
+	if (stored < lines.length) out['metadata[bible_unrecorded]'] = String(lines.length - stored);
+	return out;
+}
+
 const BOOK_EDITIONS: Record<
 	string,
 	{ title: string; retail: number; img: string; books: number; name: string; desc: string }
@@ -1629,6 +1740,17 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		// for author reporting. One value per book line (under Stripe's 500-char cap): see bookSaleMetadata.
 		...bookSaleMetadata(counts, destCode, intl ? dest : null, unitPctFinal),
 	};
+	// 3ee-1: Bible lines carry the same sale fields, packed into whatever keys Stripe's 50-key limit leaves.
+	Object.assign(
+		form,
+		bibleSaleMetadata(
+			counts,
+			destCode,
+			intl ? dest : null,
+			unitPctFinal,
+			STRIPE_META_KEYS_MAX - Object.keys(form).filter((k) => k.startsWith('metadata[')).length,
+		),
+	);
 
 	let li = 0;
 	for (const [slug, qty] of Object.entries(counts)) {

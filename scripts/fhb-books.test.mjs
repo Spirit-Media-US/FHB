@@ -13,7 +13,12 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
-import { bookSaleMetadata, onRequestPost } from '../functions/dvc-checkout.ts';
+import {
+	bibleSaleMetadata,
+	bibleSkuIsbn,
+	bookSaleMetadata,
+	onRequestPost,
+} from '../functions/dvc-checkout.ts';
 import { BOOK_SKUS, DISCOUNT_EXEMPT } from '../src/lib/order-pricing.ts';
 
 const cat = JSON.parse(fs.readFileSync(new URL('../src/data/books.json', import.meta.url), 'utf8'));
@@ -157,4 +162,88 @@ test('bookSaleMetadata: net measured where a landed cost exists; nothing for a B
 	const m = bookSaleMetadata({ [PB]: 1 }, 'DE', dest, 0, new Date('2026-11-13T12:00:00Z'));
 	assert.match(m['metadata[book_1]'], /country=DE\|date=2026-11-13\|net_usd=-?\d+\.\d{2}$/);
 	assert.deepEqual(bookSaleMetadata({ 'teen-pb': 3 }, 'US', null, 15), {});
+});
+
+// ── 3ee-1 (pmseoaeo 2026-11-13): BIBLE sales carry the same sale fields as books ─────────────────────────
+test('3ee-1: every sellable Bible SKU resolves to an ISBN (Large Print set alone = none)', () => {
+	const src = fs.readFileSync(new URL('../functions/dvc-checkout.ts', import.meta.url), 'utf8');
+	const all = [...src.matchAll(/^\t'([a-z0-9-]+-(?:hb|pb))': \{\n\t\ttitle: '([^']*)'/gm)];
+	assert.ok(all.length >= 200, `found ${all.length} SKUs`);
+	// A PRE-ORDER language has no ISBN in the publisher's master yet (2026-11-13: nri nkf sgc ktu yaf); it records
+	// isbn=unresolved until the master assigns one and fhb-isbn-list/build.py carries it here. Every other SKU must resolve.
+	const preorder = new Set(all.filter((m) => /\(pre-order\)/.test(m[2])).map((m) => m[1]));
+	const skus = all.map((m) => m[1]).filter((s) => !(preorder.has(s) && bibleSkuIsbn(s) == null));
+	const bad = skus
+		.filter((s) => !BOOK_SKUS[s])
+		.filter((s) => {
+			const r = bibleSkuIsbn(s);
+			return (
+				!r ||
+				(r.isbn === 'none') !== s.startsWith('lp-set-') ||
+				(r.isbn !== 'none' && !/^979-8-\d{5}-\d{3}-\d$/.test(r.isbn))
+			);
+		});
+	assert.deepEqual(bad, []);
+	assert.deepEqual(bibleSkuIsbn('general-regular-charcoal-hb'), {
+		isbn: '979-8-89307-336-2',
+		format: 'Hardback',
+	});
+	assert.equal(bibleSkuIsbn('nonsense-xx'), null);
+});
+
+test('3ee-1: a Bible session carries bible_1 with the book field names; books keep book_N', async () => {
+	const r = await post({
+		counts: { 'teen-pb': 2, [PB]: 1 },
+		country: 'US',
+		email: 'new@buyer.org',
+	});
+	assert.equal(r.status, 200, JSON.stringify(r.json));
+	assert.match(
+		r.s['metadata[bible_1]'],
+		/^title=[^|;]+\|isbn=979-8-\d{5}-\d{3}-\d\|format=Paperback\|qty=2\|unit_cents=\d+\|fee_cents=0\|country=US\|date=\d{4}-\d{2}-\d{2}\|net_usd=unmeasured$/,
+	);
+	assert.equal(r.s['metadata[bible_lines]'], '1');
+	assert.equal(r.s['metadata[book_lines]'], '1');
+	assert.equal(r.s['metadata[bible_unrecorded]'], undefined);
+});
+
+test('3ee-1: a 100-SKU cart stays within 50 keys and 500 chars, and COUNTS what did not fit', () => {
+	const src = fs.readFileSync(new URL('../functions/dvc-checkout.ts', import.meta.url), 'utf8');
+	const skus = [...src.matchAll(/^\t'(lang-[a-z0-9-]+-(?:hb|pb))': \{/gm)]
+		.map((m) => m[1])
+		.slice(0, 100);
+	const counts = Object.fromEntries(skus.map((s) => [s, 1]));
+	const m = bibleSaleMetadata(counts, 'US', null, 0, 10);
+	assert.ok(Object.keys(m).length <= 10, `${Object.keys(m).length} keys`);
+	for (const v of Object.values(m)) assert.ok(v.length <= 500);
+	const stored = Object.entries(m)
+		.filter(([k]) => /bible_\d+/.test(k))
+		.reduce((t, [, v]) => t + v.split(';').length, 0);
+	assert.equal(
+		stored + Number(m['metadata[bible_unrecorded]'] ?? 0),
+		100,
+		'every line stored or counted',
+	);
+	assert.ok(Number(m['metadata[bible_unrecorded]']) > 0, 'budget 10 cannot hold 100 lines');
+	assert.deepEqual(
+		bibleSaleMetadata({ [PB]: 1 }, 'US', null, 0, 40),
+		{},
+		'books never go in bible_N',
+	);
+});
+
+test('3ee-1: abroad, Bible net is measured from the landed cost', () => {
+	const dest = { code: 'GB', landed_cost_usd: { hc: 20, pb: 15, basis: 'MEASURED' } };
+	const m = bibleSaleMetadata(
+		{ 'teen-hb': 1 },
+		'GB',
+		dest,
+		0,
+		40,
+		new Date('2026-11-13T12:00:00Z'),
+	);
+	assert.match(
+		m['metadata[bible_1]'],
+		/format=Hardback\|qty=1\|.*country=GB\|date=2026-11-13\|net_usd=-?\d+\.\d{2}$/,
+	);
 });
