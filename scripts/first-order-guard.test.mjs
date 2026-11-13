@@ -89,7 +89,8 @@ test('constant time: fast work is padded to the floor', async () => {
 
 test('handler never logs a raw email and gates before Stripe', () => {
 	const src = fs.readFileSync(new URL('../functions/dvc-checkout.ts', import.meta.url), 'utf8');
-	const blk = src.slice(src.indexOf('if (payload.firstOrderCheck)'), src.indexOf('const counts: Record'));
+	const blk = src.slice(src.indexOf('if (payload.firstOrderCheck)'), src.indexOf('const r = await checkoutForm('));
+	assert.ok(blk.length > 0 && src.includes('const r = await checkoutForm('), 'the first-order lookup block ends where the order is handed to the store engine');
 	assert.ok(blk.indexOf('sameOrigin') < blk.indexOf('isFirstOrder'));
 	assert.ok(blk.indexOf('allowCheck') < blk.indexOf('isFirstOrder'));
 	for (const l of blk.split('\n').filter((x) => x.includes('console.'))) assert.doesNotMatch(l, /\bem\b|email/);
