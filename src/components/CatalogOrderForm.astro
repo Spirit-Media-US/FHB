@@ -21,6 +21,7 @@ import { handlingTable } from '../lib/marginGuard';
 import { FIRST_ORDER_PCT } from '../lib/order-pricing';
 import { formatCount, ORDER_STRINGS, tr } from '../lib/orderStrings';
 import { LIVE_COUNTRIES, shipsLine, shipsParts, shipsToSentence } from '../lib/shipCountries';
+import BiblesBooksToggle from './BiblesBooksToggle.astro';
 import OrderRow from './OrderRow.astro';
 import OrderSummary from './OrderSummary.astro';
 import ShipsDisclosure from './ShipsDisclosure.astro';
@@ -56,6 +57,7 @@ const config = JSON.stringify({
 });
 ---
 <div class="cat__form" data-order={config}>
+	<div style="text-align: center;"><BiblesBooksToggle current="bibles" /></div>
 	<div class="cat__grid">
 		<div class="cat__list">
 			<label class="cat__search-label" for={`${idp}-search`} data-t="c.find">Find an edition</label>

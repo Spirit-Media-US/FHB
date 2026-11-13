@@ -34,6 +34,7 @@ import {
 	shipsParts,
 	shipsToSentence,
 } from '../lib/shipCountries';
+import BiblesBooksToggle from './BiblesBooksToggle.astro';
 import BindingQty from './BindingQty.astro';
 import OrderSummary from './OrderSummary.astro';
 import ShipsDisclosure from './ShipsDisclosure.astro';
@@ -93,6 +94,7 @@ const priceLine = [
 const idp = `eo-${lead.id}`;
 ---
 <div id="order" class="lqo" data-order={config} data-lang={lang}>
+	<BiblesBooksToggle current="bibles" lang={lang} />
 	{/* Kevin 2026-10-04: the same line on every single-edition form, at its top. */}
 	<p class="lqo__catalog"><a href={lang === 'en' ? '/print/order/' : `/print/order/?lang=${lang}`}>{t('o.catalogLink')}</a></p>
 	<p class="lqo__eyebrow">{t('o.eyebrow')}{freeShip ? ` · ${t('o.freeShipping')}` : ''}</p>

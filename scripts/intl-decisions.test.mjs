@@ -141,7 +141,7 @@ test('2A: far-band flag follows the zone rule for every pending country', () => 
 });
 
 test('1A: WELCOME15 is offered to everyone: no far-band block anywhere in the code', () => {
-	for (const f of ['src/lib/marginGuard.ts', 'functions/dvc-checkout.ts', 'src/scripts/order-form.ts', 'src/components/OrderSummary.astro']) {
+	for (const f of ['src/lib/marginGuard.ts', 'functions/dvc-checkout.ts', 'src/lib/storeEngine.ts', 'src/scripts/order-form.ts', 'src/components/OrderSummary.astro']) {
 		const src = fs.readFileSync(f, 'utf8');
 		assert.doesNotMatch(src, /welcomeOffered|data-far|dataset\.far|firstOffered/, f);
 	}
