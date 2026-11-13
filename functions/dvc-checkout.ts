@@ -1483,7 +1483,86 @@ function encodeForm(obj: Record<string, string | number>): string {
 		.join('&');
 }
 
+// ── 3ef-1 (pmseoaeo 2026-11-13; evidence aeo-state/checkout-expiry-3ef-20261113.json) ──────────────────────────────
+// The browser's checkout_start beacon counted 3 starts on days Stripe created 13 sessions: 57 of 94 expired sessions
+// were scripted bursts, probes or tests, and 20 POSTs that died with a 502 left no trace at all. Every POST that is
+// not the order form's first-order lookup now reports ITSELF, server-side, to the same /_evt sink (kind
+// checkout_server): tag site|qa, HTTP status, error code, path. Aggregate only — no email, no cart, no IP.
+// qa = what ONE request shows: a *.pages.dev preview host, an example.* email, an x-fhb-qa header, or a scripted /
+// headless user agent. Bursts need several requests to see; the daily ledger classifies those from Stripe timestamps.
+const QA_UA = /headless|playwright|puppeteer|python|curl|wget|node-fetch|undici|go-http|java\//i;
+export function checkoutTag(
+	host: string,
+	email: string,
+	ua: string,
+	qaHeader: string | null,
+): 'site' | 'qa' {
+	return host.endsWith('.pages.dev') ||
+		/@example\.(com|org|net)$/i.test(email) ||
+		!!qaHeader ||
+		QA_UA.test(ua)
+		? 'qa'
+		: 'site';
+}
+export async function checkoutReport(
+	request: Request,
+	res: Response,
+	body: Record<string, unknown> | null,
+) {
+	if (body?.firstOrderCheck) return null; // the order form's "is this a first order?" lookup creates no session
+	let reason = '';
+	if (res.status >= 400) {
+		const j = (await res
+			.clone()
+			.json()
+			.catch(() => null)) as { error?: string } | null;
+		reason = String(j?.error ?? `http_${res.status}`);
+	}
+	const host = new URL(request.url).hostname;
+	return {
+		kind: 'checkout_server',
+		tag: checkoutTag(
+			host,
+			String(body?.email ?? ''),
+			request.headers.get('user-agent') ?? '',
+			request.headers.get('x-fhb-qa'),
+		),
+		status: res.status,
+		reason,
+		path: String(body?.returnPath ?? '').slice(0, 60),
+	};
+}
+
 export const onRequestPost: PagesFunction<Env> = async (context) => {
+	const body = (await context.request
+		.clone()
+		.json()
+		.catch(() => null)) as Record<string, unknown> | null;
+	let res: Response;
+	try {
+		res = await handlePost(context);
+	} catch (e) {
+		res = new Response(JSON.stringify({ error: 'exception' }), {
+			status: 500,
+			headers: { 'content-type': 'application/json' },
+		});
+		console.error('dvc-checkout threw', e);
+	}
+	if (typeof context.waitUntil === 'function') {
+		const ev = await checkoutReport(context.request, res, body);
+		if (ev)
+			context.waitUntil(
+				fetch('https://fathersheartbible.com/_evt', {
+					method: 'POST',
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify(ev),
+				}).catch(() => undefined),
+			);
+	}
+	return res;
+};
+
+const handlePost: PagesFunction<Env> = async (context) => {
 	const { request, env } = context;
 	const json = (body: unknown, status = 200) =>
 		new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
