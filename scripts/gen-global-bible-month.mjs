@@ -23,7 +23,9 @@ export function cleanCode(row) {
 }
 
 // Pure: rows from the state file + committed statuses + a read200(code) predicate -> generated rows.
-export async function buildRows(stateRows, committed, read200) {
+// committedDates (name -> date) keeps a row's existing date when the state row has no public_day
+// (2026-11-13 pmpublish: the state stopped carrying public_day and every row was written as date: 'undefined').
+export async function buildRows(stateRows, committed, read200, committedDates = {}) {
 	const out = [];
 	const flipped = [];
 	for (const r of stateRows) {
@@ -37,7 +39,9 @@ export async function buildRows(stateRows, committed, read200) {
 				flipped.push({ name: r.name, code });
 			}
 		}
-		out.push({ date: r.public_day, name: r.name, code, status });
+		const date = r.public_day || committedDates[r.name];
+		if (!date) throw new Error(`no date for ${r.name}: state has no public_day and the committed file has none`);
+		out.push({ date, name: r.name, code, status });
 	}
 	return { rows: out, flipped };
 }
@@ -47,6 +51,12 @@ export function render(header, rows) {
 		.map((r) => `\t{\n\t\tdate: '${r.date}',\n\t\tname: '${r.name.replace(/'/g, "\\'")}',\n\t\tcode: ${r.code === null ? 'null' : `'${r.code}'`},\n\t\tstatus: '${r.status}',\n\t},\n`)
 		.join('');
 	return `${header}export const GLOBAL_BIBLE_MONTH: GbmRow[] = [\n${body}] as GbmRow[];\n`;
+}
+
+export function parseCommittedDates(text) {
+	const m = {};
+	for (const b of text.matchAll(/date: '([^']+)',\s*name: '((?:[^'\\]|\\.)*)'/g)) if (b[1] !== 'undefined') m[b[2].replace(/\\'/g, "'")] = b[1];
+	return m;
 }
 
 export function parseCommitted(text) {
@@ -71,7 +81,7 @@ async function main() {
 	const out = arg('--out', DATA);
 	const text = fs.readFileSync(DATA, 'utf8');
 	const header = text.slice(0, text.indexOf('export const GLOBAL_BIBLE_MONTH'));
-	const { rows, flipped } = await buildRows(state.languages, parseCommitted(text), http200);
+	const { rows, flipped } = await buildRows(state.languages, parseCommitted(text), http200, parseCommittedDates(text));
 	const next = render(header, rows);
 	if (a.includes('--check')) process.exit(next === text ? 0 : 1);
 	fs.mkdirSync(path.dirname(out), { recursive: true });
