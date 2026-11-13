@@ -35,6 +35,11 @@ const wept: any = verseShortTies.find(
 const bookLong = X.book_by_words.longest[0];
 const bookShort = X.book_by_words.shortest[0];
 const psalms: any = data.books.find((b: any) => b.book === 'Psalms');
+const fear: any = (data as any).fear_not;
+const fearPhrases = Object.entries(fear.by_phrase)
+	.map(([k, v]: any) => `“${k.replace("'", '’')}” ${v}`)
+	.join(', ');
+const fearOut = fear.excluded_statements.map((e: any) => ref(e)).join(', ');
 const oneChapter: any[] = X.book_by_chapters.shortest;
 const skippedN = data.skipped_numbers.reduce((a: number, s: any) => a + s.numbers.length, 0);
 const TRADITIONAL = 31102;
@@ -81,6 +86,11 @@ const FAQS = [
 		a: `There are ${psalms.chapters} psalms: the book of Psalms has ${psalms.chapters} chapters, one psalm each, with ${N(psalms.verses)} verses and ${N(psalms.words)} words in Father’s Heart Bible. The longest is Psalm ${psalms.longest_chapter} (${N(psalms.longest_chapter_words)} words).`,
 	},
 	{
+		// 3ad (pmseoaeo decision B): counted by scripts/gen-who-speaks.py measure_fear_not; rule published.
+		q: 'How many times does the Bible say “fear not”?',
+		a: `${fear.occurrences} times, in ${fear.verses} verses across ${fear.books} books of Father’s Heart Bible: ${fearPhrases}. We count every “fear not”, “do not fear”, “do not be afraid” and “don’t be afraid” said as a command, and leave out the ${fear.excluded_statements.length} places where the same words describe people (${fearOut}).`,
+	},
+	{
 		q: 'Can I use these numbers?',
 		a: 'Yes. Download the CSVs and cite this page with the citation above. Every figure was counted from the locked English text and checked against a second, independent count of the same text.',
 	},
@@ -104,6 +114,10 @@ const jsonLd = [
 		inLanguage: 'en',
 		isAccessibleForFree: true,
 		citation: CITE,
+		// 3ad (pmseoaeo 11-13): points to the EXISTING all-rights-reserved + quotation terms; grants no new rights.
+		license: 'https://fathersheartbible.com/copyright/',
+		creditText: 'Spirit Media Publishing, Father’s Heart Bible™ (fathersheartbible.com)',
+		copyrightHolder: { '@type': 'Organization', name: 'Spirit Media Inc.' },
 		creator: SITE,
 		publisher: { '@id': 'https://spiritmediapublishing.com/#organization' },
 		keywords: [
@@ -198,6 +212,7 @@ const LINK = 'color: var(--color-brand);';
 					<li><strong style="color: var(--color-ink);">Shortest verse:</strong> by words, {verseShortTies.length} verses tie at two (listed below), among them <a href={url(wept)} style={LINK} class="hover:underline">John 11:35</a>, &ldquo;{wept.text}&rdquo; By characters the shortest is <a href={url(verseShortChars)} style={LINK} class="hover:underline">{ref(verseShortChars)}</a>, {verseShortChars.chars} characters.</li>
 					<li><strong style="color: var(--color-ink);">Longest book:</strong> <a href={`/read/${slug(bookLong.book)}/`} style={LINK} class="hover:underline">{bookLong.book}</a>, {bookLong.chapters} chapters, {N(bookLong.verses)} verses, {N(bookLong.words)} words.</li>
 					<li><strong style="color: var(--color-ink);">Shortest book:</strong> <a href={`/read/${slug(bookShort.book)}/`} style={LINK} class="hover:underline">{bookShort.book}</a> by verses and words ({bookShort.verses} verses, {bookShort.words} words). Books of one chapter: {oneChapter.map((b: any, i: number) => (<Fragment>{i ? ', ' : ''}<a href={`/read/${slug(b.book)}/`} style={LINK} class="hover:underline">{b.book}</a></Fragment>))}.</li>
+					<li><strong style="color: var(--color-ink);">&ldquo;Fear not&rdquo;:</strong> {fear.occurrences} times in {fear.verses} verses ({fearPhrases}). Counted: every &ldquo;fear not&rdquo;, &ldquo;do not fear&rdquo;, &ldquo;do not be afraid&rdquo; and &ldquo;don&rsquo;t be afraid&rdquo; said as a command; left out: the {fear.excluded_statements.length} places where the words describe people ({fear.excluded_statements.map((e: any, i: number) => (<Fragment>{i ? ', ' : ''}<a href={url(e)} style={LINK} class="hover:underline">{ref(e)}</a></Fragment>))}).</li>
 				</ul>
 				<p class="text-base leading-relaxed mb-5" style={P}>
 					Verses that tie for shortest by words:
@@ -243,6 +258,7 @@ const LINK = 'color: var(--color-brand);';
 
 				<h2 id="cite" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How to cite</h2>
 				<p class="text-base leading-relaxed mb-5 p-4" style="font-family: var(--font-sans); color: var(--color-ink); background: var(--color-surface-low); border-radius: 0.5rem; user-select: all;" id="bn-cite">{CITE}</p>
+				<p class="text-sm mb-5" style="font-family: var(--font-sans); color: var(--color-ink);">Copyright and terms of use: <a href="/copyright/" style={LINK} class="hover:underline">fathersheartbible.com/copyright/</a>.</p>
 
 				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style={H2}>Frequently asked questions</h2>
 				<dl class="space-y-6">
