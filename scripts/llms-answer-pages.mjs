@@ -18,7 +18,10 @@ export const TYPES = [
 	{ label: 'The Bible country by country', dir: 'bible-in' },
 	{ label: 'The Bible by audience and season', dir: 'bible-for' },
 	{ label: 'Bible reading guides', dir: 'guides' },
-	{ label: 'The books of the Bible', pages: ['old-testament', 'new-testament', 'books-of-the-bible'] },
+	{
+		label: 'The books of the Bible',
+		pages: ['old-testament', 'new-testament', 'books-of-the-bible'],
+	},
 	// Top-level campaign page (2s, 2026-10-28): a lone page, not a folder, so no dir type reached it.
 	{ label: 'Bible months and campaigns', pages: ['global-bible-month'] },
 	// Original data (2gm, 2026-10-31): per-book words of the Father, Son and Spirit from the locked Divine Voice Color tags.
@@ -27,19 +30,54 @@ export const TYPES = [
 	// description ONLY where the page file cannot be read statically (data-driven or template-built copy).
 	{
 		label: 'Books, ordering and publisher pages',
-		pages: ['books/beloved-identity', 'where-to-buy', 'print/order', 'translation-progress', 'partners', 'press', 'give', 'family', 'youversion', 'verse-of-the-day-widget'],
+		pages: [
+			'books/beloved-identity',
+			'where-to-buy',
+			'print/order',
+			'translation-progress',
+			'partners',
+			'press',
+			'give',
+			'family',
+			'youversion',
+			'verse-of-the-day-widget',
+		],
 		overrides: {
 			'books/beloved-identity': {
 				title: "Father's Heart - Beloved Identity: What Your Heavenly Father Thinks of You",
 				description: 'The paperback book on what our Father thinks of you, with ordering.',
 			},
-			'where-to-buy': { title: "Where to Buy Father's Heart Bible", description: 'Every print edition, regular and large print, with buy links by retailer.' },
-			'translation-progress': { description: 'One row for every language in the publishing roster: script, region, and whether it can be read free online.' },
+			'where-to-buy': {
+				title: "Where to Buy Father's Heart Bible",
+				description: 'Every print edition, regular and large print, with buy links by retailer.',
+			},
+			'translation-progress': {
+				description:
+					'One row for every language in the publishing roster: script, region, and whether it can be read free online.',
+			},
 		},
 	},
 	// 2sq: the per-language free-reading landing pages and the Spanish prayer-verses page.
-	{ label: 'Free reading pages by language', pages: ['italian-bible', 'marathi-bible', 'telugu-bible', 'tangkhul-bible', 'versiculos-sobre-oracao'] },
-	{ label: 'Original data', pages: ['who-speaks-in-scripture', 'names-of-god-the-father', 'bible-by-the-numbers', 'read-the-bible-in-a-year'] },
+	{
+		label: 'Free reading pages by language',
+		pages: [
+			'italian-bible',
+			'marathi-bible',
+			'telugu-bible',
+			'tangkhul-bible',
+			'versiculos-sobre-oracao',
+		],
+	},
+	{
+		label: 'Original data',
+		pages: [
+			'who-speaks-in-scripture',
+			'names-of-god-the-father',
+			'bible-by-the-numbers',
+			'read-the-bible-in-a-year',
+			'bible-trivia',
+		],
+	},
 ];
 
 // CSV downloads of the Original data pages, listed in the answer-page block with a line DERIVED from the file.
@@ -50,6 +88,7 @@ export const DATA_FILES = [
 	'public/data/bible-by-the-numbers-by-book.csv',
 	'public/data/bible-by-the-numbers-by-chapter.csv',
 	'public/data/bible-reading-plan.csv',
+	'public/data/bible-trivia.csv',
 ];
 
 // Pages whose title/description live in a shared component's copy object, not in the page file (2he):
@@ -60,7 +99,11 @@ const COMPONENT_META = {
 };
 
 const humanize = (s) => s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-const clean = (s) => s.replace(/\s+/g, ' ').replace(/\\(['"`])/g, '$1').trim();
+const clean = (s) =>
+	s
+		.replace(/\s+/g, ' ')
+		.replace(/\\(['"`])/g, '$1')
+		.trim();
 
 // Resolve one `${...}` interpolation from the page's own data JSON; null = cannot be resolved statically.
 function makeResolver(src, root) {
@@ -73,9 +116,17 @@ function makeResolver(src, root) {
 		}
 	}
 	for (const m of src.matchAll(/^const (\w+) = (\w+)((?:\.\w+)*);/gm)) {
-		if (scope[m[2]] !== undefined) scope[m[1]] = m[3].split('.').filter(Boolean).reduce((o, k) => o?.[k], scope[m[2]]);
+		if (scope[m[2]] !== undefined)
+			scope[m[1]] = m[3]
+				.split('.')
+				.filter(Boolean)
+				.reduce((o, k) => o?.[k], scope[m[2]]);
 	}
-	const ref = (e) => e.trim().split('.').reduce((o, k) => (o == null ? undefined : o[k]), scope);
+	const ref = (e) =>
+		e
+			.trim()
+			.split('.')
+			.reduce((o, k) => (o == null ? undefined : o[k]), scope);
 	return (expr) => {
 		const f = expr.match(/^N\((.+)\)$/);
 		const v = ref(f ? f[1] : expr);
@@ -110,7 +161,7 @@ export function meta(file, root = process.cwd(), nth = 0, objectKeys = false) {
 	const src = fs.readFileSync(file, 'utf8');
 	const resolve = makeResolver(src, root);
 	const pick = (name, upper, fit) => {
-		const lit = "(?:'((?:[^'\\\\\\n]|\\\\.)*)'|\"((?:[^\"\\\\\\n]|\\\\.)*)\"|`([^`]+)`)";
+		const lit = '(?:\'((?:[^\'\\\\\\n]|\\\\.)*)\'|"((?:[^"\\\\\\n]|\\\\.)*)"|`([^`]+)`)';
 		const re = new RegExp(
 			`(?:^\\s*${name}=(?:\\{\`([^\`]+)\`\\}|"([^"]+)"|\\{'([^']+)'\\})|const ${upper}\\s*=\\s*(?:${fit}\\(\\s*)?${lit}|^\\s*${name}:\\s*${lit})`,
 			'gm',
@@ -138,7 +189,10 @@ export function meta(file, root = process.cwd(), nth = 0, objectKeys = false) {
 		}
 		return '';
 	};
-	return { title: pick('title', 'TITLE', 'fitTitle'), description: pick('description', 'DESCRIPTION', 'fitDescription') };
+	return {
+		title: pick('title', 'TITLE', 'fitTitle'),
+		description: pick('description', 'DESCRIPTION', 'fitDescription'),
+	};
 }
 
 // 2sr (2026-11-11): the /bibles/<slug>-bible/ edition pages, DERIVED from src/data/editions/*.json by the same filter
@@ -157,7 +211,10 @@ export function editionGroup(root = process.cwd()) {
 		/* no llms.txt: nothing to dedupe against */
 	}
 	const entries = [];
-	for (const f of fs.readdirSync(dir).filter((x) => /^[a-z0-9-]+\.json$/.test(x)).sort()) {
+	for (const f of fs
+		.readdirSync(dir)
+		.filter((x) => /^[a-z0-9-]+\.json$/.test(x))
+		.sort()) {
 		const e = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
 		if (!e || typeof e.slug !== 'string' || !e.listing || !e.hook) continue;
 		const url = `/bibles/${e.slug}-bible/`;
@@ -195,7 +252,10 @@ export function collect(root = process.cwd()) {
 			return {
 				url: `/${rel}/`,
 				slug,
-				title: (ov.title || m.title || humanize(slug)).replace(/\s*\|\s*Father.s Heart Bible.*$/, ''),
+				title: (ov.title || m.title || humanize(slug)).replace(
+					/\s*\|\s*Father.s Heart Bible.*$/,
+					'',
+				),
 				description: ov.description || m.description,
 			};
 		});
@@ -225,7 +285,32 @@ export const LLMS_TXT_DESC_MAX = 120;
 // 3cn (pmseoaeo 2026-11-13): 135 of 179 clipped descriptions stopped mid-sentence, 49 on a stop word. Prefer the
 // last SENTENCE end inside the cap (no ellipsis needed), else the last clause end, else a word boundary; then never
 // end on a stop word or a bare "(FHB)".
-const CLIP_STOP = new Set(['a', 'an', 'and', 'as', 'at', 'by', 'for', 'from', 'in', 'into', 'is', 'its', 'of', 'on', 'or', 'our', 'reveals', 'that', 'the', 'their', 'to', 'with', 'your', '(fhb)']);
+const CLIP_STOP = new Set([
+	'a',
+	'an',
+	'and',
+	'as',
+	'at',
+	'by',
+	'for',
+	'from',
+	'in',
+	'into',
+	'is',
+	'its',
+	'of',
+	'on',
+	'or',
+	'our',
+	'reveals',
+	'that',
+	'the',
+	'their',
+	'to',
+	'with',
+	'your',
+	'(fhb)',
+]);
 export function clip(s, max) {
 	if (!max || [...s].length <= max) return s;
 	const cut = [...s].slice(0, max - 1).join('');
@@ -244,7 +329,10 @@ export function clip(s, max) {
 	for (;;) {
 		const words = body.split(' ');
 		if (words.length < 3 || !CLIP_STOP.has(words[words.length - 1].toLowerCase())) break;
-		body = words.slice(0, -1).join(' ').replace(/[\s,;:—-]+$/, '');
+		body = words
+			.slice(0, -1)
+			.join(' ')
+			.replace(/[\s,;:—-]+$/, '');
 	}
 	return `${body}…`;
 }
@@ -258,7 +346,10 @@ export function render(groups, maxDesc = 0) {
 	const out = [BEGIN, '## Answer pages (every page, generated from the site on each build)', ''];
 	for (const g of groups) {
 		out.push(`### ${g.label}`, '');
-		for (const e of g.entries) out.push(`- ${e.url} — ${e.description ? `${join(e.title)}${clip(e.description, maxDesc)}` : e.title}`);
+		for (const e of g.entries)
+			out.push(
+				`- ${e.url} — ${e.description ? `${join(e.title)}${clip(e.description, maxDesc)}` : e.title}`,
+			);
 		out.push('');
 	}
 	out.push(END);
@@ -273,7 +364,8 @@ export function apply(text, block) {
 	const b = text.indexOf(END);
 	if (a !== -1 && b > a) return text.slice(0, a) + block + text.slice(b + END.length);
 	const c = ['\n## Contact', '\n## Publisher'].map((h) => text.indexOf(h)).find((i) => i !== -1);
-	if (c === undefined) throw new Error('no "## Contact" / "## Publisher" anchor to insert the answer-pages block');
+	if (c === undefined)
+		throw new Error('no "## Contact" / "## Publisher" anchor to insert the answer-pages block');
 	return text.slice(0, c + 1) + block + '\n' + text.slice(c);
 }
 

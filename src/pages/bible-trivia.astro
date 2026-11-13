@@ -1,0 +1,146 @@
+---
+// /bible-trivia/ — 3co-1 (pmseoaeo 2026-11-13). Bible trivia questions whose every answer is a COUNT from the locked
+// English text of Father's Heart Bible. Data: src/data/bible-trivia.json + public/data/bible-trivia.csv, written by
+// scripts/gen-who-speaks.py (measure_trivia) from the three lock-reconciled data files behind /bible-by-the-numbers/,
+// /who-speaks-in-scripture/ and /names-of-god-the-father/. No number is typed here: each answer carries the field it
+// was read from, and reconcile_trivia() refuses to write if any answer is not exactly its source. No Scripture text is
+// quoted; every link into the text goes to our /read.
+import data from '../data/bible-trivia.json';
+import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+
+const PAGE_URL = 'https://fathersheartbible.com/bible-trivia/';
+const CSV_URL = 'https://fathersheartbible.com/data/bible-trivia.csv';
+const items = data.items as {
+	n: number;
+	category: string;
+	q: string;
+	a: string;
+	read_url: string;
+	source: string;
+}[];
+const cats = [...new Set(items.map((i) => i.category))];
+const catId = (c: string) =>
+	c
+		.toLowerCase()
+		.replace(/[^a-z]+/g, '-')
+		.replace(/^-|-$/g, '');
+const TITLE = fitTitle('Bible Trivia Questions and Answers, Counted from the Text');
+const DESCRIPTION = fitDescription(
+	'Bible trivia questions with answers counted from the locked text of Father’s Heart Bible: books, chapters, verses, who speaks, how our Father is named. Free CSV.',
+);
+const PUBLISHED = '2026-11-13';
+const toRead = (u: string) => u.replace('https://fathersheartbible.com', '');
+const CITE = `Spirit Media Publishing. “Bible trivia questions and answers, counted from Father’s Heart Bible.” Father’s Heart Bible™, edition ${data.edition}. ${PAGE_URL} (data: ${CSV_URL}), accessed ${PUBLISHED}.`;
+
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'Dataset',
+		name: 'Bible trivia questions and answers counted from the English text of Father’s Heart Bible',
+		description: `${items.length} trivia questions whose answers are counts from the locked English text of Father’s Heart Bible (edition ${data.edition}), each with the data field it was read from and a reader link.`,
+		url: PAGE_URL,
+		datePublished: PUBLISHED,
+		dateModified: PUBLISHED,
+		version: data.edition,
+		inLanguage: 'en',
+		isAccessibleForFree: true,
+		citation: CITE,
+		license: 'https://fathersheartbible.com/copyright/',
+		creditText: 'Spirit Media Publishing, Father’s Heart Bible™ (fathersheartbible.com)',
+		copyrightHolder: { '@type': 'Organization', name: 'Spirit Media Inc.' },
+		creator: {
+			'@type': 'Organization',
+			name: 'Spirit Media Publishing',
+			url: 'https://spiritmediapublishing.com/',
+		},
+		publisher: { '@id': 'https://spiritmediapublishing.com/#organization' },
+		keywords: [
+			'bible trivia',
+			'bible trivia questions and answers',
+			'bible facts',
+			'facts about the bible',
+		],
+		measurementTechnique:
+			'Every answer read from a counted field of the locked English text (chapters, verses, words, Divine Voice speaker tags, the capitalised token Father); each answer re-checked against its source before the page can be built.',
+		variableMeasured: ['n', 'category', 'question', 'answer', 'figure', 'source', 'read_url'],
+		distribution: [{ '@type': 'DataDownload', encodingFormat: 'text/csv', contentUrl: CSV_URL }],
+		isPartOf: {
+			'@type': 'WebSite',
+			name: "Father's Heart Bible™",
+			url: 'https://fathersheartbible.com/',
+		},
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: items.map((i) => ({
+			'@type': 'Question',
+			name: i.q,
+			acceptedAnswer: { '@type': 'Answer', text: i.a },
+		})),
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{ '@type': 'ListItem', position: 2, name: 'Bible Trivia', item: PAGE_URL },
+		],
+	},
+];
+const P = 'font-family: var(--font-sans); color: var(--color-muted);';
+const H2 = 'font-family: var(--font-serif); color: var(--color-ink);';
+const LINK = 'color: var(--color-brand);';
+---
+
+<Layout title={TITLE} description={DESCRIPTION} jsonLd={jsonLd}>
+	<main id="main-content">
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style={P}>
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Bible Trivia</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Counted from the locked text &middot; edition {data.edition}</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style={H2}>Bible Trivia Questions and Answers</h1>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style={P}>
+					<strong style="color: var(--color-ink);">{items.length} Bible trivia questions, and every answer is a number we counted</strong> in the locked English text of Father&rsquo;s Heart Bible&trade; (edition {data.edition}). Each one links to the place to read it. <a href="/data/bible-trivia.csv" style={LINK} class="hover:underline" download>Download them all as a CSV</a> for a quiz night, a class or a small group.
+				</p>
+				<p class="text-base leading-relaxed mb-5" style={P}>
+					Jump to: {cats.map((c, i) => (<Fragment>{i ? ' · ' : ''}<a href={`#${catId(c)}`} style={LINK} class="hover:underline">{c}</a></Fragment>))}
+				</p>
+
+				{cats.map((c) => (
+					<Fragment>
+						<h2 id={catId(c)} class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style={H2}>{c}</h2>
+						<dl class="space-y-5">
+							{items.filter((i) => i.category === c).map((i) => (
+								<div id={`q${i.n}`}>
+									<dt class="text-lg font-medium mb-1" style={H2}>{i.n}. {i.q}</dt>
+									<dd class="text-lg leading-relaxed" style={P}><strong style="color: var(--color-ink);">{i.a}</strong> &middot; <a href={toRead(i.read_url)} style={LINK} class="hover:underline">read it</a></dd>
+								</div>
+							))}
+						</dl>
+					</Fragment>
+				))}
+
+				<h2 id="method" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How we counted</h2>
+				<ol class="text-lg leading-relaxed mb-5 list-decimal pl-6 space-y-2" style={P}>
+					<li>Every answer comes from the counted data behind <a href="/bible-by-the-numbers/" style={LINK} class="hover:underline">the Bible by the numbers</a>, <a href="/who-speaks-in-scripture/" style={LINK} class="hover:underline">who speaks in Scripture</a> and <a href="/names-of-god-the-father/" style={LINK} class="hover:underline">the names of God the Father counted</a>, each measured from the locked English text and checked against a second count.</li>
+					<li>No number on this page was typed. Each answer names the data field it was read from (the <code>source</code> column of the CSV), and the page cannot be built if any answer differs from its field.</li>
+					<li>These are counts of one Bible&rsquo;s English wording. Trivia sets based on other translations can give other answers; ours are the ones you can check, line by line, in our reader.</li>
+				</ol>
+
+				<h2 id="cite" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How to cite</h2>
+				<p class="text-base leading-relaxed mb-5 p-4" style="font-family: var(--font-sans); color: var(--color-ink); background: var(--color-surface-low); border-radius: 0.5rem; user-select: all;">{CITE}</p>
+				<p class="text-sm mb-5" style="font-family: var(--font-sans); color: var(--color-ink);">Copyright and terms of use: <a href="/copyright/" style={LINK} class="hover:underline">fathersheartbible.com/copyright/</a>.</p>
+			</div>
+		</section>
+	</main>
+</Layout>

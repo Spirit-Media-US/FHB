@@ -3,17 +3,40 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { collect, TYPES, render, renderFor, apply, clip, LLMS_TXT_DESC_MAX } from './llms-answer-pages.mjs';
+import {
+	collect,
+	TYPES,
+	render,
+	renderFor,
+	apply,
+	clip,
+	LLMS_TXT_DESC_MAX,
+} from './llms-answer-pages.mjs';
 
 const groups = collect();
 const all = groups.flatMap((g) => g.entries);
 
 test('covered types are non-empty and include the named 6ae pages', () => {
 	for (const g of groups) assert.ok(g.entries.length > 0, `type "${g.label}" has no pages`);
-	for (const u of ['/meaning/forsake/', '/meaning/folly/', '/meaning/consecrate/', '/meaning/sheol/',
-		'/verses/thanksgiving/', '/verses/advent/', '/bible-in/ukraine/', '/bible-in/poland/',
-		'/bible-in/romania/', '/old-testament/', '/new-testament/', '/books-of-the-bible/', '/global-bible-month/'])
-		assert.ok(all.some((e) => e.url === u), `${u} not discovered`);
+	for (const u of [
+		'/meaning/forsake/',
+		'/meaning/folly/',
+		'/meaning/consecrate/',
+		'/meaning/sheol/',
+		'/verses/thanksgiving/',
+		'/verses/advent/',
+		'/bible-in/ukraine/',
+		'/bible-in/poland/',
+		'/bible-in/romania/',
+		'/old-testament/',
+		'/new-testament/',
+		'/books-of-the-bible/',
+		'/global-bible-month/',
+	])
+		assert.ok(
+			all.some((e) => e.url === u),
+			`${u} not discovered`,
+		);
 });
 
 test('every src/pages folder of a covered type is registered', () => {
@@ -34,14 +57,22 @@ test('every src/pages folder of a covered type is registered', () => {
 		legacy: 'noindex redirect shims',
 		'glossary-review': 'noindex native-reviewer pages, excluded from the sitemap',
 	};
-	for (const d of fs.readdirSync('src/pages', { withFileTypes: true }).filter((x) => x.isDirectory())) {
+	for (const d of fs
+		.readdirSync('src/pages', { withFileTypes: true })
+		.filter((x) => x.isDirectory())) {
 		if (registered.has(d.name)) continue;
-		assert.ok(exempt[d.name], `src/pages/${d.name}/ is not in TYPES and not in the exempt list (give a reason)`);
+		assert.ok(
+			exempt[d.name],
+			`src/pages/${d.name}/ is not in TYPES and not in the exempt list (give a reason)`,
+		);
 	}
 });
 
 // ---- 2sq (2026-11-11): SITEMAP PARITY. Every marketing page is in the generated llms.txt or EXEMPT with a reason. ----
-const generated = apply(fs.readFileSync('public/llms.txt', 'utf8'), renderFor('public/llms.txt', groups));
+const generated = apply(
+	fs.readFileSync('public/llms.txt', 'utf8'),
+	renderFor('public/llms.txt', groups),
+);
 // url -> reason. Only pages a visitor/AI engine would not look for in an answer index, or noindex/legal boilerplate.
 export const PAGE_EXEMPT = {
 	'/404/': 'error page, not in the sitemap',
@@ -51,7 +82,8 @@ export const PAGE_EXEMPT = {
 	'/privacy/': 'legal boilerplate, linked from every footer',
 	'/terms/': 'legal boilerplate, linked from every footer',
 	'/returns/': 'policy boilerplate, linked from every footer',
-	'/bibles/': 'edition hub (2xz): only a directory of the /bibles/<slug>-bible/ pages that llms.txt already names one by one; llms.txt sits at its 70 KB cap',
+	'/bibles/':
+		'edition hub (2xz): only a directory of the /bibles/<slug>-bible/ pages that llms.txt already names one by one; llms.txt sits at its 70 KB cap',
 };
 function staticRoutes(dir = 'src/pages', rel = '') {
 	const out = [];
@@ -65,20 +97,30 @@ function staticRoutes(dir = 'src/pages', rel = '') {
 	}
 	return out;
 }
-const listed = (u) => new RegExp(`(^|[\\s(\`])${u.replace(/\/$/, '')}/?(?=[\\s).,:\`]|$)`, 'm').test(generated);
+const listed = (u) =>
+	new RegExp(`(^|[\\s(\`])${u.replace(/\/$/, '')}/?(?=[\\s).,:\`]|$)`, 'm').test(generated);
 
 test('sitemap parity: every marketing page is listed in llms.txt or exempt with a reason', () => {
 	const routes = staticRoutes();
 	assert.ok(routes.length > 30, 'route walk found too few pages');
 	const missing = routes.filter((u) => !listed(u) && !PAGE_EXEMPT[u]);
-	assert.deepEqual(missing, [], `${missing.length} page(s) neither listed in llms.txt nor exempt: ${missing.join(', ')}`);
-	for (const [u, why] of Object.entries(PAGE_EXEMPT)) assert.ok(why.length > 10, `${u} exempt without a reason`);
-	assert.ok(routes.includes('/books/beloved-identity/') && listed('/books/beloved-identity/'), 'beloved-identity not listed');
+	assert.deepEqual(
+		missing,
+		[],
+		`${missing.length} page(s) neither listed in llms.txt nor exempt: ${missing.join(', ')}`,
+	);
+	for (const [u, why] of Object.entries(PAGE_EXEMPT))
+		assert.ok(why.length > 10, `${u} exempt without a reason`);
+	assert.ok(
+		routes.includes('/books/beloved-identity/') && listed('/books/beloved-identity/'),
+		'beloved-identity not listed',
+	);
 });
 
 test('sitemap parity: the exempt list holds no stale or already-listed page', () => {
 	const routes = new Set(staticRoutes());
-	for (const u of Object.keys(PAGE_EXEMPT)) assert.ok(routes.has(u), `exempt ${u} is not a page any more`);
+	for (const u of Object.keys(PAGE_EXEMPT))
+		assert.ok(routes.has(u), `exempt ${u} is not a page any more`);
 });
 
 test("hand-written 'Reader home' line points at /read/ (the canonical URL, /read is a 301)", () => {
@@ -92,7 +134,8 @@ test('every /bibles edition page is in llms.txt (hand-written audience list or g
 	const eds = [];
 	for (const f of fs.readdirSync('src/data/editions').filter((x) => /^[a-z0-9-]+\.json$/.test(x))) {
 		const e = JSON.parse(fs.readFileSync(`src/data/editions/${f}`, 'utf8'));
-		if (e && typeof e.slug === 'string' && e.listing && e.hook) eds.push(`/bibles/${e.slug}-bible/`);
+		if (e && typeof e.slug === 'string' && e.listing && e.hook)
+			eds.push(`/bibles/${e.slug}-bible/`);
 	}
 	assert.ok(eds.length > 90, `expected ~100 edition pages, found ${eds.length}`);
 	const missing = eds.filter((u) => !generated.includes(u));
@@ -102,14 +145,18 @@ test('every /bibles edition page is in llms.txt (hand-written audience list or g
 });
 
 test('generated llms.txt stays under 70 KB', () => {
-	assert.ok(Buffer.byteLength(generated) < 70000, `llms.txt would be ${Buffer.byteLength(generated)} bytes`);
+	assert.ok(
+		Buffer.byteLength(generated) < 70000,
+		`llms.txt would be ${Buffer.byteLength(generated)} bytes`,
+	);
 });
 // 3bo: llms.txt descriptions are cut to LLMS_TXT_DESC_MAX; llms-full.txt keeps them whole (failure path: an uncut
 // description in llms.txt, or a cut one in llms-full.txt, fails here).
 test('llms.txt descriptions are capped, llms-full.txt descriptions are whole', () => {
 	const long = all.filter((e) => e.description && [...e.description].length > LLMS_TXT_DESC_MAX);
 	assert.ok(long.length > 0, 'fixture: some answer page has a long description');
-	const idx = renderFor('public/llms.txt', groups), full = renderFor('public/llms-full.txt', groups);
+	const idx = renderFor('public/llms.txt', groups),
+		full = renderFor('public/llms-full.txt', groups);
 	for (const e of long) {
 		assert.ok(!idx.includes(e.description), `${e.url}: full description still in llms.txt`);
 		assert.ok(full.includes(e.description), `${e.url}: description cut in llms-full.txt`);
@@ -128,15 +175,27 @@ for (const file of ['public/llms.txt', 'public/llms-full.txt']) {
 	test(`generator output for ${file} lists every answer page`, () => {
 		const text = apply(fs.readFileSync(file, 'utf8'), renderFor(file, groups));
 		const missing = all.filter((e) => !text.includes(`- ${e.url} `)).map((e) => e.url);
-		assert.deepEqual(missing, [], `${missing.length} answer page(s) missing from generated ${file}: ${missing.join(', ')}`);
+		assert.deepEqual(
+			missing,
+			[],
+			`${missing.length} answer page(s) missing from generated ${file}: ${missing.join(', ')}`,
+		);
 	});
 }
 
 test('every /meaning/ page has a real title and a non-empty answer line', () => {
 	const entries = groups.find((g) => g.label === 'Bible words and what they mean').entries;
 	// failure path: a page whose title/description the parser cannot read falls back to the slug / empty and fails here
-	const bad = entries.filter((e) => !e.description || e.title === e.slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()));
-	assert.deepEqual(bad.map((e) => e.url), [], 'meaning page(s) with unreadable title/description');
+	const bad = entries.filter(
+		(e) =>
+			!e.description ||
+			e.title === e.slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+	);
+	assert.deepEqual(
+		bad.map((e) => e.url),
+		[],
+		'meaning page(s) with unreadable title/description',
+	);
 });
 
 // ---- 2he (2026-11-01): pages that wrap their text in fitTitle()/fitDescription() ----
@@ -147,34 +206,55 @@ import { meta, DATA_FILES } from './llms-answer-pages.mjs';
 test('meta() reads title/description written through fitTitle()/fitDescription() (fixture)', () => {
 	const d = fs.mkdtempSync(path.join(os.tmpdir(), 'llms-2he-'));
 	const f = path.join(d, 'p.astro');
-	fs.writeFileSync(f, "---\nconst TITLE = fitTitle(\"Fixture Page: It's Wrapped\");\nconst DESCRIPTION = fitDescription(\n\t'A wrapped description that must be read.',\n);\n---\n");
+	fs.writeFileSync(
+		f,
+		"---\nconst TITLE = fitTitle(\"Fixture Page: It's Wrapped\");\nconst DESCRIPTION = fitDescription(\n\t'A wrapped description that must be read.',\n);\n---\n",
+	);
 	const m = meta(f, d);
 	assert.equal(m.title, "Fixture Page: It's Wrapped");
 	assert.equal(m.description, 'A wrapped description that must be read.');
 });
 
 test('every answer page has a description (none is a bare title)', () => {
-	assert.deepEqual(all.filter((e) => !e.description).map((e) => e.url), []);
+	assert.deepEqual(
+		all.filter((e) => !e.description).map((e) => e.url),
+		[],
+	);
 });
 
-test('original-data pages and their 6 CSVs are listed, with the page title and derived descriptions', () => {
-	for (const u of ['/who-speaks-in-scripture/', '/names-of-god-the-father/', '/bible-by-the-numbers/', '/read-the-bible-in-a-year/']) {
+test('original-data pages and their 7 CSVs are listed, with the page title and derived descriptions', () => {
+	for (const u of [
+		'/who-speaks-in-scripture/',
+		'/names-of-god-the-father/',
+		'/bible-by-the-numbers/',
+		'/read-the-bible-in-a-year/',
+		'/bible-trivia/',
+	]) {
 		const e = all.find((x) => x.url === u);
 		assert.ok(e, `${u} not discovered`);
 		assert.ok(e.title.length > 20 && e.description.length > 60, `${u} title/description not read`);
 	}
-	assert.equal(DATA_FILES.length, 6);
-	for (const f of DATA_FILES) assert.ok(all.some((e) => e.url === `/${f.replace(/^public\//, '')}` && /rows\. Columns:/.test(e.description)), `${f} not listed`);
+	assert.equal(DATA_FILES.length, 7); // 3co-1: + bible-trivia.csv
+	for (const f of DATA_FILES)
+		assert.ok(
+			all.some(
+				(e) => e.url === `/${f.replace(/^public\//, '')}` && /rows\. Columns:/.test(e.description),
+			),
+			`${f} not listed`,
+		);
 	const out = render(groups);
 	assert.equal((out.match(/- \/names-of-god-the-father\/ /g) || []).length, 1);
-	assert.equal((out.match(/\.csv /g) || []).length, 6);
+	assert.equal((out.match(/\.csv /g) || []).length, 7);
 });
 
 // 3cn: a clipped llms.txt line never ends on a stop word or a bare "(FHB)", and a title ending in "?" is not
 // followed by ".". Checked on every real line the build writes, plus fixtures that prove each check fires.
-const STOP_END = /\b(a|an|and|as|at|by|for|from|in|into|is|its|of|on|or|our|reveals|that|the|their|to|with|your)…$|\(FHB\)…$/i;
+const STOP_END =
+	/\b(a|an|and|as|at|by|for|from|in|into|is|its|of|on|or|our|reveals|that|the|their|to|with|your)…$|\(FHB\)…$/i;
 test('clipped llms.txt descriptions never end on a stop word or bare (FHB)', () => {
-	const lines = renderFor('public/llms.txt', groups).split('\n').filter((l) => l.endsWith('…'));
+	const lines = renderFor('public/llms.txt', groups)
+		.split('\n')
+		.filter((l) => l.endsWith('…'));
 	const bad = lines.filter((l) => STOP_END.test(l));
 	assert.deepEqual(bad, [], `${bad.length} line(s) end on a stop word`);
 	assert.ok(STOP_END.test('x and…') && STOP_END.test('x (FHB)…'), 'the check itself must fire');
@@ -182,12 +262,40 @@ test('clipped llms.txt descriptions never end on a stop word or bare (FHB)', () 
 test('no "?." / "!." after a title', () => {
 	const txt = renderFor('public/llms.txt', groups) + renderFor('public/llms-full.txt', groups);
 	assert.equal((txt.match(/[?!]\. /g) || []).length, 0);
-	const one = render([{ label: 'T', entries: [{ url: '/meaning/x/', title: 'What is reproof in the Bible?', description: 'D' }] }]);
+	const one = render([
+		{
+			label: 'T',
+			entries: [{ url: '/meaning/x/', title: 'What is reproof in the Bible?', description: 'D' }],
+		},
+	]);
 	assert.ok(one.includes('Bible? D') && !one.includes('Bible?.'));
 });
 test('clip prefers a sentence end, then a clause, and drops trailing stop words', () => {
-	assert.equal(clip('One full sentence here that is long enough. Then a second sentence that runs on and on.', 60), 'One full sentence here that is long enough.');
-	assert.equal(clip('Words words words words words words words words and the rest of it keeps going on', 50).endsWith('…'), true);
-	assert.ok(!/\b(and|the)…$/.test(clip('Words words words words words words words words and the rest of it keeps going on', 50)));
-	assert.ok(!/\(FHB\)…$/.test(clip('Read the whole Father heart Bible translation online free today (FHB) with audio and more', 64)));
+	assert.equal(
+		clip(
+			'One full sentence here that is long enough. Then a second sentence that runs on and on.',
+			60,
+		),
+		'One full sentence here that is long enough.',
+	);
+	assert.equal(
+		clip(
+			'Words words words words words words words words and the rest of it keeps going on',
+			50,
+		).endsWith('…'),
+		true,
+	);
+	assert.ok(
+		!/\b(and|the)…$/.test(
+			clip('Words words words words words words words words and the rest of it keeps going on', 50),
+		),
+	);
+	assert.ok(
+		!/\(FHB\)…$/.test(
+			clip(
+				'Read the whole Father heart Bible translation online free today (FHB) with audio and more',
+				64,
+			),
+		),
+	);
 });
