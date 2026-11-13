@@ -1,3 +1,5 @@
+import bookSkus from '../src/data/book-skus.json' with { type: 'json' };
+import booksCatalog from '../src/data/books.json' with { type: 'json' };
 // /dvc-checkout — Divine Voice Color print orders (Cloudflare Pages Function).
 //
 //   POST /dvc-checkout  { counts: { teen: 2, dads: 1, journaling: 1, … } }
@@ -32,10 +34,11 @@ import {
 	handlingFeeCents,
 	handlingLabel,
 	marginCheck,
+	netPerItemUsd,
 	volumesFor,
 } from '../src/lib/marginGuard.ts';
 import {
-	BELOVED_SKU,
+	BOOK_SKUS,
 	FIRST_ORDER_CODE,
 	FIRST_ORDER_PCT,
 	isDiscountExempt,
@@ -1193,21 +1196,80 @@ for (const [sku, e] of Object.entries(CATALOG_LANG_EDITIONS))
 //                 count toward the Bible tiers). It is still a physical copy: far-band quotes, expedited
 //                 shipping and the fulfilment count use volumesFor, which is 1.
 //   Discounts   = none. order-pricing.ts DISCOUNT_EXEMPT keeps it at list price under every offer.
-// Beloved Identity: paperback only, 96pp, 5 x 8 in, perfect bound, ISBN 979-8-89307-239-6, list $9.99
-// (spec sheet price_record). Cover is the R2 original (no pre-sized WebP exists).
+// FHB-BOOKS (Kevin 2026-11-13 L1959): every book format comes from src/data/books.json (adding a book = data).
+// Beloved Identity's row carries the exact values this block held by hand (Kevin 2026-11-10), so its Stripe
+// line is unchanged. A book whose status is not "live" is not sellable here.
+const US_CARD_PCT = 0.029;
+const US_CARD_FIXED_USD = 0.3;
+/** FHB-BOOKS: Stripe metadata for every book line in a cart, for author reporting (Kevin 2026-11-13: title,
+ *  ISBN, format, country, date, net). net_usd = per-copy net after Stripe's fee and the book's MEASURED landed
+ *  cost for that country (marginGuard.netPerItemUsd, the same figure the margin floor uses), times qty.
+ *  US: the book's measured us_cost_usd and Stripe's US card fee; a book without one records net_usd=unmeasured. */
+export function bookSaleMetadata(
+	counts: Record<string, number>,
+	destCode: string,
+	dest: Parameters<typeof netPerItemUsd>[2] | null,
+	pct: number,
+	now = new Date(),
+): Record<string, string> {
+	const out: Record<string, string> = {};
+	let k = 0;
+	for (const [slug, qty] of Object.entries(counts)) {
+		const b = BOOK_SKUS[slug];
+		if (!b || qty <= 0) continue;
+		const unit = paidUnit(slug, EDITIONS[slug].retail, pct);
+		const fee = dest ? handlingFeeCents(slug, unit, dest) : 0;
+		// US: no country-list cost row, so the book's own MEASURED US cost (book-skus.json us_cost_usd) and
+		// Stripe's standard US card fee (2.9% + 30c); unmeasured stays 'unmeasured', never a guess.
+		const us = BOOK_SKUS[slug].usCostUsd;
+		const per = dest
+			? netPerItemUsd(slug, unit, dest, fee)
+			: destCode === 'US' && us != null
+				? unit / 100 - (unit / 100) * US_CARD_PCT - US_CARD_FIXED_USD - us
+				: null;
+		const net = per == null ? 'unmeasured' : (per * qty).toFixed(2);
+		k += 1;
+		out[`metadata[book_${k}]`] = [
+			`title=${b.title}`,
+			`isbn=${b.isbn}`,
+			`format=${b.format}`,
+			`qty=${qty}`,
+			`unit_cents=${unit}`,
+			`fee_cents=${fee}`,
+			`country=${destCode}`,
+			`date=${now.toISOString().slice(0, 10)}`,
+			`net_usd=${net}`,
+		]
+			.join('|')
+			.slice(0, 500);
+	}
+	if (k) out['metadata[book_lines]'] = String(k);
+	return out;
+}
+
 const BOOK_EDITIONS: Record<
 	string,
 	{ title: string; retail: number; img: string; books: number; name: string; desc: string }
-> = {
-	[BELOVED_SKU]: {
-		title: 'Beloved Identity — Paperback',
-		name: 'Father’s Heart - Beloved Identity: What Your Heavenly Father Thinks of You',
-		desc: 'Paperback · 96 pages · by Kevin White · free shipping',
-		retail: 999,
-		books: 0,
-		img: 'https://assets.spiritmediapublishing.com/SPM.com/assets/covers/fathers-heart-beloved-identity.jpg?v=2',
-	},
-};
+> = Object.fromEntries(
+	(booksCatalog.books as { status: string; formats: string[] }[])
+		.filter((b) => b.status === 'live')
+		.flatMap((b) =>
+			b.formats.map((sku) => {
+				const f = (bookSkus.skus as Record<string, Record<string, unknown>>)[sku];
+				return [
+					sku,
+					{
+						title: f.checkout_title as string,
+						name: f.checkout_name as string,
+						desc: f.checkout_desc as string,
+						retail: f.list_cents as number,
+						books: 0,
+						img: f.checkout_img as string,
+					},
+				];
+			}),
+		),
+);
 for (const [sku, e] of Object.entries(BOOK_EDITIONS)) EDITIONS[sku] = e;
 
 // The SET MUST NEVER COST MORE than the same three volumes bought separately, in either
@@ -1428,9 +1490,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 			400,
 		);
 	}
-	// Beloved Identity has its own measured landed cost per country (landed_cost_usd.bi). A country
-	// without one cannot be sized, so that book is refused there rather than priced off a Bible's cost.
-	if (intl && counts[BELOVED_SKU] > 0 && dest?.landed_cost_usd?.bi == null) {
+	// Every book has its own measured landed cost per country (landed_cost_usd.<costKey>, e.g. bi for
+	// Beloved Identity). A country without one cannot be sized, so that book is refused there rather than
+	// priced off a Bible's cost (fail closed).
+	const unsized = Object.entries(counts).some(
+		([slug, n]) =>
+			n > 0 && BOOK_SKUS[slug] && dest?.landed_cost_usd?.[BOOK_SKUS[slug].costKey] == null,
+	);
+	if (intl && unsized) {
 		return json(
 			{ error: 'country_not_served', message: 'We do not ship that book to that country yet.' },
 			400,
@@ -1537,8 +1604,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 			? `${origin}${payload.returnPath}?order=canceled#order`
 			: payload.returnPath === '/print/order/'
 				? `${origin}/print/order/?order=canceled`
-				: payload.returnPath === '/books/beloved-identity/'
-					? `${origin}/books/beloved-identity/?order=canceled#order`
+				: /^\/books\/[a-z0-9-]+\/$/.test(String(payload.returnPath ?? '')) &&
+						(booksCatalog.books as { slug: string }[]).some(
+							(b) => payload.returnPath === `/books/${b.slug}/`,
+						)
+					? `${origin}${payload.returnPath}?order=canceled#order`
 					: `${origin}/print/?order=canceled#bulk-order`,
 		'automatic_tax[enabled]': 'true',
 		// Country, shipping rate + delivery estimate, REQUIRED phone and the address-form hint all
@@ -1555,6 +1625,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		'metadata[offer]': promo ? 'first_order' : pct > 0 ? 'volume' : 'none',
 		// Split under Stripe's 500-char value cap (an 82-SKU cart was one 1,138-char value: 502).
 		...packBreakdown(counts),
+		// FHB-BOOKS (Kevin 2026-11-13): every BOOK sale carries title / ISBN / format / country / date / net
+		// for author reporting. One value per book line (under Stripe's 500-char cap): see bookSaleMetadata.
+		...bookSaleMetadata(counts, destCode, intl ? dest : null, unitPctFinal),
 	};
 
 	let li = 0;

@@ -9,6 +9,7 @@
 // button that fails.
 import LookInside from '../../components/LookInside.astro';
 import Section from '../../components/Section.astro';
+import bookSkus from '../../data/book-skus.json';
 import catalog from '../../data/books.json';
 import lookinside from '../../data/lookinside.json';
 import Layout from '../../layouts/Layout.astro';
@@ -66,20 +67,26 @@ const hasLook = !!(book.look_inside && (lookinside as Record<string, unknown>)[b
 
 // Destinations per format: the US, plus every live country with a MEASURED landed cost for that format
 // (ship-countries.json landed_cost_usd.<landed_key>), fee from the checkout's own rule (marginGuard.ts).
-const formats = book.formats.map((f) => {
-	const dests = LIVE_COUNTRIES.filter(
-		(c) =>
-			c.code === 'US' ||
-			(c.landed_cost_usd as Record<string, unknown> | undefined)?.[f.landed_key] != null,
-	).map((c) => ({
-		code: c.code,
-		name: c.name,
-		far: c.farBand === true,
-		fee: c.code === 'US' ? 0 : handlingFeeCents(f.sku, f.list_cents, c),
-		label: c.code === 'US' ? '' : handlingLabel(c.code),
-	}));
-	return { ...f, dests };
-});
+const SKUS = bookSkus.skus as Record<
+	string,
+	Omit<Format, 'sku' | 'landed_key'> & { cost_key: string }
+>;
+const formats = (book.formats as unknown as string[])
+	.map((sku) => ({ sku, ...SKUS[sku], landed_key: SKUS[sku].cost_key }))
+	.map((f) => {
+		const dests = LIVE_COUNTRIES.filter(
+			(c) =>
+				c.code === 'US' ||
+				(c.landed_cost_usd as Record<string, unknown> | undefined)?.[f.landed_key] != null,
+		).map((c) => ({
+			code: c.code,
+			name: c.name,
+			far: c.farBand === true,
+			fee: c.code === 'US' ? 0 : handlingFeeCents(f.sku, f.list_cents, c),
+			label: c.code === 'US' ? '' : handlingLabel(c.code),
+		}));
+		return { ...f, dests };
+	});
 const config = JSON.stringify({
 	formats: formats.map((f) => ({ sku: f.sku, list: f.list_cents, dests: f.dests })),
 	quote: BULK_QUOTE_COPY.error,

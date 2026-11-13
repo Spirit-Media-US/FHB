@@ -1,5 +1,5 @@
 {
-	"_about": "FHB /books catalogue (Kevin 2026-11-13 L1959). ONE row per book; adding a book is DATA, not code. Bibles stay #1 everywhere. Copy comes only from sourced data (spec sheets / pmpublish data pack); never invented.",
+	"_about": "FHB /books catalogue (Kevin 2026-11-13 L1959). ONE row per book; adding a book is DATA, not code. Bibles stay #1 everywhere. Copy comes only from sourced data (spec sheets / pmpublish data pack); never invented. Each book lists its format SKUs; their commerce fields live in src/data/book-skus.json.",
 	"books": [
 		{
 			"slug": "beloved-identity",
@@ -24,20 +24,7 @@
 				"height": 512,
 				"alt": "Cover of Father's Heart - Beloved Identity by Kevin White"
 			},
-			"formats": [
-				{
-					"sku": "beloved-identity-pb",
-					"format": "Paperback",
-					"schema_format": "https://schema.org/Paperback",
-					"isbn": "9798893072396",
-					"isbn_display": "979-8-89307-239-6",
-					"list_cents": 999,
-					"pages": 96,
-					"trim": "5 × 8 in",
-					"binding": "perfect bound",
-					"landed_key": "bi"
-				}
-			],
+			"formats": ["beloved-identity-pb"],
 			"language": "en",
 			"look_inside": null,
 			"_source": "verbatim from src/pages/books/beloved-identity.astro (Kevin 2026-11-10 page); copy = the book's spec-sheet long description"
@@ -45,7 +32,7 @@
 		{
 			"slug": "who-am-i",
 			"order": 2,
-			"status": "pending",
+			"status": "live",
 			"title": "Who Am I?",
 			"subtitle": "Seeing myself through my heavenly Father's eyes",
 			"full_title": "Who Am I? Seeing myself through my heavenly Father's eyes",
@@ -54,7 +41,7 @@
 			},
 			"author_bio": "Karen Inge Hailstones is a wife, a mother of three and a first-time author from KwaZulu-Natal, South Africa. She grew up on a sugar cane farm near Wartburg and went on to earn a Master's degree in Dietetics, including five months as an exchange student at Uppsala University in Sweden. Married to Eric for nine years, Karen is a full-time mom who also helps in his business, Car Solutions, a pre-owned car dealership in Hilton. She loves sewing, gardening and opening her home to others. Who Am I? grew from her desire to share the love of our Father in its simplest form, so even the littlest ones can hear who He says they are.",
 			"age": "Ages 0–5",
-			"page_title": "Who Am I? A Read-Aloud Devotional for Ages 0–5 | FHB",
+			"page_title": "Who Am I? Seeing Myself Through My Heavenly Father's Eyes, by Karen Inge Hailstones",
 			"short": "Kids books that build self esteem and courage start here: 21 watercolor 'I am' affirmations from our Father's heart for parents to read aloud with children ages 0-5, each with a Bible verse and a prayer.",
 			"who_for": [
 				"parents of babies",
@@ -84,32 +71,7 @@
 				"height": 320,
 				"alt": "Cover of Who Am I? by Karen Inge Hailstones"
 			},
-			"formats": [
-				{
-					"sku": "who-am-i-pb",
-					"format": "Paperback",
-					"schema_format": "https://schema.org/Paperback",
-					"isbn": "9798893075595",
-					"isbn_display": "979-8-89307-559-5",
-					"list_cents": 1599,
-					"pages": 50,
-					"trim": "8.5 × 8.5 in",
-					"binding": "perfect bound",
-					"landed_key": "wai_pb"
-				},
-				{
-					"sku": "who-am-i-hb",
-					"format": "Hardback",
-					"schema_format": "https://schema.org/Hardcover",
-					"isbn": "9798893075601",
-					"isbn_display": "979-8-89307-560-1",
-					"list_cents": 2499,
-					"pages": 50,
-					"trim": "8.5 × 8.5 in",
-					"binding": "case laminate",
-					"landed_key": "wai_hb"
-				}
-			],
+			"formats": ["who-am-i-pb", "who-am-i-hb"],
 			"language": "en",
 			"look_inside": null,
 			"_source": "aeo-state/fhb-books-datapack-3dm-20261113.json (pmseoaeo 3dm, every field sourced) + projects/who-am-i-childrens-book/specsheet/sheet.json (isbn, price). SKU names + landed keys are build choices (pack: not sourced). Cover = front panel cut from cover/render-paperback.png (delivered art). status pending until P2 adds the SKUs to dvc-checkout."
