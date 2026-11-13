@@ -247,3 +247,47 @@ test('3ee-1: abroad, Bible net is measured from the landed cost', () => {
 		/format=Hardback\|qty=1\|.*country=GB\|date=2026-11-13\|net_usd=-?\d+\.\d{2}$/,
 	);
 });
+
+// ── 3es F2 (pmseoaeo 2026-11-13): no HTML entity, tag or raw newline inside any built /books page's JSON-LD ──────
+test('3es: built /books pages carry plain-text JSON-LD (no &entity;, no <tag>, no newline)', () => {
+	const dist = new URL('../dist/books/', import.meta.url);
+	assert.ok(fs.existsSync(dist), 'dist/books missing: this test runs after astro build');
+	const pages = fs
+		.readdirSync(dist, { withFileTypes: true })
+		.filter((d) => d.isDirectory())
+		.map((d) => d.name);
+	assert.ok(pages.length >= 2, `book pages built: ${pages.join(' ')}`);
+	for (const slug of ['', ...pages]) {
+		const html = fs.readFileSync(new URL(`${slug ? `${slug}/` : ''}index.html`, dist), 'utf8');
+		for (const [, ld] of html.matchAll(
+			/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g,
+		)) {
+			const strings = [];
+			JSON.parse(ld, (_k, v) => (typeof v === 'string' && strings.push(v), v));
+			for (const v of strings) {
+				assert.doesNotMatch(
+					v,
+					/&(#\d+|#x[0-9a-f]+|[a-z]+);/i,
+					`${slug || 'index'}: entity in "${v.slice(0, 60)}"`,
+				);
+				assert.doesNotMatch(
+					v,
+					/<\/?[a-z][^>]*>/i,
+					`${slug || 'index'}: tag in "${v.slice(0, 60)}"`,
+				);
+				assert.doesNotMatch(v, /\n/, `${slug || 'index'}: newline in "${v.slice(0, 60)}"`);
+			}
+		}
+	}
+});
+
+test('3es F1/F3: Who Am I? title + offers InStock + no future datePublished', () => {
+	const html = fs.readFileSync(
+		new URL('../dist/books/who-am-i/index.html', import.meta.url),
+		'utf8',
+	);
+	assert.match(html, /<title>Who Am I\? Read-Aloud Devotional by Karen Inge Hailstones<\/title>/);
+	assert.doesNotMatch(html, /"availability":"https:\/\/schema\.org\/(PreOrder|OutOfStock)"/);
+	for (const [, d] of html.matchAll(/"datePublished":"([^"]+)"/g))
+		assert.ok(new Date(d) <= new Date(), `future datePublished ${d}`);
+});

@@ -65,6 +65,9 @@ const bookPriceLine = (skus: string[]) =>
 	title="Father Heart Books for Children and Adults | FHB"
 	description="Books from the Father's Heart Bible family, for children and adults: each one about who our Heavenly Father is and who you are to Him."
 	jsonLd={jsonLd}
+	preloadImageMobile={books[0]?.cover.w600}
+	preloadMobileIsLcp={true}
+	preloadImageDesktop={books[0]?.cover.w300}
 >
 	<main id="main-content" style="margin-top: 80px;">
 		<Section variant="soft">
@@ -74,10 +77,10 @@ const bookPriceLine = (skus: string[]) =>
 				<BiblesBooksToggle current="books" />
 				<p class="bks__lead">Looking for the Bible? <a href="/print/">See every Father's Heart Bible edition</a>.</p>
 				<div class="bks__grid">
-					{books.map((b) => (
+					{books.map((b, i) => (
 						<article class="bks__card">
 							<a href={`/books/${b.slug}/`} class="bks__cover" aria-label={`${b.title}: full details`}>
-								<img src={b.cover.w300} srcset={`${b.cover.w300} 300w, ${b.cover.w600} 600w`} sizes="160px" width={b.cover.width} height={b.cover.height} alt={b.cover.alt} loading="lazy" decoding="async" />
+								<img src={b.cover.w300} srcset={`${b.cover.w300} 300w, ${b.cover.w600} 600w`} sizes="160px" width={b.cover.width} height={b.cover.height} alt={b.cover.alt} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
 							</a>
 							<div>
 								<h2 class="bks__title"><a href={`/books/${b.slug}/`}>{b.title}</a></h2>
