@@ -107,6 +107,14 @@ const shifts = biblePageData?.shifts ?? [
 // llms.txt saying the same thing.
 const DIVINE_NAMES =
 	'The covenant name YHWH is rendered “our Father” by default; on the lips of outsiders, such as Pharaoh, it keeps a title (“the LORD” or “God”). Where Elohim or Theos refers to the Father, it is rendered as Father too; “God” is kept where Scripture speaks of God as God. Where Adonai refers to the Father, it is rendered “Sovereign,” most often “my Sovereign Father”; “Lord” is used chiefly of Jesus.';
+// 3ap B1 (pmseoaeo 2026-11-13): stable anchor per FAQ question, from the question's own words, so a forum or
+// answer engine can link the exact block it quotes ("#faq-who-translated-fathers-heart-bible"). Ids only.
+const faqId = (q: string) =>
+	`faq-${q
+		.toLowerCase()
+		.replace(/[™’']/g, '')
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '')}`;
 const faqs = [
 	{
 		q: "What kind of translation is Father's Heart Bible™?",
@@ -416,6 +424,7 @@ const formatDate = (dateString: string) => {
 					See the Difference
 				</p>
 				<h2
+					id="zephaniah-3-17"
 					class="text-3xl md:text-4xl font-light"
 					style="font-family: var(--font-serif); color: var(--color-ink);"
 				>
@@ -618,7 +627,7 @@ const formatDate = (dateString: string) => {
 				<p>The Old Testament follows the Masoretic Hebrew and Aramaic text as preserved in the Leningrad Codex (AD 1008), checked against the Westminster Leningrad Codex; the New Testament follows the modern critical Greek text, checked against the SBL Greek New Testament. Where the manuscripts differ, it keeps company with the consensus of the modern critical editions. Standard Hebrew and Greek reference works are gratefully acknowledged; its English text, notes, and headings are its own.</p>
 					</div>
 				</details>
-				<details class="fm-item">
+				<details class="fm-item" id="how-translated">
 					<summary><span>How it was made</span><svg class="fm-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
 					<div class="fm-body">
 				<p>Father's Heart Bible™ was produced through a structured, rule-governed translation process built for this work, bringing the consistency and reach of modern language technology to the ancient task of translation. Within that process, AI language tools rendered the text and footnotes directly from the original Hebrew, Aramaic, and Greek, guided by a written set of 160 translation rules. Each book was then carried through successive passes, its most difficult readings cross-checked against the Hebrew and Greek and against independent references, before being reviewed and finalized. The rules and every interpretive decision are the work of Kevin White of Spirit Media Publishing, who led the process; other readers reviewed it and offered feedback.</p>
@@ -664,6 +673,7 @@ const formatDate = (dateString: string) => {
 					{faqs.map((faq) => (
 						<div data-reveal>
 							<h3
+								id={faqId(faq.q)}
 								class="text-xl md:text-2xl font-medium mb-3 leading-snug"
 								style="font-family: var(--font-serif); color: var(--color-ink);"
 							>
