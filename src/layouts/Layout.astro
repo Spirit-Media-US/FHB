@@ -59,6 +59,8 @@ interface Props {
 	bookReleaseDate?: string;
 	articleAuthor?: string;
 	articlePublishedTime?: string;
+	// 3bx: article:modified_time, same value as the page's JSON-LD dateModified.
+	articleModifiedTime?: string;
 	articleSection?: string;
 	articleTags?: string[];
 }
@@ -81,6 +83,7 @@ const {
 	pageType = 'website',
 	articleAuthor,
 	articlePublishedTime,
+	articleModifiedTime,
 	articleSection,
 	articleTags = [],
 	bookIsbn,
@@ -196,7 +199,11 @@ const LARGE_IMAGE_EXCLUDE = new Set([
 const _p = Astro.url.pathname.replace(/\/+$/, '');
 // 2xz: the /bibles/ edition hub is a NEW page (in no arm or readout), so it carries it from day one.
 const robotsContent =
-	(/^\/(blog|guides|meaning|bible-in)\/[^/]+$/.test(_p) || _p === '/bibles') &&
+	// 3bx: + /verses/<x>, /bible-for/<x>, /bibles/<x>-bible and the home page (hold list kept).
+	(/^\/(blog|guides|meaning|bible-in|verses|bible-for)\/[^/]+$/.test(_p) ||
+		/^\/bibles\/[^/]+-bible$/.test(_p) ||
+		_p === '/bibles' ||
+		_p === '') &&
 	!LARGE_IMAGE_EXCLUDE.has(_p)
 		? 'index, follow, max-image-preview:large'
 		: 'index, follow';
@@ -444,6 +451,9 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		)}
 		{pageType === 'article' && articlePublishedTime && (
 			<meta property="article:published_time" content={articlePublishedTime} />
+		)}
+		{pageType === 'article' && articleModifiedTime && (
+			<meta property="article:modified_time" content={articleModifiedTime} />
 		)}
 		{pageType === 'article' && articleSection && (
 			<meta property="article:section" content={articleSection} />
