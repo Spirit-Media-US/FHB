@@ -115,6 +115,16 @@ const faqId = (q: string) =>
 		.replace(/[™’']/g, '')
 		.replace(/[^a-z0-9]+/g, '-')
 		.replace(/^-+|-+$/g, '')}`;
+// 3aq (pmseoaeo 2026-11-13, W7 target-10): body links from pages engines already cite to the uncited target
+// pages. Anchor = each target page's own H1; no new prose beyond the one label line.
+const BIBLE_FOR_3AQ: [string, string][] = [
+	['incarcerated', 'The Bible for the Incarcerated'],
+	['teenagers', 'The Bible for Teenagers'],
+	['muslims', 'The Bible for Muslims'],
+	['new-believers', 'The Best Bible to Give a New Believer'],
+	['addiction', 'The Bible for Those Facing Addiction'],
+	['fathers', 'The Bible for Fathers'],
+];
 const faqs = [
 	{
 		q: "What kind of translation is Father's Heart Bible™?",
@@ -688,6 +698,10 @@ const formatDate = (dateString: string) => {
 						</div>
 					))}
 				</div>
+				<p class="mt-12 mb-3" style="font-family: var(--font-sans); color: var(--color-ink); font-weight: 600;">The Bible for:</p>
+				<ul class="space-y-3" style="list-style: none; padding: 0; margin: 0; font-family: var(--font-sans); color: var(--color-muted); line-height: 1.65;">
+					{BIBLE_FOR_3AQ.map(([s, h]) => (<li><a href={`/bible-for/${s}/`} style="color: var(--color-brand);" class="hover:underline">{h}</a></li>))}
+				</ul>
 			</div>
 		</Section>
 
