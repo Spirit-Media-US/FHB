@@ -253,7 +253,7 @@ export function collect(root = process.cwd()) {
 				url: `/${rel}/`,
 				slug,
 				title: (ov.title || m.title || humanize(slug)).replace(
-					/\s*\|\s*Father.s Heart Bible.*$/,
+					/\s*\|\s*(Father.s Heart Bible.*|FHB)$/, // 3cv-1: a short ' | FHB' brand suffix is stripped too
 					'',
 				),
 				description: ov.description || m.description,
