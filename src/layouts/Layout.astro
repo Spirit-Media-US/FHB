@@ -567,5 +567,23 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 			document.querySelectorAll('[data-counter]').forEach((el) => counterObserver.observe(el));
 
 		</script>
+		<!-- 3ec-3 (pmseoaeo 2026-11-13): marketing pages never pass through the apex router's AI-referral logger, so an
+		     AI-assistant landing reports itself to /_evt (kind ai_landing -> ai-ref bucket, via beacon). It fires ONLY when
+		     utm_source or the referrer host is an assistant: no request at all for every other visitor (KV free cap). -->
+		<script is:inline>
+			(() => {
+				try {
+					const q = new URLSearchParams(location.search).get('utm_source') || '';
+					let r = '';
+					try { r = document.referrer ? new URL(document.referrer).hostname : ''; } catch (e) { r = ''; }
+					const AI = /^(chatgpt(\.com)?|openai(\.com)?|chat\.openai\.com|(www\.)?perplexity(\.ai)?|claude(\.ai)?|anthropic|gemini(\.google\.com)?|copilot(\.microsoft\.com|\.com)?|you(\.com)?|deepseek(\.com)?|grok(\.com)?|meta\.ai|poe(\.com)?|le-?chat|mistral(\.ai)?)$/i;
+					const HOST = /(^|\.)(chatgpt\.com|openai\.com|perplexity\.ai|claude\.ai|anthropic\.com|gemini\.google\.com|aistudio\.google\.com|copilot\.microsoft\.com|you\.com|deepseek\.com|grok\.com|x\.ai|meta\.ai|poe\.com|chat\.mistral\.ai)$/i;
+					if (!(AI.test(q) || HOST.test(r))) return;
+					const b = JSON.stringify({ kind: 'ai_landing', utm: q.slice(0, 60), ref_host: r.slice(0, 80), path: location.pathname.slice(0, 120) });
+					if (navigator.sendBeacon) navigator.sendBeacon('/_evt', new Blob([b], { type: 'application/json' }));
+					else fetch('/_evt', { method: 'POST', body: b, keepalive: true }).catch(() => {});
+				} catch (e) { /* telemetry never breaks the page */ }
+			})();
+		</script>
 	</body>
 </html>
