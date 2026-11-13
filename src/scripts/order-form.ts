@@ -58,11 +58,51 @@ interface Config {
 	/** the page's order language and its string table (absent = English) */
 	lang?: OrderLang;
 	s?: Strings;
+	/** discount-exempt SKUs (books): list price, nothing on the ladder — embedded at build, no costs */
+	exempt?: string[];
 }
+
+// ── ONE CART PER SITE (FHB-BOOKS, Kevin 2026-11-13 'Shopper': "ONE cart per site holding Bibles + books") ──
+// Every order form (the /print catalog, /print/order/, edition pages) and every book page reads and writes ONE
+// browser cart, so Bibles and books picked on different pages meet at one checkout. Browser storage only (a
+// convenience): private windows or blocked storage simply mean no carry-over, never a broken form.
+export const CART_KEY = 'fhb-cart';
+export const FULL_CART_PATH = '/print/order/';
+export function cartRead(): Record<string, number> {
+	try {
+		const v = JSON.parse(localStorage.getItem(CART_KEY) || '{}');
+		return v && typeof v === 'object' ? (v as Record<string, number>) : {};
+	} catch {
+		return {};
+	}
+}
+export function cartWrite(all: Record<string, number>, source?: unknown) {
+	try {
+		const clean = Object.fromEntries(Object.entries(all).filter(([, n]) => Number(n) > 0));
+		localStorage.setItem(CART_KEY, JSON.stringify(clean));
+	} catch {
+		/* storage blocked: the form still works on this page */
+	}
+	window.dispatchEvent(new CustomEvent('fhb-cart', { detail: source }));
+}
+export const cartCount = (c: Record<string, number> = cartRead()) =>
+	Object.values(c).reduce((s, n) => s + (Number(n) > 0 ? Number(n) : 0), 0);
 
 function init(root: HTMLElement) {
 	const cfg = JSON.parse(root.dataset.order ?? '{}') as Config;
 	const counts: Record<string, number> = {};
+	// The shared cart: this form owns the SKUs it can price; everything else in the cart is kept as it is.
+	const mine = (k: string) => cfg.prices[k] != null;
+	for (const [k, n] of Object.entries(cartRead()))
+		if (mine(k) && Number(n) > 0) counts[k] = Math.floor(Number(n));
+	const others = () => Object.entries(cartRead()).filter(([k, n]) => !mine(k) && Number(n) > 0);
+	let syncing = false;
+	const saveCart = () => {
+		if (syncing) return;
+		const all = Object.fromEntries(Object.entries(cartRead()).filter(([k]) => !mine(k)));
+		for (const [k, n] of Object.entries(counts)) if (n > 0) all[k] = n;
+		cartWrite(all, root);
+	};
 	let S: Strings = cfg.s ?? en;
 	let lang: OrderLang = cfg.lang ?? 'en';
 	const money = (cents: number) => formatUsd(lang, cents);
@@ -210,7 +250,12 @@ function init(root: HTMLElement) {
 	function lines() {
 		return Object.entries(counts)
 			.filter(([k, n]) => n > 0 && cfg.prices[k] != null)
-			.map(([k, n]) => ({ slug: k, cents: Math.round(cfg.prices[k] * 100), qty: n }));
+			.map(([k, n]) => ({
+				slug: k,
+				cents: Math.round(cfg.prices[k] * 100),
+				qty: n,
+				exempt: (cfg.exempt ?? []).includes(k),
+			}));
 	}
 	const countryRow = (): { code: string; row: IntlRow | undefined } => {
 		const code = q<HTMLSelectElement>('[data-country]')?.value ?? 'US';
@@ -274,6 +319,7 @@ function init(root: HTMLElement) {
 			});
 	}
 	function render() {
+		saveCart();
 		// 1A: the first-order 15% is offered everywhere. Outside the US it comes off each unit
 		// (the server does the same), so it rounds per unit.
 		const { code, row } = countryRow();
@@ -356,6 +402,17 @@ function init(root: HTMLElement) {
 	};
 	q('[data-checkout]')?.addEventListener('click', async (ev) => {
 		const btn = ev.currentTarget as HTMLButtonElement;
+		// The cart holds items this page cannot price (a book picked on its own page, say): never show a partial
+		// total — the full cart page prices and checks out everything together.
+		const extra = others();
+		if (extra.length && window.location.pathname !== FULL_CART_PATH) {
+			saveCart();
+			say(
+				`Your cart also holds ${extra.length} item${extra.length === 1 ? '' : 's'} from other pages — opening your full cart…`,
+			);
+			window.location.href = FULL_CART_PATH;
+			return;
+		}
 		if (!lines().length) return say(t('m.choose'));
 		if (email && !email.checkValidity()) {
 			email.focus();
@@ -426,6 +483,16 @@ function init(root: HTMLElement) {
 
 	for (const row of qa('[data-row]')) paintRow(row);
 	render();
+	// Another form or a book page changed the cart: take this form's SKUs from it and repaint, without writing back.
+	window.addEventListener('fhb-cart', (e) => {
+		if ((e as CustomEvent).detail === root) return;
+		syncing = true;
+		const c = cartRead();
+		for (const k of Object.keys(cfg.prices)) counts[k] = Math.floor(Number(c[k]) || 0);
+		for (const row of qa('[data-row]')) paintRow(row);
+		render();
+		syncing = false;
+	});
 
 	// /print/order/?lang=de: the link on a German edition page. Unknown or absent = stay English.
 	const want =

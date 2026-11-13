@@ -94,6 +94,14 @@ function parseCheckout(src) {
 	const out = parseObject(src, 'const EDITIONS');
 	for (const [sku, v] of Object.entries(parseObject(src, 'const CATALOG_LANG_EDITIONS')))
 		if (!(sku in out)) out[sku] = v;
+	// FHB-BOOKS: the function adds every LIVE book format from src/data/books.json + book-skus.json at RUNTIME
+	// (BOOK_EDITIONS, books: 0), which no source scan can see. Mirror it exactly so a book in the one-cart order form
+	// is checked against the price the server will charge, not reported as unsold.
+	const bk = JSON.parse(readFileSync('src/data/books.json', 'utf8'));
+	const skus = JSON.parse(readFileSync('src/data/book-skus.json', 'utf8')).skus;
+	for (const b of bk.books)
+		if (b.status === 'live')
+			for (const sku of b.formats) if (!(sku in out)) out[sku] = { cents: skus[sku].list_cents, books: 0 };
 	return out;
 }
 function parseObject(src, decl) {

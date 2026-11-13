@@ -50,7 +50,9 @@ export interface Quote {
 
 /** lines: list-price cents, quantity and ladder weight per SKU. All amounts in cents. */
 export function quote(
-	lines: { cents: number; qty: number; books?: number }[],
+	/** exempt = a discount-exempt SKU (a book): list price under every offer and NOTHING on the Bible ladder —
+	 *  the same rule /dvc-checkout charges (FHB-BOOKS one cart, 2026-11-13) */
+	lines: { cents: number; qty: number; books?: number; exempt?: boolean }[],
 	tiers: Tier[],
 	/**
 	 * true for an international destination: the first-order discount is then taken off each unit
@@ -61,14 +63,19 @@ export function quote(
 	/** false until the buyer's email is known to belong to a first order: never show a total the buyer will not pay (no-drip rule) */
 	firstAvailable = true,
 ): Quote {
-	const copies = lines.reduce((s, l) => s + l.qty * (l.books ?? 1), 0);
+	const disc = lines.filter((l) => !l.exempt);
+	const exemptSum = lines.filter((l) => l.exempt).reduce((s, l) => s + l.cents * l.qty, 0);
+	const copies = disc.reduce((s, l) => s + l.qty * (l.books ?? 1), 0);
 	const subtotal = lines.reduce((s, l) => s + l.cents * l.qty, 0);
+	const discSub = subtotal - exemptSum;
 	const bulkPct = tierPct(tiers, copies);
-	const bulkTotal = lines.reduce((s, l) => s + unitAfter(l.cents, bulkPct) * l.qty, 0);
-	// Stripe applies the percent-off coupon to the order subtotal and rounds the discount once.
-	const firstTotal = firstPerUnit
-		? lines.reduce((s, l) => s + unitAfter(l.cents, FIRST_ORDER_PCT) * l.qty, 0)
-		: subtotal - Math.round((subtotal * FIRST_ORDER_PCT) / 100);
+	const bulkTotal = disc.reduce((s, l) => s + unitAfter(l.cents, bulkPct) * l.qty, 0) + exemptSum;
+	// Stripe applies the percent-off coupon to the order subtotal and rounds the discount once — unless the cart
+	// holds an exempt book, where the server takes it per Bible unit (perUnitPromo), like an international cart.
+	const firstTotal =
+		firstPerUnit || exemptSum > 0
+			? disc.reduce((s, l) => s + unitAfter(l.cents, FIRST_ORDER_PCT) * l.qty, 0) + exemptSum
+			: discSub - Math.round((discSub * FIRST_ORDER_PCT) / 100);
 	const best =
 		copies < 1
 			? 'none'
@@ -153,7 +160,7 @@ export interface Handling {
 }
 /** lines carry the LIST price; `pct` is the discount actually applied to the unit price. */
 export function handlingFor(
-	lines: { slug: string; cents: number; qty: number }[],
+	lines: { slug: string; cents: number; qty: number; exempt?: boolean }[],
 	pct: number,
 	row: IntlRow | undefined,
 ): Handling {
@@ -161,7 +168,8 @@ export function handlingFor(
 	let total = 0;
 	if (row)
 		for (const l of lines) {
-			const fee = row.fees[feeKey(l.slug, unitAfter(l.cents, pct))];
+			// an exempt book is paid at list under every offer, and its fee was sized on that price (handlingTable/paidUnit)
+			const fee = row.fees[feeKey(l.slug, l.exempt ? l.cents : unitAfter(l.cents, pct))];
 			if (fee == null) throw new Error(`no handling fee for ${l.slug} at ${pct}%`);
 			perSku[l.slug] = fee;
 			total += fee * l.qty;

@@ -228,9 +228,11 @@ ${shippedBlock}
 		200,
 		// Google Customer Reviews opt-in: this page only, values from the verified session above.
 		// buildOptIn returns null (module omitted) for test-mode sessions or any unverifiable value.
-		(() => {
+		// FHB-BOOKS one cart: a PAID order empties the site cart (src/scripts/order-form.ts, key fhb-cart); a cancelled
+		// or unpaid checkout never reaches this view, so the buyer's picks survive it.
+		`<script>try{localStorage.removeItem('fhb-cart')}catch(e){}</script>${(() => {
 			const o = buildOptIn(s);
 			return o ? optInSnippet(o) : '';
-		})(),
+		})()}`,
 	);
 };

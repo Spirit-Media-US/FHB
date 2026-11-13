@@ -16,12 +16,17 @@ type Book = {
 	subtitle?: string;
 	full_title: string;
 	author: { name: string };
+	group?: string;
 	short: string;
 	who_for: string[];
 	cover: { w600: string; w300: string; width: number; height: number; alt: string; jpg: string };
 	formats: { format: string; list_cents: number; isbn: string }[];
 };
 const books = (catalog.books as Book[]).slice().sort((a, b) => a.order - b.order);
+// 'Shopper' (Kevin 2026-11-13): groups and filters, never a long scroll. A chip per group that HAS books (data field
+// books.json group); the search box only once the list is long enough to need one.
+const groups = [...new Set(books.map((b) => b.group).filter(Boolean))] as string[];
+const SEARCH_FROM = 7;
 const URL_ = 'https://fathersheartbible.com/books/';
 const money = (c: number) => `$${(c / 100).toFixed(2)}`;
 const jsonLd = [
@@ -76,9 +81,18 @@ const bookPriceLine = (skus: string[]) =>
 				<h1 class="bks__h1">Father Heart Books</h1>
 				<BiblesBooksToggle current="books" />
 				<p class="bks__lead">Looking for the Bible? <a href="/print/">See every Father's Heart Bible edition</a>.</p>
+				{groups.length > 1 && (
+					<div class="bks__filters" data-bks-filters>
+						<div class="bks__chips" role="group" aria-label="Filter books by group">
+							<button type="button" class="bks__chip" data-group="" aria-pressed="true">All</button>
+							{groups.map((g) => <button type="button" class="bks__chip" data-group={g} aria-pressed="false">{g}</button>)}
+						</div>
+						{books.length >= SEARCH_FROM && <input class="bks__search" type="search" placeholder="Search title or author" aria-label="Search books" data-bks-search />}
+					</div>
+				)}
 				<div class="bks__grid">
 					{books.map((b, i) => (
-						<article class="bks__card">
+						<article class="bks__card" data-group={b.group ?? ''} data-search={`${b.title} ${b.subtitle ?? ''} ${b.author.name}`.toLowerCase()}>
 							<a href={`/books/${b.slug}/`} class="bks__cover" aria-label={`${b.title}: full details`}>
 								<img src={b.cover.w300} srcset={`${b.cover.w300} 300w, ${b.cover.w600} 600w`} sizes="160px" width={b.cover.width} height={b.cover.height} alt={b.cover.alt} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
 							</a>
@@ -98,7 +112,33 @@ const bookPriceLine = (skus: string[]) =>
 	</main>
 </Layout>
 
+<script>
+	const box = document.querySelector('[data-bks-filters]');
+	if (box) {
+		const cards = [...document.querySelectorAll<HTMLElement>('.bks__card')];
+		const search = box.querySelector<HTMLInputElement>('[data-bks-search]');
+		let group = '';
+		const apply = () => {
+			const q = (search?.value ?? '').trim().toLowerCase();
+			for (const c of cards) c.hidden = (!!group && c.dataset.group !== group) || (!!q && !(c.dataset.search ?? '').includes(q));
+		};
+		for (const chip of box.querySelectorAll<HTMLButtonElement>('[data-group]'))
+			chip.addEventListener('click', () => {
+				group = chip.dataset.group ?? '';
+				for (const o of box.querySelectorAll('[data-group]')) o.setAttribute('aria-pressed', String(o === chip));
+				apply();
+			});
+		search?.addEventListener('input', apply);
+	}
+</script>
+
 <style>
+	.bks__filters { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin: 0 0 1.25rem; }
+	.bks__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+	.bks__chip { min-height: 40px; padding: 0 1rem; border-radius: 999px; border: 1px solid var(--color-hairline); background: #fff; color: var(--color-ink); font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+	.bks__chip[aria-pressed='true'] { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+	.bks__search { min-height: 40px; flex: 1 1 14rem; max-width: 22rem; border: 1px solid #a1a1aa; border-radius: 0.5rem; padding: 0 0.75rem; font: inherit; }
+	.bks__card[hidden] { display: none; }
 	.bks { max-width: 60rem; margin: 0 auto; font-family: var(--font-sans); }
 	.bks__crumb { font-size: 0.85rem; color: #3f3f46; display: flex; gap: 0.4rem; margin-bottom: 1rem; }
 	.bks__crumb a { text-decoration: underline; }

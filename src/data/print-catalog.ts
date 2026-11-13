@@ -3,11 +3,13 @@
 // them (Kevin 2026-10-03). The SKUs are functions/dvc-checkout.ts's; scripts/pricing-verify.mjs
 // reads the prices each BUILT order form carries and fails the build if any differs from the
 // server's, or if the catalog misses a SKU the server sells.
+import bookSkus from './book-skus.json';
+import booksCatalog from './books.json';
 import { cardUrl, hasLangCard } from './card-art';
 import { dvcEditions, trimTargeted } from './dvc-editions';
 import { LANG_HB, LANG_PB, langSlug, orderableLanguages } from './language-editions';
 
-export type CatalogCategory = 'general' | 'audience' | 'large-print' | 'language';
+export type CatalogCategory = 'general' | 'audience' | 'large-print' | 'language' | 'books';
 
 export interface CatalogRow {
 	/** SKU stem: the row sells `${id}-hb` and `${id}-pb` */
@@ -32,6 +34,9 @@ export const CATALOG_CATEGORIES: { key: CatalogCategory; label: string }[] = [
 	{ key: 'audience', label: 'Audience Editions' },
 	{ key: 'large-print', label: 'Large Print' },
 	{ key: 'language', label: 'Language Editions' },
+	// FHB-BOOKS one cart (Kevin 2026-11-13 'Shopper'): the books sit in the SAME order form as the Bibles, LAST, so
+	// Bibles stay first and one checkout carries both.
+	{ key: 'books', label: 'Books' },
 ];
 
 const norm = (...parts: (string | undefined)[]) =>
@@ -105,13 +110,47 @@ export const catalogRows: CatalogRow[] = [
 		pb: LANG_PB,
 		search: norm(l.english, l.name, langSlug(l), 'language'),
 	})),
+	// Every LIVE book from src/data/books.json (adding a book = data). A binding the book is not sold in has price 0
+	// and no button (OrderRow), and is left out of catalogPrices.
+	...(
+		booksCatalog.books as {
+			slug: string;
+			status: string;
+			title: string;
+			author: { name: string };
+			group?: string;
+			cover: { w300: string };
+			formats: string[];
+		}[]
+	)
+		.filter((b) => b.status === 'live')
+		.map((b) => {
+			const fmt = (k: 'hb' | 'pb') =>
+				b.formats
+					.map((f) => (bookSkus.skus as Record<string, { list_cents: number; spec?: string }>)[f])
+					.find((_, i) => b.formats[i].endsWith(`-${k}`));
+			const hb = fmt('hb');
+			const pb = fmt('pb');
+			return {
+				id: b.slug,
+				category: 'books' as const,
+				title: `${b.title} — ${b.author.name}`,
+				trim: (pb ?? hb)?.spec ?? '',
+				img: b.cover.w300,
+				hb: hb ? hb.list_cents / 100 : 0,
+				pb: pb ? pb.list_cents / 100 : 0,
+				search: norm(b.title, b.author.name, b.group, 'book books'),
+			};
+		}),
 ];
 
 /** Every SKU's list price in dollars — what each order form embeds for its live total. */
 export const catalogPrices = (rows: CatalogRow[] = catalogRows): Record<string, number> =>
 	Object.fromEntries(
-		rows.flatMap((r) => [
-			[`${r.id}-hb`, r.hb],
-			[`${r.id}-pb`, r.pb],
-		]),
+		rows.flatMap((r) =>
+			[
+				[`${r.id}-hb`, r.hb],
+				[`${r.id}-pb`, r.pb],
+			].filter(([, v]) => (v as number) > 0),
+		),
 	);

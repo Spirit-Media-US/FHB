@@ -291,3 +291,46 @@ test('3es F1/F3: Who Am I? title + offers InStock + no future datePublished', ()
 	for (const [, d] of html.matchAll(/"datePublished":"([^"]+)"/g))
 		assert.ok(new Date(d) <= new Date(), `future datePublished ${d}`);
 });
+
+// ── ONE CART (FHB-BOOKS 'Shopper', 2026-11-13): what the order form SHOWS == what the server CHARGES ──────────
+import { PRINT_TIERS } from '../src/data/print-tiers.ts';
+import { handlingTable } from '../src/lib/marginGuard.ts';
+import { FIRST_ORDER_PCT, handlingFor, quote } from '../src/lib/order-pricing.ts';
+
+for (const country of ['US', 'GB']) {
+	test(`one cart: a Bible + two books, first order, ${country} — form total == Stripe charge`, async () => {
+		const counts = { 'general-regular-plum-hb': 1, [PB]: 1, 'beloved-identity-pb': 2 };
+		// the catalog's own sources (print-catalog.ts is Vite-resolved, not loadable by node): the General edition's
+		// hardback list price constant, and every book format from book-skus.json — exactly what catalogPrices() emits
+		const prices = {
+			'general-regular-plum-hb': 99.99,
+			...Object.fromEntries(Object.entries(SKU).map(([k, v]) => [k, v.list_cents / 100])),
+		};
+		for (const k of Object.keys(counts)) assert.ok(prices[k] != null, `catalog prices ${k}`);
+		const ex = DISCOUNT_EXEMPT.filter((k) => k in prices);
+		const ls = Object.entries(counts).map(([k, n]) => ({
+			slug: k,
+			cents: Math.round(prices[k] * 100),
+			qty: n,
+			exempt: ex.includes(k),
+		}));
+		const r = quote(ls, PRINT_TIERS, country !== 'US', true);
+		const pct = r.best === 'first' ? FIRST_ORDER_PCT : r.best === 'bulk' ? r.bulkPct : 0;
+		const table = handlingTable(
+			Object.fromEntries(Object.entries(prices).map(([k, v]) => [k, Math.round(v * 100)])),
+			[FIRST_ORDER_PCT, ...PRINT_TIERS.map((t) => t.pct)],
+		);
+		const shown =
+			(r.best === 'first' ? r.firstTotal : r.bulkTotal) +
+			handlingFor(ls, pct, table[country]).total;
+		const res = await post({ counts, country, email: 'new@buyer.org' });
+		assert.equal(res.status, 200, JSON.stringify(res.json));
+		const charged = lines(res.s).reduce((t, l) => t + l.unit * l.qty, 0);
+		assert.ok(
+			!res.s['discounts[0][promotion_code]'],
+			'a cart with a book takes the 15% per Bible unit, no coupon',
+		);
+		assert.equal(shown, charged, `${country}: form ${shown} vs Stripe ${charged}`);
+		assert.equal(r.copies, 1, 'books add nothing to the Bible ladder');
+	});
+}

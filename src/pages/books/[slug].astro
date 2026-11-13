@@ -90,6 +90,25 @@ const LONG_TEXT = book.long_html
 	.replace(/&([a-z]+);/gi, (m: string, n: string) => ENTITY[n.toLowerCase()] ?? m)
 	.replace(/\s+/g, ' ')
 	.trim();
+// 'Shopper' (Kevin 2026-11-13): at most 3 "you may also like" from the SAME group (books.json group), never the catalogue.
+const alsoLike = (
+	catalog.books as {
+		slug: string;
+		status: string;
+		group?: string;
+		title: string;
+		author: { name: string };
+		cover: { w300: string; alt: string; width: number; height: number };
+	}[]
+)
+	.filter(
+		(b) =>
+			b.slug !== book.slug &&
+			b.status === 'live' &&
+			b.group &&
+			b.group === (book as { group?: string }).group,
+	)
+	.slice(0, 3);
 const hasLook = !!(book.look_inside && (lookinside as Record<string, unknown>)[book.look_inside]);
 
 // Destinations per format: the US, plus every live country with a MEASURED landed cost for that format
@@ -252,6 +271,7 @@ const jsonLd = [
 							<p class="bi__fee" data-fee hidden></p>
 							<p class="bi__total">Total <b data-total>{money(first.list_cents)}</b> <span>plus tax where it applies</span></p>
 							<button type="button" class="bi__btn" data-order-btn>Order now</button>
+							<p class="bi__more"><button type="button" class="bi__link" data-add-cart>Add to cart &amp; keep shopping</button> · <a href="/print/order/" data-cart-link>Your cart<span data-cart-n></span></a></p>
 							<p class="bi__msg" data-msg role="status" hidden></p>
 							<p class="bi__fine"><a href="/returns/">Your purchase is guaranteed</a> · Printed and shipped to you by our printer, IngramSpark.</p>
 						</div>
@@ -277,12 +297,27 @@ const jsonLd = [
 					<p style="line-height: 1.7;">{book.author_bio}</p>
 				</div>
 			)}
+			{alsoLike.length > 0 && (
+				<nav class="bk__also" aria-label="You may also like">
+					<h2 class="bk__h2">You may also like</h2>
+					<ul class="bk__also-list">
+						{alsoLike.map((b) => (
+							<li><a href={`/books/${b.slug}/`}><img src={b.cover.w300} alt="" width={b.cover.width} height={b.cover.height} loading="lazy" decoding="async" /><span>{b.title}</span><span class="bk__also-by">{b.author.name}</span></a></li>
+						))}
+					</ul>
+				</nav>
+			)}
 			<p class="bk__more"><a href="/books/">More Father Heart books</a> · <a href="/print/">Father's Heart Bible editions</a></p>
 		</Section>
 	</main>
 </Layout>
 
 <style>
+	.bk__also { max-width: 44rem; margin: 2rem auto 0; font-family: var(--font-sans); }
+	.bk__also-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: 1rem; }
+	.bk__also-list a { display: grid; gap: 0.3rem; color: var(--color-ink); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+	.bk__also-list img { width: 100%; height: auto; border-radius: 0.3rem; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+	.bk__also-by { font-weight: 400; color: #3f3f46; font-size: 0.8rem; }
 	.bk__crumb { max-width: 60rem; margin: 0 auto 1.2rem; font-family: var(--font-sans); font-size: 0.85rem; color: #3f3f46; display: flex; gap: 0.4rem; flex-wrap: wrap; }
 	.bk__crumb a { text-decoration: underline; }
 	.bk__look { margin-top: 1rem; text-align: center; }
@@ -313,6 +348,9 @@ const jsonLd = [
 	.bi__btn:disabled { opacity: 0.6; cursor: wait; }
 	.bi__msg { margin: 0.7rem 0 0; font-size: 0.9rem; font-weight: 600; color: #7f1d1d; }
 	.bi__fine { margin: 0.8rem 0 0; font-size: 0.8rem; color: #3f3f46; }
+	.bi__more { margin: 0.7rem 0 0; font-size: 0.9rem; color: #3f3f46; }
+	.bi__more a, .bi__link { color: var(--color-ink); text-decoration: underline; }
+	.bi__link { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; min-height: 44px; }
 	.bi__fine a { text-decoration: underline; }
 	.bi__desc { max-width: 44rem; margin: 2.5rem auto 0; font-family: var(--font-sans); color: #27272a; line-height: 1.7; }
 	.bi__desc :global(p) { margin: 0 0 0.9rem; }
@@ -320,6 +358,8 @@ const jsonLd = [
 </style>
 
 <script>
+	// FHB-BOOKS one cart (Kevin 2026-11-13 'Shopper'): this book joins the SAME site cart as the Bibles.
+	import { cartCount, cartRead, cartWrite, FULL_CART_PATH } from '../../scripts/order-form';
 	const root = document.querySelector<HTMLElement>('[data-bi]');
 	if (root) {
 		type Dest = { code: string; name: string; far: boolean; fee: number; label: string };
@@ -369,7 +409,33 @@ const jsonLd = [
 		qty.addEventListener('input', render);
 		sel.addEventListener('change', render);
 		render();
+		const cartN = root.querySelector<HTMLElement>('[data-cart-n]');
+		const others = () => Object.keys(cartRead()).filter((k) => k !== fmt().sku);
+		const paintCart = () => {
+			const c = cartCount();
+			if (cartN) cartN.textContent = c ? ` (${c})` : '';
+			btn.textContent = others().length ? 'Add to cart' : 'Order now';
+		};
+		const addToCart = () => {
+			const c = cartRead();
+			c[fmt().sku] = (Number(c[fmt().sku]) || 0) + n();
+			cartWrite(c);
+		};
+		paintCart();
+		window.addEventListener('fhb-cart', paintCart);
+		fmtSel?.addEventListener('change', paintCart);
+		root.querySelector('[data-add-cart]')?.addEventListener('click', () => {
+			addToCart();
+			say(`Added to your cart. Keep shopping, or open your cart to check out.`);
+		});
 		btn.addEventListener('click', async () => {
+			// Other items already in the cart: this book joins them and ONE checkout carries everything.
+			if (others().length) {
+				addToCart();
+				say('Added — opening your cart…');
+				window.location.href = FULL_CART_PATH;
+				return;
+			}
 			if (dest().far && n() >= 10) return say(cfg.quote);
 			say('Opening secure checkout…');
 			btn.disabled = true;

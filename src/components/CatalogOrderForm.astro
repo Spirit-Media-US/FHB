@@ -18,7 +18,7 @@
 import { CATALOG_CATEGORIES, catalogPrices, catalogRows } from '../data/print-catalog';
 import { PRINT_TIERS } from '../data/print-tiers';
 import { handlingTable } from '../lib/marginGuard';
-import { FIRST_ORDER_PCT } from '../lib/order-pricing';
+import { DISCOUNT_EXEMPT, FIRST_ORDER_PCT } from '../lib/order-pricing';
 import { formatCount, ORDER_STRINGS, tr } from '../lib/orderStrings';
 import { LIVE_COUNTRIES, shipsLine, shipsParts, shipsToSentence } from '../lib/shipCountries';
 import BiblesBooksToggle from './BiblesBooksToggle.astro';
@@ -46,6 +46,8 @@ const tiers = PRINT_TIERS;
 const config = JSON.stringify({
 	prices: catalogPrices(),
 	tiers: PRINT_TIERS,
+	// FHB-BOOKS one cart: books sit in this form (Books section); the form prices them as the server does.
+	exempt: DISCOUNT_EXEMPT.filter((k) => k in catalogPrices()),
 	returnPath,
 	// Far-band countries (unit 2kx): no volume ladder, and 10+ copies go to a bulk quote, not checkout.
 	farBand: LIVE_COUNTRIES.filter((c) => c.farBand).map((c) => c.code),

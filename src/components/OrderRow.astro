@@ -29,10 +29,13 @@ const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const bindings = [
 	{ key: 'hb', label: 'Hardback', tkey: 'p.hardback', cents: Math.round(hb * 100) },
 	{ key: 'pb', label: 'Paperback', tkey: 'p.paperback', cents: Math.round(pb * 100) },
-].map((b) => ({ ...b, first: firstOrderUnit(b.cents) }));
+]
+	// a book sold in one binding only (Beloved Identity: paperback) shows only that one
+	.filter((b) => b.cents > 0)
+	.map((b) => ({ ...b, first: firstOrderUnit(b.cents) }));
 const name = native ? `${native} (${title})` : title;
 ---
-<div class:list={['orow', { 'orow--bare': bare }]} data-row data-id={id} data-bind="hb" data-search={search}>
+<div class:list={['orow', { 'orow--bare': bare }]} data-row data-id={id} data-bind={bindings[0]?.key ?? 'hb'} data-search={search}>
 	{img && !bare && <img class="orow__img" src={img} alt="" width="360" height="458" loading="lazy" decoding="async" />}
 	<div class="orow__main">
 		{!bare && <p class="orow__title">
@@ -43,7 +46,7 @@ const name = native ? `${native} (${title})` : title;
 		<div class="orow__ctl">
 			<div class="orow__seg" role="group" aria-label={bare ? 'Binding' : `${name}: binding`} data-t-aria-label={bare ? undefined : 'c.rowBinding'} data-vars={bare ? undefined : JSON.stringify({ name })}>
 				{bindings.map((b) => (
-					<button type="button" class="orow__bind" data-bind={b.key} aria-pressed={b.key === 'hb' ? 'true' : 'false'}>
+					<button type="button" class="orow__bind" data-bind={b.key} aria-pressed={b.key === bindings[0]?.key ? 'true' : 'false'}>
 						<span class="orow__bname"><span data-t={b.tkey}>{b.label}</span> <span class="orow__count" data-seg-count hidden></span></span>
 						<span class="orow__price"><s data-list={b.key}>{money(b.cents)}</s> <b data-first={b.key}>{money(b.first)}</b></span>
 						<span class="orow__fee" data-fee-sku={`${id}-${b.key}`} hidden></span>
