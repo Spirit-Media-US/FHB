@@ -58,11 +58,37 @@ const { book } = Astro.props as { book: Book };
 const URL_ = `https://fathersheartbible.com/books/${book.slug}/`;
 const live = book.status === 'live';
 const money = (c: number) => `$${(c / 100).toFixed(2)}`;
+// 3es F2 (pmseoaeo 2026-11-13): the JSON-LD description is PLAIN text — every HTML entity decoded (&bull; &ndash; sat in
+// it raw), no tags, no newlines. scripts/fhb-books.test.mjs fails the build on any entity or tag left in a built page.
+const ENTITY: Record<string, string> = {
+	amp: '&',
+	bull: '•',
+	ndash: '–',
+	mdash: '—',
+	rsquo: '’',
+	lsquo: '‘',
+	ldquo: '“',
+	rdquo: '”',
+	hellip: '…',
+	nbsp: ' ',
+	quot: '"',
+	apos: "'",
+	lt: '<',
+	gt: '>',
+	trade: '™',
+	copy: '©',
+	reg: '®',
+};
 const LONG_TEXT = book.long_html
 	.replace(/<p><br><\/p>/g, '')
-	.replace(/<\/p>/g, '\n')
+	.replace(/<\/p>/g, ' ')
 	.replace(/<[^>]+>/g, '')
-	.replace(/&amp;/g, '&')
+	.replace(/&#x([0-9a-f]+);/gi, (_: string, h: string) =>
+		String.fromCodePoint(Number.parseInt(h, 16)),
+	)
+	.replace(/&#(\d+);/g, (_: string, d: string) => String.fromCodePoint(Number(d)))
+	.replace(/&([a-z]+);/gi, (m: string, n: string) => ENTITY[n.toLowerCase()] ?? m)
+	.replace(/\s+/g, ' ')
 	.trim();
 const hasLook = !!(book.look_inside && (lookinside as Record<string, unknown>)[book.look_inside]);
 
