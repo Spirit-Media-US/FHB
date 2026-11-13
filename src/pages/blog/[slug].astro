@@ -203,10 +203,14 @@ const formatDate = (dateString: string) => {
 };
 
 const publishDate = formatDate(post.publishDate);
-const modifiedDate =
-	post.dateModified && post.dateModified.slice(0, 10) !== post.publishDate
-		? formatDate(post.dateModified)
+// 3ac: a dateModified BEFORE publishDate (Sanity field set earlier, post published later) is not
+// an update: ignore it here and in the JSON-LD, so datePublished <= dateModified always holds.
+const realModified =
+	post.dateModified && post.dateModified.slice(0, 10) > post.publishDate.slice(0, 10)
+		? post.dateModified
 		: null;
+const modifiedDate =
+	realModified && realModified.slice(0, 10) !== post.publishDate ? formatDate(realModified) : null;
 const heroImage = post.heroImage
 	? urlFor(post.heroImage).width(1200).quality(72).format('webp').url()
 	: '/fhb-logo.png';
@@ -354,7 +358,7 @@ const KEVIN_WHITE_AUTHOR = {
 const postUrl = `https://fathersheartbible.com/blog/${post.slug.current}/`;
 
 // Normalize dateModified — accept full ISO datetime or fall back to publishDate.
-const dateModified = post.dateModified || post.publishDate;
+const dateModified = realModified || post.publishDate;
 
 // Publish posts under the FATHER'S HEART BIBLE brand entity (matches the @id
 // defined on the homepage), with Spirit Media as the parent org. This ties
