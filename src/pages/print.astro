@@ -8,6 +8,7 @@ import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import VoiceChips from '../components/VoiceChips.astro';
 import YouVersionBanner from '../components/YouVersionBanner.astro';
+import bookSkus from '../data/book-skus.json';
 import booksCatalog from '../data/books.json';
 // GENERATED from the SMP bookstore's Sanity documents by scripts/sync-amazon-links.mjs —
 // the bookstore is the one master for an Amazon link and no ASIN is typed into this page.
@@ -512,6 +513,14 @@ const dvcVerses = [
 	},
 ];
 const books = (booksCatalog.books as any[]).slice().sort((a, b) => a.order - b.order);
+const BOOK_SKU_ROWS = bookSkus.skus as Record<string, { format: string; list_cents: number }>;
+/** "Paperback $15.99 · Hardback $24.99" for a book's format SKUs (FHB-BOOKS, src/data/book-skus.json). */
+const bookPriceLine = (skus: string[]) =>
+	skus
+		.map(
+			(sku) => `${BOOK_SKU_ROWS[sku].format} $${(BOOK_SKU_ROWS[sku].list_cents / 100).toFixed(2)}`,
+		)
+		.join(' · ');
 ---
 
 <Layout
@@ -921,7 +930,7 @@ const books = (booksCatalog.books as any[]).slice().sort((a, b) => a.order - b.o
 						</a>
 						<div style="min-width: 0;">
 							<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0 0 0.15rem;">{b.title}</h3>
-							<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; margin: 0 0 0.5rem;">By {b.author.name} · {b.formats.map((f) => `${f.format} $${(f.list_cents / 100).toFixed(2)}`).join(' · ')}</p>
+							<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; margin: 0 0 0.5rem;">By {b.author.name} · {bookPriceLine(b.formats)}</p>
 							<a href={`/books/${b.slug}/`} class="card-link">Full details &rarr;</a>
 						</div>
 					</div>

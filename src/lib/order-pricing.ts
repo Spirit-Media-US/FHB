@@ -1,3 +1,4 @@
+import bookSkus from '../data/book-skus.json' with { type: 'json' };
 // ONE PRICING RULE for every print order form and for the server that charges it
 // (functions/dvc-checkout.ts imports this file). Kevin 2026-10-03.
 //
@@ -92,29 +93,47 @@ export const volumesFor = (slug: string): number => (slug.includes('-set-') ? 3 
  *  a checkout page to be fulfilled through ingram"). One list price, NO discount of any kind: it is not on
  *  the volume ladder, does not count toward a Bible tier, and the first-order 15% never touches it. */
 export const BELOVED_SKU = 'beloved-identity-pb';
-/** SKUs charged at list price whatever discount the cart earns. */
-/** Plain ISBN-13 (no hyphens) for the Ingram order line, and the buyer-facing title, per non-Bible SKU. */
-export const BOOK_SKUS: Record<
-	string,
-	{ title: string; isbn: string; spec: string; floorUsd: number }
-> = {
-	[BELOVED_SKU]: {
-		// Overseas this book is sold at BREAK-EVEN shipping, not the Bibles' $20 net floor (Kevin 2026-11-10,
-		// kevin-decisions L1735 "2 A"): the handling fee is the smallest x.99 that nets >= floorUsd per copy.
-		floorUsd: 0,
-		title: 'Father’s Heart - Beloved Identity: What Your Heavenly Father Thinks of You',
-		isbn: '9798893072396',
-		spec: '96pp, 5 x 8 in, perfect-bound paperback',
-	},
-};
-export const DISCOUNT_EXEMPT: readonly string[] = [BELOVED_SKU];
+/** Every non-Bible book format sold through THIS checkout (FHB-BOOKS, Kevin 2026-11-13 L1959), read from
+ *  src/data/book-skus.json (commerce half of src/data/books.json) so adding a book is data, not code. Per format: plain ISBN-13 and title for the Ingram
+ *  order line, the spec to check it against, the net floor overseas (Beloved Identity: break-even, Kevin
+ *  2026-11-10 kevin-decisions L1735 "2 A" -> floorUsd 0) and the key of its own measured landed cost in
+ *  ship-countries.json (landed_cost_usd.<costKey>). */
+export interface BookFormatRow {
+	title: string;
+	isbn: string;
+	spec: string;
+	floorUsd: number;
+	costKey: string;
+	format: string;
+	bookSlug: string;
+	/** Measured US per-copy print + ship cost (the US has no country-list cost row); null = unmeasured. */
+	usCostUsd: number | null;
+}
+export const BOOK_SKUS: Record<string, BookFormatRow> = Object.fromEntries(
+	Object.entries(bookSkus.skus as Record<string, Record<string, unknown>>).map(([sku, f]) => [
+		sku,
+		{
+			title: f.ingram_title as string,
+			isbn: f.isbn as string,
+			spec: f.spec as string,
+			floorUsd: (f.floor_usd as number) ?? 0,
+			costKey: f.cost_key as string,
+			format: f.format as string,
+			bookSlug: f.book as string,
+			usCostUsd: (f.us_cost_usd as number) ?? null,
+		},
+	]),
+);
+/** Discounts are Bibles-only (Kevin 2026-11-10): every book SKU is charged at list under every offer. */
+export const DISCOUNT_EXEMPT: readonly string[] = Object.keys(BOOK_SKUS);
 export const isDiscountExempt = (slug: string): boolean => DISCOUNT_EXEMPT.includes(slug);
 /** The unit price in cents actually charged for `slug` after the cart's `pct` off: exempt SKUs stay at list. */
 export const paidUnit = (slug: string, cents: number, pct: number): number =>
 	isDiscountExempt(slug) ? cents : unitAfter(cents, pct);
-/** Binding from the SKU key (<slug>-hb | <slug>-pb); 'bi' = Beloved Identity (its own 5 x 8 landed cost). */
-export const bindingFor = (slug: string): 'hc' | 'pb' | 'bi' =>
-	slug === BELOVED_SKU ? 'bi' : slug.endsWith('-hb') ? 'hc' : 'pb';
+/** Landed-cost key for a SKU: a book uses its OWN measured cost (books.json landed_key, e.g. 'bi' for Beloved
+ *  Identity); a Bible is its binding from the SKU key (<slug>-hb | <slug>-pb). */
+export const bindingFor = (slug: string): string =>
+	BOOK_SKUS[slug]?.costKey ?? (slug.endsWith('-hb') ? 'hc' : 'pb');
 /** Key into IntlRow.fees: the fee depends on binding, volumes in the box and the paid unit price. */
 export const feeKey = (slug: string, paidCents: number): string =>
 	`${bindingFor(slug)}${volumesFor(slug)}:${paidCents}`;

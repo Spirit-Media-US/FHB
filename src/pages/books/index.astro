@@ -4,6 +4,7 @@
 // is #1 priority"). Every card comes from src/data/books.json; adding a book is a data row. The Father's Heart Bible
 // editions lead the page, so the Bibles stay first.
 import Section from '../../components/Section.astro';
+import bookSkus from '../../data/book-skus.json';
 import catalog from '../../data/books.json';
 import Layout from '../../layouts/Layout.astro';
 
@@ -49,6 +50,14 @@ const jsonLd = [
 		],
 	},
 ];
+const BOOK_SKU_ROWS = bookSkus.skus as Record<string, { format: string; list_cents: number }>;
+/** "Paperback $15.99 · Hardback $24.99" for a book's format SKUs (FHB-BOOKS, src/data/book-skus.json). */
+const bookPriceLine = (skus: string[]) =>
+	skus
+		.map(
+			(sku) => `${BOOK_SKU_ROWS[sku].format} $${(BOOK_SKU_ROWS[sku].list_cents / 100).toFixed(2)}`,
+		)
+		.join(' · ');
 ---
 
 <Layout
@@ -73,7 +82,7 @@ const jsonLd = [
 								{b.subtitle && <p class="bks__sub">{b.subtitle}</p>}
 								<p class="bks__by">By {b.author.name}</p>
 								<p class="bks__short">{b.short}</p>
-								<p class="bks__price">{b.formats.map((f) => `${f.format} ${money(f.list_cents)}`).join(' · ')}</p>
+								<p class="bks__price">{bookPriceLine(b.formats)}</p>
 								<a href={`/books/${b.slug}/`} class="bks__link">Full details &rarr;</a>
 							</div>
 						</article>
