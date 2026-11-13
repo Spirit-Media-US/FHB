@@ -28,7 +28,7 @@ import {
 import { reachPhrase } from '../data/language-speakers';
 import readerLanguages from '../data/reader-languages.json';
 import Layout from '../layouts/Layout.astro';
-import { FHB_ORG_ID } from '../lib/fhb-org';
+import { FHB_ORG_ID, withBrandVariants } from '../lib/fhb-org';
 import { merchantReturnPolicy } from '../lib/merchantReturnPolicy';
 import { directTarget } from '../lib/print-cards.mjs';
 import { fitDescription, fitTitle } from '../lib/seoFit';
@@ -387,6 +387,7 @@ const bookSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'Book',
 	name: "Father's Heart Bible: An Intimate Translation",
+	alternateName: withBrandVariants(["Father's Heart Bible", 'FHB']),
 	url: 'https://fathersheartbible.com/print/',
 	inLanguage: 'en-US',
 	author: { '@type': 'Person', name: 'Kevin White', url: 'https://kevinwhite.us' },
@@ -590,7 +591,7 @@ const dvcVerses = [
 							<a href={`/bibles/${e.slug}-bible/`} aria-label={`${e.title} edition: full details`} class="cover-link" style="display: flex; justify-content: center; width: 100%;">
 						<img
 							src={cardUrl(`dvc-${e.slug}`)}
-							srcset={`${cardUrl(`dvc-${e.slug}`)} 600w, ${cardUrl(`dvc-${e.slug}`, 1200)} 1200w`}
+							srcset={`${cardUrl(`dvc-${e.slug}`, 360)} 360w, ${cardUrl(`dvc-${e.slug}`)} 600w, ${cardUrl(`dvc-${e.slug}`, 1200)} 1200w`}
 							sizes="(min-width: 1024px) 260px, 44vw"
 							alt={`Father's Heart Bible (FHB) — ${e.title}, Divine Voice™ Color`}
 							width="600" height="764" loading="lazy" decoding="async"
@@ -600,7 +601,7 @@ const dvcVerses = [
 						) : (
 						<img
 							src={cardUrl(`dvc-${e.slug}`)}
-							srcset={`${cardUrl(`dvc-${e.slug}`)} 600w, ${cardUrl(`dvc-${e.slug}`, 1200)} 1200w`}
+							srcset={`${cardUrl(`dvc-${e.slug}`, 360)} 360w, ${cardUrl(`dvc-${e.slug}`)} 600w, ${cardUrl(`dvc-${e.slug}`, 1200)} 1200w`}
 							sizes="(min-width: 1024px) 260px, 44vw"
 							alt={`Father's Heart Bible (FHB) — ${e.title}, Divine Voice™ Color`}
 							width="600" height="764" loading="lazy" decoding="async"
@@ -971,10 +972,10 @@ const dvcVerses = [
 								<div class="lang-card flex flex-col items-center text-center rounded-2xl p-4 md:p-5" data-lang-card="en" data-search={langSearch(l)} style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
 									{builtPages.has('fathers-heart-bible') ? (
 									<a href="/bibles/fathers-heart-bible/" aria-label="Father's Heart Bible, English edition: full details" class="cover-link" style="display: flex; justify-content: center; width: 100%;">
-										<img src={cardUrl(EN_KEY)} srcset={`${cardUrl(EN_KEY)} 600w, ${cardUrl(EN_KEY, 1200)} 1200w`} sizes="(min-width: 1024px) 260px, 44vw" alt="Father's Heart Bible (FHB) — the English General edition, Plum cover" width="600" height="764" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 220px;" />
+										<img src={cardUrl(EN_KEY)} srcset={`${cardUrl(EN_KEY, 360)} 360w, ${cardUrl(EN_KEY)} 600w, ${cardUrl(EN_KEY, 1200)} 1200w`} sizes="(min-width: 1024px) 260px, 44vw" alt="Father's Heart Bible (FHB) — the English General edition, Plum cover" width="600" height="764" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 220px;" />
 									</a>
 								) : (
-									<img src={cardUrl(EN_KEY)} srcset={`${cardUrl(EN_KEY)} 600w, ${cardUrl(EN_KEY, 1200)} 1200w`} sizes="(min-width: 1024px) 260px, 44vw" alt="Father's Heart Bible (FHB) — the English General edition, Plum cover" width="600" height="764" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 220px;" />
+									<img src={cardUrl(EN_KEY)} srcset={`${cardUrl(EN_KEY, 360)} 360w, ${cardUrl(EN_KEY)} 600w, ${cardUrl(EN_KEY, 1200)} 1200w`} sizes="(min-width: 1024px) 260px, 44vw" alt="Father's Heart Bible (FHB) — the English General edition, Plum cover" width="600" height="764" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 220px;" />
 								)}
 									<h3 lang="en" class="lang-card-title" style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.05rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">Father’s Heart Bible™</h3>
 									<p class="lang-card-english" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 0.35rem;">English</p>

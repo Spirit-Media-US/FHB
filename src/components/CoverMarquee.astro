@@ -65,7 +65,8 @@ const LARGE_PRINT = [
 ];
 
 // Displayed box is 180 CSS px wide (1.5x the original 120 — Kevin 2026-09-24). The
-// source cards are 600 wide, so even a 2x screen draws 360 of 600 available pixels.
+// source cards come at 360 (= 180 at 2x, every pixel a 2x screen draws), so that is what loads
+// (2yy 2026-11-12: the 600 cost ~10KB waste per card on PSI; 360s built from the -1200, LANCZOS).
 // Every card is 600x764 except the 8x10 journaling card (600x725), so height is
 // computed from each card's own ratio — a shared number would letterbox it and report
 // the wrong aspect to the browser. width/height are the DISPLAY size (180x229 and
@@ -77,7 +78,7 @@ const covers = [
 	...DVC.map(([slug, name]) => ({ key: `dvc-${slug}`, name, href: `/bibles/${slug}-bible/` })),
 	...GENERAL.map(([key, name]) => ({ key, name, href: '/bibles/fathers-heart-bible/' })),
 	...LARGE_PRINT.map(([key, name]) => ({ key, name, href: `/bibles/${key}-bible/` })),
-].map((c) => ({ ...c, src: cardUrl(c.key), h: H(c.key) }));
+].map((c) => ({ ...c, src: cardUrl(c.key, 360), h: H(c.key) }));
 
 // SECOND ROW (Kevin 2026-10-02): every LANGUAGE edition, running the OPPOSITE way. Same
 // card style, size, spacing and on-screen speed as the English row — it is the same strip
@@ -162,7 +163,7 @@ const { showTitle = true, showChips = true } = Astro.props;
 
 	<!-- The strip. The track holds the covers TWICE and travels exactly -50%, so the
 	     second copy is under the cursor at the moment the first wraps — that is what
-	     makes the loop seamless without any JS. aria-hidden on the duplicate so a
+	     makes the loop seamless without any JS. aria-hidden on the duplicate (which carries the same real alt — 2yo: Bing flags the minified empty `alt`) so a
 	     screen reader hears each cover once. -->
 	{rows.map((row) => (
 		<>
@@ -180,7 +181,7 @@ const { showTitle = true, showChips = true } = Astro.props;
 									<div class="fhbm-soon">
 										<img
 											src={c.src}
-											alt={copy === 1 ? '' : `Father's Heart Bible — ${c.name}`}
+											alt={`Father's Heart Bible — ${c.name}`}
 											width={W}
 											height={c.h}
 											loading="lazy"
@@ -193,7 +194,7 @@ const { showTitle = true, showChips = true } = Astro.props;
 									<a href={c.href ?? row.href} tabindex={copy === 1 ? -1 : undefined}>
 										<img
 											src={c.src}
-											alt={copy === 1 ? '' : `Father's Heart Bible — ${c.name}`}
+											alt={`Father's Heart Bible — ${c.name}`}
 											width={W}
 											height={c.h}
 											loading="lazy"

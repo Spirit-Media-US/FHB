@@ -880,26 +880,6 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-af-600.webp`,
 	},
-	'lang-anw-hb': {
-		title: 'Adisana Ñwed Anaang (Anaang) — Hardback (pre-order)',
-		retail: 9999,
-		img: `${ASSETS}/lang/v2/lang-anw-600.webp`,
-	},
-	'lang-anw-pb': {
-		title: 'Adisana Ñwed Anaang (Anaang) — Paperback (pre-order)',
-		retail: 7999,
-		img: `${ASSETS}/lang/v2/lang-anw-600.webp`,
-	},
-	'lang-ny-hb': {
-		title: 'Baibulo la Chicheŵa (Chichewa) — Hardback',
-		retail: 9999,
-		img: `${ASSETS}/lang/v2/lang-ny-600.webp`,
-	},
-	'lang-ny-pb': {
-		title: 'Baibulo la Chicheŵa (Chichewa) — Paperback',
-		retail: 7999,
-		img: `${ASSETS}/lang/v2/lang-ny-600.webp`,
-	},
 	'lang-nri-hb': {
 		title: 'Chokri Ketholesi (Chokri Naga) — Hardback (pre-order)',
 		retail: 9999,
@@ -929,16 +909,6 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 		title: 'Bib Kreyòl Ayisyen (Haitian Creole) — Paperback',
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-ht-600.webp`,
-	},
-	'lang-ha-hb': {
-		title: 'Littafi Mai Tsarki na Hausa (Hausa) — Hardback',
-		retail: 9999,
-		img: `${ASSETS}/lang/v2/lang-ha-600.webp`,
-	},
-	'lang-ha-pb': {
-		title: 'Littafi Mai Tsarki na Hausa (Hausa) — Paperback',
-		retail: 7999,
-		img: `${ASSETS}/lang/v2/lang-ha-600.webp`,
 	},
 	'lang-hil-hb': {
 		title: 'Hiligaynon nga Biblia (Hiligaynon) — Hardback',
@@ -979,16 +949,6 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 		title: 'Inpui Bathiangnu Chongdip (Inpui Naga) — Paperback (pre-order)',
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-nkf-600.webp`,
-	},
-	'lang-ijc-hb': {
-		title: 'Izon Baibul (Izon) — Hardback (pre-order)',
-		retail: 9999,
-		img: `${ASSETS}/lang/v2/lang-ijc-600.webp`,
-	},
-	'lang-ijc-pb': {
-		title: 'Izon Baibul (Izon) — Paperback (pre-order)',
-		retail: 7999,
-		img: `${ASSETS}/lang/v2/lang-ijc-600.webp`,
 	},
 	'lang-jv-hb': {
 		title: 'Kitab Suci Jawa (Javanese) — Hardback',
@@ -1100,16 +1060,6 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-ml-600.webp`,
 	},
-	'lang-mdj-hb': {
-		title: 'Biblia Nemangbetu (Mangbetu) — Hardback (pre-order)',
-		retail: 9999,
-		img: `${ASSETS}/lang/v2/lang-mdj-600.webp`,
-	},
-	'lang-mdj-pb': {
-		title: 'Biblia Nemangbetu (Mangbetu) — Paperback (pre-order)',
-		retail: 7999,
-		img: `${ASSETS}/lang/v2/lang-mdj-600.webp`,
-	},
 	'lang-nag-hb': {
 		title: 'Nagamese Pobitro Kitab (Nagamese) — Hardback',
 		retail: 9999,
@@ -1149,26 +1099,6 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 		title: 'د پښتو سپیڅلی کتاب (Pashto) — Paperback',
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-ps-600.webp`,
-	},
-	'lang-seh-hb': {
-		title: 'Bukhu ya Mulungu ya Chisena (Sena) — Hardback',
-		retail: 9999,
-		img: `${ASSETS}/lang/v2/lang-seh-600.webp`,
-	},
-	'lang-seh-pb': {
-		title: 'Bukhu ya Mulungu ya Chisena (Sena) — Paperback',
-		retail: 7999,
-		img: `${ASSETS}/lang/v2/lang-seh-600.webp`,
-	},
-	'lang-sn-hb': {
-		title: 'Bhaibheri rechiShona (Shona) — Hardback',
-		retail: 9999,
-		img: `${ASSETS}/lang/v2/lang-sn-600.webp`,
-	},
-	'lang-sn-pb': {
-		title: 'Bhaibheri rechiShona (Shona) — Paperback',
-		retail: 7999,
-		img: `${ASSETS}/lang/v2/lang-sn-600.webp`,
 	},
 	'lang-sd-hb': {
 		title: 'سنڌي بائيبل (Sindhi) — Hardback',
@@ -1663,6 +1593,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 	}
 
 	if (validEmail) form.customer_email = email;
+	// Abandoned-checkout recovery (Kevin 2026-11-11 "1 C"): an expired session gets a recovery URL.
+	// consent_collection[promotions] (which lets Stripe email it) is refused until the Stripe
+	// dashboard's Checkout terms are accepted — tested 2026-11-11, so it is not set here.
+	form['after_expiration[recovery][enabled]'] = 'true';
 	// Pre-applied, so the buyer never types it; Stripe shows WELCOME15 on the summary and counts
 	// its redemptions. Units above are at list price when it applies — the two never stack.
 	if (promo && useCode) form['discounts[0][promotion_code]'] = promo;

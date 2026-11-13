@@ -12,13 +12,23 @@ import { VERSE_TOPICS } from './verseTopics';
 import { WORD_MEANINGS } from './wordMeanings';
 
 const PAGE_LINKS: Record<string, RelatedLink> = {
-	'old-testament': { href: '/old-testament/', label: 'The Old Testament: 39 books and how they fit together' },
-	'new-testament': { href: '/new-testament/', label: 'The New Testament: 27 books and how they fit together' },
-	'books-of-the-bible': { href: '/books-of-the-bible/', label: 'All 66 books of the Bible, in order' },
+	'old-testament': {
+		href: '/old-testament/',
+		label: 'The Old Testament: 39 books and how they fit together',
+	},
+	'new-testament': {
+		href: '/new-testament/',
+		label: 'The New Testament: 27 books and how they fit together',
+	},
+	'books-of-the-bible': {
+		href: '/books-of-the-bible/',
+		label: 'All 66 books of the Bible, in order',
+	},
 };
 
 export const RELATED: Record<string, string[]> = {
 	// /verses
+	'v:identity': ['v:god-as-father', 'm:abba-father', 'v:salvation', 'v:faith'],
 	'v:advent': ['v:christmas', 'm:begotten', 'v:hope'],
 	'v:christmas': ['v:advent', 'm:begotten', 'v:joy'],
 	'v:anger': ['m:meek', 'v:patience', 'v:forgiveness', 'b:men'],
@@ -26,8 +36,8 @@ export const RELATED: Record<string, string[]> = {
 	'v:comfort': ['v:death', 'v:encouragement', 'b:grief', 'b:widows', 'b:cancer', 'm:forsake'],
 	'v:death': ['v:comfort', 'v:hope', 'v:anxiety', 'b:grief'],
 	'v:courage': ['v:fear', 'v:strength', 'v:hope'],
-	'v:encouragement': ['v:comfort', 'v:hope', 'v:strength'],
-	'v:faith': ['m:faith', 'v:trust', 'v:hope'],
+	'v:encouragement': ['v:comfort', 'v:hope', 'v:strength', 'v:identity'],
+	'v:faith': ['m:faith', 'v:trust', 'v:hope', 'v:identity'],
 	'v:fear': ['v:courage', 'v:anxiety', 'v:trust', 'v:peace', 'v:comfort', 'b:cancer'],
 	'v:family': ['b:fathers', 'b:mothers', 'b:marriage', 'v:thanksgiving'],
 	'v:forgiveness': ['v:kindness', 'm:grace', 'm:mercy', 'b:divorce', 'm:lords-prayer'],
@@ -125,11 +135,11 @@ export const RELATED: Record<string, string[]> = {
 	'b:spiritually-curious': ['v:god-as-father', 'm:our-father', 'v:faith', 'b:new-believers'],
 	'b:student-ministry': ['v:friendship', 'v:faith', 'm:wisdom'],
 	'b:teachers': ['v:patience', 'm:wisdom', 'v:strength'],
-	'b:teenagers': ['v:friendship', 'v:anxiety', 'v:faith'],
+	'b:teenagers': ['v:friendship', 'v:anxiety', 'v:faith', 'v:identity'],
 	'b:veterans': ['v:peace', 'v:healing', 'v:comfort'],
 	'b:widows': ['v:comfort', 'v:hope', 'v:peace'],
 	'b:wives': ['v:love', 'v:family', 'v:patience'],
-	'b:women': ['v:strength', 'v:faith', 'v:peace'],
+	'b:women': ['v:strength', 'v:faith', 'v:peace', 'v:identity'],
 	'b:work': ['v:strength', 'm:wisdom', 'v:anxiety'],
 	'b:worship-leaders': ['v:prayer', 'v:joy', 'v:thanksgiving', 'm:selah'],
 };

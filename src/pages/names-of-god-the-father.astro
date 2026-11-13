@@ -24,7 +24,10 @@ const TOP = TERMS[0];
 const slug = (b: string) => b.toLowerCase().replace(/\s+/g, '-');
 const topBooks = [...data.books].sort((a, b) => b.tokens - a.tokens).slice(0, 10);
 const naming = data.books.filter((b) => b.tokens > 0).length;
-const sovereign = TERMS.filter((t) => t.term.includes('sovereign')).reduce((a, t) => a + t.count, 0);
+const sovereign = TERMS.filter((t) => t.term.includes('sovereign')).reduce(
+	(a, t) => a + t.count,
+	0,
+);
 const heaven = data.overlay.find((o) => o.term === 'Father of heaven');
 const israel = data.overlay.find((o) => o.term === 'Father of Israel');
 const CITE = `Spirit Media Publishing. “Names of God the Father: how Father’s Heart Bible names our Father, counted.” Father’s Heart Bible™, edition ${data.edition}. ${PAGE_URL} (data: ${CSV_URL}), accessed ${PUBLISHED}.`;
@@ -52,7 +55,11 @@ const FAQS = [
 	},
 ];
 
-const SITE = { '@type': 'Organization', name: 'Spirit Media Publishing', url: 'https://spiritmediapublishing.com/' };
+const SITE = {
+	'@type': 'Organization',
+	name: 'Spirit Media Publishing',
+	url: 'https://spiritmediapublishing.com/',
+};
 const jsonLd = [
 	{
 		'@context': 'https://schema.org',
@@ -66,22 +73,48 @@ const jsonLd = [
 		inLanguage: 'en',
 		isAccessibleForFree: true,
 		citation: CITE,
+		// 3ad (pmseoaeo 11-13): points to the EXISTING all-rights-reserved + quotation terms; grants no new rights.
+		license: 'https://fathersheartbible.com/copyright/',
+		creditText: 'Spirit Media Publishing, Father’s Heart Bible™ (fathersheartbible.com)',
+		copyrightHolder: { '@type': 'Organization', name: 'Spirit Media Inc.' },
 		creator: SITE,
 		publisher: { '@id': 'https://spiritmediapublishing.com/#organization' },
-		keywords: ['names of God', 'God the Father', 'names of the Father', 'Abba Father', 'how many times Father in the Bible'],
+		keywords: [
+			'names of God',
+			'God the Father',
+			'names of the Father',
+			'Abba Father',
+			'how many times Father in the Bible',
+		],
 		measurementTechnique:
 			'Every capitalised token Father in the locked English text, classified by the determiner and epithet words directly before it; term counts reconciled to an independent recount of the same text, per book and in total.',
-		variableMeasured: ['term', 'count', 'verses', 'books', 'by_book', 'father_names', 'verses_naming_the_father'],
+		variableMeasured: [
+			'term',
+			'count',
+			'verses',
+			'books',
+			'by_book',
+			'father_names',
+			'verses_naming_the_father',
+		],
 		distribution: [
 			{ '@type': 'DataDownload', encodingFormat: 'text/csv', contentUrl: CSV_URL },
 			{ '@type': 'DataDownload', encodingFormat: 'text/csv', contentUrl: CSV_BOOK_URL },
 		],
-		isPartOf: { '@type': 'WebSite', name: "Father's Heart Bible™", url: 'https://fathersheartbible.com/' },
+		isPartOf: {
+			'@type': 'WebSite',
+			name: "Father's Heart Bible™",
+			url: 'https://fathersheartbible.com/',
+		},
 	},
 	{
 		'@context': 'https://schema.org',
 		'@type': 'FAQPage',
-		mainEntity: FAQS.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+		mainEntity: FAQS.map((f) => ({
+			'@type': 'Question',
+			name: f.q,
+			acceptedAnswer: { '@type': 'Answer', text: f.a },
+		})),
 	},
 	{
 		'@context': 'https://schema.org',
@@ -200,6 +233,7 @@ const LINK = 'color: var(--color-brand);';
 
 				<h2 id="cite" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How to cite</h2>
 				<p class="text-base leading-relaxed mb-5 p-4" style="font-family: var(--font-sans); color: var(--color-ink); background: var(--color-surface-low); border-radius: 0.5rem; user-select: all;" id="nf-cite">{CITE}</p>
+				<p class="text-sm mb-5" style="font-family: var(--font-sans); color: var(--color-ink);">Copyright and terms of use: <a href="/copyright/" style={LINK} class="hover:underline">fathersheartbible.com/copyright/</a>.</p>
 
 				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style={H2}>Frequently asked questions</h2>
 				<dl class="space-y-6">

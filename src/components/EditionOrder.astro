@@ -18,7 +18,15 @@ import type { CatalogRow } from '../data/print-catalog';
 import { PRINT_TIERS } from '../data/print-tiers';
 import { handlingTable } from '../lib/marginGuard';
 import { FIRST_ORDER_LABEL, FIRST_ORDER_PCT, firstOrderUnit } from '../lib/order-pricing';
-import { ORDER_STRINGS, type OrderLang, orderLangFor, shipsText, tr } from '../lib/orderStrings';
+import {
+	formatCount,
+	formatUsd,
+	ORDER_STRINGS,
+	type OrderLang,
+	orderLangFor,
+	shipsText,
+	tr,
+} from '../lib/orderStrings';
 import {
 	allFreeShipping,
 	LIVE_COUNTRIES,
@@ -28,6 +36,7 @@ import {
 } from '../lib/shipCountries';
 import BindingQty from './BindingQty.astro';
 import OrderSummary from './OrderSummary.astro';
+import ShipsDisclosure from './ShipsDisclosure.astro';
 
 interface Props {
 	/** the edition's catalog row(s) — one, except the General edition, sold in three colours */
@@ -72,7 +81,7 @@ const config = JSON.stringify({
 // first-order unit price with the regular price struck through. Read from the first row; the
 // General colours share one price. pricing-verify reads data-line-sku and the two figures back
 // out of the built page and checks them against the server.
-const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+const money = (cents: number) => formatUsd(lang, cents);
 const lead = rows[0];
 const priceLine = [
 	{ binding: t('p.paperback'), sku: `${lead.id}-pb`, usd: lead.pb },
@@ -97,7 +106,7 @@ const idp = `eo-${lead.id}`;
 		<p class="eo-price__note">{lang === 'en' ? FIRST_ORDER_LABEL : t('p.firstOrder', { pct: FIRST_ORDER_PCT })}{freeShip ? ` · ${t('o.freeShipping')}` : ''}</p>
 		{note && <p class="eo-price__note" data-preorder-note>{note}</p>}
 		<p class="eo-price__note"><a href="/returns/">{t('p.returns')}</a></p>
-		<p class="eo-price__note" data-ships-line>{lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts())}</p>
+		<ShipsDisclosure cls="eo-price__note" full={lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts())} summary={t('o.shipsSummary', { n: formatCount(lang, LIVE_COUNTRIES.length) })} />
 	</div>
 	{rows.map((r) => (
 		<div class={multi ? 'eo-variant' : undefined}>
@@ -122,7 +131,9 @@ const idp = `eo-${lead.id}`;
 	.eo-price__reg { color: #71717a; font-size: 0.9rem; }
 	.eo-price__fee { color: #3f3f46; font-size: 0.9rem; font-weight: 600; }
 	.eo-price__fee[hidden] { display: none; }
-	.eo-price__note {
+	.eo-price__note,
+	.eo-price :global(.ships-d--wide),
+	.eo-price :global(.ships-d--narrow) {
 		margin: 0.35rem 0 0;
 		color: #3f3f46;
 		font-size: 0.85rem;

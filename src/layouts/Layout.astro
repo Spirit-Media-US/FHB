@@ -7,6 +7,7 @@ import Header from '../chrome/Header.astro';
 import globalNav from '../chrome/nav.generated.json';
 import MailtoLink from '../components/MailtoLink.astro';
 import WelcomeTour from '../components/WelcomeTour.astro';
+import { clampDescription } from '../lib/clamp-description';
 import { ogLocale, ogLocaleAlternates } from '../lib/og-locale';
 import { sanityClient } from '../lib/sanity';
 import '../styles/global.css';
@@ -139,6 +140,66 @@ const ogImageAlt = imageAlt || "Father's Heart Bible (FHB) — Come home to Me a
 // cards + w=1200&h=630 Sanity crops); skip for arbitrary blog hero images.
 const ogSized = ogImage.includes('/FHB/share/') || ogImage.includes('w=1200&h=630');
 
+// 2vc: max-image-preview:large (Discover/large-thumbnail eligibility), head-only. Scoped to
+// /blog /guides /meaning /bible-in; pages inside a running test arm or pending readout are
+// excluded so their measurement stays clean. noindex pages never reach this tag.
+const LARGE_IMAGE_EXCLUDE = new Set([
+	'/guides/healing-the-father-wound',
+	'/meaning/fathers-heart-of-god',
+	'/guides/armor-of-god',
+	'/guides/noahs-ark',
+	'/guides/prayer-of-jabez',
+	'/guides/sermon-on-the-mount',
+	'/guides/how-to-pray',
+	'/guides/pray-without-ceasing',
+	'/guides/best-books-on-the-fathers-heart',
+	'/guides/resources-for-the-fathers-heart',
+	'/guides/how-to-read-the-bible',
+	'/guides/where-to-start-reading-the-bible',
+	'/meaning/hallowed-be-thy-name',
+	'/meaning/begotten',
+	'/meaning/abba-father',
+	'/meaning/lords-prayer',
+	'/meaning/psalm-23',
+	'/meaning/consecrate',
+	'/meaning/conviction',
+	'/meaning/covenant',
+	'/meaning/propitiation',
+	'/meaning/reproof',
+	'/meaning/sanctified',
+	'/meaning/2-timothy-1-7',
+	'/meaning/haggai-1-8',
+	'/meaning/isaiah-40-31',
+	'/meaning/isaiah-41-10',
+	'/meaning/john-14-6',
+	'/meaning/joshua-1-9',
+	'/meaning/matthew-11-28',
+	'/meaning/philippians-4-6-7',
+	'/meaning/proverbs-3-5-6',
+	'/meaning/psalm-34-18',
+	'/meaning/psalm-46-10',
+	'/meaning/romans-12-2',
+	'/bible-in/brazil',
+	'/bible-in/india',
+	'/bible-in/indonesia',
+	'/bible-in/pakistan',
+	'/bible-in/tanzania',
+	'/bible-in/thailand',
+	'/bible-in/ethiopia',
+	'/bible-in/iran',
+	'/blog/best-christian-book-publishers-for-new-authors',
+	'/blog/christian-ghostwriting-services',
+	'/blog/from-stones-to-sons',
+	'/blog/prodigal-son-parable-meaning-fathers-heart',
+	'/blog/greek-bible-septuagint-new-testament-modern-greek',
+]);
+const _p = Astro.url.pathname.replace(/\/+$/, '');
+// 2xz: the /bibles/ edition hub is a NEW page (in no arm or readout), so it carries it from day one.
+const robotsContent =
+	(/^\/(blog|guides|meaning|bible-in)\/[^/]+$/.test(_p) || _p === '/bibles') &&
+	!LARGE_IMAGE_EXCLUDE.has(_p)
+		? 'index, follow, max-image-preview:large'
+		: 'index, follow';
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 // Site-wide Organization schema — Spirit Media Publishing as the publisher.
@@ -152,6 +213,7 @@ const ORGANIZATION_SCHEMA = {
 	'@id': 'https://spiritmediapublishing.com/#organization',
 	name: 'Spirit Media Publishing',
 	alternateName: 'SMP',
+	legalName: 'Spirit Media Inc.',
 	// Spirit Media Inc. = the LEGAL company; Spirit Media Publishing is its imprint (Kevin 2026-07-13/10-25).
 	parentOrganization: {
 		'@type': 'Organization',
@@ -160,7 +222,8 @@ const ORGANIZATION_SCHEMA = {
 		legalName: 'Spirit Media Inc.',
 	},
 	url: 'https://spiritmediapublishing.com',
-	logo: 'https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp',
+	// 3ab: square flame mark (>=112x112), identical to spiritmediapublishing.com's node.
+	logo: 'https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo-square-512.png',
 	// ONE sameAs list, byte-identical to the Organization on spiritmediapublishing.com
 	// (src/pages/index.astro there). Kevin 2026-10-21: handles are "spiritmediapublishing";
 	// only accounts verified to exist are listed.
@@ -201,6 +264,7 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=4" />
 		<link rel="manifest" href="/site.webmanifest" />
 		<link rel="canonical" href={canonicalURL} />
+		<link rel="alternate" type="application/rss+xml" title="Father's Heart Bible Blog" href="/rss.xml" />
 		{alternates.map((a) => (
 			<link rel="alternate" hreflang={a.hreflang} href={a.href} />
 		))}
@@ -346,8 +410,8 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 		</style>
 
 		<title>{title}</title>
-		<meta name="description" content={description} />
-		{!noindex && <meta name="robots" content="index, follow" />}
+		<meta name="description" content={clampDescription(description)} />
+		{!noindex && <meta name="robots" content={robotsContent} />}
 		{/* Publisher/imprint AND by-line are both "Spirit Media Publishing" per the Metadata &
 		    Messaging Guidelines — Spirit Media Inc. is the parent company, never the publisher
 		    of record, and no individual is credited as author/translator. */}

@@ -80,11 +80,14 @@ test('failure path: a tampered count breaks the reconciliation', () => {
 
 const astro = read('src/pages/bible-by-the-numbers.astro');
 const datasetBlock = (src) => src.slice(src.indexOf("'@type': 'Dataset'"), src.indexOf("'@type': 'FAQPage'"));
-test('Dataset JSON-LD has citation and isAccessibleForFree: true, no licence; FAQ + Breadcrumb present', () => {
+test('Dataset JSON-LD has citation and isAccessibleForFree: true, licence only /copyright/; FAQ + Breadcrumb present', () => {
 	const b = datasetBlock(astro);
 	assert.match(b, /isAccessibleForFree: true,/);
 	assert.match(b, /citation: CITE,/);
-	assert.doesNotMatch(b, /\blicense\b/);
+	// 3ad (pmseoaeo 11-13): license may ONLY point at the existing all-rights-reserved /copyright/ terms (grants no
+	// new rights). A permissive/CC data licence is still Kevin's decision (2he) and fails here.
+	for (const m of b.matchAll(/license:\s*'([^']*)'/g)) assert.equal(m[1], 'https://fathersheartbible.com/copyright/');
+	assert.doesNotMatch(b, /creativecommons|opendatacommons|\bCC[- ]?BY\b|\bCC0\b/i);
 	assert.match(astro, /const CITE = `/);
 	assert.match(astro, /'@type': 'FAQPage'/);
 	assert.match(astro, /'@type': 'BreadcrumbList'/);

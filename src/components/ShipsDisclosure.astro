@@ -1,0 +1,31 @@
+---
+/* The ships-to paragraph, folded behind a native <details> on phones (units 2sb/2sd/2sf). ONE markup for
+ * the edition order form (EditionOrder) and the catalog order form (CatalogOrderForm) so they cannot drift.
+ * Desktop: the full paragraph, unchanged. <=640px: the summary line; the full text stays in the DOM.
+ * `ships` (JSON of shipsParts()) lets order-form.ts's applyLang rebuild both copies for /print/order/?lang=xx;
+ * `n` is the live country count for the summary (applyLang re-renders it via data-ships-n). */
+interface Props {
+	/** class the surrounding form gives its note paragraphs (eo-price__note, cat__more) */
+	cls: string;
+	full: string;
+	summary: string;
+	ships?: string;
+	n?: number;
+}
+const { cls, full, summary, ships, n } = Astro.props;
+---
+<p class={`${cls} ships-d--wide`} data-ships-line data-ships={ships}>{full}</p>
+<details class={`${cls} ships-d--narrow`} data-ships-details>
+	<summary data-ships-n={n}>{summary}</summary>
+	<p data-ships={ships}>{full}</p>
+</details>
+
+<style>
+	.ships-d--narrow { display: none; }
+	.ships-d--narrow summary { cursor: pointer; line-height: 1.25; }
+	.ships-d--narrow p { margin: 0.35rem 0 0; font-weight: 500; }
+	@media (max-width: 640px) {
+		.ships-d--wide { display: none; }
+		.ships-d--narrow { display: block; }
+	}
+</style>

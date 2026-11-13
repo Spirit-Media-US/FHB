@@ -10,6 +10,7 @@ import isbnList from '../../data/isbn-list.json';
 import { langSlug, orderableLanguages } from '../../data/language-editions';
 import { catalogRows } from '../../data/print-catalog';
 import readerEntry from '../../data/reader-entry-links.json';
+import readerLanguages from '../../data/reader-languages.json';
 import youversion from '../../data/youversion-versions.json';
 // /bibles/<slug>-bible — the PRODUCT page for every Divine Voice™ Color edition.
 //
@@ -133,6 +134,12 @@ const { ed, alternates } = Astro.props as {
 	ed: Edition;
 	alternates: { hreflang: string; href: string }[];
 };
+// FAQ answers may carry {{READ_COUNT}}: the number of languages live in the /read reader, from the
+// generated reader-languages.json, so no typed count goes stale (Kevin 2026-11-10: 80 everywhere).
+const faqList = ed.faq.map((f) => ({
+	...f,
+	a: f.a.replaceAll('{{READ_COUNT}}', String(readerLanguages.languages.length)),
+}));
 
 const fm = (frontmatter as Record<string, { pages?: number; pillars?: Pillar[] }>)[
 	ed.frontmatterKey ?? FM_ALIAS[ed.slug] ?? ed.slug
@@ -151,6 +158,29 @@ const hasCover = !isLang || hasLangCard(langCode);
 const coverUrl = hasCover
 	? cardUrl(ed.coverImage ?? `dvc-${ed.slug}`, 1200)
 	: 'https://assets.spiritmediapublishing.com/FHB/share/v5/fhb-og-family.jpg';
+const coverAlt = ed.name.startsWith('Father')
+	? `${ed.name} in Divine Voice™ Color`
+	: `${ed.name} — Father's Heart Bible (FHB) in Divine Voice™ Color`;
+// Image search (unit 2rl): the cover is an ImageObject, not a bare URL, so Google Images can show
+// creator / credit / copyright. copyrightNotice is the site footer's own line (Footer.astro, wired in
+// Layout.astro) verbatim; width/height are omitted because cover files differ (1200x1528, one 1200x1451,
+// and the og-family fallback) — never guess. license + acquireLicensePage (unit 2rm, Kevin 2026-11-12 delegated to pmseoaeo, option A) point at the
+// existing Copyright & Permissions page, which states all rights reserved and how to request permission.
+const coverImageObject = {
+	'@type': 'ImageObject',
+	url: coverUrl,
+	contentUrl: coverUrl,
+	caption: coverAlt,
+	creator: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	creditText: 'Spirit Media Publishing',
+	license: 'https://fathersheartbible.com/copyright/',
+	acquireLicensePage: 'https://fathersheartbible.com/copyright/',
+	copyrightNotice: `© ${new Date().getFullYear()} Spirit Media Publishing, the imprint of Spirit Media Inc. All rights reserved.`,
+};
 // THE ORDER FORM under the header, on EVERY edition (Kevin 2026-10-05; language pages since
 // 2026-10-03). It sells this edition's catalog row(s) from print-catalog.ts — the same record
 // /print's rows and dvc-checkout.ts use: lang-<code> for a language, the slug itself for an
@@ -412,7 +442,7 @@ const productSchema = {
 	inLanguage: nativeMeta ? inLang : (ed.lang ?? 'en'),
 	...(datePublished ? { datePublished } : {}),
 	description: productDescription,
-	image: coverUrl,
+	image: coverImageObject,
 	url,
 	// The same edition on YouVersion, when fhb-partner-link-watch has FOUND it (one map, one line per language).
 	...(ed.lang && (youversion.versions as Record<string, string>)[ed.lang]
@@ -445,7 +475,7 @@ const productSchema = {
 		...(v.isbn ? { isbn: v.isbn, gtin13: v.isbn.replace(/-/g, '') } : {}),
 		sku: v.sku,
 		description: productDescription,
-		image: coverUrl,
+		image: coverImageObject,
 		inLanguage: nativeMeta ? inLang : (ed.lang ?? 'en'),
 		brand: { '@type': 'Brand', name: "Father's Heart Bible" },
 		offers: offerFor(v),
@@ -463,7 +493,7 @@ const breadcrumbSchema = {
 const faqSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'FAQPage',
-	mainEntity: ed.faq.map((f) => ({
+	mainEntity: faqList.map((f) => ({
 		'@type': 'Question',
 		name: f.q,
 		acceptedAnswer: { '@type': 'Answer', text: f.a },
@@ -499,7 +529,7 @@ const faqSchema = {
 						{isLang ? (
 							<LangCover code={langCode} name={ed.name} english={ed.english ?? ''} rtl={ed.dir === 'rtl'} variant="page" />
 						) : (
-							<img id="cover-main" src={coverUrl} alt={ed.name.startsWith('Father') ? `${ed.name} in Divine Voice™ Color` : `${ed.name} — Father's Heart Bible (FHB) in Divine Voice™ Color`} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
+							<img id="cover-main" src={coverUrl} alt={coverAlt} width="1200" height="1528" fetchpriority="high" decoding="async" class="block w-full h-auto" />
 						)}
 						</a>
 					</div>
@@ -719,7 +749,7 @@ const faqSchema = {
 			<div class="max-w-3xl mx-auto">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1.2rem;">Questions</h2>
 				<div class="space-y-3">
-					{ed.faq.map((f) => (
+					{faqList.map((f) => (
 						<details class="faq-item rounded-2xl" style="background-color: #fff; border: 1px solid var(--color-hairline);">
 							<summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">
 								<span>{f.q}</span>

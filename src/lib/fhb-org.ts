@@ -4,13 +4,22 @@
 export const FHB_ORG_ID = 'https://fathersheartbible.com/#organization';
 export const SMP_ORG_ID = 'https://spiritmediapublishing.com/#organization';
 
+// Real spelling variants people search (unit 2sy, 2026-11-11): no-apostrophe and "FHB Bible".
+// ONE list; every Organization/WebSite/Book alternateName on the marketing site is built with withBrandVariants().
+export const FHB_BRAND_VARIANTS = ['Fathers Heart Bible', 'FHB Bible'];
+export function withBrandVariants(names: string[]): string[] {
+	return [...new Set([...names, ...FHB_BRAND_VARIANTS])];
+}
+
 export const FHB_ORG_REF = { '@id': FHB_ORG_ID };
 
 export const FHB_ORG_CORE = {
 	'@type': 'Organization',
 	'@id': FHB_ORG_ID,
 	name: "Father's Heart Bible",
-	alternateName: ["Father's Heart Bible™", 'FHB'],
+	alternateName: withBrandVariants(["Father's Heart Bible™", 'FHB']),
+	// Spirit Media Inc. is the legal company behind the imprint (Kevin 2026-07-13, 2026-10-25); 2xz.
+	legalName: 'Spirit Media Inc.',
 	url: 'https://fathersheartbible.com',
 	logo: 'https://fathersheartbible.com/fhb-logo.png',
 	parentOrganization: { '@id': SMP_ORG_ID },
@@ -25,5 +34,8 @@ export const FHB_ORG_CORE = {
 		'https://www.linkedin.com/company/130004384',
 		// English FHB version record on YouVersion (unit 2jk): our own structured data, not a link request.
 		'https://www.bible.com/versions/4926-FHB',
+		// Podcast show pages (unit 2qv): our own show, same URLs the footer uses.
+		'https://open.spotify.com/show/4JY5TXhYE5vM6vhgxebsmY',
+		'https://podcasts.apple.com/us/podcast/fathers-heart-bible%E2%84%A2-%E2%80%94-audio-bible/id6818374650',
 	],
 };

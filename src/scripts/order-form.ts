@@ -12,6 +12,7 @@
 // nothing resets; /print's cards ([data-pick-edition]) pre-fill a row without touching the rest.
 
 import en from '../data/order-strings/en.json';
+import { buildCheckoutEvent, sendCheckoutEvent } from '../lib/checkoutEvent';
 import { BULK_QUOTE_MIN, bulkQuoteMailto, bulkQuoteRequired } from '../lib/farBand';
 import { firstStateFrom } from '../lib/firstOrderGuard';
 import {
@@ -27,6 +28,8 @@ import {
 import {
 	applyLang,
 	feeLabel,
+	feeLabelInline,
+	formatUsd,
 	type OrderLang,
 	orderLangFor,
 	regionName,
@@ -57,14 +60,12 @@ interface Config {
 	s?: Strings;
 }
 
-const money = (cents: number) =>
-	`$${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
 function init(root: HTMLElement) {
 	const cfg = JSON.parse(root.dataset.order ?? '{}') as Config;
 	const counts: Record<string, number> = {};
 	let S: Strings = cfg.s ?? en;
 	let lang: OrderLang = cfg.lang ?? 'en';
+	const money = (cents: number) => formatUsd(lang, cents);
 	const t = (key: string, v: Record<string, string | number> = {}) =>
 		tr(S, key, { pct: FIRST_ORDER_PCT, min: BULK_QUOTE_MIN, ...v });
 	const firstLabel = () => t('p.firstOrder');
@@ -229,7 +230,7 @@ function init(root: HTMLElement) {
 			el.hidden = !(row && fee > 0);
 			el.textContent =
 				row && fee > 0
-					? `+ ${money(fee)} ${feeLabel(S, row.label).toLowerCase()}${el.hasAttribute('data-fee-full') ? ` (${countryName(code, row)})` : ''}`
+					? `+ ${money(fee)} ${feeLabelInline(lang, feeLabel(S, row.label))}${el.hasAttribute('data-fee-full') ? ` (${countryName(code, row)})` : ''}`
 					: '';
 		}
 	}
@@ -362,6 +363,13 @@ function init(root: HTMLElement) {
 		}
 		say(t('m.opening'));
 		btn.disabled = true;
+		sendCheckoutEvent(
+			buildCheckoutEvent(counts, {
+				path: window.location.pathname,
+				dest: q<HTMLSelectElement>('[data-country]')?.value,
+				lang,
+			}),
+		);
 		try {
 			const res = await fetch('/dvc-checkout', {
 				method: 'POST',
