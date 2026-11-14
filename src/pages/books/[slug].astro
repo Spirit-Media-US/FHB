@@ -13,6 +13,7 @@ import LookInside from '../../components/LookInside.astro';
 import Section from '../../components/Section.astro';
 import bookSkus from '../../data/book-skus.json';
 import catalog from '../../data/books.json';
+import booksSurface from '../../data/books-surface.json';
 import lookinside from '../../data/lookinside.json';
 import Layout from '../../layouts/Layout.astro';
 import {
@@ -56,7 +57,10 @@ type Book = {
 };
 
 export function getStaticPaths() {
-	return (catalog.books as Book[]).map((b) => ({ params: { slug: b.slug }, props: { book: b } }));
+	// BOOKS SURFACE SWITCH (src/data/books-surface.json): while off, only the book pages already live keep building.
+	return (catalog.books as Book[])
+		.filter((b) => booksSurface.live || booksSurface.liveSlugs.includes(b.slug))
+		.map((b) => ({ params: { slug: b.slug }, props: { book: b } }));
 }
 
 const { book } = Astro.props as { book: Book };

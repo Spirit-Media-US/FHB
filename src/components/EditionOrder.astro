@@ -1,4 +1,5 @@
 ---
+import booksSurface from '../data/books-surface.json';
 /* THE ORDER FORM ON EVERY EDITION PAGE, under the header of /bibles/<slug>-bible/, anchored
  * #order so the hero's Order button, the reader's "Now in Print" card and its popup land on it.
  * Born as the language pages' quick order form (Kevin 2026-10-03); on EVERY edition since
@@ -239,7 +240,7 @@ const guaranteeBody = en
 	<nav class="eo-shop" aria-label="Keep shopping">
 		<span class="eo-shop__label">Keep shopping</span>
 		<a href="/print/">FH Bibles</a>
-		<a href="/books/">FH Books</a>
+		{booksSurface.live && <a href="/books/">FH Books</a>}
 		<a href="https://spiritmediapublishing.com/bookstore/">All SMP Books</a>
 	</nav>
 )}
