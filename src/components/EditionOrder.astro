@@ -154,12 +154,10 @@ const guaranteeBody = en
 			</div>
 		</details>
 		<details class="eo-acc__item">
-			<summary data-acc-volume>{BOX.accVolume}</summary>
+			<summary>{t('p.returns')}</summary>
 			<div class="eo-acc__body">
-				<ul class="eo-bubbles eo-tiers" data-tiers-line>
-					{ladder.map((tier) => <li class="eo-bubble eo-tier" data-tier={tier.pct} data-min={tier.min}>{t('s.tier', { pct: tier.pct, min: tier.min })}</li>)}
-				</ul>
-				<p>{BOX.accVolumeBody && `${BOX.accVolumeBody} `}<span data-t="s.fine">{en ? FIRST_ORDER_FINE : t('s.fine')}</span></p>
+				{guaranteeBody && <p>{guaranteeBody}</p>}
+				<p><a href="/returns/">{en ? 'Read our guarantee →' : `${t('p.returns')} →`}</a></p>
 			</div>
 		</details>
 		<details class="eo-acc__item">
@@ -169,10 +167,12 @@ const guaranteeBody = en
 			</div>
 		</details>
 		<details class="eo-acc__item">
-			<summary>{t('p.returns')}</summary>
+			<summary data-acc-volume>{BOX.accVolume}</summary>
 			<div class="eo-acc__body">
-				{guaranteeBody && <p>{guaranteeBody}</p>}
-				<p><a href="/returns/">{en ? 'Read our guarantee →' : `${t('p.returns')} →`}</a></p>
+				<ul class="eo-bubbles eo-tiers" data-tiers-line>
+					{ladder.map((tier) => <li class="eo-bubble eo-tier" data-tier={tier.pct} data-min={tier.min}>{t('s.tier', { pct: tier.pct, min: tier.min })}</li>)}
+				</ul>
+				<p>{BOX.accVolumeBody && `${BOX.accVolumeBody} `}<span data-t="s.fine">{en ? FIRST_ORDER_FINE : t('s.fine')}</span></p>
 			</div>
 		</details>
 	</div>
@@ -197,7 +197,7 @@ const guaranteeBody = en
 					<div class="eo-row" data-line-sku={l.sku}>
 						<div class="eo-row__info">
 							<span class="eo-row__binding">{l.binding}</span>
-							<span class="eo-row__price"><b data-first>{l.first}</b> <span class="eo-row__reg">{t('p.reg')} <s data-reg>{l.reg}</s></span></span>
+							<span class="eo-row__price"><b data-first>{l.first}</b> <span class="eo-row__reg"><span class="sr-only">{t('p.reg')} </span><s data-reg>{l.reg}</s></span></span>
 							<span class="eo-row__fee" data-fee-sku={l.sku} data-fee-full hidden></span>
 						</div>
 						<div class="eo-qty__ctl">
@@ -212,7 +212,7 @@ const guaranteeBody = en
 		{note && <p class="eo-note" data-preorder-note>{note}</p>}
 	</div>
 	<div class="lqo__foot">
-		<OrderSummary tiers={tiers} idp={idp} lang={lang} variant="edition" firstLine={BOX.first} />
+		<OrderSummary tiers={tiers} idp={idp} lang={lang} variant="edition" />
 	</div>
 	</div>
 </div>
@@ -284,9 +284,12 @@ const guaranteeBody = en
 	}
 	.eo-row__info { display: flex; flex-direction: column; gap: 0; min-width: 0; line-height: 1.35; }
 	.eo-row__binding { font-size: 0.95rem; font-weight: 600; }
-	.eo-row__price b { font-size: 1.05rem; font-weight: 800; }
-	.eo-row__price { white-space: nowrap; }
-	.eo-row__reg { color: #52525b; font-size: 0.78rem; }
+	/* Kevin 2026-11-14: "(bigger) $79.99 (crossed out) (smaller) $67.99". DOM keeps first-order then regular
+	   (pricing-verify reads them in that order); flex order shows the regular price first. */
+	.eo-row__price { display: inline-flex; align-items: baseline; gap: 0.4rem; white-space: nowrap; }
+	.eo-row__price b { order: 2; font-size: 0.95rem; font-weight: 800; color: var(--color-ink); }
+	.eo-row__price .eo-row__reg { order: 1; }
+	.eo-row__reg { color: #52525b; font-size: 1.1rem; font-weight: 600; }
 	.eo-row__fee { color: #3f3f46; font-size: 0.78rem; font-weight: 600; }
 	.eo-row__fee[hidden] { display: none; }
 	.eo-note { margin: 0 0 0.9rem; color: #3f3f46; font-size: 0.85rem; font-weight: 600; }

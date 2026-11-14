@@ -278,7 +278,16 @@ function init(root: HTMLElement) {
 		// (the server does the same), so it rounds per unit.
 		const { code, row } = countryRow();
 		const far = isFar();
-		const r = quote(lines(), far ? [] : cfg.tiers, code !== 'US', firstState === 'first');
+		// The edition box (root holds [data-pick]) CARRIES the first-order price through the total until the email
+		// says otherwise (Kevin 2026-11-14: "Then the discounted price carries throughout"); a repeat buyer's total
+		// returns to list the moment the email is checked. The catalog form keeps the confirmed-only rule.
+		const carryFirst = Boolean(q('[data-pick]')) && firstState !== 'repeat';
+		const r = quote(
+			lines(),
+			far ? [] : cfg.tiers,
+			code !== 'US',
+			firstState === 'first' || carryFirst,
+		);
 		const base = r.best === 'first' ? r.firstTotal : r.bulkTotal;
 		const appliedPct = r.best === 'first' ? FIRST_ORDER_PCT : r.best === 'bulk' ? r.bulkPct : 0;
 		const h = handlingFor(lines(), appliedPct, row);
@@ -294,21 +303,9 @@ function init(root: HTMLElement) {
 		set('[data-sum-copies-word]', r.copies === 1 ? t('s.copy') : t('s.copies'));
 		set('[data-sum-subtotal]', money(r.subtotal));
 		set('[data-sum-total]', money(total));
-		// The first-order line names the saving in money (Kevin 2026-11-14: "Can't the discount show here"). It is the
-		// NET saving against the total shown now: abroad the handling fee sized on the 15% price is counted, and a
-		// volume tier already in the total is not counted twice (independent audit 11-14: the gross figure overstated
-		// both). Not taken off the total until the email is confirmed (no understated totals); hidden when there is
-		// no net saving, for a confirmed first order (the discount line shows it), a repeat buyer, or a bulk quote.
-		const firstAll = r.firstTotal + handlingFor(lines(), FIRST_ORDER_PCT, row).total;
-		const firstSave = total - firstAll;
+		// The discount now sits IN the total as its own line (Kevin 2026-11-14 "the discounted price carries
+		// throughout"), beside any handling fee, so no separate saving sentence is needed.
 		const quoting = bulkQuoteRequired(far, volumes());
-		for (const el of qa('[data-first-save]')) {
-			el.hidden = firstState !== 'unknown' || r.copies < 1 || firstSave <= 0 || quoting;
-			el.textContent =
-				lang === 'en'
-					? `${FIRST_ORDER_PCT}% off your first order: save ${money(firstSave)} at checkout`
-					: `${t('p.firstOrder')}: −${money(firstSave)}`;
-		}
 		for (const el of qa('[data-ship-note]')) el.hidden = quoting;
 		// Far-band countries get no volume tiers (they are quoted): the bulk choice says so instead of "Save up to".
 		for (const el of qa<HTMLElement>('[data-acc-volume]')) {

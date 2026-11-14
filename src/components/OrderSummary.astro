@@ -27,10 +27,8 @@ interface Props {
 	 *  shipping line, one first-order line, Email, Checkout, guarantee link. The offer label/fine, volume ladder and
 	 *  fee/expedited notes move into EditionOrder's accordions (still inside [data-order], so order-form.ts finds them). */
 	variant?: 'catalog' | 'edition';
-	/** edition variant: the one first-order line ("15% off your first order, applied at checkout") */
-	firstLine?: string;
 }
-const { tiers, idp, lang: pageLang, variant = 'catalog', firstLine } = Astro.props;
+const { tiers, idp, lang: pageLang, variant = 'catalog' } = Astro.props;
 const edition = variant === 'edition';
 const lang = orderLangFor(pageLang);
 const S = ORDER_STRINGS[lang];
@@ -66,7 +64,6 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 		<div data-sum-fee hidden><dt data-sum-fee-label></dt><dd data-sum-fee-amt></dd></div>
 		<div class="osum__total"><dt data-t="s.total">{t('s.total')}</dt><dd data-sum-total aria-live="polite">{formatUsd(lang, 0)}</dd></div>
 	</dl>
-	{edition && firstLine && <p class="osum__first" data-offer data-first-save>{firstLine}</p>}
 	{edition && multiCountry && (<>
 	<label class="osum__label osum__label--ship" for={`${idp}-country`} data-t="s.shipTo">{t('s.shipTo')}</label>
 	<select id={`${idp}-country`} class="osum__email" name="country" autocomplete="country" data-country>
