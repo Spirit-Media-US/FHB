@@ -156,7 +156,7 @@ async function checkout({ country, counts, email = 'a@b.co', repeat = false }) {
 		const j = (o) => new Response(JSON.stringify(o), { status: 200 });
 		if (u.includes('promotion_codes')) return j({ data: [{ id: 'promo_1', coupon: { valid: true, percent_off: 15 } }] });
 		if (u.includes('checkout/sessions') && init?.method === 'POST') { body = init.body; return j({ url: 'https://stripe.test/x' }); }
-		if (u.includes('checkout/sessions')) return j({ data: repeat ? [{ payment_status: 'paid' }] : [] });
+		if (u.includes('checkout/sessions')) return j({ data: repeat ? [{ payment_status: 'paid', metadata: { kind: 'dvc_print' } }] : [] }); // a store order (Kevin 2026-11-14)
 		return j({ data: [] });
 	};
 	const { onRequestPost } = await import('../functions/dvc-checkout.ts');
@@ -383,7 +383,7 @@ test('server: the first-order check answers yes/no from the same rule checkout u
 			const j = (o) => new Response(JSON.stringify(o), { status: 200 });
 			if (u.includes('promotion_codes')) return j({ data: [{ id: 'promo_1', coupon: { valid: true, percent_off: 15 } }] });
 			if (u.includes('checkout/sessions') && init?.method === 'POST') { posted = true; return j({ url: 'x' }); }
-			if (u.includes('checkout/sessions')) return j({ data: repeat ? [{ payment_status: 'paid' }] : [] });
+			if (u.includes('checkout/sessions')) return j({ data: repeat ? [{ payment_status: 'paid', metadata: { kind: 'dvc_print' } }] : [] }); // a store order (Kevin 2026-11-14)
 			return j({ data: [] });
 		};
 		const store = new Map();
