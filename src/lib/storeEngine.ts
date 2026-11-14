@@ -1417,27 +1417,34 @@ export function encodeForm(obj: Record<string, string | number>): string {
 
 // The Stripe-backed first-order lookups (moved verbatim from functions/dvc-checkout.ts, Phase 3: one copy for
 // every checkout that uses the engine). Read-only GETs against the store's Stripe account.
+// A FIRST ORDER = this email has never bought from the STORE (Kevin 2026-11-14: "Someone who has never purchased
+// anything off our new SMP store"). Only paid Checkout sessions the store itself created count: kind dvc_print
+// (this engine, Bibles + books) and print_bulk (the retired /print bulk path). Other payments on the same Stripe
+// account (publishing invoices, pre-release sales, app charges) no longer make a buyer a "repeat".
+export const STORE_ORDER_KINDS: readonly string[] = ['dvc_print', 'print_bulk'];
 export async function isFirstOrder(email: string, key: string): Promise<boolean> {
 	const get = async (path: string) => {
 		const r = await fetch(`https://api.stripe.com/v1/${path}`, {
 			headers: { authorization: `Bearer ${key}` },
 		});
 		if (!r.ok) throw new Error(`stripe ${r.status}`);
-		return (await r.json()) as { data: Record<string, unknown>[] };
+		return (await r.json()) as { data: Record<string, unknown>[]; has_more?: boolean };
 	};
 	try {
 		for (const e of new Set([email, email.toLowerCase()])) {
 			const s = await get(
-				`checkout/sessions?status=complete&limit=10&customer_details[email]=${encodeURIComponent(e)}`,
+				`checkout/sessions?status=complete&limit=100&customer_details[email]=${encodeURIComponent(e)}`,
 			);
-			if (s.data.some((x) => x.payment_status === 'paid')) return false;
-		}
-		const c = await get(
-			`customers/search?limit=10&query=${encodeURIComponent(`email:'${email.toLowerCase()}'`)}`,
-		);
-		for (const cust of c.data) {
-			const ch = await get(`charges?limit=10&customer=${cust.id}`);
-			if (ch.data.some((x) => x.paid === true && x.status === 'succeeded')) return false;
+			if (
+				s.data.some(
+					(x) =>
+						x.payment_status === 'paid' &&
+						STORE_ORDER_KINDS.includes(
+							String((x.metadata as Record<string, unknown> | null)?.kind ?? ''),
+						),
+				)
+			)
+				return false;
 		}
 		return true;
 	} catch {

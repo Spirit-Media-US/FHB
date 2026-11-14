@@ -5,7 +5,7 @@
 			"url": "https://stripe.test/x"
 		},
 		"calls": [
-			"GET https://api.stripe.com/v1/checkout/sessions?status=complete&limit=10&customer_details[email]=x%40y.co",
+			"GET https://api.stripe.com/v1/checkout/sessions?status=complete&limit=100&customer_details[email]=x%40y.co",
 			"POST https://api.stripe.com/v1/checkout/sessions"
 		],
 		"body": "mode=payment&success_url=https%3A%2F%2Ffathersheartbible.com%2Forder%3Fs%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=https%3A%2F%2Ffathersheartbible.com%2Fprint%2F%3Forder%3Dcanceled%23bulk-order&automatic_tax%5Benabled%5D=true&shipping_address_collection%5Ballowed_countries%5D%5B0%5D=US&phone_number_collection%5Benabled%5D=true&adaptive_pricing%5Benabled%5D=true&shipping_options%5B0%5D%5Bshipping_rate_data%5D%5Btype%5D=fixed_amount&shipping_options%5B0%5D%5Bshipping_rate_data%5D%5Bfixed_amount%5D%5Bamount%5D=0&shipping_options%5B0%5D%5Bshipping_rate_data%5D%5Bfixed_amount%5D%5Bcurrency%5D=usd&shipping_options%5B0%5D%5Bshipping_rate_data%5D%5Bdisplay_name%5D=Free%20shipping&shipping_options%5B0%5D%5Bshipping_rate_data%5D%5Btax_behavior%5D=exclusive&shipping_options%5B0%5D%5Bshipping_rate_data%5D%5Btax_code%5D=txcd_92010001&shipping_options%5B0%5D%5Bshipping_rate_data%5D%5Bdelivery_estimate%5D%5Bminimum%5D%5Bunit%5D=business_day&shipping_options%5B0%5D%5Bshipping_rate_data%5D%5Bdelivery_estimate%5D%5Bminimum%5D%5Bvalue%5D=7&shipping_options%5B0%5D%5Bshipping_rate_data%5D%5Bdelivery_estimate%5D%5Bmaximum%5D%5Bunit%5D=business_day&shipping_options%5B0%5D%5Bshipping_rate_data%5D%5Bdelivery_estimate%5D%5Bmaximum%5D%5Bvalue%5D=10&custom_text%5Bshipping_address%5D%5Bmessage%5D=Enter%20the%20address%20exactly%20as%20the%20local%20post%20or%20courier%20writes%20it%2C%20and%20a%20phone%20number%20with%20country%20code%3A%20international%20carriers%20often%20call%20to%20confirm%20delivery.&metadata%5Bkind%5D=dvc_print&metadata%5Btotal%5D=12&metadata%5Bladder_total%5D=12&metadata%5Bpct_off%5D=10&metadata%5Bhandling_cents%5D=0&metadata%5Boffer%5D=volume&metadata%5Bbreakdown%5D=moms-hb%3A12&metadata%5Bbible_1%5D=title%3DMom%E2%80%99s%20Bible%20%E2%80%94%20Hardback%7Cisbn%3D979-8-89307-321-8%7Cformat%3DHardback%7Cqty%3D12%7Cunit_cents%3D8999%7Cfee_cents%3D0%7Ccountry%3DUS%7Cdate%3D2026-11-13%7Cnet_usd%3Dunmeasured&metadata%5Bbible_lines%5D=1&line_items%5B0%5D%5Bquantity%5D=12&line_items%5B0%5D%5Bprice_data%5D%5Bcurrency%5D=usd&line_items%5B0%5D%5Bprice_data%5D%5Bunit_amount%5D=8999&line_items%5B0%5D%5Bprice_data%5D%5Btax_behavior%5D=exclusive&line_items%5B0%5D%5Bprice_data%5D%5Bproduct_data%5D%5Bname%5D=Father%E2%80%99s%20Heart%20Bible%E2%84%A2%20%E2%80%94%20Mom%E2%80%99s%20Bible%20%E2%80%94%20Hardback&line_items%5B0%5D%5Bprice_data%5D%5Bproduct_data%5D%5Bdescription%5D=Divine%20Voice%20Color%20%C2%B7%20Complete%20Bible%20%C2%B7%2010%25%20volume%20discount%20%C2%B7%20free%20shipping&line_items%5B0%5D%5Bprice_data%5D%5Bproduct_data%5D%5Bimages%5D%5B0%5D=https%3A%2F%2Fassets.spiritmediapublishing.com%2FFHB%2Fprint%2Fcards%2Fv2%2Fdvc-moms-600.webp&line_items%5B0%5D%5Bprice_data%5D%5Bproduct_data%5D%5Btax_code%5D=txcd_99999999&customer_email=x%40y.co&after_expiration%5Brecovery%5D%5Benabled%5D=true"
@@ -16,8 +16,7 @@
 			"url": "https://stripe.test/x"
 		},
 		"calls": [
-			"GET https://api.stripe.com/v1/checkout/sessions?status=complete&limit=10&customer_details[email]=new%40y.co",
-			"GET https://api.stripe.com/v1/customers/search?limit=10&query=email%3A'new%40y.co'",
+			"GET https://api.stripe.com/v1/checkout/sessions?status=complete&limit=100&customer_details[email]=new%40y.co",
 			"GET https://api.stripe.com/v1/promotion_codes?active=true&limit=1&code=WELCOME15",
 			"POST https://api.stripe.com/v1/checkout/sessions"
 		],
@@ -37,8 +36,7 @@
 			"url": "https://stripe.test/x"
 		},
 		"calls": [
-			"GET https://api.stripe.com/v1/checkout/sessions?status=complete&limit=10&customer_details[email]=new%40y.co",
-			"GET https://api.stripe.com/v1/customers/search?limit=10&query=email%3A'new%40y.co'",
+			"GET https://api.stripe.com/v1/checkout/sessions?status=complete&limit=100&customer_details[email]=new%40y.co",
 			"GET https://api.stripe.com/v1/promotion_codes?active=true&limit=1&code=WELCOME15",
 			"POST https://api.stripe.com/v1/checkout/sessions"
 		],
@@ -50,8 +48,7 @@
 			"url": "https://stripe.test/x"
 		},
 		"calls": [
-			"GET https://api.stripe.com/v1/checkout/sessions?status=complete&limit=10&customer_details[email]=new%40y.co",
-			"GET https://api.stripe.com/v1/customers/search?limit=10&query=email%3A'new%40y.co'",
+			"GET https://api.stripe.com/v1/checkout/sessions?status=complete&limit=100&customer_details[email]=new%40y.co",
 			"GET https://api.stripe.com/v1/promotion_codes?active=true&limit=1&code=WELCOME15",
 			"POST https://api.stripe.com/v1/checkout/sessions"
 		],
@@ -72,8 +69,7 @@
 			"url": "https://stripe.test/x"
 		},
 		"calls": [
-			"GET https://api.stripe.com/v1/checkout/sessions?status=complete&limit=10&customer_details[email]=new%40y.co",
-			"GET https://api.stripe.com/v1/customers/search?limit=10&query=email%3A'new%40y.co'",
+			"GET https://api.stripe.com/v1/checkout/sessions?status=complete&limit=100&customer_details[email]=new%40y.co",
 			"GET https://api.stripe.com/v1/promotion_codes?active=true&limit=1&code=WELCOME15",
 			"POST https://api.stripe.com/v1/checkout/sessions"
 		],
