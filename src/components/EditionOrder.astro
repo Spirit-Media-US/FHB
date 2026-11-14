@@ -13,6 +13,15 @@
  * The summary, the first-order 15% and the behaviour are the shared order-form family
  * (OrderSummary + src/scripts/order-form.ts + src/lib/order-pricing.ts), the same as the
  * catalog order form on /print and /print/order/.
+ *
+ * THE BOX, MOBILE FIRST (Kevin 2026-11-14 store session: "house built by adding on... accordion... bulk discounts
+ * behind accordion"; "1 and 2 Pull and use market science best practice."; "Do what data science says!"). Measured
+ * before, grandparents-bible at 390px: box 1,124px tall, Checkout at 1,045px, every price shown twice, quantity 0,
+ * free shipping 4x. Now: format = two tap buttons carrying the price (Baymard: buttons for variant choice), one
+ * quantity at 1, the summary's Ship to / Total / Email / Checkout, and three CLOSED accordions under Checkout whose
+ * headers carry the offer (collapsed headers need information scent). 0 of 67 paid orders ever held 2+ items, so
+ * the quantity follows the chosen format (order-form.ts [data-pick]); mixed orders go to the catalog form.
+ * New strings are English-first constants here (ORDER_STRINGS stays complete per language; no English stand-ins).
  */
 import type { CatalogRow } from '../data/print-catalog';
 import { PRINT_TIERS } from '../data/print-tiers';
@@ -35,9 +44,7 @@ import {
 	shipsToSentence,
 } from '../lib/shipCountries';
 import BiblesBooksToggle from './BiblesBooksToggle.astro';
-import BindingQty from './BindingQty.astro';
 import OrderSummary from './OrderSummary.astro';
-import ShipsDisclosure from './ShipsDisclosure.astro';
 
 interface Props {
 	/** the edition's catalog row(s) — one, except the General edition, sold in three colours */
@@ -92,32 +99,84 @@ const priceLine = [
 	return { ...l, first: money(firstOrderUnit(list)), reg: money(list) };
 });
 const idp = `eo-${lead.id}`;
+// English-first strings for the new box (other order languages show these until translated; tr() rule).
+const ladder = PRINT_TIERS.filter((x) => x.pct > 0).sort((a, b) => a.min - b.min);
+const BOX = {
+	format: 'Format',
+	qty: 'Quantity',
+	colour: 'Colour',
+	first: `${FIRST_ORDER_PCT}% off your first order, applied at checkout`,
+	accVolume: `Buying ${ladder[0].min} or more? Save up to ${Math.max(...ladder.map((x) => x.pct))}%`,
+	accVolumeBody: 'The discount is applied automatically when your quantity reaches a tier.',
+	accMixed: 'Ordering more than one edition, or paperbacks and hardbacks together?',
+	accShip: 'Shipping and international orders',
+};
+const shipsFull = lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts());
 ---
 <div id="order" class="lqo" data-order={config} data-lang={lang}>
 	<BiblesBooksToggle current="bibles" lang={lang} />
-	{/* Kevin 2026-10-04: the same line on every single-edition form, at its top. */}
-	<p class="lqo__catalog"><a href={lang === 'en' ? '/print/order/' : `/print/order/?lang=${lang}`}>{t('o.catalogLink')}</a></p>
-	<p class="lqo__eyebrow">{t('o.eyebrow')}{freeShip ? ` · ${t('o.freeShipping')}` : ''}</p>
 	<h2 class="lqo__title">{t('o.title', { heading })}</h2>
-	<div class="eo-price" data-price-line>
-		{priceLine.map((l) => (
-			<p class="eo-price__row" data-line-sku={l.sku}>
-				<span class="eo-price__binding">{l.binding}</span> <b data-first>{l.first}</b> <span class="eo-price__reg">({t('p.reg')} <s data-reg>{l.reg}</s>)</span> <span class="eo-price__fee" data-fee-sku={l.sku} data-fee-full hidden></span>
-			</p>
-		))}
-		<p class="eo-price__note">{lang === 'en' ? FIRST_ORDER_LABEL : t('p.firstOrder', { pct: FIRST_ORDER_PCT })}{freeShip ? ` · ${t('o.freeShipping')}` : ''}</p>
-		{note && <p class="eo-price__note" data-preorder-note>{note}</p>}
-		<p class="eo-price__note"><a href="/returns/">{t('p.returns')}</a></p>
-		<ShipsDisclosure cls="eo-price__note" full={lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts())} summary={t('o.shipsSummary', { n: formatCount(lang, LIVE_COUNTRIES.length) })} />
-	</div>
-	{rows.map((r) => (
-		<div class={multi ? 'eo-variant' : undefined}>
-			{multi && <p class="eo-variant__name">{r.title.replace(/^.*—\s*/, '')}</p>}
-			<BindingQty hbSlug={`${r.id}-hb`} pbSlug={`${r.id}-pb`} hb={r.hb} pb={r.pb} label={r.native ? `${r.native} (${r.title})` : r.title} lang={lang} />
+	<div class="eo-pick" data-pick data-id={lead.id} data-fmt="pb">
+		{multi && (
+			<fieldset class="eo-group">
+				<legend class="eo-legend">{BOX.colour}</legend>
+				<div class="eo-colours">
+					{rows.map((r, i) => (
+						<button type="button" class="eo-chip" data-pick-id={r.id} aria-pressed={i === 0 ? 'true' : 'false'}>{r.title.replace(/^.*—\s*/, '')}</button>
+					))}
+				</div>
+			</fieldset>
+		)}
+		<fieldset class="eo-group">
+			<legend class="eo-legend">{BOX.format}</legend>
+			<div class="eo-formats" data-price-line>
+				{priceLine.map((l, i) => (
+					<button type="button" class="eo-fmt" data-pick-fmt={l.sku.endsWith('-pb') ? 'pb' : 'hb'} data-line-sku={l.sku} aria-pressed={i === 0 ? 'true' : 'false'}>
+						<span class="eo-fmt__binding">{l.binding}</span>
+						<b class="eo-fmt__price" data-first>{l.first}</b>
+						<span class="eo-fmt__reg">{t('p.reg')} <s data-reg>{l.reg}</s></span>
+						<span class="eo-fmt__fee" data-fee-sku={l.sku} hidden></span>
+					</button>
+				))}
+			</div>
+		</fieldset>
+		{note && <p class="eo-note" data-preorder-note>{note}</p>}
+		<div class="eo-qty">
+			<label class="eo-legend" for={`${idp}-qty`}>{BOX.qty}</label>
+			<div class="eo-qty__ctl">
+				<button type="button" class="eo-step" data-pick-step="-1" aria-label={t('a.fewer', { label: heading, binding: '' }).trim()}>−</button>
+				<input id={`${idp}-qty`} class="eo-qty__in" type="number" value="1" min="1" step="1" inputmode="numeric" data-pick-qty />
+				<button type="button" class="eo-step" data-pick-step="1" aria-label={t('a.more', { label: heading, binding: '' }).trim()}>+</button>
+			</div>
 		</div>
-	))}
+	</div>
 	<div class="lqo__foot">
-		<OrderSummary tiers={tiers} idp={idp} lang={lang} />
+		<OrderSummary tiers={tiers} idp={idp} lang={lang} variant="edition" firstLine={lang === 'en' ? BOX.first : t('p.firstOrder', { pct: FIRST_ORDER_PCT })} />
+	</div>
+	<div class="eo-acc">
+		<details class="eo-acc__item">
+			<summary>{BOX.accVolume}</summary>
+			<div class="eo-acc__body">
+				<p class="eo-tiers" data-tiers-line>
+					{ladder.map((tier) => <span class="eo-tier" data-tier={tier.pct} data-min={tier.min}>{t('s.tier', { pct: tier.pct, min: tier.min })}</span>)}
+				</p>
+				<p>{BOX.accVolumeBody} <span data-t="s.fine">{lang === 'en' ? FIRST_ORDER_FINE : t('s.fine')}</span></p>
+			</div>
+		</details>
+		<details class="eo-acc__item">
+			<summary>{BOX.accMixed}</summary>
+			<div class="eo-acc__body">
+				<p><a href={lang === 'en' ? '/print/order/' : `/print/order/?lang=${lang}`}>{t('o.catalogLink')}</a></p>
+			</div>
+		</details>
+		<details class="eo-acc__item">
+			<summary>{BOX.accShip}</summary>
+			<div class="eo-acc__body">
+				<p>{shipsFull}</p>
+				{LIVE_COUNTRIES.length > 1 && <p data-fee-note data-t="s.feeNote">{t('s.feeNote')}</p>}
+				{LIVE_COUNTRIES.length > 1 && <p data-expedited-note hidden><span data-t="s.expedited">{lang === 'en' ? EXPEDITED_DISCLAIMER : t('s.expedited')}</span> <span data-t="s.expeditedPrice">{t('s.expeditedPrice')}</span></p>}
+			</div>
+		</details>
 	</div>
 </div>
 

@@ -23,8 +23,15 @@ interface Props {
 	idp: string;
 	/** page language (src/lib/orderStrings.ts); English when absent */
 	lang?: string;
+	/** 'edition' = the single-edition order box (Kevin 2026-11-14 store session, mobile first): Ship to, Total, one
+	 *  shipping line, one first-order line, Email, Checkout, guarantee link. The offer label/fine, volume ladder and
+	 *  fee/expedited notes move into EditionOrder's accordions (still inside [data-order], so order-form.ts finds them). */
+	variant?: 'catalog' | 'edition';
+	/** edition variant: the one first-order line ("15% off your first order, applied at checkout") */
+	firstLine?: string;
 }
-const { tiers, idp, lang: pageLang } = Astro.props;
+const { tiers, idp, lang: pageLang, variant = 'catalog', firstLine } = Astro.props;
+const edition = variant === 'edition';
 const lang = orderLangFor(pageLang);
 const S = ORDER_STRINGS[lang];
 const t = (k: string, v?: Record<string, string | number>) => tr(S, k, v);
@@ -42,23 +49,32 @@ const quoteTitle = en ? BULK_QUOTE_COPY.title : t('q.title');
 const quoteNote = en ? BULK_QUOTE_COPY.note : t('q.note', { min: BULK_QUOTE_MIN });
 const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min);
 ---
-<div class="osum" data-summary>
+<div class:list={['osum', { 'osum--edition': edition }]} data-summary>
+	{!edition && (<>
 	<p class="osum__offer" data-offer data-offer-label>{offerLabel}</p>
 	<p class="osum__fine" data-offer data-offer-fine data-t="s.fine">{offerFine}</p>
 	<p class="osum__tiers" data-tiers-line>
 		<span data-t="s.volume">{t('s.volume')}</span>
 		{ladder.map((tier) => <span class="osum__tier" data-tier={tier.pct} data-min={tier.min}>{t('s.tier', { pct: tier.pct, min: tier.min })}</span>)}
 	</p>
+	</>)}
+	{edition && multiCountry && (<>
+	<label class="osum__label osum__label--first" for={`${idp}-country`} data-t="s.shipTo">{t('s.shipTo')}</label>
+	<select id={`${idp}-country`} class="osum__email" name="country" autocomplete="country" data-country>
+		{LIVE_COUNTRIES.map((c) => <option value={c.code}>{en ? c.name : regionName(lang, c.code)}</option>)}
+	</select>
+	</>)}
 	<dl class="osum__lines">
-		<div><dt><span data-sum-copies>0</span> <span data-sum-copies-word>{t('s.copies')}</span></dt><dd data-sum-subtotal>{formatUsd(lang, 0)}</dd></div>
+		<div class={edition ? 'osum__copies' : undefined}><dt><span data-sum-copies>0</span> <span data-sum-copies-word>{t('s.copies')}</span></dt><dd data-sum-subtotal>{formatUsd(lang, 0)}</dd></div>
 		<div data-sum-disc hidden><dt data-sum-disc-label></dt><dd data-sum-disc-amt></dd></div>
 		<div data-sum-fee hidden><dt data-sum-fee-label></dt><dd data-sum-fee-amt></dd></div>
 		<div class="osum__total"><dt data-t="s.total">{t('s.total')}</dt><dd data-sum-total>{formatUsd(lang, 0)}</dd></div>
 	</dl>
 	<p class="osum__note"><span data-t={shipKey}>{t(shipKey)}</span> · <span data-t="s.tax">{t('s.tax')}</span></p>
-	{multiCountry && <p class="osum__note" data-fee-note data-t="s.feeNote">{t('s.feeNote')}</p>}
-	{multiCountry && <p class="osum__note" data-expedited-note hidden><span data-t="s.expedited">{expeditedNote}</span> <span data-t="s.expeditedPrice">{t('s.expeditedPrice')}</span></p>}
-	{multiCountry && (<>
+	{edition && firstLine && <p class="osum__note osum__first" data-offer>{firstLine}</p>}
+	{!edition && multiCountry && <p class="osum__note" data-fee-note data-t="s.feeNote">{t('s.feeNote')}</p>}
+	{!edition && multiCountry && <p class="osum__note" data-expedited-note hidden><span data-t="s.expedited">{expeditedNote}</span> <span data-t="s.expeditedPrice">{t('s.expeditedPrice')}</span></p>}
+	{!edition && multiCountry && (<>
 	<label class="osum__label" for={`${idp}-country`} data-t="s.shipTo">{t('s.shipTo')}</label>
 	<select id={`${idp}-country`} class="osum__email" name="country" autocomplete="country" data-country>
 		{LIVE_COUNTRIES.map((c) => <option value={c.code}>{en ? c.name : regionName(lang, c.code)}</option>)}
@@ -67,6 +83,7 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	<label class="osum__label" for={`${idp}-email`} data-t="s.email">{t('s.email')}</label>
 	<input id={`${idp}-email`} class="osum__email" type="email" name="email" autocomplete="email" inputmode="email" required data-email />
 	<button type="button" class="osum__checkout" data-checkout data-t="s.checkout">{t('s.checkout')}</button>
+	{edition && <p class="osum__guarantee"><a href="/returns/" data-t="p.returns">{t('p.returns')}</a></p>}
 	{multiCountry && (
 	<div class="osum__quote" data-quote hidden>
 		<p class="osum__note" data-quote-note data-t="q.note">{quoteNote}</p>
@@ -130,6 +147,21 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	.osum__quote-btn { display: flex; align-items: center; justify-content: center; box-sizing: border-box; text-decoration: none; }
 	.osum__checkout:disabled { opacity: 0.6; cursor: wait; }
 	.osum__msg { color: var(--color-muted); font-size: 0.85rem; margin: 0.6rem 0 0; }
+	/* edition variant (single-edition order box, mobile first) */
+	.osum__label--first { margin-top: 0; }
+	.osum--edition .osum__lines { margin-top: 0.7rem; padding-top: 0.6rem; }
+	.osum--edition .osum__copies { display: none; }
+	.osum--edition .osum__lines :global(.is-struck) { text-decoration: none; color: inherit; }
+	.osum__first { font-weight: 600; color: var(--color-ink); }
+	.osum__guarantee { margin: 0.5rem 0 0; text-align: center; font-size: 0.85rem; }
+	.osum__guarantee a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		color: #3f3f46;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
 </style>
 
 <script>
