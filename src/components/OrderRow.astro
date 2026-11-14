@@ -109,7 +109,10 @@ const name = native ? `${native} (${title})` : title;
 	.orow__bind[aria-pressed='true'] { background: var(--color-primary-fixed, #ffd9e0); box-shadow: inset 0 0 0 2px var(--color-primary, #b60057); }
 	.orow__bname { font-weight: 600; }
 	.orow__count { font-weight: 700; color: var(--color-primary, #b60057); }
-	.orow__price { font-size: 0.8rem; white-space: nowrap; }
+	/* 3eg-1: at 360px "$99.99 $84.99" overflowed the 107px button and clipped to "$84.9"; break only
+	   BETWEEN the two amounts (each stays whole), so narrow phones get two lines and 390px+ is unchanged. */
+	.orow__price { font-size: 0.8rem; white-space: normal; }
+	.orow__price s, .orow__price b { white-space: nowrap; }
 	.orow__price s { color: var(--color-muted); }
 	.orow__fee { display: block; font-size: 0.72rem; color: var(--color-muted); }
 	.orow__fee[hidden] { display: none; }
