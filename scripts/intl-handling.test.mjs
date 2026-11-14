@@ -297,7 +297,7 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	const cfg = JSON.parse(root.dataset.order);
 	const hb = Object.keys(cfg.prices).find((k) => k.endsWith('-hb')), pb = Object.keys(cfg.prices).find((k) => k.endsWith('-pb'));
 	// The edition box (Kevin 2026-11-14): a format button picks the binding, one quantity field counts it.
-	const setQty = (sku, n) => { d.querySelector(`[data-pick-fmt="${sku.endsWith('-pb') ? 'pb' : 'hb'}"]`).click(); const el = d.querySelector('[data-pick-qty]'); el.value = String(n); el.dispatchEvent(new w.Event('input', { bubbles: true })); };
+	const setQty = (sku, n) => { const el = d.querySelector(`[data-pick-qty][data-fmt="${sku.endsWith('-pb') ? 'pb' : 'hb'}"]`); el.value = String(n); el.dispatchEvent(new w.Event('input', { bubbles: true })); };
 	const pick = (code) => { const s = d.querySelector('[data-country]'); s.value = code; s.dispatchEvent(new w.Event('change', { bubbles: true })); };
 	const feeEl = (sku) => [...d.querySelectorAll(`[data-fee-sku="${sku}"][data-fee-full]`)][0];
 	const txt = (sel) => d.querySelector(sel).textContent;
@@ -315,7 +315,9 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	const firstHb = unitAfter(hbList, 15);
 
 	pick('US');
+	setQty(pb, 0); // the box opens with one paperback
 	setQty(hb, 2);
+	assert.equal(d.querySelector('[data-sum-items]').textContent.replace(/[\s,]/g, ''), `2×Hardback$${usd(hbList * 2)}`, 'itemized: 2 x Hardback');
 	assert.equal(feeEl(hb).hidden, true, 'US shows no fee');
 	assert.equal(d.querySelector('[data-sum-fee]').hidden, true);
 

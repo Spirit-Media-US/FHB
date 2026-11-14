@@ -294,6 +294,20 @@ function init(root: HTMLElement) {
 		set('[data-sum-copies-word]', r.copies === 1 ? t('s.copy') : t('s.copies'));
 		set('[data-sum-subtotal]', money(r.subtotal));
 		set('[data-sum-total]', money(total));
+		// The edition box itemizes the order (Kevin 2026-11-14: "they only see 3. 3 of what?").
+		for (const ul of qa('[data-sum-items]')) {
+			ul.replaceChildren(
+				...lines().map((l) => {
+					const li = document.createElement('li');
+					const name = document.createElement('span');
+					name.textContent = `${l.qty} × ${l.slug.endsWith('-pb') ? t('p.paperback') : t('p.hardback')}`;
+					const amt = document.createElement('span');
+					amt.textContent = money(l.cents * l.qty);
+					li.append(name, amt);
+					return li;
+				}),
+			);
+		}
 		const disc = qa('[data-sum-disc]');
 		for (const d of disc) d.hidden = r.best === 'none';
 		set(
@@ -424,29 +438,25 @@ function init(root: HTMLElement) {
 		}).observe(root);
 	} else bar?.removeAttribute('data-away');
 
-	// ── single-edition pick (EditionOrder, Kevin 2026-11-14 store session): ONE format, ONE quantity ──
-	// Format buttons + a quantity at 1. 0 of 67 paid orders ever held two items, so the quantity follows
-	// the chosen format (and colour, on the General edition); mixed orders go to the catalog form.
+	// ── single-edition box (EditionOrder, Kevin 2026-11-14 store session): each format keeps its own quantity
+	// ("Buyer wants 2 PB and 1 HB"); paperback starts at 1. On the General edition a colour chip moves the
+	// counts to that colour, so the box always orders one edition.
 	const pick = q('[data-pick]');
-	const pickQty = pick?.querySelector<HTMLInputElement>('[data-pick-qty]');
+	const pickQty = (fmt: string) =>
+		pick?.querySelector<HTMLInputElement>(`[data-pick-qty][data-fmt="${fmt}"]`);
 	function applyPick() {
 		if (!pick) return;
-		const n = Math.max(1, Math.floor(Number(pickQty?.value) || 1));
-		if (pickQty && pickQty.value !== '') pickQty.value = String(n);
 		for (const k of Object.keys(counts)) counts[k] = 0;
-		counts[`${pick.dataset.id}-${pick.dataset.fmt}`] = n;
-		for (const b of pick.querySelectorAll<HTMLElement>('[data-pick-fmt]'))
-			b.setAttribute('aria-pressed', String(b.dataset.pickFmt === pick.dataset.fmt));
+		for (const el of pick.querySelectorAll<HTMLInputElement>('[data-pick-qty]')) {
+			const n = Math.max(0, Math.floor(Number(el.value) || 0));
+			if (el.value !== '') el.value = String(n);
+			counts[`${pick.dataset.id}-${el.dataset.fmt}`] = n;
+		}
 		for (const c of pick.querySelectorAll<HTMLElement>('[data-pick-id]'))
 			c.setAttribute('aria-pressed', String(c.dataset.pickId === pick.dataset.id));
 		render();
 	}
 	if (pick) {
-		for (const b of pick.querySelectorAll<HTMLElement>('[data-pick-fmt]'))
-			b.addEventListener('click', () => {
-				pick.dataset.fmt = b.dataset.pickFmt;
-				applyPick();
-			});
 		for (const c of pick.querySelectorAll<HTMLElement>('[data-pick-id]'))
 			c.addEventListener('click', () => {
 				pick.dataset.id = c.dataset.pickId;
@@ -454,17 +464,20 @@ function init(root: HTMLElement) {
 			});
 		for (const s of pick.querySelectorAll<HTMLElement>('[data-pick-step]'))
 			s.addEventListener('click', () => {
-				if (pickQty)
-					pickQty.value = String(
-						Math.max(1, (Math.floor(Number(pickQty.value)) || 1) + Number(s.dataset.pickStep)),
+				const el = pickQty(s.dataset.fmt ?? '');
+				if (el)
+					el.value = String(
+						Math.max(0, (Math.floor(Number(el.value)) || 0) + Number(s.dataset.pickStep)),
 					);
 				applyPick();
 			});
-		// Typing: recount on each digit, but let the field be empty mid-edit; settle to >= 1 on change.
-		pickQty?.addEventListener('input', () => {
-			if (pickQty.value !== '') applyPick();
-		});
-		pickQty?.addEventListener('change', applyPick);
+		// Typing: recount on each digit, but let a field be empty mid-edit; settle to a whole number on change.
+		for (const el of pick.querySelectorAll<HTMLInputElement>('[data-pick-qty]')) {
+			el.addEventListener('input', () => {
+				if (el.value !== '') applyPick();
+			});
+			el.addEventListener('change', applyPick);
+		}
 		applyPick();
 	}
 

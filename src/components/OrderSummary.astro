@@ -64,6 +64,7 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 		{LIVE_COUNTRIES.map((c) => <option value={c.code}>{en ? c.name : regionName(lang, c.code)}</option>)}
 	</select>
 	</>)}
+	{edition && <ul class="osum__items" data-sum-items></ul>}
 	<dl class="osum__lines">
 		<div class={edition ? 'osum__copies' : undefined}><dt><span data-sum-copies>0</span> <span data-sum-copies-word>{t('s.copies')}</span></dt><dd data-sum-subtotal>{formatUsd(lang, 0)}</dd></div>
 		<div data-sum-disc hidden><dt data-sum-disc-label></dt><dd data-sum-disc-amt></dd></div>
@@ -151,6 +152,8 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	.osum__label--first { margin-top: 0; }
 	.osum--edition .osum__lines { margin-top: 0.7rem; padding-top: 0.6rem; }
 	.osum--edition .osum__copies { display: none; }
+	.osum__items { list-style: none; margin: 0.8rem 0 0; padding: 0; font-size: 0.9rem; }
+	.osum__items :global(li) { display: flex; justify-content: space-between; gap: 1rem; line-height: 1.7; }
 	.osum--edition .osum__lines :global(.is-struck) { text-decoration: none; color: inherit; }
 	.osum__first { font-weight: 600; color: var(--color-ink); }
 	.osum__guarantee { margin: 0.5rem 0 0; text-align: center; font-size: 0.85rem; }

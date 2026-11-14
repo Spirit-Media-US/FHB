@@ -41,7 +41,6 @@ import {
 	tr,
 } from '../lib/orderStrings';
 import { LIVE_COUNTRIES, shipsLine, shipsParts, shipsToSentence } from '../lib/shipCountries';
-import BiblesBooksToggle from './BiblesBooksToggle.astro';
 import OrderSummary from './OrderSummary.astro';
 
 interface Props {
@@ -103,21 +102,15 @@ const ladder = PRINT_TIERS.filter((x) => x.pct > 0).sort((a, b) => a.min - b.min
 const topPct = Math.max(...ladder.map((x) => x.pct));
 const BOX = en
 	? {
-			format: 'Format',
-			qty: 'Quantity',
-			qtyHidden: false,
 			colour: 'Colour',
 			first: `${FIRST_ORDER_PCT}% off your first order, applied at checkout`,
 			accVolume: `Buying ${ladder[0].min} or more? Save up to ${topPct}%`,
 			accVolumeBody: 'The discount is applied automatically when your quantity reaches a tier.',
-			accMixed: 'Ordering more than one edition, or paperbacks and hardbacks together?',
+			accMixed: 'Ordering more than one edition?',
 			accMixedLink: t('o.catalogLink'),
-			accShip: 'Shipping and international orders',
+			accShip: `International shipping: we ship to ${LIVE_COUNTRIES.length} countries`,
 		}
 	: {
-			format: t('c.binding'),
-			qty: t('a.qty', { label: heading, binding: '' }).replace(/\s+/g, ' ').trim(),
-			qtyHidden: true,
 			colour: '',
 			first: t('p.firstOrder', { pct: FIRST_ORDER_PCT }),
 			accVolume: `${t('s.volume')} ${ladder.map((x) => t('s.tier', { pct: x.pct, min: x.min })).join(' · ')}`,
@@ -129,46 +122,18 @@ const BOX = en
 const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts());
 ---
 <div id="order" class="lqo" data-order={config} data-lang={lang}>
-	<BiblesBooksToggle current="bibles" lang={lang} />
 	<h2 class="lqo__title">{t('o.title', { heading })}</h2>
-	<div class="eo-pick" data-pick data-id={lead.id} data-fmt="pb">
-		{multi && (
-			<fieldset class="eo-group">
-				<legend class:list={['eo-legend', { 'eo-sr': !BOX.colour }]}>{BOX.colour || t('c.binding')}</legend>
-				<div class="eo-colours">
-					{rows.map((r, i) => (
-						<button type="button" class="eo-chip" data-pick-id={r.id} aria-pressed={i === 0 ? 'true' : 'false'}>{r.title.replace(/^.*—\s*/, '')}</button>
-					))}
-				</div>
-			</fieldset>
-		)}
-		<fieldset class="eo-group">
-			<legend class="eo-legend">{BOX.format}</legend>
-			<div class="eo-formats" data-price-line>
-				{priceLine.map((l, i) => (
-					<button type="button" class="eo-fmt" data-pick-fmt={l.sku.endsWith('-pb') ? 'pb' : 'hb'} data-line-sku={l.sku} aria-pressed={i === 0 ? 'true' : 'false'}>
-						<span class="eo-fmt__binding">{l.binding}</span>
-						<b class="eo-fmt__price" data-first>{l.first}</b>
-						<span class="eo-fmt__reg">{t('p.reg')} <s data-reg>{l.reg}</s></span>
-						<span class="eo-fmt__fee" data-fee-sku={l.sku} data-fee-full hidden></span>
-					</button>
-				))}
-			</div>
-		</fieldset>
-		{note && <p class="eo-note" data-preorder-note>{note}</p>}
-		<div class="eo-qty">
-			<label class:list={['eo-legend', { 'eo-sr': BOX.qtyHidden }]} for={`${idp}-qty`}>{BOX.qty}</label>
-			<div class="eo-qty__ctl">
-				<button type="button" class="eo-step" data-pick-step="-1" aria-label={t('a.fewer', { label: heading, binding: '' }).trim()}>−</button>
-				<input id={`${idp}-qty`} class="eo-qty__in" type="number" value="1" min="1" step="1" inputmode="numeric" data-pick-qty />
-				<button type="button" class="eo-step" data-pick-step="1" aria-label={t('a.more', { label: heading, binding: '' }).trim()}>+</button>
-			</div>
-		</div>
-	</div>
-	<div class="lqo__foot">
-		<OrderSummary tiers={tiers} idp={idp} lang={lang} variant="edition" firstLine={BOX.first} />
-	</div>
+	{/* Kevin 2026-11-14: "assure shoppers at the top that we ship to their country ... Show them choices at the
+	    top for bulk quantity and catalog." Three closed choices lead the box; each opens on tap. */}
 	<div class="eo-acc">
+		<details class="eo-acc__item">
+			<summary>{BOX.accShip}</summary>
+			<div class="eo-acc__body">
+				<p>{shipsFull}</p>
+				{LIVE_COUNTRIES.length > 1 && <p data-fee-note data-t="s.feeNote">{t('s.feeNote')}</p>}
+				{LIVE_COUNTRIES.length > 1 && <p data-expedited-note hidden><span data-t="s.expedited">{en ? EXPEDITED_DISCLAIMER : t('s.expedited')}</span> <span data-t="s.expeditedPrice">{t('s.expeditedPrice')}</span></p>}
+			</div>
+		</details>
 		<details class="eo-acc__item">
 			<summary>{BOX.accVolume}</summary>
 			<div class="eo-acc__body">
@@ -184,16 +149,52 @@ const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S
 				<p><a href={en ? '/print/order/' : `/print/order/?lang=${lang}`}>{BOX.accMixedLink}</a></p>
 			</div>
 		</details>
-		<details class="eo-acc__item">
-			<summary>{BOX.accShip}</summary>
-			<div class="eo-acc__body">
-				<p>{shipsFull}</p>
-				{LIVE_COUNTRIES.length > 1 && <p data-fee-note data-t="s.feeNote">{t('s.feeNote')}</p>}
-				{LIVE_COUNTRIES.length > 1 && <p data-expedited-note hidden><span data-t="s.expedited">{en ? EXPEDITED_DISCLAIMER : t('s.expedited')}</span> <span data-t="s.expeditedPrice">{t('s.expeditedPrice')}</span></p>}
-			</div>
-		</details>
+	</div>
+	<div class="eo-pick" data-pick data-id={lead.id}>
+		{multi && (
+			<fieldset class="eo-group">
+				<legend class:list={['eo-legend', { 'eo-sr': !BOX.colour }]}>{BOX.colour || t('c.binding')}</legend>
+				<div class="eo-colours">
+					{rows.map((r, i) => (
+						<button type="button" class="eo-chip" data-pick-id={r.id} aria-pressed={i === 0 ? 'true' : 'false'}>{r.title.replace(/^.*—\s*/, '')}</button>
+					))}
+				</div>
+			</fieldset>
+		)}
+		{/* Kevin 2026-11-14: "Buyer wants 2 PB and 1 HB" - each format keeps its own quantity. */}
+		<div class="eo-rows" data-price-line>
+			{priceLine.map((l) => {
+				const fmt = l.sku.endsWith('-pb') ? 'pb' : 'hb';
+				return (
+					<div class="eo-row" data-line-sku={l.sku}>
+						<div class="eo-row__info">
+							<span class="eo-row__binding">{l.binding}</span>
+							<span class="eo-row__price"><b data-first>{l.first}</b> <span class="eo-row__reg">{t('p.reg')} <s data-reg>{l.reg}</s></span></span>
+							<span class="eo-row__fee" data-fee-sku={l.sku} data-fee-full hidden></span>
+						</div>
+						<div class="eo-qty__ctl">
+							<button type="button" class="eo-step" data-pick-step="-1" data-fmt={fmt} aria-label={t('a.fewer', { label: heading, binding: l.binding })}>−</button>
+							<input class="eo-qty__in" type="number" value={fmt === 'pb' ? '1' : '0'} min="0" step="1" inputmode="numeric" data-pick-qty data-fmt={fmt} aria-label={t('a.qty', { label: heading, binding: l.binding })} />
+							<button type="button" class="eo-step" data-pick-step="1" data-fmt={fmt} aria-label={t('a.more', { label: heading, binding: l.binding })}>+</button>
+						</div>
+					</div>
+				);
+			})}
+		</div>
+		{note && <p class="eo-note" data-preorder-note>{note}</p>}
+	</div>
+	<div class="lqo__foot">
+		<OrderSummary tiers={tiers} idp={idp} lang={lang} variant="edition" firstLine={BOX.first} />
 	</div>
 </div>
+{en && (
+	<nav class="eo-shop" aria-label="Keep shopping">
+		<span>Keep shopping:</span>
+		<a href="/print/">All Bibles</a>
+		<a href="/books/">Father’s Heart Books</a>
+		<a href="https://spiritmediapublishing.com/bookstore/">All SMP Books</a>
+	</nav>
+)}
 
 <style>
 	/* MOBILE FIRST (Kevin 2026-11-14 "Do what data science says!"): base = phone; min-width widens. */
@@ -215,7 +216,7 @@ const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S
 		font-weight: 600;
 		margin: 0.4rem 0 0.9rem;
 	}
-	.eo-group { border: 0; margin: 0 0 0.9rem; padding: 0; min-width: 0; }
+	.eo-group { border: 0; margin: 0.9rem 0 0; padding: 0; min-width: 0; }
 	.eo-legend { display: block; padding: 0; margin: 0 0 0.4rem; font-size: 0.85rem; font-weight: 600; }
 	.eo-sr {
 		position: absolute;
@@ -225,38 +226,42 @@ const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S
 		clip: rect(0 0 0 0);
 		white-space: nowrap;
 	}
-	.eo-formats, .eo-colours { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
-	.eo-colours { grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); }
-	.eo-fmt, .eo-chip {
+	.eo-colours { display: grid; grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); gap: 0.6rem; }
+	.eo-chip {
 		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.1rem;
+		align-items: center;
+		justify-content: center;
 		min-height: 48px;
-		padding: 0.7rem 0.8rem;
+		padding: 0.6rem 0.8rem;
 		border: 1.5px solid var(--color-hairline);
 		border-radius: 0.75rem;
 		background: #fff;
 		color: var(--color-ink);
 		font: inherit;
-		text-align: left;
+		font-size: 0.9rem;
+		font-weight: 600;
 		cursor: pointer;
 	}
-	.eo-chip { align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 600; }
-	.eo-fmt[aria-pressed='true'], .eo-chip[aria-pressed='true'] {
-		border-color: var(--color-ink);
-		box-shadow: inset 0 0 0 1px var(--color-ink);
+	.eo-chip[aria-pressed='true'] { border-color: var(--color-ink); box-shadow: inset 0 0 0 1px var(--color-ink); }
+	.eo-chip:focus-visible, .eo-step:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
+	.eo-rows { display: grid; gap: 0.6rem; margin-top: 0.9rem; }
+	.eo-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding: 0.7rem 0.8rem;
+		border: 1.5px solid var(--color-hairline);
+		border-radius: 0.75rem;
 	}
-	.eo-fmt:focus-visible, .eo-chip:focus-visible, .eo-step:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
-	.eo-fmt__binding { font-size: 0.9rem; font-weight: 600; }
-	.eo-fmt__price { font-size: 1.15rem; font-weight: 800; }
-	.eo-fmt__reg { color: #71717a; font-size: 0.8rem; }
-	.eo-fmt__fee { color: #3f3f46; font-size: 0.78rem; font-weight: 600; }
-	.eo-fmt__fee[hidden] { display: none; }
+	.eo-row__info { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+	.eo-row__binding { font-size: 0.95rem; font-weight: 600; }
+	.eo-row__price b { font-size: 1.1rem; font-weight: 800; }
+	.eo-row__reg { color: #71717a; font-size: 0.8rem; }
+	.eo-row__fee { color: #3f3f46; font-size: 0.78rem; font-weight: 600; }
+	.eo-row__fee[hidden] { display: none; }
 	.eo-note { margin: 0 0 0.9rem; color: #3f3f46; font-size: 0.85rem; font-weight: 600; }
-	.eo-qty { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-	.eo-qty .eo-legend { margin: 0; }
-	.eo-qty__ctl { display: inline-flex; align-items: center; gap: 0.4rem; }
+	.eo-qty__ctl { display: inline-flex; flex: none; align-items: center; gap: 0.35rem; }
 	.eo-step {
 		width: 44px;
 		height: 44px;
@@ -280,7 +285,7 @@ const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S
 	}
 	.eo-qty__in::-webkit-inner-spin-button, .eo-qty__in::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 	.lqo__foot { margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--color-hairline); }
-	.eo-acc { margin-top: 0.6rem; border-top: 1px solid var(--color-hairline); }
+	.eo-acc { border-top: 1px solid var(--color-hairline); }
 	.eo-acc__item { border-bottom: 1px solid var(--color-hairline); }
 	.eo-acc__item > summary {
 		display: flex;
@@ -303,6 +308,19 @@ const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S
 	.eo-acc__body a { color: #3f3f46; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 	.eo-tiers { display: flex; flex-wrap: wrap; gap: 0.25rem 0.8rem; }
 	.eo-tier[data-on] { color: var(--color-ink); font-weight: 700; }
+	.eo-shop {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.2rem 1rem;
+		max-width: 34rem;
+		margin: 0.9rem auto 0;
+		font-family: var(--font-sans);
+		font-size: 0.9rem;
+		color: #3f3f46;
+	}
+	.eo-shop a { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+	.eo-shop span { display: inline-flex; align-items: center; min-height: 44px; }
 	@media (min-width: 641px) {
 		.lqo { padding: 1.25rem 1.25rem 1.1rem; }
 	}
