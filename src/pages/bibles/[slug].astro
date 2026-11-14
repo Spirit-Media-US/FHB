@@ -701,7 +701,7 @@ const metaDescription =
 	bookReleaseDate={datePublished}
 	title={fitTitle(isLang ? (ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`) : `${ed.name} | Father's Heart Bible™ (FHB)`)}
 	description={metaDescription}
-	image={`https://assets.spiritmediapublishing.com/FHB/og/editions/v2/${ed.slug}-bible-og.jpg`}
+	image={`https://assets.spiritmediapublishing.com/FHB/og/editions/v3/${ed.slug}-bible-og.jpg`}
 	preloadImageMobile={coverUrl}
 	preloadMobileIsLcp
 	preloadImageDesktop={coverUrl}
@@ -760,7 +760,7 @@ const metaDescription =
 					<a href={RESERVE_MAIL} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; padding: 0.75rem 1.6rem; text-decoration: none; font-size: 0.95rem;">Reserve a copy by email</a>
 				</div>
 			) : (
-				<EditionOrder offerLine={orderLang === 'en' || !orderLang ? `15% off first order + free international shipping to ${LIVE_COUNTRIES.length} countries` : orderT('hero.freeShipValue')} titleStyle={coverTitle ? titleStyle : undefined} rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} lang={orderLang} note={preorder ? orderT('o.preorder') : undefined} />
+				<EditionOrder offerLine={orderLang === 'en' || !orderLang ? `15% off first order + free standard shipping to ${LIVE_COUNTRIES.length} countries` : orderT('hero.freeShipValue')} titleStyle={coverTitle ? titleStyle : undefined} rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} lang={orderLang} note={preorder ? orderT('o.preorder') : undefined} />
 			)}
 		</Section>
 		<Section variant="warm">
