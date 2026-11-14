@@ -46,7 +46,7 @@ import { handlingFeeCents } from '../src/lib/marginGuard.ts';
 import { LIVE_COUNTRIES } from '../src/lib/shipCountries.ts';
 
 const ISBNS = '/home/deploy/projects/fhb-print-bible/editions/ISBNS.json';
-const CHECKOUT = 'functions/dvc-checkout.ts';
+const CHECKOUT = 'src/lib/storeEngine.ts'; // the catalogue moved into the SMP store engine (plan 3fb Phase 2)
 const DIST = 'dist';
 // The forms that must offer the whole catalog, and one language page as the per-language form.
 const FULL_FORMS = ['dist/print/order/index.html', 'dist/print/index.html'];

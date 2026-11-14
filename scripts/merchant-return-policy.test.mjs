@@ -1,6 +1,6 @@
 // node --test scripts/merchant-return-policy.test.mjs   (unit 2jr)
 // Every PAID Offer/AggregateOffer in the BUILT site (dist/) must carry a valid MerchantReturnPolicy
-// (Kevin 1A 2026-11-08: 30d, ReturnByMail, FullRefund, buyer-pays fees, defects free). Run after `npm run build`.
+// (30-day window, countries, link; Kevin 2026-11-14: nothing /returns does not state). Run after `npm run build`.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -16,11 +16,9 @@ export function checkPolicy(p) {
 	assert.notEqual(p.returnMethod, 'https://schema.org/KeepProduct', 'KeepProduct is not an allowed returnMethod');
 	if (p.returnMethod) assert.match(p.returnMethod, /Return(AtKiosk|ByMail|InStore)$/);
 	assert.equal(p.merchantReturnDays, 30, 'Kevin 1A: 30 days');
-	assert.equal(p.returnMethod, 'https://schema.org/ReturnByMail', 'Kevin 1A: ReturnByMail');
-	assert.equal(p.refundType, 'https://schema.org/FullRefund', 'Kevin 1A: FullRefund');
-	assert.equal(p.returnFees, 'https://schema.org/ReturnFeesCustomerResponsibility', 'Kevin 1A: change of mind at buyer cost');
-	assert.equal(p.customerRemorseReturnFees, 'https://schema.org/ReturnFeesCustomerResponsibility', 'customerRemorseReturnFees');
-	assert.equal(p.itemDefectReturnFees, 'https://schema.org/FreeReturn', 'defects are free to return');
+	// Kevin 2026-11-14 item 7: markup states only what /returns states (no method, fees or refund type there).
+	for (const k of ['returnMethod', 'returnFees', 'customerRemorseReturnFees', 'itemDefectReturnFees', 'refundType'])
+		assert.equal(p[k], undefined, `${k} is not stated on /returns, so it must not be declared`);
 	assert.match(p.merchantReturnLink, /^https:\/\/fathersheartbible\.com\/returns\/$/);
 }
 function offers(node, out = []) {
@@ -48,9 +46,8 @@ test('failure path: Unspecified, KeepProduct, missing days, missing policy all f
 	assert.throws(() => checkPolicy({ ...P, returnPolicyCategory: 'https://schema.org/MerchantReturnUnspecified' }), /Unspecified/);
 	assert.throws(() => checkPolicy({ ...P, returnMethod: 'https://schema.org/KeepProduct' }), /KeepProduct/);
 	assert.throws(() => checkPolicy({ ...P, merchantReturnDays: undefined }), /merchantReturnDays/);
-	assert.throws(() => checkPolicy({ ...P, returnFees: 'https://schema.org/FreeReturn' }), /buyer cost/);
-	assert.throws(() => checkPolicy({ ...P, returnMethod: undefined }), /ReturnByMail/);
-	assert.throws(() => checkPolicy({ ...P, itemDefectReturnFees: undefined }), /defects/);
+	assert.throws(() => checkPolicy({ ...P, returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility' }), /not stated on \/returns/);
+	assert.throws(() => checkPolicy({ ...P, returnMethod: 'https://schema.org/ReturnByMail' }), /not stated on \/returns/);
 	assert.throws(() => checkPolicy({ ...P, merchantReturnDays: 14 }), /30 days/);
 	assert.throws(() => checkPolicy(undefined), /missing/);
 });

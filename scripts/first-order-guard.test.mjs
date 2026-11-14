@@ -89,7 +89,8 @@ test('constant time: fast work is padded to the floor', async () => {
 
 test('handler never logs a raw email and gates before Stripe', () => {
 	const src = fs.readFileSync(new URL('../functions/dvc-checkout.ts', import.meta.url), 'utf8');
-	const blk = src.slice(src.indexOf('if (payload.firstOrderCheck)'), src.indexOf('const counts: Record'));
+	const blk = src.slice(src.indexOf('if (payload.firstOrderCheck)'), src.indexOf('const r = await checkoutForm('));
+	assert.ok(blk.length > 0 && src.includes('const r = await checkoutForm('), 'the first-order lookup block ends where the order is handed to the store engine');
 	assert.ok(blk.indexOf('sameOrigin') < blk.indexOf('isFirstOrder'));
 	assert.ok(blk.indexOf('allowCheck') < blk.indexOf('isFirstOrder'));
 	for (const l of blk.split('\n').filter((x) => x.includes('console.'))) assert.doesNotMatch(l, /\bem\b|email/);
@@ -143,4 +144,21 @@ test('handler: after N checks from one IP the answer is "unknown" in the same sh
 	assert.deepEqual(await r.json(), { status: 'unknown' });
 	assert.equal(calls.length, before, 'limited: Stripe never asked');
 	assert.ok(Date.now() - t0 >= 850, 'limited answer is padded to the same floor');
+});
+
+// Kevin 2026-11-14 ("Someone who has never purchased anything off our new SMP store"): only STORE orders make a
+// buyer a repeat. A paid session of another kind (pre-release sale, invoice, app charge) must NOT block the 15%.
+test('first order: only a paid STORE session (dvc_print / print_bulk) makes a buyer a repeat', async () => {
+	const { isFirstOrder } = await import('../src/lib/storeEngine.ts');
+	const withSessions = (data) => {
+		globalThis.fetch = async () => new Response(JSON.stringify({ data }), { status: 200 });
+	};
+	withSessions([{ payment_status: 'paid', metadata: { kind: 'pre_release' } }, { payment_status: 'paid', metadata: null }]);
+	assert.equal(await isFirstOrder('a@b.co', 'sk_test'), true, 'non-store payments do not count');
+	withSessions([{ payment_status: 'paid', metadata: { kind: 'dvc_print' } }]);
+	assert.equal(await isFirstOrder('a@b.co', 'sk_test'), false, 'a paid store order counts');
+	withSessions([{ payment_status: 'unpaid', metadata: { kind: 'dvc_print' } }]);
+	assert.equal(await isFirstOrder('a@b.co', 'sk_test'), true, 'an unpaid store session does not count');
+	globalThis.fetch = async () => new Response('{}', { status: 500 });
+	assert.equal(await isFirstOrder('a@b.co', 'sk_test'), false, 'a Stripe error never grants the 15%');
 });

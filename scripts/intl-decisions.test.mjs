@@ -21,18 +21,20 @@ const wave = live(WAVE);
 const P = 'shipping_options';
 const key = (i, k) => `${P}[${i}][shipping_rate_data]${k}`;
 
-test('committed state: liveWave is the only switch; with it empty only US is live, no faster option', () => {
+test('committed state: liveWave is the only switch; with it empty only US is live, with its measured Expedited option', () => {
 	const base = live([]);
 	assert.deepEqual(base.map((c) => c.code), ['US']);
-	assert.equal(base[0].fast, null);
+	// Kevin 2026-11-14 "1A": the US offers paid Expedited delivery (measured rush print, +$9.90).
+	assert.equal(base[0].fast?.label, 'Expedited delivery');
+	assert.equal(base[0].fast?.extra_usd, 9.9);
 	const f = checkoutShippingForm('US', 1, base);
 	assert.equal(f['adaptive_pricing[enabled]'], 'true');
-	assert.equal(f[key(1, '[type]')], undefined, 'US has a single shipping option');
+	assert.equal(f[key(1, '[display_name]')], 'Expedited delivery', 'US: free shipping + Expedited delivery');
 	assert.equal(f[key(0, '[fixed_amount][amount]')], 0);
 	assert.equal(checkoutShippingForm('GB', 1, base), null);
 	assert.equal(raw.liveWave.every((c) => PENDING_COUNTRIES.some((p) => p.code === c)), true);
 	// the live module state matches the data: liveWave countries + US, in order
-	assert.deepEqual(LIVE_COUNTRIES.map((c) => c.code), ['US', ...raw.liveWave]);
+	assert.deepEqual(LIVE_COUNTRIES.map((c) => c.code), ['US', ...raw.liveWave, ...(raw.liveWave2 ?? [])]);
 });
 
 test('liveWave fails closed: unknown, duplicate, US, or unrouted codes throw', () => {
@@ -58,13 +60,14 @@ test('3A: free standard is option 0 (default) and Adaptive Pricing is on, in eve
 });
 
 test('EXPEDITED: ONE paid option after the free one, in every live country, with honest estimates', () => {
-	for (const c of wave.filter((x) => x.code !== 'US')) {
+	for (const c of wave) {
 		const f = checkoutShippingForm(c.code, 1, wave);
 		assert.ok(c.fast, `${c.code} has an expedited option`);
 		assert.equal(f[key(1, '[type]')], 'fixed_amount', c.code);
 		assert.equal(Object.keys(f).filter((k) => /^shipping_options\[2\]/.test(k)).length, 0, 'never a third option');
 		assert.equal(f[key(1, '[display_name]')], 'Expedited delivery', c.code);
 		assert.equal(f['custom_text[submit][message]'], EXPEDITED_DISCLAIMER, `${c.code} disclaimer at checkout`);
+		assert.doesNotMatch(JSON.stringify(f), /@spiritmediapublishing\.com/, `${c.code}: never an email address on Stripe's page`);
 		assert.ok(f[key(1, '[display_name]')].length <= 100, `${c.code} Stripe display_name cap`);
 		assert.equal(f[key(1, '[fixed_amount][amount]')], fastPriceCents(c.fast.extra_usd, 1));
 		assert.ok(f[key(1, '[delivery_estimate][maximum][value]')] < f[key(0, '[delivery_estimate][maximum][value]')], `${c.code} expedited max < standard max`);
@@ -72,8 +75,6 @@ test('EXPEDITED: ONE paid option after the free one, in every live country, with
 		// the two old separate options are gone, everywhere in the form
 		assert.doesNotMatch(JSON.stringify(f), /Faster delivery|Priority printing/);
 	}
-	assert.equal(checkoutShippingForm('US', 1, wave)[key(1, '[type]')], undefined, 'US: free shipping only');
-	assert.equal(checkoutShippingForm('US', 1, wave)['custom_text[submit][message]'], undefined);
 	for (const [id, r] of Object.entries(DELIVERY_ROUTES)) {
 		if (id.startsWith('_')) continue;
 		assert.match(r.transitBasis, /^ESTIMATE/, `${id}: transit must be labelled an estimate`);
@@ -141,7 +142,7 @@ test('2A: far-band flag follows the zone rule for every pending country', () => 
 });
 
 test('1A: WELCOME15 is offered to everyone: no far-band block anywhere in the code', () => {
-	for (const f of ['src/lib/marginGuard.ts', 'functions/dvc-checkout.ts', 'src/scripts/order-form.ts', 'src/components/OrderSummary.astro']) {
+	for (const f of ['src/lib/marginGuard.ts', 'functions/dvc-checkout.ts', 'src/lib/storeEngine.ts', 'src/scripts/order-form.ts', 'src/components/OrderSummary.astro']) {
 		const src = fs.readFileSync(f, 'utf8');
 		assert.doesNotMatch(src, /welcomeOffered|data-far|dataset\.far|firstOffered/, f);
 	}

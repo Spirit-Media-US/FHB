@@ -10,7 +10,7 @@ export type CheckoutEvent = {
 	kind: typeof CHECKOUT_EVENT_KIND;
 	path: string;
 	editions: string[];
-	binding: 'hc' | 'pb' | 'bi' | 'mixed';
+	binding: 'hc' | 'pb' | 'bi' | 'book' | 'mixed';
 	qty: '1' | '2-4' | '5-9' | '10-24' | '25+';
 	dest: string;
 	lang: string;
@@ -26,7 +26,13 @@ export function buildCheckoutEvent(
 	o: { path: string; dest?: string; lang?: string },
 ): CheckoutEvent {
 	const skus = Object.entries(counts).filter(([, n]) => n > 0);
-	const bindings = new Set(skus.map(([k]) => bindingFor(k)));
+	// FHB-BOOKS: Bibles report hc/pb and Beloved Identity 'bi' as before; any other book reports 'book'.
+	const bindings = new Set(
+		skus.map(([k]) => {
+			const b = bindingFor(k);
+			return b === 'hc' || b === 'pb' || b === 'bi' ? b : 'book';
+		}),
+	);
 	const editions = [...new Set(skus.map(([k]) => k.replace(/-(hb|pb)$/, '')))].slice(0, 8);
 	const total = skus.reduce((s, [, n]) => s + n, 0);
 	const path = String(o.path || '/').slice(0, 80);

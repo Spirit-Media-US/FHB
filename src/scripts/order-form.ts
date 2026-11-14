@@ -218,14 +218,14 @@ function init(root: HTMLElement) {
 	};
 	// The fee beside each price, BEFORE checkout (no drip pricing). The price shown is the
 	// first-order unit price, so the fee shown is the one sized on that price.
-	function paintFees() {
+	function paintFees(pct = FIRST_ORDER_PCT) {
 		const { code, row } = countryRow();
 		for (const el of qa('[data-fee-sku]')) {
 			const sku = el.dataset.feeSku as string;
 			const list = cfg.prices[sku];
 			const fee =
 				row && list != null
-					? (row.fees[feeKey(sku, unitAfter(Math.round(list * 100), FIRST_ORDER_PCT))] ?? 0)
+					? (row.fees[feeKey(sku, unitAfter(Math.round(list * 100), pct))] ?? 0)
 					: 0;
 			el.hidden = !(row && fee > 0);
 			el.textContent =
@@ -278,12 +278,16 @@ function init(root: HTMLElement) {
 		// (the server does the same), so it rounds per unit.
 		const { code, row } = countryRow();
 		const far = isFar();
+		// The total is the price everyone pays until the email confirms a first order (Kevin 2026-11-14 "1A", best
+		// practice: Google promotions rule + no price that rises at checkout).
 		const r = quote(lines(), far ? [] : cfg.tiers, code !== 'US', firstState === 'first');
 		const base = r.best === 'first' ? r.firstTotal : r.bulkTotal;
 		const appliedPct = r.best === 'first' ? FIRST_ORDER_PCT : r.best === 'bulk' ? r.bulkPct : 0;
 		const h = handlingFor(lines(), appliedPct, row);
 		const total = base + h.total;
-		paintFees();
+		// The edition box sizes each row's fee on the discount the total actually applies (audit 11-14: at 10+ copies
+		// the row said the first-order fee while the summary charged the volume-tier fee); the catalog keeps 15%.
+		paintFees(q('[data-pick]') ? appliedPct : FIRST_ORDER_PCT);
 		paintOffer();
 		paintQuote();
 		for (const n of qa('[data-expedited-note]')) n.hidden = !row;
@@ -294,6 +298,43 @@ function init(root: HTMLElement) {
 		set('[data-sum-copies-word]', r.copies === 1 ? t('s.copy') : t('s.copies'));
 		set('[data-sum-subtotal]', money(r.subtotal));
 		set('[data-sum-total]', money(total));
+		// "First order? −$X (15%) comes off at checkout": the NET saving against the total shown now (handling fee the
+		// 15% brings and any volume tier already applied are counted). Hidden with no net saving, once a first order is
+		// confirmed (the discount line shows it), for a repeat buyer, or in bulk-quote mode.
+		const firstAll = r.firstTotal + handlingFor(lines(), FIRST_ORDER_PCT, row).total;
+		const firstSave = total - firstAll;
+		const quoting = bulkQuoteRequired(far, volumes());
+		for (const el of qa('[data-first-save]')) {
+			el.hidden = firstState !== 'unknown' || r.copies < 1 || firstSave <= 0 || quoting;
+			el.textContent =
+				lang === 'en'
+					? `First order? −${money(firstSave)} (${FIRST_ORDER_PCT}%) comes off at checkout`
+					: `${t('p.firstOrder')}: −${money(firstSave)}`;
+		}
+		for (const el of qa('[data-ship-note]')) el.hidden = quoting;
+		// Far-band countries get no volume tiers (they are quoted): the bulk choice says so instead of "Save up to".
+		for (const el of qa<HTMLElement>('[data-acc-volume]')) {
+			el.dataset.orig ??= el.textContent ?? '';
+			el.textContent = far
+				? lang === 'en'
+					? 'Buying 10 or more? Contact us for bulk rates'
+					: t('q.title')
+				: el.dataset.orig;
+		}
+		// The edition box itemizes the order (Kevin 2026-11-14: "they only see 3. 3 of what?").
+		for (const ul of qa('[data-sum-items]')) {
+			ul.replaceChildren(
+				...lines().map((l) => {
+					const li = document.createElement('li');
+					const name = document.createElement('span');
+					name.textContent = `${l.qty} × ${l.slug.endsWith('-pb') ? t('p.paperback') : t('p.hardback')}`;
+					const amt = document.createElement('span');
+					amt.textContent = money(l.cents * l.qty);
+					li.append(name, amt);
+					return li;
+				}),
+			);
+		}
 		const disc = qa('[data-sum-disc]');
 		for (const d of disc) d.hidden = r.best === 'none';
 		set(
@@ -423,6 +464,49 @@ function init(root: HTMLElement) {
 			paintBar();
 		}).observe(root);
 	} else bar?.removeAttribute('data-away');
+
+	// ── single-edition box (EditionOrder, Kevin 2026-11-14 store session): each format keeps its own quantity
+	// ("Buyer wants 2 PB and 1 HB"); paperback starts at 1. On the General edition a colour chip moves the
+	// counts to that colour, so the box always orders one edition.
+	const pick = q('[data-pick]');
+	const pickQty = (fmt: string) =>
+		pick?.querySelector<HTMLInputElement>(`[data-pick-qty][data-fmt="${fmt}"]`);
+	function applyPick() {
+		if (!pick) return;
+		for (const k of Object.keys(counts)) counts[k] = 0;
+		for (const el of pick.querySelectorAll<HTMLInputElement>('[data-pick-qty]')) {
+			const n = Math.max(0, Math.floor(Number(el.value) || 0));
+			if (el.value !== '') el.value = String(n);
+			counts[`${pick.dataset.id}-${el.dataset.fmt}`] = n;
+		}
+		for (const c of pick.querySelectorAll<HTMLElement>('[data-pick-id]'))
+			c.setAttribute('aria-pressed', String(c.dataset.pickId === pick.dataset.id));
+		render();
+	}
+	if (pick) {
+		for (const c of pick.querySelectorAll<HTMLElement>('[data-pick-id]'))
+			c.addEventListener('click', () => {
+				pick.dataset.id = c.dataset.pickId;
+				applyPick();
+			});
+		for (const s of pick.querySelectorAll<HTMLElement>('[data-pick-step]'))
+			s.addEventListener('click', () => {
+				const el = pickQty(s.dataset.fmt ?? '');
+				if (el)
+					el.value = String(
+						Math.max(0, (Math.floor(Number(el.value)) || 0) + Number(s.dataset.pickStep)),
+					);
+				applyPick();
+			});
+		// Typing: recount on each digit, but let a field be empty mid-edit; settle to a whole number on change.
+		for (const el of pick.querySelectorAll<HTMLInputElement>('[data-pick-qty]')) {
+			el.addEventListener('input', () => {
+				if (el.value !== '') applyPick();
+			});
+			el.addEventListener('change', applyPick);
+		}
+		applyPick();
+	}
 
 	for (const row of qa('[data-row]')) paintRow(row);
 	render();
