@@ -26,9 +26,13 @@
 import type { CatalogRow } from '../data/print-catalog';
 import { PRINT_TIERS } from '../data/print-tiers';
 import { handlingTable } from '../lib/marginGuard';
-import { FIRST_ORDER_LABEL, FIRST_ORDER_PCT, firstOrderUnit } from '../lib/order-pricing';
 import {
-	formatCount,
+	EXPEDITED_DISCLAIMER,
+	FIRST_ORDER_FINE,
+	FIRST_ORDER_PCT,
+	firstOrderUnit,
+} from '../lib/order-pricing';
+import {
 	formatUsd,
 	ORDER_STRINGS,
 	type OrderLang,
@@ -36,13 +40,7 @@ import {
 	shipsText,
 	tr,
 } from '../lib/orderStrings';
-import {
-	allFreeShipping,
-	LIVE_COUNTRIES,
-	shipsLine,
-	shipsParts,
-	shipsToSentence,
-} from '../lib/shipCountries';
+import { LIVE_COUNTRIES, shipsLine, shipsParts, shipsToSentence } from '../lib/shipCountries';
 import BiblesBooksToggle from './BiblesBooksToggle.astro';
 import OrderSummary from './OrderSummary.astro';
 
@@ -63,7 +61,6 @@ const lang: OrderLang = orderLangFor(pageLang);
 const S = ORDER_STRINGS[lang];
 const t = (k: string, v?: Record<string, string | number>) => tr(S, k, v);
 const multi = rows.length > 1;
-const freeShip = allFreeShipping();
 // Runtime const: biome cannot see .astro template use (keep this line).
 const tiers = PRINT_TIERS;
 const skuPrices: Record<string, number> = Object.fromEntries(
@@ -99,19 +96,37 @@ const priceLine = [
 	return { ...l, first: money(firstOrderUnit(list)), reg: money(list) };
 });
 const idp = `eo-${lead.id}`;
-// English-first strings for the new box (other order languages show these until translated; tr() rule).
+// The new box's labels. English is written here; every other order language uses its own REVIEWED strings
+// (src/data/order-strings/<lang>.json), never an English stand-in on a translated page.
+const en = lang === 'en';
 const ladder = PRINT_TIERS.filter((x) => x.pct > 0).sort((a, b) => a.min - b.min);
-const BOX = {
-	format: 'Format',
-	qty: 'Quantity',
-	colour: 'Colour',
-	first: `${FIRST_ORDER_PCT}% off your first order, applied at checkout`,
-	accVolume: `Buying ${ladder[0].min} or more? Save up to ${Math.max(...ladder.map((x) => x.pct))}%`,
-	accVolumeBody: 'The discount is applied automatically when your quantity reaches a tier.',
-	accMixed: 'Ordering more than one edition, or paperbacks and hardbacks together?',
-	accShip: 'Shipping and international orders',
-};
-const shipsFull = lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts());
+const topPct = Math.max(...ladder.map((x) => x.pct));
+const BOX = en
+	? {
+			format: 'Format',
+			qty: 'Quantity',
+			qtyHidden: false,
+			colour: 'Colour',
+			first: `${FIRST_ORDER_PCT}% off your first order, applied at checkout`,
+			accVolume: `Buying ${ladder[0].min} or more? Save up to ${topPct}%`,
+			accVolumeBody: 'The discount is applied automatically when your quantity reaches a tier.',
+			accMixed: 'Ordering more than one edition, or paperbacks and hardbacks together?',
+			accMixedLink: t('o.catalogLink'),
+			accShip: 'Shipping and international orders',
+		}
+	: {
+			format: t('c.binding'),
+			qty: t('a.qty', { label: heading, binding: '' }).replace(/\s+/g, ' ').trim(),
+			qtyHidden: true,
+			colour: '',
+			first: t('p.firstOrder', { pct: FIRST_ORDER_PCT }),
+			accVolume: `${t('s.volume')} ${ladder.map((x) => t('s.tier', { pct: x.pct, min: x.min })).join(' · ')}`,
+			accVolumeBody: '',
+			accMixed: t('o.catalogLink').replace(/\s*→\s*$/, ''),
+			accMixedLink: `${t('c.h1')} →`,
+			accShip: t('o.shipsSummary', { n: LIVE_COUNTRIES.length }),
+		};
+const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts());
 ---
 <div id="order" class="lqo" data-order={config} data-lang={lang}>
 	<BiblesBooksToggle current="bibles" lang={lang} />
@@ -119,7 +134,7 @@ const shipsFull = lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsT
 	<div class="eo-pick" data-pick data-id={lead.id} data-fmt="pb">
 		{multi && (
 			<fieldset class="eo-group">
-				<legend class="eo-legend">{BOX.colour}</legend>
+				<legend class:list={['eo-legend', { 'eo-sr': !BOX.colour }]}>{BOX.colour || t('c.binding')}</legend>
 				<div class="eo-colours">
 					{rows.map((r, i) => (
 						<button type="button" class="eo-chip" data-pick-id={r.id} aria-pressed={i === 0 ? 'true' : 'false'}>{r.title.replace(/^.*—\s*/, '')}</button>
@@ -135,14 +150,14 @@ const shipsFull = lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsT
 						<span class="eo-fmt__binding">{l.binding}</span>
 						<b class="eo-fmt__price" data-first>{l.first}</b>
 						<span class="eo-fmt__reg">{t('p.reg')} <s data-reg>{l.reg}</s></span>
-						<span class="eo-fmt__fee" data-fee-sku={l.sku} hidden></span>
+						<span class="eo-fmt__fee" data-fee-sku={l.sku} data-fee-full hidden></span>
 					</button>
 				))}
 			</div>
 		</fieldset>
 		{note && <p class="eo-note" data-preorder-note>{note}</p>}
 		<div class="eo-qty">
-			<label class="eo-legend" for={`${idp}-qty`}>{BOX.qty}</label>
+			<label class:list={['eo-legend', { 'eo-sr': BOX.qtyHidden }]} for={`${idp}-qty`}>{BOX.qty}</label>
 			<div class="eo-qty__ctl">
 				<button type="button" class="eo-step" data-pick-step="-1" aria-label={t('a.fewer', { label: heading, binding: '' }).trim()}>−</button>
 				<input id={`${idp}-qty`} class="eo-qty__in" type="number" value="1" min="1" step="1" inputmode="numeric" data-pick-qty />
@@ -151,7 +166,7 @@ const shipsFull = lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsT
 		</div>
 	</div>
 	<div class="lqo__foot">
-		<OrderSummary tiers={tiers} idp={idp} lang={lang} variant="edition" firstLine={lang === 'en' ? BOX.first : t('p.firstOrder', { pct: FIRST_ORDER_PCT })} />
+		<OrderSummary tiers={tiers} idp={idp} lang={lang} variant="edition" firstLine={BOX.first} />
 	</div>
 	<div class="eo-acc">
 		<details class="eo-acc__item">
@@ -160,13 +175,13 @@ const shipsFull = lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsT
 				<p class="eo-tiers" data-tiers-line>
 					{ladder.map((tier) => <span class="eo-tier" data-tier={tier.pct} data-min={tier.min}>{t('s.tier', { pct: tier.pct, min: tier.min })}</span>)}
 				</p>
-				<p>{BOX.accVolumeBody} <span data-t="s.fine">{lang === 'en' ? FIRST_ORDER_FINE : t('s.fine')}</span></p>
+				<p>{BOX.accVolumeBody && `${BOX.accVolumeBody} `}<span data-t="s.fine">{en ? FIRST_ORDER_FINE : t('s.fine')}</span></p>
 			</div>
 		</details>
 		<details class="eo-acc__item">
 			<summary>{BOX.accMixed}</summary>
 			<div class="eo-acc__body">
-				<p><a href={lang === 'en' ? '/print/order/' : `/print/order/?lang=${lang}`}>{t('o.catalogLink')}</a></p>
+				<p><a href={en ? '/print/order/' : `/print/order/?lang=${lang}`}>{BOX.accMixedLink}</a></p>
 			</div>
 		</details>
 		<details class="eo-acc__item">
@@ -174,84 +189,121 @@ const shipsFull = lang === 'en' ? `${shipsLine()} ${shipsToSentence()}` : shipsT
 			<div class="eo-acc__body">
 				<p>{shipsFull}</p>
 				{LIVE_COUNTRIES.length > 1 && <p data-fee-note data-t="s.feeNote">{t('s.feeNote')}</p>}
-				{LIVE_COUNTRIES.length > 1 && <p data-expedited-note hidden><span data-t="s.expedited">{lang === 'en' ? EXPEDITED_DISCLAIMER : t('s.expedited')}</span> <span data-t="s.expeditedPrice">{t('s.expeditedPrice')}</span></p>}
+				{LIVE_COUNTRIES.length > 1 && <p data-expedited-note hidden><span data-t="s.expedited">{en ? EXPEDITED_DISCLAIMER : t('s.expedited')}</span> <span data-t="s.expeditedPrice">{t('s.expeditedPrice')}</span></p>}
 			</div>
 		</details>
 	</div>
 </div>
 
 <style>
-	.eo-price { margin: 0 0 1rem; font-family: var(--font-sans); }
-	.eo-price__row {
-		margin: 0 0 0.15rem;
-		font-size: 1.05rem;
-		color: var(--color-ink);
-	}
-	.eo-price__binding { font-weight: 600; }
-	.eo-price__row b { font-weight: 800; }
-	.eo-price__reg { color: #71717a; font-size: 0.9rem; }
-	.eo-price__fee { color: #3f3f46; font-size: 0.9rem; font-weight: 600; }
-	.eo-price__fee[hidden] { display: none; }
-	.eo-price__note,
-	.eo-price :global(.ships-d--wide),
-	.eo-price :global(.ships-d--narrow) {
-		margin: 0.35rem 0 0;
-		color: #3f3f46;
-		font-size: 0.85rem;
-		font-weight: 600;
-	}
-	.eo-variant + .eo-variant { margin-top: 0.7rem; }
-	.eo-variant__name {
-		margin: 0 0 0.25rem;
-		font-family: var(--font-sans);
-		font-size: 0.85rem;
-		font-weight: 700;
-		color: var(--color-ink);
-	}
+	/* MOBILE FIRST (Kevin 2026-11-14 "Do what data science says!"): base = phone; min-width widens. */
 	.lqo {
 		max-width: 34rem;
 		margin: 2.2rem auto 0;
-		padding: 1.25rem 1.25rem 1.1rem;
+		padding: 1rem 0.9rem 0.95rem;
 		background: #fff;
 		border: 1px solid var(--color-hairline);
 		border-radius: 1rem;
 		scroll-margin-top: 90px;
-	}
-	.lqo__catalog { margin: -0.4rem 0 0.4rem; font-family: var(--font-sans); }
-	.lqo__catalog a {
-		display: inline-flex;
-		align-items: center;
-		min-height: 44px;
-		color: #3f3f46;
-		font-size: 0.9rem;
-		font-weight: 600;
-		text-decoration: underline;
-		text-underline-offset: 3px;
-	}
-	.lqo__eyebrow {
 		font-family: var(--font-sans);
-		color: #71717a;
-		font-size: 0.72rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		margin: 0 0 0.25rem;
+		color: var(--color-ink);
 	}
 	.lqo__title {
 		font-family: var(--font-headline);
 		color: var(--color-ink);
 		font-size: 1.35rem;
 		font-weight: 600;
-		margin: 0 0 0.9rem;
+		margin: 0.4rem 0 0.9rem;
 	}
-	.lqo__foot {
-		margin-top: 0.9rem;
-		padding-top: 0.9rem;
-		border-top: 1px solid var(--color-hairline);
+	.eo-group { border: 0; margin: 0 0 0.9rem; padding: 0; min-width: 0; }
+	.eo-legend { display: block; padding: 0; margin: 0 0 0.4rem; font-size: 0.85rem; font-weight: 600; }
+	.eo-sr {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		white-space: nowrap;
 	}
-	/* BindingQty right-aligns its counters for /print's rows; here they lead the card. */
-	.lqo :global(.binding-qty__row) { justify-content: space-between; }
-	@media (max-width: 640px) {
-		.lqo { padding: 1rem 0.9rem 0.95rem; }
+	.eo-formats, .eo-colours { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+	.eo-colours { grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); }
+	.eo-fmt, .eo-chip {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.1rem;
+		min-height: 48px;
+		padding: 0.7rem 0.8rem;
+		border: 1.5px solid var(--color-hairline);
+		border-radius: 0.75rem;
+		background: #fff;
+		color: var(--color-ink);
+		font: inherit;
+		text-align: left;
+		cursor: pointer;
+	}
+	.eo-chip { align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 600; }
+	.eo-fmt[aria-pressed='true'], .eo-chip[aria-pressed='true'] {
+		border-color: var(--color-ink);
+		box-shadow: inset 0 0 0 1px var(--color-ink);
+	}
+	.eo-fmt:focus-visible, .eo-chip:focus-visible, .eo-step:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
+	.eo-fmt__binding { font-size: 0.9rem; font-weight: 600; }
+	.eo-fmt__price { font-size: 1.15rem; font-weight: 800; }
+	.eo-fmt__reg { color: #71717a; font-size: 0.8rem; }
+	.eo-fmt__fee { color: #3f3f46; font-size: 0.78rem; font-weight: 600; }
+	.eo-fmt__fee[hidden] { display: none; }
+	.eo-note { margin: 0 0 0.9rem; color: #3f3f46; font-size: 0.85rem; font-weight: 600; }
+	.eo-qty { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+	.eo-qty .eo-legend { margin: 0; }
+	.eo-qty__ctl { display: inline-flex; align-items: center; gap: 0.4rem; }
+	.eo-step {
+		width: 44px;
+		height: 44px;
+		border: 1.5px solid var(--color-hairline);
+		border-radius: 999px;
+		background: #fff;
+		color: var(--color-ink);
+		font-size: 1.2rem;
+		line-height: 1;
+		cursor: pointer;
+	}
+	.eo-qty__in {
+		width: 3.2rem;
+		min-height: 44px;
+		border: 1.5px solid var(--color-hairline);
+		border-radius: 0.6rem;
+		font: inherit;
+		font-size: 1rem;
+		text-align: center;
+		-moz-appearance: textfield;
+	}
+	.eo-qty__in::-webkit-inner-spin-button, .eo-qty__in::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+	.lqo__foot { margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--color-hairline); }
+	.eo-acc { margin-top: 0.6rem; border-top: 1px solid var(--color-hairline); }
+	.eo-acc__item { border-bottom: 1px solid var(--color-hairline); }
+	.eo-acc__item > summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		min-height: 48px;
+		padding: 0.5rem 0;
+		font-size: 0.9rem;
+		font-weight: 600;
+		cursor: pointer;
+		list-style: none;
+	}
+	.eo-acc__item > summary::-webkit-details-marker { display: none; }
+	.eo-acc__item > summary::after { content: '+'; flex: none; font-size: 1.2rem; font-weight: 400; color: #71717a; }
+	.eo-acc__item[open] > summary::after { content: '−'; }
+	.eo-acc__body { padding: 0 0 0.8rem; color: #3f3f46; font-size: 0.85rem; line-height: 1.5; }
+	.eo-acc__body p { margin: 0 0 0.5rem; }
+	.eo-acc__body p[hidden] { display: none; }
+	.eo-acc__body a { color: #3f3f46; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+	.eo-tiers { display: flex; flex-wrap: wrap; gap: 0.25rem 0.8rem; }
+	.eo-tier[data-on] { color: var(--color-ink); font-weight: 700; }
+	@media (min-width: 641px) {
+		.lqo { padding: 1.25rem 1.25rem 1.1rem; }
 	}
 </style>

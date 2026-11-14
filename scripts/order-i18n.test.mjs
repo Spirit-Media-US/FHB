@@ -119,7 +119,7 @@ for (const [slug, lang] of [['german-bible', 'de'], ['french-bible', 'fr'], ['sp
 	test(`built /bibles/${slug}/: order block in ${lang} once live (English until then), html lang and canonical untouched`, { skip: !built && 'no dist' }, () => {
 		const h = fs.readFileSync(dist(`bibles/${slug}/index.html`), 'utf8');
 		if (!LIVE_ORDER_LANGS.includes(lang)) {
-			assert.ok(h.includes('Order direct') && !h.includes(`data-lang="${lang}"`), `${lang} not live: block must stay English`);
+			assert.ok(h.includes('Buying 10 or more?') && !h.includes(`data-lang="${lang}"`), `${lang} not live: block must stay English`);
 			return;
 		}
 		const S = ORDER_STRINGS[lang];
@@ -129,14 +129,14 @@ for (const [slug, lang] of [['german-bible', 'de'], ['french-bible', 'fr'], ['sp
 		assert.ok(block.includes(S['o.eyebrow']), 'eyebrow');
 		assert.ok(block.includes(S['p.paperback']) && block.includes(S['s.checkout'].replace('→', '').trim()), 'binding + checkout');
 		assert.ok(block.includes(S['s.expedited'].replace(/'/g, '&#39;')) || block.includes(S['s.expedited']), 'expedited disclaimer');
-		for (const en of ['Order direct', 'Paperback', 'Checkout', 'Ship to', 'Total<', 'First order?']) if (!Object.values(S).some((v) => v === en.replace('<', ''))) assert.ok(!block.includes(en), `English "${en}" left in ${lang} block`);
+		for (const en of ['Order direct', 'Paperback', 'Checkout', 'Ship to', 'Total<', 'First order?', 'Buying 10 or more?', 'Shipping and international orders', '>Quantity<', '>Format<']) if (!Object.values(S).some((v) => v === en.replace('<', ''))) assert.ok(!block.includes(en), `English "${en}" left in ${lang} block`);
 		assert.match(h, /^<!DOCTYPE html><html lang="en"/);
 		assert.ok(h.includes(`rel="canonical" href="https://fathersheartbible.com/bibles/${slug}/"`));
 	});
 }
 test('built: a language we do not translate yet stays English, and /print/order/ ships English with the hooks', { skip: !built && 'no dist' }, () => {
 	const h = fs.readFileSync(dist('bibles/korean-bible/index.html'), 'utf8');
-	assert.ok(h.includes('Order direct') && !h.includes('data-lang="ko"'));
+	assert.ok(h.includes('Buying 10 or more?') && h.includes('Checkout →') && !h.includes('data-lang="ko"'));
 	const o = fs.readFileSync(dist('print/order/index.html'), 'utf8');
 	assert.ok(o.includes('Catalog Order Form') && o.includes('data-t="c.h1"') && o.includes('data-ships='));
 	assert.ok(!o.includes('hreflang="de"'));
