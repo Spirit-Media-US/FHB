@@ -308,6 +308,11 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	w.fetch = async (url, init) => { asked.push(JSON.parse(init.body)); return { json: async () => answers.value }; };
 	const email = d.querySelector('[data-email]');
 	const typeEmail = async (v) => { email.value = v; email.dispatchEvent(new w.Event('change', { bubbles: true })); await new Promise((r) => setTimeout(r, 20)); };
+	// Edition box (Kevin 2026-11-14): ONE first-order line (data-offer) replaces the old changing label;
+	// once the server confirms a first order the 15% shows as the summary's discount line.
+	const offer = () => d.querySelector('[data-offer]');
+	// It names the saving in money (Kevin 2026-11-14) and is NOT taken off the total before the email is confirmed.
+	const OFFER_LINE = /^First order\? −\$[\d,.]+ \(15%\) comes off at checkout$/; // Kevin 2026-11-14 "1A" best practice
 	const firstHb = unitAfter(hbList, 15);
 
 	pick('US');
@@ -317,17 +322,16 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	assert.equal(feeEl(hb).hidden, true, 'US shows no fee');
 	assert.equal(d.querySelector('[data-sum-fee]').hidden, true);
 
-	// BEFORE an email: the edition box CARRIES the first-order price through the total (Kevin 2026-11-14: "Then the
-	// discounted price carries throughout"), the 15% as its own line, plus the fee sized on that price.
+	// BEFORE an email: list price + fee for the country, and only a promise of the 15%
 	pick('IN');
 	assert.equal(feeEl(hb).hidden, false);
 	assert.equal(feeEl(hb).textContent, `+ $${usd(handlingFeeCents(hb, firstHb, row('IN')))} international handling (India)`, 'price-line fee sits on the first-order price shown beside it');
-	assert.equal(d.querySelector('[data-sum-disc]').hidden, false, 'first-order discount carried before the email');
-	assert.equal(txt('[data-sum-disc-label]'), '15% off your first order');
+	assert.equal(d.querySelector('[data-sum-disc]').hidden, true, 'no discount counted before the email is checked');
+	assert.match(offer().textContent, OFFER_LINE);
+	assert.equal(offer().hidden, false);
 	assert.equal(asked.length, 0);
 	const feeList = handlingFeeCents(hb, hbList, row('IN'));
-	const feeFirst0 = handlingFeeCents(hb, firstHb, row('IN'));
-	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(firstHb * 2 + feeFirst0 * 2)}`, 'total = first-order price + its fee');
+	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(hbList * 2 + feeList * 2)}`, 'total = list price + fee: never understated');
 
 	// a first-order email: the server (existing check) says yes -> 15% off the unit + the fee sized on it
 	await typeEmail('new@buyer.co');
@@ -340,20 +344,23 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	assert.equal(txt('[data-sum-fee-label]'), 'International handling (India)');
 	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(firstHb * 2 + feeFirst * 2)}`);
 
-	// editing the email forgets the answer (still carried); a repeat buyer's total returns to list price at once
+	// editing the email forgets the answer; a repeat buyer sees list price and no offer at all
 	email.value = 'x';
 	email.dispatchEvent(new w.Event('input', { bubbles: true }));
-	assert.equal(d.querySelector('[data-sum-disc]').hidden, false);
+	assert.match(offer().textContent, OFFER_LINE);
+	assert.equal(offer().hidden, false);
 	answers.value = { status: 'repeat' };
 	await typeEmail('old@buyer.co');
-	assert.equal(d.querySelector('[data-sum-disc]').hidden, true, 'repeat buyer: no discount');
+	assert.equal(d.querySelector('[data-offer]').hidden, true, 'repeat buyer: no offer shown');
+	assert.equal(d.querySelector('[data-sum-disc]').hidden, true);
 	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(hbList * 2 + feeList * 2)}`);
 
-	// a failed check falls back to the carried first-order price (the server decides at checkout)
+	// a failed check never lowers the total
 	w.fetch = async () => { throw new Error('offline'); };
 	await typeEmail('again@buyer.co');
-	assert.equal(d.querySelector('[data-sum-disc]').hidden, false);
-	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(firstHb * 2 + feeFirst0 * 2)}`);
+	assert.match(offer().textContent, OFFER_LINE);
+	assert.equal(offer().hidden, false);
+	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(hbList * 2 + feeList * 2)}`);
 
 	// EU label, and a country with no fee at all
 	answers.value = { status: 'first' };

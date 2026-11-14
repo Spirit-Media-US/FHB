@@ -197,7 +197,7 @@ const guaranteeBody = en
 					<div class="eo-row" data-line-sku={l.sku}>
 						<div class="eo-row__info">
 							<span class="eo-row__binding">{l.binding}</span>
-							<span class="eo-row__price"><b data-first>{l.first}</b> <span class="eo-row__reg"><span class="sr-only">{t('p.reg')} </span><s data-reg>{l.reg}</s></span></span>
+							<span class="eo-row__price"><span class="eo-row__first"><span data-first>{l.first}</span> {en ? 'on your first order' : `· ${t('p.firstOrder', { pct: FIRST_ORDER_PCT })}`}</span> <b class="eo-row__list" data-reg>{l.reg}</b></span>
 							<span class="eo-row__fee" data-fee-sku={l.sku} data-fee-full hidden></span>
 						</div>
 						<div class="eo-qty__ctl">
@@ -284,12 +284,11 @@ const guaranteeBody = en
 	}
 	.eo-row__info { display: flex; flex-direction: column; gap: 0; min-width: 0; line-height: 1.35; }
 	.eo-row__binding { font-size: 0.95rem; font-weight: 600; }
-	/* Kevin 2026-11-14: "(bigger) $79.99 (crossed out) (smaller) $67.99". DOM keeps first-order then regular
-	   (pricing-verify reads them in that order); flex order shows the regular price first. */
-	.eo-row__price { display: inline-flex; align-items: baseline; gap: 0.4rem; white-space: nowrap; }
-	.eo-row__price b { order: 2; font-size: 0.95rem; font-weight: 800; color: var(--color-ink); }
-	.eo-row__price .eo-row__reg { order: 1; }
-	.eo-row__reg { color: #52525b; font-size: 1.1rem; font-weight: 600; }
+	/* Kevin 2026-11-14 "1A" (best practice): the price everyone pays leads; the first-order price is a small line
+	   under it. DOM keeps first-order then list (pricing-verify reads them in that order); flex order shows list first. */
+	.eo-row__price { display: flex; flex-direction: column; }
+	.eo-row__list { order: 1; font-size: 1.05rem; font-weight: 800; color: var(--color-ink); }
+	.eo-row__first { order: 2; color: #9d174d; font-size: 0.8rem; font-weight: 600; }
 	.eo-row__fee { color: #3f3f46; font-size: 0.78rem; font-weight: 600; }
 	.eo-row__fee[hidden] { display: none; }
 	.eo-note { margin: 0 0 0.9rem; color: #3f3f46; font-size: 0.85rem; font-weight: 600; }
