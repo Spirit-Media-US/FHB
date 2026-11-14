@@ -768,8 +768,8 @@ const faqSchema = {
 				<div style="margin: 2.6rem 0 0;">
 					<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 0 0 0.15rem;">{shared.hearing.title}</h3>
 					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.97rem; font-style: italic; margin: 0 0 1.2rem;">{shared.hearing.line}</p>
-					{shared.hearing.groups.map((g) => (
-						<div style="margin: 0 0 1.6rem;">
+					{shared.hearing.groups.map((g, gi) => (
+						<div style={`margin: 0 0 ${gi === shared.hearing.groups.length - 1 ? '0' : '1.6rem'};`}>
 							<h4 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.98rem; font-weight: 800; margin: 0 0 0.35rem;">{g.h}</h4>
 							<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 0.99rem; line-height: 1.65; margin: 0 0 0.6rem;">{g.p}</p>
 							<dl style="margin: 0;">
@@ -786,8 +786,9 @@ const faqSchema = {
 
 			</div>
 		</Section>)}
-		<!-- What's inside + product details, laid out as a retail listing rather than a list -->
-		<Section variant="soft">
+		<!-- What's inside + product details, laid out as a retail listing rather than a list.
+		     Warm background (Kevin 2026-11-14: "needs different background") so it does not run into the section above. -->
+		<Section variant="warm">
 			<div class="max-w-4xl mx-auto">
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1.4rem;">What’s inside</h2>
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-3 mb-10">
