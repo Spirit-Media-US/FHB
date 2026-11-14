@@ -225,7 +225,9 @@ export function checkoutShippingForm(
 		'custom_text[shipping_address][message]':
 			'Enter the address exactly as the local post or courier writes it, and a phone number with country code: international carriers often call to confirm delivery.',
 		// The expedited disclaimer, beside the buyer's final click (only where the option exists).
-		...(c.fast ? { 'custom_text[submit][message]': EXPEDITED_DISCLAIMER } : {}),
+		// Support is reachable on Stripe's page too (Kevin 2026-11-15), beside the final click, with the expedited
+		// disclaimer where that option exists.
+		'custom_text[submit][message]': `${c.fast ? `${EXPEDITED_DISCLAIMER} ` : ''}Questions? Email hello@spiritmediapublishing.com`,
 	};
 }
 

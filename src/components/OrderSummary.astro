@@ -95,6 +95,8 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	</div>
 	)}
 	<p class="osum__msg" data-msg hidden role="status"></p>
+	{/* Support on every order form (Kevin 2026-11-15). The address is language-neutral. */}
+	<p class="osum__help">{en ? 'Questions? ' : ''}<a href="mailto:hello@spiritmediapublishing.com">hello@spiritmediapublishing.com</a></p>
 </div>
 
 <style>
@@ -148,6 +150,8 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	.osum__quote[hidden] { display: none; }
 	.osum__quote-btn { display: flex; align-items: center; justify-content: center; box-sizing: border-box; text-decoration: none; }
 	.osum__checkout:disabled { opacity: 0.6; cursor: wait; }
+	.osum__help { margin: 0.6rem 0 0; text-align: center; font-size: 0.85rem; color: #52525b; }
+	.osum__help a { color: #3f3f46; text-decoration: underline; text-underline-offset: 3px; }
 	.osum__msg { color: var(--color-muted); font-size: 0.85rem; margin: 0.6rem 0 0; }
 	/* edition variant (single-edition order box, mobile first) */
 	.osum__label--ship { margin-top: 0.6rem; }
