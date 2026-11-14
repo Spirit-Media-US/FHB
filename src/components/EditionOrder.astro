@@ -110,7 +110,7 @@ const BOX = en
 			accVolumeBody: 'The discount is applied automatically when your quantity reaches a tier.',
 			accMixed: 'Ordering more than one edition?',
 			accMixedLink: t('o.catalogLink'),
-			accShip: `International shipping: we ship to ${LIVE_COUNTRIES.length} countries`,
+			accShip: 'Free standard international shipping',
 		}
 	: {
 			colour: '',
@@ -206,10 +206,6 @@ const guaranteeBody = en
 	</div>
 	</div>
 </div>
-<p class="eo-shipnote">
-	<b>{en ? `Free standard shipping to all ${LIVE_COUNTRIES.length} countries we ship to.` : t('o.shipsSummary', { n: LIVE_COUNTRIES.length }).split('·')[0].trim()}</b>
-	{' '}{en ? 'Outside the United States, some countries add a small per-copy handling fee, shown before you check out.' : t('s.feeNote')}
-</p>
 {en && (
 	<nav class="eo-shop" aria-label="Keep shopping">
 		<span class="eo-shop__label">Keep shopping</span>
@@ -223,7 +219,7 @@ const guaranteeBody = en
 	/* MOBILE FIRST (Kevin 2026-11-14 "Do what data science says!"): base = phone; min-width widens. */
 	.eo-wrap { max-width: 34rem; margin: 2.2rem auto 0; scroll-margin-top: 90px; font-family: var(--font-sans); color: var(--color-ink); }
 	.lqo {
-		margin: 1rem 0 0;
+		margin: 1.1rem 0 0;
 		padding: 1rem 0.9rem 0.95rem;
 		background: #fff;
 		border: 1px solid var(--color-hairline);
@@ -310,10 +306,10 @@ const guaranteeBody = en
 	.eo-qty__in::-webkit-inner-spin-button, .eo-qty__in::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 	.lqo__foot { margin-top: 0.2rem; }
 	/* Kevin 2026-11-14: "4 accordian items white on gray" */
-	.eo-acc { display: grid; gap: 0.35rem; padding: 0.4rem; background: #ececef; border-radius: 0.9rem; }
+	.eo-acc { display: grid; gap: 0.4rem; padding: 0.5rem; background: #e2e3e7; border-radius: 0.9rem; }
 	.eo-bubbles { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; margin: 0 0 0.6rem; padding: 0; }
 	/* the page's "Also known as" bubbles */
-	.eo-bubble { font-size: 0.8rem; color: #3f3f46; background: var(--color-surface-low); border: 1px solid var(--color-hairline); border-radius: 999px; padding: 0.25rem 0.7rem; }
+	.eo-bubble { font-size: 0.8rem; color: #52525b; background: #fbe7f0; border: 1px solid #f0c4d8; border-radius: 999px; padding: 0.25rem 0.7rem; }
 	.eo-acc__item { background: #fff; border-radius: 0.6rem; padding: 0 0.75rem; }
 	.eo-acc__item > summary {
 		display: flex;
@@ -335,7 +331,6 @@ const guaranteeBody = en
 	.eo-acc__body p[hidden] { display: none; }
 	.eo-acc__body a { color: #3f3f46; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 	.eo-tier[data-on] { color: var(--color-ink); font-weight: 700; border-color: var(--color-ink); }
-	.eo-shipnote { max-width: 34rem; margin: 0.8rem auto 0; padding: 0.7rem 0.9rem; background: #eef6f0; border: 1px solid #d3e8d9; border-radius: 0.75rem; font-family: var(--font-sans); font-size: 0.85rem; line-height: 1.5; color: #27402f; }
 	.eo-shop { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.5rem; max-width: 34rem; margin: 1rem auto 0; font-family: var(--font-sans); }
 	.eo-shop__label { width: 100%; text-align: center; font-size: 0.85rem; font-weight: 600; color: #3f3f46; }
 	.eo-shop a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1rem; border: 1px solid var(--color-hairline); border-radius: 999px; background: var(--color-surface-low); color: var(--color-ink); font-size: 0.88rem; font-weight: 600; text-decoration: none; }
