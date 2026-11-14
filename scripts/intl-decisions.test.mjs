@@ -66,8 +66,8 @@ test('EXPEDITED: ONE paid option after the free one, in every live country, with
 		assert.equal(f[key(1, '[type]')], 'fixed_amount', c.code);
 		assert.equal(Object.keys(f).filter((k) => /^shipping_options\[2\]/.test(k)).length, 0, 'never a third option');
 		assert.equal(f[key(1, '[display_name]')], 'Expedited delivery', c.code);
-		assert.ok(f['custom_text[submit][message]'].startsWith(EXPEDITED_DISCLAIMER), `${c.code} disclaimer at checkout`);
-		assert.match(f['custom_text[submit][message]'], /hello@spiritmediapublishing\.com/, `${c.code} support email at checkout`);
+		assert.equal(f['custom_text[submit][message]'], EXPEDITED_DISCLAIMER, `${c.code} disclaimer at checkout`);
+		assert.doesNotMatch(JSON.stringify(f), /@spiritmediapublishing\.com/, `${c.code}: never an email address on Stripe's page`);
 		assert.ok(f[key(1, '[display_name]')].length <= 100, `${c.code} Stripe display_name cap`);
 		assert.equal(f[key(1, '[fixed_amount][amount]')], fastPriceCents(c.fast.extra_usd, 1));
 		assert.ok(f[key(1, '[delivery_estimate][maximum][value]')] < f[key(0, '[delivery_estimate][maximum][value]')], `${c.code} expedited max < standard max`);

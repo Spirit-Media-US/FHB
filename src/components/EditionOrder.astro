@@ -152,7 +152,10 @@ const listOfSites = () =>
 const shipsIntro = en
 	? `Free standard shipping to ${LIVE_COUNTRIES.length} countries, printed in ${listOfSites()}.`
 	: t('o.shipsSummary', { n: LIVE_COUNTRIES.length }).split('·')[0].trim();
-const countryNames = LIVE_COUNTRIES.map((c) => (en ? c.name : regionName(lang, c.code)));
+// A-Z in the page's language (Kevin 2026-11-15; order popularity is too thin to rank by yet).
+const countryNames = LIVE_COUNTRIES.map((c) => (en ? c.name : regionName(lang, c.code))).sort(
+	(a, b) => a.localeCompare(b, lang),
+);
 const guaranteeBody = en
 	? `If anything isn’t right with your order, for any reason, let us know within ${RETURN_DAYS} days of delivery and we will make it right.`
 	: '';
