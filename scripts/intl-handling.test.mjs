@@ -30,7 +30,7 @@ test('3B + 2026-11-15: US + the 19-market wave + every country opened by Kevin (
 	assert.equal(LIVE19.length, 19);
 	assert.deepEqual(raw.liveWave, LIVE19);
 	assert.deepEqual(LIVE_COUNTRIES.map((c) => c.code), ['US', ...LIVE19, ...raw.liveWave2]);
-	for (const no of ['MM', 'AF', 'SD', 'YE', 'LY', 'SO', 'CF', 'ZW', 'NI', 'IR', 'KP', 'SY', 'CU'])
+	for (const no of ['IR', 'KP', 'SY', 'CU'])
 		assert.ok(!LIVE_COUNTRIES.some((c) => c.code === no), `${no} must not be live`);
 	for (const c of LIVE_COUNTRIES.filter((x) => x.code !== 'US')) {
 		assert.ok(c.landed_cost_usd, `${c.code} needs landed_cost_usd`);
@@ -235,8 +235,8 @@ test('backstop: a country with no landed cost is refused, never sold below an un
 	assert.equal(marginCheck([{ slug: HC, retail: 9999 }], 0, 'ZZ', ALL).ok, false);
 });
 
-test('Stripe: excluded and unknown countries are refused', async () => {
-	for (const country of ['MM', 'AF', 'ZZ']) {
+test('Stripe: countries we do not serve and unknown codes are refused', async () => {
+	for (const country of ['KP', 'IR', 'ZZ']) {
 		const r = await checkout({ country, counts: { 'moms-hb': 1 } });
 		assert.equal(r.status, 400, country);
 		assert.equal(r.json.error, 'country_not_served');

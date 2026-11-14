@@ -55,8 +55,6 @@ interface Config {
 	intl?: Record<string, IntlRow>;
 	/** far_band country codes (unit 2kx): no volume ladder; 10+ copies are a bulk quote, not checkout */
 	farBand?: string[];
-	/** per country [std min, std max, (expedited min, max)] business days (edition box) */
-	eta?: Record<string, number[]>;
 	/** the page's order language and its string table (absent = English) */
 	lang?: OrderLang;
 	s?: Strings;
@@ -314,12 +312,6 @@ function init(root: HTMLElement) {
 					: `${t('p.firstOrder')}: −${money(firstSave)}`;
 		}
 		for (const el of qa('[data-ship-note]')) el.hidden = quoting;
-		const eta = cfg.eta?.[code];
-		for (const el of qa('[data-eta]')) {
-			el.hidden = !eta || quoting || lang !== 'en';
-			if (eta)
-				el.textContent = `Arrives in about ${eta[0]}–${eta[1]} business days with free standard shipping${eta.length > 2 ? `, or ${eta[2]}–${eta[3]} with Expedited delivery (paid, chosen at checkout)` : ''}.`;
-		}
 		// Far-band countries get no volume tiers (they are quoted): the bulk choice says so instead of "Save up to".
 		for (const el of qa<HTMLElement>('[data-acc-volume]')) {
 			el.dataset.orig ??= el.textContent ?? '';
