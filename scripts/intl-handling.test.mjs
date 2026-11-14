@@ -311,7 +311,8 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	// Edition box (Kevin 2026-11-14): ONE first-order line (data-offer) replaces the old changing label;
 	// once the server confirms a first order the 15% shows as the summary's discount line.
 	const offer = () => d.querySelector('[data-offer]');
-	const OFFER_LINE = '15% off your first order, applied at checkout';
+	// It names the saving in money (Kevin 2026-11-14) and is NOT taken off the total before the email is confirmed.
+	const OFFER_LINE = /^15% off your first order: save \$[\d,.]+ at checkout$/;
 	const firstHb = unitAfter(hbList, 15);
 
 	pick('US');
@@ -326,7 +327,7 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	assert.equal(feeEl(hb).hidden, false);
 	assert.equal(feeEl(hb).textContent, `+ $${usd(handlingFeeCents(hb, firstHb, row('IN')))} international handling (India)`, 'price-line fee sits on the first-order price shown beside it');
 	assert.equal(d.querySelector('[data-sum-disc]').hidden, true, 'no discount counted before the email is checked');
-	assert.equal(offer().textContent, OFFER_LINE);
+	assert.match(offer().textContent, OFFER_LINE);
 	assert.equal(offer().hidden, false);
 	assert.equal(asked.length, 0);
 	const feeList = handlingFeeCents(hb, hbList, row('IN'));
@@ -346,7 +347,7 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	// editing the email forgets the answer; a repeat buyer sees list price and no offer at all
 	email.value = 'x';
 	email.dispatchEvent(new w.Event('input', { bubbles: true }));
-	assert.equal(offer().textContent, OFFER_LINE);
+	assert.match(offer().textContent, OFFER_LINE);
 	assert.equal(offer().hidden, false);
 	answers.value = { status: 'repeat' };
 	await typeEmail('old@buyer.co');
@@ -357,7 +358,7 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	// a failed check never lowers the total
 	w.fetch = async () => { throw new Error('offline'); };
 	await typeEmail('again@buyer.co');
-	assert.equal(offer().textContent, OFFER_LINE);
+	assert.match(offer().textContent, OFFER_LINE);
 	assert.equal(offer().hidden, false);
 	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(hbList * 2 + feeList * 2)}`);
 

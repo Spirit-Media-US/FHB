@@ -72,7 +72,7 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 		<div class="osum__total"><dt data-t="s.total">{t('s.total')}</dt><dd data-sum-total>{formatUsd(lang, 0)}</dd></div>
 	</dl>
 	<p class="osum__note"><span data-t={shipKey}>{t(shipKey)}</span> · <span data-t="s.tax">{t('s.tax')}</span></p>
-	{edition && firstLine && <p class="osum__note osum__first" data-offer>{firstLine}</p>}
+	{edition && firstLine && <p class="osum__note osum__first" data-offer data-first-save>{firstLine}</p>}
 	{!edition && multiCountry && <p class="osum__note" data-fee-note data-t="s.feeNote">{t('s.feeNote')}</p>}
 	{!edition && multiCountry && <p class="osum__note" data-expedited-note hidden><span data-t="s.expedited">{expeditedNote}</span> <span data-t="s.expeditedPrice">{t('s.expeditedPrice')}</span></p>}
 	{!edition && multiCountry && (<>
@@ -84,7 +84,6 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	<label class="osum__label" for={`${idp}-email`} data-t="s.email">{t('s.email')}</label>
 	<input id={`${idp}-email`} class="osum__email" type="email" name="email" autocomplete="email" inputmode="email" required data-email />
 	<button type="button" class="osum__checkout" data-checkout data-t="s.checkout">{t('s.checkout')}</button>
-	{edition && <p class="osum__guarantee"><a href="/returns/" data-t="p.returns">{t('p.returns')}</a></p>}
 	{multiCountry && (
 	<div class="osum__quote" data-quote hidden>
 		<p class="osum__note" data-quote-note data-t="q.note">{quoteNote}</p>

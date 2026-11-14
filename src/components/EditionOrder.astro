@@ -26,6 +26,7 @@
 import type { CatalogRow } from '../data/print-catalog';
 import { PRINT_TIERS } from '../data/print-tiers';
 import { handlingTable } from '../lib/marginGuard';
+import { RETURN_DAYS } from '../lib/merchantReturnPolicy';
 import {
 	EXPEDITED_DISCLAIMER,
 	FIRST_ORDER_FINE,
@@ -37,10 +38,11 @@ import {
 	ORDER_STRINGS,
 	type OrderLang,
 	orderLangFor,
+	regionName,
 	shipsText,
 	tr,
 } from '../lib/orderStrings';
-import { LIVE_COUNTRIES, shipsLine, shipsParts, shipsToSentence } from '../lib/shipCountries';
+import { LIVE_COUNTRIES, shipsParts } from '../lib/shipCountries';
 import OrderSummary from './OrderSummary.astro';
 
 interface Props {
@@ -119,17 +121,24 @@ const BOX = en
 			accMixedLink: `${t('c.h1')} →`,
 			accShip: t('o.shipsSummary', { n: LIVE_COUNTRIES.length }),
 		};
-const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S, shipsParts());
+// The shipping sentence WITHOUT the country list: the countries show as bubbles (Kevin 2026-11-14).
+const shipsIntro = shipsText(lang, S, { ...shipsParts(), countries: [] });
+const countryNames = LIVE_COUNTRIES.map((c) => (en ? c.name : regionName(lang, c.code)));
+const guaranteeBody = en
+	? `If anything isn’t right with your order, for any reason, let us know within ${RETURN_DAYS} days of delivery and we will make it right.`
+	: '';
 ---
-<div id="order" class="lqo" data-order={config} data-lang={lang}>
-	<h2 class="lqo__title">{t('o.title', { heading })}</h2>
-	{/* Kevin 2026-11-14: "assure shoppers at the top that we ship to their country ... Show them choices at the
-	    top for bulk quantity and catalog." Three closed choices lead the box; each opens on tap. */}
+<div id="order" class="eo-wrap" data-order={config} data-lang={lang}>
+	{/* Kevin 2026-11-14: compact choices OUTSIDE the box, above it: shipping (countries as bubbles), bulk,
+	    catalog, guarantee. Still inside [data-order] so order-form.ts keeps them live (tiers, fee notes). */}
 	<div class="eo-acc">
 		<details class="eo-acc__item">
 			<summary>{BOX.accShip}</summary>
 			<div class="eo-acc__body">
-				<p>{shipsFull}</p>
+				<p>{shipsIntro}</p>
+				<ul class="eo-bubbles" aria-label={BOX.accShip}>
+					{countryNames.map((n) => <li class="eo-bubble">{n}</li>)}
+				</ul>
 				{LIVE_COUNTRIES.length > 1 && <p data-fee-note data-t="s.feeNote">{t('s.feeNote')}</p>}
 				{LIVE_COUNTRIES.length > 1 && <p data-expedited-note hidden><span data-t="s.expedited">{en ? EXPEDITED_DISCLAIMER : t('s.expedited')}</span> <span data-t="s.expeditedPrice">{t('s.expeditedPrice')}</span></p>}
 			</div>
@@ -137,9 +146,9 @@ const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S
 		<details class="eo-acc__item">
 			<summary>{BOX.accVolume}</summary>
 			<div class="eo-acc__body">
-				<p class="eo-tiers" data-tiers-line>
-					{ladder.map((tier) => <span class="eo-tier" data-tier={tier.pct} data-min={tier.min}>{t('s.tier', { pct: tier.pct, min: tier.min })}</span>)}
-				</p>
+				<ul class="eo-bubbles eo-tiers" data-tiers-line>
+					{ladder.map((tier) => <li class="eo-bubble eo-tier" data-tier={tier.pct} data-min={tier.min}>{t('s.tier', { pct: tier.pct, min: tier.min })}</li>)}
+				</ul>
 				<p>{BOX.accVolumeBody && `${BOX.accVolumeBody} `}<span data-t="s.fine">{en ? FIRST_ORDER_FINE : t('s.fine')}</span></p>
 			</div>
 		</details>
@@ -149,7 +158,16 @@ const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S
 				<p><a href={en ? '/print/order/' : `/print/order/?lang=${lang}`}>{BOX.accMixedLink}</a></p>
 			</div>
 		</details>
+		<details class="eo-acc__item">
+			<summary>{t('p.returns')}</summary>
+			<div class="eo-acc__body">
+				{guaranteeBody && <p>{guaranteeBody}</p>}
+				<p><a href="/returns/">{en ? 'Read our guarantee →' : `${t('p.returns')} →`}</a></p>
+			</div>
+		</details>
 	</div>
+	<div class="lqo">
+	<h2 class="lqo__title">{t('o.title', { heading })}</h2>
 	<div class="eo-pick" data-pick data-id={lead.id}>
 		{multi && (
 			<fieldset class="eo-group">
@@ -186,10 +204,11 @@ const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S
 	<div class="lqo__foot">
 		<OrderSummary tiers={tiers} idp={idp} lang={lang} variant="edition" firstLine={BOX.first} />
 	</div>
+	</div>
 </div>
 {en && (
 	<nav class="eo-shop" aria-label="Keep shopping">
-		<span>Keep shopping:</span>
+		<span class="eo-shop__label">Keep shopping</span>
 		<a href="/print/">All Bibles</a>
 		<a href="/books/">Father’s Heart Books</a>
 		<a href="https://spiritmediapublishing.com/bookstore/">All SMP Books</a>
@@ -198,23 +217,20 @@ const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S
 
 <style>
 	/* MOBILE FIRST (Kevin 2026-11-14 "Do what data science says!"): base = phone; min-width widens. */
+	.eo-wrap { max-width: 34rem; margin: 2.2rem auto 0; scroll-margin-top: 90px; font-family: var(--font-sans); color: var(--color-ink); }
 	.lqo {
-		max-width: 34rem;
-		margin: 2.2rem auto 0;
+		margin: 0.8rem 0 0;
 		padding: 1rem 0.9rem 0.95rem;
 		background: #fff;
 		border: 1px solid var(--color-hairline);
 		border-radius: 1rem;
-		scroll-margin-top: 90px;
-		font-family: var(--font-sans);
-		color: var(--color-ink);
 	}
 	.lqo__title {
 		font-family: var(--font-headline);
 		color: var(--color-ink);
 		font-size: 1.35rem;
 		font-weight: 600;
-		margin: 0.4rem 0 0.9rem;
+		margin: 0 0 0.2rem;
 	}
 	.eo-group { border: 0; margin: 0.9rem 0 0; padding: 0; min-width: 0; }
 	.eo-legend { display: block; padding: 0; margin: 0 0 0.4rem; font-size: 0.85rem; font-weight: 600; }
@@ -245,26 +261,29 @@ const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S
 	.eo-chip[aria-pressed='true'] { border-color: var(--color-ink); box-shadow: inset 0 0 0 1px var(--color-ink); }
 	.eo-chip:focus-visible, .eo-step:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
 	.eo-rows { display: grid; gap: 0.6rem; margin-top: 0.9rem; }
+	/* Colour on the choice rows (Kevin 2026-11-14 "the form is too white"): the brand tint, ink text. */
 	.eo-row {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 0.75rem;
-		padding: 0.7rem 0.8rem;
-		border: 1.5px solid var(--color-hairline);
+		gap: 0.6rem;
+		padding: 0.55rem 0.7rem;
+		background: #fbf1f6;
+		border: 1px solid #efd3e1;
 		border-radius: 0.75rem;
 	}
-	.eo-row__info { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+	.eo-row__info { display: flex; flex-direction: column; gap: 0; min-width: 0; line-height: 1.35; }
 	.eo-row__binding { font-size: 0.95rem; font-weight: 600; }
-	.eo-row__price b { font-size: 1.1rem; font-weight: 800; }
-	.eo-row__reg { display: block; color: #71717a; font-size: 0.8rem; }
+	.eo-row__price b { font-size: 1.05rem; font-weight: 800; }
+	.eo-row__price { white-space: nowrap; }
+	.eo-row__reg { color: #71717a; font-size: 0.78rem; }
 	.eo-row__fee { color: #3f3f46; font-size: 0.78rem; font-weight: 600; }
 	.eo-row__fee[hidden] { display: none; }
 	.eo-note { margin: 0 0 0.9rem; color: #3f3f46; font-size: 0.85rem; font-weight: 600; }
 	.eo-qty__ctl { display: inline-flex; flex: none; align-items: center; gap: 0.35rem; }
 	.eo-step {
-		width: 44px;
-		height: 44px;
+		width: 40px;
+		height: 40px;
 		border: 1.5px solid var(--color-hairline);
 		border-radius: 999px;
 		background: #fff;
@@ -274,8 +293,9 @@ const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S
 		cursor: pointer;
 	}
 	.eo-qty__in {
-		width: 3.2rem;
-		min-height: 44px;
+		width: 2.6rem;
+		min-height: 40px;
+		background: #fff;
 		border: 1.5px solid var(--color-hairline);
 		border-radius: 0.6rem;
 		font: inherit;
@@ -286,15 +306,18 @@ const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S
 	.eo-qty__in::-webkit-inner-spin-button, .eo-qty__in::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 	.lqo__foot { margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--color-hairline); }
 	.eo-acc { border-top: 1px solid var(--color-hairline); }
+	.eo-bubbles { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; margin: 0 0 0.6rem; padding: 0; }
+	/* the page's "Also known as" bubbles */
+	.eo-bubble { font-size: 0.8rem; color: #3f3f46; background: var(--color-surface-low); border: 1px solid var(--color-hairline); border-radius: 999px; padding: 0.25rem 0.7rem; }
 	.eo-acc__item { border-bottom: 1px solid var(--color-hairline); }
 	.eo-acc__item > summary {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.75rem;
-		min-height: 48px;
-		padding: 0.5rem 0;
-		font-size: 0.9rem;
+		min-height: 44px;
+		padding: 0.35rem 0;
+		font-size: 0.85rem;
 		font-weight: 600;
 		cursor: pointer;
 		list-style: none;
@@ -306,21 +329,11 @@ const shipsFull = en ? `${shipsLine()} ${shipsToSentence()}` : shipsText(lang, S
 	.eo-acc__body p { margin: 0 0 0.5rem; }
 	.eo-acc__body p[hidden] { display: none; }
 	.eo-acc__body a { color: #3f3f46; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-	.eo-tiers { display: flex; flex-wrap: wrap; gap: 0.25rem 0.8rem; }
-	.eo-tier[data-on] { color: var(--color-ink); font-weight: 700; }
-	.eo-shop {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		gap: 0.2rem 1rem;
-		max-width: 34rem;
-		margin: 0.9rem auto 0;
-		font-family: var(--font-sans);
-		font-size: 0.9rem;
-		color: #3f3f46;
-	}
-	.eo-shop a { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-	.eo-shop span { display: inline-flex; align-items: center; min-height: 44px; }
+	.eo-tier[data-on] { color: var(--color-ink); font-weight: 700; border-color: var(--color-ink); }
+	.eo-shop { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.5rem; max-width: 34rem; margin: 1rem auto 0; font-family: var(--font-sans); }
+	.eo-shop__label { width: 100%; text-align: center; font-size: 0.85rem; font-weight: 600; color: #3f3f46; }
+	.eo-shop a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1rem; border: 1px solid var(--color-hairline); border-radius: 999px; background: var(--color-surface-low); color: var(--color-ink); font-size: 0.88rem; font-weight: 600; text-decoration: none; }
+	.eo-shop a:hover { border-color: var(--color-ink); }
 	@media (min-width: 641px) {
 		.lqo { padding: 1.25rem 1.25rem 1.1rem; }
 	}

@@ -294,6 +294,17 @@ function init(root: HTMLElement) {
 		set('[data-sum-copies-word]', r.copies === 1 ? t('s.copy') : t('s.copies'));
 		set('[data-sum-subtotal]', money(r.subtotal));
 		set('[data-sum-total]', money(total));
+		// The first-order line names the saving in money (Kevin 2026-11-14: "Can't the discount show here").
+		// It is NOT taken off the total until the email is confirmed (no understated totals); a better volume
+		// tier, a confirmed first order (the discount line shows it) or a repeat buyer hides it.
+		const firstSave = r.subtotal - r.firstTotal;
+		for (const el of qa('[data-first-save]')) {
+			el.hidden = firstState !== 'unknown' || r.copies < 1 || r.bulkPct >= FIRST_ORDER_PCT;
+			el.textContent =
+				lang === 'en'
+					? `${FIRST_ORDER_PCT}% off your first order: save ${money(firstSave)} at checkout`
+					: `${t('p.firstOrder')}: −${money(firstSave)}`;
+		}
 		// The edition box itemizes the order (Kevin 2026-11-14: "they only see 3. 3 of what?").
 		for (const ul of qa('[data-sum-items]')) {
 			ul.replaceChildren(
