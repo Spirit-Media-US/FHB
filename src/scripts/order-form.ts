@@ -55,6 +55,8 @@ interface Config {
 	intl?: Record<string, IntlRow>;
 	/** far_band country codes (unit 2kx): no volume ladder; 10+ copies are a bulk quote, not checkout */
 	farBand?: string[];
+	/** per country [std min, std max, (expedited min, max)] business days (edition box) */
+	eta?: Record<string, number[]>;
 	/** the page's order language and its string table (absent = English) */
 	lang?: OrderLang;
 	s?: Strings;
@@ -218,14 +220,14 @@ function init(root: HTMLElement) {
 	};
 	// The fee beside each price, BEFORE checkout (no drip pricing). The price shown is the
 	// first-order unit price, so the fee shown is the one sized on that price.
-	function paintFees() {
+	function paintFees(pct = FIRST_ORDER_PCT) {
 		const { code, row } = countryRow();
 		for (const el of qa('[data-fee-sku]')) {
 			const sku = el.dataset.feeSku as string;
 			const list = cfg.prices[sku];
 			const fee =
 				row && list != null
-					? (row.fees[feeKey(sku, unitAfter(Math.round(list * 100), FIRST_ORDER_PCT))] ?? 0)
+					? (row.fees[feeKey(sku, unitAfter(Math.round(list * 100), pct))] ?? 0)
 					: 0;
 			el.hidden = !(row && fee > 0);
 			el.textContent =
@@ -285,7 +287,9 @@ function init(root: HTMLElement) {
 		const appliedPct = r.best === 'first' ? FIRST_ORDER_PCT : r.best === 'bulk' ? r.bulkPct : 0;
 		const h = handlingFor(lines(), appliedPct, row);
 		const total = base + h.total;
-		paintFees();
+		// The edition box sizes each row's fee on the discount the total actually applies (audit 11-14: at 10+ copies
+		// the row said the first-order fee while the summary charged the volume-tier fee); the catalog keeps 15%.
+		paintFees(q('[data-pick]') ? appliedPct : FIRST_ORDER_PCT);
 		paintOffer();
 		paintQuote();
 		for (const n of qa('[data-expedited-note]')) n.hidden = !row;
@@ -310,6 +314,12 @@ function init(root: HTMLElement) {
 					: `${t('p.firstOrder')}: −${money(firstSave)}`;
 		}
 		for (const el of qa('[data-ship-note]')) el.hidden = quoting;
+		const eta = cfg.eta?.[code];
+		for (const el of qa('[data-eta]')) {
+			el.hidden = !eta || quoting || lang !== 'en';
+			if (eta)
+				el.textContent = `Arrives in about ${eta[0]}–${eta[1]} business days with free standard shipping${eta.length > 2 ? `, or ${eta[2]}–${eta[3]} with Expedited delivery (paid, chosen at checkout)` : ''}.`;
+		}
 		// Far-band countries get no volume tiers (they are quoted): the bulk choice says so instead of "Save up to".
 		for (const el of qa<HTMLElement>('[data-acc-volume]')) {
 			el.dataset.orig ??= el.textContent ?? '';

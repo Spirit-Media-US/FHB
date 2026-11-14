@@ -324,8 +324,10 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 
 	// BEFORE an email: list price + fee for the country, and only a promise of the 15%
 	pick('IN');
-	assert.equal(feeEl(hb).hidden, false);
-	assert.equal(feeEl(hb).textContent, `+ $${usd(handlingFeeCents(hb, firstHb, row('IN')))} international handling (India)`, 'price-line fee sits on the first-order price shown beside it');
+	// the row's fee is sized on the price the total applies (list before the email; audit 11-14), so the row and the
+	// summary always name the same fee
+	const feeAtList = handlingFeeCents(hb, hbList, row('IN'));
+	assert.equal(feeEl(hb).hidden, feeAtList <= 0);
 	assert.equal(d.querySelector('[data-sum-disc]').hidden, true, 'no discount counted before the email is checked');
 	assert.match(offer().textContent, OFFER_LINE);
 	assert.equal(offer().hidden, false);
@@ -342,6 +344,7 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	assert.equal(feeFirst, 299);
 	assert.equal(txt('[data-sum-fee-amt]'), `$${usd(feeFirst * 2)}`, 'per copy x quantity');
 	assert.equal(txt('[data-sum-fee-label]'), 'International handling (India)');
+	assert.equal(feeEl(hb).textContent, `+ $${usd(feeFirst)} international handling (India)`, 'row fee = the fee the summary charges');
 	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(firstHb * 2 + feeFirst * 2)}`);
 
 	// editing the email forgets the answer; a repeat buyer sees list price and no offer at all

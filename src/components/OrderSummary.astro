@@ -71,6 +71,7 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 		{LIVE_COUNTRIES.map((c) => <option value={c.code}>{en ? c.name : regionName(lang, c.code)}</option>)}
 	</select>
 	</>)}
+	{edition && en && <p class="osum__note osum__eta" data-eta hidden></p>}
 	</div>
 	<p class="osum__note" data-ship-note><span data-t={shipKey}>{t(shipKey)}</span> · <span data-t="s.tax">{t('s.tax')}</span></p>
 	{!edition && multiCountry && <p class="osum__note" data-fee-note data-t="s.feeNote">{t('s.feeNote')}</p>}
@@ -161,6 +162,7 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	.osum__first { margin: 0.1rem 0 0; color: #9d174d; font-size: 0.88rem; font-weight: 700; text-align: right; }
 	.osum__first[hidden] { display: none; }
 	.osum__note[hidden] { display: none; }
+	.osum__eta { margin-top: 0.45rem; color: #3f3f46; }
 	.osum__hint { margin: -0.15rem 0 0.35rem; color: #52525b; font-size: 0.8rem; }
 	.osum__guarantee { margin: 0.5rem 0 0; text-align: center; font-size: 0.85rem; }
 	.osum__guarantee a {

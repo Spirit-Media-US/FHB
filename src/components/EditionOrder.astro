@@ -76,6 +76,23 @@ const config = JSON.stringify({
 	prices: skuPrices,
 	tiers: PRINT_TIERS,
 	returnPath,
+	// Delivery estimate per country, shown under Ship to before checkout (Kevin 2026-11-14 "do everything"):
+	// [standard min, max, expedited min, max] in business days = dispatch + transit, the same numbers Stripe gets.
+	eta: Object.fromEntries(
+		LIVE_COUNTRIES.map((c) => [
+			c.code,
+			[
+				c.handlingDays[0] + c.transitDays[0],
+				c.handlingDays[1] + c.transitDays[1],
+				...(c.fast
+					? [
+							c.fast.handlingDays[0] + c.fast.transitDays[0],
+							c.fast.handlingDays[1] + c.fast.transitDays[1],
+						]
+					: []),
+			],
+		]),
+	),
 	// Far-band countries (unit 2kx): no volume ladder, and 10+ copies go to a bulk quote, not checkout.
 	farBand: LIVE_COUNTRIES.filter((c) => c.farBand).map((c) => c.code),
 	// International handling per country (Kevin 2026-11-08), shown beside each price before checkout.

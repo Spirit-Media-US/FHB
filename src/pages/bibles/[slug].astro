@@ -41,6 +41,7 @@ import { shippingDetailsFor } from '../../lib/marginGuard';
 import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
 import { ORDER_STRINGS, orderLangFor, tr as trOrder } from '../../lib/orderStrings';
 import { fitDescription, fitTitle } from '../../lib/seoFit';
+import { LIVE_COUNTRIES } from '../../lib/shipCountries';
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
 const READ_URL = 'https://fathersheartbible.com/read/';
@@ -129,20 +130,28 @@ export async function getStaticPaths() {
 		.filter((e) => e && typeof e.slug === 'string' && e.listing && e.hook);
 	return editions.map((ed) => ({
 		params: { slug: `${ed.slug}-bible` },
-		props: { ed, alternates: alternatesFrom(editions, ed.slug) },
+		props: {
+			ed,
+			alternates: alternatesFrom(editions, ed.slug),
+			// Kevin 2026-11-14: link the other AUDIENCE editions (not languages, not single Large Print volumes).
+			siblings: editions
+				.filter((x) => !x.lang && x.slug !== ed.slug && !/^lp-vol/.test(x.slug))
+				.map((x) => ({ slug: x.slug, name: x.name })),
+		},
 	}));
 }
 
-const { ed, alternates } = Astro.props as {
+const {
+	ed,
+	alternates,
+	siblings = [],
+} = Astro.props as {
 	ed: Edition;
 	alternates: { hreflang: string; href: string }[];
+	siblings?: { slug: string; name: string }[];
 };
 // FAQ answers may carry {{READ_COUNT}}: the number of languages live in the /read reader, from the
 // generated reader-languages.json, so no typed count goes stale (Kevin 2026-11-10: 80 everywhere).
-const faqList = ed.faq.map((f) => ({
-	...f,
-	a: f.a.replaceAll('{{READ_COUNT}}', String(readerLanguages.languages.length)),
-}));
 
 const fm = (frontmatter as Record<string, { pages?: number; pillars?: Pillar[] }>)[
 	ed.frontmatterKey ?? FM_ALIAS[ed.slug] ?? ed.slug
@@ -637,6 +646,25 @@ const breadcrumbSchema = {
 		{ '@type': 'ListItem', position: 3, name: ed.name, item: `${SITE}/bibles/${ed.slug}-bible/` },
 	],
 };
+// Two buyer questions every edition gets (Kevin 2026-11-14 "do everything"), answered from this edition's own
+// data and the live shipping data, never typed per page: is it large print, and how soon does it arrive.
+const usShip = LIVE_COUNTRIES.find((c) => c.code === 'US');
+const isLargePrint = /^lp-/.test(ed.slug);
+const generatedFaq: { q: string; a: string }[] = [];
+if (!isLargePrint && pages)
+	generatedFaq.push({
+		q: `Is the ${ed.name} large print?`,
+		a: `No. The ${ed.name} is a ${ed.trim ?? '6 x 9 in'} edition of ${pages.toLocaleString('en-US')} pages. For bigger type, the Father's Heart Bible™ Large Print edition sets the complete Bible in 14-point, single-column type across three volumes.`,
+	});
+if (usShip)
+	generatedFaq.push({
+		q: `How soon will the ${ed.name} arrive if I order it as a gift?`,
+		a: `Each copy is printed to order. In the United States, free standard shipping arrives in about ${usShip.handlingDays[0] + usShip.transitDays[0]}–${usShip.handlingDays[1] + usShip.transitDays[1]} business days${usShip.fast ? `, and paid Expedited delivery in about ${usShip.fast.handlingDays[0] + usShip.fast.transitDays[0]}–${usShip.fast.handlingDays[1] + usShip.fast.transitDays[1]}` : ''}. Other countries see their own delivery estimate at checkout.`,
+	});
+const faqList = [...ed.faq, ...generatedFaq].map((f) => ({
+	...f,
+	a: f.a.replaceAll('{{READ_COUNT}}', String(readerLanguages.languages.length)),
+}));
 const faqSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'FAQPage',
@@ -646,6 +674,17 @@ const faqSchema = {
 		acceptedAnswer: { '@type': 'Answer', text: f.a },
 	})),
 };
+// Meta description, 140-165 chars on English pages (house AEO spec A12): when the sheet text is cut short at a
+// sentence, a true closing line is added if it fits. Language pages keep their native text (<=160, native-meta test).
+const metaBase = fitDescription(
+	ed.seo?.description ??
+		`The ${ed.name} — the complete Bible in Divine Voice™ Color. Hardcover, ${pages} pages.`,
+	isLang ? 160 : 165,
+);
+const metaDescription =
+	!isLang && metaBase.length < 140 && `${metaBase} Free US shipping.`.length <= 165
+		? `${metaBase} Free US shipping.`
+		: metaBase;
 ---
 
 <Layout
@@ -658,8 +697,15 @@ const faqSchema = {
 	// Kevin 2026-11-14 item 6 (best practice): audience editions are titled name + brand; language editions keep
 	// their native-name titles, which already end in | FHB.
 	title={fitTitle(isLang ? (ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`) : `${ed.name} | Father's Heart Bible™ (FHB)`)}
-	description={fitDescription(ed.seo?.description ?? `The ${ed.name} — the complete Bible in Divine Voice™ Color. Hardcover, ${pages} pages.`, isLang ? 160 : 165)}
-	image={coverUrl}
+	description={metaDescription}
+	// The share card (1200x630 JPG, cover + title on brand background; Kevin 2026-11-14) for every social share;
+	// the cover stays the Book/Product image in JSON-LD.
+	// PILOT on the model page only (Kevin 2026-11-14: nothing rolls out until the one page is approved).
+	image={
+		ed.slug === 'grandparents'
+			? 'https://assets.spiritmediapublishing.com/FHB/og/editions/grandparents-bible-og.jpg'
+			: coverUrl
+	}
 	// The cover is this page's LCP element on every width (SEO/AEO audit 2026-11-14): preload it.
 	preloadImageMobile={coverUrl}
 	preloadMobileIsLcp
@@ -915,13 +961,24 @@ const faqSchema = {
 				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.1rem; font-weight: 600; margin: 2.6rem 0 0.7rem;">Also known as</h3>
 				<div class="flex flex-wrap gap-2">
 					{visibleKeywords.map((k) => (
-						<span style="font-family: var(--font-sans); font-size: 0.82rem; color: #52525b; background: #fbe7f0; border: 1px solid #f0c4d8; border-radius: 999px; padding: 0.3rem 0.75rem;">{k}</span>
+						<span lang={isLang && (/[^\x00-\x7F]/.test(k) || /\b(biblia|bibel|bijbel|bíblia)\b/i.test(k)) ? ed.lang : undefined} style="font-family: var(--font-sans); font-size: 0.82rem; color: #52525b; background: #fbe7f0; border: 1px solid #f0c4d8; border-radius: 999px; padding: 0.3rem 0.75rem;">{k}</span>
 					))}
 				</div>
 			</div>
 		</Section>
 		<Section variant="soft">
 			<div class="max-w-3xl mx-auto">
+				{!isLang && siblings.length > 0 && (
+					<nav aria-label="More Father’s Heart Bible editions" style="margin: 0 0 2.4rem;">
+						{/* Kevin 2026-11-14 (SEO/AEO audit 14): link the other editions for the whole family. */}
+						<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.4rem; font-weight: 600; margin: 0 0 0.8rem;">More Father’s Heart Bible editions</h2>
+						<ul class="flex flex-wrap gap-2" style="list-style: none; padding: 0; margin: 0;">
+							{siblings.map((x) => (
+								<li><a href={`/bibles/${x.slug}-bible/`} style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.95rem; font-family: var(--font-sans); font-size: 0.88rem; font-weight: 600; color: #52525b; background: #fbe7f0; border: 1px solid #f0c4d8; border-radius: 999px; text-decoration: none;">{x.name}</a></li>
+							))}
+						</ul>
+					</nav>
+				)}
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1.2rem;">Questions</h2>
 				<div class="space-y-3">
 					{faqList.map((f) => (
