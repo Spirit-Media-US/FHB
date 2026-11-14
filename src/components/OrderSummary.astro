@@ -64,7 +64,7 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 		<div class={edition ? 'osum__copies' : undefined}><dt><span data-sum-copies>0</span> <span data-sum-copies-word>{t('s.copies')}</span></dt><dd data-sum-subtotal>{formatUsd(lang, 0)}</dd></div>
 		<div data-sum-disc hidden><dt data-sum-disc-label></dt><dd data-sum-disc-amt></dd></div>
 		<div data-sum-fee hidden><dt data-sum-fee-label></dt><dd data-sum-fee-amt></dd></div>
-		<div class="osum__total"><dt data-t="s.total">{t('s.total')}</dt><dd data-sum-total>{formatUsd(lang, 0)}</dd></div>
+		<div class="osum__total"><dt data-t="s.total">{t('s.total')}</dt><dd data-sum-total aria-live="polite">{formatUsd(lang, 0)}</dd></div>
 	</dl>
 	{edition && firstLine && <p class="osum__first" data-offer data-first-save>{firstLine}</p>}
 	{edition && multiCountry && (<>
@@ -74,7 +74,7 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	</select>
 	</>)}
 	</div>
-	<p class="osum__note"><span data-t={shipKey}>{t(shipKey)}</span> · <span data-t="s.tax">{t('s.tax')}</span></p>
+	<p class="osum__note" data-ship-note><span data-t={shipKey}>{t(shipKey)}</span> · <span data-t="s.tax">{t('s.tax')}</span></p>
 	{!edition && multiCountry && <p class="osum__note" data-fee-note data-t="s.feeNote">{t('s.feeNote')}</p>}
 	{!edition && multiCountry && <p class="osum__note" data-expedited-note hidden><span data-t="s.expedited">{expeditedNote}</span> <span data-t="s.expeditedPrice">{t('s.expeditedPrice')}</span></p>}
 	{!edition && multiCountry && (<>
@@ -84,7 +84,8 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	</select>
 	</>)}
 	<label class="osum__label" for={`${idp}-email`} data-t="s.email">{t('s.email')}</label>
-	<input id={`${idp}-email`} class="osum__email" type="email" name="email" autocomplete="email" inputmode="email" required data-email />
+	{edition && en && <p class="osum__hint" id={`${idp}-email-hint`}>For your receipt, and to check your first-order saving.</p>}
+	<input id={`${idp}-email`} class="osum__email" type="email" name="email" autocomplete="email" inputmode="email" required data-email aria-describedby={edition && en ? `${idp}-email-hint` : undefined} />
 	<button type="button" class="osum__checkout" data-checkout data-t="s.checkout">{t('s.checkout')}</button>
 	{multiCountry && (
 	<div class="osum__quote" data-quote hidden>
@@ -161,6 +162,8 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	.osum__panel .osum__lines { border-top-color: #e4e4e7; }
 	.osum__first { margin: 0.1rem 0 0; color: #9d174d; font-size: 0.88rem; font-weight: 700; text-align: right; }
 	.osum__first[hidden] { display: none; }
+	.osum__note[hidden] { display: none; }
+	.osum__hint { margin: -0.15rem 0 0.35rem; color: #52525b; font-size: 0.8rem; }
 	.osum__guarantee { margin: 0.5rem 0 0; text-align: center; font-size: 0.85rem; }
 	.osum__guarantee a {
 		display: inline-flex;

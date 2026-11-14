@@ -18,8 +18,8 @@
  * behind accordion"; "1 and 2 Pull and use market science best practice."; "Do what data science says!"). Measured
  * before, grandparents-bible at 390px: box 1,124px tall, Checkout at 1,045px, every price shown twice, quantity 0,
  * free shipping 4x. Now: format = two tap buttons carrying the price (Baymard: buttons for variant choice), one
- * quantity at 1, the summary's Ship to / Total / Email / Checkout, and three CLOSED accordions under Checkout whose
- * headers carry the offer (collapsed headers need information scent). 0 of 67 paid orders ever held 2+ items, so
+ * quantity per format (PB starts at 1), an itemized summary, and four CLOSED choices ABOVE the box (Kevin's order)
+ * whose headers carry the offer (collapsed headers need information scent). 0 of 67 paid orders ever held 2+ items, so
  * the quantity follows the chosen format (order-form.ts [data-pick]); mixed orders go to the catalog form.
  * New strings are English-first constants here (ORDER_STRINGS stays complete per language; no English stand-ins).
  */
@@ -39,10 +39,9 @@ import {
 	type OrderLang,
 	orderLangFor,
 	regionName,
-	shipsText,
 	tr,
 } from '../lib/orderStrings';
-import { LIVE_COUNTRIES, shipsParts } from '../lib/shipCountries';
+import { LIVE_COUNTRIES, PRINT_SITE_NAMES } from '../lib/shipCountries';
 import OrderSummary from './OrderSummary.astro';
 
 interface Props {
@@ -124,7 +123,16 @@ const BOX = en
 			accShip: t('o.shipsSummary', { n: LIVE_COUNTRIES.length }),
 		};
 // The shipping sentence WITHOUT the country list: the countries show as bubbles (Kevin 2026-11-14).
-const shipsIntro = shipsText(lang, S, { ...shipsParts(), countries: [], fee: false }); // the fee note follows the bubbles
+const siteNames = [...new Set(LIVE_COUNTRIES.map((c) => PRINT_SITE_NAMES[c.printSite]))];
+const listOfSites = () =>
+	siteNames.length > 1
+		? `${siteNames.slice(0, -1).join(', ')} and ${siteNames.at(-1)}`
+		: (siteNames[0] ?? '');
+// Free standard shipping to the LIVE countries, never "worldwide" (independent audit 11-14). English names the print
+// sites; other languages use their reviewed count line.
+const shipsIntro = en
+	? `Free standard shipping to ${LIVE_COUNTRIES.length} countries, printed in ${listOfSites()}.`
+	: t('o.shipsSummary', { n: LIVE_COUNTRIES.length }).split('·')[0].trim();
 const countryNames = LIVE_COUNTRIES.map((c) => (en ? c.name : regionName(lang, c.code)));
 const guaranteeBody = en
 	? `If anything isn’t right with your order, for any reason, let us know within ${RETURN_DAYS} days of delivery and we will make it right.`
@@ -141,12 +149,12 @@ const guaranteeBody = en
 				<ul class="eo-bubbles" aria-label={BOX.accShip}>
 					{countryNames.map((n) => <li class="eo-bubble">{n}</li>)}
 				</ul>
-				{LIVE_COUNTRIES.length > 1 && <p data-fee-note data-t="s.feeNote">{t('s.feeNote')}</p>}
+				{LIVE_COUNTRIES.length > 1 && <p data-fee-note>{t('sh.fee')}</p>}
 				{LIVE_COUNTRIES.length > 1 && <p data-expedited-note hidden><span data-t="s.expedited">{en ? EXPEDITED_DISCLAIMER : t('s.expedited')}</span> <span data-t="s.expeditedPrice">{t('s.expeditedPrice')}</span></p>}
 			</div>
 		</details>
 		<details class="eo-acc__item">
-			<summary>{BOX.accVolume}</summary>
+			<summary data-acc-volume>{BOX.accVolume}</summary>
 			<div class="eo-acc__body">
 				<ul class="eo-bubbles eo-tiers" data-tiers-line>
 					{ladder.map((tier) => <li class="eo-bubble eo-tier" data-tier={tier.pct} data-min={tier.min}>{t('s.tier', { pct: tier.pct, min: tier.min })}</li>)}
@@ -278,14 +286,14 @@ const guaranteeBody = en
 	.eo-row__binding { font-size: 0.95rem; font-weight: 600; }
 	.eo-row__price b { font-size: 1.05rem; font-weight: 800; }
 	.eo-row__price { white-space: nowrap; }
-	.eo-row__reg { color: #71717a; font-size: 0.78rem; }
+	.eo-row__reg { color: #52525b; font-size: 0.78rem; }
 	.eo-row__fee { color: #3f3f46; font-size: 0.78rem; font-weight: 600; }
 	.eo-row__fee[hidden] { display: none; }
 	.eo-note { margin: 0 0 0.9rem; color: #3f3f46; font-size: 0.85rem; font-weight: 600; }
 	.eo-qty__ctl { display: inline-flex; flex: none; align-items: center; gap: 0.35rem; }
 	.eo-step {
-		width: 40px;
-		height: 40px;
+		width: 44px;
+		height: 44px;
 		border: 1.5px solid var(--color-hairline);
 		border-radius: 999px;
 		background: #fff;
@@ -295,8 +303,8 @@ const guaranteeBody = en
 		cursor: pointer;
 	}
 	.eo-qty__in {
-		width: 2.6rem;
-		min-height: 40px;
+		width: 2.75rem;
+		min-height: 44px;
 		background: #fff;
 		border: 1.5px solid var(--color-hairline);
 		border-radius: 0.6rem;

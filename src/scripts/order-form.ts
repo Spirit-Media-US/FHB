@@ -294,16 +294,30 @@ function init(root: HTMLElement) {
 		set('[data-sum-copies-word]', r.copies === 1 ? t('s.copy') : t('s.copies'));
 		set('[data-sum-subtotal]', money(r.subtotal));
 		set('[data-sum-total]', money(total));
-		// The first-order line names the saving in money (Kevin 2026-11-14: "Can't the discount show here").
-		// It is NOT taken off the total until the email is confirmed (no understated totals); a better volume
-		// tier, a confirmed first order (the discount line shows it) or a repeat buyer hides it.
-		const firstSave = r.subtotal - r.firstTotal;
+		// The first-order line names the saving in money (Kevin 2026-11-14: "Can't the discount show here"). It is the
+		// NET saving against the total shown now: abroad the handling fee sized on the 15% price is counted, and a
+		// volume tier already in the total is not counted twice (independent audit 11-14: the gross figure overstated
+		// both). Not taken off the total until the email is confirmed (no understated totals); hidden when there is
+		// no net saving, for a confirmed first order (the discount line shows it), a repeat buyer, or a bulk quote.
+		const firstAll = r.firstTotal + handlingFor(lines(), FIRST_ORDER_PCT, row).total;
+		const firstSave = total - firstAll;
+		const quoting = bulkQuoteRequired(far, volumes());
 		for (const el of qa('[data-first-save]')) {
-			el.hidden = firstState !== 'unknown' || r.copies < 1 || r.bulkPct >= FIRST_ORDER_PCT;
+			el.hidden = firstState !== 'unknown' || r.copies < 1 || firstSave <= 0 || quoting;
 			el.textContent =
 				lang === 'en'
 					? `${FIRST_ORDER_PCT}% off your first order: save ${money(firstSave)} at checkout`
 					: `${t('p.firstOrder')}: −${money(firstSave)}`;
+		}
+		for (const el of qa('[data-ship-note]')) el.hidden = quoting;
+		// Far-band countries get no volume tiers (they are quoted): the bulk choice says so instead of "Save up to".
+		for (const el of qa<HTMLElement>('[data-acc-volume]')) {
+			el.dataset.orig ??= el.textContent ?? '';
+			el.textContent = far
+				? lang === 'en'
+					? 'Buying 10 or more? Request a bulk quote'
+					: t('q.title')
+				: el.dataset.orig;
 		}
 		// The edition box itemizes the order (Kevin 2026-11-14: "they only see 3. 3 of what?").
 		for (const ul of qa('[data-sum-items]')) {
