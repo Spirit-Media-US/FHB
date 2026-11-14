@@ -94,7 +94,11 @@ test('store engine parity: every fixed cart sends the byte-identical Stripe requ
 	}
 	const want = JSON.parse(fs.readFileSync(GOLDEN, 'utf8'));
 	assert.deepEqual(Object.keys(got), Object.keys(want));
-	for (const id of Object.keys(want)) assert.deepEqual(got[id], want[id], `cart ${id} changed`);
+	// The sale metadata carries the day the cart was priced (date=YYYY-MM-DD, URL-encoded in the body). That is the
+	// one field that legitimately moves, so it is compared as a shape, never as a value (2026-11-14: the golden written
+	// 11-13 failed every build after midnight UTC on the date alone).
+	const day = (v) => JSON.parse(JSON.stringify(v).replace(/date%3D\d{4}-\d\d-\d\d|date=\d{4}-\d\d-\d\d/g, 'date=<day>'));
+	for (const id of Object.keys(want)) assert.deepEqual(day(got[id]), day(want[id]), `cart ${id} changed`);
 });
 
 test('store engine parity: the golden covers a session, a refusal and every rule path', () => {
