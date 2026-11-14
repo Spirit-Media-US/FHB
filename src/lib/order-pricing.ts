@@ -107,7 +107,6 @@ export interface BookFormatRow {
 	format: string;
 	bookSlug: string;
 	/** Measured US per-copy print + ship cost (the US has no country-list cost row); null = unmeasured. */
-	usCostUsd: number | null;
 }
 export const BOOK_SKUS: Record<string, BookFormatRow> = Object.fromEntries(
 	Object.entries(bookSkus.skus as Record<string, Record<string, unknown>>).map(([sku, f]) => [
@@ -120,7 +119,6 @@ export const BOOK_SKUS: Record<string, BookFormatRow> = Object.fromEntries(
 			costKey: f.cost_key as string,
 			format: f.format as string,
 			bookSlug: f.book as string,
-			usCostUsd: (f.us_cost_usd as number) ?? null,
 		},
 	]),
 );
