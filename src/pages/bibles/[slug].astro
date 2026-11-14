@@ -547,7 +547,7 @@ const faqSchema = {
 					     price line leads the order form below, which "Order" jumps to. */}
 					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">{orderT('hero.freeShipValue')}</p>
 					<div class="flex flex-wrap items-center gap-3">
-						<a href="#order" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #3f3f46; color: #fff; padding: 0.8rem 1.8rem; text-decoration: none; font-size: 1rem;">{orderT('hero.order')}</a>
+						{/* Kevin 2026-11-14: "Seems useless to have order button directly above the order box" - removed; the box follows. */}
 						<LookInside slug={ed.lookInsideKey ?? ed.slug} title={ed.name} size="lg" />
 						{yvUrl && (
 							<a href={yvUrl} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 2px solid #3f3f46; padding: 0.7rem 1.6rem; text-decoration: none; font-size: 1rem;">Read on Bible.com</a>
@@ -713,7 +713,12 @@ const faqSchema = {
 					{shared.credits.map(([k, v]) => (
 						<div class="rounded-xl p-4" style="background: #fff; border: 1px solid var(--color-hairline);">
 							<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 0.3rem;">{k}</p>
-							<p style="font-family: var(--font-sans); color: var(--color-ink); font-weight: 600; margin: 0;">{v}</p>
+							{k === 'Published by' && v === 'Spirit Media Publishing' ? (
+								/* Kevin 2026-11-14: "use smp logo ... here: Published by Spirit Media Publishing" */
+								<a href="https://spiritmediapublishing.com" target="_blank" rel="noopener" style="display: inline-block; line-height: 0;"><img src="https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp" alt="Spirit Media Publishing" width="220" height="22" loading="lazy" decoding="async" style="width: 220px; max-width: 100%; height: auto;" /></a>
+							) : (
+								<p style="font-family: var(--font-sans); color: var(--color-ink); font-weight: 600; margin: 0;">{v}</p>
+							)}
 						</div>
 					))}
 				</div>

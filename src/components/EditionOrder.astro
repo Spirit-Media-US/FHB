@@ -122,7 +122,7 @@ const BOX = en
 			accShip: t('o.shipsSummary', { n: LIVE_COUNTRIES.length }),
 		};
 // The shipping sentence WITHOUT the country list: the countries show as bubbles (Kevin 2026-11-14).
-const shipsIntro = shipsText(lang, S, { ...shipsParts(), countries: [] });
+const shipsIntro = shipsText(lang, S, { ...shipsParts(), countries: [], fee: false }); // the fee note follows the bubbles
 const countryNames = LIVE_COUNTRIES.map((c) => (en ? c.name : regionName(lang, c.code)));
 const guaranteeBody = en
 	? `If anything isn’t right with your order, for any reason, let us know within ${RETURN_DAYS} days of delivery and we will make it right.`
