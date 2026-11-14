@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LIVE_ORDER_LANGS, ORDER_LANGS, ORDER_STRINGS, orderLangFor, tr, shipsText } from '../src/lib/orderStrings.ts';
+import { LIVE_ORDER_LANGS, ORDER_LANGS, ORDER_STRINGS, orderLangFor, tr, shipsText, formatUsd, feeLabelInline, feeLabel } from '../src/lib/orderStrings.ts';
 import { EXPEDITED_DISCLAIMER, FIRST_ORDER_FINE, FIRST_ORDER_LABEL, FIRST_ORDER_PCT } from '../src/lib/order-pricing.ts';
 import { BULK_QUOTE_COPY } from '../src/lib/farBand.ts';
 import { shipsLine, shipsParts, shipsToSentence } from '../src/lib/shipCountries.ts';
@@ -140,4 +140,45 @@ test('built: a language we do not translate yet stays English, and /print/order/
 	const o = fs.readFileSync(dist('print/order/index.html'), 'utf8');
 	assert.ok(o.includes('Catalog Order Form') && o.includes('data-t="c.h1"') && o.includes('data-ships='));
 	assert.ok(!o.includes('hreflang="de"'));
+});
+
+// 2rg: money and the inline fee label follow the page language (src/lib/orderStrings.ts); USD stays USD.
+test('formatUsd: English is byte-identical to the old "$34.00" / "$1,234.50" / "$0.00"', () => {
+	assert.equal(formatUsd('en', 3400), '$34.00');
+	assert.equal(formatUsd('en', 123450), '$1,234.50');
+	assert.equal(formatUsd('en', 0), '$0.00');
+	assert.equal(formatUsd('en', 2999), (2999 / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
+});
+test('formatUsd: de/fr/ja follow Intl, still USD', () => {
+	const norm = (x) => x.replace(/[\u00a0\u202f]/g, ' ');
+	assert.equal(norm(formatUsd('de', 3400)), '34,00 $');
+	assert.match(norm(formatUsd('fr', 3400)), /^34,00 \$/);
+	assert.equal(formatUsd('ja', 3400), '$34.00');
+	for (const l of ORDER_LANGS) assert.ok(formatUsd(l, 3400).match(/\$|USD/), `${l} still shows USD`);
+});
+test('feeLabelInline: de keeps the noun capital, English lowercases as before, others lowercase the first letter only', () => {
+	const de = ORDER_STRINGS.de;
+	assert.equal(feeLabelInline('de', feeLabel(de, 'International handling')), 'Internationale Bearbeitungsgebühr');
+	assert.equal(feeLabelInline('de', feeLabel(de, 'Import & handling')), 'Einfuhr- und Bearbeitungsgebühr');
+	assert.equal(feeLabelInline('en', feeLabel(ORDER_STRINGS.en, 'International handling')), 'international handling');
+	assert.equal(feeLabelInline('en', feeLabel(ORDER_STRINGS.en, 'Import & handling')), 'import & handling');
+	assert.equal(feeLabelInline('fr', feeLabel(ORDER_STRINGS.fr, 'International handling')), 'frais de traitement internationaux');
+	assert.equal(feeLabelInline('ja', feeLabel(ORDER_STRINGS.ja, 'International handling')), '国際取扱手数料');
+});
+
+// Unit 2sd: the mobile ships-summary must carry the LIVE ship-country count (data-driven), never an unqualified "worldwide".
+test('shipsSummary: {n} placeholder in all 8 tables; rendered count equals LIVE_COUNTRIES.length; no worldwide claim', async () => {
+	const { LIVE_COUNTRIES } = await import('../src/lib/shipCountries.ts');
+	const { formatCount } = await import('../src/lib/orderStrings.ts');
+	for (const l of ORDER_LANGS) {
+		const raw = ORDER_STRINGS[l]['o.shipsSummary'];
+		assert.equal(ph(raw), 'n', `${l}: summary needs exactly {n}`);
+		const out = tr(ORDER_STRINGS[l], 'o.shipsSummary', { n: formatCount(l, LIVE_COUNTRIES.length) });
+		assert.ok(out.includes(formatCount(l, LIVE_COUNTRIES.length)), `${l}: rendered summary carries the live count`);
+		assert.ok(!/\{n\}/.test(out), `${l}: placeholder filled`);
+	}
+	const en = tr(ORDER_STRINGS.en, 'o.shipsSummary', { n: formatCount('en', LIVE_COUNTRIES.length) });
+	assert.equal(en, `Free standard shipping to ${LIVE_COUNTRIES.length} countries · details`);
+	assert.ok(!/worldwide|world/i.test(en), 'en summary makes no worldwide claim');
+	for (const l of WAVE) assert.ok(!/worldwide|wereldwijd|weltweit|monde entier|todo el mundo|todo o mundo|mondo|世界/i.test(ORDER_STRINGS[l]['o.shipsSummary']), `${l}: no worldwide-equivalent`);
 });

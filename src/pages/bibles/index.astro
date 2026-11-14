@@ -1,0 +1,213 @@
+---
+import readerLanguages from '../../data/reader-languages.json';
+// /bibles/ — the hub for every Father's Heart Bible™ print edition (unit 2xz, 2026-11-12).
+// /bibles/<slug>-bible/ product pages were live with no parent: /bibles/ answered 404. This page
+// lists every edition FROM THE SAME DATA THE PRODUCT PAGES ARE BUILT FROM (src/data/editions/*.json,
+// one file = one page), so a new edition appears here when its page does — no typed list, no count
+// that can go stale. Intent split (see the header of [slug].astro): /bible-for/ answers the pastoral
+// search, /bibles/<slug>-bible/ the purchase search, /print/ is the order catalog; this hub is the
+// directory between them and links to all three.
+import Layout from '../../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
+
+type Ed = {
+	slug: string;
+	name: string;
+	title: string;
+	kind?: string;
+	listing?: unknown;
+	hook?: unknown;
+};
+const files = import.meta.glob<{ default: Ed }>('../../data/editions/*.json', { eager: true });
+const all = Object.entries(files)
+	.filter(([p]) => /\/[a-z0-9-]+\.json$/.test(p))
+	.map(([, m]) => m.default)
+	.filter((e) => e && typeof e.slug === 'string' && e.listing && e.hook);
+
+const isLarge = (e: Ed) => /^lp-/.test(e.slug);
+const general = all.filter((e) => e.slug === 'fathers-heart');
+const journaling = all.filter((e) => e.slug === 'journaling');
+const large = all.filter(isLarge).sort((a, b) => a.slug.localeCompare(b.slug));
+const audience = all
+	.filter(
+		(e) =>
+			e.kind !== 'language' && !isLarge(e) && e.slug !== 'fathers-heart' && e.slug !== 'journaling',
+	)
+	.sort((a, b) => a.name.localeCompare(b.name));
+// Language editions: the English name sits in the title's trailing parentheses
+// ("Father’s Heart Bible — Magyar Biblia (Hungarian)"); sort by it so the list reads A to Z.
+const englishName = (e: Ed) => (/\(([^)]+)\)\s*$/.exec(e.title)?.[1] ?? e.name).trim();
+const languages = all
+	.filter((e) => e.kind === 'language')
+	.map((e) => ({ e, en: englishName(e) }))
+	.sort((a, b) => a.en.localeCompare(b.en));
+
+const total = all.length;
+const readCount = readerLanguages.languages.length;
+const PAGE_URL = 'https://fathersheartbible.com/bibles/';
+const hrefFor = (e: Ed) => `/bibles/${e.slug}-bible/`;
+const abs = (e: Ed) => `https://fathersheartbible.com${hrefFor(e)}`;
+
+const TITLE = fitTitle("Father's Heart Bible™ Editions: Every Print Bible | FHB");
+const DESCRIPTION = fitDescription(
+	`All ${total} printed editions of Father's Heart Bible™ in Divine Voice™ Color: the general edition, ${audience.length} audience editions, large print, and ${languages.length} languages.`,
+);
+
+const ordered: Ed[] = [
+	...general,
+	...journaling,
+	...audience,
+	...large,
+	...languages.map((l) => l.e),
+];
+const collectionSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'CollectionPage',
+	'@id': `${PAGE_URL}#collection`,
+	name: "Father's Heart Bible™ editions",
+	description: DESCRIPTION,
+	url: PAGE_URL,
+	inLanguage: 'en',
+	isPartOf: {
+		'@type': 'WebSite',
+		name: "Father's Heart Bible™",
+		url: 'https://fathersheartbible.com/',
+	},
+	publisher: { '@id': 'https://spiritmediapublishing.com/#organization' },
+	mainEntity: {
+		'@type': 'ItemList',
+		numberOfItems: ordered.length,
+		itemListElement: ordered.map((e, i) => ({
+			'@type': 'ListItem',
+			position: i + 1,
+			name: e.name,
+			url: abs(e),
+		})),
+	},
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{ '@type': 'ListItem', position: 2, name: 'Editions', item: PAGE_URL },
+	],
+};
+const FAQS = [
+	{
+		q: "How many editions of Father's Heart Bible are there?",
+		a: `${total} print editions have their own page: the general edition, a journaling edition, ${audience.length} audience editions, ${large.length} large print volumes and sets, and ${languages.length} language editions. Each page shows that edition's ISBN, price and binding.`,
+	},
+	{
+		q: 'What is the difference between the audience editions and the language editions?',
+		a: `An audience edition is the English text with a preface and reading helps written for one reader, such as dads, nurses or graduates. A language edition is the whole Bible in another language. Every edition prints the words the Father speaks in color.`,
+	},
+	{
+		q: "Can I read Father's Heart Bible free before I buy a copy?",
+		a: `Yes. The whole Bible is free to read online in ${readCount} languages, with no account. <a href="/read/" style="color: var(--color-brand);" class="hover:underline">Start in the reader</a>; the printed editions are for those who want the book in hand.`,
+	},
+	{
+		q: 'Where do I order a printed edition?',
+		a: `Every edition page has an order form, and the <a href="/print/" style="color: var(--color-brand);" class="hover:underline">print catalog</a> lists all of them with prices in one place. We ship direct, and the page for each edition states its ISBN so a bookstore or library can order it too.`,
+	},
+];
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.q,
+		acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/<[^>]+>/g, '') },
+	})),
+};
+const jsonLd = [collectionSchema, breadcrumbSchema, faqSchema];
+const linkStyle = 'color: var(--color-brand); font-family: var(--font-sans);';
+---
+
+<Layout title={TITLE} description={DESCRIPTION} jsonLd={jsonLd}>
+	<main id="main-content">
+		<section class="px-6 pt-12 pb-4 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Editions</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">The printed Bibles</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Every edition of Father&rsquo;s Heart Bible&trade;</h1>
+				<p class="mt-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);">
+					Father&rsquo;s Heart Bible&trade; is one translation in {total} printed editions, each in Divine Voice&trade; Color, where the words our Father speaks are printed in color so you can see His voice on the page.
+				</p>
+				<p class="mt-4 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					The text is the same in every English edition; what changes is who it is made for. Choose the general edition, an edition written for one kind of reader, large print, or the whole Bible in another language. Prefer to read first? <a href="/read/" style={linkStyle} class="hover:underline">The full text is free online</a> in {readCount} languages, and the <a href="/print/" style={linkStyle} class="hover:underline">print catalog</a> shows every price on one page.
+				</p>
+				<ul class="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm" style="font-family: var(--font-sans);">
+					<li><a href="#general" style={linkStyle} class="hover:underline">General</a></li>
+					<li><a href="#audience" style={linkStyle} class="hover:underline">Audience ({audience.length})</a></li>
+					<li><a href="#large-print" style={linkStyle} class="hover:underline">Large print</a></li>
+					<li><a href="#languages" style={linkStyle} class="hover:underline">Languages ({languages.length})</a></li>
+				</ul>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-4xl space-y-12">
+				<div id="general" style="scroll-margin-top: 1.5rem;">
+					<h2 class="text-2xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">General and journaling</h2>
+					<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">The complete Bible for any reader, and the wide-margin 8 x 10 edition for note-taking.</p>
+					<ul class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+						{[...general, ...journaling].map((e) => (
+							<li><a href={hrefFor(e)} style={linkStyle} class="text-lg hover:underline">{e.name}</a></li>
+						))}
+					</ul>
+				</div>
+
+				<div id="audience" style="scroll-margin-top: 1.5rem;">
+					<h2 class="text-2xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">Audience editions</h2>
+					<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Each opens with a preface written for one reader, from dads and moms to nurses, athletes and graduates. If you are searching by need rather than by edition, the <a href="/bible-for/" style={linkStyle} class="hover:underline">Bible for&hellip; guides</a> answer the question first.</p>
+					<ul class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-2">
+						{audience.map((e) => (
+							<li><a href={hrefFor(e)} style={linkStyle} class="text-base hover:underline">{e.name}</a></li>
+						))}
+					</ul>
+				</div>
+
+				<div id="large-print" style="scroll-margin-top: 1.5rem;">
+					<h2 class="text-2xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">Large print</h2>
+					<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">14-point single-column type for easier reading, as three volumes or the complete set.</p>
+					<ul class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+						{large.map((e) => (
+							<li><a href={hrefFor(e)} style={linkStyle} class="text-base hover:underline">{e.name}</a></li>
+						))}
+					</ul>
+				</div>
+
+				<div id="languages" style="scroll-margin-top: 1.5rem;">
+					<h2 class="text-2xl font-light" style="font-family: var(--font-serif); color: var(--color-ink);">Language editions</h2>
+					<p class="mt-2 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">The whole Bible in the reader&rsquo;s own language, listed here by English name with the native title beside it. Reading online? The reader has <a href="/read/" style={linkStyle} class="hover:underline">{readCount} languages</a>, including some not yet in print.</p>
+					<ul class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-2">
+						{languages.map(({ e, en }) => (
+							<li>
+								<a href={hrefFor(e)} style={linkStyle} class="text-base hover:underline">{en}</a>
+								{e.name !== en && <span class="text-sm" style="font-family: var(--font-sans); color: var(--color-muted);"> &middot; {e.name}</span>}
+							</li>
+						))}
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<section id="hub-faq" class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low); scroll-margin-top: 1.5rem;">
+			<div class="mx-auto max-w-3xl">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Questions about the editions</h2>
+				<dl class="mt-8 space-y-7">
+					{FAQS.map((f) => (
+						<div>
+							<dt class="text-lg font-medium leading-snug" style="font-family: var(--font-serif); color: var(--color-ink);">{f.q}</dt>
+							<dd class="mt-2 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);" set:html={f.a}></dd>
+						</div>
+					))}
+				</dl>
+			</div>
+		</section>
+	</main>
+</Layout>

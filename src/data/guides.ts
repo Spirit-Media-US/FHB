@@ -46,6 +46,13 @@ export const GUIDES: GuideEntry[] = [
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/a06de2cfda461dee4850c71666ad2502a503c166-6720x4480.jpg',
 	},
 	{
+		slug: 'how-to-hear-gods-voice',
+		title: 'How to Hear God’s Voice',
+		blurb:
+			'A biblical guide: start with Scripture, ask, be still and test what you hear, because our Father speaks to His children.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/a06de2cfda461dee4850c71666ad2502a503c166-6720x4480.jpg',
+	},
+	{
 		slug: 'what-is-the-gospel',
 		title: 'What Is the Gospel?',
 		blurb:
@@ -79,5 +86,26 @@ export const GUIDES: GuideEntry[] = [
 		blurb:
 			'Five honest steps, each with the verses to read: tell the truth, relearn what a father is, receive a new identity, forgive, and don’t heal alone.',
 		img: 'https://cdn.sanity.io/images/rusi1hyi/production/3991ac4134f2001479bb824b191ab464d8d3284e-8256x5504.jpg',
+	},
+	{
+		slug: 'armor-of-god',
+		title: 'The Armor of God',
+		blurb:
+			'Ephesians 6:10-18 piece by piece — belt of truth, breastplate, shield of faith, helmet of salvation and the sword of the Spirit, in our Father’s words.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'noahs-ark',
+		title: 'Noah’s Ark',
+		blurb:
+			'Genesis 6-9 in our Father’s words — why the flood came, the size of the ark, how long the waters lasted, where it landed and the rainbow covenant.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
+	},
+	{
+		slug: 'prayer-of-jabez',
+		title: 'Prayer of Jabez',
+		blurb:
+			'1 Chronicles 4:9-10 in our Father’s words — who Jabez was, what each line of his prayer asks, and how it fits the Father’s heart.',
+		img: 'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg',
 	},
 ];

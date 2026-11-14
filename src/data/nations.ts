@@ -210,7 +210,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Poland',
 		blurb:
 			'A nation that has had the Bible in Polish since 1563, and still overwhelmingly Catholic by census — where Father’s Heart Bible™ invites a faithful people to meet the Father personally in Scripture. Now in Polish.',
-		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/20200826_Wawel_i_Wis%C5%82a_w_Krakowie_1752_1334.jpg/960px-20200826_Wawel_i_Wis%C5%82a_w_Krakowie_1752_1334.jpg',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/poland-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -219,7 +219,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Ukraine',
 		blurb:
 			'A majority-Christian nation with one of Eastern Europe’s oldest Scripture traditions, holding on through war — where Father’s Heart Bible™ offers a Father who is near to the brokenhearted. Now in Ukrainian.',
-		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/2019-07-21_Saint_Sophia_Cathedral_in_Kyiv%2C_Ukraine.jpg/960px-2019-07-21_Saint_Sophia_Cathedral_in_Kyiv%2C_Ukraine.jpg',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/ukraine-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -228,7 +228,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Romania',
 		blurb:
 			'One of Europe’s most Orthodox nations, with the whole Bible in Romanian since 1688 — where Father’s Heart Bible™ lets a faithful people hear, in clear words, the Father its Scriptures reveal. Now in Romanian.',
-		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Castelul_Peles%2C_Sinaia_-_Vedere_panoramica.jpg/960px-Castelul_Peles%2C_Sinaia_-_Vedere_panoramica.jpg',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/romania-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -237,7 +237,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in South Africa',
 		blurb:
 			'A majority-Christian nation where isiZulu is the largest home language and the Zulu Bible dates to 1883 — where Father’s Heart Bible™ invites a faithful people to meet the Father personally in Scripture. Now in Zulu.',
-		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Bergville_Drakensbergen_Waterfall_05.jpg/960px-Bergville_Drakensbergen_Waterfall_05.jpg',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/south-africa-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -246,7 +246,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Greece',
 		blurb:
 			'The home of the language of the New Testament, and overwhelmingly Orthodox by self-identification — where Father’s Heart Bible™ invites a faithful people to meet the Father personally in Scripture. Now in Greek.',
-		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Meteora_landscape.jpg/960px-Meteora_landscape.jpg',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/greece-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -255,7 +255,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Hungary',
 		blurb:
 			'A nation that has had the whole Bible in Hungarian since 1590, with Catholic and Reformed churches at its heart — where Father’s Heart Bible™ invites a faithful people to meet the Father personally in Scripture. Now in Hungarian.',
-		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg/960px-20190503_Hungarian_Parliament_Building_1814_2263_DxO.jpg',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/hungary-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -264,7 +264,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in the Netherlands',
 		blurb:
 			'Five centuries of the Bible in Dutch, from the Statenvertaling of 1637 to a nation where 58% now say they have no religion — where Father’s Heart Bible™ invites a thoughtful people to meet the Father personally in Scripture. Bijbel gratis online, now in Dutch.',
-		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Amsterdam_Canals_-_July_2006.jpg/960px-Amsterdam_Canals_-_July_2006.jpg',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/netherlands-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -273,7 +273,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Malaysia',
 		blurb:
 			'Malay, Chinese, Indian and indigenous peoples in one nation, with a church that is half of Sarawak — where Father’s Heart Bible™ offers a Father near to each, in Bahasa Melayu and beyond.',
-		img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Kuala_Lumpur_Malaysia_Skyline-03.jpg/1280px-Kuala_Lumpur_Malaysia_Skyline-03.jpg',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/malaysia-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -306,7 +306,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Myanmar',
 		blurb:
 			'Golden pagodas, a great river and a country of many peoples, with a faithful Christian minority among the Chin, Kachin and Karen — where Father’s Heart Bible™ offers a Father near to each, in Burmese.',
-		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/Shwedagon_Zedi_Daw_Yangon_3.jpg/1280px-Shwedagon_Zedi_Daw_Yangon_3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/myanmar-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -315,7 +315,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Uzbekistan',
 		blurb:
 			'The heart of the Silk Road, where Eastern Christians lived at Samarkand and Bukhara from the 7th century — where Father’s Heart Bible™ offers the Scriptures free in Uzbek.',
-		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Registan_01.jpg/1280px-Registan_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/uzbekistan-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -324,7 +324,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Nepal',
 		blurb:
 			'A Himalayan nation of many peoples and many faiths, with a Christian community of over half a million — where Father’s Heart Bible™ offers a Father near to every Nepali, in Nepali.',
-		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Kathmandu_Durbar_Square%2C_Shiva_Parvati_Temple%2C_Nepal_%28edit%29.jpg/1280px-Kathmandu_Durbar_Square%2C_Shiva_Parvati_Temple%2C_Nepal_%28edit%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/nepal-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -333,7 +333,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Zimbabwe',
 		blurb:
 			'Victoria Falls, Great Zimbabwe and a people more than eight in ten Christian — where Father’s Heart Bible™ offers the Father near to them in Shona.',
-		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Victoria_Falls%2C_Zimbabwe_01.jpg/1280px-Victoria_Falls%2C_Zimbabwe_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/zimbabwe-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -342,7 +342,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Haiti',
 		blurb:
 			'The first free Black republic, a deeply Christian people carrying heavy burdens — where Father’s Heart Bible™ offers a Father near to every Haitian, in Kreyòl.',
-		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/The_Citadelle_Laferri%C3%A8re%2C_Haiti_%287761638618%29.jpg/1280px-The_Citadelle_Laferri%C3%A8re%2C_Haiti_%287761638618%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/haiti-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -351,7 +351,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Malawi',
 		blurb:
 			'The warm heart of Africa on the shore of a great lake, with nearly nine in ten Christian — where Father’s Heart Bible™ offers a Father near to every Malawian, in Chichewa.',
-		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Otter_Point%2C_Cape_Maclear_%28Malawi%29.jpg/1280px-Otter_Point%2C_Cape_Maclear_%28Malawi%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/malawi-640.webp',
 		imgDirect: true,
 	},
 	{
@@ -360,7 +360,7 @@ export const NATIONS: Nation[] = [
 		title: 'The Bible in Mozambique',
 		blurb:
 			'A long Indian Ocean coast and the Zambezi valley, seven in ten Christian — where Father’s Heart Bible™ offers a Father near to each, in Sena, Chichewa and Portuguese.',
-		img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Maputo_skyline_2006.jpg/1280px-Maputo_skyline_2006.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail',
+		img: 'https://assets.spiritmediapublishing.com/FHB/bible-in-heroes/mozambique-640.webp',
 		imgDirect: true,
 	},
 ];

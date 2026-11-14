@@ -62,11 +62,14 @@ test('page has no outside Bible links and quotes no Scripture text', () => {
 // 2he: the Dataset JSON-LD carries a citation and isAccessibleForFree (no licence: a data licence is Kevin's decision).
 const astro = fs.readFileSync(path.join(root, 'src/pages/names-of-god-the-father.astro'), 'utf8');
 const datasetBlock = (src) => src.slice(src.indexOf("'@type': 'Dataset'"), src.indexOf("'@type': 'FAQPage'"));
-test('Dataset JSON-LD has citation and isAccessibleForFree: true, and no licence', () => {
+test('Dataset JSON-LD has citation and isAccessibleForFree: true, and licence only /copyright/', () => {
 	const b = datasetBlock(astro);
 	assert.match(b, /isAccessibleForFree: true,/);
 	assert.match(b, /citation: CITE,/);
-	assert.doesNotMatch(b, /\blicense\b/);
+	// 3ad (pmseoaeo 11-13): license may ONLY point at the existing all-rights-reserved /copyright/ terms (grants no
+	// new rights). A permissive/CC data licence is still Kevin's decision (2he) and fails here.
+	for (const m of b.matchAll(/license:\s*'([^']*)'/g)) assert.equal(m[1], 'https://fathersheartbible.com/copyright/');
+	assert.doesNotMatch(b, /creativecommons|opendatacommons|\bCC[- ]?BY\b|\bCC0\b/i);
 	assert.match(astro, /const CITE = `/);
 });
 test('failure path: the same block without those fields is rejected', () => {

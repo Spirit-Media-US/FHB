@@ -65,6 +65,10 @@ const jsonLd = [
 		inLanguage: 'en',
 		isAccessibleForFree: true,
 		citation: CITE,
+		// 3ad (pmseoaeo 11-13): points to the EXISTING all-rights-reserved + quotation terms; grants no new rights.
+		license: 'https://fathersheartbible.com/copyright/',
+		creditText: 'Spirit Media Publishing, Father’s Heart Bible™ (fathersheartbible.com)',
+		copyrightHolder: { '@type': 'Organization', name: 'Spirit Media Inc.' },
 		creator: SITE,
 		publisher: { '@id': 'https://spiritmediapublishing.com/#organization' },
 		keywords: [
@@ -166,6 +170,7 @@ const runs = (chs: any[]) => {
 
 				<h2 id="cite" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>How to cite</h2>
 				<p class="text-base leading-relaxed mb-5 p-4" style="font-family: var(--font-sans); color: var(--color-ink); background: var(--color-surface-low); border-radius: 0.5rem; user-select: all;">{CITE}</p>
+				<p class="text-sm mb-5" style="font-family: var(--font-sans); color: var(--color-ink);">Copyright and terms of use: <a href="/copyright/" style={LINK} class="hover:underline">fathersheartbible.com/copyright/</a>.</p>
 
 				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style={H2}>Frequently asked questions</h2>
 				<dl class="space-y-6">

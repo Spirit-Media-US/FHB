@@ -243,6 +243,20 @@ const jsonLd = [
 		inLanguage: 'te',
 		translationOfWork: { '@type': 'BlogPosting', '@id': enUrl },
 	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{
+				'@type': 'ListItem',
+				position: 2,
+				name: 'Blog',
+				item: 'https://fathersheartbible.com/blog/',
+			},
+			{ '@type': 'ListItem', position: 3, name: title, item: teUrl },
+		],
+	},
 	faqs.length > 0
 		? {
 				'@context': 'https://schema.org',

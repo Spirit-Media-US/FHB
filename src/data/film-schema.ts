@@ -8,7 +8,9 @@ export const filmNode = {
 	description:
 		"An introduction to Father's Heart Bible — an English translation that reveals God as a loving Father throughout Scripture.",
 	thumbnailUrl: `https://i.ytimg.com/vi/${FILM_ID}/hqdefault.jpg`,
-	uploadDate: '2026-06-11',
+	// Full ISO-8601 with offset: date-only warns in GSC ("Invalid datetime" / "missing a timezone"). 2rj.
+	uploadDate: '2026-06-11T00:00:00+00:00',
+	duration: 'PT35S',
 	contentUrl: `https://youtu.be/${FILM_ID}`,
 	embedUrl: `https://www.youtube.com/embed/${FILM_ID}`,
 	publisher: {

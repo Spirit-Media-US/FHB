@@ -1,0 +1,267 @@
+---
+// Guide — /guides/how-to-hear-gods-voice (unit 2xt 2026-11-12).
+// Demand (free read 11-12): Bing GetKeywordStats us/en-US 2026-04-01..11-12 "how to hear god's voice" 126 impr (biggest truthful phrasing, leads the title); "hearing god's voice" 45; 'how to hear from god' 0. GSC 90d: 0 queries. Evidence aeo-state/keywords/bing-2xs-2xt-20261112.json.
+// Coverage map (regen.py --fetch --curl 2026-11-12): covered_by() = [] for how to hear god's voice / how to hear from god.
+// Every scripture quote is substring-matched to the locked canon (src/content/bible). Featured: John 10 (the sheep know His voice), verseLimit 5.
+import AuthorBio from '../../components/AuthorBio.astro';
+import FeatureChapter from '../../components/FeatureChapter.astro';
+import ReviewLink from '../../components/ReviewLink.astro';
+import YouVersionBanner from '../../components/YouVersionBanner.astro';
+import Layout from '../../layouts/Layout.astro';
+
+const PAGE_URL = 'https://fathersheartbible.com/guides/how-to-hear-gods-voice/';
+const TITLE = "How to Hear God's Voice: A Biblical Guide";
+const DESCRIPTION = "How to hear God's voice: Scripture, stillness, and testing it.";
+const PUBLISHED = '2026-11-12';
+const MODIFIED = '2026-11-12';
+
+const HERO_BASE =
+	'https://cdn.sanity.io/images/rusi1hyi/production/6497aa7918fb947fc7b07cc63f3f25658934727b-5472x3462.jpg';
+const HERO_ALT = 'An open Bible in a quiet church, a place to pray';
+const HERO_IMG = `${HERO_BASE}?w=1400&h=620&fit=crop&crop=entropy&fm=webp&q=72`;
+const OG_IMG = `${HERO_BASE}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg&q=80`;
+
+const formatDate = (iso: string) =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+
+const KEVIN_WHITE_AUTHOR = {
+	'@type': 'Person',
+	'@id': 'https://kevinwhite.us/#person',
+	name: 'Kevin White',
+	url: 'https://kevinwhite.us',
+	jobTitle: 'Founder & CEO, Spirit Media Publishing',
+	affiliation: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+	},
+	sameAs: [
+		'https://kevinwhite.us',
+		'https://kevinwhite.us/about/',
+		'https://www.linkedin.com/in/kevinwhiteus/',
+		'https://www.youtube.com/@KevinWhiteus',
+		'https://spiritmediapublishing.com',
+	],
+};
+
+const FAQS = [
+	{
+		question: "How do I hear God's voice?",
+		answer:
+			'Start with the Bible, because it is where our Father has already spoken (Psalm 119:105 calls His word “a lamp to my feet and a light to my path”). Then pray, ask Him to speak, and be still long enough to listen. Jesus said, “My sheep listen to my voice; I know them, and they follow me” (John 10:27). What you hear is then tested against Scripture and weighed with wise believers.',
+	},
+	{
+		question: 'Does God still speak today?',
+		answer:
+			'Yes. Hebrews 1:2 says that “in these final days he spoke to us by his Son,” and Jesus promised the Holy Spirit “will teach you everything and remind you of everything I said to you” (John 14:26). The clearest voice of God is Scripture, and the Spirit applies it to your life. Anything else you sense is weighed against it.',
+	},
+	{
+		question: "What does God's voice sound like?",
+		answer:
+			'Usually not like thunder. When Elijah stood on the mountain, our Father was not in the wind, the earthquake or the fire, but in “the sound of a gentle whisper” (1 Kings 19:12). For most people it is a verse that surfaces at the right time, a settled conviction that agrees with Scripture, or a quiet “this is the way” (Isaiah 30:21), not an audible voice.',
+	},
+	{
+		question: 'How do I know it is God and not my own thoughts?',
+		answer:
+			"Test it. 1 John 4:1 says, “test the spirits to see if they're from our Father,” and 1 Thessalonians 5:21 says, “test everything; hold on to what is good.” A voice from our Father never contradicts what He has already written, and it leads toward love, truth and obedience. If it fails that test, set it down. If you are unsure, wait and ask a trusted believer.",
+	},
+	{
+		question: "Why can't I hear God speaking to me?",
+		answer:
+			"Silence is not abandonment. Many people are listening for something dramatic while the Father has already spoken in a passage they have not opened yet. Read a Gospel slowly, pray the way Samuel did (“Speak, for your servant is listening,” 1 Samuel 3:10), and keep at it for a few weeks. Jesus said, “Whoever hears my voice and opens the door, I'll come in to him” (Revelation 3:20).",
+	},
+];
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: "How to Hear God's Voice: A Biblical Guide",
+	description: DESCRIPTION,
+	image: OG_IMG,
+	author: KEVIN_WHITE_AUTHOR,
+	publisher: {
+		'@type': 'Organization',
+		'@id': 'https://spiritmediapublishing.com/#organization',
+		name: 'Spirit Media Publishing',
+		url: 'https://spiritmediapublishing.com',
+	},
+	url: PAGE_URL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+	datePublished: PUBLISHED,
+	dateModified: MODIFIED,
+	inLanguage: 'en-US',
+	articleSection: 'Bible Reading Guides',
+	keywords:
+		"how to hear God's voice, hearing God's voice, how to hear from God, does God still speak, listening prayer",
+};
+const breadcrumbSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: 'Guides',
+			item: 'https://fathersheartbible.com/guides/',
+		},
+		{ '@type': 'ListItem', position: 3, name: "How to Hear God's Voice", item: PAGE_URL },
+	],
+};
+const faqSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQS.map((f) => ({
+		'@type': 'Question',
+		name: f.question,
+		acceptedAnswer: { '@type': 'Answer', text: f.answer },
+	})),
+};
+const jsonLd = [articleSchema, breadcrumbSchema, faqSchema];
+
+const TOC = [
+	{ id: 'he-still-speaks', label: 'He still speaks' },
+	{ id: 'start-with-scripture', label: 'Start with Scripture' },
+	{ id: 'be-still', label: 'Be still and listen' },
+	{ id: 'how-he-speaks', label: 'How He speaks' },
+	{ id: 'test-it', label: 'Test what you hear' },
+	{ id: 'five-steps', label: '5 simple steps' },
+	{ id: 'faq', label: 'FAQ' },
+];
+---
+
+<Layout
+	title={TITLE}
+	description={DESCRIPTION}
+	image={OG_IMG}
+	darkHero={true}
+	jsonLd={jsonLd}
+	pageType="article"
+	articleAuthor="Kevin White"
+	articlePublishedTime={PUBLISHED}
+	articleSection="Bible Reading Guides"
+	articleTags={["how to hear God's voice", "hearing God", "listening prayer"]}
+	preloadImageMobile={HERO_IMG.replace('w=1400', 'w=640')}
+	preloadImageDesktop={HERO_IMG}
+>
+	<main id="main-content">
+		<section class="relative w-full overflow-hidden min-h-[600px] lg:min-h-[calc(50vh_+_2in)]">
+			<img src={HERO_IMG} srcset={`${HERO_IMG.replace('w=1400', 'w=640')} 640w, ${HERO_IMG} 1400w`} sizes="(max-width: 1023px) 640px, 1400px" alt={HERO_ALT} class="absolute inset-0 w-full h-full object-cover" style="object-position: center top;" fetchpriority="high" decoding="async" />
+			<div class="absolute inset-0 z-10" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.22) 100%);" aria-hidden="true"></div>
+		</section>
+		<YouVersionBanner />
+
+		<section class="px-6 pt-10 pb-2 lg:px-8" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<a href="/guides/" class="hover:underline">Guides</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">How to Hear God&rsquo;s Voice</span>
+				</nav>
+				<p class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--color-brand); font-family: var(--font-sans);">Bible Reading Guide</p>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">How to Hear God&rsquo;s Voice: A Biblical Guide</h1>
+				<div class="flex items-center gap-3 mt-5 pb-8 text-sm border-b flex-wrap" style="color: var(--color-muted); font-family: var(--font-sans); border-color: var(--color-hairline);">
+					<span>By <a href="/the-fathers-heart-bible/leadership/" class="font-semibold hover:underline" style="color: var(--color-ink);">Kevin White</a> &mdash; Editor, Father&rsquo;s Heart Bible&trade;</span>
+					<span aria-hidden="true">&middot;</span><span>{formatDate(PUBLISHED)}</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style="font-family: var(--font-sans); color: var(--color-muted);"><strong style="color: var(--color-ink);">You hear God&rsquo;s voice mainly through the Bible, which is where our Father has already spoken, then by asking Him to speak, being still, and testing what you sense against Scripture.</strong> Jesus said, &ldquo;My sheep listen to my voice; I know them, and they follow me&rdquo; (John 10:27). Father&rsquo;s Heart Bible&trade; is a free online Bible that lets you hear that voice as a Father&rsquo;s: you can read and listen to every passage below, and each one points back to our Father who speaks to His children. This guide gives five simple steps and the verses behind each.</p>
+
+				<aside class="my-7 px-6 py-5 rounded-2xl" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--color-brand); font-family: var(--font-sans);">Key takeaway</p>
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">Our Father speaks first in Scripture. Open the Bible, ask Him to speak, be still, then test what you hear against His written word.</p>
+				</aside>
+
+				<nav aria-label="On this page" class="my-8 px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+					<p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: var(--color-muted); font-family: var(--font-sans);">On this page</p>
+					<ul class="flex flex-wrap gap-x-5 gap-y-2 list-none m-0 p-0 text-sm" style="font-family: var(--font-sans);">
+						{TOC.map((t) => (<li><a href={`#${t.id}`} class="hover:underline" style="color: var(--color-brand);">{t.label}</a></li>))}
+					</ul>
+				</nav>
+
+				<h2 id="he-still-speaks" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Does God still speak?</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Yes. The Bible does not describe a God who spoke once and went quiet. Hebrews says that long ago our Heavenly Father spoke through the prophets, &ldquo;But in these final days he spoke to us by his Son&rdquo; (Hebrews 1:2). Jesus then described the relationship in terms of a shepherd and his sheep: &ldquo;My sheep listen to my voice; I know them, and they follow me&rdquo; (John 10:27). Hearing is not reserved for prophets and pastors. It is what belonging to the flock looks like.</p>
+
+				<FeatureChapter book="John" slug="john" chapter={10} verseLimit={5} />
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Read those verses slowly. The sheep do not hear a stranger&rsquo;s voice as theirs; they know the one who calls them by name. That is the goal of this whole guide: to know our Father&rsquo;s voice well enough to recognize it, not to chase impressions.</p>
+
+				<h2 id="start-with-scripture" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Start where He has already spoken</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The most reliable way to hear God is to open the Bible, because it is the voice He has already put in writing. &ldquo;Your word is a lamp to my feet and a light to my path&rdquo; (Psalm 119:105). Paul says &ldquo;faith comes from hearing, and hearing through the word about Christ&rdquo; (Romans 10:17), and Jesus promised that the Holy Spirit &ldquo;will teach you everything and remind you of everything I said to you&rdquo; (John 14:26). That means the Spirit usually speaks by reminding you of what you have read.</p>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">So make it practical: read one chapter, ask &ldquo;Father, what are You saying to me in this?&rdquo;, and write down the line that stays with you. A new reader can begin with the <a href="/guides/how-to-read-the-bible/" style="color: var(--color-brand);" class="hover:underline">guide to reading the Bible</a> or open <a href="https://fathersheartbible.com/read/john/10/" style="color: var(--color-brand);" class="hover:underline">John 10 free with audio</a>.</p>
+
+				<h2 id="be-still" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Be still and listen</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Elijah expected God in the wind, the earthquake or the fire. Scripture says our Father &ldquo;was not in the fire. After the fire, the sound of a gentle whisper&rdquo; (1 Kings 19:12). Hearing often takes quiet. &ldquo;Be still, and know that I am the Father&rdquo; (Psalm 46:10) is an invitation to stop talking long enough to listen.</p>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Samuel is a good pattern for a beginner. He did not recognize the voice at first, and Eli told him how to answer. He said, &ldquo;Speak, for your servant is listening&rdquo; (1 Samuel 3:10). You can pray the same sentence, then sit for two or three minutes with no agenda. Our guide on <a href="/guides/how-to-pray/" style="color: var(--color-brand);" class="hover:underline">how to pray</a> covers the talking half of that conversation.</p>
+
+				<h2 id="how-he-speaks" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">How our Father speaks</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">The Bible shows several ways, and they work together rather than competing:</p>
+				<ul class="space-y-3 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: disc;">
+					<li><strong style="color: var(--color-ink);">Through Scripture.</strong> The written word is the standard everything else is measured by.</li>
+					<li><strong style="color: var(--color-ink);">Through the Holy Spirit.</strong> Jesus said the Spirit of truth &ldquo;will guide you into all truth&rdquo; (John 16:13), and Paul says &ldquo;all who are led by the Spirit of our Father are children of our Father&rdquo; (Romans 8:14).</li>
+					<li><strong style="color: var(--color-ink);">Through direction and conviction.</strong> Isaiah describes a word behind you: &ldquo;This is the way; walk in it&rdquo; (Isaiah 30:21).</li>
+					<li><strong style="color: var(--color-ink);">Through wisdom you ask for.</strong> &ldquo;If any of you lacks wisdom, ask our Father, who gives freely to all without criticizing&rdquo; (James 1:5).</li>
+				</ul>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Luke 11:13 gives the reason to ask with confidence: &ldquo;how much more will the Father from heaven give the Holy Spirit to those who ask him!&rdquo; You are not pleading with someone reluctant to speak.</p>
+
+				<h2 id="test-it" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Test what you hear</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Not every thought that feels spiritual is from God, and the Bible says so plainly: &ldquo;test the spirits to see if they&rsquo;re from our Father&rdquo; (1 John 4:1), and &ldquo;test everything; hold on to what is good&rdquo; (1 Thessalonians 5:21). Three simple tests keep you safe:</p>
+				<ol class="space-y-3 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: decimal;">
+					<li><strong style="color: var(--color-ink);">Does it agree with Scripture?</strong> Our Father does not contradict what He has written.</li>
+					<li><strong style="color: var(--color-ink);">Does it sound like Jesus?</strong> At the transfiguration the voice from the cloud said, &ldquo;Listen to him&rdquo; (Matthew 17:5). Truth, love and humility are the fingerprints.</li>
+					<li><strong style="color: var(--color-ink);">Do wise believers confirm it?</strong> Big decisions deserve a second pair of ears.</li>
+				</ol>
+
+				<h2 id="five-steps" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">How to hear God&rsquo;s voice in 5 simple steps</h2>
+				<ol class="space-y-3 mb-4 pl-5 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted); list-style: decimal;">
+					<li><strong style="color: var(--color-ink);">Open the Bible.</strong> Read one short passage, a chapter of John is a good start.</li>
+					<li><strong style="color: var(--color-ink);">Ask.</strong> &ldquo;Father, what are You saying to me?&rdquo; Then mean it.</li>
+					<li><strong style="color: var(--color-ink);">Be still.</strong> Two or three minutes, no agenda, phone away.</li>
+					<li><strong style="color: var(--color-ink);">Write it down.</strong> A line, a verse, a nudge. Writing slows you down and gives you something to test.</li>
+					<li><strong style="color: var(--color-ink);">Test it, then do it.</strong> Check it against Scripture, and take the one small step it points to.</li>
+				</ol>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Give it a few weeks. Hearing a voice you love is learned the way a child learns a parent&rsquo;s, by spending time. The shepherd says in Revelation, &ldquo;Whoever hears my voice and opens the door, I&rsquo;ll come in to him&rdquo; (Revelation 3:20), and Jeremiah records the invitation, &ldquo;Call to me, and I&rsquo;ll answer, and tell you great, hidden things you don&rsquo;t know&rdquo; (Jeremiah 33:3).</p>
+
+				<h2 id="fathers-heart" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">He speaks as a Father</h2>
+				<p class="text-lg leading-relaxed mb-4" style="font-family: var(--font-sans); color: var(--color-muted);">Many people never listen because they picture a God who is mostly displeased. The voice you are learning to recognize is a Father&rsquo;s. If you have carried a hard picture of your own father into your picture of God, the guide on <a href="/guides/healing-the-father-wound/" style="color: var(--color-brand);" class="hover:underline">healing the father wound</a> speaks to exactly that, and <a href="/verses/god-as-father/" style="color: var(--color-brand);" class="hover:underline">Bible verses about God as Father</a> shows how He describes Himself.</p>
+
+				<aside class="my-12 px-6 py-10 lg:px-10 lg:py-12 rounded-2xl text-center" style="background-color: #fdf2f5; border: 1px solid #f9d6e0;">
+					<p class="text-2xl md:text-3xl font-light leading-tight max-w-2xl mx-auto" style="font-family: var(--font-serif); color: var(--color-ink);">Listen with us</p>
+					<p class="mt-4 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Read and listen to the Gospel of John and the Psalms in Father&rsquo;s Heart Bible &mdash; free online &mdash; and let our Father&rsquo;s written word be the first place you hear Him.</p>
+					<a href="https://fathersheartbible.com/read/john/10/" class="inline-flex items-center gap-2 mt-7 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-opacity hover:opacity-90" style="background-color: #FFD9E0; color: #4A4A4A; font-family: var(--font-sans);">Read &amp; Listen Free<span aria-hidden="true">&rarr;</span></a>
+				</aside>
+
+				<h2 id="faq" class="text-2xl md:text-3xl font-light mt-12 mb-6 scroll-mt-28" style="font-family: var(--font-serif); color: var(--color-ink);">Frequently asked questions</h2>
+				<div class="space-y-6">
+					{FAQS.map((f) => (<div><h3 class="text-xl font-medium mb-2" style="font-family: var(--font-serif); color: var(--color-ink);">{f.question}</h3><p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{f.answer}</p></div>))}
+				</div>
+
+				<div class="mt-12 pt-8 border-t" style="border-color: var(--color-hairline);">
+					<p class="text-sm leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+						Keep going: read <a href="/guides/how-to-pray/" style="color: var(--color-brand);" class="hover:underline">How to Pray</a>, <a href="/guides/how-to-read-the-bible/" style="color: var(--color-brand);" class="hover:underline">How to Read the Bible</a>, or open <a href="https://fathersheartbible.com/read/john/10/" style="color: var(--color-brand);" class="hover:underline">John 10</a> and <a href="https://fathersheartbible.com/read/1-kings/19/" style="color: var(--color-brand);" class="hover:underline">1 Kings 19</a> in the reader. Browse all <a href="/guides/" style="color: var(--color-brand);" class="hover:underline">Bible reading guides</a>.
+					</p>
+				</div>
+
+			</div>
+		</section>
+
+		<section class="px-6 py-12 lg:px-8 lg:py-16" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-2xl text-center">
+				<h2 class="text-2xl md:text-3xl font-light leading-tight" style="font-family: var(--font-serif); color: var(--color-ink);">Read Father&rsquo;s Heart Bible free</h2>
+				<p class="mt-4 text-base lg:text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">Hear our Father in His own words. Read Father&rsquo;s Heart Bible free online with audio &mdash; a translation that reveals God as a loving Father on every page.</p>
+				<a href="https://fathersheartbible.com/read/" class="inline-flex items-center gap-2 mt-6 px-7 py-3 rounded-full text-sm font-semibold no-underline transition-colors" style="background-color: var(--color-brand); color: var(--color-on-primary); font-family: var(--font-sans);">Read FHB<span aria-hidden="true">&rarr;</span></a>
+			</div>
+		</section>
+
+		<ReviewLink class="mb-10" />
+
+		<AuthorBio author="Kevin White" />
+	</main>
+</Layout>

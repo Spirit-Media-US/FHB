@@ -26,9 +26,9 @@ export type OrderLang = (typeof ORDER_LANGS)[number];
 
 export const ORDER_STRINGS: Record<OrderLang, Strings> = { en, de, fr, es, it, nl, pt, ja };
 
-/** Languages a visitor actually sees. Kevin 2026-11-09 "1 A": international checkout opens in English
- *  now; a language joins this list once its strings pass native review (_meta.json review=reviewed). */
-export const LIVE_ORDER_LANGS: readonly OrderLang[] = ['en'];
+/** Languages a visitor actually sees. Kevin 2026-11-11 "What are we waiting for? Turn them on!": every
+ *  translated table is live (AI-reviewed 2rf/2rg/2rh, 11-11); native review improves them in place. */
+export const LIVE_ORDER_LANGS: readonly OrderLang[] = ORDER_LANGS;
 
 /** An edition/page language code (or ?lang= value) to a live order language; English otherwise. */
 export function orderLangFor(code: string | null | undefined): OrderLang {
@@ -62,6 +62,37 @@ function listOf(lang: string, items: string[]): string {
  *  this maps it to the page's language. */
 export const feeLabel = (s: Strings, englishLabel: string): string =>
 	englishLabel === 'Import & handling' ? tr(s, 'fee.import') : tr(s, 'fee.international');
+
+/** The fee label as it reads mid-line after "+ $x.xx". English lowercases the whole label (as always);
+ *  German keeps its noun capitals (Bearbeitungsgebühr); the other languages lowercase only the first
+ *  letter (Japanese has no case, so it is unchanged). */
+export function feeLabelInline(lang: string, label: string): string {
+	if (lang === 'en') return label.toLowerCase();
+	if (lang === 'de') return label;
+	return label.charAt(0).toLocaleLowerCase(lang) + label.slice(1);
+}
+
+/** A whole number in the page's language (the ships-to count in the mobile summary). */
+export function formatCount(lang: string, n: number): string {
+	try {
+		return new Intl.NumberFormat(lang === 'en' ? 'en-US' : lang).format(n);
+	} catch {
+		return String(n);
+	}
+}
+
+/** A displayed USD price in the page's language (we charge USD; only the formatting localizes).
+ *  English is pinned to en-US so it reads exactly "$34.00". */
+export function formatUsd(lang: string, cents: number): string {
+	try {
+		return new Intl.NumberFormat(lang === 'en' ? 'en-US' : lang, {
+			style: 'currency',
+			currency: 'USD',
+		}).format(cents / 100);
+	} catch {
+		return `$${(cents / 100).toFixed(2)}`;
+	}
+}
 
 /** What the shipping lines are built from (emitted as data-ships by the order components). */
 export interface ShipsParts {
@@ -123,6 +154,10 @@ export function applyLang(
 		});
 	for (const el of root.querySelectorAll<HTMLElement>('[data-ships]'))
 		el.textContent = shipsText(lang, s, JSON.parse(el.dataset.ships as string) as ShipsParts);
+	for (const el of root.querySelectorAll<HTMLElement>('[data-ships-n]'))
+		el.textContent = tr(s, 'o.shipsSummary', {
+			n: formatCount(lang, Number(el.dataset.shipsN)),
+		});
 	for (const o of root.querySelectorAll<HTMLOptionElement>('select[data-country] option'))
 		o.textContent = regionName(lang, o.value);
 }

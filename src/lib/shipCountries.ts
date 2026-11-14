@@ -30,6 +30,11 @@ export interface FastOption {
 export interface LandedCost {
 	hc: number;
 	pb: number;
+	/** Beloved Identity (96pp 5 x 8 B&W paperback) landed cost. Absent = not measured for this country,
+	 *  and checkout then refuses that SKU there (fail closed). */
+	bi?: number;
+	/** FHB-BOOKS: any other book's own measured landed cost, keyed by its books.json landed_key (e.g. wai_pb). */
+	[book: string]: number | string | undefined;
 	basis: 'MEASURED' | 'ZONE_MAX';
 }
 export interface PendingCountry {

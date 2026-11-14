@@ -19,7 +19,8 @@ import {
 	LANGUAGE_TOTAL,
 } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
-import { FHB_ORG_CORE } from '../lib/fhb-org';
+import { FHB_ORG_CORE, withBrandVariants } from '../lib/fhb-org';
+import { merchantReturnPolicy } from '../lib/merchantReturnPolicy';
 import { sanityClient, urlFor } from '../lib/sanity';
 import { fitDescription, fitTitle } from '../lib/seoFit';
 
@@ -197,13 +198,29 @@ const homeVoices: VoiceGroup[] = [
 				...FHB_ORG_CORE,
 				"description": `Father's Heart Bible™ (FHB) is the complete Bible — 66 books, 1,189 chapters, 31,087 verses — in a translation from the original Hebrew, Aramaic, and Greek. Free to read and hear online, in print, and soon in 80 languages.`,
 				"knowsLanguage": publishedLangCodes,
+				// Contact + address as published on /returns/, /privacy/, /terms/ (Spirit Media Publishing = imprint); one shared return policy.
+				"contactPoint": {
+					"@type": "ContactPoint",
+					"contactType": "customer service",
+					"email": "hello@spiritmediapublishing.com",
+					"availableLanguage": "English"
+				},
+				"address": {
+					"@type": "PostalAddress",
+					"streetAddress": "205 Academy Street #3251",
+					"addressLocality": "Cary",
+					"addressRegion": "NC",
+					"postalCode": "27519",
+					"addressCountry": "US"
+				},
+				"hasMerchantReturnPolicy": merchantReturnPolicy,
 			},
 			{
 				"@type": "WebSite",
 				"@id": "https://fathersheartbible.com/#website",
 				"url": "https://fathersheartbible.com",
 				"name": "Father's Heart Bible",
-				"alternateName": ["Father's Heart Bible™", "FHB", "The Father's Heart Bible"],
+				"alternateName": withBrandVariants(["Father's Heart Bible™", "FHB", "The Father's Heart Bible"]),
 				"publisher": { "@id": "https://fathersheartbible.com/#organization" }
 			},
 			{
@@ -221,7 +238,7 @@ const homeVoices: VoiceGroup[] = [
 				"@type": "Book",
 				"@id": BOOK_ID,
 				"name": "Father's Heart Bible™",
-				"alternateName": ["Father's Heart Bible", "FHB"],
+				"alternateName": withBrandVariants(["Father's Heart Bible", "FHB"]),
 				"inLanguage": "en",
 				"url": "https://fathersheartbible.com/the-fathers-heart-bible/",
 				"publisher": { "@id": "https://spiritmediapublishing.com/#organization" }

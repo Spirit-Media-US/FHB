@@ -64,6 +64,14 @@ const OG_LOCALE: Record<string, string> = {
 	'zh-hans': 'zh_CN',
 	'zh-hant': 'zh_TW',
 	yue: 'zh_HK',
+	// no Facebook locale (absent from both gists; omit og:locale): om, ln, sd, azb, ilo, ti, pcm, nmf, yo, ig, zu, su, ny, nag, ki, seh, xh, rn, ak, tw, hil (Akan/Twi: no ak_ or tw_ row in gist fabulator/27aa3af1e51e6c2060c840d5dfaa177e, checked 2026-11-12; Hiligaynon: no hil_ row, only cx_PH Bisaya and tl_PH Filipino, checked 2026-11-12). Listed 2026-11-11: so_SO ("Af-Soomaali"), rw_RW ("Ikinyarwanda"), mg_MG ("Malagasy") in gist fabulator/27aa3af1e51e6c2060c840d5dfaa177e; 2tu: th_TH ("ภาษาไทย"), gu_IN ("ગુજરાતી"), or_IN ("ଓଡ଼ିଆ"), ps_AF ("پښتو") in the same gist.
+	so: 'so_SO',
+	rw: 'rw_RW',
+	mg: 'mg_MG',
+	th: 'th_TH',
+	gu: 'gu_IN',
+	or: 'or_IN',
+	ps: 'ps_AF',
 };
 
 /** Every ll_CC value the map can emit (asserted valid by og-locale.test.ts). */

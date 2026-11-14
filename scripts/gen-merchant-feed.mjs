@@ -12,6 +12,12 @@
  * Runs AFTER `astro build` (writes dist/merchant-feed.xml). Nothing is submitted anywhere:
  * the file is just served at /merchant-feed.xml; registering it in Merchant Center is a later,
  * Kevin-gated step. Validate with scripts/merchant-feed-verify.mjs.
+ * Unit 2ra: the SAME item list also emits dist/merchant-feed-openai.jsonl (OpenAI/ChatGPT merchant
+ * product feed, https://developers.openai.com/commerce/specs/feed, read 2026-11-10): one JSON object per
+ * line, the 9 required fields (item_id,title,description,url,brand,seller_name,image_url,availability,
+ * price) plus gtin, condition, group_id, product_category, target_countries, store_country. Same
+ * ids/prices/availability/links/images/GTINs as the XML by construction; scripts/openai-feed.test.mjs
+ * enforces parity. NOT submitted anywhere (application is unit 2rb).
  * Usage: node scripts/gen-merchant-feed.mjs [--out dist/merchant-feed.xml]
  */
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -22,6 +28,8 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const BIND = { 'https://schema.org/Hardcover': 'Hardcover', 'https://schema.org/Paperback': 'Paperback' };
 
 const items = new Map();
+// image may be a bare URL or an ImageObject (unit 2rl): the feed needs the URL string.
+const imgUrl = (i) => (i && typeof i === 'object' ? i.contentUrl || i.url : i);
 const walk = (n, ctx) => {
 	if (Array.isArray(n)) return n.forEach((x) => walk(x, ctx));
 	if (!n || typeof n !== 'object') return;
@@ -34,7 +42,7 @@ const walk = (n, ctx) => {
 				title: `${n.name.replace(/ \((Hardcover|Paperback)\)$/, '')}${fmt ? ` (${fmt})` : ''}`,
 				description: (n.description || ctx.desc || n.name).replace(/\s+/g, ' ').trim().slice(0, 4900),
 				link: offer.url,
-				image: n.image || ctx.image,
+				image: imgUrl(n.image) || ctx.image,
 				price: offer.price,
 				currency: offer.priceCurrency,
 				availability: offer.availability,
@@ -54,7 +62,7 @@ for (const d of readdirSync(`${DIST}/bibles`).sort()) {
 	for (const m of html.matchAll(/<script type="application\/ld\+json"[^>]*>(.*?)<\/script>/gs)) {
 		let j;
 		try { j = JSON.parse(m[1]); } catch { continue; }
-		walk(j, { slug: d, desc: j.description, image: j.image });
+		walk(j, { slug: d, desc: j.description, image: imgUrl(j.image) });
 	}
 }
 
@@ -103,4 +111,25 @@ ${rows.join('\n')}
 </rss>
 `;
 writeFileSync(OUT, xml);
+const OUT_JSONL = OUT.replace(/\.xml$/, '') + '-openai.jsonl';
+const AVAIL = (a) => (a.endsWith('InStock') ? 'in_stock' : 'out_of_stock');
+const jsonl = [...items.values()].map((i) => JSON.stringify({
+	item_id: String(i.id),
+	title: i.title,
+	description: i.description,
+	url: i.link,
+	brand: "Father's Heart Bible",
+	seller_name: 'Spirit Media Publishing',
+	image_url: i.image,
+	availability: AVAIL(i.availability),
+	price: `${i.price} ${i.currency}`,
+	gtin: String(i.gtin),
+	condition: 'new',
+	group_id: i.group,
+	product_category: 'Media > Books',
+	target_countries: ['US'],
+	store_country: 'US',
+})).join('\n') + '\n';
+writeFileSync(OUT_JSONL, jsonl);
+console.log(`merchant-feed: ${items.size} records -> ${OUT_JSONL}`);
 console.log(`merchant-feed: ${rows.length} items -> ${OUT}`);

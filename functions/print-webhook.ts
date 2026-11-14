@@ -12,8 +12,8 @@
 // NB: path is /print-webhook, not /api/* — the apex router proxies /api/* to
 // the community app, so this marketing function lives off that prefix.
 
-import { readBreakdown } from '../src/lib/order-pricing';
-import { countryFor } from '../src/lib/shipCountries';
+import { BOOK_SKUS, readBreakdown } from '../src/lib/order-pricing.ts';
+import { countryFor } from '../src/lib/shipCountries.ts';
 
 interface Env {
 	STRIPE_PRINT_WEBHOOK_SECRET?: string;
@@ -141,6 +141,7 @@ const LANG_TITLES: Record<string, string> = {
 };
 
 function skuTitle(sku: string): string {
+	if (BOOK_SKUS[sku]) return BOOK_SKUS[sku].title;
 	if (TITLES[sku]) return `${TITLES[sku]} — Divine Voice Color`;
 	// Every SKU carries its binding (<slug>-hb / -pb, since 2026-09-17); the map is keyed by
 	// edition, so read the binding off the end rather than printing the raw SKU.
@@ -154,6 +155,18 @@ function skuTitle(sku: string): string {
 	const [, size, colour, binding] = m;
 	const c = colour.charAt(0).toUpperCase() + colour.slice(1);
 	return `Father’s Heart Bible — ${size === 'largeprint' ? 'Large Print' : 'Regular Print'}, ${c}, ${binding === 'hb' ? 'Hardback' : 'Paperback'}`;
+}
+
+// What the Ingram order needs for any non-Bible book in the cart: the ISBN-13 to type in, the
+// quantity, and the spec to check it against. Empty when the order has none.
+function ingramLines(breakdown: string | undefined): string {
+	const out: string[] = [];
+	for (const part of (breakdown ?? '').split(/[,\s]+/).filter(Boolean)) {
+		const i = part.lastIndexOf(':');
+		const book = i < 0 ? undefined : BOOK_SKUS[part.slice(0, i)];
+		if (book) out.push(`  ISBN ${book.isbn} × ${part.slice(i + 1)}  (${book.title}; ${book.spec})`);
+	}
+	return out.length ? `Ingram order lines (non-Bible books):\n${out.join('\n')}\n` : '';
 }
 
 function fmtOrder(breakdown: string | undefined): string {
@@ -318,7 +331,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		`New print order — Father's Heart Bible\n\n` +
 		`Total: ${amount} (incl. tax ${tax})\n` +
 		`Copies: ${m.total ?? '?'}  ·  Discount: ${m.pct_off ?? '?'}% off${m.offer === 'first_order' ? ' (first order, WELCOME15)' : m.offer === 'volume' ? ' (volume)' : ''}\n` +
-		`Editions:\n${fmtOrder(readBreakdown(m))}\n\n` +
+		`Editions:\n${fmtOrder(readBreakdown(m))}\n` +
+		`${ingramLines(readBreakdown(m))}\n` +
 		`Ship to:\n${name}\n${fmtAddr(ship.address)}\n\n` +
 		`Customer email: ${email}\n` +
 		`Phone (pass to the Ingram order, carriers call international buyers): ${phone ?? '*** MISSING: email the buyer before placing the order ***'}\n` +

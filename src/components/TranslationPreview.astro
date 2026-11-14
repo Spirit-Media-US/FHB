@@ -65,16 +65,16 @@ const multi = previews.length > 1;
 					<div role="table" style="background-color: var(--color-surface);">
 						<div role="row" class="hidden md:grid md:grid-cols-2 gap-px text-xs font-semibold uppercase tracking-wide"
 							style="font-family: var(--font-sans); color: var(--color-muted); border-bottom: 1px solid var(--color-hairline);">
-							<div class="px-5 py-2">Father&rsquo;s Heart Bible (English)</div>
-							<div class="px-5 py-2">{p.langName}</div>
+							<div role="columnheader" class="px-5 py-2">Father&rsquo;s Heart Bible (English)</div>
+							<div role="columnheader" class="px-5 py-2">{p.langName}</div>
 						</div>
 						{c.verses.map((v) => (
 							<div role="row" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 px-5 py-3"
 								style="border-bottom: 1px solid var(--color-hairline);">
-								<p class="text-base leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">
+								<p role="cell" class="text-base leading-relaxed" style="font-family: var(--font-serif); color: var(--color-ink);">
 									<span class="text-xs align-super" style="color: var(--color-brand);">{v.n}</span> {v.en}
 								</p>
-								<p class="text-base leading-relaxed" lang={p.langCode} style="font-family: var(--font-serif); color: var(--color-ink);">
+								<p role="cell" class="text-base leading-relaxed" lang={p.langCode} style="font-family: var(--font-serif); color: var(--color-ink);">
 									<span class="text-xs align-super" style="color: var(--color-brand);">{v.n}</span> {v.tr}
 								</p>
 							</div>

@@ -97,19 +97,34 @@ const connections = [
 	},
 ];
 
-const jsonLd = {
-	'@context': 'https://schema.org',
-	'@type': 'CollectionPage',
-	name: 'Join the Father’s Heart Family',
-	description:
-		'Connect with beloved sons and daughters around the world — groups, prayer, events, and the global family of Father’s Heart Bible readers.',
-	url: 'https://fathersheartbible.com/family/',
-	hasPart: [...groups, ...connections].map((c) => ({
-		'@type': 'WebPage',
-		name: c.title,
-		url: c.href,
-	})),
-};
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'CollectionPage',
+		name: 'Join the Father’s Heart Family',
+		description:
+			'Connect with beloved sons and daughters around the world — groups, prayer, events, and the global family of Father’s Heart Bible readers.',
+		url: 'https://fathersheartbible.com/family/',
+		hasPart: [...groups, ...connections].map((c) => ({
+			'@type': 'WebPage',
+			name: c.title,
+			url: c.href,
+		})),
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{
+				'@type': 'ListItem',
+				position: 2,
+				name: 'Join the Father’s Heart Family',
+				item: 'https://fathersheartbible.com/family/',
+			},
+		],
+	},
+];
 ---
 
 <Layout youversionBanner={false}

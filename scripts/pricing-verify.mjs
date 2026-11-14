@@ -46,7 +46,7 @@ import { handlingFeeCents } from '../src/lib/marginGuard.ts';
 import { LIVE_COUNTRIES } from '../src/lib/shipCountries.ts';
 
 const ISBNS = '/home/deploy/projects/fhb-print-bible/editions/ISBNS.json';
-const CHECKOUT = 'functions/dvc-checkout.ts';
+const CHECKOUT = 'src/lib/storeEngine.ts'; // the catalogue moved into the SMP store engine (plan 3fb Phase 2)
 const DIST = 'dist';
 // The forms that must offer the whole catalog, and one language page as the per-language form.
 const FULL_FORMS = ['dist/print/order/index.html', 'dist/print/index.html'];
@@ -491,15 +491,18 @@ function editionPageErrs(pages, srv) {
 			);
 			continue;
 		}
+		// A live order language formats the figure locally ("67,99 $", "US$ 67,99", "67,99 USD"), so compare
+		// the AMOUNT in cents, and require a US-dollar marker so a wrong currency still fails.
+		const cents = (t) => (/\$|USD/.test(t) ? Number(t.replace(/[^0-9]/g, '')) : Number.NaN);
 		for (const r of rows) {
 			const sv = srv[r.sku];
 			if (sv == null) {
 				errs.push(`${f}: price line names ${r.sku}, which the server does not sell`);
 				continue;
 			}
-			if (r.reg !== usd(sv.cents))
+			if (cents(r.reg) !== sv.cents)
 				errs.push(`${f}: ${r.sku} regular shows ${r.reg}, server charges ${usd(sv.cents)}`);
-			if (r.first !== usd(firstUnit(sv.cents)))
+			if (cents(r.first) !== firstUnit(sv.cents))
 				errs.push(
 					`${f}: ${r.sku} first-order shows ${r.first}, rule gives ${usd(firstUnit(sv.cents))}`,
 				);

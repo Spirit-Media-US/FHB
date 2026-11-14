@@ -55,6 +55,8 @@
 	}
 	/* The offer rests bottom-center until accepted. */
 	#tour-welcome { left: 50%; bottom: 24px; transform: translateX(-50%); text-align: center; }
+	/* Phones: step aside while an order form is on screen so it never covers Email / Checkout (2sc). */
+	@media (max-width: 767px) { #tour-welcome.tour-yield { visibility: hidden; pointer-events: none; } }
 	.tour-emoji { font-size: 26px; margin: 0 0 4px; }
 	.tour-title { font-weight: 700; font-size: 16px; margin: 0 0 4px; color: var(--color-ink); }
 	.tour-sub { font-size: 13px; color: var(--color-muted, #5F5A54); margin: 0 0 14px; }
@@ -200,6 +202,18 @@
 			welcome.hidden = false;
 			post('offered', 0);
 			document.addEventListener('keydown', onKey);
+		}
+
+		// 2sc: the offer card is fixed bottom-center and would cover the order form's Email field and
+		// Checkout button on phones. Yield (visibility only, so no layout shift) while an order form is in view.
+		const orderEls = document.querySelectorAll('#order, [data-order]');
+		if (orderEls.length && 'IntersectionObserver' in window) {
+			const vis = new Set();
+			const io = new IntersectionObserver((entries) => {
+				for (const en of entries) { if (en.isIntersecting) vis.add(en.target); else vis.delete(en.target); }
+				welcome.classList.toggle('tour-yield', vis.size > 0);
+			});
+			orderEls.forEach((el) => io.observe(el));
 		}
 
 		// Wire buttons (delegated within the tour root).

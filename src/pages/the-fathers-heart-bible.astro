@@ -16,6 +16,7 @@ import {
 	topLanguages,
 } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
+import { withBrandVariants } from '../lib/fhb-org';
 import { sanityClient, urlFor } from '../lib/sanity';
 import { fitDescription, fitTitle } from '../lib/seoFit';
 
@@ -106,6 +107,24 @@ const shifts = biblePageData?.shifts ?? [
 // llms.txt saying the same thing.
 const DIVINE_NAMES =
 	'The covenant name YHWH is rendered “our Father” by default; on the lips of outsiders, such as Pharaoh, it keeps a title (“the LORD” or “God”). Where Elohim or Theos refers to the Father, it is rendered as Father too; “God” is kept where Scripture speaks of God as God. Where Adonai refers to the Father, it is rendered “Sovereign,” most often “my Sovereign Father”; “Lord” is used chiefly of Jesus.';
+// 3ap B1 (pmseoaeo 2026-11-13): stable anchor per FAQ question, from the question's own words, so a forum or
+// answer engine can link the exact block it quotes ("#faq-who-translated-fathers-heart-bible"). Ids only.
+const faqId = (q: string) =>
+	`faq-${q
+		.toLowerCase()
+		.replace(/[™’']/g, '')
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '')}`;
+// 3aq (pmseoaeo 2026-11-13, W7 target-10): body links from pages engines already cite to the uncited target
+// pages. Anchor = each target page's own H1; no new prose beyond the one label line.
+const BIBLE_FOR_3AQ: [string, string][] = [
+	['incarcerated', 'The Bible for the Incarcerated'],
+	['teenagers', 'The Bible for Teenagers'],
+	['muslims', 'The Bible for Muslims'],
+	['new-believers', 'The Best Bible to Give a New Believer'],
+	['addiction', 'The Bible for Those Facing Addiction'],
+	['fathers', 'The Bible for Fathers'],
+];
 const faqs = [
 	{
 		q: "What kind of translation is Father's Heart Bible™?",
@@ -114,6 +133,11 @@ const faqs = [
 	{
 		q: "What is Father's Heart Bible™?",
 		a: "Father's Heart Bible™ (FHB) is the complete Bible — 66 books, 1,189 chapters, 31,087 verses — in a translation from the original Hebrew, Aramaic, and Greek, governed by 160 written translation rules. To our knowledge, it is the first Bible in print to show which words a divine person spoke, and which person spoke them: our Father's words in blue, the Son's in red, the Spirit's in purple.",
+	},
+	{
+		// Spelling-variant question (unit 2sz): people search the no-apostrophe form; one factual answer, no new claims.
+		q: 'Is it Fathers Heart Bible or Father\u2019s Heart Bible?',
+		a: 'The name is Father\u2019s Heart Bible\u2122, the Bible that reveals the heart of our Father. \u201CFathers Heart Bible\u201D and \u201CFHB\u201D refer to the same Bible.',
 	},
 	{
 		// The abbreviation needs its own QUESTION, not just a mention inside another answer
@@ -198,15 +222,15 @@ const formatDate = (dateString: string) => {
 			// node in community/src/lib/reader-seo.ts MUST stay identical to this, since
 			// two values for one @id is precisely the conflict this pass removed.
 			"name": "Father's Heart Bible™",
-			"alternateName": [
+			"alternateName": withBrandVariants([
 				"Father's Heart Bible",
 				"Father's Heart Bible: An Intimate Translation",
 				"FHB"
-			],
+			]),
 			"bookEdition": "An Intimate Translation",
 			"description": "A Bible translation from the original Hebrew, Aramaic, and Greek that reveals God as your Father. Come home to your Father. His heart is for you.",
 			"inLanguage": "en",
-			"url": "https://fathersheartbible.com",
+			"url": "https://fathersheartbible.com/the-fathers-heart-bible/", // 3by: same url the home Book node gives
 			"translationOfWork": { "@type": "Book", "name": "The Holy Bible" },
 			"isAccessibleForFree": true,
 			"sameAs": [
@@ -331,7 +355,7 @@ const formatDate = (dateString: string) => {
 					style="font-family: var(--font-sans); color: var(--color-muted);"
 				>
 					Father's Heart Bible™ is built on one conviction: God has always been reaching toward
-					His children, not His servants. And Scripture has always been saying so.
+					His children, not His servants. And Scripture has always been saying so. See what <a href="/meaning/fathers-heart-of-god/" style="color: var(--color-brand);">the Father&rsquo;s heart of God</a> means.
 				</p>
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-left">
 					{shifts.map(({ from, to }) => (
@@ -410,6 +434,7 @@ const formatDate = (dateString: string) => {
 					See the Difference
 				</p>
 				<h2
+					id="zephaniah-3-17"
 					class="text-3xl md:text-4xl font-light"
 					style="font-family: var(--font-serif); color: var(--color-ink);"
 				>
@@ -612,7 +637,7 @@ const formatDate = (dateString: string) => {
 				<p>The Old Testament follows the Masoretic Hebrew and Aramaic text as preserved in the Leningrad Codex (AD 1008), checked against the Westminster Leningrad Codex; the New Testament follows the modern critical Greek text, checked against the SBL Greek New Testament. Where the manuscripts differ, it keeps company with the consensus of the modern critical editions. Standard Hebrew and Greek reference works are gratefully acknowledged; its English text, notes, and headings are its own.</p>
 					</div>
 				</details>
-				<details class="fm-item">
+				<details class="fm-item" id="how-translated">
 					<summary><span>How it was made</span><svg class="fm-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></summary>
 					<div class="fm-body">
 				<p>Father's Heart Bible™ was produced through a structured, rule-governed translation process built for this work, bringing the consistency and reach of modern language technology to the ancient task of translation. Within that process, AI language tools rendered the text and footnotes directly from the original Hebrew, Aramaic, and Greek, guided by a written set of 160 translation rules. Each book was then carried through successive passes, its most difficult readings cross-checked against the Hebrew and Greek and against independent references, before being reviewed and finalized. The rules and every interpretive decision are the work of Kevin White of Spirit Media Publishing, who led the process; other readers reviewed it and offered feedback.</p>
@@ -658,6 +683,7 @@ const formatDate = (dateString: string) => {
 					{faqs.map((faq) => (
 						<div data-reveal>
 							<h3
+								id={faqId(faq.q)}
 								class="text-xl md:text-2xl font-medium mb-3 leading-snug"
 								style="font-family: var(--font-serif); color: var(--color-ink);"
 							>
@@ -672,6 +698,10 @@ const formatDate = (dateString: string) => {
 						</div>
 					))}
 				</div>
+				<p class="mt-12 mb-3" style="font-family: var(--font-sans); color: var(--color-ink); font-weight: 600;">The Bible for:</p>
+				<ul class="space-y-3" style="list-style: none; padding: 0; margin: 0; font-family: var(--font-sans); color: var(--color-muted); line-height: 1.65;">
+					{BIBLE_FOR_3AQ.map(([s, h]) => (<li><a href={`/bible-for/${s}/`} style="color: var(--color-brand);" class="hover:underline">{h}</a></li>))}
+				</ul>
 			</div>
 		</Section>
 

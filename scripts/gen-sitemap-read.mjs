@@ -40,6 +40,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { HUB_LASTMOD_LANGS, hubLastmods } from './lib/hub-lastmod.mjs';
+import { chapterLastmod, maxLastmod } from './lib/sitemap-lastmod.mjs';
 import { loadLiveCache, saveLiveCache, probeWithCache, DEFAULT_PATH as LIVE_CACHE_PATH } from './lib/live-cache.mjs';
 
 // Shared 24h cache of URLs production already served 200 (unit 2cr). Only 200s are cached, so the
@@ -398,9 +399,10 @@ function bookLastmods(lang, slug) {
 	try {
 		const doc = JSON.parse(fs.readFileSync(path.join(BIBLE_DATA, lang, `${slug}.json`), 'utf8'));
 		for (const [n, ch] of Object.entries(doc.chapters || {})) {
-			const raw = ch && ch.updatedAt;
-			if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}/.test(raw))
-				out.set(Number(n), raw.slice(0, 10));
+			// 2xw: latest of updatedAt + lockedAt, the SAME rule as the page's JSON-LD dateModified
+			// (the old updatedAt-only read left all 1,189 English chapters at June vs the page's 08-04).
+			const d = chapterLastmod(ch);
+			if (d) out.set(Number(n), d);
 		}
 	} catch {
 		/* no reader data for this book: emit no lastmod, never a guess */
@@ -549,16 +551,21 @@ if (SPLIT) {
 	for (const [l, entries] of segs) {
 		if (!entries.length) continue; // never publish an empty segment
 		const name = `sitemap-read-${l}.xml`;
-		fs.writeFileSync(path.join(path.dirname(OUT), name), HEAD + entries.join('') + '</urlset>');
-		index.push(`<sitemap><loc>${SITE}/${name}</loc></sitemap>`);
+		const body = HEAD + entries.join('') + '</urlset>';
+		fs.writeFileSync(path.join(path.dirname(OUT), name), body);
+		// 2xw: index <lastmod> = newest TRUE lastmod inside the child (absent when the child has none).
+		const childLm = maxLastmod(body);
+		index.push(`<sitemap><loc>${SITE}/${name}</loc>${childLm ? `<lastmod>${childLm}</lastmod>` : ''}</sitemap>`);
 	}
 	// A small DEDICATED verse sitemap so GSC reports the 21 verse pages' indexing on their own. It is a
 	// DUPLICATE listing (the English segment keeps them: fhb-index-submit's per-language Bing queue and
 	// fhb-index-inspect read sitemap-read-<lang>.xml). Named sitemap-verses.xml, NOT sitemap-read-verses.xml,
 	// because those tools parse sitemap-read-<letters>.xml out of the index as a language code.
 	if (VERSE_ENTRIES.length) {
-		fs.writeFileSync(path.join(path.dirname(OUT), 'sitemap-verses.xml'), HEAD + VERSE_ENTRIES.join('') + '</urlset>');
-		index.push(`<sitemap><loc>${SITE}/sitemap-verses.xml</loc></sitemap>`);
+		const vbody = HEAD + VERSE_ENTRIES.join('') + '</urlset>';
+		fs.writeFileSync(path.join(path.dirname(OUT), 'sitemap-verses.xml'), vbody);
+		const vLm = maxLastmod(vbody);
+		index.push(`<sitemap><loc>${SITE}/sitemap-verses.xml</loc>${vLm ? `<lastmod>${vLm}</lastmod>` : ''}</sitemap>`);
 	}
 	const indexXml =
 		'<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +

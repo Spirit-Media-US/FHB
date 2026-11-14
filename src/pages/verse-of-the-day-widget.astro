@@ -1,0 +1,135 @@
+---
+// /verse-of-the-day-widget/ — copy-paste embed for the community app's verse-of-the-day card (unit 2ni).
+// The card itself is served by the reader app at /read/verse-of-the-day/embed/ (same domain, same verse as
+// /read/verse-of-the-day/ and its feeds). Verse text lives only there; this page types no verse text and
+// invents no licence terms: quoting terms are /copyright's. The preview loads only if the embed answers 200.
+import Layout from '../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../lib/seoFit';
+
+const PAGE_URL = 'https://fathersheartbible.com/verse-of-the-day-widget/';
+const EMBED_URL = 'https://fathersheartbible.com/read/verse-of-the-day/embed/';
+const TITLE = fitTitle('Bible Verse of the Day Widget: Embed on Your Website');
+const DESCRIPTION = fitDescription(
+	`Add a free Bible verse of the day card to your website or blog. Copy one iframe snippet; the verse changes daily and links back to its chapter in Father's Heart Bible™.`,
+);
+const snippet = (theme: string) =>
+	`<iframe src="${EMBED_URL}${theme}" title="Verse of the Day from Father's Heart Bible" width="100%" height="240" style="border:0;max-width:640px" loading="lazy"></iframe>`;
+const LIGHT = snippet('');
+const DARK = snippet('?theme=dark');
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'WebPage',
+		name: 'Bible Verse of the Day widget for your website',
+		url: PAGE_URL,
+		description: DESCRIPTION,
+		inLanguage: 'en',
+		isPartOf: {
+			'@type': 'WebSite',
+			name: "Father's Heart Bible™",
+			url: 'https://fathersheartbible.com/',
+		},
+		publisher: { '@id': 'https://spiritmediapublishing.com/#organization' },
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'HowTo',
+		name: 'How to add the Father’s Heart Bible verse of the day to your website',
+		step: [
+			{
+				'@type': 'HowToStep',
+				position: 1,
+				name: 'Copy the snippet',
+				text: 'Copy the iframe snippet from this page.',
+			},
+			{
+				'@type': 'HowToStep',
+				position: 2,
+				name: 'Paste it into your page',
+				text: 'Paste it into the HTML of the page, post or widget area where the verse should appear.',
+			},
+			{
+				'@type': 'HowToStep',
+				position: 3,
+				name: 'Choose light or dark',
+				text: 'Use the dark snippet, which adds ?theme=dark, on dark backgrounds.',
+			},
+		],
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{ '@type': 'ListItem', position: 2, name: 'Verse of the day widget', item: PAGE_URL },
+		],
+	},
+];
+const P = 'font-family: var(--font-sans); color: var(--color-muted);';
+const H2 = 'font-family: var(--font-serif); color: var(--color-ink);';
+const LINK = 'color: var(--color-brand);';
+const CODE =
+	'display:block; width:100%; font-family: ui-monospace, monospace; font-size:0.85rem; padding:0.75rem; border:1px solid var(--color-hairline); border-radius:0.5rem; background: var(--color-surface-low); color: var(--color-ink); resize: vertical;';
+---
+
+<Layout title={TITLE} description={DESCRIPTION} jsonLd={jsonLd}>
+	<main id="main-content">
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface-low);">
+			<div class="mx-auto max-w-3xl">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style={P}>
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Verse of the day widget</span>
+				</nav>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight" style={H2}>Bible Verse of the Day Widget</h1>
+			</div>
+		</section>
+
+		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
+			<div class="mx-auto max-w-3xl">
+				<p class="text-lg leading-relaxed mb-5" style={P}>
+					<strong style="color: var(--color-ink);">Put a new Bible verse in front of your readers every day.</strong> Paste one snippet into your website, blog or church page. The card shows the same verse as our <a href="/read/verse-of-the-day/" style={LINK} class="hover:underline">verse of the day</a> in Father&rsquo;s Heart Bible&trade; (FHB), changes at midnight Eastern Time, and links to the verse in its chapter.
+				</p>
+
+				<h2 id="preview" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>Preview</h2>
+				<div id="vw-preview" style="max-width:640px;">
+					<iframe id="vw-frame" title="Verse of the Day preview" width="100%" height="240" style="border:0;max-width:640px;display:none;"></iframe>
+					<p id="vw-fallback" class="text-base" style={P}>The live preview is not available right now. The snippets below still work.</p>
+				</div>
+
+				<h2 id="snippet" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>Copy and paste</h2>
+				<p class="text-base leading-relaxed mb-3" style={P}>Light card (click the box to select it all):</p>
+				<textarea readonly rows="4" style={CODE} aria-label="Light verse of the day embed code" onclick="this.select()">{LIGHT}</textarea>
+				<p class="text-base leading-relaxed mt-5 mb-3" style={P}>For a dark background, add <code>?theme=dark</code>:</p>
+				<textarea readonly rows="4" style={CODE} aria-label="Dark verse of the day embed code" onclick="this.select()">{DARK}</textarea>
+				<p class="text-base leading-relaxed mt-5" style={P}>The card is English. It is a small page with no scripts or cookies, and it keeps the &ldquo;Father&rsquo;s Heart Bible&rdquo; credit and the verse link visible: please leave them in place.</p>
+
+				<h2 id="feeds" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>Prefer a feed?</h2>
+				<p class="text-base leading-relaxed mb-5" style={P}>
+					The last seven verses are also available as an <a href="/read/verse-of-the-day/feed.xml" style={LINK} class="hover:underline">RSS feed</a> and a <a href="/read/verse-of-the-day/feed.json" style={LINK} class="hover:underline">JSON feed</a>, for newsletters, readers and apps.
+				</p>
+
+				<h2 id="terms" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>Using the text</h2>
+				<p class="text-base leading-relaxed" style={P}>
+					Quoting terms for Father&rsquo;s Heart Bible&trade; are on the <a href="/copyright/" style={LINK} class="hover:underline">copyright and permissions page</a>, including how to cite it. For other languages, see <a href="/translation-progress/" style={LINK} class="hover:underline">translation progress</a>.
+				</p>
+			</div>
+		</section>
+	</main>
+</Layout>
+
+<script is:inline>
+	// Show the preview only when the embed answers; otherwise the fallback sentence stays.
+	(function () {
+		var u = '/read/verse-of-the-day/embed/';
+		try {
+			fetch(u, { method: 'HEAD', credentials: 'omit' }).then(function (r) {
+				var ct = r.headers.get('content-type') || '';
+				if (!r.ok || ct.indexOf('text/html') !== 0) return;
+				var f = document.getElementById('vw-frame');
+				f.src = u;
+				f.style.display = 'block';
+				document.getElementById('vw-fallback').style.display = 'none';
+			}).catch(function () {});
+		} catch (e) {}
+	})();
+</script>

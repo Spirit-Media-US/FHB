@@ -271,6 +271,17 @@ h6 {
 	transform: translateX(0);
 }
 
+/* A slide starts 24px off-axis; clip it at its section so the page never grows wider than the
+   phone (2026-11-11: home was 396px at 390 and slid sideways until the blocks revealed). */
+section:has([data-reveal^="slide"]) {
+	overflow-x: clip;
+}
+
+/* Inline code (URLs, paths) has no break opportunity; let it wrap rather than widen the page on phones. */
+code {
+	overflow-wrap: anywhere;
+}
+
 /* ── Staggered grid children ── */
 [data-stagger] > * {
 	opacity: 0;

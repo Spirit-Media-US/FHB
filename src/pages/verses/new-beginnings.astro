@@ -1,0 +1,162 @@
+---
+// /verses/new-beginnings — unit 3bn-1 (pmseoaeo 2026-11-13). Demand: Bing GetKeywordStats us/en-US 25 weeks to 2026-11-07:
+// 'new beginnings' 9,182 (flat ~370/wk); new-year companions rising (new year's day 3,393, happy new year 2,218, new year's
+// eve 2,315, new years 1,601); every 'bible verses/scripture' phrasing 0. Biggest truthful term leads; new year beside it.
+// Coverage: no page for new beginnings / new year (coverage map 2026-11-13). Evidence aeo-state/fhb-seasonal-3bn-20261113.json.
+// Verses are VERBATIM from /srv/sites/community/src/content/bible (locked canon), extracted by script, not typed.
+import VerseCollection from '../../components/VerseCollection.astro';
+
+const themes = [
+	{
+		id: 'new-creation',
+		heading: 'A new heart and a new creation',
+		intro: 'Our Father does not patch up the old; he makes something new, starting with the heart.',
+		verses: [
+			{
+				ref: '2 Corinthians 5:17',
+				slug: '2-corinthians',
+				ch: 5,
+				text: 'So if anyone is in Christ, new creation! The old has passed away; look, the new has come!',
+			},
+			{
+				ref: 'Ezekiel 36:26',
+				slug: 'ezekiel',
+				ch: 36,
+				text: 'I will give you a new heart and a new spirit within you. I will take the heart of stone out of your flesh and give you a heart of flesh.',
+			},
+			{
+				ref: 'Psalm 51:10',
+				slug: 'psalms',
+				ch: 51,
+				text: 'Create in me a clean heart, my Father, and renew a steadfast spirit within me.',
+			},
+			{
+				ref: 'Romans 6:4',
+				slug: 'romans',
+				ch: 6,
+				text: "So we were buried with him through baptism into death, that as Christ was raised from the dead through our Father's glory, we too might walk in newness of life.",
+			},
+		],
+	},
+	{
+		id: 'forgetting-what-is-behind',
+		heading: 'Forgetting what is behind',
+		intro: 'The past is real, but it is not the last word. He is already doing the next thing.',
+		verses: [
+			{
+				ref: 'Isaiah 43:18–19',
+				slug: 'isaiah',
+				ch: 43,
+				text: 'Do not remember the former things, nor consider the things of the past. Look, I am doing a new thing; now it springs up—do you not see it? I will make a way in the wilderness and rivers in the desert.',
+			},
+			{
+				ref: 'Philippians 3:13–14',
+				slug: 'philippians',
+				ch: 3,
+				text: "Brothers, I don't count myself as having grasped it yet. But one thing: forgetting what's behind, reaching for what's ahead, I press toward the goal for the prize of our Father's heavenward call in Christ Jesus.",
+			},
+			{
+				ref: 'Isaiah 42:9',
+				slug: 'isaiah',
+				ch: 42,
+				text: 'See, the former things have come true, and new things I now declare; before they spring forth, I tell you of them."',
+			},
+			{
+				ref: 'Revelation 21:5',
+				slug: 'revelation',
+				ch: 21,
+				text: 'The one seated on the throne said, "Look, I am making everything new." He added, "Write this: these words are trustworthy and true."',
+			},
+		],
+	},
+	{
+		id: 'new-mercies',
+		heading: 'New mercies every morning',
+		intro:
+			'Every day starts with a fresh supply of his kindness, and strength for those who wait for him.',
+		verses: [
+			{
+				ref: 'Lamentations 3:22–23',
+				slug: 'lamentations',
+				ch: 3,
+				text: 'The covenant love of our Father never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness.',
+			},
+			{
+				ref: 'Isaiah 40:31',
+				slug: 'isaiah',
+				ch: 40,
+				text: 'but those who wait for our Father will renew their strength; they will soar on wings like eagles; they will run and not be weary; they will walk and not faint.',
+			},
+		],
+	},
+	{
+		id: 'a-blessing-for-the-year',
+		heading: 'A blessing to begin the year',
+		intro:
+			'A prayer for wisdom with the days ahead, and the blessing our Father gave his people to speak over one another.',
+		verses: [
+			{
+				ref: 'Psalm 90:12',
+				slug: 'psalms',
+				ch: 90,
+				text: 'Teach us to number our days, that we may gain a heart of wisdom.',
+			},
+			{
+				ref: 'Numbers 6:24–26',
+				slug: 'numbers',
+				ch: 6,
+				text: "'May your Father bless you and keep you; may your Father make his face shine upon you and be gracious to you; may your Father look on you with favor and give you peace.'",
+			},
+		],
+	},
+];
+
+const faqs = [
+	{
+		question: 'What are good Bible verses for the new year?',
+		answer:
+			'His mercies are “new every morning” (Lamentations 3:22–23), “Look, I am doing a new thing” (Isaiah 43:19), and for anyone in Christ “the new has come!” (2 Corinthians 5:17). For a blessing over the year, pray Numbers 6:24–26. All are on this page, word for word in Father’s Heart Bible™.',
+	},
+	{
+		question: 'What does the Bible say about new beginnings?',
+		answer:
+			'That our Father makes them. 2 Corinthians 5:17 calls anyone in Christ a new creation, Ezekiel 36:26 promises a new heart and a new spirit, and Revelation 21:5 ends with “Look, I am making everything new.” A new beginning is something he gives, not something we earn.',
+	},
+	{
+		question: 'Which Bible verse says his mercies are new every morning?',
+		answer:
+			'Lamentations 3:22–23: “The covenant love of our Father never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness.”',
+	},
+	{
+		question: 'What is a Bible blessing to pray over the new year?',
+		answer:
+			'Pray the blessing our Father gave Aaron to speak over Israel: “May your Father bless you and keep you; may your Father make his face shine upon you and be gracious to you” (Numbers 6:24–25). For wisdom with the days ahead, pray Psalm 90:12.',
+	},
+	{
+		question: 'How do I start over after a hard year?',
+		answer:
+			'Start with what he says about the past: Isaiah 43:18 says “Do not remember the former things,” and Philippians 3:13–14 talks of forgetting what is behind and pressing on. Then take Psalm 51:10 as your prayer: “Create in me a clean heart, my Father, and renew a steadfast spirit within me.”',
+	},
+];
+---
+
+<VerseCollection
+	slug="new-beginnings"
+	topic="New Beginnings"
+	title="Bible Verses About New Beginnings | Father's Heart Bible™"
+	description="Bible verses about new beginnings and the new year in Father's Heart Bible™: a new heart, new mercies every morning, forgetting what is behind, and a blessing for the year. Free, with audio."
+	h1="Bible Verses About New Beginnings"
+	heroBase="https://cdn.sanity.io/images/rusi1hyi/production/3a06ad4a994d786bd7b1bf8bbc482e5cf5f4d5ba-6016x4016.jpg"
+	heroAlt="A family together outdoors"
+	published="2026-11-13"
+	directAnswerHtml={`<strong style="color: var(--color-ink);">The Bible speaks of new beginnings as something our Father gives: a new creation in 2 Corinthians 5:17, a new heart in Ezekiel 36:26, and mercies new every morning in Lamentations 3:22&ndash;23.</strong> Below are 12 passages for a fresh start or a new year, in four parts, each word for word in Father&rsquo;s Heart Bible&trade;.`}
+	keyTakeaway="A new beginning is our Father's gift: he makes the heart new, lets the past be past, and meets every morning with fresh mercy."
+	themes={themes}
+	featured={{ book: 'Isaiah', slug: 'isaiah', chapter: 43, verseLimit: 21, heading: 'A new thing: Isaiah 43:1–21', intro: 'Isaiah 43 is where our Father says he is doing a new thing. Read or hear the first twenty-one verses below, then continue into the whole chapter.' }}
+	faqs={faqs}
+	relatedHtml={`Keep going: read <a href="https://fathersheartbible.com/read/isaiah/43/" style="color: var(--color-brand);" class="hover:underline">Isaiah 43</a> or <a href="https://fathersheartbible.com/read/lamentations/3/" style="color: var(--color-brand);" class="hover:underline">Lamentations 3</a>, find <a href="/verses/hope/" style="color: var(--color-brand);" class="hover:underline">Bible verses about hope</a> and <a href="/verses/peace/" style="color: var(--color-brand);" class="hover:underline">Bible verses about peace</a>, give thanks with <a href="/verses/gratitude/" style="color: var(--color-brand);" class="hover:underline">Bible verses about gratitude</a>, or read <a href="/verses/god-as-father/" style="color: var(--color-brand);" class="hover:underline">Bible verses about God as Father</a>.`}
+	ctaMidHeading="Hear Isaiah 43 in full"
+	ctaMidBodyHtml="Read and listen to Isaiah 43 &mdash; free online in Father&rsquo;s Heart Bible, a translation that lets you hear our Father making all things new."
+	ctaBottomBodyHtml="Every verse above is a doorway. Step through and read the whole chapter &mdash; free online with audio, in a translation that reveals God as a loving Father."
+	tags={["bible verses about new beginnings", "new beginnings", "new year bible verses", "fresh start", "Lamentations 3:22-23"]}
+/>
