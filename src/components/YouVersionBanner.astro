@@ -31,7 +31,7 @@ const items = [
 <div class="fhb-yv-wrap" data-yv-counters>
 	<a class="fhb-yv-banner" href={YOUVERSION_URL} target="_blank" rel="noopener">
 		<img src="https://assets.spiritmediapublishing.com/FHB/partners/youversion-icon-96.webp" alt="" width="20" height="20" decoding="async" loading="lazy" />
-		<span>Now on YouVersion &mdash; read free in the Bible App <span aria-hidden="true">&rarr;</span></span>
+		<span>Now on YouVersion <span aria-hidden="true">&rarr;</span></span>
 	</a>
 	<ul class="fhb-yv-stats" aria-label="FHB on YouVersion, all time">
 		{items.map((i) => (
@@ -93,7 +93,10 @@ const items = [
 	/* Under 1100px the one-row layout would crowd: stack the stats under the link, then one per line on phones. */
 	@media (max-width: 1100px) { .fhb-yv-wrap { flex-direction: column; } .fhb-yv-banner { padding-bottom: 0; } }
 	@media (max-width: 640px) {
-		.fhb-yv-stats { display: grid; grid-template-columns: repeat(2, max-content); justify-content: center; gap: 0.125rem 1.25rem; padding: 0.375rem 0.5rem 0.5rem; }
+		/* Kevin 2026-11-14: two columns, each right-aligned so the labels end in a line. */
+		.fhb-yv-stats { display: grid; grid-template-columns: repeat(2, max-content); justify-content: center; gap: 0.125rem 1.75rem; padding: 0.375rem 0.5rem 0.5rem; }
+		.fhb-yv-stats li { text-align: right; }
+		.fhb-yv-stats li b { min-width: 0 !important; }
 	}
 	/* Stay one thin line on phones: at 14px it wrapped to two lines at 390px. */
 	@media (max-width: 480px) {
