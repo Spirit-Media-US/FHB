@@ -1669,11 +1669,15 @@ export async function checkoutForm(
 			: payload.returnPath === '/print/order/'
 				? `${origin}/print/order/?order=canceled`
 				: /^\/books\/[a-z0-9-]+\/(buy\/)?$/.test(String(payload.returnPath ?? '')) &&
-						(booksCatalog.books as { slug: string }[]).some(
+						[
+							...(booksCatalog.books as { slug: string }[]).map((b) => b.slug),
+							// a book the registry sells for another site (owner_site smp) returns to its own book page
+							...Object.values(BOOK_SKUS).map((b) => b.bookSlug),
+						].some(
 							// the book page, or its SMP checkout page /books/<slug>/buy/ (plan 3fb Phase 3)
-							(b) =>
-								payload.returnPath === `/books/${b.slug}/` ||
-								payload.returnPath === `/books/${b.slug}/buy/`,
+							(slug) =>
+								payload.returnPath === `/books/${slug}/` ||
+								payload.returnPath === `/books/${slug}/buy/`,
 						)
 					? `${origin}${payload.returnPath}?order=canceled#order`
 					: `${origin}/print/?order=canceled#bulk-order`,
