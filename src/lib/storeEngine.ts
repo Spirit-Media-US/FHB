@@ -7,6 +7,8 @@
 // Moved VERBATIM out of functions/dvc-checkout.ts; scripts/store-engine-parity.test.mjs proves the Stripe
 // request for 11 fixed carts is byte-identical to the pre-extraction golden.
 import bookSkus from '../data/book-skus.json' with { type: 'json' };
+// SERVER-ONLY measured US costs (kept out of book-skus.json, which order-pricing.ts carries into the browser).
+import bookUsCosts from '../data/book-us-costs.json' with { type: 'json' };
 import booksCatalog from '../data/books.json' with { type: 'json' };
 import isbnList from '../data/isbn-list.json' with { type: 'json' };
 
@@ -1199,7 +1201,7 @@ export function bookSaleMetadata(
 		const fee = dest ? handlingFeeCents(slug, unit, dest) : 0;
 		// US: no country-list cost row, so the book's own MEASURED US cost (book-skus.json us_cost_usd) and
 		// Stripe's standard US card fee (2.9% + 30c); unmeasured stays 'unmeasured', never a guess.
-		const us = BOOK_SKUS[slug].usCostUsd;
+		const us = (bookUsCosts.usd as Record<string, number>)[slug] ?? null;
 		const per = dest
 			? netPerItemUsd(slug, unit, dest, fee)
 			: destCode === 'US' && us != null
