@@ -1,4 +1,6 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
 import EditionOrder from '../../components/EditionOrder.astro';
 import LangCover from '../../components/LangCover.astro';
 import LookInside from '../../components/LookInside.astro';
@@ -324,11 +326,96 @@ const COLOUR_WORD: Record<string, string> = {
 	PURPLE: VOICE.spirit,
 };
 function colorWords(text: string): string {
-	return text.replace(
-		/\b(BLUE|RED|PURPLE)\b/g,
-		(w) => `<span style="color:${COLOUR_WORD[w]};font-weight:800;">${w}</span>`,
+	return colourInlineQuotes(
+		text.replace(
+			/\b(BLUE|RED|PURPLE)\b/g,
+			(w) => `<span style="color:${COLOUR_WORD[w]};font-weight:800;">${w}</span>`,
+		),
 	);
 }
+
+// QUOTED SCRIPTURE IN DIVINE VOICE COLOUR (Kevin 2026-11-14: "Can any of the scriptures shown be blue, red, or
+// purple?"). Extends mark() above: the coloured spans are not typed here (the homepage's hand-copied lists can
+// drift); they are READ from the locked English canon at build (src/content/bible/<book>/<ccc>.json, rebuilt by
+// sync-translations): fatherWords = blue, jesusWords/sonWords = red, spiritWords = purple. Only words the canon
+// records as SPOKEN by a divine person are coloured (rules/fhb-divine-voice.md); narration, the serpent, Pharaoh
+// and the tempter carry no field and stay plain. No canon file or no match = text unchanged (never a guess).
+const VOICE_FIELDS: [string, string][] = [
+	['fatherWords', VOICE.father],
+	['jesusWords', VOICE.son],
+	['sonWords', VOICE.son],
+	['spiritWords', VOICE.spirit],
+];
+const canonCache = new Map<string, { verse: number; [k: string]: unknown }[] | null>();
+function canonSpans(ref: string): { text: string; color: string }[] {
+	const m = ref.trim().match(/^((?:[1-3] )?[A-Za-z][A-Za-z ]*?) (\d+):(\d+)(?:[-–](\d+))?$/);
+	if (!m) return [];
+	const book = m[1]
+		.toLowerCase()
+		.replace(/^psalm$/, 'psalms')
+		.replace(/\s+/g, '-');
+	const key = `${book}/${m[2].padStart(3, '0')}`;
+	if (!canonCache.has(key)) {
+		try {
+			// The /read app's copy is what readers see and carries every voice field (rules/fhb-divine-voice.md:
+			// "read the verse in /srv/sites/community/src/content/bible"); this repo's synced copy is the fallback.
+			const file = [
+				path.join('/srv/sites/community/src/content/bible', `${key}.json`),
+				path.resolve('src/content/bible', `${key}.json`),
+			].find((f) => fs.existsSync(f));
+			if (!file) throw new Error('no canon');
+			const d = JSON.parse(fs.readFileSync(file, 'utf8'));
+			canonCache.set(key, Array.isArray(d.verses) ? d.verses : null);
+		} catch {
+			canonCache.set(key, null);
+		}
+	}
+	const verses = canonCache.get(key);
+	if (!verses) return [];
+	const from = Number(m[3]);
+	const to = m[4] ? Number(m[4]) : from;
+	const out: { text: string; color: string }[] = [];
+	for (const v of verses) {
+		if (v.verse < from || v.verse > to) continue;
+		for (const [field, color] of VOICE_FIELDS) {
+			const list = v[field];
+			if (Array.isArray(list))
+				for (const t of list) if (typeof t === 'string' && t.trim()) out.push({ text: t, color });
+		}
+	}
+	return out;
+}
+// Curly and straight quotes are one character each, so the normalised copy keeps every index.
+const qNorm = (x: string) => x.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
+const qCore = (x: string) => qNorm(x).replace(/^[\s"']+|[\s"'.,;:!?]+$/g, '');
+/** `text` (HTML-safe) with the canon's divine words for `ref` coloured; unchanged when none apply. */
+function colourVerse(ref: string, text: string): string {
+	const n = qNorm(text);
+	const shown = qCore(text);
+	const paint = (i: number, len: number, color: string) =>
+		`${text.slice(0, i)}<span style="color:${color};font-weight:600;">${text.slice(i, i + len)}</span>${text.slice(i + len)}`;
+	for (const { text: span, color } of canonSpans(ref)) {
+		const c = qCore(span);
+		if (!c) continue;
+		// the quote shown sits inside a divine utterance: colour the quote
+		if (shown && c.includes(shown) && n.indexOf(shown) >= 0)
+			return paint(n.indexOf(shown), shown.length, color);
+		// the divine words sit inside a longer quote (narration around them): colour only those words
+		if (n.indexOf(c) >= 0) return paint(n.indexOf(c), c.length, color);
+	}
+	return text;
+}
+/** Inline quotes in prose: “…” followed by a reference, e.g. “I am the way…” (John 14:6). */
+function colourInlineQuotes(html: string): string {
+	return html.replace(
+		/“([^”<]+)”(\s*\(?)((?:[1-3] )?[A-Z][a-z]+(?: of [A-Z][a-z]+)? \d+:\d+(?:[-–]\d+)?)/g,
+		(all, quote: string, gap: string, ref: string) => {
+			const coloured = colourVerse(ref, quote);
+			return coloured === quote ? all : `“${coloured}”${gap}${ref}`;
+		},
+	);
+}
+const escHtml = (x: string) => x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 // The front matter every copy carries, before Genesis 1:1. Shared for every edition except
 // the pillars line, which names this edition's own reader — and which the journaling
@@ -370,6 +457,10 @@ const pairFor = (rowId: string): IsbnPair | undefined => {
 		return ((il.general as IsbnPair[]) ?? []).find((p) => p.colour?.toLowerCase() === colour);
 	return ed.isbn ? isbnPairs.find((p) => p.hb === ed.isbn || p.pb === ed.isbn) : undefined;
 };
+// This edition's own two ISBNs, for Product details (Kevin 2026-11-14: "edition title at the top with both ISBNs").
+const isbnPair: IsbnPair | undefined = ed.isbn
+	? isbnPairs.find((p) => p.hb === ed.isbn || p.pb === ed.isbn)
+	: undefined;
 const BIND = {
 	hb: { label: 'Hardcover', format: 'https://schema.org/Hardcover' },
 	pb: { label: 'Paperback', format: 'https://schema.org/Paperback' },
@@ -598,7 +689,7 @@ const faqSchema = {
 					{frontMatterParts.map(([name, what]) => (
 						<div>
 							<h3 style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.88rem; font-weight: 800; letter-spacing: 0.01em; margin: 0 0 0.2rem;">{name}</h3>
-							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.92rem; line-height: 1.55; margin: 0;">{what}</p>
+							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.92rem; line-height: 1.55; margin: 0;" set:html={colourInlineQuotes(escHtml(what))}></p>
 						</div>
 					))}
 				</div>
@@ -611,7 +702,7 @@ const faqSchema = {
 							{pil.verses.map(([ref, text]) => (
 								<div style="display: flex; gap: 0.75rem; align-items: baseline; padding: 0.4rem 0; border-top: 1px solid var(--color-hairline);">
 									<dt style="font-family: var(--font-sans); font-size: 0.8rem; font-weight: 700; color: #3f3f46; white-space: nowrap; min-width: 7.5rem;">{ref}</dt>
-									<dd style="font-family: var(--font-body); font-size: 0.97rem; line-height: 1.6; color: var(--color-ink); margin: 0;">{text}</dd>
+									<dd style="font-family: var(--font-body); font-size: 0.97rem; line-height: 1.6; color: var(--color-ink); margin: 0;" set:html={colourVerse(ref, escHtml(text))}></dd>
 								</div>
 							))}
 						</dl>
@@ -628,7 +719,7 @@ const faqSchema = {
 								{g.verses.map(([ref, text]) => (
 								<div style="display: flex; gap: 0.75rem; align-items: baseline; padding: 0.4rem 0; border-top: 1px solid var(--color-hairline);">
 									<dt style="font-family: var(--font-sans); font-size: 0.8rem; font-weight: 700; color: #3f3f46; white-space: nowrap; min-width: 7.5rem;">{ref}</dt>
-									<dd style="font-family: var(--font-body); font-size: 0.97rem; line-height: 1.6; color: var(--color-ink); margin: 0;">{text}</dd>
+									<dd style="font-family: var(--font-body); font-size: 0.97rem; line-height: 1.6; color: var(--color-ink); margin: 0;" set:html={colourVerse(ref, escHtml(text))}></dd>
 								</div>
 								))}
 							</dl>
@@ -654,18 +745,26 @@ const faqSchema = {
 				<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.25rem; font-weight: 600; margin: 0 0 0.9rem;">Product details</h3>
 				<div class="rounded-2xl overflow-hidden" style="border: 1px solid var(--color-hairline); background: #fff;">
 					{[
+						// Kevin 2026-11-14: "put edition title at the top with both ISBNs."
+						['Edition', ed.name],
+						...(isbnPair?.pb || isbnPair?.hb
+							? [
+									['ISBN-13 (Paperback)', isbnPair?.pb ?? ''],
+									['ISBN-13 (Hardback)', isbnPair?.hb ?? ''],
+								]
+							: [['ISBN-13', ed.isbn]]),
 						['Publisher', 'Spirit Media Publishing'],
 						['Publication date', ed.published],
 						['Language', isLang ? ed.english : 'English'],
 						// Language editions only: their page counts differ per language and come from each sheet.
 						['Pages', isLang ? (pages ? String(pages) : 'Being set — final page count to come') : ''],
-						['Translation', 'Father’s Heart Bible™ — An Intimate Translation'],
-						['Binding', binding],
+						['Translation', 'Father’s Heart Bible™ + Divine Voice™ Color'],
+						// the trim size is on Dimensions (Kevin 2026-11-14: "Don't need 6x9 on binding")
+						['Binding', binding.replace(/\(\s*jacketed\s*\)/i, '(jacketed)').replace(/,?\s*\d+(\.\d+)?\s*x\s*\d+(\.\d+)?(\s*in)?\s*$/i, '').trim()],
 						['Dimensions', trim],
 						['Interior', 'Full color throughout'],
-						// Empty for the Large Print SET, which has no ISBN of its own — the row is
-						// dropped rather than printed with a blank value (filtered below).
-						['ISBN-13', ed.isbn],
+						// (ISBNs now lead the table with the edition title; empty values are dropped below,
+						// e.g. the Large Print SET, which has no ISBN of its own.)
 						// BISAC codes are OFF the storefront (Kevin 2026-09-18). They are the book
 						// trade's shelf classification and belong in the metadata sheet and the ONIX
 						// feed, where retailers read them. A shopper has never heard of BISAC, and a
@@ -677,7 +776,11 @@ const faqSchema = {
 						.map(([k, v], n) => (
 						<div class="flex flex-wrap gap-2 px-5 py-3" style={`font-family: var(--font-sans); font-size: 0.9rem; ${n % 2 ? 'background: #fafafa;' : ''}`}>
 							<span style="color: #71717a; min-width: 10rem;">{k}</span>
-							<span style="color: var(--color-ink); font-weight: 600; flex: 1;">{v}</span>
+							{k === 'Publisher' ? (
+								<a href="https://spiritmediapublishing.com" target="_blank" rel="noopener" style="flex: 1; line-height: 0;"><img src="https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp" alt="Spirit Media Publishing" width="200" height="20" loading="lazy" decoding="async" style="width: 200px; max-width: 100%; height: auto;" /></a>
+							) : (
+								<span style="color: var(--color-ink); font-weight: 600; flex: 1;">{v}</span>
+							)}
 						</div>
 					))}
 				</div>
@@ -755,8 +858,9 @@ const faqSchema = {
 				<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.8rem; font-weight: 600; margin: 0 0 1.2rem;">Questions</h2>
 				<div class="space-y-3">
 					{faqList.map((f) => (
-						<details class="faq-item rounded-2xl" style="background-color: #fff; border: 1px solid var(--color-hairline);">
-							<summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold" style="font-family: var(--font-sans); color: var(--color-ink);">
+						<details class="faq-item rounded-2xl" style="background-color: #fff; border: 1px solid var(--color-hairline); overflow: hidden;">
+							{/* Kevin 2026-11-14: questions as white text on gray, like the order choices */}
+							<summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold" style="font-family: var(--font-sans); color: #fff; background: #6b6b74;">
 								<span>{f.q}</span>
 							</summary>
 							<div class="px-5 pb-5 -mt-1">
@@ -787,4 +891,7 @@ const faqSchema = {
 <style>
 	.faq-item > summary { cursor: pointer; list-style: none; }
 	.faq-item > summary::-webkit-details-marker { display: none; }
+	.faq-item > summary::after { content: '+'; flex: none; font-size: 1.25rem; font-weight: 400; color: #fff; }
+	.faq-item[open] > summary::after { content: '−'; }
+	.faq-item[open] > summary + div { padding-top: 1rem; }
 </style>
