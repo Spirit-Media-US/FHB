@@ -685,6 +685,11 @@ const metaDescription =
 	!isLang && metaBase.length < 140 && `${metaBase} Free US shipping.`.length <= 165
 		? `${metaBase} Free US shipping.`
 		: metaBase;
+// Layout props (moved out of the tag: a // line inside a tag becomes attributes, which set <title> to "true"):
+//  - title: audience editions = name + brand; language editions keep their native titles ending | FHB (Kevin 2026-11-14 item 6).
+//  - image: 1200x630 JPG share card, PILOT on grandparents only until the model page is approved (Kevin 2026-11-14);
+//    the cover stays the Book/Product image in JSON-LD.
+//  - preload: the cover is the LCP element on every width (SEO/AEO audit 2026-11-14).
 ---
 
 <Layout
@@ -694,19 +699,13 @@ const metaDescription =
 	ogLang={nativeMeta ? ed.lang : undefined}
 	bookIsbn={ed.isbn || undefined}
 	bookReleaseDate={datePublished}
-	// Kevin 2026-11-14 item 6 (best practice): audience editions are titled name + brand; language editions keep
-	// their native-name titles, which already end in | FHB.
 	title={fitTitle(isLang ? (ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`) : `${ed.name} | Father's Heart Bible™ (FHB)`)}
 	description={metaDescription}
-	// The share card (1200x630 JPG, cover + title on brand background; Kevin 2026-11-14) for every social share;
-	// the cover stays the Book/Product image in JSON-LD.
-	// PILOT on the model page only (Kevin 2026-11-14: nothing rolls out until the one page is approved).
 	image={
 		ed.slug === 'grandparents'
 			? 'https://assets.spiritmediapublishing.com/FHB/og/editions/grandparents-bible-og.jpg'
 			: coverUrl
 	}
-	// The cover is this page's LCP element on every width (SEO/AEO audit 2026-11-14): preload it.
 	preloadImageMobile={coverUrl}
 	preloadMobileIsLcp
 	preloadImageDesktop={coverUrl}
