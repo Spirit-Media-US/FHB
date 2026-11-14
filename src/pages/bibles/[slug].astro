@@ -569,6 +569,9 @@ const productSchema = {
 		name: 'Spirit Media Publishing',
 	},
 	translationOfWork: { '@type': 'Book', name: 'The Holy Bible' },
+	// Visible credit "Edited by Kevin White" (shared.credits); the Person node lives on /the-fathers-heart-bible/leadership/.
+	editor: { '@type': 'Person', '@id': 'https://kevinwhite.us/#person', name: 'Kevin White' },
+	isPartOf: { '@id': 'https://fathersheartbible.com/#website' },
 	keywords: (ed.listing.keywordsSchema ?? ed.listing.keywords).join(', '),
 	...(mainVariant ? { offers: offerFor(mainVariant) } : {}),
 	// The other binding(s): each its own book, ISBN and offer (Google: one product per GTIN).
@@ -620,6 +623,8 @@ const faqSchema = {
 	<script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
 	<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
 	<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+	{/* House AEO spec A9: Organization + WebSite on every page (SEO/AEO audit 2026-11-14). */}
+	<script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', '@id': 'https://fathersheartbible.com/#website', name: "Father's Heart Bible™", alternateName: 'FHB', url: 'https://fathersheartbible.com/', publisher: { '@id': 'https://spiritmediapublishing.com/#organization' } })} />
 
 	<main>
 		<Section variant="light">
@@ -790,7 +795,7 @@ const faqSchema = {
 						<div class="flex flex-wrap gap-2 px-5 py-3" style={`font-family: var(--font-sans); font-size: 0.9rem; ${n % 2 ? 'background: #fafafa;' : ''}`}>
 							<span style="color: #71717a; min-width: 7.5rem;">{k}</span>
 							{k === 'Publisher' ? (
-								<a href="https://spiritmediapublishing.com" target="_blank" rel="noopener" style="flex: 1; line-height: 0;"><img src="https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp" alt="Spirit Media Publishing" width="200" height="20" loading="lazy" decoding="async" style="width: 200px; max-width: 100%; height: auto;" /></a>
+								<a href="https://spiritmediapublishing.com" target="_blank" rel="noopener" style="flex: 1; line-height: 0;"><img src="https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp" alt="" width="200" height="20" loading="lazy" decoding="async" style="width: 200px; max-width: 100%; height: auto;" /><span class="sr-only">Spirit Media Publishing</span></a>
 							) : (
 								<span style={`color: ${k === 'Edition' ? smallTitleColor : 'var(--color-ink)'}; font-weight: 600; flex: 1;${k.includes('ISBN') ? ' white-space: nowrap;' : ''}`}>{v}</span>
 							)}
@@ -831,7 +836,7 @@ const faqSchema = {
 							<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 0.3rem;">{k}</p>
 							{k === 'Published by' && v === 'Spirit Media Publishing' ? (
 								/* Kevin 2026-11-14: "use smp logo ... here: Published by Spirit Media Publishing" */
-								<a href="https://spiritmediapublishing.com" target="_blank" rel="noopener" style="display: inline-block; line-height: 0;"><img src="https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp" alt="Spirit Media Publishing" width="220" height="22" loading="lazy" decoding="async" style="width: 220px; max-width: 100%; height: auto;" /></a>
+								<a href="https://spiritmediapublishing.com" target="_blank" rel="noopener" style="display: inline-block; line-height: 0;"><img src="https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp" alt="" width="220" height="22" loading="lazy" decoding="async" style="width: 220px; max-width: 100%; height: auto;" /><span class="sr-only">Spirit Media Publishing</span></a>
 							) : (
 								<p style="font-family: var(--font-sans); color: var(--color-ink); font-weight: 600; margin: 0;">{v}</p>
 							)}
