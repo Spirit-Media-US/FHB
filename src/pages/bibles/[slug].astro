@@ -292,7 +292,38 @@ const BRAND_KEYWORDS = new Set([
 	"father's heart bible fhb",
 	'father’s heart bible fhb',
 ]);
-const visibleKeywords = ed.listing.keywords.filter((k) => !BRAND_KEYWORDS.has(k.toLowerCase()));
+// Kevin 2026-11-14 item 8 (best practice, SEO/AEO audit): "Also known as" shows only WHOLE names for this
+// Bible: phrases that name a Bible (not gift-keyword fragments like "day gifts"), plus "Bible for <audience>"
+// and, for a language edition, "<Language> Bible". The sheet's keyword line is untouched (it feeds Ingram and is
+// checked against the sheet by fhb-edition-metadata.py); only what the page and its JSON-LD show is filtered.
+const ALIAS_RE = /\b(bible|biblia|bibel|bijbel|bíblia)\b/i;
+// Paragraphs shown in the short summary are not shown again in the long listing (Kevin 2026-11-14 item 9).
+// Compared after decoding the few entities the sheet text carries (&trade; etc.) and collapsing spaces.
+const paraKey = (p: string) =>
+	p
+		.replace(/&trade;/g, '™')
+		.replace(/&amp;/g, '&')
+		.replace(/&rsquo;|&#39;/g, '’')
+		.replace(/&mdash;/g, '—')
+		.replace(/<[^>]+>/g, '')
+		.replace(/\s+/g, ' ')
+		.trim();
+const shortSet = new Set(ed.listing.short350.map(paraKey));
+const visibleKeywords = [
+	...new Map(
+		[
+			`Bible for ${ed.audienceNoun}`,
+			...(isLang ? [] : [`${ed.audienceNoun} Bible`]),
+			...(isLang && ed.english ? [`${ed.english} Bible`] : []),
+			...ed.listing.keywords.filter(
+				(k) =>
+					ALIAS_RE.test(k) &&
+					!/^(what|how|why|where|when)\b/i.test(k) &&
+					!BRAND_KEYWORDS.has(k.toLowerCase()),
+			),
+		].map((k) => [k.toLowerCase(), k]),
+	).values(),
+].slice(0, 12);
 
 // shared.json is what is IDENTICAL IN ALL EDITIONS. One preface paragraph is not: it counts
 // this edition's notes and chapters ("1,355 notes across 777 chapters"), which are the 6x9
@@ -572,7 +603,7 @@ const productSchema = {
 	// Visible credit "Edited by Kevin White" (shared.credits); the Person node lives on /the-fathers-heart-bible/leadership/.
 	editor: { '@type': 'Person', '@id': 'https://kevinwhite.us/#person', name: 'Kevin White' },
 	isPartOf: { '@id': 'https://fathersheartbible.com/#website' },
-	keywords: (ed.listing.keywordsSchema ?? ed.listing.keywords).join(', '),
+	keywords: ["Father's Heart Bible", 'FHB', ...visibleKeywords].join(', '),
 	...(mainVariant ? { offers: offerFor(mainVariant) } : {}),
 	// The other binding(s): each its own book, ISBN and offer (Google: one product per GTIN).
 	workExample: otherVariants.map((v) => ({
@@ -615,7 +646,9 @@ const faqSchema = {
 	ogLang={nativeMeta ? ed.lang : undefined}
 	bookIsbn={ed.isbn || undefined}
 	bookReleaseDate={datePublished}
-	title={fitTitle(ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`)}
+	// Kevin 2026-11-14 item 6 (best practice): audience editions are titled name + brand; language editions keep
+	// their native-name titles, which already end in | FHB.
+	title={fitTitle(isLang ? (ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`) : `${ed.name} | Father's Heart Bible™ (FHB)`)}
 	description={fitDescription(ed.seo?.description ?? `The ${ed.name} — the complete Bible in Divine Voice™ Color. Hardcover, ${pages} pages.`, isLang ? 160 : 165)}
 	image={coverUrl}
 	// The cover is this page's LCP element on every width (SEO/AEO audit 2026-11-14): preload it.
@@ -650,7 +683,9 @@ const faqSchema = {
 				<div>
 					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">{/* Kevin 2026-11-14: the label is the product name, not the colour feature alone. */}{isLang ? `${ed.english} edition · Father’s Heart Bible™ + Divine Voice™ Color` : 'Father’s Heart Bible™ + Divine Voice™ Color'}</p>
 					<h1 lang={isLang ? ed.lang : undefined} dir={isLang ? ed.dir : undefined} style={`font-family: var(--font-headline); ${titleStyle} font-size: 2.4rem; font-weight: 600; margin: 0 0 0.6rem;`}>{ed.name}</h1>
-					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.55; margin: 0 0 1.2rem;">{ed.sub}</p>
+					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.55; margin: 0 0 0.6rem;">{ed.sub}</p>
+					{/* Kevin 2026-11-14 item 9 (AEO): one plain answer to "what is it and who is it for" near the top. */}
+					<p style="font-family: var(--font-body); color: var(--color-ink); font-size: 1rem; line-height: 1.55; margin: 0 0 1.2rem;">{`${ed.name} is the complete Father’s Heart Bible™ in Divine Voice™ Color, made for ${ed.audienceNoun}: our Father’s words in blue, the Son’s in red and the Spirit’s in purple.`}</p>
 					<div class="flex flex-wrap items-center gap-2 mb-5">
 						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.father}; background: #fff; border: 2px solid ${VOICE.father}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>FATHER</span>
 						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.son}; background: #fff; border: 2px solid ${VOICE.son}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>SON</span>
@@ -813,7 +848,7 @@ const faqSchema = {
 		     only given 10% of what we gave Ingram." -->
 		<Section variant="light">
 			<div class="max-w-3xl mx-auto">
-				{ed.listing.long.map((sec) => (
+				{ed.listing.long.map((sec) => ({ ...sec, body: sec.body.filter((p) => !shortSet.has(paraKey(p))) })).filter((sec) => sec.body.length).map((sec) => (
 					<div class="mb-8">
 						{sec.h && (<h2 dir={isLang ? 'auto' : undefined} style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.8rem;">{sec.h}</h2>)}
 						{sec.body.map((para) => (

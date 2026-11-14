@@ -19,6 +19,12 @@
 //    fee if returned due to customer remorse / for defect products"), so the defect case is
 //    declared FreeReturn separately. refundType FullRefund.
 //
+// UPDATE 2026-11-14 (Kevin "Follow best practice ... don't ask me", item 7 "make the data match /returns"): the
+// public /returns page (Kevin 2026-11-09: a satisfaction guarantee, resolved privately, "don't send anything back
+// until we have replied") states NO return method, no fee split and no refund type. Google requires markup to
+// reflect the page, so those fields are no longer declared: only the 30-day window, countries and the link.
+// The 11-08 internal terms above still guide how the team resolves a request; they are just not published here.
+//
 import { SHIP_CODES } from './shipCountries.ts';
 
 // COUNTRIES come from ONE list. Keep applicableCountry equal to shippingDestination; the list lives in
@@ -34,11 +40,6 @@ export const merchantReturnPolicy = {
 	applicableCountry: countryValue(SHIP_COUNTRIES),
 	returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
 	merchantReturnDays: RETURN_DAYS,
-	returnMethod: 'https://schema.org/ReturnByMail',
-	returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
-	customerRemorseReturnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
-	itemDefectReturnFees: 'https://schema.org/FreeReturn',
-	refundType: 'https://schema.org/FullRefund',
 	merchantReturnLink: RETURNS_URL,
 };
 
