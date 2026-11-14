@@ -80,7 +80,8 @@ export function buildLive(
 	wave: readonly string[],
 	routes: Record<string, DeliveryRoute> = DELIVERY_ROUTES,
 ): ShipCountry[] {
-	const out: ShipCountry[] = live.map((c) => ({ ...c, farBand: false, fast: null }));
+	// A first-wave country may carry its own measured Expedited option (US: Kevin 2026-11-14 '1A'); else none.
+	const out: ShipCountry[] = live.map((c) => ({ ...c, farBand: false, fast: c.fast ?? null }));
 	for (const code of wave) {
 		const p = pending.find((r) => r.code === code);
 		if (!p) throw new Error(`liveWave: ${code} is not a pending country`);

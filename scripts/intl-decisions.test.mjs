@@ -21,13 +21,15 @@ const wave = live(WAVE);
 const P = 'shipping_options';
 const key = (i, k) => `${P}[${i}][shipping_rate_data]${k}`;
 
-test('committed state: liveWave is the only switch; with it empty only US is live, no faster option', () => {
+test('committed state: liveWave is the only switch; with it empty only US is live, with its measured Expedited option', () => {
 	const base = live([]);
 	assert.deepEqual(base.map((c) => c.code), ['US']);
-	assert.equal(base[0].fast, null);
+	// Kevin 2026-11-14 "1A": the US offers paid Expedited delivery (measured rush print, +$9.90).
+	assert.equal(base[0].fast?.label, 'Expedited delivery');
+	assert.equal(base[0].fast?.extra_usd, 9.9);
 	const f = checkoutShippingForm('US', 1, base);
 	assert.equal(f['adaptive_pricing[enabled]'], 'true');
-	assert.equal(f[key(1, '[type]')], undefined, 'US has a single shipping option');
+	assert.equal(f[key(1, '[display_name]')], 'Expedited delivery', 'US: free shipping + Expedited delivery');
 	assert.equal(f[key(0, '[fixed_amount][amount]')], 0);
 	assert.equal(checkoutShippingForm('GB', 1, base), null);
 	assert.equal(raw.liveWave.every((c) => PENDING_COUNTRIES.some((p) => p.code === c)), true);
@@ -58,7 +60,7 @@ test('3A: free standard is option 0 (default) and Adaptive Pricing is on, in eve
 });
 
 test('EXPEDITED: ONE paid option after the free one, in every live country, with honest estimates', () => {
-	for (const c of wave.filter((x) => x.code !== 'US')) {
+	for (const c of wave) {
 		const f = checkoutShippingForm(c.code, 1, wave);
 		assert.ok(c.fast, `${c.code} has an expedited option`);
 		assert.equal(f[key(1, '[type]')], 'fixed_amount', c.code);
@@ -72,8 +74,6 @@ test('EXPEDITED: ONE paid option after the free one, in every live country, with
 		// the two old separate options are gone, everywhere in the form
 		assert.doesNotMatch(JSON.stringify(f), /Faster delivery|Priority printing/);
 	}
-	assert.equal(checkoutShippingForm('US', 1, wave)[key(1, '[type]')], undefined, 'US: free shipping only');
-	assert.equal(checkoutShippingForm('US', 1, wave)['custom_text[submit][message]'], undefined);
 	for (const [id, r] of Object.entries(DELIVERY_ROUTES)) {
 		if (id.startsWith('_')) continue;
 		assert.match(r.transitBasis, /^ESTIMATE/, `${id}: transit must be labelled an estimate`);
