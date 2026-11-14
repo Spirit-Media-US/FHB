@@ -687,7 +687,7 @@ const metaDescription =
 		: metaBase;
 // Layout props (moved out of the tag: a // line inside a tag becomes attributes, which set <title> to "true"):
 //  - title: audience editions = name + brand; language editions keep their native titles ending | FHB (Kevin 2026-11-14 item 6).
-//  - image: 1200x630 JPG share card, PILOT on grandparents only until the model page is approved (Kevin 2026-11-14);
+//  - image: 1200x630 JPG share card for every edition (model page approved as the standard, Kevin 2026-11-15);
 //    the cover stays the Book/Product image in JSON-LD.
 //  - preload: the cover is the LCP element on every width (SEO/AEO audit 2026-11-14).
 ---
@@ -701,11 +701,7 @@ const metaDescription =
 	bookReleaseDate={datePublished}
 	title={fitTitle(isLang ? (ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`) : `${ed.name} | Father's Heart Bible™ (FHB)`)}
 	description={metaDescription}
-	image={
-		ed.slug === 'grandparents'
-			? 'https://assets.spiritmediapublishing.com/FHB/og/editions/grandparents-bible-og.jpg'
-			: coverUrl
-	}
+	image={`https://assets.spiritmediapublishing.com/FHB/og/editions/${ed.slug}-bible-og.jpg`}
 	preloadImageMobile={coverUrl}
 	preloadMobileIsLcp
 	preloadImageDesktop={coverUrl}
