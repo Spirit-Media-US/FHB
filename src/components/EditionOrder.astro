@@ -56,8 +56,10 @@ interface Props {
 	note?: string;
 	/** the page's language (src/lib/orderStrings.ts); English when absent or unsupported */
 	lang?: string;
+	/** the edition title's colour (its cover colour, Kevin 2026-11-14); ink when absent */
+	titleColor?: string;
 }
-const { rows, heading, returnPath, note, lang: pageLang } = Astro.props;
+const { rows, heading, returnPath, note, lang: pageLang, titleColor } = Astro.props;
 const lang: OrderLang = orderLangFor(pageLang);
 const S = ORDER_STRINGS[lang];
 const t = (k: string, v?: Record<string, string | number>) => tr(S, k, v);
@@ -167,7 +169,7 @@ const guaranteeBody = en
 		</details>
 	</div>
 	<div class="lqo">
-	<h2 class="lqo__title">{t('o.title', { heading })}</h2>
+	<h2 class="lqo__title" style={titleColor ? `color: ${titleColor};` : undefined}>{t('o.title', { heading })}</h2>
 	<div class="eo-pick" data-pick data-id={lead.id}>
 		{multi && (
 			<fieldset class="eo-group">
@@ -310,10 +312,10 @@ const guaranteeBody = en
 	.eo-bubbles { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; margin: 0 0 0.6rem; padding: 0; }
 	/* the page's "Also known as" bubbles */
 	.eo-bubble { font-size: 0.8rem; color: #52525b; background: #fbe7f0; border: 1px solid #f0c4d8; border-radius: 999px; padding: 0.25rem 0.7rem; }
-	.eo-acc__item { background: #fff; border: 1px solid #d4d4d8; border-radius: 0.7rem; overflow: hidden; }
+	.eo-acc__item { background: #fff; border: 1px solid #c4c4cc; border-radius: 0.7rem; overflow: hidden; }
 	.eo-acc__item > summary {
-		background: #6b6b74;
-		color: #fff;
+		background: #fff;
+		color: #3f3f46;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -326,7 +328,7 @@ const guaranteeBody = en
 		list-style: none;
 	}
 	.eo-acc__item > summary::-webkit-details-marker { display: none; }
-	.eo-acc__item > summary::after { content: '+'; flex: none; font-size: 1.2rem; font-weight: 400; color: #fff; }
+	.eo-acc__item > summary::after { content: '+'; flex: none; font-size: 1.2rem; font-weight: 400; color: #71717a; }
 	.eo-acc__item[open] > summary::after { content: '−'; }
 	.eo-acc__body { padding: 0.7rem 0.85rem 0.4rem; color: #3f3f46; font-size: 0.85rem; line-height: 1.5; }
 	.eo-acc__body p { margin: 0 0 0.5rem; }
