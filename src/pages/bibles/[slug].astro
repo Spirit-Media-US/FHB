@@ -296,9 +296,8 @@ const BRAND_KEYWORDS = new Set([
 // Bible: phrases that name a Bible (not gift-keyword fragments like "day gifts"), plus "Bible for <audience>"
 // and, for a language edition, "<Language> Bible". The sheet's keyword line is untouched (it feeds Ingram and is
 // checked against the sheet by fhb-edition-metadata.py); only what the page and its JSON-LD show is filtered.
-const ALIAS_RE = /\b(bible|biblia|bibel|bijbel|bíblia)\b/i;
-// Paragraphs shown in the short summary are not shown again in the long listing (Kevin 2026-11-14 item 9).
-// Compared after decoding the few entities the sheet text carries (&trade; etc.) and collapsing spaces.
+// Paragraphs shown in the short summary are not shown again in the long listing (Kevin 2026-11-14 item 9),
+// compared after decoding the few entities the sheet text carries (&trade; etc.) and collapsing spaces.
 const paraKey = (p: string) =>
 	p
 		.replace(/&trade;/g, '™')
@@ -309,6 +308,17 @@ const paraKey = (p: string) =>
 		.replace(/\s+/g, ' ')
 		.trim();
 const shortSet = new Set(ed.listing.short350.map(paraKey));
+const ALIAS_RE = /\b(bible|biblia|bibel|bijbel|bíblia)\b/i;
+// Kevin 2026-11-14 "Seems like you stripped too many": keep every WHOLE phrase (two or more words that read as a
+// complete search), drop single words and the broken fragments a split keyword line leaves behind ("day gifts",
+// "great gifts", "first time gifts", "grandpa be gifts", "verses anxiety").
+const isFragment = (k: string) =>
+	k.trim().split(/\s+/).length < 2 ||
+	/^(day|great|first|time|new|best|good) gifts$/i.test(k.trim()) ||
+	/^first time gifts$/i.test(k.trim()) ||
+	/\bbe gifts$/i.test(k) ||
+	/^verses\b/i.test(k) ||
+	/^(what|how|why|where|when)\b/i.test(k);
 const visibleKeywords = [
 	...new Map(
 		[
@@ -317,13 +327,12 @@ const visibleKeywords = [
 			...(isLang && ed.english ? [`${ed.english} Bible`] : []),
 			...ed.listing.keywords.filter(
 				(k) =>
-					ALIAS_RE.test(k) &&
-					!/^(what|how|why|where|when)\b/i.test(k) &&
-					!BRAND_KEYWORDS.has(k.toLowerCase()),
+					!BRAND_KEYWORDS.has(k.toLowerCase()) &&
+					(ALIAS_RE.test(k) ? !/^(what|how|why|where|when)\b/i.test(k) : !isFragment(k)),
 			),
 		].map((k) => [k.toLowerCase(), k]),
 	).values(),
-].slice(0, 12);
+].slice(0, 30);
 
 // shared.json is what is IDENTICAL IN ALL EDITIONS. One preface paragraph is not: it counts
 // this edition's notes and chapters ("1,355 notes across 777 chapters"), which are the 6x9
