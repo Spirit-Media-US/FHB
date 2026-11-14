@@ -172,15 +172,22 @@ test('international: far band 10+ copies is a bulk quote, the book included', as
 		'bulk_quote_required',
 	);
 });
-test('FAILURE PATH: a country with no measured book cost fails closed, never priced off a Bible cost', () => {
-	const row = { ...NEAR, landed_cost_usd: { hc: 40, pb: 30, basis: 'MEASURED' } }; // no `bi`
-	const m = marginCheck([{ slug: BI, retail: 999 }], 0, row.code, [row]);
-	assert.equal(m.ok, false);
-	assert.match(m.reason, /no landed cost for beloved-identity-pb/);
+// ONE ENGINE (Kevin 2026-11-15): a book with no measured cost for a country is sized on that country's Bible cost
+// for the same binding (an upper bound); only a country with no cost at all fails closed.
+test('one engine: no measured book cost -> sized on the same-binding Bible cost; no cost at all fails closed', async () => {
+	const { landedUnitCost } = await import('../src/lib/marginGuard.ts');
+	assert.equal(landedUnitCost(BI, { hc: 40, pb: 30, basis: 'MEASURED' }), 30, 'paperback book -> Bible pb cost');
+	assert.equal(landedUnitCost(BI, { hc: 40, pb: 30, bi: 12 }), 12, 'its own measured cost wins');
+	assert.equal(landedUnitCost(BI, undefined), null, 'no cost at all');
+	const row = { ...NEAR, landed_cost_usd: { hc: 40, pb: 30, basis: 'MEASURED' } };
+	assert.equal(marginCheck([{ slug: BI, retail: 999 }], 0, row.code, [row]).ok, true);
+	const none = { ...NEAR, landed_cost_usd: undefined };
+	assert.equal(marginCheck([{ slug: BI, retail: 999 }], 0, none.code, [none]).ok, false, 'FAILURE PATH');
 });
 
-test('every live country the page offers has a measured book cost', () => {
-	for (const c of LIVE_COUNTRIES) if (c.code !== 'US') assert.ok(c.landed_cost_usd?.bi > 0, c.code);
+test('every live country can size the book (own cost or the Bible fallback)', async () => {
+	const { landedUnitCost } = await import('../src/lib/marginGuard.ts');
+	for (const c of LIVE_COUNTRIES) if (c.code !== 'US') assert.ok(landedUnitCost(BI, c.landed_cost_usd) > 0, c.code);
 });
 
 // ── the paid order becomes an Ingram order ──
@@ -301,12 +308,9 @@ const WANT = {
 };
 const byCode = (c) => LIVE_COUNTRIES.find((r) => r.code === c);
 test('break-even: the 1-copy fee per country is the agreed table', () => {
-	assert.deepEqual(
-		Object.keys(WANT).sort(),
-		LIVE_COUNTRIES.filter((c) => c.code !== 'US')
-			.map((c) => c.code)
-			.sort(),
-	);
+	// the agreed table covers the first 19 markets (measured book cost); countries opened 2026-11-15 are sized
+	// by the one-engine Bible fallback and covered by the next test
+	for (const c of Object.keys(WANT)) assert.ok(byCode(c), `${c} is live`);
 	for (const [c, fee] of Object.entries(WANT))
 		assert.equal(handlingFeeCents(BI, 999, byCode(c)), fee, c);
 });
@@ -334,19 +338,27 @@ test('checkout: 1 copy and 3 copies carry the break-even fee per copy', async ()
 		}
 	}
 });
-test('FAILURE PATH: a country with no measured book cost is refused with a message, not priced by the Bible rule', async () => {
-	const real = byCode('DE').landed_cost_usd;
-	const saved = real.bi;
-	delete real.bi;
+test('FAILURE PATH: a country with NO landed cost at all is refused with a message (one engine sizes every other)', async () => {
+	const real = byCode('DE');
+	const saved = real.landed_cost_usd;
+	real.landed_cost_usd = undefined;
 	try {
 		const r = await post({ counts: { [BI]: 1 }, country: 'DE' });
 		assert.equal(r.status, 400);
 		assert.equal(r.json.error, 'country_not_served');
-		assert.match(r.json.message, /book/i);
 		assert.equal(r.n, 0, 'no Stripe session');
-		assert.equal(handlingFeeCents(BI, 999, byCode('DE')), 0); // never a Bible-rule fee
 	} finally {
-		real.bi = saved;
+		real.landed_cost_usd = saved;
+	}
+	// without its own measured cost the book is sized on the Bible pb cost (Kevin 2026-11-15 "one engine")
+	const lc = byCode('DE').landed_cost_usd;
+	const bi = lc.bi;
+	delete lc.bi;
+	try {
+		const r = await post({ counts: { [BI]: 1 }, country: 'DE' });
+		assert.equal(r.status, 200, 'sold on the one-engine fallback');
+	} finally {
+		lc.bi = bi;
 	}
 });
 test('Bible pricing and floor are byte-identical: fee/net numbers pinned', () => {

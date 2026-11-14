@@ -66,7 +66,8 @@ async function run(c) {
 			return j({ url: 'https://stripe.test/x' });
 		}
 		if (u.includes('checkout/sessions'))
-			return j({ data: c.repeat ? [{ payment_status: 'paid' }] : [] });
+			// a repeat buyer = a paid STORE session (Kevin 2026-11-14: only store orders count)
+			return j({ data: c.repeat ? [{ payment_status: 'paid', metadata: { kind: 'dvc_print' } }] : [] });
 		return j({ data: [] });
 	};
 	const { onRequestPost } = await import('../functions/dvc-checkout.ts');

@@ -10,6 +10,7 @@
 // 2026-11-10), Stripe book-sale metadata for author reporting (title, ISBN, format, country, date, net), and
 // fail-closed abroad until its own landed cost is measured. Also the catalogue contract.
 
+import surface from '../src/data/books-surface.json' with { type: 'json' };
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
@@ -144,7 +145,7 @@ test('abroad (GB, measured wai_pb): list price + handling line, net measured in 
 	assert.match(r.s['metadata[book_1]'], /country=GB\|date=\d{4}-\d{2}-\d{2}\|net_usd=\d+\.\d{2}$/);
 });
 
-test('fail closed: a book with no measured cost for a country is refused there', async () => {
+test('reporting: a book sold on the Bible-cost fallback never reports a guessed net', async () => {
 	const dest = { code: 'DE', landed_cost_usd: { hc: 20, pb: 15, basis: 'MEASURED' } };
 	const m = bookSaleMetadata({ [PB]: 1 }, 'DE', dest, 0);
 	assert.match(m['metadata[book_1]'], /net_usd=unmeasured$/, 'no cost row -> never a guessed net');
@@ -256,8 +257,9 @@ test('3es: built /books pages carry plain-text JSON-LD (no &entity;, no <tag>, n
 		.readdirSync(dist, { withFileTypes: true })
 		.filter((d) => d.isDirectory())
 		.map((d) => d.name);
-	assert.ok(pages.length >= 2, `book pages built: ${pages.join(' ')}`);
-	for (const slug of ['', ...pages]) {
+	// books surface off (books-surface.json): only the already-live book pages are built, and no /books index
+	assert.ok(pages.length >= (surface.live ? 2 : surface.liveSlugs.length), `book pages built: ${pages.join(' ')}`);
+	for (const slug of [...(surface.live ? [''] : []), ...pages]) {
 		const html = fs.readFileSync(new URL(`${slug ? `${slug}/` : ''}index.html`, dist), 'utf8');
 		for (const [, ld] of html.matchAll(
 			/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g,
@@ -281,7 +283,7 @@ test('3es: built /books pages carry plain-text JSON-LD (no &entity;, no <tag>, n
 	}
 });
 
-test('3es F1/F3: Who Am I? title + offers InStock + no future datePublished', () => {
+test('3es F1/F3: Who Am I? title + offers InStock + no future datePublished', { skip: !surface.live && 'books surface off' }, () => {
 	const html = fs.readFileSync(
 		new URL('../dist/books/who-am-i/index.html', import.meta.url),
 		'utf8',
@@ -296,7 +298,7 @@ test('3es F1/F3: Who Am I? title + offers InStock + no future datePublished', ()
 // /bibles/grandparents-bible/), ordering on the SMP store (L1990; contract 3fe). Every live book page carries the
 // #order card with one price line and one counter per format, no one-line "per copy" price, and no off-site link.
 test('every live book page has its order form ON the page: per-format price lines + counters, posting to SMP', () => {
-	for (const slug of ['beloved-identity', 'who-am-i']) {
+	for (const slug of ['beloved-identity', 'who-am-i'].filter((x) => surface.live || surface.liveSlugs.includes(x))) {
 		const html = fs.readFileSync(new URL(`../dist/books/${slug}/index.html`, import.meta.url), 'utf8');
 		assert.match(html, /id="order"[^>]*data-book-order=/, `${slug}: order card on the page`);
 		const lines = [...html.matchAll(/data-line-sku="([a-z0-9-]+)"/g)].map((m) => m[1]);

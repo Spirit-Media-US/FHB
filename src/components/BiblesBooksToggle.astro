@@ -4,12 +4,14 @@
 // Two links, one line, above the order form: Bibles -> /print/ (the editions, always first), Books -> /books/.
 // The current side is marked aria-current and not a link. The books are English, so a non-English order surface
 // does not show it (the caller passes lang).
+import booksSurface from '../data/books-surface.json';
+
 interface Props {
 	current: 'bibles' | 'books';
 	lang?: string;
 }
 const { current, lang = 'en' } = Astro.props;
-const show = lang === 'en';
+const show = lang === 'en' && booksSurface.live; // off until the books surface ships (books-surface.json)
 ---
 
 {show && (

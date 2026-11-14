@@ -16,6 +16,7 @@ import { BULK_QUOTE_COPY, bulkQuoteRequired, tierPctFor } from './farBand.ts';
 import {
 	handlingFeeCents,
 	handlingLabel,
+	landedUnitCost,
 	marginCheck,
 	netPerItemUsd,
 	volumesFor,
@@ -1202,8 +1203,14 @@ export function bookSaleMetadata(
 		// US: no country-list cost row, so the book's own MEASURED US cost (book-skus.json us_cost_usd) and
 		// Stripe's standard US card fee (2.9% + 30c); unmeasured stays 'unmeasured', never a guess.
 		const us = (bookUsCosts.usd as Record<string, number>)[slug] ?? null;
+		// Author reporting needs a MEASURED net: a sale priced on the one-engine Bible-cost fallback (no own cost
+		// for that country) reports 'unmeasured', never the fallback's estimate.
+		const ownCost =
+			(dest?.landed_cost_usd as Record<string, unknown> | undefined)?.[b.costKey] != null;
 		const per = dest
-			? netPerItemUsd(slug, unit, dest, fee)
+			? ownCost
+				? netPerItemUsd(slug, unit, dest, fee)
+				: null
 			: destCode === 'US' && us != null
 				? unit / 100 - (unit / 100) * US_CARD_PCT - US_CARD_FIXED_USD - us
 				: null;
@@ -1417,27 +1424,34 @@ export function encodeForm(obj: Record<string, string | number>): string {
 
 // The Stripe-backed first-order lookups (moved verbatim from functions/dvc-checkout.ts, Phase 3: one copy for
 // every checkout that uses the engine). Read-only GETs against the store's Stripe account.
+// A FIRST ORDER = this email has never bought from the STORE (Kevin 2026-11-14: "Someone who has never purchased
+// anything off our new SMP store"). Only paid Checkout sessions the store itself created count: kind dvc_print
+// (this engine, Bibles + books) and print_bulk (the retired /print bulk path). Other payments on the same Stripe
+// account (publishing invoices, pre-release sales, app charges) no longer make a buyer a "repeat".
+export const STORE_ORDER_KINDS: readonly string[] = ['dvc_print', 'print_bulk'];
 export async function isFirstOrder(email: string, key: string): Promise<boolean> {
 	const get = async (path: string) => {
 		const r = await fetch(`https://api.stripe.com/v1/${path}`, {
 			headers: { authorization: `Bearer ${key}` },
 		});
 		if (!r.ok) throw new Error(`stripe ${r.status}`);
-		return (await r.json()) as { data: Record<string, unknown>[] };
+		return (await r.json()) as { data: Record<string, unknown>[]; has_more?: boolean };
 	};
 	try {
 		for (const e of new Set([email, email.toLowerCase()])) {
 			const s = await get(
-				`checkout/sessions?status=complete&limit=10&customer_details[email]=${encodeURIComponent(e)}`,
+				`checkout/sessions?status=complete&limit=100&customer_details[email]=${encodeURIComponent(e)}`,
 			);
-			if (s.data.some((x) => x.payment_status === 'paid')) return false;
-		}
-		const c = await get(
-			`customers/search?limit=10&query=${encodeURIComponent(`email:'${email.toLowerCase()}'`)}`,
-		);
-		for (const cust of c.data) {
-			const ch = await get(`charges?limit=10&customer=${cust.id}`);
-			if (ch.data.some((x) => x.paid === true && x.status === 'succeeded')) return false;
+			if (
+				s.data.some(
+					(x) =>
+						x.payment_status === 'paid' &&
+						STORE_ORDER_KINDS.includes(
+							String((x.metadata as Record<string, unknown> | null)?.kind ?? ''),
+						),
+				)
+			)
+				return false;
 		}
 		return true;
 	} catch {
@@ -1528,7 +1542,7 @@ export async function checkoutForm(
 	const destCode = String(payload.country ?? 'US').toUpperCase();
 	const dest = countryFor(destCode);
 	const copies = Object.entries(counts).reduce((s, [slug, n]) => s + n * volumesFor(slug), 0);
-	if (bulkQuoteRequired(dest?.farBand, copies)) {
+	if (bulkQuoteRequired(dest?.bulkQuote, copies)) {
 		return reply({ error: 'bulk_quote_required', message: BULK_QUOTE_COPY.error }, 400);
 	}
 
@@ -1556,12 +1570,10 @@ export async function checkoutForm(
 			400,
 		);
 	}
-	// Every book has its own measured landed cost per country (landed_cost_usd.<costKey>, e.g. bi for
-	// Beloved Identity). A country without one cannot be sized, so that book is refused there rather than
-	// priced off a Bible's cost (fail closed).
+	// ONE ENGINE (Kevin 2026-11-15): a book is sized on its own measured landed cost, else the country's Bible
+	// cost for the same binding (marginGuard.landedUnitCost). Refused only when the country has no cost at all.
 	const unsized = Object.entries(counts).some(
-		([slug, n]) =>
-			n > 0 && BOOK_SKUS[slug] && dest?.landed_cost_usd?.[BOOK_SKUS[slug].costKey] == null,
+		([slug, n]) => n > 0 && BOOK_SKUS[slug] && landedUnitCost(slug, dest?.landed_cost_usd) == null,
 	);
 	if (intl && unsized) {
 		return reply(
@@ -1582,7 +1594,7 @@ export async function checkoutForm(
 	// now only the backstop (handling is sized to the floor, so it drops a discount only when the
 	// fee cannot reach it, or the landed cost is unknown).
 	// Far band: no volume ladder at all, so the first-order 15% is the only discount on offer.
-	const tierPctNow = tierPctFor(dest?.farBand, tier.pct);
+	const tierPctNow = tierPctFor(dest?.bulkQuote, tier.pct);
 	if (discountable && validEmail && FIRST_ORDER_PCT > tierPctNow) {
 		const m = marginCheck(lines, FIRST_ORDER_PCT, destCode);
 		if (!m.ok) {

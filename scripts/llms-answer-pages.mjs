@@ -234,12 +234,22 @@ export function collect(root = process.cwd()) {
 	for (const t of TYPES) {
 		if (t.books) {
 			const cat = JSON.parse(fs.readFileSync(path.resolve(root, 'src/data/books.json'), 'utf8'));
-			const rows = (cat.books || []).slice().sort((x, y) => (x.order ?? 0) - (y.order ?? 0));
-			const idx = meta(path.join(pagesDir, 'books/index.astro'), root);
+			// BOOKS SURFACE SWITCH (src/data/books-surface.json): while off, only book pages already live are listed.
+			const surface = JSON.parse(fs.readFileSync(path.resolve(root, 'src/data/books-surface.json'), 'utf8'));
+			const rows = (cat.books || [])
+				.filter((b) => surface.live || surface.liveSlugs.includes(b.slug))
+				.slice()
+				.sort((x, y) => (x.order ?? 0) - (y.order ?? 0));
+			const idxEntry = surface.live
+				? (() => {
+						const idx = meta(path.join(pagesDir, 'books/index.astro'), root);
+						return [{ url: '/books/', slug: 'books', title: idx.title.replace(/\s*\|\s*(Father.s Heart Bible.*|FHB)$/, ''), description: idx.description }];
+					})()
+				: [];
 			groups.push({
 				label: t.label,
 				entries: [
-					{ url: '/books/', slug: 'books', title: idx.title.replace(/\s*\|\s*(Father.s Heart Bible.*|FHB)$/, ''), description: idx.description },
+					...idxEntry,
 					...rows.map((b) => ({ url: `/books/${b.slug}/`, slug: b.slug, title: b.full_title, description: b.short })),
 				],
 			});
