@@ -81,7 +81,7 @@ const config = JSON.stringify({
 			<div data-fee-line hidden><dt data-fee-label>Handling</dt><dd data-fee-total>$0.00</dd></div>
 			<div class="bko__total"><dt>Total</dt><dd data-total>$0.00</dd></div>
 		</dl>
-		<p class="bko__fine">Tax calculated at checkout. Printed and shipped to you by our printer, IngramSpark.</p>
+		<p class="bko__fine">Tax calculated at checkout. Printed and shipped to you by our printer.</p>
 		<label class="bko__lbl" for={`bko-country-${slug}`}>Ship to</label>
 		<select id={`bko-country-${slug}`} class="bko__select" data-country>
 			{countries.map((c) => <option value={c.code} selected={c.code === 'US'}>{c.name}</option>)}
@@ -178,13 +178,15 @@ const config = JSON.stringify({
 		min-height: 48px;
 		padding: 0.7rem 1.8rem;
 		border-radius: 999px;
-		background: var(--color-primary, #b60057);
+		/* calm charcoal, the SMP store's Checkout (Kevin: never an alarming red; pmseoaeo 3gb 11-14) */
+		background: #2e2a26;
 		color: #fff;
-		border: 2px solid var(--color-primary, #b60057);
+		border: 2px solid #2e2a26;
 		font-weight: 600;
 		font-size: 1rem;
 		cursor: pointer;
 	}
+	.bko__checkout:hover { background: #1a1714; border-color: #1a1714; }
 	.bko__checkout:disabled { opacity: 0.6; cursor: wait; }
 	.bko__msg { color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0.6rem 0 0; }
 	.bko__msg[hidden] { display: none; }
