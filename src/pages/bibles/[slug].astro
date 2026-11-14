@@ -6,6 +6,7 @@ import LangCover from '../../components/LangCover.astro';
 import LookInside from '../../components/LookInside.astro';
 import Section from '../../components/Section.astro';
 import { cardUrl, hasLangCard } from '../../data/card-art';
+import coverColors from '../../data/cover-colors.json';
 import frontmatter from '../../data/editions/frontmatter.json';
 import shared from '../../data/editions/shared.json';
 import isbnList from '../../data/isbn-list.json';
@@ -227,10 +228,18 @@ const trim = ed.trim ?? '6 x 9 in';
 // sheets say. It previously read "with dust jacket", which no sheet supports —
 // the journaling sheet says outright "No dust jacket: not offered at 8 x 10".
 const binding = ed.binding ?? 'Paperback or Hardback';
-// Kevin 2026-11-14: the edition title in the colour of its cover, wherever the title is used. A MEASURED cover
-// colour (deepened until it passes WCAG AA 4.5:1 on white and the soft section grey) lives in the edition's data;
-// editions without one keep ink.
-const titleColor: string = (ed as { coverColor?: string }).coverColor ?? 'var(--color-ink)';
+// Kevin 2026-11-14 ("1A"): the edition title in the colour of its cover, wherever the title is used. The colours
+// are MEASURED per cover (src/data/cover-colors.json says how): a pale cover keeps its true colour with a thin dark
+// outline (W3C technique G18), which is legible on the big headings only; small text (the Product details row)
+// stays ink for those. No entry = ink.
+const cc = (coverColors as Record<string, { title: string; outline: boolean } | string>)[ed.slug];
+const coverTitle = typeof cc === 'object' ? cc : undefined;
+const titleColor: string = coverTitle?.title ?? 'var(--color-ink)';
+const titleOutline = coverTitle?.outline ?? false;
+const OUTLINE_SHADOW =
+	'-1px -1px 0 #27272a, 1px -1px 0 #27272a, -1px 1px 0 #27272a, 1px 1px 0 #27272a, 0 1px 0 #27272a, 0 -1px 0 #27272a, 1px 0 0 #27272a, -1px 0 0 #27272a';
+const titleStyle = `color: ${titleColor};${titleOutline ? ` text-shadow: ${OUTLINE_SHADOW};` : ''}`;
+const smallTitleColor = titleOutline ? 'var(--color-ink)' : titleColor;
 
 // "Intimacy for Teens" -> "for Teens". The pillar titles are uniform across the interiors,
 // so the audience phrase the printed book uses is the one the page uses too — no second
@@ -631,7 +640,7 @@ const faqSchema = {
 				</div>
 				<div>
 					<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 0.5rem;">{/* Kevin 2026-11-14: the label is the product name, not the colour feature alone. */}{isLang ? `${ed.english} edition · Father’s Heart Bible™ + Divine Voice™ Color` : 'Father’s Heart Bible™ + Divine Voice™ Color'}</p>
-					<h1 lang={isLang ? ed.lang : undefined} dir={isLang ? ed.dir : undefined} style={`font-family: var(--font-headline); color: ${titleColor}; font-size: 2.4rem; font-weight: 600; margin: 0 0 0.6rem;`}>{ed.name}</h1>
+					<h1 lang={isLang ? ed.lang : undefined} dir={isLang ? ed.dir : undefined} style={`font-family: var(--font-headline); ${titleStyle} font-size: 2.4rem; font-weight: 600; margin: 0 0 0.6rem;`}>{ed.name}</h1>
 					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.55; margin: 0 0 1.2rem;">{ed.sub}</p>
 					<div class="flex flex-wrap items-center gap-2 mb-5">
 						<span style={`font-family: var(--font-sans); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; color: ${VOICE.father}; background: #fff; border: 2px solid ${VOICE.father}; padding: 0.35rem 0.8rem; border-radius: 6px; line-height: 1;`}>FATHER</span>
@@ -657,7 +666,7 @@ const faqSchema = {
 					<a href={RESERVE_MAIL} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; padding: 0.75rem 1.6rem; text-decoration: none; font-size: 0.95rem;">Reserve a copy by email</a>
 				</div>
 			) : (
-				<EditionOrder titleColor={titleColor} rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} lang={orderLang} note={preorder ? orderT('o.preorder') : undefined} />
+				<EditionOrder titleStyle={coverTitle ? titleStyle : undefined} rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} lang={orderLang} note={preorder ? orderT('o.preorder') : undefined} />
 			)}
 		</Section>
 		<Section variant="warm">
@@ -783,7 +792,7 @@ const faqSchema = {
 							{k === 'Publisher' ? (
 								<a href="https://spiritmediapublishing.com" target="_blank" rel="noopener" style="flex: 1; line-height: 0;"><img src="https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp" alt="Spirit Media Publishing" width="200" height="20" loading="lazy" decoding="async" style="width: 200px; max-width: 100%; height: auto;" /></a>
 							) : (
-								<span style={`color: ${k === 'Edition' ? titleColor : 'var(--color-ink)'}; font-weight: 600; flex: 1;${k.includes('ISBN') ? ' white-space: nowrap;' : ''}`}>{v}</span>
+								<span style={`color: ${k === 'Edition' ? smallTitleColor : 'var(--color-ink)'}; font-weight: 600; flex: 1;${k.includes('ISBN') ? ' white-space: nowrap;' : ''}`}>{v}</span>
 							)}
 						</div>
 					))}

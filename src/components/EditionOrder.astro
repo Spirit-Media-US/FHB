@@ -56,10 +56,10 @@ interface Props {
 	note?: string;
 	/** the page's language (src/lib/orderStrings.ts); English when absent or unsupported */
 	lang?: string;
-	/** the edition title's colour (its cover colour, Kevin 2026-11-14); ink when absent */
-	titleColor?: string;
+	/** the edition title's style: its cover colour (+ outline on pale covers), Kevin 2026-11-14; ink when absent */
+	titleStyle?: string;
 }
-const { rows, heading, returnPath, note, lang: pageLang, titleColor } = Astro.props;
+const { rows, heading, returnPath, note, lang: pageLang, titleStyle } = Astro.props;
 const lang: OrderLang = orderLangFor(pageLang);
 const S = ORDER_STRINGS[lang];
 const t = (k: string, v?: Record<string, string | number>) => tr(S, k, v);
@@ -169,7 +169,7 @@ const guaranteeBody = en
 		</details>
 	</div>
 	<div class="lqo">
-	<h2 class="lqo__title" style={titleColor ? `color: ${titleColor};` : undefined}>{t('o.title', { heading })}</h2>
+	<h2 class="lqo__title" style={titleStyle}>{t('o.title', { heading })}</h2>
 	<div class="eo-pick" data-pick data-id={lead.id}>
 		{multi && (
 			<fieldset class="eo-group">
@@ -211,8 +211,8 @@ const guaranteeBody = en
 {en && (
 	<nav class="eo-shop" aria-label="Keep shopping">
 		<span class="eo-shop__label">Keep shopping</span>
-		<a href="/print/">All Bibles</a>
-		<a href="/books/">Father’s Heart Books</a>
+		<a href="/print/">FH Bibles</a>
+		<a href="/books/">FH Books</a>
 		<a href="https://spiritmediapublishing.com/bookstore/">All SMP Books</a>
 	</nav>
 )}
