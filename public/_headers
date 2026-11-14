@@ -60,6 +60,13 @@ https://:sub.fathersheartbible.pages.dev/*
   ! X-Robots-Tag
   X-Robots-Tag: noindex
 
+# Book pages only (Kevin 2026-11-13 L1999 'put the order form on the page'; L1990 SMP is the store): the on-page
+# order form posts to the SMP store's /store-checkout. The SMP hosts are added HERE and nowhere else; every other
+# page keeps the strict /* policy. The pages.dev host is the SMP store PREVIEW that FHB previews order against.
+/books/*
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://mail.spiritmediaone.com https://static.cloudflareinsights.com https://js.stripe.com https://challenges.cloudflare.com https://www.clarity.ms https://scripts.clarity.ms; style-src 'self' 'unsafe-inline'; font-src 'self' https://assets.spiritmediapublishing.com; img-src 'self' data: https://cdn.sanity.io https://assets.spiritmediapublishing.com https://*.supabase.co https://*.stripe.com https://i.ytimg.com https://*.clarity.ms https://c.bing.com; connect-src 'self' https://spiritmediapublishing.com https://feat-smp-store.spirit-media-publishing.pages.dev https://assets.spiritmediapublishing.com https://rusi1hyi.api.sanity.io https://cdn.sanity.io https://cloudflareinsights.com https://tools-api.spiritmediapublishing.com https://api.stripe.com https://*.clarity.ms https://c.bing.com; frame-src 'self' https://challenges.cloudflare.com https://api.leadconnectorhq.com https://link.msgsndr.com https://*.gohighlevel.com https://mail.spiritmediaone.com https://js.stripe.com https://hooks.stripe.com https://www.youtube-nocookie.com; media-src 'self' https://assets.spiritmediapublishing.com https://media.spiritmediapublishing.com; object-src 'none'; base-uri 'self'; form-action 'self'
+
 # Order confirmation only (unit 2qy): Google Customer Reviews opt-in needs Google script/frame hosts.
 # The Google hosts are added HERE and nowhere else; every other page keeps the strict /* policy.
 /order
