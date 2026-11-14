@@ -16,6 +16,7 @@ import { BULK_QUOTE_COPY, bulkQuoteRequired, tierPctFor } from './farBand.ts';
 import {
 	handlingFeeCents,
 	handlingLabel,
+	landedUnitCost,
 	marginCheck,
 	netPerItemUsd,
 	volumesFor,
@@ -1202,8 +1203,14 @@ export function bookSaleMetadata(
 		// US: no country-list cost row, so the book's own MEASURED US cost (book-skus.json us_cost_usd) and
 		// Stripe's standard US card fee (2.9% + 30c); unmeasured stays 'unmeasured', never a guess.
 		const us = (bookUsCosts.usd as Record<string, number>)[slug] ?? null;
+		// Author reporting needs a MEASURED net: a sale priced on the one-engine Bible-cost fallback (no own cost
+		// for that country) reports 'unmeasured', never the fallback's estimate.
+		const ownCost =
+			(dest?.landed_cost_usd as Record<string, unknown> | undefined)?.[b.costKey] != null;
 		const per = dest
-			? netPerItemUsd(slug, unit, dest, fee)
+			? ownCost
+				? netPerItemUsd(slug, unit, dest, fee)
+				: null
 			: destCode === 'US' && us != null
 				? unit / 100 - (unit / 100) * US_CARD_PCT - US_CARD_FIXED_USD - us
 				: null;
@@ -1535,7 +1542,7 @@ export async function checkoutForm(
 	const destCode = String(payload.country ?? 'US').toUpperCase();
 	const dest = countryFor(destCode);
 	const copies = Object.entries(counts).reduce((s, [slug, n]) => s + n * volumesFor(slug), 0);
-	if (bulkQuoteRequired(dest?.farBand, copies)) {
+	if (bulkQuoteRequired(dest?.bulkQuote, copies)) {
 		return reply({ error: 'bulk_quote_required', message: BULK_QUOTE_COPY.error }, 400);
 	}
 
@@ -1563,12 +1570,10 @@ export async function checkoutForm(
 			400,
 		);
 	}
-	// Every book has its own measured landed cost per country (landed_cost_usd.<costKey>, e.g. bi for
-	// Beloved Identity). A country without one cannot be sized, so that book is refused there rather than
-	// priced off a Bible's cost (fail closed).
+	// ONE ENGINE (Kevin 2026-11-15): a book is sized on its own measured landed cost, else the country's Bible
+	// cost for the same binding (marginGuard.landedUnitCost). Refused only when the country has no cost at all.
 	const unsized = Object.entries(counts).some(
-		([slug, n]) =>
-			n > 0 && BOOK_SKUS[slug] && dest?.landed_cost_usd?.[BOOK_SKUS[slug].costKey] == null,
+		([slug, n]) => n > 0 && BOOK_SKUS[slug] && landedUnitCost(slug, dest?.landed_cost_usd) == null,
 	);
 	if (intl && unsized) {
 		return reply(
@@ -1589,7 +1594,7 @@ export async function checkoutForm(
 	// now only the backstop (handling is sized to the floor, so it drops a discount only when the
 	// fee cannot reach it, or the landed cost is unknown).
 	// Far band: no volume ladder at all, so the first-order 15% is the only discount on offer.
-	const tierPctNow = tierPctFor(dest?.farBand, tier.pct);
+	const tierPctNow = tierPctFor(dest?.bulkQuote, tier.pct);
 	if (discountable && validEmail && FIRST_ORDER_PCT > tierPctNow) {
 		const m = marginCheck(lines, FIRST_ORDER_PCT, destCode);
 		if (!m.ok) {

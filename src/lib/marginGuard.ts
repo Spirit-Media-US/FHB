@@ -89,6 +89,20 @@ export const floorFor = (c: Pick<ShipCountry, 'farBand'>): number =>
 export const floorForSku = (slug: string, c: Pick<ShipCountry, 'farBand'>): number =>
 	BOOK_SKUS[slug]?.floorUsd ?? floorFor(c);
 
+/** Landed cost for one unit of `slug`: its own measured cost, else the Bible cost of the same binding. */
+export function landedUnitCost(
+	slug: string,
+	lc: Record<string, unknown> | undefined,
+): number | null {
+	if (!lc) return null;
+	const own = lc[bindingFor(slug)];
+	if (typeof own === 'number') return own;
+	const book = BOOK_SKUS[slug];
+	if (!book) return null;
+	const fallback = lc[/hard/i.test(book.format) ? 'hc' : 'pb'];
+	return typeof fallback === 'number' ? fallback : null;
+}
+
 /** Net USD for ONE SKU unit charged at `priceCents` plus `feeCents` handling; null = landed cost unknown. */
 export function netPerItemUsd(
 	slug: string,
@@ -101,8 +115,11 @@ export function netPerItemUsd(
 	const v = volumesFor(slug);
 	const charged = (priceCents + feeCents) / 100;
 	const duty = country.code && isEu(country.code) ? EU_DUTY_USD * v : 0;
-	const unitCost = lc[bindingFor(slug)];
-	if (unitCost == null) return null; // e.g. Beloved Identity in a country with no measured cost
+	// ONE ENGINE (Kevin 2026-11-15: "we do what our engine does per the engine not per book"): a book uses its
+	// own measured landed cost where one exists, else the country's measured BIBLE cost for the same binding.
+	// A 6x9 Bible (~890 pp) outweighs almost every book, so the fallback is a conservative upper bound.
+	const unitCost = landedUnitCost(slug, lc);
+	if (unitCost == null) return null;
 	return charged - (charged * STRIPE_INTL_PCT + STRIPE_FIXED_USD) - unitCost * v - duty;
 }
 

@@ -55,10 +55,12 @@ interface Props {
 	note?: string;
 	/** the page's language (src/lib/orderStrings.ts); English when absent or unsupported */
 	lang?: string;
+	/** the offer line shown centered above the country marquee (Kevin 2026-11-15) */
+	offerLine?: string;
 	/** the edition title's style: its cover colour (+ outline on pale covers), Kevin 2026-11-14; ink when absent */
 	titleStyle?: string;
 }
-const { rows, heading, returnPath, note, lang: pageLang, titleStyle } = Astro.props;
+const { rows, heading, returnPath, note, lang: pageLang, titleStyle, offerLine } = Astro.props;
 const lang: OrderLang = orderLangFor(pageLang);
 const S = ORDER_STRINGS[lang];
 const t = (k: string, v?: Record<string, string | number>) => tr(S, k, v);
@@ -94,7 +96,7 @@ const config = JSON.stringify({
 		]),
 	),
 	// Far-band countries (unit 2kx): no volume ladder, and 10+ copies go to a bulk quote, not checkout.
-	farBand: LIVE_COUNTRIES.filter((c) => c.farBand).map((c) => c.code),
+	farBand: LIVE_COUNTRIES.filter((c) => c.bulkQuote).map((c) => c.code),
 	// International handling per country (Kevin 2026-11-08), shown beside each price before checkout.
 	intl: handlingTable(
 		Object.fromEntries(Object.entries(skuPrices).map(([k, v]) => [k, Math.round(v * 100)])),
@@ -158,6 +160,7 @@ const guaranteeBody = en
 {/* Kevin 2026-11-14: a black marquee of the countries we ship to, under the hero (Look inside) and above the
     choices; black like the YouVersion bar so the hero gets a frame. The list is the LIVE ship list. Screen readers
     get one plain list; the moving copy is decorative. Motion stops for prefers-reduced-motion. */}
+{offerLine && <p class="eo-offer">{offerLine}</p>}
 <div class="eo-marquee" role="region" aria-label={BOX.accShip}>
 	<p class="eo-sr">{countryNames.join(', ')}</p>
 	<div class="eo-marquee__track" aria-hidden="true">
@@ -257,10 +260,11 @@ const guaranteeBody = en
 
 <style>
 	/* MOBILE FIRST (Kevin 2026-11-14 "Do what data science says!"): base = phone; min-width widens. */
+	.eo-offer { margin: 1.6rem auto 0; text-align: center; font-family: var(--font-sans); color: #3f3f46; font-size: 1rem; font-weight: 700; }
 	/* Country marquee: full-bleed black band (breaks out of the page column). */
-	.eo-marquee { position: relative; width: 100vw; margin: 1.6rem 0 0 calc(50% - 50vw); background: #1a1714; color: #f5f5f4; overflow: hidden; font-family: var(--font-sans); font-size: 1rem; font-weight: 600; }
+	.eo-marquee { position: relative; width: 100vw; margin: 0.8rem 0 0 calc(50% - 50vw); background: #1a1714; color: #f5f5f4; overflow: hidden; font-family: var(--font-body); font-size: 1rem; line-height: 1.4rem; font-weight: 600; } /* same band as the YouVersion bar (Kevin 2026-11-15) */
 	.eo-marquee__track { display: flex; width: max-content; animation: eo-marquee 60s linear infinite; }
-	.eo-marquee__list { display: flex; gap: 0; margin: 0; padding: 0.7rem 0; list-style: none; white-space: nowrap; }
+	.eo-marquee__list { display: flex; gap: 0; margin: 0; padding: 0.5rem 0; list-style: none; white-space: nowrap; }
 	.eo-marquee__list li { padding: 0 1.1rem; }
 	.eo-marquee__list li::after { content: '•'; margin-left: 2.2rem; color: #e4006f; }
 	.eo-marquee:hover .eo-marquee__track { animation-play-state: paused; }

@@ -34,7 +34,7 @@ test('committed state: liveWave is the only switch; with it empty only US is liv
 	assert.equal(checkoutShippingForm('GB', 1, base), null);
 	assert.equal(raw.liveWave.every((c) => PENDING_COUNTRIES.some((p) => p.code === c)), true);
 	// the live module state matches the data: liveWave countries + US, in order
-	assert.deepEqual(LIVE_COUNTRIES.map((c) => c.code), ['US', ...raw.liveWave]);
+	assert.deepEqual(LIVE_COUNTRIES.map((c) => c.code), ['US', ...raw.liveWave, ...(raw.liveWave2 ?? [])]);
 });
 
 test('liveWave fails closed: unknown, duplicate, US, or unrouted codes throw', () => {

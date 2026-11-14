@@ -15,6 +15,8 @@ export interface ShipCountry {
 	landed_cost_usd?: LandedCost;
 	/** True in the farthest shipping band: net floor $10 per copy instead of $20 (Kevin 2026-11-08, 1A). */
 	farBand?: boolean;
+	/** 10+ physical copies go to a bulk quote (far band, and every country opened 2026-11-15 until bulk is studied) */
+	bulkQuote?: boolean;
 	/** Optional buyer-paid "Expedited delivery"; absent/null = not offered for this country. */
 	fast?: FastOption | null;
 }
@@ -79,10 +81,11 @@ export function buildLive(
 	pending: readonly PendingCountry[],
 	wave: readonly string[],
 	routes: Record<string, DeliveryRoute> = DELIVERY_ROUTES,
+	wave2: readonly string[] = [],
 ): ShipCountry[] {
 	// A first-wave country may carry its own measured Expedited option (US: Kevin 2026-11-14 '1A'); else none.
 	const out: ShipCountry[] = live.map((c) => ({ ...c, farBand: false, fast: c.fast ?? null }));
-	for (const code of wave) {
+	for (const code of [...wave, ...wave2]) {
 		const p = pending.find((r) => r.code === code);
 		if (!p) throw new Error(`liveWave: ${code} is not a pending country`);
 		if (out.some((c) => c.code === code))
@@ -98,6 +101,8 @@ export function buildLive(
 			transitDays: r.transitDays,
 			landed_cost_usd: p.landed_cost_usd,
 			farBand: p.far_band === true,
+			// Kevin 2026-11-15: opened for 1-9 copies; 10+ = contact us for bulk rates (phase 2).
+			bulkQuote: p.far_band === true || wave2.includes(code),
 			fast: r.fast,
 		});
 	}
@@ -108,6 +113,8 @@ export const LIVE_COUNTRIES = buildLive(
 	raw.live as unknown as readonly ShipCountry[],
 	PENDING_COUNTRIES,
 	(raw as { liveWave?: string[] }).liveWave ?? [],
+	DELIVERY_ROUTES,
+	(raw as { liveWave2?: string[] }).liveWave2 ?? [],
 );
 export const SHIP_CODES: readonly string[] = LIVE_COUNTRIES.map((c) => c.code);
 

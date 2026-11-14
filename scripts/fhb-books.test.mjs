@@ -144,7 +144,7 @@ test('abroad (GB, measured wai_pb): list price + handling line, net measured in 
 	assert.match(r.s['metadata[book_1]'], /country=GB\|date=\d{4}-\d{2}-\d{2}\|net_usd=\d+\.\d{2}$/);
 });
 
-test('fail closed: a book with no measured cost for a country is refused there', async () => {
+test('reporting: a book sold on the Bible-cost fallback never reports a guessed net', async () => {
 	const dest = { code: 'DE', landed_cost_usd: { hc: 20, pb: 15, basis: 'MEASURED' } };
 	const m = bookSaleMetadata({ [PB]: 1 }, 'DE', dest, 0);
 	assert.match(m['metadata[book_1]'], /net_usd=unmeasured$/, 'no cost row -> never a guessed net');

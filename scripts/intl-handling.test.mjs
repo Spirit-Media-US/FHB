@@ -26,16 +26,19 @@ const HC_FIRST = unitAfter(9999, 15), PB_FIRST = unitAfter(7999, 15);
 const usd = (cents) => (cents / 100).toFixed(2);
 const feeUsd = (code, slug, paid) => handlingFeeCents(slug, paid, row(code)) / 100;
 
-test('3B: exactly the 19 markets are live (US + the wave), AE SA NG are not', () => {
+test('3B + 2026-11-15: US + the 19-market wave + every country opened by Kevin ("never bottleneck"), sanctions excluded', () => {
 	assert.equal(LIVE19.length, 19);
 	assert.deepEqual(raw.liveWave, LIVE19);
-	assert.deepEqual(LIVE_COUNTRIES.map((c) => c.code), ['US', ...LIVE19]);
-	for (const no of ['AE', 'SA', 'NG']) assert.ok(!LIVE_COUNTRIES.some((c) => c.code === no), `${no} must not be live`);
+	assert.deepEqual(LIVE_COUNTRIES.map((c) => c.code), ['US', ...LIVE19, ...raw.liveWave2]);
+	for (const no of ['MM', 'AF', 'SD', 'YE', 'LY', 'SO', 'CF', 'ZW', 'NI', 'IR', 'KP', 'SY', 'CU'])
+		assert.ok(!LIVE_COUNTRIES.some((c) => c.code === no), `${no} must not be live`);
 	for (const c of LIVE_COUNTRIES.filter((x) => x.code !== 'US')) {
 		assert.ok(c.landed_cost_usd, `${c.code} needs landed_cost_usd`);
 		assert.ok(c.landed_cost_usd.hc > 0 && c.landed_cost_usd.pb > 0, c.code);
 		assert.ok(checkoutShippingForm(c.code, 1), `${c.code} reaches Stripe`);
 	}
+	// opened countries: 1-9 copies check out; 10+ is a bulk quote (phase 2)
+	for (const code of raw.liveWave2) assert.equal(LIVE_COUNTRIES.find((c) => c.code === code)?.bulkQuote, true, code);
 });
 
 test('3B: zone-inferred landed costs are flagged INFERRED in the data (basis ZONE_MAX)', () => {
@@ -232,8 +235,8 @@ test('backstop: a country with no landed cost is refused, never sold below an un
 	assert.equal(marginCheck([{ slug: HC, retail: 9999 }], 0, 'ZZ', ALL).ok, false);
 });
 
-test('Stripe: pending / non-wave countries (AE SA NG) are refused', async () => {
-	for (const country of ['AE', 'SA', 'NG', 'ZZ']) {
+test('Stripe: excluded and unknown countries are refused', async () => {
+	for (const country of ['MM', 'AF', 'ZZ']) {
 		const r = await checkout({ country, counts: { 'moms-hb': 1 } });
 		assert.equal(r.status, 400, country);
 		assert.equal(r.json.error, 'country_not_served');
@@ -267,7 +270,7 @@ test('dist: edition order block carries the fee table, the per-price fee slots a
 	assert.ok(fs.existsSync(DIST_PAGE), 'dist/ missing: run the build first');
 	const h = fs.readFileSync(DIST_PAGE, 'utf8');
 	const cfg = JSON.parse(h.match(/data-order="([^"]*)"/)[1].replaceAll('&#34;', '"').replaceAll('&quot;', '"').replaceAll('&#38;', '&').replaceAll('&amp;', '&'));
-	assert.deepEqual(Object.keys(cfg.intl).sort(), [...LIVE19].sort());
+	assert.deepEqual(Object.keys(cfg.intl).sort(), [...LIVE19, ...raw.liveWave2].sort());
 	assert.equal(cfg.intl.IN.label, 'International handling');
 	assert.equal(cfg.intl.DE.label, 'Import & handling');
 	assert.match(h, /data-fee-sku="[a-z0-9-]+-pb"[^>]*data-fee-full/);

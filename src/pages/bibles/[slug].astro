@@ -682,8 +682,8 @@ const metaBase = fitDescription(
 	isLang ? 160 : 165,
 );
 const metaDescription =
-	!isLang && metaBase.length < 140 && `${metaBase} Free US shipping.`.length <= 165
-		? `${metaBase} Free US shipping.`
+	!isLang && metaBase.length < 140 && `${metaBase} 15% off first order.`.length <= 165
+		? `${metaBase} 15% off first order.`
 		: metaBase;
 // Layout props (moved out of the tag: a // line inside a tag becomes attributes, which set <title> to "true"):
 //  - title: audience editions = name + brand; language editions keep their native titles ending | FHB (Kevin 2026-11-14 item 6).
@@ -701,7 +701,7 @@ const metaDescription =
 	bookReleaseDate={datePublished}
 	title={fitTitle(isLang ? (ed.seo?.title ?? `${ed.name} | Father's Heart Bible™ (FHB)`) : `${ed.name} | Father's Heart Bible™ (FHB)`)}
 	description={metaDescription}
-	image={`https://assets.spiritmediapublishing.com/FHB/og/editions/${ed.slug}-bible-og.jpg`}
+	image={`https://assets.spiritmediapublishing.com/FHB/og/editions/v2/${ed.slug}-bible-og.jpg`}
 	preloadImageMobile={coverUrl}
 	preloadMobileIsLcp
 	preloadImageDesktop={coverUrl}
@@ -743,7 +743,7 @@ const metaDescription =
 					</div>
 					{/* No price up here (Kevin 2026-10-05, B14a): it is the first thing a phone shows. The
 					     price line leads the order form below, which "Order" jumps to. */}
-					<p style="font-family: var(--font-sans); color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0 0 1.2rem;">{orderT('hero.freeShipValue')}</p>
+
 					<div class="flex flex-wrap items-center gap-3">
 						{/* Kevin 2026-11-14: "Seems useless to have order button directly above the order box" - removed; the box follows. */}
 						<LookInside slug={ed.lookInsideKey ?? ed.slug} title={ed.name} size="lg" />
@@ -760,7 +760,7 @@ const metaDescription =
 					<a href={RESERVE_MAIL} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; padding: 0.75rem 1.6rem; text-decoration: none; font-size: 0.95rem;">Reserve a copy by email</a>
 				</div>
 			) : (
-				<EditionOrder titleStyle={coverTitle ? titleStyle : undefined} rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} lang={orderLang} note={preorder ? orderT('o.preorder') : undefined} />
+				<EditionOrder offerLine={orderT('hero.freeShipValue')} titleStyle={coverTitle ? titleStyle : undefined} rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} lang={orderLang} note={preorder ? orderT('o.preorder') : undefined} />
 			)}
 		</Section>
 		<Section variant="warm">

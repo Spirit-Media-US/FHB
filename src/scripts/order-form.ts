@@ -325,7 +325,7 @@ function init(root: HTMLElement) {
 			el.dataset.orig ??= el.textContent ?? '';
 			el.textContent = far
 				? lang === 'en'
-					? 'Buying 10 or more? Request a bulk quote'
+					? 'Buying 10 or more? Contact us for bulk rates'
 					: t('q.title')
 				: el.dataset.orig;
 		}
