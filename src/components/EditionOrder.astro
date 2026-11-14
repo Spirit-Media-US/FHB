@@ -163,7 +163,7 @@ const guaranteeBody = en
 {offerLine && <p class="eo-offer">{offerLine}</p>}
 <div class="eo-marquee" role="region" aria-label={BOX.accShip}>
 	<p class="eo-sr">{countryNames.join(', ')}</p>
-	<div class="eo-marquee__track" aria-hidden="true">
+	<div class="eo-marquee__track" aria-hidden="true" style={`--eo-marquee-dur: ${countryNames.length * 4}s;`}>
 		{[0, 1].map(() => (
 			<ul class="eo-marquee__list">
 				{countryNames.map((n) => <li>{n}</li>)}
@@ -263,7 +263,7 @@ const guaranteeBody = en
 	.eo-offer { margin: 1.6rem auto 0; text-align: center; font-family: var(--font-sans); color: #3f3f46; font-size: 1rem; font-weight: 700; }
 	/* Country marquee: full-bleed black band (breaks out of the page column). */
 	.eo-marquee { position: relative; width: 100vw; margin: 0.8rem 0 0 calc(50% - 50vw); background: #1a1714; color: #f5f5f4; overflow: hidden; font-family: var(--font-body); font-size: 1rem; line-height: 1.4rem; font-weight: 600; } /* same band as the YouVersion bar (Kevin 2026-11-15) */
-	.eo-marquee__track { display: flex; width: max-content; animation: eo-marquee 60s linear infinite; }
+	.eo-marquee__track { display: flex; width: max-content; animation: eo-marquee var(--eo-marquee-dur, 600s) linear infinite; /* ~40px/s, readable (Kevin 2026-11-15) */ }
 	.eo-marquee__list { display: flex; gap: 0; margin: 0; padding: 0.5rem 0; list-style: none; white-space: nowrap; }
 	.eo-marquee__list li { padding: 0 1.1rem; }
 	.eo-marquee__list li::after { content: '•'; margin-left: 2.2rem; color: #e4006f; }
