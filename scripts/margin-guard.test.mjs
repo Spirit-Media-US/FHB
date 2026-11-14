@@ -74,7 +74,7 @@ test('dvc-checkout US first order still gets WELCOME15 (unchanged)', async () =>
 	assert.equal((await r.json()).url, 'https://stripe.test/x');
 	assert.match(decodeURIComponent(body), /discounts\[0\]\[promotion_code\]=promo_1/);
 	assert.match(decodeURIComponent(body), /adaptive_pricing\[enabled\]=true/); // 3A, unit 2kd
-	assert.doesNotMatch(decodeURIComponent(body), /shipping_options\[1\]/); // US: no faster option
+	assert.match(decodeURIComponent(body), /shipping_options\[1\]\[shipping_rate_data\]\[display_name\]=Expedited delivery/); // US Expedited (Kevin 2026-11-14 '1A')
 	const { SHIP_CODES } = await import('../src/lib/shipCountries.ts');
 	if (!SHIP_CODES.includes('PH')) {
 		const r2 = await mk('PH'); // pending country: refused outright, never reaches Stripe

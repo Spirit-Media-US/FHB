@@ -141,7 +141,11 @@ const ogImage = image || 'https://assets.spiritmediapublishing.com/FHB/share/v5/
 const ogImageAlt = imageAlt || "Father's Heart Bible (FHB) — Come home to Me as your Father";
 // Emit explicit dimensions/type only for known 1200×630 JPG cards (our share
 // cards + w=1200&h=630 Sanity crops); skip for arbitrary blog hero images.
-const ogSized = ogImage.includes('/FHB/share/') || ogImage.includes('w=1200&h=630');
+// /FHB/og/ = the 1200x630 JPG share cards made with bin/fhb-og-card.mjs (edition pages, 2026-11-14).
+const ogSized =
+	ogImage.includes('/FHB/share/') ||
+	ogImage.includes('/FHB/og/') ||
+	ogImage.includes('w=1200&h=630');
 
 // 2vc: max-image-preview:large (Discover/large-thumbnail eligibility), head-only. Scoped to
 // /blog /guides /meaning /bible-in; pages inside a running test arm or pending readout are

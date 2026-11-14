@@ -115,7 +115,11 @@ test('sitemap parity: every marketing page is listed in llms.txt or exempt with 
 	// Beloved Identity included, and the /books/ catalogue must be listed.
 	const bookRows = JSON.parse(fs.readFileSync('src/data/books.json', 'utf8')).books;
 	assert.ok(bookRows.some((b) => b.slug === 'beloved-identity'), 'beloved-identity missing from books.json');
-	for (const u of ['/books/', ...bookRows.map((b) => `/books/${b.slug}/`)]) assert.ok(listed(u), `${u} not listed`);
+	// books surface off (src/data/books-surface.json): no /books/ index, only the already-live book pages
+	const surface = JSON.parse(fs.readFileSync('src/data/books-surface.json', 'utf8'));
+	const shown = bookRows.filter((b) => surface.live || surface.liveSlugs.includes(b.slug));
+	for (const u of [...(surface.live ? ['/books/'] : []), ...shown.map((b) => `/books/${b.slug}/`)]) assert.ok(listed(u), `${u} not listed`);
+	if (!surface.live) assert.ok(!listed('/books/who-am-i/'), 'a book page that is not live must not be listed');
 });
 
 test('sitemap parity: the exempt list holds no stale or already-listed page', () => {

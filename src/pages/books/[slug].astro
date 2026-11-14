@@ -13,9 +13,15 @@ import LookInside from '../../components/LookInside.astro';
 import Section from '../../components/Section.astro';
 import bookSkus from '../../data/book-skus.json';
 import catalog from '../../data/books.json';
+import booksSurface from '../../data/books-surface.json';
 import lookinside from '../../data/lookinside.json';
 import Layout from '../../layouts/Layout.astro';
-import { handlingFeeCents, handlingLabel, shippingDetailsFor } from '../../lib/marginGuard';
+import {
+	handlingFeeCents,
+	handlingLabel,
+	landedUnitCost,
+	shippingDetailsFor,
+} from '../../lib/marginGuard';
 import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
 import { LIVE_COUNTRIES } from '../../lib/shipCountries';
 
@@ -51,7 +57,10 @@ type Book = {
 };
 
 export function getStaticPaths() {
-	return (catalog.books as Book[]).map((b) => ({ params: { slug: b.slug }, props: { book: b } }));
+	// BOOKS SURFACE SWITCH (src/data/books-surface.json): while off, only the book pages already live keep building.
+	return (catalog.books as Book[])
+		.filter((b) => booksSurface.live || booksSurface.liveSlugs.includes(b.slug))
+		.map((b) => ({ params: { slug: b.slug }, props: { book: b } }));
 }
 
 const { book } = Astro.props as { book: Book };
@@ -101,14 +110,15 @@ const SKUS = bookSkus.skus as Record<
 const formats = (book.formats as unknown as string[])
 	.map((sku) => ({ sku, ...SKUS[sku], landed_key: SKUS[sku].cost_key }))
 	.map((f) => {
+		// ONE ENGINE (Kevin 2026-11-15): every live country the engine can size (own cost or Bible fallback).
 		const dests = LIVE_COUNTRIES.filter(
 			(c) =>
 				c.code === 'US' ||
-				(c.landed_cost_usd as Record<string, unknown> | undefined)?.[f.landed_key] != null,
+				landedUnitCost(f.sku, c.landed_cost_usd as Record<string, unknown> | undefined) != null,
 		).map((c) => ({
 			code: c.code,
 			name: c.name,
-			far: c.farBand === true,
+			far: c.bulkQuote === true,
 			fee: c.code === 'US' ? 0 : handlingFeeCents(f.sku, f.list_cents, c),
 			label: c.code === 'US' ? '' : handlingLabel(c.code),
 		}));

@@ -26,16 +26,19 @@ const HC_FIRST = unitAfter(9999, 15), PB_FIRST = unitAfter(7999, 15);
 const usd = (cents) => (cents / 100).toFixed(2);
 const feeUsd = (code, slug, paid) => handlingFeeCents(slug, paid, row(code)) / 100;
 
-test('3B: exactly the 19 markets are live (US + the wave), AE SA NG are not', () => {
+test('3B + 2026-11-15: US + the 19-market wave + every country opened by Kevin ("never bottleneck"), sanctions excluded', () => {
 	assert.equal(LIVE19.length, 19);
 	assert.deepEqual(raw.liveWave, LIVE19);
-	assert.deepEqual(LIVE_COUNTRIES.map((c) => c.code), ['US', ...LIVE19]);
-	for (const no of ['AE', 'SA', 'NG']) assert.ok(!LIVE_COUNTRIES.some((c) => c.code === no), `${no} must not be live`);
+	assert.deepEqual(LIVE_COUNTRIES.map((c) => c.code), ['US', ...LIVE19, ...raw.liveWave2]);
+	for (const no of ['IR', 'KP', 'SY', 'CU'])
+		assert.ok(!LIVE_COUNTRIES.some((c) => c.code === no), `${no} must not be live`);
 	for (const c of LIVE_COUNTRIES.filter((x) => x.code !== 'US')) {
 		assert.ok(c.landed_cost_usd, `${c.code} needs landed_cost_usd`);
 		assert.ok(c.landed_cost_usd.hc > 0 && c.landed_cost_usd.pb > 0, c.code);
 		assert.ok(checkoutShippingForm(c.code, 1), `${c.code} reaches Stripe`);
 	}
+	// opened countries: 1-9 copies check out; 10+ is a bulk quote (phase 2)
+	for (const code of raw.liveWave2) assert.equal(LIVE_COUNTRIES.find((c) => c.code === code)?.bulkQuote, true, code);
 });
 
 test('3B: zone-inferred landed costs are flagged INFERRED in the data (basis ZONE_MAX)', () => {
@@ -156,7 +159,7 @@ async function checkout({ country, counts, email = 'a@b.co', repeat = false }) {
 		const j = (o) => new Response(JSON.stringify(o), { status: 200 });
 		if (u.includes('promotion_codes')) return j({ data: [{ id: 'promo_1', coupon: { valid: true, percent_off: 15 } }] });
 		if (u.includes('checkout/sessions') && init?.method === 'POST') { body = init.body; return j({ url: 'https://stripe.test/x' }); }
-		if (u.includes('checkout/sessions')) return j({ data: repeat ? [{ payment_status: 'paid' }] : [] });
+		if (u.includes('checkout/sessions')) return j({ data: repeat ? [{ payment_status: 'paid', metadata: { kind: 'dvc_print' } }] : [] }); // a store order (Kevin 2026-11-14)
 		return j({ data: [] });
 	};
 	const { onRequestPost } = await import('../functions/dvc-checkout.ts');
@@ -232,8 +235,8 @@ test('backstop: a country with no landed cost is refused, never sold below an un
 	assert.equal(marginCheck([{ slug: HC, retail: 9999 }], 0, 'ZZ', ALL).ok, false);
 });
 
-test('Stripe: pending / non-wave countries (AE SA NG) are refused', async () => {
-	for (const country of ['AE', 'SA', 'NG', 'ZZ']) {
+test('Stripe: countries we do not serve and unknown codes are refused', async () => {
+	for (const country of ['KP', 'IR', 'ZZ']) {
 		const r = await checkout({ country, counts: { 'moms-hb': 1 } });
 		assert.equal(r.status, 400, country);
 		assert.equal(r.json.error, 'country_not_served');
@@ -267,7 +270,7 @@ test('dist: edition order block carries the fee table, the per-price fee slots a
 	assert.ok(fs.existsSync(DIST_PAGE), 'dist/ missing: run the build first');
 	const h = fs.readFileSync(DIST_PAGE, 'utf8');
 	const cfg = JSON.parse(h.match(/data-order="([^"]*)"/)[1].replaceAll('&#34;', '"').replaceAll('&quot;', '"').replaceAll('&#38;', '&').replaceAll('&amp;', '&'));
-	assert.deepEqual(Object.keys(cfg.intl).sort(), [...LIVE19].sort());
+	assert.deepEqual(Object.keys(cfg.intl).sort(), [...LIVE19, ...raw.liveWave2].sort());
 	assert.equal(cfg.intl.IN.label, 'International handling');
 	assert.equal(cfg.intl.DE.label, 'Import & handling');
 	assert.match(h, /data-fee-sku="[a-z0-9-]+-pb"[^>]*data-fee-full/);
@@ -296,7 +299,8 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	const root = d.querySelector('[data-order]');
 	const cfg = JSON.parse(root.dataset.order);
 	const hb = Object.keys(cfg.prices).find((k) => k.endsWith('-hb')), pb = Object.keys(cfg.prices).find((k) => k.endsWith('-pb'));
-	const setQty = (sku, n) => { const el = d.querySelector(`.qty-in[data-slug="${sku}"]`); el.value = String(n); el.dispatchEvent(new w.Event('input', { bubbles: true })); };
+	// The edition box (Kevin 2026-11-14): a format button picks the binding, one quantity field counts it.
+	const setQty = (sku, n) => { const el = d.querySelector(`[data-pick-qty][data-fmt="${sku.endsWith('-pb') ? 'pb' : 'hb'}"]`); el.value = String(n); el.dispatchEvent(new w.Event('input', { bubbles: true })); };
 	const pick = (code) => { const s = d.querySelector('[data-country]'); s.value = code; s.dispatchEvent(new w.Event('change', { bubbles: true })); };
 	const feeEl = (sku) => [...d.querySelectorAll(`[data-fee-sku="${sku}"][data-fee-full]`)][0];
 	const txt = (sel) => d.querySelector(sel).textContent;
@@ -307,20 +311,29 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	w.fetch = async (url, init) => { asked.push(JSON.parse(init.body)); return { json: async () => answers.value }; };
 	const email = d.querySelector('[data-email]');
 	const typeEmail = async (v) => { email.value = v; email.dispatchEvent(new w.Event('change', { bubbles: true })); await new Promise((r) => setTimeout(r, 20)); };
-	const offer = () => d.querySelector('[data-offer-label]');
+	// Edition box (Kevin 2026-11-14): ONE first-order line (data-offer) replaces the old changing label;
+	// once the server confirms a first order the 15% shows as the summary's discount line.
+	const offer = () => d.querySelector('[data-offer]');
+	// It names the saving in money (Kevin 2026-11-14) and is NOT taken off the total before the email is confirmed.
+	const OFFER_LINE = /^First order\? −\$[\d,.]+ \(15%\) comes off at checkout$/; // Kevin 2026-11-14 "1A" best practice
 	const firstHb = unitAfter(hbList, 15);
 
 	pick('US');
+	setQty(pb, 0); // the box opens with one paperback
 	setQty(hb, 2);
+	assert.equal(d.querySelector('[data-sum-items]').textContent.replace(/[\s,]/g, ''), `2×Hardback$${usd(hbList * 2)}`, 'itemized: 2 x Hardback');
 	assert.equal(feeEl(hb).hidden, true, 'US shows no fee');
 	assert.equal(d.querySelector('[data-sum-fee]').hidden, true);
 
 	// BEFORE an email: list price + fee for the country, and only a promise of the 15%
 	pick('IN');
-	assert.equal(feeEl(hb).hidden, false);
-	assert.equal(feeEl(hb).textContent, `+ $${usd(handlingFeeCents(hb, firstHb, row('IN')))} international handling (India)`, 'price-line fee sits on the first-order price shown beside it');
+	// the row's fee is sized on the price the total applies (list before the email; audit 11-14), so the row and the
+	// summary always name the same fee
+	const feeAtList = handlingFeeCents(hb, hbList, row('IN'));
+	assert.equal(feeEl(hb).hidden, feeAtList <= 0);
 	assert.equal(d.querySelector('[data-sum-disc]').hidden, true, 'no discount counted before the email is checked');
-	assert.equal(offer().textContent, 'First order? 15% off at checkout.');
+	assert.match(offer().textContent, OFFER_LINE);
+	assert.equal(offer().hidden, false);
 	assert.equal(asked.length, 0);
 	const feeList = handlingFeeCents(hb, hbList, row('IN'));
 	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(hbList * 2 + feeList * 2)}`, 'total = list price + fee: never understated');
@@ -328,18 +341,20 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	// a first-order email: the server (existing check) says yes -> 15% off the unit + the fee sized on it
 	await typeEmail('new@buyer.co');
 	assert.deepEqual(asked.at(-1), { firstOrderCheck: true, email: 'new@buyer.co' });
-	assert.equal(offer().textContent, '15% off your first order');
+	assert.equal(txt('[data-sum-disc-label]'), '15% off your first order');
 	assert.equal(d.querySelector('[data-sum-disc]').hidden, false);
 	const feeFirst = handlingFeeCents(hb, firstHb, row('IN'));
 	assert.equal(feeFirst, 299);
 	assert.equal(txt('[data-sum-fee-amt]'), `$${usd(feeFirst * 2)}`, 'per copy x quantity');
 	assert.equal(txt('[data-sum-fee-label]'), 'International handling (India)');
+	assert.equal(feeEl(hb).textContent, `+ $${usd(feeFirst)} international handling (India)`, 'row fee = the fee the summary charges');
 	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(firstHb * 2 + feeFirst * 2)}`);
 
 	// editing the email forgets the answer; a repeat buyer sees list price and no offer at all
 	email.value = 'x';
 	email.dispatchEvent(new w.Event('input', { bubbles: true }));
-	assert.equal(offer().textContent, 'First order? 15% off at checkout.');
+	assert.match(offer().textContent, OFFER_LINE);
+	assert.equal(offer().hidden, false);
 	answers.value = { status: 'repeat' };
 	await typeEmail('old@buyer.co');
 	assert.equal(d.querySelector('[data-offer]').hidden, true, 'repeat buyer: no offer shown');
@@ -349,7 +364,8 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	// a failed check never lowers the total
 	w.fetch = async () => { throw new Error('offline'); };
 	await typeEmail('again@buyer.co');
-	assert.equal(offer().textContent, 'First order? 15% off at checkout.');
+	assert.match(offer().textContent, OFFER_LINE);
+	assert.equal(offer().hidden, false);
 	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(hbList * 2 + feeList * 2)}`);
 
 	// EU label, and a country with no fee at all
@@ -373,7 +389,7 @@ test('server: the first-order check answers yes/no from the same rule checkout u
 			const j = (o) => new Response(JSON.stringify(o), { status: 200 });
 			if (u.includes('promotion_codes')) return j({ data: [{ id: 'promo_1', coupon: { valid: true, percent_off: 15 } }] });
 			if (u.includes('checkout/sessions') && init?.method === 'POST') { posted = true; return j({ url: 'x' }); }
-			if (u.includes('checkout/sessions')) return j({ data: repeat ? [{ payment_status: 'paid' }] : [] });
+			if (u.includes('checkout/sessions')) return j({ data: repeat ? [{ payment_status: 'paid', metadata: { kind: 'dvc_print' } }] : [] }); // a store order (Kevin 2026-11-14)
 			return j({ data: [] });
 		};
 		const store = new Map();
