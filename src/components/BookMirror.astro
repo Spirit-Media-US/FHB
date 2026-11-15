@@ -1,0 +1,344 @@
+---
+// The SMP book page body, MIRRORING fathersheartbible.com/bibles/grandparents-bible/ section for section (Kevin
+// 2026-11-14 ~00:13Z via pmseoaeo: SMP book pages are "far from" the FHB edition pages; L2006; Kevin 2026-11-14 again:
+// "inspect them side by side ... While text will change the WHY of the text does not"). Rendered under the hero + order
+// area by src/pages/books/[slug]/index.astro when a title carries `book.page` copy.
+// ORDER = the FHB edition page, block for block, with ONE intentional difference (Kevin 2026-11-14: "On SMP books move
+// the author and headshot and publisher section up higher. For example above look inside"):
+//   hook (warm: headline, white quote card, note) -> what makes it different (light) -> ABOUT THE AUTHOR + headshot +
+//   publisher (warm; FHB has it lower as "About this translation") -> look inside (soft; FHB "What every copy opens
+//   with") -> what's inside + product details (warm) -> the long listing: audience sections + stories (light) -> why it
+//   exists (soft) -> more books + questions (light).
+// Every section renders ONLY from its field (copy by pmseoaeo, field list in jobs/seat-status/builder.md); nothing is
+// written here. One column, phone first.
+interface Props {
+	/** true when the hero carries the FHB page viewer: no Look inside section below (Kevin 2026-11-14) */
+	hideLookInside?: boolean;
+	page: Record<string, any>;
+	title: string;
+	faq: { q: string; a: string }[];
+	lang?: string;
+	/** the author's headshot (src/data/books/authors.json), shown beside the bio */
+	headshot?: { src: string; w: number; h: number; alt: string };
+	/** the measured cover colour for the title in small text (Product details), or undefined = ink */
+	titleColor?: string;
+	authorName?: string;
+	/** other SMP books to link (page.more slugs resolved by the page), FHB "More editions" */
+	more?: { slug: string; title: string }[];
+}
+const {
+	page: g,
+	title,
+	faq,
+	lang = 'en',
+	hideLookInside = false,
+	headshot,
+	titleColor,
+	authorName,
+	more = [],
+} = Astro.props;
+// Section labels: the page's own heading when its copy names one (a Spanish page, 3ge), else the house label in its
+// language. Nothing is invented: es strings are the plain labels the Spanish copy itself uses.
+const HOUSE: Record<string, Record<string, string>> = {
+	en: {
+		look_inside: 'Look inside',
+		contents: 'Contents',
+		whats_inside: "What's inside",
+		details: 'Product details',
+		author: 'About the author',
+		faq: 'Questions',
+		why: 'Why this book exists',
+		browse: 'Browse all Father Heart books',
+		more: 'Since you like {title}…',
+		written: 'Written by',
+		foreword: 'Foreword by',
+		published: 'Published by',
+	},
+	es: {
+		look_inside: 'Un vistazo por dentro',
+		contents: 'Contenido',
+		whats_inside: 'Qué trae el libro',
+		details: 'Datos del libro',
+		author: 'Sobre la autora',
+		faq: 'Preguntas',
+		why: 'Por qué existe este libro',
+		browse: 'Ver todos los libros de Spirit Media',
+		more: 'Más libros de Spirit Media',
+		written: 'Escrito por',
+		foreword: 'Prólogo de',
+		published: 'Publicado por',
+	},
+	fr: {
+		look_inside: "Un aperçu de l'intérieur",
+		contents: 'Sommaire',
+		whats_inside: 'Ce que contient le livre',
+		details: 'Fiche du livre',
+		author: "À propos de l'auteur",
+		faq: 'Questions fréquentes',
+		why: 'Pourquoi ce livre existe',
+		browse: 'Voir tous les livres de Spirit Media',
+		more: 'Autres livres de Spirit Media',
+		written: 'Écrit par',
+		foreword: 'Préface de',
+		published: 'Publié par',
+	},
+};
+const L = { ...(HOUSE[lang] ?? HOUSE.en), ...(g.labels ?? {}) };
+// the FHB page's three section backgrounds, in SMP's stone palette
+const BG = { light: 'bg-stone-50', warm: 'bg-stone-200', soft: 'bg-stone-100' } as const;
+const has = (v: unknown) => (Array.isArray(v) ? v.length > 0 : v != null && v !== '');
+const look = (g.look_inside ?? []).filter((x: any) => x?.src);
+// Product details, FHB order: the title first with the ISBNs, then the rest as the copy lists them.
+const detailRows = Object.entries(g.details ?? {}).filter(([, v]) => has(v));
+const isTitle = (k: string) => /^(title|título|titre)$/i.test(k);
+const details = [
+	...detailRows.filter(([k]) => isTitle(k)),
+	...detailRows.filter(([k]) => !isTitle(k) && /ISBN/i.test(k)),
+	...detailRows.filter(([k]) => !isTitle(k) && !/ISBN/i.test(k)),
+];
+const foreword = (g.details ?? {}).Foreword as string | undefined;
+const SMP = 'Spirit Media Publishing';
+const SMP_LOGO = 'https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp';
+const author = g.author?.name || authorName;
+const credits = [
+	...(author ? [[L.written, author]] : []),
+	...(foreword ? [[L.foreword, foreword]] : []),
+	[L.published, g.publisher?.name || SMP],
+] as [string, string][];
+const H2 = 'text-2xl font-bold leading-snug text-ink sm:text-3xl';
+// An answer written as a series ("They are, in order: A; B; ...; and Z. After.") shows as a numbered list
+// (Kevin 2026-11-14 "Please put this in list order so it shows 1-12"). The words are unchanged, so the FAQ schema text still matches.
+const asList = (a: string) => {
+	const m = a.match(/^(.*?:)\s+(.+?)\.(?:\s+(.*))?$/s);
+	if (!m) return null;
+	const items = m[2]
+		.split(/;\s*/)
+		.map((x, i, all) => (i === all.length - 1 ? x.replace(/^and\s+/, '') : x).trim());
+	return items.length >= 3 ? { lead: m[1], items, after: m[3] ?? '' } : null;
+};
+---
+
+{g.audience && has(g.audience.headline) && (
+	<section class={`${BG.warm} px-4 py-12 sm:px-6 lg:px-8`}>
+		<div class="mx-auto max-w-3xl">
+			<h2 class={H2}>{g.audience.headline}</h2>
+			{g.audience.quote?.text && (
+				<figure class="mt-5 rounded-2xl border border-stone-300 bg-white p-7">
+					<p class="font-serif text-lg leading-relaxed text-ink">{g.audience.quote.text}</p>
+					{g.audience.quote.cite && <figcaption class="mt-4 text-xs font-bold tracking-wide text-stone-600">{g.audience.quote.cite}</figcaption>}
+				</figure>
+			)}
+			{has(g.audience.body) && <p class="mt-6 leading-relaxed text-stone-600">{g.audience.body}</p>}
+		</div>
+	</section>
+)}
+
+{g.what_makes && has(g.what_makes.paras) && (
+	<section class={`${BG.light} px-4 py-12 sm:px-6 lg:px-8`}>
+		<div class="mx-auto max-w-3xl space-y-4 leading-relaxed text-stone-800">
+			<h2 class={H2}>{g.what_makes.title || `What makes ${title} different`}</h2>
+			{g.what_makes.paras.map((t: string) => <p>{t}</p>)}
+			{has(g.what_makes.list) && (
+				<ol class="list-decimal space-y-3 pl-6 marker:font-bold marker:text-ink">{g.what_makes.list.map((t: string) => <li>{t}</li>)}</ol>
+			)}
+		</div>
+	</section>
+)}
+
+{(g.author?.bio || g.publisher?.about) && (
+	<section class={`${BG.warm} px-4 py-12 sm:px-6 lg:px-8`} id="author">
+		<div class="mx-auto max-w-3xl leading-relaxed text-stone-800">
+			<h2 class={H2}>{L.author}</h2>
+			<div class="mb-8 mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+				{credits.map(([k, v]) => (
+					<div class="rounded-xl border border-stone-300 bg-white p-4">
+						<p class="mb-1 text-xs uppercase tracking-widest text-stone-600">{k}</p>
+						{k === L.published && v === SMP ? (
+							<a href="/" class="inline-block leading-none"><img src={SMP_LOGO} alt="" width="220" height="22" loading="lazy" decoding="async" class="h-auto w-[220px] max-w-full" /><span class="sr-only">{SMP}</span></a>
+						) : (
+							<p class="font-semibold text-ink">{v}</p>
+						)}
+					</div>
+				))}
+			</div>
+			{g.author?.bio && (
+				<div class="flex items-start gap-4 sm:gap-6" data-bio-beside-photo>
+					{headshot && <img src={headshot.src} width={headshot.w} height={headshot.h} alt={headshot.alt} loading="lazy" decoding="async" class="h-28 w-28 shrink-0 rounded-2xl object-cover sm:h-44 sm:w-44" data-headshot />}
+					<div class="min-w-0">
+						{author && <h3 class="text-xl font-bold text-ink">{author}</h3>}
+						<p class="mt-2 text-stone-700">{g.author.bio}</p>
+					</div>
+				</div>
+			)}
+			{g.publisher?.about && (
+				<div class="mt-8">
+					<h3 class="text-xl font-bold text-ink">{g.publisher.name || SMP}</h3>
+					<p class="mt-2 text-stone-700">{g.publisher.about}</p>
+				</div>
+			)}
+		</div>
+	</section>
+)}
+
+{!hideLookInside && look.length === 0 && g.look_inside_text && has(g.look_inside_text.blocks) && (
+	<section class={`${BG.soft} px-4 py-12 sm:px-6 lg:px-8`} id="look-inside">
+		<div class="mx-auto max-w-3xl text-stone-800">
+			<h2 class={H2}>{L.look_inside}</h2>
+			{(g.look_inside_text.blocks ?? [{ type: 'p', text: '' }]).map((b: any) =>
+				b.type === 'quote' ? (
+					<figure class="mt-5 rounded-2xl border border-stone-300 bg-white p-6">
+						{b.paras.map((t: string) => <p class="font-serif text-lg leading-relaxed text-ink [&+p]:mt-4">{t}</p>)}
+					</figure>
+				) : b.type === 'list' ? (
+					<ol class="mt-4 list-decimal space-y-2 pl-6 leading-relaxed marker:font-bold marker:text-ink">{b.items.map((t: string) => <li>{t}</li>)}</ol>
+				) : (
+					b.text && <p class="mt-4 leading-relaxed">{b.text}</p>
+				),
+			)}
+			{has(g.look_inside_text.contents) && (
+				<div class="mt-6">
+					<h3 class="text-lg font-bold text-ink">{L.contents}</h3>
+					{g.look_inside_text.numbered === false ? (
+						<ul class="mt-3 list-disc space-y-2 pl-6">{g.look_inside_text.contents.map((t: string) => <li>{t}</li>)}</ul>
+					) : (
+						<ol class="mt-3 list-decimal columns-1 gap-8 space-y-1 pl-6 sm:columns-2">{g.look_inside_text.contents.map((t: string) => <li class="break-inside-avoid">{t}</li>)}</ol>
+					)}
+					{has(g.look_inside_text.contents_after) && (
+						<ul class="mt-2 space-y-1 pl-6 text-stone-700">{g.look_inside_text.contents_after.map((t: string) => <li>{t}</li>)}</ul>
+					)}
+				</div>
+			)}
+		</div>
+	</section>
+)}
+
+{/* Kevin 2026-11-14: Look inside = the real pages, front of the book through Chapter 1, for every book; the page
+    images replace the text summary whenever they exist. */}
+{!hideLookInside && look.length > 0 && (
+	<section class={`${BG.soft} px-4 py-12 sm:px-6 lg:px-8`} id="look-inside">
+		<div class="mx-auto max-w-5xl">
+			<h2 class={H2}>{L.look_inside}</h2>
+			{g.look_inside_note && <p class="mt-2 text-stone-600">{g.look_inside_note}</p>}
+			<div class="mt-6 flex snap-x gap-4 overflow-x-auto pb-2">
+				{look.map((p: any, i: number) => (
+					<img src={p.src} alt={p.alt || `${title}, page ${i + 1}`} width={p.w || 600} height={p.h || 900} loading="lazy" decoding="async" class="h-auto w-[78%] max-w-[320px] shrink-0 snap-start rounded border border-stone-200 shadow sm:w-[300px]" />
+				))}
+			</div>
+		</div>
+	</section>
+)}
+
+{(has(g.whats_inside) || details.length > 0) && (
+	<section class={`${BG.warm} px-4 py-12 sm:px-6 lg:px-8`}>
+		<div class="mx-auto max-w-4xl text-stone-800">
+			{has(g.whats_inside) && (
+				<>
+					<h2 class={H2}>{L.whats_inside}</h2>
+					<ul class="mb-10 mt-5 grid grid-cols-1 gap-x-10 gap-y-3 md:grid-cols-2">
+						{g.whats_inside.map((t: string) => (
+							<li class="flex items-start gap-3 leading-relaxed"><span aria-hidden="true" class="font-bold text-stone-600">·</span><span class="text-ink">{t}</span></li>
+						))}
+					</ul>
+				</>
+			)}
+			{details.length > 0 && (
+				<>
+					<h3 class="mb-3 text-xl font-bold text-ink">{L.details}</h3>
+					<dl class="overflow-hidden rounded-2xl border border-stone-300 bg-white">
+						{details.map(([k, v], n) => (
+							<div class={`flex flex-wrap gap-2 px-5 py-3 text-[0.9rem] ${n % 2 ? 'bg-stone-50' : ''}`}>
+								<dt class="min-w-[7.5rem] text-stone-600">{k}</dt>
+								{/^(publisher|editorial|éditeur)$/i.test(k) && String(v) === SMP ? (
+									<dd class="flex-1 leading-none"><a href="/" class="inline-block"><img src={SMP_LOGO} alt="" width="200" height="20" loading="lazy" decoding="async" class="h-auto w-[200px] max-w-full" /><span class="sr-only">{SMP}</span></a></dd>
+								) : (
+									<dd class={`flex-1 font-semibold ${/ISBN/i.test(k) ? 'whitespace-nowrap' : ''} ${isTitle(k) && titleColor ? '' : 'text-ink'}`} style={isTitle(k) && titleColor ? `color: ${titleColor};` : undefined}>{String(v)}</dd>
+								)}
+							</div>
+						))}
+					</dl>
+				</>
+			)}
+			{g.content_note && has(g.content_note.paras) && (
+				<div class="mt-8 rounded-lg border border-stone-300 bg-stone-50 p-4">
+					<h3 class="text-lg font-bold text-ink">{g.content_note.title}</h3>
+					{g.content_note.paras.map((x: string) => <p class="mt-2 leading-relaxed">{x}</p>)}
+				</div>
+			)}
+		</div>
+	</section>
+)}
+
+{((g.sections ?? []).some((s: any) => has(s?.h2) && has(s?.paras)) || has(g.stories)) && (
+	<section class={`${BG.light} px-4 py-12 sm:px-6 lg:px-8`}>
+		<div class="mx-auto max-w-3xl text-stone-800">
+			{(g.sections ?? []).filter((s: any) => has(s?.h2) && has(s?.paras)).map((s: any) => (
+				<div class="mb-8 space-y-4 leading-relaxed">
+					<h2 class="text-2xl font-bold leading-snug text-ink">{s.h2}</h2>
+					{s.paras.map((t: string) => <p>{t}</p>)}
+				</div>
+			))}
+			{has(g.stories) && (
+				<div class="mt-4">
+					{g.stories_title && <h2 class={H2}>{g.stories_title}</h2>}
+					<div class="mt-6 space-y-8">
+						{g.stories.filter((s: any) => has(s?.h2) && has(s?.paras)).map((s: any) => (
+							<div class="rounded-2xl border border-stone-300 bg-white p-6">
+								<h3 class="text-xl font-bold text-ink">{s.h2}</h3>
+								{s.paras.map((t: string) => <p class="mt-3 leading-relaxed">{t}</p>)}
+							</div>
+						))}
+					</div>
+				</div>
+			)}
+		</div>
+	</section>
+)}
+
+{g.why && has(g.why.paras) && (
+	<section class={`${BG.soft} px-4 py-12 sm:px-6 lg:px-8`}>
+		<div class="mx-auto max-w-3xl space-y-4 leading-relaxed text-stone-800">
+			<h2 class={H2}>{g.why.title || L.why}</h2>
+			{g.why.paras.map((t: string) => <p>{t}</p>)}
+		</div>
+	</section>
+)}
+
+{(faq.length > 0 || more.length > 0) && (
+	<section class={`${BG.light} px-4 py-12 sm:px-6 lg:px-8`}>
+		<div class="mx-auto max-w-3xl">
+			{more.length > 0 && (
+				<nav aria-label={L.more.replace("{title}", title)} class="mb-10">
+					<h2 class="mb-3 text-xl font-bold text-ink">{L.more.replace("{title}", title)}</h2>
+					<ul class="flex flex-wrap gap-2">
+						{more.map((m) => <li><a href={m.href ?? `/books/${m.slug}/`} class="inline-flex min-h-11 items-center rounded-full border border-[#f0c4d8] bg-[#fbe7f0] px-4 text-sm font-semibold text-stone-700 no-underline hover:border-ink">{m.title}</a></li>)}
+					</ul>
+				</nav>
+			)}
+			{faq.length > 0 && (
+				<>
+					<h2 class={H2}>{L.faq}</h2>
+					<div class="mt-5 space-y-3">
+						{faq.map((f) => (
+							<details class="overflow-hidden rounded-2xl border border-[#c4c4cc] bg-white">
+								<summary class="cursor-pointer list-none px-5 py-4 font-semibold text-stone-700">{f.q}</summary>
+								{(() => {
+									const l = asList(f.a);
+									return l ? (
+										<div class="-mt-1 px-5 pb-5 leading-relaxed text-stone-600">
+											<p>{l.lead}</p>
+											<ol class="mt-2 list-decimal space-y-1 pl-6">{l.items.map((x) => <li>{x}</li>)}</ol>
+											{l.after && <p class="mt-2">{l.after}</p>}
+										</div>
+									) : (
+										<p class="-mt-1 px-5 pb-5 leading-relaxed text-stone-600">{f.a}</p>
+									);
+								})()}
+							</details>
+						))}
+					</div>
+				</>
+			)}
+			<p class="mt-6"><a href="/books/" class="font-semibold text-muted underline underline-offset-2">{L.browse}</a></p>
+		</div>
+	</section>
+)}

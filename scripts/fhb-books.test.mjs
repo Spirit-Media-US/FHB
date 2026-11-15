@@ -299,19 +299,22 @@ test('3es F1/F3: Who Am I? title + offers InStock + no future datePublished', { 
 // /bibles/grandparents-bible/), ordering on the SMP store (L1990; contract 3fe). Every live book page carries the
 // #order card with one price line and one counter per format, no one-line "per copy" price, and no off-site link.
 test('every live book page has its order form ON the page: per-format price lines + counters, posting to SMP', () => {
+	// The RIAB-standard order area (Kevin 2026-11-14 "This is the standard"; the SMP book page's box in FHB colours).
 	for (const slug of ['beloved-identity', 'who-am-i'].filter((x) => surface.live || surface.liveSlugs.includes(x))) {
 		const html = fs.readFileSync(new URL(`../dist/books/${slug}/index.html`, import.meta.url), 'utf8');
-		assert.match(html, /id="order"[^>]*data-book-order=/, `${slug}: order card on the page`);
-		const lines = [...html.matchAll(/data-line-sku="([a-z0-9-]+)"/g)].map((m) => m[1]);
-		const counters = new Set([...html.matchAll(/class="bko__in"[^>]*data-sku="([a-z0-9-]+)"/g)].map((m) => m[1]));
-		assert.ok(lines.length >= 1, `${slug}: a price line per format`);
-		for (const sku of lines) assert.ok(counters.has(sku), `${slug}: ${sku} has a counter`);
-		assert.doesNotMatch(html, /per copy · free shipping in the United States/, `${slug}: the rejected one-line price`);
+		assert.match(html, /<form id="order"[^>]*data-slug="[a-z0-9-]+"[^>]*data-status="live"/, `${slug}: order form on the page`);
+		const skus = [...html.matchAll(/class="bo-qty__in"[^>]*name="([a-z0-9-]+)"/g)].map((m) => m[1]);
+		assert.ok(skus.length >= 1, `${slug}: a quantity per format`);
+		for (const sku of skus) assert.match(html, new RegExp(`data-sku="${sku}"`), `${slug}: ${sku} has its price row`);
+		assert.match(html, /off first order \+ free standard shipping to \d+ countries/, `${slug}: the offer line`);
+		assert.match(html, /aria-label="Keep shopping"/, `${slug}: Keep shopping`);
+		assert.doesNotMatch(html, /hello@spiritmediapublishing\.com<|>[^<]*@spiritmediapublishing\.com/, `${slug}: no printed email address`);
 		assert.doesNotMatch(html, /spiritmediapublishing\.com\/books\/[a-z0-9-]+\/buy\//, `${slug}: no hand-off to the SMP buy page`);
 	}
 	const src = fs.readFileSync(new URL('../src/components/BookOrder.astro', import.meta.url), 'utf8');
 	assert.match(src, /https:\/\/spiritmediapublishing\.com'/, 'production orders on the SMP store');
 	assert.match(src, /\/store-checkout`/, 'posts to SMP /store-checkout');
+	assert.match(src, /const site = 'fhb'/, 'the sale records site=fhb');
 });
 
 // The on-page book form calls the SMP store cross-origin; the CSP must allow it on /books/* and ONLY there
