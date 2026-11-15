@@ -69,7 +69,7 @@ test('schema: one OfferShippingDetails per live country; return policy uses the 
 	const d = [].concat(shippingDetailsForOffers());
 	assert.deepEqual([...new Set(d.map((x) => x.shippingDestination.addressCountry))], [...SHIP_CODES]);
 	for (const code of SHIP_CODES) assert.equal(d.filter((x) => x.shippingDestination.addressCountry === code)[0].shippingRate.value, '0', `${code}: the free option must be the default (first)`);
-	assert.deepEqual([].concat(merchantReturnPolicy.applicableCountry), [...SHIP_CODES]);
+	assert.deepEqual([].concat(merchantReturnPolicy).flatMap((p) => [].concat(p.applicableCountry)), [...SHIP_CODES]);
 	for (const x of d) assert.ok(x.deliveryTime.handlingTime && x.deliveryTime.transitTime && x.shippingRate.currency);
 });
 test('copy: never claims worldwide while only one country is live', () => {

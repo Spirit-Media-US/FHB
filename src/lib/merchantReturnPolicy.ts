@@ -33,15 +33,30 @@ export const SHIP_COUNTRIES: readonly string[] = SHIP_CODES;
 export const RETURN_DAYS = 30;
 export const RETURNS_URL = 'https://fathersheartbible.com/returns/';
 
+// Google: "applicableCountry ... You can specify up to 50 countries" PER MerchantReturnPolicy (GSC 2026-11-14:
+// "applicableCountry can be defined at most 50 times"). The terms are the SAME for every country, so the list is
+// split into several MerchantReturnPolicy objects of <=50 countries each (ship-countries.json order kept, so
+// the first object is the main markets). Coverage stays equal to shippingDestination; nothing is dropped.
+export const MAX_RETURN_COUNTRIES = 50;
 const countryValue = (list: readonly string[]) => (list.length === 1 ? list[0] : [...list]);
-
-export const merchantReturnPolicy = {
+export const returnPolicyFor = (list: readonly string[]) => ({
 	'@type': 'MerchantReturnPolicy',
-	applicableCountry: countryValue(SHIP_COUNTRIES),
+	applicableCountry: countryValue(list),
 	returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
 	merchantReturnDays: RETURN_DAYS,
 	merchantReturnLink: RETURNS_URL,
+});
+export const returnPolicyChunks = (
+	list: readonly string[] = SHIP_COUNTRIES,
+	size = MAX_RETURN_COUNTRIES,
+) => {
+	const out: ReturnType<typeof returnPolicyFor>[] = [];
+	for (let i = 0; i < list.length; i += size) out.push(returnPolicyFor(list.slice(i, i + size)));
+	return out;
 };
+const chunks = returnPolicyChunks();
+// One object when the list fits, else an array of objects (each <=50 countries).
+export const merchantReturnPolicy = chunks.length === 1 ? chunks[0] : chunks;
 
 // shippingDestination for OfferShippingDetails: same country list.
 export const shippingDestination = () =>
