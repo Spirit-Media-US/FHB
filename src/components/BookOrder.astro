@@ -130,6 +130,10 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 			<select id={`bo-${slug}-country`} name="country" class="bo-select" autocomplete="country">
 				{countries.map((c) => <option value={c.code} selected={c.code === 'US'}>{c.name}</option>)}
 			</select>
+			{/* a first order can only be recognised by its email (the engine's isFirstOrder): the FHB edition box asks the same way */}
+			<label class="bo-label" for={`bo-${slug}-email`}>Email</label>
+			{firstOrder && <p class="bo-hint" id={`bo-${slug}-email-hint`}>For your receipt, and to check your first-order saving.</p>}
+			<input id={`bo-${slug}-email`} class="bo-select" type="email" name="email" autocomplete="email" inputmode="email" required aria-describedby={firstOrder ? `bo-${slug}-email-hint` : undefined} data-email />
 		</div>
 		<p class="bo-note">Free standard shipping · tax calculated at checkout</p>
 		<button type="submit" class="bo-checkout">Checkout →</button>
@@ -194,6 +198,7 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 	.bo-total dd { font-size: 1.5rem; line-height: 1.3; }
 	.bo-first { margin: 0.1rem 0 0; color: #9d174d; font-size: 0.88rem; font-weight: 700; text-align: right; }
 	.bo-first[hidden] { display: none; }
+	.bo-hint { margin: 0 0 0.3rem; font-size: 0.8rem; color: #57534e; }
 	.bo-label { display: block; margin: 0.6rem 0 0.3rem; font-size: 0.85rem; font-weight: 600; }
 	.bo-select { box-sizing: border-box; width: 100%; min-height: 44px; padding: 0.55rem 0.8rem; border: 1.5px solid #d9d0c4; border-radius: 0.6rem; background: #fff; font: inherit; font-size: 1rem; }
 	.bo-note { margin: 0.4rem 0 0; color: #57534e; font-size: 0.78rem; }
@@ -303,7 +308,7 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 				const r = await fetch(`${STORE}/store-checkout`, {
 					method: 'POST',
 					headers: { 'content-type': 'application/json' },
-					body: JSON.stringify({ counts, country: sel.value, returnPath: `/books/${form.dataset.slug}/`, site, utm }),
+					body: JSON.stringify({ counts, country: sel.value, email: (form.querySelector('[data-email]') as HTMLInputElement | null)?.value.trim() ?? '', returnPath: `/books/${form.dataset.slug}/`, site, utm }),
 				});
 				const j = await r.json();
 				if (j.url) {
