@@ -308,6 +308,8 @@ test('every live book page has its order form ON the page: per-format price line
 		for (const sku of skus) assert.match(html, new RegExp(`data-sku="${sku}"`), `${slug}: ${sku} has its price row`);
 		assert.match(html, /off first order \+ free standard shipping to \d+ countries/, `${slug}: the offer line`);
 		assert.match(html, /aria-label="Keep shopping"/, `${slug}: Keep shopping`);
+		// the first-order 15% needs the email (engine isFirstOrder): without it every book sells at list (2026-11-15 prod finding)
+		assert.match(html, /<input[^>]*type="email"[^>]*name="email"[^>]*required/, `${slug}: email field for the first-order check`);
 		assert.doesNotMatch(html, /hello@spiritmediapublishing\.com<|>[^<]*@spiritmediapublishing\.com/, `${slug}: no printed email address`);
 		assert.doesNotMatch(html, /spiritmediapublishing\.com\/books\/[a-z0-9-]+\/buy\//, `${slug}: no hand-off to the SMP buy page`);
 	}
@@ -315,6 +317,7 @@ test('every live book page has its order form ON the page: per-format price line
 	assert.match(src, /https:\/\/spiritmediapublishing\.com'/, 'production orders on the SMP store');
 	assert.match(src, /\/store-checkout`/, 'posts to SMP /store-checkout');
 	assert.match(src, /const site = 'fhb'/, 'the sale records site=fhb');
+	assert.match(src, /email: \(form\.querySelector\('\[data-email\]'\)/, 'the order sends the email');
 });
 
 // The on-page book form calls the SMP store cross-origin; the CSP must allow it on /books/* and ONLY there
