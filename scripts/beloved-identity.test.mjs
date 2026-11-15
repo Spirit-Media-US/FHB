@@ -67,24 +67,25 @@ test('facts: SKU, ISBN and list price are the measured ones', () => {
 	assert.equal(f.list_cents, 999);
 });
 
-test('1 copy: $9.99, one line, no discount, no coupon', async () => {
+// SAME OFFER ON BOTH SITES (Kevin 2026-11-14): a first order takes 15% on books too (US: the WELCOME15 coupon).
+test('1 copy, first order: $9.99 list with the first-order coupon (books take the 15% like Bibles)', async () => {
 	const r = await post({ counts: { [BI]: 1 }, country: 'US', email: 'new@buyer.org' });
 	assert.equal(r.status, 200, JSON.stringify(r.json));
 	const l = lines(r.s);
 	assert.equal(l.length, 1);
 	assert.deepEqual([l[0].qty, l[0].unit], [1, 999]);
 	assert.match(l[0].name, /Beloved Identity/);
-	assert.equal(r.s['discounts[0][promotion_code]'], undefined, 'no first-order coupon on the book');
-	assert.equal(r.s['metadata[pct_off]'], '0');
-	assert.equal(r.s['metadata[offer]'], 'none');
+	assert.equal(r.s['discounts[0][promotion_code]'], 'promo_1', 'first-order coupon on the book');
+	assert.equal(r.s['metadata[offer]'], 'first_order');
 	assert.equal(r.s['metadata[total]'], '1');
 	assert.equal(r.s['metadata[breakdown]'], `${BI}:1`);
 });
 
-test('3 copies: 3 x $9.99 = $29.97, no discount', async () => {
-	const r = await post({ counts: { [BI]: 3 }, country: 'US', email: 'new@buyer.org' });
+test('FAILURE PATH: no email (or a repeat buyer) -> list price, no coupon', async () => {
+	const r = await post({ counts: { [BI]: 3 }, country: 'US' });
 	const l = lines(r.s);
 	assert.deepEqual([l[0].qty, l[0].unit, l[0].qty * l[0].unit], [3, 999, 2997]);
+	assert.equal(r.s['discounts[0][promotion_code]'], undefined);
 	assert.equal(r.s['metadata[pct_off]'], '0');
 });
 
@@ -126,27 +127,14 @@ test('every Bible tier is unchanged by the book being in the cart (and absent)',
 	}
 });
 
-test('first-order 15% still applies to a Bible, per unit, and never to the book', async () => {
-	const bibleOnly = await post({ counts: { [BIBLE]: 1 }, country: 'US', email: 'new@buyer.org' });
-	assert.equal(
-		bibleOnly.s['discounts[0][promotion_code]'],
-		'promo_1',
-		'Bible-only cart: unchanged coupon path',
-	);
-	assert.equal(lines(bibleOnly.s)[0].unit, BIBLE_LIST);
-	const mixed = await post({
-		counts: { [BIBLE]: 1, [BI]: 2 },
-		country: 'US',
-		email: 'new@buyer.org',
-	});
-	assert.equal(
-		mixed.s['discounts[0][promotion_code]'],
-		undefined,
-		'no order-wide coupon that would discount the book',
-	);
-	assert.equal(lines(mixed.s).find((l) => !isBi(l)).unit, unitAfter(BIBLE_LIST, 15));
-	assert.equal(lines(mixed.s).find(isBi).unit, 999);
+test('first order: the 15% applies to Bibles and books alike (US coupon; abroad per unit)', async () => {
+	const mixed = await post({ counts: { [BIBLE]: 1, [BI]: 2 }, country: 'US', email: 'new@buyer.org' });
+	assert.equal(mixed.s['discounts[0][promotion_code]'], 'promo_1', 'US: one order-wide coupon covers the book too');
 	assert.equal(mixed.s['metadata[offer]'], 'first_order');
+	const abroad = await post({ counts: { [BIBLE]: 1, [BI]: 2 }, country: 'DE', email: 'new@buyer.org' });
+	assert.equal(abroad.s['discounts[0][promotion_code]'], undefined, 'abroad: per unit, never a coupon');
+	assert.equal(lines(abroad.s).find((l) => !isBi(l) && !/handling/i.test(l.name)).unit, unitAfter(BIBLE_LIST, 15));
+	assert.equal(lines(abroad.s).find(isBi).unit, unitAfter(999, 15), 'book 15% off per unit');
 });
 
 test('empty and bad carts still refused', async () => {

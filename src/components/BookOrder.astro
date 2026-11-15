@@ -1,298 +1,324 @@
 ---
-/* THE ORDER FORM ON A FATHER HEART BOOK PAGE (/books/<slug>/), anchored #order.
- *
- * Kevin 2026-11-13 ~22:53Z (kevin-decisions L1999): "/books/who-am-i/ - no. Look at
- * https://fathersheartbible.com/bibles/grandparents-bible/ put the order form on the page. This doesn't look best:
- * Paperback $15.99 · Hardback $24.99 per copy · free shipping in the United States -- Make sure all new pages look
- * best in mobile as most users use mobile."
- *
- * So this is the edition order card (EditionOrder.astro) in the book's terms: the same card, eyebrow, title, one
- * price per line, the same pill counters and the same pink Checkout. What differs is commerce, and none of it is
- * invented here: books take NO first-order 15% and NO volume ladder (every book is discount-exempt in the store
- * engine), so there is no struck price and no tier line. Per-country handling and the far-band bulk-quote rule are
- * the checkout's own (marginGuard.ts / farBand.ts), passed in by the page.
- *
- * The order is placed on the SMP store (Kevin L1990 "SMP is the engine"; contract 3fe): the form POSTs to SMP's
- * /store-checkout, which allowlists this origin, records site=fhb, and returns the buyer here (cancel) or to this
- * site's /order (paid). The server prices every order; the total shown is only the same arithmetic.
- */
-import { BULK_QUOTE_COPY } from '../lib/farBand';
-import BiblesBooksToggle from './BiblesBooksToggle.astro';
+// THE ORDER AREA ON AN FHB BOOK PAGE (/books/<slug>/#order) — the SAME area as the SMP book page (Kevin 2026-11-14:
+// Who Am I? + Beloved Identity "same content but on 2 different sites"; RIAB is the standard), in FHB's colours,
+// ordering on the SMP store (contract 3fe). Mirrors the approved FHB edition-page order area
+// (FHB src/components/EditionOrder.astro + OrderSummary.astro, grandparents-bible, Kevin 2026-11-14/15):
+//   offer line centered -> full-width black country marquee (~2s per country, A-Z, data-nosnippet moving copies,
+//   reduced-motion stops it) -> four compact choices ABOVE the box (white items, gray frame, gray text) -> the box:
+//   one row per format with its own quantity, the price everyone pays first, an itemized summary, Total, Ship to under
+//   Total, Checkout in FHB's primary button style (the edition box's), and a "Contact us" BUTTON (MailtoLink: an address is
+//   never printed, Kevin 2026-11-15 "We do not post our emails ... mailto: show a button not the email").
+// Nothing here is commerce: prices are the engine's registry rows, the countries are the ones the engine itself sells
+// this book to (asked in the page's getStaticPaths), the per-copy handling fee is the engine's marginGuard figure, and
+// the POST is the existing /store-checkout. The server stays authoritative.
+// English only for now: es/fr book pages keep their reviewed-string form until their own strings exist.
+import MailtoLink from './MailtoLink.astro';
 
-type Dest = { code: string; name: string; far: boolean; fee: number; label: string };
 interface Props {
 	slug: string;
 	title: string;
-	formats: { sku: string; format: string; list_cents: number; dests: Dest[] }[];
+	/** the title's cover colour style (src/data/books/cover-colors.json), or undefined = ink */
+	titleStyle?: string;
+	formats: { sku: string; format: string; list_cents: number }[];
+	/** the countries the engine sells ALL these formats to, engine order */
+	countries: { code: string; name: string }[];
+	/** { list: {sku: cents}, fee: {country: {sku: cents}} } */
+	feeCfg: string;
+	/** the engine lets these SKUs take the first-order 15% (books: false today, Kevin 2026-11-10) */
+	firstOrder: boolean;
+	firstOrderPct: number;
+	returnDays: number;
 }
-const { slug, title, formats } = Astro.props;
-const money = (c: number) => `$${(c / 100).toFixed(2)}`;
-// a country is offered only when EVERY format can ship there (US always)
-const countries = formats[0].dests
-	.filter((d) => formats.every((f) => f.dests.some((x) => x.code === d.code)))
-	.map((d) => ({ code: d.code, name: d.name, far: d.far, label: d.label }));
-const abroad = countries.filter((c) => c.code !== 'US');
-const config = JSON.stringify({
+const {
 	slug,
-	formats: formats.map((f) => ({
-		sku: f.sku,
-		format: f.format,
-		list: f.list_cents,
-		fee: Object.fromEntries(f.dests.map((d) => [d.code, d.fee])),
-	})),
-	far: countries.filter((c) => c.far).map((c) => c.code),
-	label: Object.fromEntries(countries.map((c) => [c.code, c.label])),
-	quote: BULK_QUOTE_COPY.error,
-	returnPath: `/books/${slug}/`,
-});
+	title,
+	titleStyle,
+	formats,
+	countries,
+	feeCfg,
+	firstOrder,
+	firstOrderPct,
+	returnDays,
+} = Astro.props;
+const money = (c: number) => `$${(c / 100).toFixed(2)}`;
+const n = countries.length;
+const names = countries.map((c) => c.name).sort((a, b) => a.localeCompare(b, 'en'));
+const shipLine =
+	n > 1
+		? `Free standard shipping to ${n} countries`
+		: `Free standard shipping in the ${names[0] ?? 'United States'}`;
+// ONE-LINE SWITCH (15% wording): it follows the engine. When the engine lets books take the first-order discount,
+// firstOrder is true and the offer line, the per-row first-order price and the summary line appear by themselves.
+const offerLine = firstOrder
+	? `${firstOrderPct}% off first order + ${shipLine.replace(/^Free/, 'free')}`
+	: shipLine;
+const feeTable = (JSON.parse(feeCfg).fee ?? {}) as Record<string, Record<string, number>>;
+const anyFee = Object.values(feeTable).some((row) => Object.values(row).some((c) => c > 0));
+const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 ---
-<div id="order" class="bko" data-book-order={config}>
-	<BiblesBooksToggle current="books" />
-	<p class="bko__eyebrow">Order direct · free US shipping</p>
-	<h2 class="bko__title">Order {title}</h2>
-	<div class="bko__prices">
-		{formats.map((f) => (
-			<p class="bko__price" data-line-sku={f.sku}><span>{f.format}</span> <b>{money(f.list_cents)}</b> <span class="bko__fee" data-fee-sku={f.sku} hidden></span></p>
-		))}
-		<p class="bko__note">Free shipping in the United States</p>
-		<p class="bko__note"><a href="/returns/">Your purchase is guaranteed</a></p>
-		{abroad.length > 0 && (
-			<details class="bko__note bko__ships">
-				<summary>Also ships to {abroad.length} more countries · details</summary>
-				<p>{abroad.map((c) => c.name).join(', ')}. Outside the United States a handling fee per copy is added for your country and shown here before you check out.</p>
-			</details>
-		)}
-	</div>
-	<div class="bko__qty">
-		{formats.map((f) => (
-			<div class="bko__row">
-				<span class="bko__label">{f.format} <b>{money(f.list_cents)}</b></span>
-				<div class="bko__ctl">
-					<button type="button" class="bko__step" data-sku={f.sku} data-dir="-1" aria-label={`Fewer ${title} ${f.format}`}>−</button>
-					<input type="number" class="bko__in" data-sku={f.sku} value={formats.length === 1 ? '1' : '0'} min="0" max="99" step="1" inputmode="numeric" aria-label={`${title} ${f.format} quantity`} />
-					<button type="button" class="bko__step" data-sku={f.sku} data-dir="1" aria-label={`More ${title} ${f.format}`}>+</button>
-				</div>
-			</div>
-		))}
-	</div>
-	<div class="bko__foot">
-		<dl class="bko__lines">
-			<div><dt data-copies>0 copies</dt><dd data-sub>$0.00</dd></div>
-			<div data-fee-line hidden><dt data-fee-label>Handling</dt><dd data-fee-total>$0.00</dd></div>
-			<div class="bko__total"><dt>Total</dt><dd data-total>$0.00</dd></div>
-		</dl>
-		<p class="bko__fine">Tax calculated at checkout. Printed and shipped to you by our printer.</p>
-		<label class="bko__lbl" for={`bko-country-${slug}`}>Ship to</label>
-		<select id={`bko-country-${slug}`} class="bko__select" data-country>
-			{countries.map((c) => <option value={c.code} selected={c.code === 'US'}>{c.name}</option>)}
-		</select>
-		<button type="button" class="bko__checkout" data-checkout>Checkout →</button>
-		<p class="bko__msg" data-msg role="status" hidden></p>
-	</div>
+<p class="bo-offer">{offerLine}</p>
+<div class="bo-marquee" role="region" aria-label={shipLine}>
+	<p class="bo-sr">{names.join(', ')}</p>
+	{n > 1 ? (
+		<div class="bo-marquee__track" aria-hidden="true" data-nosnippet style={`--bo-marquee-dur: ${n * 2}s;`}>
+			{[0, 1].map(() => (
+				<ul class="bo-marquee__list">
+					{names.map((x) => <li>{x}</li>)}
+				</ul>
+			))}
+		</div>
+	) : (
+		<ul class="bo-marquee__list bo-marquee__list--still" aria-hidden="true" data-nosnippet>
+			{names.map((x) => <li>{x}</li>)}
+		</ul>
+	)}
 </div>
+<form id="order" class="bo-wrap" data-box data-slug={slug} data-status="live" data-fees={feeCfg} data-first={firstOrder ? firstOrderPct : 0}>
+	<div class="bo-acc">
+		<details class="bo-acc__item">
+			<summary data-choice>{shipLine}</summary>
+			<div class="bo-acc__body">
+				<p>{shipLine}.</p>
+				<ul class="bo-bubbles" aria-label={shipLine}>
+					{names.map((x) => <li class="bo-bubble">{x}</li>)}
+				</ul>
+				{n === 1 && <p>Ships to more countries soon.</p>}
+				{anyFee && <p>Outside the United States any international handling fee for your country is shown on the order form before checkout.</p>}
+			</div>
+		</details>
+		<details class="bo-acc__item">
+			<summary data-choice>Your purchase is guaranteed</summary>
+			<div class="bo-acc__body">
+				<p>If anything isn’t right with your order, for any reason, let us know within {returnDays} days of delivery and we will make it right.</p>
+				<p><a href="/returns/">Read our guarantee →</a></p>
+			</div>
+		</details>
+		<details class="bo-acc__item">
+			<summary data-choice>Ordering more than one book?</summary>
+			<div class="bo-acc__body">
+				<p><a href="/bookstore/">Browse the Spirit Media bookstore →</a></p>
+			</div>
+		</details>
+		{/* "Buying 10 or more?" is omitted: the engine gives books no volume ladder (DISCOUNT_EXEMPT). */}
+	</div>
+	<div class="bo-box">
+		<h2 class="bo-title" style={titleStyle}>Order {title}</h2>
+		<div class="bo-rows">
+			{formats.map((f, i) => (
+				<div class="bo-row" data-line-sku={f.sku}>
+					<div class="bo-row__info">
+						<span class="bo-row__binding">{f.format}</span>
+						<b class="bo-row__list">{money(f.list_cents)}</b>
+						{firstOrder && <span class="bo-row__first">{money(firstUnit(f.list_cents))} on your first order</span>}
+					</div>
+					<div class="bo-qty">
+						<button type="button" class="bo-step" data-step="-1" data-sku={f.sku} aria-label={`One fewer ${f.format}`}>−</button>
+						<input class="bo-qty__in" type="number" inputmode="numeric" name={f.sku} min="0" max="999" value={i === 0 ? '1' : '0'} aria-label={`${f.format} quantity`} />
+						<button type="button" class="bo-step" data-step="1" data-sku={f.sku} aria-label={`One more ${f.format}`}>+</button>
+					</div>
+				</div>
+			))}
+		</div>
+		<div class="bo-panel">
+			<ul class="bo-items" data-items></ul>
+			<dl class="bo-lines">
+				<div data-fee-line hidden><dt>Shipping &amp; handling</dt><dd data-fee>$0.00</dd></div>
+				<div class="bo-total"><dt>Total</dt><dd data-total aria-live="polite">{money(formats[0]?.list_cents ?? 0)}</dd></div>
+			</dl>
+			{firstOrder && <p class="bo-first" data-first-save hidden></p>}
+			<label class="bo-label" for={`bo-${slug}-country`}>Ship to</label>
+			<select id={`bo-${slug}-country`} name="country" class="bo-select" autocomplete="country">
+				{countries.map((c) => <option value={c.code} selected={c.code === 'US'}>{c.name}</option>)}
+			</select>
+			{/* a first order can only be recognised by its email (the engine's isFirstOrder): the FHB edition box asks the same way */}
+			<label class="bo-label" for={`bo-${slug}-email`}>Email</label>
+			{firstOrder && <p class="bo-hint" id={`bo-${slug}-email-hint`}>For your receipt, and to check your first-order saving.</p>}
+			<input id={`bo-${slug}-email`} class="bo-select" type="email" name="email" autocomplete="email" inputmode="email" required aria-describedby={firstOrder ? `bo-${slug}-email-hint` : undefined} data-email />
+		</div>
+		<p class="bo-note">Free standard shipping · tax calculated at checkout</p>
+		<button type="submit" class="bo-checkout">Checkout →</button>
+		<p id="buy-msg" class="bo-msg" role="status"></p>
+		<p class="bo-help"><MailtoLink email="hello@spiritmediapublishing.com" class="bo-help-btn">Contact us</MailtoLink></p>
+	</div>
+</form>
+<nav class="bo-shop" aria-label="Keep shopping">
+	<span class="bo-shop__label">Keep shopping</span>
+	<a href="/print/">FH Bibles</a>
+	<a href="/books/">FH Books</a>
+	<a href="https://spiritmediapublishing.com/bookstore/">All SMP Books</a>
+</nav>
 
 <style>
-	.bko {
-		max-width: 34rem;
-		margin: 1.6rem 0 0;
-		padding: 1.25rem 1.25rem 1.1rem;
-		background: #fff;
-		border: 1px solid var(--color-hairline);
-		border-radius: 1rem;
-		scroll-margin-top: 90px;
-		font-family: var(--font-sans);
-		color: var(--color-ink);
-	}
-	.bko__eyebrow {
-		color: #71717a;
-		font-size: 0.72rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		margin: 1rem 0 0.25rem;
-	}
-	.bko__title { font-family: var(--font-headline); font-size: 1.35rem; font-weight: 600; margin: 0 0 0.9rem; }
-	.bko__prices { margin: 0 0 1rem; }
-	.bko__price { margin: 0 0 0.15rem; font-size: 1.05rem; }
-	.bko__price > span:first-child { font-weight: 600; }
-	.bko__price b { font-weight: 800; }
-	.bko__fee { color: #3f3f46; font-size: 0.9rem; font-weight: 600; }
-	.bko__fee[hidden] { display: none; }
-	.bko__note { margin: 0.35rem 0 0; color: #3f3f46; font-size: 0.85rem; font-weight: 600; }
-	.bko__note a { text-decoration: underline; text-underline-offset: 3px; }
-	.bko__ships summary { cursor: pointer; }
-	.bko__ships p { margin: 0.4rem 0 0; font-weight: 400; line-height: 1.5; }
-	.bko__qty { display: flex; gap: 0.75rem; }
-	.bko__row { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 0.25rem; }
-	.bko__label { font-size: 0.85rem; color: var(--color-muted); }
-	.bko__label b { color: var(--color-ink); font-weight: 700; }
-	.bko__ctl { display: flex; align-items: center; border: 1.5px solid var(--color-hairline); border-radius: 999px; overflow: hidden; }
-	.bko__step {
-		width: 44px;
-		height: 44px;
-		flex-shrink: 0;
-		border: 0;
-		background: var(--color-primary-fixed, #ffd9e0);
-		color: var(--color-ink);
-		font-size: 1.15rem;
-		cursor: pointer;
-	}
-	.bko__in {
-		flex: 1 1 auto;
-		min-width: 0;
-		height: 44px;
-		text-align: center;
-		border: 0;
-		background: #fff;
-		font: inherit;
-		font-size: 1rem;
-		color: var(--color-ink);
-		-moz-appearance: textfield;
-	}
-	.bko__in::-webkit-outer-spin-button,
-	.bko__in::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-	.bko__foot { margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--color-hairline); }
-	.bko__lines { margin: 0; }
-	.bko__lines > div { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.9rem; line-height: 1.7; }
-	.bko__lines > div[hidden] { display: none; }
-	.bko__lines dt, .bko__lines dd { margin: 0; }
-	.bko__total { font-weight: 700; }
-	.bko__total dd { font-family: var(--font-headline); font-size: 1.5rem; line-height: 1.3; }
-	.bko__fine { color: var(--color-muted); font-size: 0.78rem; margin: 0.2rem 0 0; }
-	.bko__lbl { display: block; font-size: 0.85rem; font-weight: 600; margin: 0.9rem 0 0.3rem; }
-	.bko__select {
-		box-sizing: border-box;
-		width: 100%;
-		min-height: 44px;
-		padding: 0.55rem 0.8rem;
-		border: 1.5px solid var(--color-hairline);
-		border-radius: 0.6rem;
-		font: inherit;
-		font-size: 1rem;
-		background: #fff;
-	}
-	/* the same pink Checkout as every edition order form (Kevin 2026-09-17, B1) */
-	.bko__checkout {
-		width: 100%;
-		margin-top: 0.75rem;
-		min-height: 48px;
-		padding: 0.7rem 1.8rem;
-		border-radius: 999px;
-		/* calm charcoal, the SMP store's Checkout (Kevin: never an alarming red; pmseoaeo 3gb 11-14) */
-		background: #2e2a26;
-		color: #fff;
-		border: 2px solid #2e2a26;
-		font-weight: 600;
-		font-size: 1rem;
-		cursor: pointer;
-	}
-	.bko__checkout:hover { background: #1a1714; border-color: #1a1714; }
-	.bko__checkout:disabled { opacity: 0.6; cursor: wait; }
-	.bko__msg { color: #3f3f46; font-size: 0.9rem; font-weight: 600; margin: 0.6rem 0 0; }
-	.bko__msg[hidden] { display: none; }
-	@media (max-width: 640px) {
-		.bko { padding: 1rem 0.9rem 0.95rem; margin-left: auto; margin-right: auto; }
-	}
+	/* MOBILE FIRST, the FHB edition-page order area (EditionOrder.astro) in SMP's charcoal. */
+	.bo-offer { margin: 1.6rem auto 0; padding: 0 1rem; text-align: center; color: var(--color-primary, #b60057); font-size: 1rem; font-weight: 700; }
+	.bo-marquee { position: relative; margin: 0.8rem 0 0; background: #1a1714; color: #f5f5f4; overflow: hidden; font-size: 1rem; line-height: 1.4rem; font-weight: 600; }
+	.bo-marquee__track { display: flex; width: max-content; animation: bo-marquee var(--bo-marquee-dur, 446s) linear infinite; }
+	.bo-marquee__list { display: flex; margin: 0; padding: 0.5rem 0; list-style: none; white-space: nowrap; }
+	.bo-marquee__list li { padding: 0 1.1rem; }
+	.bo-marquee__list li::after { content: '•'; margin-left: 2.2rem; color: #e4006f; }
+	.bo-marquee__list--still { justify-content: center; }
+	.bo-marquee__list--still li::after { content: none; }
+	.bo-marquee:hover .bo-marquee__track { animation-play-state: paused; }
+	@keyframes bo-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+	@media (prefers-reduced-motion: reduce) { .bo-marquee__track { animation: none; flex-wrap: wrap; width: auto; } }
+	.bo-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+	.bo-wrap { max-width: 34rem; margin: 2.2rem auto 0; padding: 0 1rem; scroll-margin-top: 110px; color: var(--color-ink); box-sizing: content-box; }
+	.bo-acc { display: grid; gap: 0.4rem; }
+	.bo-acc__item { background: #fff; border: 1px solid #c4c4cc; border-radius: 0.7rem; overflow: hidden; }
+	.bo-acc__item > summary { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; min-height: 44px; padding: 0.35rem 0.85rem; color: #3f3f46; font-size: 0.85rem; font-weight: 600; cursor: pointer; list-style: none; }
+	.bo-acc__item > summary::-webkit-details-marker { display: none; }
+	.bo-acc__item > summary::after { content: '+'; flex: none; font-size: 1.2rem; font-weight: 400; color: #71717a; }
+	.bo-acc__item[open] > summary::after { content: '−'; }
+	.bo-acc__body { padding: 0.7rem 0.85rem 0.4rem; color: #3f3f46; font-size: 0.85rem; line-height: 1.5; }
+	.bo-acc__body p { margin: 0 0 0.5rem; }
+	.bo-acc__body a { color: #3f3f46; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+	.bo-bubbles { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; margin: 0 0 0.6rem; padding: 0; }
+	.bo-bubble { font-size: 0.8rem; color: #52525b; background: #fbe7f0; border: 1px solid #f0c4d8; border-radius: 999px; padding: 0.25rem 0.7rem; }
+	.bo-box { margin: 1.1rem 0 0; padding: 1rem 0.9rem 0.95rem; background: #fff; border: 1px solid var(--color-border, #ddd7cf); border-radius: 1rem; }
+	.bo-title { margin: 0 0 0.2rem; color: var(--color-ink); font-size: 1.35rem; font-weight: 700; line-height: 1.25; }
+	.bo-rows { display: grid; gap: 0.6rem; margin-top: 0.9rem; }
+	.bo-row { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; padding: 0.55rem 0.7rem; background: #fbf1f6; border: 1px solid #efd3e1; border-radius: 0.75rem; }
+	.bo-row__info { display: flex; flex-direction: column; min-width: 0; line-height: 1.35; }
+	.bo-row__binding { font-size: 0.95rem; font-weight: 600; }
+	.bo-row__list { font-size: 1.05rem; font-weight: 800; color: var(--color-ink); }
+	.bo-row__first { color: #9d174d; font-size: 0.8rem; font-weight: 600; }
+	.bo-qty { display: inline-flex; flex: none; align-items: center; gap: 0.35rem; }
+	.bo-step { width: 44px; height: 44px; border: 1.5px solid #d9d0c4; border-radius: 999px; background: #fff; color: var(--color-ink); font-size: 1.2rem; line-height: 1; cursor: pointer; }
+	.bo-qty__in { width: 2.75rem; min-height: 44px; background: #fff; border: 1.5px solid #d9d0c4; border-radius: 0.6rem; font: inherit; font-size: 1rem; text-align: center; -moz-appearance: textfield; }
+	.bo-qty__in::-webkit-inner-spin-button, .bo-qty__in::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+	.bo-step:focus-visible, .bo-qty__in:focus-visible, .bo-select:focus-visible, .bo-checkout:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
+	.bo-panel { margin-top: 0.9rem; padding: 0.2rem 0.8rem 0.8rem; background: #f6f6f8; border-radius: 0.75rem; }
+	.bo-items { list-style: none; margin: 0.6rem 0 0; padding: 0; font-size: 0.9rem; }
+	.bo-items :global(li) { display: flex; justify-content: space-between; gap: 1rem; line-height: 1.7; }
+	.bo-lines { margin: 0.7rem 0 0; padding: 0.6rem 0 0; border-top: 1px solid #e4e4e7; }
+	.bo-lines > div { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.9rem; line-height: 1.7; }
+	.bo-lines > div[hidden] { display: none; }
+	.bo-lines dt, .bo-lines dd { margin: 0; }
+	.bo-total { font-weight: 700; }
+	.bo-total dd { font-size: 1.5rem; line-height: 1.3; }
+	.bo-first { margin: 0.1rem 0 0; color: #9d174d; font-size: 0.88rem; font-weight: 700; text-align: right; }
+	.bo-first[hidden] { display: none; }
+	.bo-hint { margin: 0 0 0.3rem; font-size: 0.8rem; color: #57534e; }
+	.bo-label { display: block; margin: 0.6rem 0 0.3rem; font-size: 0.85rem; font-weight: 600; }
+	.bo-select { box-sizing: border-box; width: 100%; min-height: 44px; padding: 0.55rem 0.8rem; border: 1.5px solid #d9d0c4; border-radius: 0.6rem; background: #fff; font: inherit; font-size: 1rem; }
+	.bo-note { margin: 0.4rem 0 0; color: #57534e; font-size: 0.78rem; }
+	/* SMP's own primary button (global .btn-primary: --color-red, hover --color-red-deep). Kevin 2026-11-14: "We don't
+	   use black buttons. KNOW your site! Know and follow SMP style." */
+	.bo-checkout { width: 100%; margin-top: 0.75rem; min-height: 48px; padding: 0.7rem 1.8rem; border: 2px solid var(--color-primary, #b60057); border-radius: 999px; background: var(--color-primary, #b60057); color: #fff; font: inherit; font-weight: 600; font-size: 1rem; cursor: pointer; }
+	.bo-checkout:hover { background: var(--color-brand-dark, #8f0043); border-color: var(--color-brand-dark, #8f0043); }
+	.bo-checkout:disabled { opacity: 0.6; cursor: wait; }
+	.bo-msg { margin: 0.5rem 0 0; color: #57534e; font-size: 0.85rem; }
+	.bo-msg:empty { display: none; }
+	.bo-help { margin: 0.6rem 0 0; text-align: center; }
+	.bo-help :global(.bo-help-btn) { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1.2rem; border: 1px solid #c4c4cc; border-radius: 999px; background: #fff; color: #3f3f46; font-size: 0.85rem; font-weight: 600; text-decoration: none; } /* the FHB edition box's Contact us */
+	.bo-shop { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.5rem; max-width: 34rem; margin: 1rem auto 0; padding: 0 1rem; }
+	.bo-shop__label { width: 100%; text-align: center; font-size: 0.85rem; font-weight: 600; color: #3f3f46; }
+	.bo-shop a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1rem; border: 1px solid #f0c4d8; border-radius: 999px; background: #fbe7f0; color: #52525b; font-size: 0.88rem; font-weight: 600; text-decoration: none; }
+	.bo-shop a:hover { border-color: var(--color-ink); }
+	@media (min-width: 641px) { .bo-box { padding: 1.25rem 1.25rem 1.1rem; } }
 </style>
 
 <script>
-	// SMP is the store (contract 3fe). Production FHB orders on spiritmediapublishing.com; any FHB preview
-	// (*.fathersheartbible.pages.dev) orders on the SMP store PREVIEW so a test never touches production.
-	const STORE =
-		location.hostname.endsWith('.pages.dev') && location.hostname !== 'fathersheartbible.pages.dev'
-			? 'https://feat-smp-store.spirit-media-publishing.pages.dev'
-			: 'https://spiritmediapublishing.com';
-	for (const root of document.querySelectorAll<HTMLElement>('[data-book-order]')) {
-		const cfg = JSON.parse(root.dataset.bookOrder ?? '{}') as {
-			slug: string;
-			formats: { sku: string; format: string; list: number; fee: Record<string, number> }[];
-			far: string[];
-			label: Record<string, string>;
-			quote: string;
-			returnPath: string;
+	// The same arithmetic the server charges: list x qty + the country's per-copy handling fee x qty.
+	for (const form of document.querySelectorAll<HTMLFormElement>('form[data-box]')) {
+		const cfg = JSON.parse(form.dataset.fees || '{"list":{},"fee":{}}') as {
+			list: Record<string, number>;
+			fee: Record<string, Record<string, number>>;
 		};
-		const $ = <T extends Element>(s: string) => root.querySelector<T>(s) as T;
-		const inputs = [...root.querySelectorAll<HTMLInputElement>('.bko__in')];
-		const sel = $<HTMLSelectElement>('[data-country]');
-		const btn = $<HTMLButtonElement>('[data-checkout]');
-		const msg = $<HTMLElement>('[data-msg]');
-		const money = (c: number) => `$${(c / 100).toFixed(2)}`;
-		const qty = (sku: string) => {
-			const i = inputs.find((x) => x.dataset.sku === sku);
-			return Math.max(0, Math.min(99, Math.floor(Number(i?.value) || 0)));
-		};
-		const say = (t: string) => {
-			msg.textContent = t;
-			msg.hidden = !t;
-		};
-		function render() {
-			const c = sel.value;
-			let n = 0;
+		const pct = Number(form.dataset.first || 0);
+		const cents = (c: number) => `$${(c / 100).toFixed(2)}`;
+		const sel = form.querySelector('select[name=country]') as HTMLSelectElement;
+		const inputs = [...form.querySelectorAll<HTMLInputElement>('input[type=number]')];
+		const qty = (i: HTMLInputElement) => Math.max(0, Math.min(999, Math.floor(Number(i.value) || 0)));
+		const label = (i: HTMLInputElement) =>
+			(i.closest('.bo-row')?.querySelector('.bo-row__binding')?.textContent ?? i.name).trim();
+		const render = () => {
 			let sub = 0;
 			let fees = 0;
-			for (const f of cfg.formats) {
-				const q = qty(f.sku);
-				const fee = c === 'US' ? 0 : (f.fee[c] ?? 0);
-				n += q;
-				sub += q * f.list;
-				fees += q * fee;
-				const el = root.querySelector<HTMLElement>(`[data-fee-sku="${f.sku}"]`);
-				if (el) {
-					el.hidden = fee <= 0;
-					el.textContent = fee > 0 ? `+ ${money(fee)} ${(cfg.label[c] || 'handling').toLowerCase()}` : '';
-				}
+			const items = form.querySelector('[data-items]') as HTMLElement;
+			items.replaceChildren();
+			for (const i of inputs) {
+				const q = qty(i);
+				if (!q) continue;
+				const line = q * (cfg.list[i.name] ?? 0);
+				sub += line;
+				fees += q * (cfg.fee[sel.value]?.[i.name] ?? 0);
+				const li = document.createElement('li');
+				const a = document.createElement('span');
+				a.textContent = `${q} × ${label(i)}`;
+				const b = document.createElement('span');
+				b.textContent = cents(line);
+				li.append(a, b);
+				items.append(li);
 			}
-			$<HTMLElement>('[data-copies]').textContent = `${n} ${n === 1 ? 'copy' : 'copies'}`;
-			$<HTMLElement>('[data-sub]').textContent = money(sub);
-			const feeLine = $<HTMLElement>('[data-fee-line]');
-			feeLine.hidden = fees <= 0;
-			$<HTMLElement>('[data-fee-label]').textContent = `${cfg.label[c] || 'Handling'} (${sel.selectedOptions[0]?.textContent ?? c})`;
-			$<HTMLElement>('[data-fee-total]').textContent = money(fees);
-			$<HTMLElement>('[data-total]').textContent = money(sub + fees);
-		}
-		for (const b of root.querySelectorAll<HTMLButtonElement>('.bko__step')) {
+			(form.querySelector('[data-fee]') as HTMLElement).textContent = cents(fees);
+			(form.querySelector('[data-fee-line]') as HTMLElement).hidden = fees <= 0;
+			(form.querySelector('[data-total]') as HTMLElement).textContent = cents(sub + fees);
+			const save = form.querySelector<HTMLElement>('[data-first-save]');
+			if (save) {
+				const off = sub - Math.round((sub * (100 - pct)) / 100);
+				save.hidden = !(pct > 0 && off > 0);
+				save.textContent = `First order? -${cents(off)} (${pct}%) comes off at checkout`;
+			}
+		};
+		for (const b of form.querySelectorAll<HTMLButtonElement>('[data-step]')) {
 			b.addEventListener('click', () => {
-				const i = inputs.find((x) => x.dataset.sku === b.dataset.sku);
+				const i = form.querySelector<HTMLInputElement>(`input[name="${b.dataset.sku}"]`);
 				if (!i) return;
-				i.value = String(Math.max(0, Math.min(99, qty(b.dataset.sku ?? '') + Number(b.dataset.dir))));
-				say('');
+				i.value = String(Math.max(0, Math.min(999, qty(i) + Number(b.dataset.step))));
 				render();
 			});
 		}
-		for (const i of inputs) i.addEventListener('input', render);
+		form.addEventListener('input', render);
 		sel.addEventListener('change', render);
 		render();
-		btn.addEventListener('click', async () => {
-			const counts = Object.fromEntries(cfg.formats.map((f) => [f.sku, qty(f.sku)]).filter(([, n]) => Number(n) > 0));
-			const total = Object.values(counts).reduce((a, b) => a + Number(b), 0);
-			if (!total) return say('Choose at least one copy.');
-			if (cfg.far.includes(sel.value) && total >= 10) return say(cfg.quote);
-			say('Opening secure checkout…');
-			btn.disabled = true;
-			(window as unknown as { gtag?: (...a: unknown[]) => void }).gtag?.('event', 'begin_checkout', {
+		form.addEventListener('submit', async (ev) => {
+			ev.preventDefault();
+			const msg = form.querySelector('#buy-msg') as HTMLElement;
+			const counts: Record<string, number> = {};
+			for (const i of inputs) counts[i.name] = qty(i);
+			if (!Object.values(counts).some((x) => x > 0)) {
+				msg.textContent = 'Choose at least one copy.';
+				return;
+			}
+			const q = new URLSearchParams(location.search);
+			const utm = Object.fromEntries(
+				['source', 'medium', 'campaign', 'content']
+					.map((k) => [k, q.get(`utm_${k}`) ?? ''])
+					.filter(([, v]) => v),
+			);
+			const site = 'fhb';
+			if (!utm.source) Object.assign(utm, { source: 'fathersheartbible.com', medium: 'referral', campaign: 'book-order-form', content: form.dataset.slug ?? '' });
+			// SMP is the store (contract 3fe): production orders on spiritmediapublishing.com; an FHB preview orders on the
+			// SMP store PREVIEW so a test never touches production (the old FHB book box's rule, kept).
+			const STORE =
+				location.hostname.endsWith('.pages.dev') && location.hostname !== 'fathersheartbible.pages.dev'
+					? 'https://feat-smp-store.spirit-media-publishing.pages.dev'
+					: 'https://spiritmediapublishing.com';
+			(window as any).gtag?.('event', 'begin_checkout', {
 				currency: 'USD',
-				items: Object.entries(counts).map(([id, quantity]) => ({ item_id: id, quantity })),
+				items: Object.entries(counts)
+					.filter(([, x]) => x > 0)
+					.map(([id, x]) => ({ item_id: id, quantity: x })),
 			});
+			msg.textContent = '';
+			const btn = form.querySelector('.bo-checkout') as HTMLButtonElement;
+			btn.disabled = true;
 			try {
-				const res = await fetch(`${STORE}/store-checkout`, {
+				const r = await fetch(`${STORE}/store-checkout`, {
 					method: 'POST',
 					headers: { 'content-type': 'application/json' },
-					body: JSON.stringify({
-						counts,
-						country: sel.value,
-						returnPath: cfg.returnPath,
-						site: 'fhb',
-						utm: { source: 'fathersheartbible.com', medium: 'referral', campaign: 'book-order-form', content: cfg.slug },
-					}),
+					body: JSON.stringify({ counts, country: sel.value, email: (form.querySelector('[data-email]') as HTMLInputElement | null)?.value.trim() ?? '', returnPath: `/books/${form.dataset.slug}/`, site, utm }),
 				});
-				const d = (await res.json()) as { url?: string; disabled?: boolean; message?: string };
-				if (d.url) {
-					window.location.href = d.url;
+				const j = await r.json();
+				if (j.url) {
+					location.href = j.url;
 					return;
 				}
-				say(d.disabled ? 'Checkout is not open yet.' : (d.message ?? 'Something went wrong. Please try again.'));
+				msg.textContent =
+					j.message || (j.disabled ? 'Checkout is not open yet.' : 'Something went wrong. Please try again.');
 			} catch {
-				say('Something went wrong. Please try again.');
+				msg.textContent = 'Something went wrong. Please try again.';
 			}
 			btn.disabled = false;
 		});

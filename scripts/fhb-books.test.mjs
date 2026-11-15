@@ -92,7 +92,7 @@ test('catalogue contract: every format carries what checkout, Ingram and the pag
 	const all = cat.books.flatMap((b) => b.formats);
 	assert.equal(new Set(all.map((f) => f.sku)).size, all.length, 'duplicate SKU');
 	for (const f of all)
-		assert.ok(DISCOUNT_EXEMPT.includes(f.sku), `${f.sku} must be discount-exempt`);
+		assert.ok(!DISCOUNT_EXEMPT.includes(f.sku), `${f.sku}: books take the first-order 15% (Kevin 2026-11-14)`);
 });
 
 test('Who Am I? facts are the spec sheet ones', () => {
@@ -105,7 +105,7 @@ test('Who Am I? facts are the spec sheet ones', () => {
 	);
 });
 
-test('US: PB $15.99 + HB $24.99 at list, no coupon, book metadata with ISBN/format/country/date', async () => {
+test('US first order: PB $15.99 + HB $24.99 lines with the first-order coupon, book metadata with ISBN/format/country/date', async () => {
 	const r = await post({ counts: { [PB]: 2, [HB]: 1 }, country: 'US', email: 'new@buyer.org' });
 	assert.equal(r.status, 200, JSON.stringify(r.json));
 	assert.deepEqual(
@@ -115,7 +115,7 @@ test('US: PB $15.99 + HB $24.99 at list, no coupon, book metadata with ISBN/form
 			[1, 2499],
 		],
 	);
-	assert.equal(r.s['discounts[0][promotion_code]'], undefined, 'no first-order coupon on books');
+	assert.equal(r.s['discounts[0][promotion_code]'], 'promo_1', 'books take the first-order coupon (Kevin 2026-11-14)');
 	assert.equal(r.s['metadata[book_lines]'], '2');
 	assert.match(
 		r.s['metadata[book_1]'],
@@ -126,7 +126,7 @@ test('US: PB $15.99 + HB $24.99 at list, no coupon, book metadata with ISBN/form
 	assert.match(r.s['metadata[book_2]'], /isbn=9798893075601\|format=Hardback/);
 });
 
-test('beside a Bible the book stays at list (Bibles-only discount)', async () => {
+test('beside a Bible on a first order: one coupon covers both (same offer)', async () => {
 	const r = await post({
 		counts: { 'teen-pb': 1, [PB]: 1 },
 		country: 'US',
@@ -134,14 +134,15 @@ test('beside a Bible the book stays at list (Bibles-only discount)', async () =>
 	});
 	assert.equal(r.status, 200, JSON.stringify(r.json));
 	assert.equal(lines(r.s).find((x) => /Who Am I/.test(x.name)).unit, 1599);
+	assert.equal(r.s['discounts[0][promotion_code]'], 'promo_1');
 	assert.equal(r.s['metadata[book_lines]'], '1');
 });
 
-test('abroad (GB, measured wai_pb): list price + handling line, net measured in metadata', async () => {
+test('abroad (GB, measured wai_pb), first order: 15% off per unit + handling line, net measured in metadata', async () => {
 	const r = await post({ counts: { [PB]: 1 }, country: 'GB', email: 'new@buyer.org' });
 	assert.equal(r.status, 200, JSON.stringify(r.json));
 	const l = lines(r.s);
-	assert.equal(l.find((x) => /Who Am I/.test(x.name)).unit, 1599);
+	assert.equal(l.find((x) => /Who Am I/.test(x.name)).unit, 1359);
 	assert.match(r.s['metadata[book_1]'], /country=GB\|date=\d{4}-\d{2}-\d{2}\|net_usd=\d+\.\d{2}$/);
 });
 
@@ -298,19 +299,25 @@ test('3es F1/F3: Who Am I? title + offers InStock + no future datePublished', { 
 // /bibles/grandparents-bible/), ordering on the SMP store (L1990; contract 3fe). Every live book page carries the
 // #order card with one price line and one counter per format, no one-line "per copy" price, and no off-site link.
 test('every live book page has its order form ON the page: per-format price lines + counters, posting to SMP', () => {
+	// The RIAB-standard order area (Kevin 2026-11-14 "This is the standard"; the SMP book page's box in FHB colours).
 	for (const slug of ['beloved-identity', 'who-am-i'].filter((x) => surface.live || surface.liveSlugs.includes(x))) {
 		const html = fs.readFileSync(new URL(`../dist/books/${slug}/index.html`, import.meta.url), 'utf8');
-		assert.match(html, /id="order"[^>]*data-book-order=/, `${slug}: order card on the page`);
-		const lines = [...html.matchAll(/data-line-sku="([a-z0-9-]+)"/g)].map((m) => m[1]);
-		const counters = new Set([...html.matchAll(/class="bko__in"[^>]*data-sku="([a-z0-9-]+)"/g)].map((m) => m[1]));
-		assert.ok(lines.length >= 1, `${slug}: a price line per format`);
-		for (const sku of lines) assert.ok(counters.has(sku), `${slug}: ${sku} has a counter`);
-		assert.doesNotMatch(html, /per copy · free shipping in the United States/, `${slug}: the rejected one-line price`);
+		assert.match(html, /<form id="order"[^>]*data-slug="[a-z0-9-]+"[^>]*data-status="live"/, `${slug}: order form on the page`);
+		const skus = [...html.matchAll(/class="bo-qty__in"[^>]*name="([a-z0-9-]+)"/g)].map((m) => m[1]);
+		assert.ok(skus.length >= 1, `${slug}: a quantity per format`);
+		for (const sku of skus) assert.match(html, new RegExp(`data-sku="${sku}"`), `${slug}: ${sku} has its price row`);
+		assert.match(html, /off first order \+ free standard shipping to \d+ countries/, `${slug}: the offer line`);
+		assert.match(html, /aria-label="Keep shopping"/, `${slug}: Keep shopping`);
+		// the first-order 15% needs the email (engine isFirstOrder): without it every book sells at list (2026-11-15 prod finding)
+		assert.match(html, /<input[^>]*type="email"[^>]*name="email"[^>]*required/, `${slug}: email field for the first-order check`);
+		assert.doesNotMatch(html, /hello@spiritmediapublishing\.com<|>[^<]*@spiritmediapublishing\.com/, `${slug}: no printed email address`);
 		assert.doesNotMatch(html, /spiritmediapublishing\.com\/books\/[a-z0-9-]+\/buy\//, `${slug}: no hand-off to the SMP buy page`);
 	}
 	const src = fs.readFileSync(new URL('../src/components/BookOrder.astro', import.meta.url), 'utf8');
 	assert.match(src, /https:\/\/spiritmediapublishing\.com'/, 'production orders on the SMP store');
 	assert.match(src, /\/store-checkout`/, 'posts to SMP /store-checkout');
+	assert.match(src, /const site = 'fhb'/, 'the sale records site=fhb');
+	assert.match(src, /email: \(form\.querySelector\('\[data-email\]'\)/, 'the order sends the email');
 });
 
 // The on-page book form calls the SMP store cross-origin; the CSP must allow it on /books/* and ONLY there
