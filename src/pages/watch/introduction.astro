@@ -1,0 +1,101 @@
+---
+// /watch/introduction/ — the watch page for the 35-second introduction film (unit 3jq).
+// Google's rule: a video needs a page whose MAIN purpose is that one video. Every other page that embeds
+// this film (/, /bible-for/*, the resources guide) shows it as complementary content. The film is shown as a
+// visible iframe (never a video tag), and filmNode's embedUrl matches it. Copy uses only facts already
+// published on this site: film-schema.ts description + PT35S, resources guide "Watch" group and FAQ,
+// the guide "Where to Start Reading the Bible" (Genesis 1-3, then the Gospel of John), Luke 15 blurb.
+import Section from '../../components/Section.astro';
+import { FILM_ID, filmNode } from '../../data/film-schema';
+import Layout from '../../layouts/Layout.astro';
+import { fitDescription, fitTitle } from '../../lib/seoFit';
+
+const PAGE_URL = 'https://fathersheartbible.com/watch/introduction/';
+const TITLE = fitTitle("Father's Heart Bible Introduction Film (35 Seconds)");
+const DESCRIPTION = fitDescription(
+	"Watch the 35-second Father's Heart Bible film: why this English Bible exists, the ache it answers and the Father it reveals. Read it free online with audio.",
+);
+
+const READ_LINKS = [
+	{
+		href: '/read/luke/15/',
+		name: 'Read Luke 15',
+		blurb:
+			'The prodigal’s homecoming: our Father’s heart in a single story, the best first chapter.',
+	},
+	{
+		href: '/read/john/1/',
+		name: 'Read John 1',
+		blurb: 'The Gospel of John, the second step in the simple plan from our Where to Start guide.',
+	},
+	{
+		href: '/read/',
+		name: 'Open the reader',
+		blurb: 'All 66 books, free with audio, no app and no account. Start anywhere.',
+	},
+];
+
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'WebPage',
+		'@id': `${PAGE_URL}#webpage`,
+		url: PAGE_URL,
+		name: TITLE,
+		description: DESCRIPTION,
+		inLanguage: 'en-US',
+		mainEntity: { '@id': `${PAGE_URL}#video` },
+	},
+	{ '@context': 'https://schema.org', ...filmNode, '@id': `${PAGE_URL}#video` },
+	{
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://fathersheartbible.com/' },
+			{ '@type': 'ListItem', position: 2, name: 'Introduction film', item: PAGE_URL },
+		],
+	},
+];
+---
+
+<Layout youtube title={TITLE} description={DESCRIPTION} jsonLd={jsonLd}>
+	<main id="main-content" style="margin-top: 80px;">
+		<Section variant="soft">
+			<div class="max-w-3xl mx-auto">
+				<nav aria-label="Breadcrumb" class="mb-5 text-sm" style="color: var(--color-muted); font-family: var(--font-sans);">
+					<a href="/" class="hover:underline">Home</a><span class="px-1.5" aria-hidden="true">/</span>
+					<span style="color: var(--color-ink);">Introduction film</span>
+				</nav>
+				<h1 class="text-4xl md:text-5xl font-light leading-tight mb-6" style="font-family: var(--font-serif); color: var(--color-ink);">Father&rsquo;s Heart Bible&trade; Introduction Film</h1>
+				<iframe
+					class="block w-full overflow-hidden rounded-xl shadow-lg"
+					style="aspect-ratio: 16 / 9; border: 1px solid var(--color-hairline);"
+					src={`https://www.youtube-nocookie.com/embed/${FILM_ID}?rel=0&playsinline=1`}
+					title="Father's Heart Bible — Introduction"
+					loading="lazy"
+					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+					allowfullscreen
+				></iframe>
+				<p class="mt-6 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					This 35-second film introduces Father&rsquo;s Heart Bible&trade;, an English translation that reveals God as a loving Father throughout Scripture. It is a short film on why the translation exists: the ache it answers and the Father it reveals.
+				</p>
+				<p class="mt-4 text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">
+					Father&rsquo;s Heart Bible&trade; is completely free to read and listen to online, with no app, no account and no cost. Read the <a href="/the-fathers-heart-bible/" class="hover:underline" style="color: var(--color-brand);">full story behind the translation</a> and meet the team.
+				</p>
+			</div>
+		</Section>
+		<Section variant="light">
+			<div class="max-w-3xl mx-auto">
+				<h2 class="text-2xl md:text-3xl font-light mb-4" style="font-family: var(--font-serif); color: var(--color-ink);">Start reading</h2>
+				<ul class="space-y-4 list-none m-0 p-0">
+					{READ_LINKS.map((r) => (
+						<li class="px-5 py-4 rounded-xl" style="background-color: var(--color-surface-low); border: 1px solid var(--color-hairline);">
+							<a href={r.href} class="text-lg font-medium hover:underline" style="font-family: var(--font-serif); color: var(--color-brand);">{r.name}</a>
+							<p class="mt-1 text-base leading-relaxed" style="font-family: var(--font-sans); color: var(--color-muted);">{r.blurb}</p>
+						</li>
+					))}
+				</ul>
+			</div>
+		</Section>
+	</main>
+</Layout>
