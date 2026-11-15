@@ -5,14 +5,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { merchantReturnPolicy as P, SHIP_COUNTRIES } from '../src/lib/merchantReturnPolicy.ts';
+import { merchantReturnPolicy, returnPolicyChunks, returnPolicyFor, SHIP_COUNTRIES } from '../src/lib/merchantReturnPolicy.ts';
 
+const P = [].concat(merchantReturnPolicy)[0];
 export function checkPolicy(p) {
 	assert.ok(p && p['@type'] === 'MerchantReturnPolicy', 'missing MerchantReturnPolicy');
 	assert.notEqual(p.returnPolicyCategory, 'https://schema.org/MerchantReturnUnspecified', 'Unspecified category is invalid for Google');
 	assert.equal(p.returnPolicyCategory, 'https://schema.org/MerchantReturnFiniteReturnWindow', 'category not FiniteReturnWindow');
 	assert.ok(Number.isInteger(p.merchantReturnDays) && p.merchantReturnDays > 0, 'merchantReturnDays required for finite window');
 	assert.ok(p.applicableCountry, 'applicableCountry required');
+	assert.ok([].concat(p.applicableCountry).length <= 50, 'applicableCountry can be defined at most 50 times (Google)');
 	assert.notEqual(p.returnMethod, 'https://schema.org/KeepProduct', 'KeepProduct is not an allowed returnMethod');
 	if (p.returnMethod) assert.match(p.returnMethod, /Return(AtKiosk|ByMail|InStore)$/);
 	assert.equal(p.merchantReturnDays, 30, 'Kevin 1A: 30 days');
@@ -39,8 +41,18 @@ function htmlFiles(d, out = []) {
 	return out;
 }
 test('shared policy is valid and countries come from the shipping list', () => {
-	checkPolicy(P);
-	assert.deepEqual([].concat(P.applicableCountry), [...SHIP_COUNTRIES]);
+	const all = [].concat(merchantReturnPolicy);
+	all.forEach(checkPolicy);
+	assert.deepEqual(all.flatMap((x) => [].concat(x.applicableCountry)), [...SHIP_COUNTRIES]);
+	assert.equal(new Set(all.flatMap((x) => [].concat(x.applicableCountry))).size, SHIP_COUNTRIES.length, 'no duplicates');
+});
+test('more than 50 countries are split into <=50 chunks with full coverage; a 51-country policy fails', () => {
+	const many = Array.from({ length: 223 }, (_, i) => String.fromCharCode(65 + (i % 26)) + String.fromCharCode(65 + Math.floor(i / 26)));
+	const ch = returnPolicyChunks(many);
+	assert.equal(ch.length, 5);
+	ch.forEach((c) => { checkPolicy(c); assert.ok([].concat(c.applicableCountry).length <= 50); });
+	assert.deepEqual(ch.flatMap((c) => [].concat(c.applicableCountry)), many);
+	assert.throws(() => checkPolicy(returnPolicyFor(many.slice(0, 51))), /at most 50/);
 });
 test('failure path: Unspecified, KeepProduct, missing days, missing policy all fail', () => {
 	assert.throws(() => checkPolicy({ ...P, returnPolicyCategory: 'https://schema.org/MerchantReturnUnspecified' }), /Unspecified/);
@@ -61,7 +73,9 @@ test('every paid Offer in dist/ has a valid MerchantReturnPolicy', () => {
 			let j; try { j = JSON.parse(m[1]); } catch { continue; }
 			for (const o of offers(j)) {
 				if (String(o.price) === '0') continue; // free online reading: nothing to refund
-				try { checkPolicy(o.hasMerchantReturnPolicy); } catch (e) { assert.fail(`${f}: ${e.message}`); }
+				const pol = [].concat(o.hasMerchantReturnPolicy);
+				try { pol.forEach(checkPolicy); } catch (e) { assert.fail(`${f}: ${e.message}`); }
+				assert.deepEqual(pol.flatMap((x) => [].concat(x.applicableCountry)), [...SHIP_COUNTRIES], `${f}: return countries must equal the ship list`);
 				checked++;
 			}
 		}
