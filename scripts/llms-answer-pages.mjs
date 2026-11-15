@@ -42,11 +42,16 @@ export const TYPES = [
 			'family',
 			'youversion',
 			'verse-of-the-day-widget',
+			'watch/introduction',
 		],
 		overrides: {
 			'where-to-buy': {
 				title: "Where to Buy Father's Heart Bible",
 				description: 'Every print edition, regular and large print, with buy links by retailer.',
+			},
+			'watch/introduction': {
+				title: "Father's Heart Bible Introduction Film",
+				description: 'The 35-second introduction film: why Father\'s Heart Bible exists, with links to start reading free.',
 			},
 			'translation-progress': {
 				description:
