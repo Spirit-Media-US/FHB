@@ -1192,13 +1192,14 @@ export function bookSaleMetadata(
 	dest: Parameters<typeof netPerItemUsd>[2] | null,
 	pct: number,
 	now = new Date(),
+	firstOrder = false,
 ): Record<string, string> {
 	const out: Record<string, string> = {};
 	let k = 0;
 	for (const [slug, qty] of Object.entries(counts)) {
 		const b = BOOK_SKUS[slug];
 		if (!b || qty <= 0) continue;
-		const unit = paidUnit(slug, EDITIONS[slug].retail, pct);
+		const unit = paidUnit(slug, EDITIONS[slug].retail, pct, firstOrder);
 		const fee = dest ? handlingFeeCents(slug, unit, dest) : 0;
 		// US: no country-list cost row, so the book's own MEASURED US cost (book-skus.json us_cost_usd) and
 		// Stripe's standard US card fee (2.9% + 30c); unmeasured stays 'unmeasured', never a guess.
@@ -1520,7 +1521,7 @@ export async function checkoutForm(
 	// A discount-exempt book adds nothing to the ladder (books: 0), so a cart of only that book has a
 	// Bible total of 0: it is a real order with no tier and nothing the discounts can apply to.
 	const exemptQty = Object.entries(counts).reduce(
-		(s, [slug, n]) => s + (isDiscountExempt(slug) ? n : 0),
+		(s, [slug, n]) => s + (BOOK_SKUS[slug] ? n : 0),
 		0,
 	);
 	const tier = total < 1 && exemptQty > 0 ? { min: 0, pct: 0 } : tierFor(total);
@@ -1585,10 +1586,11 @@ export async function checkoutForm(
 		.filter(([, n]) => n > 0)
 		.map(([slug]) => ({ slug, retail: EDITIONS[slug].retail }));
 	// Only Bibles can take a discount; a cart of nothing else has none to apply.
-	const discountable = Object.entries(counts).some(([slug, n]) => n > 0 && !isDiscountExempt(slug));
+	// Every line takes the first-order 15% (Bibles and books alike, Kevin 2026-11-14).
+	const discountable = Object.entries(counts).some(([, n]) => n > 0);
 	// A cart holding an exempt book takes the first-order 15% per Bible unit instead of Stripe's
 	// order-wide coupon, exactly like international carts, because the coupon would discount the book.
-	const perUnitPromo = intl || exemptQty > 0;
+	const perUnitPromo = intl;
 	let promo: string | null = null;
 	// 1A (Kevin 2026-11-08): WELCOME15 is offered to EVERYONE, every country. The margin check is
 	// now only the backstop (handling is sized to the floor, so it drops a discount only when the
@@ -1596,7 +1598,7 @@ export async function checkoutForm(
 	// Far band: no volume ladder at all, so the first-order 15% is the only discount on offer.
 	const tierPctNow = tierPctFor(dest?.bulkQuote, tier.pct);
 	if (discountable && validEmail && FIRST_ORDER_PCT > tierPctNow) {
-		const m = marginCheck(lines, FIRST_ORDER_PCT, destCode);
+		const m = marginCheck(lines, FIRST_ORDER_PCT, destCode, undefined, undefined, true);
 		if (!m.ok) {
 			console.log(`margin-guard: dropped ${FIRST_ORDER_CODE}: ${m.reason}`);
 		} else if (await deps.isFirstOrder(email)) {
@@ -1617,7 +1619,14 @@ export async function checkoutForm(
 	// Last guard, whatever happened above: the order as it will be charged, handling included, must
 	// net the floor. If it does not at the discounted price, charge list price; if still not, refuse.
 	if (intl) {
-		const last = marginCheck(lines, promo ? FIRST_ORDER_PCT : pct, destCode);
+		const last = marginCheck(
+			lines,
+			promo ? FIRST_ORDER_PCT : pct,
+			destCode,
+			undefined,
+			undefined,
+			Boolean(promo),
+		);
 		if (!last.ok) {
 			if (!marginCheck(lines, 0, destCode).ok) {
 				return reply(
@@ -1646,7 +1655,11 @@ export async function checkoutForm(
 	if (dest && intl) {
 		for (const [slug, qty] of Object.entries(counts)) {
 			if (qty <= 0) continue;
-			const fee = handlingFeeCents(slug, paidUnit(slug, EDITIONS[slug].retail, unitPctFinal), dest);
+			const fee = handlingFeeCents(
+				slug,
+				paidUnit(slug, EDITIONS[slug].retail, unitPctFinal, Boolean(promo)),
+				dest,
+			);
 			if (fee <= 0) continue;
 			const binding = slug.endsWith('-hb') ? 'hardback' : 'paperback';
 			const row = handling.find((h) => h.binding === binding && h.fee === fee);
@@ -1712,7 +1725,14 @@ export async function checkoutForm(
 		...packBreakdown(counts),
 		// FHB-BOOKS (Kevin 2026-11-13): every BOOK sale carries title / ISBN / format / country / date / net
 		// for author reporting. One value per book line (under Stripe's 500-char cap): see bookSaleMetadata.
-		...bookSaleMetadata(counts, destCode, intl ? dest : null, unitPctFinal),
+		...bookSaleMetadata(
+			counts,
+			destCode,
+			intl ? dest : null,
+			unitPctFinal,
+			undefined,
+			Boolean(promo),
+		),
 	};
 	// 3ee-1: Bible lines carry the same sale fields, packed into whatever keys Stripe's 50-key limit leaves.
 	Object.assign(
@@ -1730,7 +1750,7 @@ export async function checkoutForm(
 	for (const [slug, qty] of Object.entries(counts)) {
 		if (qty <= 0) continue;
 		const e = EDITIONS[slug];
-		const unit = paidUnit(slug, e.retail, unitPctFinal);
+		const unit = paidUnit(slug, e.retail, unitPctFinal, Boolean(promo));
 		form[`line_items[${li}][quantity]`] = qty;
 		form[`line_items[${li}][price_data][currency]`] = 'usd';
 		form[`line_items[${li}][price_data][unit_amount]`] = unit;

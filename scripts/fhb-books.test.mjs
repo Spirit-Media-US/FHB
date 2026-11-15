@@ -92,7 +92,7 @@ test('catalogue contract: every format carries what checkout, Ingram and the pag
 	const all = cat.books.flatMap((b) => b.formats);
 	assert.equal(new Set(all.map((f) => f.sku)).size, all.length, 'duplicate SKU');
 	for (const f of all)
-		assert.ok(DISCOUNT_EXEMPT.includes(f.sku), `${f.sku} must be discount-exempt`);
+		assert.ok(!DISCOUNT_EXEMPT.includes(f.sku), `${f.sku}: books take the first-order 15% (Kevin 2026-11-14)`);
 });
 
 test('Who Am I? facts are the spec sheet ones', () => {
@@ -105,7 +105,7 @@ test('Who Am I? facts are the spec sheet ones', () => {
 	);
 });
 
-test('US: PB $15.99 + HB $24.99 at list, no coupon, book metadata with ISBN/format/country/date', async () => {
+test('US first order: PB $15.99 + HB $24.99 lines with the first-order coupon, book metadata with ISBN/format/country/date', async () => {
 	const r = await post({ counts: { [PB]: 2, [HB]: 1 }, country: 'US', email: 'new@buyer.org' });
 	assert.equal(r.status, 200, JSON.stringify(r.json));
 	assert.deepEqual(
@@ -115,7 +115,7 @@ test('US: PB $15.99 + HB $24.99 at list, no coupon, book metadata with ISBN/form
 			[1, 2499],
 		],
 	);
-	assert.equal(r.s['discounts[0][promotion_code]'], undefined, 'no first-order coupon on books');
+	assert.equal(r.s['discounts[0][promotion_code]'], 'promo_1', 'books take the first-order coupon (Kevin 2026-11-14)');
 	assert.equal(r.s['metadata[book_lines]'], '2');
 	assert.match(
 		r.s['metadata[book_1]'],
@@ -126,7 +126,7 @@ test('US: PB $15.99 + HB $24.99 at list, no coupon, book metadata with ISBN/form
 	assert.match(r.s['metadata[book_2]'], /isbn=9798893075601\|format=Hardback/);
 });
 
-test('beside a Bible the book stays at list (Bibles-only discount)', async () => {
+test('beside a Bible on a first order: one coupon covers both (same offer)', async () => {
 	const r = await post({
 		counts: { 'teen-pb': 1, [PB]: 1 },
 		country: 'US',
@@ -134,14 +134,15 @@ test('beside a Bible the book stays at list (Bibles-only discount)', async () =>
 	});
 	assert.equal(r.status, 200, JSON.stringify(r.json));
 	assert.equal(lines(r.s).find((x) => /Who Am I/.test(x.name)).unit, 1599);
+	assert.equal(r.s['discounts[0][promotion_code]'], 'promo_1');
 	assert.equal(r.s['metadata[book_lines]'], '1');
 });
 
-test('abroad (GB, measured wai_pb): list price + handling line, net measured in metadata', async () => {
+test('abroad (GB, measured wai_pb), first order: 15% off per unit + handling line, net measured in metadata', async () => {
 	const r = await post({ counts: { [PB]: 1 }, country: 'GB', email: 'new@buyer.org' });
 	assert.equal(r.status, 200, JSON.stringify(r.json));
 	const l = lines(r.s);
-	assert.equal(l.find((x) => /Who Am I/.test(x.name)).unit, 1599);
+	assert.equal(l.find((x) => /Who Am I/.test(x.name)).unit, 1359);
 	assert.match(r.s['metadata[book_1]'], /country=GB\|date=\d{4}-\d{2}-\d{2}\|net_usd=\d+\.\d{2}$/);
 });
 
