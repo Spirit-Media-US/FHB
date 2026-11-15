@@ -25,6 +25,7 @@ import raw from '../data/ship-countries.json' with { type: 'json' };
 import {
 	BOOK_SKUS,
 	bindingFor,
+	FIRST_ORDER_PCT,
 	type IntlRow,
 	paidUnit,
 	unitAfter,
@@ -159,7 +160,7 @@ export function handlingTable(
 		const fees: Record<string, number> = {};
 		for (const [slug, list] of Object.entries(skuCents))
 			for (const pct of new Set([0, ...pcts])) {
-				const paid = paidUnit(slug, list, pct);
+				const paid = paidUnit(slug, list, pct, pct === FIRST_ORDER_PCT);
 				fees[`${bindingFor(slug)}${volumesFor(slug)}:${paid}`] = handlingFeeCents(slug, paid, c);
 			}
 		out[c.code] = { name: c.name, label: handlingLabel(c.code), fees };
@@ -185,6 +186,8 @@ export function marginCheck(
 	code: string,
 	rows: readonly ShipCountry[] = LIVE_COUNTRIES,
 	floor?: number,
+	/** true when `pct` is the first-order 15% (books take only that, Kevin 2026-11-14) */
+	firstOrder = false,
 ): MarginResult {
 	if (code.toUpperCase() === 'US') return { ok: true, reason: '', worst: null };
 	const c = rows.find((r) => r.code === code.toUpperCase());
@@ -193,7 +196,7 @@ export function marginCheck(
 	let need = floor ?? floorFor(c);
 	for (const l of lines) {
 		const lineNeed = floor ?? floorForSku(l.slug, c);
-		const paid = paidUnit(l.slug, l.retail, pct);
+		const paid = paidUnit(l.slug, l.retail, pct, firstOrder);
 		const net = netPerItemUsd(l.slug, paid, c, handlingFeeCents(l.slug, paid, c));
 		if (net == null)
 			return { ok: false, reason: `no landed cost for ${l.slug} to ${code}`, worst: null };

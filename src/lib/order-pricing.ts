@@ -123,11 +123,16 @@ export const BOOK_SKUS: Record<string, BookFormatRow> = Object.fromEntries(
 	]),
 );
 /** Discounts are Bibles-only (Kevin 2026-11-10): every book SKU is charged at list under every offer. */
-export const DISCOUNT_EXEMPT: readonly string[] = Object.keys(BOOK_SKUS);
+// SAME OFFER ON BOTH SITES (Kevin 2026-11-14: "we can do 15% on first order everywhere ... we offer same offer on
+// both sites"): books take the first-order 15% like Bibles (supersedes "15% Bibles only", 2026-11-10). Books still add
+// nothing to the Bible volume ladder (books: 0), so a book-only cart never reaches a volume tier.
+export const DISCOUNT_EXEMPT: readonly string[] = [];
 export const isDiscountExempt = (slug: string): boolean => DISCOUNT_EXEMPT.includes(slug);
 /** The unit price in cents actually charged for `slug` after the cart's `pct` off: exempt SKUs stay at list. */
-export const paidUnit = (slug: string, cents: number, pct: number): number =>
-	isDiscountExempt(slug) ? cents : unitAfter(cents, pct);
+// Books take ONLY the first-order 15% (Kevin 2026-11-14: same offer on both sites); the Bible volume ladder never
+// discounts a book (books add nothing to it), so a volume pct leaves a book at list.
+export const paidUnit = (slug: string, cents: number, pct: number, firstOrder = false): number =>
+	isDiscountExempt(slug) || (BOOK_SKUS[slug] && !firstOrder) ? cents : unitAfter(cents, pct);
 /** Landed-cost key for a SKU: a book uses its OWN measured cost (books.json landed_key, e.g. 'bi' for Beloved
  *  Identity); a Bible is its binding from the SKU key (<slug>-hb | <slug>-pb). */
 export const bindingFor = (slug: string): string =>
