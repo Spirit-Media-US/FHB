@@ -1,5 +1,6 @@
 ---
 import BiblesBooksToggle from '../../components/BiblesBooksToggle.astro';
+import BookMirror from '../../components/BookMirror.astro';
 import BookOrder from '../../components/BookOrder.astro';
 // /books/<slug>/ — one page per Father Heart book (Kevin 2026-11-13, kevin-decisions L1959: "each book needs to be
 // treated like each bible edition given it's own page and easy check out ... declare who this book is for ... full
@@ -11,6 +12,8 @@ import BookOrder from '../../components/BookOrder.astro';
 // button that fails.
 import LookInside from '../../components/LookInside.astro';
 import Section from '../../components/Section.astro';
+import pageAssets from '../../data/book-page-assets.json';
+import bookPages from '../../data/book-pages.json';
 import bookSkus from '../../data/book-skus.json';
 import catalog from '../../data/books.json';
 import booksSurface from '../../data/books-surface.json';
@@ -23,6 +26,7 @@ import {
 	shippingDetailsFor,
 } from '../../lib/marginGuard';
 import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
+import { FIRST_ORDER_PCT, isDiscountExempt } from '../../lib/order-pricing';
 import { LIVE_COUNTRIES } from '../../lib/shipCountries';
 
 type Format = {
@@ -210,96 +214,165 @@ const jsonLd = [
 		],
 	},
 ];
+
+// ── THE RIAB STANDARD (Kevin 2026-11-14 "This is the standard. Meet or exceed it with each page we build." + "Who Am I
+// and Beloved Identity on SMP and FHB - they will be the same content but on 2 different sites"). The page object
+// (src/data/book-pages.json, identical on SMP) drives the hero and every section below the order area (BookMirror).
+const pg = (bookPages as Record<string, any>)[book.slug] ?? null;
+const ax = ((pageAssets as Record<string, any>)[book.slug] ?? {}) as {
+	hero3d?: { w600: string; w300: string; width: number; height: number };
+	headshot?: { src: string; w: number; h: number };
+	og?: { src: string; w: number; h: number };
+	color?: { title: string; outline: boolean };
+};
+const OUTLINE =
+	'-1px -1px 0 #27272a, 1px -1px 0 #27272a, -1px 1px 0 #27272a, 1px 1px 0 #27272a, 0 1px 0 #27272a, 0 -1px 0 #27272a, 1px 0 0 #27272a, -1px 0 0 #27272a';
+const titleStyle = ax.color
+	? `color: ${ax.color.title};${ax.color.outline ? ` text-shadow: ${OUTLINE};` : ''}`
+	: undefined;
+const smallTitleColor = ax.color && !ax.color.outline ? ax.color.title : undefined;
+const hero = ax.hero3d
+	? {
+			src: ax.hero3d.w600,
+			w300: ax.hero3d.w300,
+			w: ax.hero3d.width,
+			h: ax.hero3d.height,
+			is3d: true,
+		}
+	: {
+			src: book.cover.w600,
+			w300: book.cover.w300,
+			w: book.cover.width,
+			h: book.cover.height,
+			is3d: false,
+		};
+const headshot = ax.headshot
+	? { ...ax.headshot, alt: `${book.author.name}, author of ${book.title}` }
+	: undefined;
+// the order area: the countries EVERY format ships to (US always), the engine's fee per country, the first-order 15%
+const countries = formats[0].dests
+	.filter((d) => formats.every((f) => f.dests.some((x) => x.code === d.code)))
+	.map((d) => ({ code: d.code, name: d.name }));
+const feeCfg = JSON.stringify({
+	list: Object.fromEntries(formats.map((f) => [f.sku, f.list_cents])),
+	fee: Object.fromEntries(
+		countries
+			.filter((c) => c.code !== 'US')
+			.map((c) => [
+				c.code,
+				Object.fromEntries(
+					formats.map((f) => [f.sku, f.dests.find((d) => d.code === c.code)?.fee ?? 0]),
+				),
+			]),
+	),
+});
+const firstOrder = formats.some((f) => !isDiscountExempt(f.sku));
+const RETURN_DAYS = 30; // the SMP store promise (spiritmediapublishing.com/returns/) — the store these orders go to
+// related picks: another FHB book -> /books/<slug>/; an edition slug (<x>-bible) -> /bibles/<slug>/
+const editionFiles = import.meta.glob<{ default: { slug: string; title?: string; name?: string } }>(
+	'../../data/editions/*.json',
+	{ eager: true },
+);
+const editionTitle = (slug: string) =>
+	Object.values(editionFiles)
+		.map((m) => m.default)
+		.find((e) => e && `${e.slug}-bible` === slug)?.title;
+const more = ((pg?.more ?? []) as string[])
+	.map((slug) => {
+		const b = (catalog.books as Book[]).find((x) => x.slug === slug);
+		if (b) return { slug, title: b.title };
+		const t = editionTitle(slug);
+		return t ? { slug, title: t, href: `/bibles/${slug}/` } : null;
+	})
+	.filter(Boolean) as { slug: string; title: string; href?: string }[];
+const faq = ((pg?.faq ?? []) as { q: string; a: string }[]).filter((f) => f.q && f.a);
+const faqLd = faq.length
+	? {
+			'@context': 'https://schema.org',
+			'@type': 'FAQPage',
+			mainEntity: faq.map((f) => ({
+				'@type': 'Question',
+				name: f.q,
+				acceptedAnswer: { '@type': 'Answer', text: f.a },
+			})),
+		}
+	: null;
 ---
 
-<Layout title={book.page_title} description={book.short} image={book.cover.jpg} imageAlt={book.cover.alt} jsonLd={jsonLd}>
-	<main id="main-content" style="margin-top: 80px;">
-		<Section variant="soft">
-			<nav aria-label="Breadcrumb" class="bk__crumb">
-				<a href="/">Home</a><span aria-hidden="true">/</span><a href="/books/">Books</a><span aria-hidden="true">/</span><span>{book.title}</span>
-			</nav>
-			<div class="bi">
-				<div class="bi__cover">
-					<img src={book.cover.w600} srcset={`${book.cover.w300} 300w, ${book.cover.w600} 600w`} sizes="(min-width: 768px) 320px, 300px" width={book.cover.width} height={book.cover.height} alt={book.cover.alt} fetchpriority="high" decoding="async" />
-					{hasLook && <div class="bk__look"><LookInside slug={book.look_inside!} title={book.title} size="lg" /></div>}
-				</div>
-				<div class="bi__main">
-					<h1 class="bi__title">{book.title}</h1>
-					{book.subtitle && <p class="bi__sub">{book.subtitle}</p>}
-					<p class="bi__by">By {book.author.name} · Spirit Media Publishing</p>
-					{book.age && <p class="bi__facts">{book.age}</p>}
-					{formats.map((f) => (
-						<p class="bi__facts">{f.format} · {f.pages} pages · {f.trim} · ISBN {f.isbn_display}</p>
-					))}
-
-					{live ? (
-						// THE ORDER FORM ON THE PAGE (Kevin 2026-11-13 ~22:53Z, L1999: "put the order form on the page" like
-						// /bibles/grandparents-bible/). It orders on the SMP store (L1990 "SMP is the engine"; contract 3fe).
-						<BookOrder slug={book.slug} title={book.title} formats={formats} />
-					) : (
-						<>
-							<div style="margin-top: 1.4rem;"><BiblesBooksToggle current="books" /></div>
-							<div id="order" class="bi__order">
-								{formats.map((f) => <p class="bi__price">{f.format} {money(f.list_cents)}</p>)}
-								<p class="bi__fine">Ordering on this site opens soon.</p>
+<Layout title={book.page_title} description={book.short} image={ax.og?.src ?? book.cover.jpg} imageAlt={book.cover.alt} jsonLd={faqLd ? [...jsonLd, faqLd] : jsonLd}>
+	<main id="main-content">
+		{/* HERO = the RIAB hero (itself the FHB grandparents edition hero): 3D cover | eyebrow, title in the cover colour,
+		    subtitle, who it is for, chips, Look inside. All from the page object. */}
+		<section class="bk-hero">
+			<div class="mx-auto max-w-5xl">
+				<nav aria-label="Breadcrumb" class="bk__crumb">
+					<a href="/">Home</a><span aria-hidden="true">/</span><a href="/books/">Books</a><span aria-hidden="true">/</span><span aria-current="page">{book.title}</span>
+				</nav>
+				<div class="grid items-start gap-8 md:grid-cols-2 md:gap-10">
+					<div class="flex justify-center">
+						<a href="#order" aria-label={`Order ${book.title}`} class="block w-full max-w-[240px] md:max-w-[340px]">
+							<img src={hero.src} srcset={`${hero.w300} 300w, ${hero.src} 600w`} sizes="(min-width: 768px) 340px, 240px" width={hero.w} height={hero.h} alt={book.cover.alt} fetchpriority="high" decoding="async" class={hero.is3d ? 'h-auto w-full' : 'h-auto w-full rounded shadow-lg'} />
+						</a>
+					</div>
+					<div>
+						{pg?.hero?.eyebrow ? <p class="bk-eyebrow">{pg.hero.eyebrow}</p> : <p class="bk-eyebrow">By {book.author.name}</p>}
+						<h1 class="bk-title" style={titleStyle}>{book.title}</h1>
+						{book.subtitle && <p class="bk-sub">{book.subtitle}</p>}
+						{pg?.hero?.audience_line && <p class="bk-aud">{pg.hero.audience_line}</p>}
+						{pg?.hero?.tagline && <p class="bk-tag">{pg.hero.tagline}</p>}
+						{pg?.hero?.chips?.length > 0 && (
+							<div class="mt-4 flex flex-wrap gap-2">
+								{(pg.hero.chips as string[]).map((c) => <span class="bk-chip" style={smallTitleColor ? `color: ${smallTitleColor}; border-color: ${smallTitleColor};` : undefined}>{c}</span>)}
 							</div>
-						</>
-					)}
+						)}
+						{hasLook && <div class="mt-5"><LookInside slug={book.look_inside!} title={book.title} size="lg" /></div>}
+						{!pg && <p class="bk-tag">{book.short}</p>}
+					</div>
 				</div>
 			</div>
-
-			{book.who_for.length > 0 && (
-				<div class="bk__who">
-					<h2 class="bk__h2">Who this book is for</h2>
-					<ul>{book.who_for.map((w) => <li>{w}</li>)}</ul>
+		</section>
+		{live ? (
+			// THE ORDER AREA (the same as the SMP book page and the FHB edition box): offer line, country marquee, the box,
+			// Keep shopping. It orders on the SMP store (contract 3fe).
+			<section class="bk-order" aria-label={`Order ${book.title}`}>
+				<BookOrder slug={book.slug} title={book.title} titleStyle={titleStyle} formats={formats.map((f) => ({ sku: f.sku, format: f.format, list_cents: f.list_cents }))} countries={countries} feeCfg={feeCfg} firstOrder={firstOrder} firstOrderPct={FIRST_ORDER_PCT} returnDays={RETURN_DAYS} />
+			</section>
+		) : (
+			<section class="bk-order">
+				<div class="mx-auto max-w-xl px-4"><BiblesBooksToggle current="books" />
+					<div id="order" class="bi__order">
+						{formats.map((f) => <p class="bi__price">{f.format} {money(f.list_cents)}</p>)}
+						<p class="bi__fine">Ordering on this site opens soon.</p>
+					</div>
 				</div>
-			)}
-			<div class="bi__desc" set:html={book.long_html} />
-			{book.author_bio && (
-				<div class="bk__who">
-					<h2 class="bk__h2">About the author</h2>
-					<p style="line-height: 1.7;">{book.author_bio}</p>
-				</div>
-			)}
-			<p class="bk__more"><a href="/books/">More Father Heart books</a> · <a href="/print/">Father's Heart Bible editions</a></p>
-		</Section>
+			</section>
+		)}
+		{pg ? (
+			<BookMirror hideLookInside={hasLook} page={pg} title={book.title} faq={faq} lang="en" headshot={headshot} titleColor={smallTitleColor} authorName={book.author.name} more={more} />
+		) : (
+			<Section variant="soft">
+				<div class="bi__desc" set:html={book.long_html} />
+				{book.author_bio && <p class="bi__desc">{book.author_bio}</p>}
+			</Section>
+		)}
 	</main>
 </Layout>
 
 <style>
-	.bk__crumb { max-width: 60rem; margin: 0 auto 1.2rem; font-family: var(--font-sans); font-size: 0.85rem; color: #3f3f46; display: flex; gap: 0.4rem; flex-wrap: wrap; }
-	.bk__crumb a { text-decoration: underline; }
-	.bk__look { margin-top: 1rem; text-align: center; }
-	.bk__who { max-width: 44rem; margin: 2.5rem auto 0; font-family: var(--font-sans); color: #27272a; }
-	.bk__h2 { font-family: var(--font-serif); color: var(--color-ink); font-size: 1.5rem; font-weight: 400; margin: 0 0 0.8rem; }
-	.bk__who ul { margin: 0; padding-left: 1.2rem; columns: 2; column-gap: 2rem; line-height: 1.8; }
-	@media (max-width: 520px) { .bk__who ul { columns: 1; } }
-	.bk__more { max-width: 44rem; margin: 2rem auto 0; font-family: var(--font-sans); font-size: 0.95rem; }
-	.bk__more a { text-decoration: underline; color: var(--color-brand); }
-	.bi { display: grid; gap: 2rem; max-width: 60rem; margin: 0 auto; grid-template-columns: 1fr; }
-	@media (min-width: 768px) { .bi { grid-template-columns: 320px 1fr; align-items: start; } }
-	.bi__cover img { width: 100%; max-width: 320px; height: auto; border-radius: 0.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18); display: block; margin: 0 auto; }
-	.bi__title { font-family: var(--font-serif); color: var(--color-ink); font-size: 2.2rem; font-weight: 300; line-height: 1.15; margin: 0 0 0.4rem; }
-	.bi__sub { font-family: var(--font-serif); color: var(--color-ink); font-size: 1.2rem; margin: 0 0 0.6rem; }
-	.bi__by, .bi__facts { font-family: var(--font-sans); color: #3f3f46; font-size: 0.95rem; margin: 0 0 0.25rem; }
-	.bi__order { margin-top: 1.4rem; padding: 1.25rem; background: #fff; border: 1px solid var(--color-hairline); border-radius: 1rem; max-width: 30rem; font-family: var(--font-sans); }
+	.bk-hero { background: #faf8f5; padding: 2rem 1rem; }
+	@media (min-width: 1024px) { .bk-hero { padding: 3.5rem 2rem; } }
+	.bk-order { background: #faf8f5; padding-bottom: 2.5rem; }
+	.bk__crumb { margin: 0 0 1.25rem; font-family: var(--font-sans); font-size: 0.875rem; color: #57534e; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+	.bk__crumb a { text-decoration: underline; text-underline-offset: 2px; }
+	.bk-eyebrow { margin: 0 0 0.5rem; font-family: var(--font-sans); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #57534e; }
+	.bk-title { margin: 0; font-size: 2.1rem; font-weight: 600; line-height: 1.15; color: var(--color-ink); }
+	@media (min-width: 1024px) { .bk-title { font-size: 2.7rem; } } /* the edition h1: Epilogue 600 (global h1 font) */
+	.bk-sub { margin: 0.5rem 0 0; font-family: var(--font-sans); font-size: 1.15rem; line-height: 1.35; color: var(--color-muted); }
+	.bk-aud { margin: 0.75rem 0 0; font-family: var(--font-sans); font-size: 1rem; line-height: 1.65; color: #57534e; }
+	.bk-tag { margin: 0.75rem 0 0; font-family: var(--font-sans); font-size: 1rem; line-height: 1.65; color: var(--color-ink); }
+	.bk-chip { display: inline-block; padding: 0.35rem 0.8rem; border: 2px solid var(--color-muted); border-radius: 6px; background: #fff; color: var(--color-muted); font-family: var(--font-sans); font-size: 1.05rem; font-weight: 800; letter-spacing: 0.06em; line-height: 1; text-transform: uppercase; }
+	.bi__order { margin: 1.4rem auto 0; padding: 1.25rem; background: #fff; border: 1px solid var(--color-hairline); border-radius: 1rem; max-width: 30rem; font-family: var(--font-sans); }
 	.bi__price { margin: 0 0 0.9rem; font-size: 1.5rem; font-weight: 800; color: var(--color-ink); }
-	.bi__price span + span { font-size: 0.85rem; font-weight: 600; color: #3f3f46; }
-	.bi__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 0 0 0.7rem; }
-	.bi__row label { font-weight: 600; color: var(--color-ink); }
-	.bi__row input, .bi__row select { min-height: 44px; border: 1px solid #a1a1aa; border-radius: 0.5rem; padding: 0 0.6rem; font-size: 1rem; background: #fff; color: var(--color-ink); }
-	.bi__row input { width: 6rem; }
-	.bi__row select { max-width: 16rem; }
-	.bi__fee { margin: 0 0 0.6rem; font-size: 0.9rem; font-weight: 600; color: #3f3f46; }
-	.bi__total { margin: 0.4rem 0 0.9rem; font-size: 1.1rem; color: var(--color-ink); }
-	.bi__total span { font-size: 0.8rem; color: #3f3f46; }
-	.bi__btn { width: 100%; min-height: 48px; border: 0; border-radius: 0.6rem; background: var(--color-primary); color: #fff; font-size: 1.05rem; font-weight: 700; cursor: pointer; }
-	.bi__btn:disabled { opacity: 0.6; cursor: wait; }
-	.bi__msg { margin: 0.7rem 0 0; font-size: 0.9rem; font-weight: 600; color: #7f1d1d; }
 	.bi__fine { margin: 0.8rem 0 0; font-size: 0.8rem; color: #3f3f46; }
-	.bi__fine a { text-decoration: underline; }
-	.bi__btn--link { display: flex; align-items: center; justify-content: center; text-decoration: none; }
 	.bi__desc { max-width: 44rem; margin: 2.5rem auto 0; font-family: var(--font-sans); color: #27272a; line-height: 1.7; }
-	.bi__desc :global(p) { margin: 0 0 0.9rem; }
-	.bi__desc :global(strong) { color: var(--color-ink); }
 </style>
