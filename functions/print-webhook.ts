@@ -45,13 +45,16 @@ export const BUYER_REPLY_TO = 'hello@spiritmediapublishing.com';
 // Two window-branded confirmations (Kevin 2026-11-16 "1A"; Option C: one store, two shop windows). The window is the
 // session's Option C tag (metadata[window]); a session from before the tags falls back on its site (an SMP-store
 // session carried site=smp|vaneure), else FHB. Only the subject and the sign-off change; the body is the same.
+// The SMP window has NO window line (Kevin 2026-11-16 15:42Z "we do not need: Spirit Media Publishing ·
+// spiritmediapublishing.com above the signature which gives the same thing!"); FHB keeps its line.
+// signoffBlock() is the one place the line is written: '' or 'line\n\n', always followed by SIGNATURE.
 export function buyerBrand(m: Record<string, string> | null | undefined, amount: string) {
 	const w = m?.window || (m?.site && m.site !== 'fhb' ? 'smp' : 'fhb');
 	return w === 'smp'
 		? {
 				window: 'smp',
 				subject: `Your Spirit Media Publishing order — ${amount}`,
-				signoff: 'Spirit Media Publishing · spiritmediapublishing.com',
+				signoff: '',
 			}
 		: {
 				window: 'fhb',
@@ -59,6 +62,7 @@ export function buyerBrand(m: Record<string, string> | null | undefined, amount:
 				signoff: 'Father’s Heart Bible · Spirit Media Publishing',
 			};
 }
+export const signoffBlock = (signoff: string) => (signoff ? `${signoff}\n\n` : '');
 
 function hexToBytes(hex: string): Uint8Array | null {
 	if (hex.length % 2 !== 0) return null;
@@ -350,7 +354,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 					`It's a DRM-free EPUB — open it in Apple Books, Google Play Books,\n` +
 					`or any reader. Total paid: ${amount}\n\n` +
 					`Order reference: ${s.id ?? '?'}\n\n` +
-					`Trouble opening it? Just reply to this email.\n\n${buyerBrand(m, amount).signoff}\n\n${SIGNATURE}\n`,
+					`Trouble opening it? Just reply to this email.\n\n${signoffBlock(buyerBrand(m, amount).signoff)}${SIGNATURE}\n`,
 				BUYER_REPLY_TO,
 			));
 		if (okKevin && okCust) {
@@ -387,7 +391,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 			: `Shipping is free, and most orders arrive within 7–10 days.\n\n`) +
 		`Need to change or ask about this order? Just reply to this email and it comes\n` +
 		`straight to us — please include your order reference above.\n\n` +
-		`${brand.signoff}\n\n${SIGNATURE}\n`;
+		`${signoffBlock(brand.signoff)}${SIGNATURE}\n`;
 
 	const okKevin = await send(
 		env.PRINT_ORDER_NOTIFY_TO || NOTIFY_TO_DEFAULT,
