@@ -1,6 +1,5 @@
 ---
 import CoverMarquee from '../components/CoverMarquee.astro';
-import DonationForm from '../components/donations/DonationForm.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import YouVersionBanner from '../components/YouVersionBanner.astro';
@@ -39,7 +38,7 @@ const REACH_BILLIONS = (REACH_TOTAL / 1e9).toFixed(1);
 
 // Legacy page (Kevin 2026-10-13): formerly /a-bible-for-the-whole-world/ (and /partner before
 // that). The page gathers people around a shared legacy: sharing our Father to the ends of the
-// earth. Giving: the simple Donate now box lives ON this page (Kevin 2026-11-16); /give/ remains for other links. Title/description live in code, not the old Sanity partner doc.
+// earth. Giving lives on /give/; this page carries a short line + Give now button to it (Kevin 2026-11-16). Title/description live in code, not the old Sanity partner doc.
 const seoTitle = "Father's Heart Legacy — Sharing Our Father";
 const seoDescription = `There is no greater legacy than sharing the Father — the greatest desire in every soul. Father's Heart Bible™ (FHB) is soon in 80 languages.`;
 const heroHeading = 'Sharing Our Father';
@@ -263,13 +262,11 @@ const upcoming = upcomingLanguages;
 						<p class="legacy-sign-status text-sm" style="min-height: 1.25rem; margin-top: 0.75rem; text-align: center; font-family: var(--font-sans); color: var(--color-muted);" aria-live="polite"></p>
 					</form>
 				</div>
-				<!-- DONATE NOW: the simple donation box ON this page, the same form as /legacy/youversion/ (Kevin 2026-11-16:
-				     "There should be a donate now on legacy page like the youversion giving page. Needs to be simple donation box.";
-				     supersedes the 2026-11-10 Give-now button and the 2026-10-13 no-giving-on-/legacy rule). -->
-				<div id="donate" class="max-w-xl mx-auto" style="margin-top: 2.5rem; scroll-margin-top: 110px;">
-					<h2 class="text-2xl md:text-3xl mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Donate now</h2>
-					<p class="leading-relaxed mb-6" style="font-family: var(--font-sans); color: var(--color-muted);">When you give to Father&rsquo;s Heart Bible, you help accelerate Bible translation and Scripture access around the world inviting all people groups to receive the Father, hear his voice, and know his heart is for them.</p>
-					<DonationForm />
+				<!-- GIVE NOW (Kevin 2026-11-16: "Actually, I prefer the give now about but with a little text. 3.3B people worldwide have
+				     never held a bible in their hands. We're on a mission to change that. (then Give Now button)."); the form stays on /give/. -->
+				<div class="max-w-xl mx-auto text-center" style="margin-top: 2.25rem;">
+					<p class="text-lg leading-relaxed" style="font-family: var(--font-sans); color: var(--color-ink);">3.3B people worldwide have never held a Bible in their hands. We&rsquo;re on a mission to change that.</p>
+					<a href="/give/" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold no-underline" style="margin-top: 1.25rem; min-height: 48px; background-color: var(--color-brand); color: #fff; font-family: var(--font-sans); border-radius: 999px;">Give now &rarr;</a>
 				</div>
 			</div>
 		</Section>
