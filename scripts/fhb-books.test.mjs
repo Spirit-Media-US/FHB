@@ -333,3 +333,42 @@ test('CSP: /books/* may connect to the SMP store; the site-wide policy may not',
 	assert.match(connect(blocks['/books/*']), /https:\/\/spiritmediapublishing\.com/);
 	assert.doesNotMatch(connect(blocks['/*']), /https:\/\/spiritmediapublishing\.com|spirit-media-publishing\.pages\.dev/);
 });
+
+// DUPLICATE RULE (store-168 item 2; Kevin 2026-11-16 "SMP not FHB will be #1 retailer and distributor of FHB bibles,
+// books, and SMP books"; brief: FH Bibles + FH books KEEP the FHB canonical for now — FHB has the measured reach; the SMP
+// page for an FH book is the retail listing with rel=canonical -> FHB, asserted in SMP scripts/store-checkout.test.mjs).
+// Revisit trigger (weekly store ledger): SMP Google impressions > FHB for 4 weeks -> flip that product.
+// canonicalErrs() is the ONE check; the failure-path test proves it rejects a wrong canonical.
+const canonicalErrs = (url, html, { product }) => {
+	const got = [...html.matchAll(/<link rel="canonical" href="([^"]+)"/g)].map((m) => m[1]);
+	const errs = [];
+	if (got.length !== 1) errs.push(`${url}: ${got.length} canonical tags`);
+	else if (got[0] !== url) errs.push(`${url}: canonical ${got[0]} (must be self)`);
+	if (product && !/"@type":\["Book","Product"\]/.test(html)) errs.push(`${url}: no Book+Product node`);
+	if (product && !/"@type":"Offer"/.test(html)) errs.push(`${url}: no Offer`);
+	return errs;
+};
+test('duplicate rule check FAILS on a wrong canonical or missing Product (proof the gate can reject)', () => {
+	const u = 'https://fathersheartbible.com/books/who-am-i/';
+	const ok = `<link rel="canonical" href="${u}"><script>{"@type":["Book","Product"],"offers":{"@type":"Offer"}}</script>`;
+	assert.deepEqual(canonicalErrs(u, ok, { product: true }), []);
+	assert.equal(canonicalErrs(u, ok.replace(u, 'https://spiritmediapublishing.com/books/who-am-i/'), { product: true }).length, 1, 'canonical -> SMP must fail');
+	assert.equal(canonicalErrs(u, ok.replace('["Book","Product"]', '"Book"').replace('"Offer"', '"X"'), { product: true }).length, 2, 'no Product/Offer must fail');
+	assert.equal(canonicalErrs(u, '<p></p>', { product: false }).length, 1, 'no canonical must fail');
+});
+test('FH books + FH Bible editions keep the FHB canonical (built pages)', { skip: !fs.existsSync(new URL('../dist/bibles/', import.meta.url)) && 'no dist' }, () => {
+	const built = cat.books.filter((b) => fs.existsSync(new URL(`../dist/books/${b.slug}/index.html`, import.meta.url)));
+	assert.ok(built.length >= 1, 'at least one FH book page built');
+	for (const b of built) {
+		const html = fs.readFileSync(new URL(`../dist/books/${b.slug}/index.html`, import.meta.url), 'utf8');
+		const errs = canonicalErrs(`https://fathersheartbible.com/books/${b.slug}/`, html, { product: b.status === 'live' });
+		assert.deepEqual(errs, [], errs.join('; '));
+	}
+	const bibles = fs.readdirSync(new URL('../dist/bibles/', import.meta.url)).filter((d) => /-bible$/.test(d));
+	assert.ok(bibles.length >= 50, `only ${bibles.length} edition pages`);
+	for (const d of bibles) {
+		const html = fs.readFileSync(new URL(`../dist/bibles/${d}/index.html`, import.meta.url), 'utf8');
+		const errs = canonicalErrs(`https://fathersheartbible.com/bibles/${d}/`, html, { product: false });
+		assert.deepEqual(errs, [], errs.join('; '));
+	}
+});
