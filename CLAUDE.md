@@ -40,6 +40,7 @@ The global Header/Footer here are **shared chrome** whose canonical source lives
 
 - SSL must cover all four domain variants: fathersheartbible.org, www.fathersheartbible.org, fathersheartbible.com, www.fathersheartbible.com
 - Uses Biome for linting and Lefthook for git hooks
+- **Store engine is a COPY here** — `src/lib/{storeEngine,farBand,firstOrderGuard,marginGuard,order-pricing,shipCountries}.ts` + `src/data/{book-skus,book-us-costs,books,isbn-list,ship-countries}.json`. MASTER = SMP `src/store-engine/` (Kevin 2026-11-16 "1 store SMP"). Never edit these here: change SMP, then `node scripts/sync-store-engine.mjs` (copies SMP origin/dev, manifest-checked, into place + `scripts/store-engine.MANIFEST.json`). Prebuild runs `--check` and FAILS on a hand edit or drift from SMP.
 
 ## Status — as of 2026-05-01
 
