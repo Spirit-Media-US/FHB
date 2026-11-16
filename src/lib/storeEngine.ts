@@ -6,6 +6,8 @@
 // SMP checkout service in Phase 3) supplies the Stripe-backed first-order lookups and POSTs the form.
 // Moved VERBATIM out of functions/dvc-checkout.ts; scripts/store-engine-parity.test.mjs proves the Stripe
 // request for 11 fixed carts is byte-identical to the pre-extraction golden.
+// MASTER = SMP src/store-engine/ (Kevin 2026-11-16 "1 store SMP. 2 shop windows FHB and SMP"). FHB's src/lib + src/data
+// copy is byte-identical, written ONLY by FHB's node scripts/sync-store-engine.mjs; its prebuild fails on drift.
 import bookSkus from '../data/book-skus.json' with { type: 'json' };
 // SERVER-ONLY measured US costs (kept out of book-skus.json, which order-pricing.ts carries into the browser).
 import bookUsCosts from '../data/book-us-costs.json' with { type: 'json' };
