@@ -34,12 +34,15 @@ const walk = (n, ctx) => {
 	if (Array.isArray(n)) return n.forEach((x) => walk(x, ctx));
 	if (!n || typeof n !== 'object') return;
 	const offer = n.offers && !Array.isArray(n.offers) ? n.offers : undefined;
-	if (offer && offer.sku && offer.gtin13) {
+	// /books/ pages put sku + gtin13 on the Book/Product node, not the Offer (src/pages/books/[slug].astro): read either
+	const sku = offer?.sku || (ctx.type === 'Books' ? n.sku : undefined);
+	const gtin = offer?.gtin13 || (ctx.type === 'Books' ? n.gtin13 : undefined);
+	if (offer && sku && gtin) {
 		const fmt = BIND[n.bookFormat];
-		if (!items.has(offer.sku))
-			items.set(offer.sku, {
-				id: offer.sku,
-				title: `${n.name.replace(/ \((Hardcover|Paperback)\)$/, '')}${fmt ? ` (${fmt})` : ''}`,
+		if (!items.has(sku))
+			items.set(sku, {
+				id: sku,
+				title: `${n.name.replace(/ \((Hardcover|Hardback|Paperback)\)$/, '')}${fmt ? ` (${fmt})` : ''}`,
 				description: (n.description || ctx.desc || n.name).replace(/\s+/g, ' ').trim().slice(0, 4900),
 				link: offer.url,
 				image: imgUrl(n.image) || ctx.image,
@@ -47,22 +50,34 @@ const walk = (n, ctx) => {
 				currency: offer.priceCurrency,
 				availability: offer.availability,
 				condition: offer.itemCondition,
-				gtin: offer.gtin13,
+				gtin: gtin,
 				group: ctx.slug,
+				type: ctx.type,
+				brand: ctx.type === 'Books' && n.brand?.name ? n.brand.name : "Father's Heart Bible",
 				ship: offer.shippingDetails,
 			});
 	}
 	for (const v of Object.values(n)) walk(v, ctx);
 };
 
-for (const d of readdirSync(`${DIST}/bibles`).sort()) {
-	const f = `${DIST}/bibles/${d}/index.html`;
-	if (!existsSync(f)) continue;
-	const html = readFileSync(f, 'utf8');
-	for (const m of html.matchAll(/<script type="application\/ld\+json"[^>]*>(.*?)<\/script>/gs)) {
-		let j;
-		try { j = JSON.parse(m[1]); } catch { continue; }
-		walk(j, { slug: d, desc: j.description, image: imgUrl(j.image) });
+// Store-168 #3 (Kevin brief pmprint-store-168-strategy-20261116): the FHB feed = the Bible editions AND the FH books
+// (Who Am I?, Beloved Identity: canonical on FHB, so FHB lists them; SMP's feed leaves them out and its
+// merchant-feed.test.mjs fails if any GTIN is in both feeds). A /books/ page that declares no Offer adds nothing.
+const SECTIONS = [
+	{ dir: 'bibles', type: 'Bibles' },
+	{ dir: 'books', type: 'Books' },
+];
+for (const { dir, type } of SECTIONS) {
+	if (!existsSync(`${DIST}/${dir}`)) continue;
+	for (const d of readdirSync(`${DIST}/${dir}`).sort()) {
+		const f = `${DIST}/${dir}/${d}/index.html`;
+		if (!existsSync(f)) continue;
+		const html = readFileSync(f, 'utf8');
+		for (const m of html.matchAll(/<script type="application\/ld\+json"[^>]*>(.*?)<\/script>/gs)) {
+			let j;
+			try { j = JSON.parse(m[1]); } catch { continue; }
+			walk(j, { slug: d, desc: j.description, image: imgUrl(j.image), type });
+		}
 	}
 }
 
@@ -92,10 +107,10 @@ const rows = [...items.values()].map((i) => {
 <g:availability>${i.availability.endsWith('InStock') ? 'in_stock' : 'out_of_stock'}</g:availability>
 <g:condition>new</g:condition>
 <g:gtin>${esc(i.gtin)}</g:gtin>
-<g:brand>Father's Heart Bible</g:brand>
+<g:brand>${esc(i.brand)}</g:brand>
 <g:identifier_exists>yes</g:identifier_exists>
 <g:google_product_category>Media &gt; Books</g:google_product_category>
-<g:product_type>Bibles</g:product_type>
+<g:product_type>${esc(i.type)}</g:product_type>
 <g:item_group_id>${esc(i.group)}</g:item_group_id>
 ${ship}
 </item>`;
@@ -118,7 +133,7 @@ const jsonl = [...items.values()].map((i) => JSON.stringify({
 	title: i.title,
 	description: i.description,
 	url: i.link,
-	brand: "Father's Heart Bible",
+	brand: i.brand,
 	seller_name: 'Spirit Media Publishing',
 	image_url: i.image,
 	availability: AVAIL(i.availability),
