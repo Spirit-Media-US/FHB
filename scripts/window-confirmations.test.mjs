@@ -45,10 +45,10 @@ test('item 8: FH window -> Father’s Heart Bible subject + sign-off; SMP window
 	assert.ok(fhb.buyer.text.endsWith(`\n\nFather’s Heart Bible · Spirit Media Publishing\n\n${SIGNATURE}\n`));
 	const smp = await confirm({ site: 'smp', window: 'smp', family: 'smp_book' });
 	assert.equal(smp.buyer.subject, 'Your Spirit Media Publishing order — $31.98');
-	assert.ok(smp.buyer.text.endsWith(`\n\nSpirit Media Publishing · spiritmediapublishing.com\n\n${SIGNATURE}\n`));
+	// SMP window: NO window line, the address signature follows the body directly (Kevin 15:42Z)
+	assert.ok(smp.buyer.text.endsWith(`straight to us — please include your order reference above.\n\n${SIGNATURE}\n`));
 	// body unchanged: only the sign-off line differs between the two windows
-	const cut = (t) => t.slice(0, t.lastIndexOf('\n\n', t.lastIndexOf('\n\n') - 1));
-	assert.equal(cut(fhb.buyer.text), cut(smp.buyer.text));
+	assert.equal(fhb.buyer.text.replace(`Father’s Heart Bible · Spirit Media Publishing\n\n${SIGNATURE}\n`, ''), smp.buyer.text.replace(`${SIGNATURE}\n`, ''));
 	if (process.env.SHOW_MESSAGE) for (const m of [fhb.buyer, smp.buyer]) console.log(`\n--- ${m.subject} ---\n${m.text}`);
 });
 
@@ -118,4 +118,14 @@ test('item 10: every order email is From "SMP Orders"; every buyer email ends wi
 	assert.equal(endsWithSeven('Thanks\n\nSpirit Media Publishing\n'), false);
 	assert.equal(endsWithSeven(`x\n${[...SEVEN].reverse().join('\n')}\n`), false);
 	assert.equal(endsWithSeven(`x\n${SEVEN.slice(0, 6).join('\n')}\n`), false);
+});
+
+// ---- Kevin 2026-11-16 15:42Z "we do not need: Spirit Media Publishing · spiritmediapublishing.com above the signature"
+test('SMP-window emails carry NO window line above the signature; FHB-window emails keep theirs', async () => {
+	const smp = await confirm({ site: 'smp', window: 'smp', family: 'smp_book' });
+	const fhb = await confirm({ site: 'fhb', window: 'fhb', family: 'bible' });
+	assert.doesNotMatch(smp.buyer.text, /Spirit Media Publishing · spiritmediapublishing\.com/, 'SMP: no window line');
+	assert.equal(smp.buyer.text.split('Spirit Media Publishing\n205 S Academy').length, 2, 'SMP: the signature once');
+	assert.ok(fhb.buyer.text.endsWith(`\n\nFather’s Heart Bible · Spirit Media Publishing\n\n${SIGNATURE}\n`), 'FHB: keeps its line');
+	assert.equal(buyerBrand({ window: 'smp' }, '$1').signoff, '');
 });
