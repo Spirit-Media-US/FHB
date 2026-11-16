@@ -434,3 +434,44 @@ test('every owner_site smp checkout_img answers HTTP 200 (build-time network che
 		);
 	assert.deepEqual(bad, [], bad.join('; '));
 });
+
+// HERO COVER SIZE (Kevin 2026-11-16 "Perfer larger as possible"): every built book page draws its hero cover at the ONE
+// common height (src/lib/cover-hero.mjs, mirrors SMP's): img[data-hero-cover].book-cover with --ar = its own
+// width/height, sizes from heroSizes, and the 3D render's 1200 file in srcset when book-page-assets.json has one.
+import { HERO_H, heroAspect, heroSizes } from '../src/lib/cover-hero.mjs';
+const heroAssets = JSON.parse(fs.readFileSync(new URL('../src/data/book-page-assets.json', import.meta.url), 'utf8'));
+const hAttr = (t, a) => t.match(new RegExp(`\\s${a}="([^"]*)"`))?.[1]?.replace(/&amp;/g, '&') ?? null;
+export function heroCoverErrors(html, slug) {
+	const tags = html.match(/<img\b[^>]*\bdata-hero-cover\b[^>]*>/g) ?? [];
+	if (tags.length !== 1) return [`${slug}: ${tags.length} img[data-hero-cover]`];
+	const t = tags[0];
+	const w = Number(hAttr(t, 'width'));
+	const h = Number(hAttr(t, 'height'));
+	const e = [];
+	if (!/\bbook-cover\b/.test(hAttr(t, 'class') ?? '')) e.push(`${slug}: no book-cover class`);
+	const ar = (hAttr(t, 'style') ?? '').match(/--ar:\s*([\d.]+)/);
+	if (!ar || Math.abs(Number(ar[1]) - heroAspect(w, h)) > 0.001) e.push(`${slug}: --ar wrong`);
+	if (hAttr(t, 'sizes') !== heroSizes(w, h)) e.push(`${slug}: sizes "${hAttr(t, 'sizes')}" != "${heroSizes(w, h)}"`);
+	const x = heroAssets[slug]?.hero3d?.w1200;
+	if (x && !(hAttr(t, 'srcset') ?? '').includes(`${x} 1200w`)) e.push(`${slug}: 1200 file not in srcset`);
+	return e;
+}
+const heroDist = new URL('../dist/books/', import.meta.url);
+const heroSlugs = fs.existsSync(heroDist)
+	? fs.readdirSync(heroDist, { withFileTypes: true }).filter((d) => d.isDirectory() && fs.existsSync(new URL(`${d.name}/index.html`, heroDist))).map((d) => d.name).filter((s) => heroAssets[s] || fs.readFileSync(new URL(`${s}/index.html`, heroDist), 'utf8').includes('data-hero-cover'))
+	: [];
+test('hero cover: every built book page uses the one common-height rule (+ CSS in px, never vh)', { skip: !heroSlugs.length && 'no dist/books' }, () => {
+	const errs = heroSlugs.flatMap((s) => heroCoverErrors(fs.readFileSync(new URL(`${s}/index.html`, heroDist), 'utf8'), s));
+	assert.deepEqual(errs, []);
+	const astro = new URL('../dist/_astro/', import.meta.url);
+	const css = fs.readdirSync(astro).filter((f) => f.endsWith('.css')).map((f) => fs.readFileSync(new URL(f, astro), 'utf8')).join('\n') + heroSlugs.map((s) => fs.readFileSync(new URL(`${s}/index.html`, heroDist), 'utf8')).join('\n');
+	const rules = css.match(/\.book-cover[^{]*\{[^}]*\}/g) ?? [];
+	assert.ok(rules.some((r) => new RegExp(`--hh:\\s*${HERO_H.desktop}px`).test(r)) && rules.some((r) => new RegExp(`--hh:\\s*${HERO_H.mobile}px`).test(r)), 'common heights missing from the built CSS');
+	assert.ok(!rules.some((r) => /\d(s|d|l)?vh\b/.test(r)), 'vh in the hero cover rule');
+});
+test('hero cover INJECTED: the old fixed 340px box is rejected', { skip: !heroSlugs.length && 'no dist/books' }, () => {
+	const s = heroSlugs[0];
+	const html = fs.readFileSync(new URL(`${s}/index.html`, heroDist), 'utf8').replace(/(<img\b[^>]*\bdata-hero-cover\b[^>]*>)/, (t) => t.replace(/\sclass="[^"]*"/, ' class="h-auto w-full"').replace(/\ssizes="[^"]*"/, ' sizes="(min-width: 768px) 340px, 240px"'));
+	const e = heroCoverErrors(html, s);
+	assert.ok(e.some((x) => x.includes('book-cover')) && e.some((x) => x.includes('sizes')), e.join('\n'));
+});

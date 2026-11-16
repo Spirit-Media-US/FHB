@@ -1,4 +1,6 @@
 ---
+import { newTabHtml } from '../lib/xsite';
+
 // The buy controls every product card on /print carries, in one place.
 //
 // WHY A COMPONENT: the targeted cards, the General Audience colour cards and the Large Print
@@ -174,7 +176,7 @@ const spare = Math.max(0, reserveSlots - stores.length);
 		return st.ebookDirect ? (
 			<button type="button" data-ebook-buy class={btnClass}>{inner}</button>
 		) : (
-			<a href={st.href} target="_blank" rel="noopener" class={btnClass} style="text-decoration: none;" data-store={st.key}>{inner}</a>
+			<a href={st.href} target="_blank" rel="noopener" class={btnClass} style="text-decoration: none;" data-store={st.key}>{inner}<Fragment set:html={newTabHtml} /></a>
 		);
 	})
 }

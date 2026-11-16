@@ -43,6 +43,7 @@ import {
 	tr,
 } from '../lib/orderStrings';
 import { LIVE_COUNTRIES, PRINT_SITE_NAMES } from '../lib/shipCountries';
+import { destHtml, SISTER_HOST } from '../lib/xsite';
 import OrderSummary from './OrderSummary.astro';
 import ShipCountryMarquee from './ShipCountryMarquee.astro';
 
@@ -231,7 +232,7 @@ const guaranteeBody = en
 		<span class="eo-shop__label">Keep shopping</span>
 		<a href="/print/">FH Bibles</a>
 		{booksSurface.live && <a href="/books/">FH Books</a>}
-		<a href="https://spiritmediapublishing.com/bookstore/smp-worldwide/">All SMP Books</a>
+		<a href="https://spiritmediapublishing.com/bookstore/smp-worldwide/">All SMP Books <Fragment set:html={destHtml(SISTER_HOST)} /></a>
 	</nav>
 )}
 
