@@ -475,3 +475,70 @@ test('hero cover INJECTED: the old fixed 340px box is rejected', { skip: !heroSl
 	const e = heroCoverErrors(html, s);
 	assert.ok(e.some((x) => x.includes('book-cover')) && e.some((x) => x.includes('sizes')), e.join('\n'));
 });
+
+// OG SIZE (pmseoaeo metadata audit 2026-11-16: /books/who-am-i/ had no og:image:width/height, Layout's URL guess missed
+// /FHB/print/books/). Every built book page states og:image:width + og:image:height, and they equal the pixel size of
+// the image itself, read from the file's own header at build time (JPEG SOF / PNG IHDR / WebP VP8*). Pure checker first.
+const imageSize = (buf) => {
+	if (buf[0] === 0x89 && buf.toString('ascii', 1, 4) === 'PNG') return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+	if (buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') {
+		const k = buf.toString('ascii', 12, 16);
+		if (k === 'VP8X') return { w: 1 + buf.readUIntLE(24, 3), h: 1 + buf.readUIntLE(27, 3) };
+		if (k === 'VP8L') { const b = buf.readUInt32LE(21); return { w: (b & 0x3fff) + 1, h: ((b >> 14) & 0x3fff) + 1 }; }
+		return { w: buf.readUInt16LE(26) & 0x3fff, h: buf.readUInt16LE(28) & 0x3fff };
+	}
+	for (let i = 2; i < buf.length - 9; ) {
+		if (buf[i] !== 0xff) { i++; continue; }
+		const m = buf[i + 1];
+		if (m >= 0xc0 && m <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(m)) return { w: buf.readUInt16BE(i + 7), h: buf.readUInt16BE(i + 5) };
+		i += 2 + buf.readUInt16BE(i + 2);
+	}
+	return null;
+};
+const metaProp = (html, p) => html.match(new RegExp(`<meta property="${p}" content="([^"]*)"`))?.[1] ?? null;
+const ogDimErrs = (slug, html, size) => {
+	const e = [];
+	const w = metaProp(html, 'og:image:width');
+	const h = metaProp(html, 'og:image:height');
+	if (!metaProp(html, 'og:image')) e.push(`${slug}: no og:image`);
+	if (w == null) e.push(`${slug}: no og:image:width`);
+	if (h == null) e.push(`${slug}: no og:image:height`);
+	if (!size) e.push(`${slug}: og:image size unreadable`);
+	else if (w != null && h != null && (Number(w) !== size.w || Number(h) !== size.h))
+		e.push(`${slug}: og says ${w}x${h}, image is ${size.w}x${size.h}`);
+	return e;
+};
+const ogDist = new URL('../dist/books/', import.meta.url);
+const ogSlugs = fs.existsSync(ogDist)
+	? fs.readdirSync(ogDist, { withFileTypes: true }).filter((d) => d.isDirectory() && fs.existsSync(new URL(`${d.name}/index.html`, ogDist))).map((d) => d.name)
+	: [];
+const ogFetched = new Map();
+const ogImageSize = async (u) => {
+	if (!ogFetched.has(u)) {
+		const r = await fetch(u);
+		assert.equal(r.status, 200, `og:image ${u} -> HTTP ${r.status}`);
+		ogFetched.set(u, imageSize(Buffer.from(await r.arrayBuffer())));
+	}
+	return ogFetched.get(u);
+};
+test('og size: every built book page states og:image:width/height = the image\'s real pixel size', { skip: !ogSlugs.length && 'no dist/books' }, async () => {
+	const errs = [];
+	for (const s of ogSlugs) {
+		const html = fs.readFileSync(new URL(`${s}/index.html`, ogDist), 'utf8');
+		const u = metaProp(html, 'og:image');
+		errs.push(...ogDimErrs(s, html, u ? await ogImageSize(u.replace(/&amp;/g, '&')) : null));
+	}
+	assert.deepEqual(errs, []);
+});
+test('og size INJECTED: missing tags and a wrong size are both rejected', { skip: !ogSlugs.length && 'no dist/books' }, async () => {
+	const s = ogSlugs[0];
+	const html = fs.readFileSync(new URL(`${s}/index.html`, ogDist), 'utf8');
+	const size = await ogImageSize(metaProp(html, 'og:image').replace(/&amp;/g, '&'));
+	assert.deepEqual(ogDimErrs(s, html, size), []);
+	const stripped = html.replace(/<meta property="og:image:(width|height)"[^>]*>/g, '');
+	const e1 = ogDimErrs(s, stripped, size);
+	assert.ok(e1.some((x) => x.includes('no og:image:width')) && e1.some((x) => x.includes('no og:image:height')), e1.join('\n'));
+	const wrong = html.replace(/(<meta property="og:image:height" content=")\d+/, '$1600');
+	assert.ok(ogDimErrs(s, wrong, size).some((x) => x.includes('og says')), 'a wrong height must fail');
+	assert.equal(imageSize(Buffer.from('not an image')), null);
+});
