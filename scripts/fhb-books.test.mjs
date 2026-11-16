@@ -384,3 +384,48 @@ test('FH books + FH Bible editions keep the FHB canonical (built pages)', { skip
 		assert.deepEqual(errs, [], errs.join('; '));
 	}
 });
+
+// SELLABLE-39 (pmprint 2026-11-16, Kevin "1 store SMP. 2 shop windows FHB and SMP"): every registry row another site
+// owns (owner_site smp) is SOLD by the engine with no books.json gate, so the row itself must carry what checkout needs:
+// the 18 keys, a 13-digit ISBN, an integer list price > 0, and a checkout image that answers HTTP 200 at build time
+// (Stripe shows it; a 404 is a broken checkout). Pure checker first so the failure path is proven offline.
+const SMP_ROW_KEYS = ['owner_site', 'format', 'schema_format', 'isbn', 'isbn_display', 'list_cents', 'pages', 'trim', 'binding', 'checkout_title', 'checkout_name', 'checkout_desc', 'checkout_img', 'ingram_title', 'spec', 'floor_usd', 'cost_key', 'book'];
+const smpRowErrs = (sku, r) => {
+	const e = [];
+	for (const k of SMP_ROW_KEYS) if (!(k in r)) e.push(`${sku}: missing key ${k}`);
+	if (!/^97[89]\d{10}$/.test(String(r.isbn ?? ''))) e.push(`${sku}: isbn ${r.isbn}`);
+	if (!Number.isInteger(r.list_cents) || r.list_cents <= 0) e.push(`${sku}: list_cents ${r.list_cents}`);
+	if (!/^https:\/\/\S+$/.test(String(r.checkout_img ?? ''))) e.push(`${sku}: checkout_img ${r.checkout_img}`);
+	return e;
+};
+const smpRows = Object.entries(SKU).filter(([, r]) => r.owner_site && r.owner_site !== 'fhb');
+test('smp registry row checker FAILS on a missing ISBN, zero price or bad image (proof the gate can reject)', () => {
+	const [sku, r] = smpRows[0];
+	assert.deepEqual(smpRowErrs(sku, r), []);
+	assert.equal(smpRowErrs(sku, { ...r, isbn: null }).length, 1, 'no ISBN must fail');
+	assert.equal(smpRowErrs(sku, { ...r, list_cents: 0 }).length, 1, 'price 0 must fail');
+	assert.equal(smpRowErrs(sku, { ...r, checkout_img: '' }).length, 1, 'no image must fail');
+	const { book, ...short } = r;
+	assert.equal(smpRowErrs(sku, short).length, 1, 'a missing key must fail');
+});
+test('every owner_site smp registry row: 18 keys, ISBN, list_cents > 0, unique ISBN', () => {
+	assert.ok(smpRows.length >= 80, `only ${smpRows.length} smp rows`);
+	const errs = smpRows.flatMap(([sku, r]) => smpRowErrs(sku, r));
+	assert.deepEqual(errs, [], errs.join('; '));
+	const isbns = Object.values(SKU).map((r) => r.isbn).filter(Boolean);
+	assert.equal(new Set(isbns).size, isbns.length, 'an ISBN sits on two registry rows');
+});
+test('every owner_site smp checkout_img answers HTTP 200 (build-time network check)', async () => {
+	const urls = [...new Set(smpRows.map(([, r]) => r.checkout_img))];
+	const bad = [];
+	for (let i = 0; i < urls.length; i += 8)
+		await Promise.all(
+			urls.slice(i, i + 8).map(async (u) => {
+				let st = 0;
+				for (let a = 0; a < 3 && st !== 200; a++)
+					st = await fetch(u, { method: 'HEAD', signal: AbortSignal.timeout(10000) }).then((r) => r.status, () => 0);
+				if (st !== 200) bad.push(`${u} -> ${st}`);
+			}),
+		);
+	assert.deepEqual(bad, [], bad.join('; '));
+});
