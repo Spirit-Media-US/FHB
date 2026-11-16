@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { build } from 'esbuild';
-import { buyerBrand, onRequestPost as webhook } from '../functions/print-webhook.ts';
+import { buyerBrand, NOTIFY_FROM, SIGNATURE, onRequestPost as webhook } from '../functions/print-webhook.ts';
 
 const secret = 'whsec_test';
 export async function confirm(metadata, { email = 'buyer@test', amount = 3198, kind = 'dvc_print' } = {}) {
@@ -42,12 +42,12 @@ test('item 8: FH window -> Father’s Heart Bible subject + sign-off; SMP window
 	const fhb = await confirm({ site: 'fhb', window: 'fhb', family: 'bible' });
 	assert.equal(fhb.status, 200);
 	assert.equal(fhb.buyer.subject, 'Your Father’s Heart Bible order — $31.98');
-	assert.ok(fhb.buyer.text.endsWith('\n\nFather’s Heart Bible · Spirit Media Publishing\n'));
+	assert.ok(fhb.buyer.text.endsWith(`\n\nFather’s Heart Bible · Spirit Media Publishing\n\n${SIGNATURE}\n`));
 	const smp = await confirm({ site: 'smp', window: 'smp', family: 'smp_book' });
 	assert.equal(smp.buyer.subject, 'Your Spirit Media Publishing order — $31.98');
-	assert.ok(smp.buyer.text.endsWith('\n\nSpirit Media Publishing · spiritmediapublishing.com\n'));
+	assert.ok(smp.buyer.text.endsWith(`\n\nSpirit Media Publishing · spiritmediapublishing.com\n\n${SIGNATURE}\n`));
 	// body unchanged: only the sign-off line differs between the two windows
-	const cut = (t) => t.slice(0, t.lastIndexOf('\n\n'));
+	const cut = (t) => t.slice(0, t.lastIndexOf('\n\n', t.lastIndexOf('\n\n') - 1));
 	assert.equal(cut(fhb.buyer.text), cut(smp.buyer.text));
 	if (process.env.SHOW_MESSAGE) for (const m of [fhb.buyer, smp.buyer]) console.log(`\n--- ${m.subject} ---\n${m.text}`);
 });
@@ -69,7 +69,7 @@ test('item 9: buyer emails Reply-To hello@; Kevin’s notification unchanged (hi
 	const e = await confirm({ site: 'fhb', window: 'fhb', family: 'bible_ebook' }, { kind: 'ebook_direct', amount: 749 });
 	assert.equal(e.buyer['h:Reply-To'], 'hello@spiritmediapublishing.com');
 	assert.equal(e.buyer.subject, 'Your Father’s Heart Bible eBook');
-	assert.ok(e.buyer.text.endsWith('\n\nFather’s Heart Bible · Spirit Media Publishing\n'));
+	assert.ok(e.buyer.text.endsWith(`\n\nFather’s Heart Bible · Spirit Media Publishing\n\n${SIGNATURE}\n`));
 	assert.equal(e.kevin['h:Reply-To'], 'buyer@test');
 });
 
@@ -97,4 +97,25 @@ test('item 9: every /order state has the Contact us button and never prints the 
 	} finally {
 		globalThis.fetch = f;
 	}
+});
+
+// ---- item 10 (Kevin 2026-11-16): From "SMP Orders" on every order email; the 7-line address signature on every buyer email
+const SEVEN = ['Spirit Media Publishing', '205 S Academy St Unit 3251', 'Cary, NC 27519', 'USA', 'Tel. 1-888-800-3744', 'spiritmediapublishing.com', 'fathersheartbible.com'];
+const endsWithSeven = (text) => text.trimEnd().split('\n').slice(-7).join('\n') === SEVEN.join('\n');
+test('item 10: every order email is From "SMP Orders"; every buyer email ends with the 7 signature lines in order', async () => {
+	assert.equal(NOTIFY_FROM, 'SMP Orders <orders@send.spiritmediapublishing.com>');
+	const all = [
+		await confirm({ site: 'fhb', window: 'fhb', family: 'bible' }),
+		await confirm({ site: 'smp', window: 'smp', family: 'smp_book' }),
+		await confirm({ site: 'fhb', window: 'fhb', family: 'bible_ebook' }, { kind: 'ebook_direct', amount: 749 }),
+	];
+	for (const r of all) {
+		for (const m of [r.buyer, r.kevin]) assert.match(m.from, /^SMP Orders </, `${m.subject}: From name`);
+		assert.ok(endsWithSeven(r.buyer.text), `${r.buyer.subject}: signature`);
+		assert.ok(r.buyer.html.includes('205 S Academy St Unit 3251'), `${r.buyer.subject}: html part too`);
+	}
+	// FAILURE PATH: the check rejects a missing, reordered or partial signature
+	assert.equal(endsWithSeven('Thanks\n\nSpirit Media Publishing\n'), false);
+	assert.equal(endsWithSeven(`x\n${[...SEVEN].reverse().join('\n')}\n`), false);
+	assert.equal(endsWithSeven(`x\n${SEVEN.slice(0, 6).join('\n')}\n`), false);
 });

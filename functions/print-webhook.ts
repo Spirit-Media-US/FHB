@@ -24,7 +24,19 @@ interface Env {
 	PRINT_ORDER_NOTIFY_TO?: string;
 }
 
-const NOTIFY_FROM = 'FHB Orders <orders@send.spiritmediapublishing.com>';
+// Kevin 2026-11-16 (Option C item 10): "The order emails show FHB Orders. Should be SMP Orders." Every order email.
+export const NOTIFY_FROM = 'SMP Orders <orders@send.spiritmediapublishing.com>';
+// ...and "add our address to the bottom signature of each email": every BUYER order email (print, both windows, and the
+// eBook email) ends with this, verbatim, below the item-8 window line. Mirrored in bin/fhb-order-reconcile.py.
+export const SIGNATURE = [
+	'Spirit Media Publishing',
+	'205 S Academy St Unit 3251',
+	'Cary, NC 27519',
+	'USA',
+	'Tel. 1-888-800-3744',
+	'spiritmediapublishing.com',
+	'fathersheartbible.com',
+].join('\n');
 const NOTIFY_TO_DEFAULT = 'kevin@spiritmediapublishing.com';
 // Contact us = hello@ at every step (Kevin 2026-11-16): the BUYER's emails reply there. Kevin's internal notification
 // keeps its own Reply-To (the buyer) and its own recipient.
@@ -338,7 +350,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 					`It's a DRM-free EPUB — open it in Apple Books, Google Play Books,\n` +
 					`or any reader. Total paid: ${amount}\n\n` +
 					`Order reference: ${s.id ?? '?'}\n\n` +
-					`Trouble opening it? Just reply to this email.\n\n${buyerBrand(m, amount).signoff}\n`,
+					`Trouble opening it? Just reply to this email.\n\n${buyerBrand(m, amount).signoff}\n\n${SIGNATURE}\n`,
 				BUYER_REPLY_TO,
 			));
 		if (okKevin && okCust) {
@@ -375,7 +387,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 			: `Shipping is free, and most orders arrive within 7–10 days.\n\n`) +
 		`Need to change or ask about this order? Just reply to this email and it comes\n` +
 		`straight to us — please include your order reference above.\n\n` +
-		`${brand.signoff}\n`;
+		`${brand.signoff}\n\n${SIGNATURE}\n`;
 
 	const okKevin = await send(
 		env.PRINT_ORDER_NOTIFY_TO || NOTIFY_TO_DEFAULT,
