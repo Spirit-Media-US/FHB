@@ -1,4 +1,5 @@
 ---
+import AuthorLinks from '../../components/AuthorLinks.astro';
 import BiblesBooksToggle from '../../components/BiblesBooksToggle.astro';
 import BookMirror from '../../components/BookMirror.astro';
 import BookOrder from '../../components/BookOrder.astro';
@@ -19,6 +20,7 @@ import catalog from '../../data/books.json';
 import booksSurface from '../../data/books-surface.json';
 import lookinside from '../../data/lookinside.json';
 import Layout from '../../layouts/Layout.astro';
+import { authorLd } from '../../lib/author-sites.mjs';
 import { heroSizes, heroSrcset, heroStyle } from '../../lib/cover-hero.mjs';
 import {
 	handlingFeeCents,
@@ -162,6 +164,8 @@ const jsonLd = [
 			'@type': 'Person',
 			name: book.author.name,
 			...(book.author.url ? { url: book.author.url } : {}),
+			// url + sameAs = the author's CERTAIN sites (src/data/author-sites.json), the same set the bio's link row shows.
+			...authorLd(book.author.name),
 		},
 		publisher: {
 			'@type': 'Organization',
@@ -358,6 +362,7 @@ const faqLd = faq.length
 			<Section variant="soft">
 				<div class="bi__desc" set:html={book.long_html} />
 				{book.author_bio && <p class="bi__desc">{book.author_bio}</p>}
+				{book.author_bio && <AuthorLinks author={book.author.name} />}
 			</Section>
 		)}
 	</main>
