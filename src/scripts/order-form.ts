@@ -36,6 +36,7 @@ import {
 	type Strings,
 	tr,
 } from '../lib/orderStrings';
+import { storeOrigin, storeUtm } from '../lib/storeOrigin';
 
 // /print/order/ carries every language's table in <script id="order-strings" type="application/json"> (edition
 // pages carry their own in data-order, rendered at build time); it is used only when ?lang= asks for one.
@@ -351,6 +352,9 @@ function init(root: HTMLElement) {
 	q<HTMLInputElement>('[data-quote-name]')?.addEventListener('input', render);
 
 	// ── checkout ──
+	// ONE STORE (Option C, Kevin 2026-11-16): the Bible box checks out on the SMP store engine, exactly as the FHB book
+	// box does (BookOrder.astro). Same engine code, same Stripe account; the buyer still returns to this FHB page.
+	const STORE_CHECKOUT = `${storeOrigin(location.hostname)}/store-checkout`;
 	const email = q<HTMLInputElement>('[data-email]');
 	const msg = q('[data-msg]');
 	// Ask the server (the same check checkout uses) once the email looks valid; any failure leaves
@@ -361,7 +365,7 @@ function init(root: HTMLElement) {
 		const id = ++askId;
 		if (!email || !email.value.trim() || !email.checkValidity()) return;
 		try {
-			const res = await fetch('/dvc-checkout', {
+			const res = await fetch(STORE_CHECKOUT, {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({ firstOrderCheck: true, email: email.value.trim() }),
@@ -412,7 +416,7 @@ function init(root: HTMLElement) {
 			}),
 		);
 		try {
-			const res = await fetch('/dvc-checkout', {
+			const res = await fetch(STORE_CHECKOUT, {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({
@@ -421,6 +425,9 @@ function init(root: HTMLElement) {
 					// Only rendered when more than one country is live; the server defaults to US.
 					country: q<HTMLSelectElement>('[data-country]')?.value,
 					returnPath: cfg.returnPath,
+					// the store derives the site from Origin; these say the same thing for the record (book box parity)
+					site: 'fhb',
+					utm: storeUtm(location.search, 'bible-order-form', cfg.returnPath ?? location.pathname),
 				}),
 			});
 			const d = (await res.json()) as { url?: string; disabled?: boolean; error?: string };

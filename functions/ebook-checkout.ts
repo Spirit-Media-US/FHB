@@ -8,6 +8,8 @@
 // NB: path is /ebook-checkout (not /api/*) — the apex router proxies /api/* to the
 // community app, so this marketing function must live off that prefix.
 
+import { storeTagErrors, storeTags } from '../src/lib/storeEngine.ts';
+
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
 	FHB_EBOOK?: R2Bucket; // bucket holding fathers-heart-bible.epub (private)
@@ -60,7 +62,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 		'line_items[0][price_data][product_data][description]':
 			'Instant download · DRM-free EPUB · An Intimate Translation',
 		'line_items[0][price_data][product_data][tax_code]': TAX_CODE,
+		// Option C tags (Kevin 2026-11-16): sold on FHB, FHB window, the Bible eBook.
+		...storeTags('fhb', 'bible_ebook'),
 	};
+	if (storeTagErrors(form).length) return json({ error: 'untagged' }, 500);
 
 	const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
 		method: 'POST',

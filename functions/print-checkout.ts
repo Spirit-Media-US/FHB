@@ -19,6 +19,7 @@
 
 import { packBreakdown } from '../src/lib/order-pricing';
 import { checkoutShippingForm } from '../src/lib/shipCountries';
+import { storeTagErrors, storeTags } from '../src/lib/storeEngine.ts';
 
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;
@@ -155,6 +156,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 			}
 		}
 	}
+	// Option C tags (Kevin 2026-11-16): sold on FHB, FHB window, Bibles. An untagged session never reaches Stripe.
+	Object.assign(form, storeTags('fhb', 'bible'));
+	if (storeTagErrors(form).length) return json({ error: 'untagged' }, 500);
 	const formStr = encodeForm(form);
 
 	const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {

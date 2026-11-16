@@ -314,7 +314,10 @@ test('every live book page has its order form ON the page: per-format price line
 		assert.doesNotMatch(html, /spiritmediapublishing\.com\/books\/[a-z0-9-]+\/buy\//, `${slug}: no hand-off to the SMP buy page`);
 	}
 	const src = fs.readFileSync(new URL('../src/components/BookOrder.astro', import.meta.url), 'utf8');
-	assert.match(src, /https:\/\/spiritmediapublishing\.com'/, 'production orders on the SMP store');
+	// one store address for every FHB order box (Option C 2026-11-16): src/lib/storeOrigin.ts
+	const store = fs.readFileSync(new URL('../src/lib/storeOrigin.ts', import.meta.url), 'utf8');
+	assert.match(store, /https:\/\/spiritmediapublishing\.com'/, 'production orders on the SMP store');
+	assert.match(src, /storeOrigin\(location\.hostname\)/, 'the book box uses the one store address');
 	assert.match(src, /\/store-checkout`/, 'posts to SMP /store-checkout');
 	assert.match(src, /const site = 'fhb'/, 'the sale records site=fhb');
 	assert.match(src, /email: \(form\.querySelector\('\[data-email\]'\)/, 'the order sends the email');
@@ -332,6 +335,15 @@ test('CSP: /books/* may connect to the SMP store; the site-wide policy may not',
 	assert.match(blocks['/books/*'], /! Content-Security-Policy/);
 	assert.match(connect(blocks['/books/*']), /https:\/\/spiritmediapublishing\.com/);
 	assert.doesNotMatch(connect(blocks['/*']), /https:\/\/spiritmediapublishing\.com|spirit-media-publishing\.pages\.dev/);
+	// Option C (2026-11-16): the Bible box pages order on the same store, so they carry the same allowance (prod + the
+	// SMP dev preview storeOrigin.ts sends FHB previews to)
+	const { STORE_PREVIEW } = { STORE_PREVIEW: 'https://dev.spirit-media-publishing.pages.dev' };
+	for (const b of ['/books/*', '/bibles/*', '/print', '/print/*']) {
+		assert.ok(blocks[b], `${b} block exists`);
+		assert.match(blocks[b], /! Content-Security-Policy/, `${b} replaces the site policy`);
+		assert.ok(connect(blocks[b]).includes(' https://spiritmediapublishing.com ') && connect(blocks[b]).includes(STORE_PREVIEW), `${b}: may connect to the store`);
+	}
+	assert.ok(fs.readFileSync(new URL('../src/lib/storeOrigin.ts', import.meta.url), 'utf8').includes(`'${STORE_PREVIEW}'`), 'CSP preview host = storeOrigin preview');
 });
 
 // DUPLICATE RULE (store-168 item 2; Kevin 2026-11-16 "SMP not FHB will be #1 retailer and distributor of FHB bibles,

@@ -31,9 +31,12 @@ import {
 	checkoutForm,
 	EMAIL_RE,
 	encodeForm,
+	familyOf,
 	firstOrderPromo,
 	isFirstOrder,
 	type OrderPayload,
+	storeTagErrors,
+	storeTags,
 } from '../src/lib/storeEngine.ts';
 
 // The catalogue, prices and sale metadata live in the SMP store engine (plan 3fb Phase 2); re-exported so every
@@ -189,6 +192,9 @@ const handlePost: PagesFunction<Env> = async (context) => {
 	});
 	if (!('form' in r)) return json(r.body, r.status);
 	const { form } = r;
+	// Option C tags (Kevin 2026-11-16): sold on FHB, in the FHB window. An untagged session never reaches Stripe.
+	Object.assign(form, storeTags('fhb', familyOf(payload.counts ?? {})));
+	if (storeTagErrors(form).length) return json({ error: 'untagged' }, 500);
 	const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
 		method: 'POST',
 		headers: {
