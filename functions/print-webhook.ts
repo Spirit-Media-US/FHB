@@ -12,8 +12,10 @@
 // NB: path is /print-webhook, not /api/* — the apex router proxies /api/* to
 // the community app, so this marketing function lives off that prefix.
 
+import { ebookLinkUrl, windowOrigin } from '../src/lib/ebookLink.ts';
 import { BOOK_SKUS, readBreakdown } from '../src/lib/order-pricing.ts';
 import { countryFor } from '../src/lib/shipCountries.ts';
+import { EBOOK_SKUS } from '../src/lib/storeEngine.ts';
 
 interface Env {
 	STRIPE_PRINT_WEBHOOK_SECRET?: string;
@@ -336,20 +338,34 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	// eBook: no address, no production run — the buyer needs their download link in
 	// writing, because the success page is otherwise the only place it ever appears.
 	if (kind === 'ebook_direct') {
-		const link = `https://fathersheartbible.com/ebook-download?s=${encodeURIComponent(s.id ?? '')}`;
+		// A book's eBook (metadata ebook_sku, SMP /store-checkout) gets the SIGNED link on its shop window's own site
+		// (src/lib/ebookLink.ts); the Bible eBook keeps its v1 session link on FHB.
+		const ebookSku: string | undefined = m.ebook_sku || undefined;
+		const bookTitle = ebookSku ? (EBOOK_SKUS[ebookSku]?.title ?? ebookSku) : "Father's Heart Bible";
+		const link = ebookSku
+			? await ebookLinkUrl(
+					env.STRIPE_PRINT_WEBHOOK_SECRET,
+					windowOrigin(buyerBrand(m, amount).window),
+					s.id ?? '',
+					ebookSku,
+				)
+			: `https://fathersheartbible.com/ebook-download?s=${encodeURIComponent(s.id ?? '')}`;
+		if (!link) return retry(); // unsignable (no secret / malformed session): never email a link that cannot work
 		const okKevin = await send(
 			env.PRINT_ORDER_NOTIFY_TO || NOTIFY_TO_DEFAULT,
 			`📖 eBook sale — ${amount}`,
-			`New eBook sale — Father's Heart Bible\n\n` +
-				`Total: ${amount}\nCustomer email: ${email}\nStripe session: ${s.id ?? '?'}\n`,
+			`New eBook sale — ${bookTitle}\n\n` +
+				`Total: ${amount}\nCustomer email: ${email}\nStripe session: ${s.id ?? '?'}\n` +
+				(ebookSku ? `eBook SKU: ${ebookSku} · window: ${buyerBrand(m, amount).window}\n` : ''),
 			email !== '(no email)' ? email : undefined,
 		);
 		const okCust =
 			email === '(no email)' ||
 			(await send(
 				email,
-				'Your Father’s Heart Bible eBook',
+				ebookSku ? `Your eBook — ${bookTitle}` : 'Your Father’s Heart Bible eBook',
 				`Thank you — your eBook is ready.\n\n` +
+					(ebookSku ? `${bookTitle}\n\n` : '') +
 					`Download it here (the link stays valid, so keep this email):\n${link}\n\n` +
 					`It's a DRM-free EPUB — open it in Apple Books, Google Play Books,\n` +
 					`or any reader. Total paid: ${amount}\n\n` +
