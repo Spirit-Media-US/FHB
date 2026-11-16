@@ -1,0 +1,62 @@
+{
+	"_about": "A checkout.session.completed event for ONE SMP-window book eBook, shaped as Stripe delivers it (top-level session fields from a live session's key list, read-only 2026-11-16; no PII). Its metadata is EXACTLY what ebookCheckoutForm + storeTags produce for the order in _order (scripts/direct-ebooks.test.mjs proves it, so the fixture cannot drift from the engine). SKU fixture-book-ebook is a test-only registry row the test injects.",
+	"_order": {
+		"counts": { "fixture-book-ebook": 1 },
+		"email": "buyer@example.com",
+		"returnPath": "/books/fixture-book/",
+		"site": "smp",
+		"now": "2026-11-16T18:00:00.000Z",
+		"firstOrder": false
+	},
+	"id": "evt_1FixtureEbookCompleted",
+	"object": "event",
+	"api_version": "2025-03-31.basil",
+	"livemode": false,
+	"type": "checkout.session.completed",
+	"data": {
+		"object": {
+			"id": "cs_test_a1FixtureEbookSession0000000000000000000000000000",
+			"object": "checkout.session",
+			"mode": "payment",
+			"status": "complete",
+			"payment_status": "paid",
+			"livemode": false,
+			"currency": "usd",
+			"amount_subtotal": 599,
+			"amount_total": 599,
+			"total_details": { "amount_discount": 0, "amount_shipping": 0, "amount_tax": 0 },
+			"automatic_tax": { "enabled": true, "status": "complete" },
+			"billing_address_collection": "required",
+			"customer_creation": "always",
+			"customer_email": "buyer@example.com",
+			"customer_details": {
+				"email": "buyer@example.com",
+				"name": "Ann Reader",
+				"phone": null,
+				"address": {
+					"city": "Cary",
+					"country": "US",
+					"line1": "1 Main St",
+					"line2": null,
+					"postal_code": "27519",
+					"state": "NC"
+				}
+			},
+			"collected_information": { "shipping_details": null },
+			"shipping_details": null,
+			"success_url": "https://spiritmediapublishing.com/ebook-download?s={CHECKOUT_SESSION_ID}",
+			"cancel_url": "https://spiritmediapublishing.com/books/fixture-book/?order=canceled#order",
+			"metadata": {
+				"kind": "ebook_direct",
+				"ebook_sku": "fixture-book-ebook",
+				"pct_off": "0",
+				"offer": "none",
+				"book_1": "title=Fixture Book|isbn=9790000000000|format=eBook|qty=1|unit_cents=599|fee_cents=0|country=billing_address|date=2026-11-16|net_usd=5.52",
+				"book_lines": "1",
+				"site": "smp",
+				"window": "smp",
+				"family": "smp_ebook"
+			}
+		}
+	}
+}
