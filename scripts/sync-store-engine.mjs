@@ -56,7 +56,11 @@ export const manifestOf = (files) =>
 		'\t', // tabs = what biome writes on commit, so the stamp is a fixed point
 	)}\n`;
 
-const git = (dir, args) => execFileSync('git', ['-C', dir, ...args], { encoding: 'buffer', stdio: ['ignore', 'pipe', 'pipe'] });
+// GIT_* stripped: under `git pushd` (a git alias) GIT_DIR points at the CALLING repo, and `git -C <SMP>` would then read
+// FHB's refs and report a false drift (2026-11-16, first FHB pushd after the switch).
+const gitEnv = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith('GIT_')));
+const git = (dir, args) =>
+	execFileSync('git', ['-C', dir, ...args], { encoding: 'buffer', stdio: ['ignore', 'pipe', 'pipe'], env: gitEnv });
 const shaAtRef = (ref) => {
 	const out = {};
 	for (const f of FILES) out[f] = sha(git(SMP_REPO, ['show', `${ref}:${destOf(f)}`]));
