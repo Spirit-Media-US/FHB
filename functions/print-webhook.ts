@@ -26,6 +26,27 @@ interface Env {
 
 const NOTIFY_FROM = 'FHB Orders <orders@send.spiritmediapublishing.com>';
 const NOTIFY_TO_DEFAULT = 'kevin@spiritmediapublishing.com';
+// Contact us = hello@ at every step (Kevin 2026-11-16): the BUYER's emails reply there. Kevin's internal notification
+// keeps its own Reply-To (the buyer) and its own recipient.
+export const BUYER_REPLY_TO = 'hello@spiritmediapublishing.com';
+
+// Two window-branded confirmations (Kevin 2026-11-16 "1A"; Option C: one store, two shop windows). The window is the
+// session's Option C tag (metadata[window]); a session from before the tags falls back on its site (an SMP-store
+// session carried site=smp|vaneure), else FHB. Only the subject and the sign-off change; the body is the same.
+export function buyerBrand(m: Record<string, string> | null | undefined, amount: string) {
+	const w = m?.window || (m?.site && m.site !== 'fhb' ? 'smp' : 'fhb');
+	return w === 'smp'
+		? {
+				window: 'smp',
+				subject: `Your Spirit Media Publishing order — ${amount}`,
+				signoff: 'Spirit Media Publishing · spiritmediapublishing.com',
+			}
+		: {
+				window: 'fhb',
+				subject: `Your Father’s Heart Bible order — ${amount}`,
+				signoff: 'Father’s Heart Bible · Spirit Media Publishing',
+			};
+}
 
 function hexToBytes(hex: string): Uint8Array | null {
 	if (hex.length % 2 !== 0) return null;
@@ -317,8 +338,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 					`It's a DRM-free EPUB — open it in Apple Books, Google Play Books,\n` +
 					`or any reader. Total paid: ${amount}\n\n` +
 					`Order reference: ${s.id ?? '?'}\n\n` +
-					`Trouble opening it? Just reply to this email.\n\nSpirit Media Publishing\n`,
-				NOTIFY_TO_DEFAULT,
+					`Trouble opening it? Just reply to this email.\n\n${buyerBrand(m, amount).signoff}\n`,
+				BUYER_REPLY_TO,
 			));
 		if (okKevin && okCust) {
 			await markNotified();
@@ -341,6 +362,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	// The buyer's own confirmation. Until 2026-09-03 we sent the customer NOTHING —
 	// Stripe's payment receipt was the only thing they ever received, so a buyer had
 	// no confirmation their ORDER (as opposed to their payment) existed.
+	const brand = buyerBrand(m, amount);
 	const custText =
 		`Thank you — we've received your order.\n\n` +
 		`What you ordered:\n${fmtOrder(readBreakdown(m))}\n\n` +
@@ -353,7 +375,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 			: `Shipping is free, and most orders arrive within 7–10 days.\n\n`) +
 		`Need to change or ask about this order? Just reply to this email and it comes\n` +
 		`straight to us — please include your order reference above.\n\n` +
-		`Spirit Media Publishing\n`;
+		`${brand.signoff}\n`;
 
 	const okKevin = await send(
 		env.PRINT_ORDER_NOTIFY_TO || NOTIFY_TO_DEFAULT,
@@ -362,8 +384,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		email !== '(no email)' ? email : undefined,
 	);
 	const okCust =
-		email === '(no email)' ||
-		(await send(email, `Your Father’s Heart Bible order — ${amount}`, custText, NOTIFY_TO_DEFAULT));
+		email === '(no email)' || (await send(email, brand.subject, custText, BUYER_REPLY_TO));
 
 	if (okKevin && okCust) {
 		await markNotified();

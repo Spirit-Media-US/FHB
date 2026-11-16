@@ -24,6 +24,10 @@ interface Env {
 }
 
 const SUPPORT = 'hello@spiritmediapublishing.com';
+// CONTACT US (Kevin 2026-11-16, standing rule): a button that opens mail to hello@, labelled only "Contact us"; the
+// address itself is never printed on the page.
+export const contactUs = (subject = '') =>
+	`<a class="contact" href="mailto:${SUPPORT}${subject ? `?subject=${encodeURIComponent(subject)}` : ''}">Contact us</a>`;
 
 const TITLES: Record<string, string> = {
 	chosen: 'Chosen Bible',
@@ -123,6 +127,7 @@ code{background:#faf6f2;padding:.15rem .4rem;border-radius:.3rem;font-size:.85em
 address{font-style:normal;white-space:pre-line}
 a.btn{display:inline-block;background:#b60057;color:#fff;text-decoration:none;font-weight:700;padding:.85rem 1.8rem;border-radius:999px;margin-top:1.5rem}
 input{width:100%;box-sizing:border-box;padding:.7rem .9rem;border:1.5px solid #e4bdc4;border-radius:.5rem;font-size:1rem;margin:.5rem 0 1rem}
+.contact{display:inline-block;background:#b60057;color:#fff;font-weight:700;padding:.6rem 1.4rem;border-radius:999px;text-decoration:none;margin-left:.25rem}
 button{background:#b60057;color:#fff;border:0;font-weight:700;padding:.8rem 1.8rem;border-radius:999px;font-size:1rem;cursor:pointer}
 .badge{display:inline-block;background:#eef7ee;color:#1f6b30;border-radius:999px;padding:.3rem .8rem;font-size:.8rem;font-weight:700}
 </style></head><body><div class="card">${body}</div>${tail}</body></html>`,
@@ -136,7 +141,7 @@ const lookupForm = (msg = '') =>
 	page(
 		`<h1>Look up your order</h1><p>${
 			msg || 'Paste the order reference from your confirmation email.'
-		}</p><form method="GET" action="/order"><label for="s">Order reference</label><input id="s" name="s" placeholder="cs_live_…" autocomplete="off" required><button type="submit">Find my order</button></form><p style="margin-top:1.5rem;font-size:.9rem">Can’t find it? Email <a href="mailto:${SUPPORT}">${SUPPORT}</a> and we’ll look it up for you.</p>`,
+		}</p><form method="GET" action="/order"><label for="s">Order reference</label><input id="s" name="s" placeholder="cs_live_…" autocomplete="off" required><button type="submit">Find my order</button></form><p style="margin-top:1.5rem;font-size:.9rem">Can’t find it? ${contactUs()} and we’ll look it up for you.</p>`,
 	);
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
@@ -150,7 +155,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 	}
 	if (!env.STRIPE_FHB_SECRET_KEY) {
 		return page(
-			`<h1>Your order is safe</h1><p>We can’t show the details right now, but your payment went through and we have your order. Email <a href="mailto:${SUPPORT}">${SUPPORT}</a> if you’d like confirmation in writing.</p>`,
+			`<h1>Your order is safe</h1><p>We can’t show the details right now, but your payment went through and we have your order. ${contactUs()} if you’d like confirmation in writing.</p>`,
 		);
 	}
 
@@ -224,7 +229,7 @@ ${s.customer_details?.phone ? `<dt>Phone for the delivery carrier</dt><dd>${esc(
 ${shippedBlock}
 <dt>Order reference</dt><dd><code>${esc(sid)}</code></dd>
 </dl>
-<p style="margin-top:1.5rem;font-size:.9rem">Need to change something? Email <a href="mailto:${SUPPORT}?subject=Order%20${encodeURIComponent(sid)}">${SUPPORT}</a> with your reference and we’ll sort it out.</p>`,
+<p style="margin-top:1.5rem;font-size:.9rem">Need to change something? ${contactUs(`Order ${sid}`)} with your reference and we’ll sort it out.</p>`,
 		200,
 		// Google Customer Reviews opt-in: this page only, values from the verified session above.
 		// buildOptIn returns null (module omitted) for test-mode sessions or any unverifiable value.
