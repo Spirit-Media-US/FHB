@@ -414,6 +414,11 @@ test('every owner_site smp registry row: 18 keys, ISBN, list_cents > 0, unique I
 	assert.deepEqual(errs, [], errs.join('; '));
 	const isbns = Object.values(SKU).map((r) => r.isbn).filter(Boolean);
 	assert.equal(new Set(isbns).size, isbns.length, 'an ISBN sits on two registry rows');
+	// a cost_key with no per-country landed cost makes checkoutForm refuse every country but the US (one engine broken):
+	// unmeasured = null (Bible-cost fallback); a US-only measured cost lives in book-us-costs.json, not in cost_key
+	const ship = fs.readFileSync(new URL('../src/data/ship-countries.json', import.meta.url), 'utf8');
+	const orphan = smpRows.filter(([, r]) => r.cost_key != null && !ship.includes(`"${r.cost_key}"`)).map(([k]) => k);
+	assert.deepEqual(orphan, [], `cost_key with no landed cost: ${orphan.join(', ')}`);
 });
 test('every owner_site smp checkout_img answers HTTP 200 (build-time network check)', async () => {
 	const urls = [...new Set(smpRows.map(([, r]) => r.checkout_img))];
