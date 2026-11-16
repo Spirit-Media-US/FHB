@@ -62,3 +62,49 @@ test('validator rejects injected defects (failure path)', () => {
 	assert.ok(mut((c) => { c[0].availability = 'out_of_stock'; }).some((e) => e.includes('availability')));
 	assert.ok(mut((c) => { c[0].url = 'https://x.example/'; }).some((e) => e.includes('url')));
 });
+
+// OPTION C (Kevin 2026-11-16 "1 store SMP. 2 shop windows FHB and SMP"): FHB is the ONE window for every Father's Heart
+// product, so FHB's Merchant feed = the Bible editions + the FH books (src/data/books.json); SMP's feed = SMP-author
+// books only. One listing per GTIN per business: the two feeds share no GTIN (mirrored in SMP
+// scripts/merchant-feed.test.mjs). SMP_FEED points at another SMP build; else the local SMP build, else the live feed.
+const FH_BOOKS = JSON.parse(fs.readFileSync('src/data/books.json', 'utf8')).books;
+/** GTINs present in both feeds (must be empty). */
+export const overlap = (a, b) => {
+	const B = new Set(b.map((i) => i.gtin));
+	return [...new Set(a.map((i) => i.gtin))].filter((g) => B.has(g));
+};
+/** Items that are not a Father's Heart product (a Bible edition page or an FH book page). */
+export const notFh = (feed, fhBooks) => {
+	const slugs = new Set(fhBooks.map((b) => b.slug));
+	return feed.filter((i) => {
+		const m = i.link.match(/^https:\/\/fathersheartbible\.com\/(bibles|books)\/([^/]+)\//);
+		return !m || (m[1] === 'books' && !slugs.has(m[2]));
+	}).map((i) => i.id);
+};
+test('FHB feed = Bible editions + the FH books (Option C)', () => {
+	const g = google();
+	assert.deepEqual(notFh(g, FH_BOOKS), [], 'an item that is not a Father\'s Heart product');
+	assert.ok(g.some((i) => i.link.includes('/bibles/')), 'Bible editions in the feed');
+	for (const b of FH_BOOKS) {
+		if (!fs.existsSync(`dist/books/${b.slug}/index.html`)) continue; // page not live on FHB yet
+		const html = fs.readFileSync(`dist/books/${b.slug}/index.html`, 'utf8');
+		for (const sku of b.formats)
+			if (new RegExp(`"sku":"${sku}"`).test(html)) assert.ok(g.some((i) => i.id === sku), `${sku} (FH book) missing from the FHB feed`);
+	}
+	assert.equal(notFh([{ id: 'x', link: 'https://fathersheartbible.com/books/some-smp-book/#order' }], FH_BOOKS).length, 1, 'check rejects a non-FH book');
+});
+test('no GTIN is in both the FHB and SMP feeds (one listing per GTIN per business)', async (t) => {
+	const local = process.env.SMP_FEED ?? '/srv/sites/spirit-media-publishing/dist/merchant-feed.xml';
+	const xml = fs.existsSync(local)
+		? fs.readFileSync(local, 'utf8')
+		: await fetch('https://spiritmediapublishing.com/merchant-feed.xml').then((r) => (r.ok ? r.text() : null)).catch(() => null);
+	if (!xml) return t.skip('SMP feed not reachable');
+	const smp = parseGoogle(xml);
+	assert.ok(smp.length > 0, 'SMP feed parsed to 0 items');
+	assert.deepEqual(overlap(google(), smp), [], 'GTIN listed by both businesses');
+});
+test('the overlap check FAILS on an injected duplicate GTIN (proof it can reject)', () => {
+	const fhb = [{ gtin: '9798893072396' }];
+	assert.deepEqual(overlap(fhb, [{ gtin: '9798893000000' }]), []);
+	assert.deepEqual(overlap(fhb, [{ gtin: '9798893000000' }, { gtin: '9798893072396' }]), ['9798893072396']);
+});

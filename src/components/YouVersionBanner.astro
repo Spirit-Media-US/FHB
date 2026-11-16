@@ -1,5 +1,5 @@
 ---
-// Thin black "Now on YouVersion" announcement under the hero on every FHB page (Kevin 2026-11-06
+// Thin black "FHB+DVC on YouVersion" announcement under the hero on every FHB page (Kevin 2026-11-06
 // ~22:0xZ: "we need announcement banner like SMP to grab people's attention. Add this black banner
 // under the hero on every page."). Same look as SMP's live one (spirit-media-publishing
 // CoverMarquee .fhbm-yv). Layout renders it under the top bar; a page whose first section is a hero
@@ -18,20 +18,22 @@ import stats from '../data/youversion-stats.json';
 
 const YOUVERSION_URL = 'https://www.bible.com/organizations/89162c01-3892-4c7b-a462-239df0931522';
 // Full numbers with commas (Kevin 2026-11-09: "7,302 users 51 languages 157 countries 84,700 chapters");
-// chapters round to the nearest hundred. Highlights removed (same ruling).
+// Highlights removed (same ruling). Chapters show the EXACT count (Kevin 2026-11-16 ~15:0xZ: "16,682 users 51 languages
+// 176 Countries, 233,326 chapters"), replacing the 11-09 round-to-hundred.
+// Label (same ruling): "FHB+DVC on YouVersion". SMP carries a byte-identical copy of this file (src/components/).
 const fmt = (n: number) => n.toLocaleString('en-US');
 const items = [
 	{ n: stats.users, label: 'users', key: 'users' },
 	{ n: stats.languages, label: 'languages', key: 'languages' },
 	{ n: stats.countries, label: 'countries', key: 'countries' },
-	{ n: Math.round(stats.chapters / 100) * 100, label: 'chapters', key: 'chapters' },
+	{ n: stats.chapters, label: 'chapters', key: 'chapters' },
 ];
 ---
 
 <div class="fhb-yv-wrap" data-yv-counters>
 	<a class="fhb-yv-banner" href={YOUVERSION_URL} target="_blank" rel="noopener">
 		<img src="https://assets.spiritmediapublishing.com/FHB/partners/youversion-icon-96.webp" alt="" width="20" height="20" decoding="async" loading="lazy" />
-		<span>Now on YouVersion <span aria-hidden="true">&rarr;</span></span>
+		<span>FHB+DVC on YouVersion <span aria-hidden="true">&rarr;</span></span>
 	</a>
 	<ul class="fhb-yv-stats" aria-label="FHB on YouVersion, all time">
 		{items.map((i) => (
@@ -52,7 +54,7 @@ const items = [
 		try {
 			const r = await fetch(STATS_URL, { signal: AbortSignal.timeout(3000) });
 			const j = r.ok ? await r.json() : null;
-			return live(j) ? { ...j, chapters: Math.round(j.chapters / 100) * 100 } : null;
+			return live(j) ? j : null;
 		} catch { return null; }
 	})());
 	document.querySelectorAll<HTMLElement>('[data-yv-counters]').forEach((root) => {

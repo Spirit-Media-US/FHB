@@ -314,7 +314,10 @@ test('every live book page has its order form ON the page: per-format price line
 		assert.doesNotMatch(html, /spiritmediapublishing\.com\/books\/[a-z0-9-]+\/buy\//, `${slug}: no hand-off to the SMP buy page`);
 	}
 	const src = fs.readFileSync(new URL('../src/components/BookOrder.astro', import.meta.url), 'utf8');
-	assert.match(src, /https:\/\/spiritmediapublishing\.com'/, 'production orders on the SMP store');
+	// one store address for every FHB order box (Option C 2026-11-16): src/lib/storeOrigin.ts
+	const store = fs.readFileSync(new URL('../src/lib/storeOrigin.ts', import.meta.url), 'utf8');
+	assert.match(store, /https:\/\/spiritmediapublishing\.com'/, 'production orders on the SMP store');
+	assert.match(src, /storeOrigin\(location\.hostname\)/, 'the book box uses the one store address');
 	assert.match(src, /\/store-checkout`/, 'posts to SMP /store-checkout');
 	assert.match(src, /const site = 'fhb'/, 'the sale records site=fhb');
 	assert.match(src, /email: \(form\.querySelector\('\[data-email\]'\)/, 'the order sends the email');
@@ -332,4 +335,102 @@ test('CSP: /books/* may connect to the SMP store; the site-wide policy may not',
 	assert.match(blocks['/books/*'], /! Content-Security-Policy/);
 	assert.match(connect(blocks['/books/*']), /https:\/\/spiritmediapublishing\.com/);
 	assert.doesNotMatch(connect(blocks['/*']), /https:\/\/spiritmediapublishing\.com|spirit-media-publishing\.pages\.dev/);
+	// Option C (2026-11-16): the Bible box pages order on the same store, so they carry the same allowance (prod + the
+	// SMP dev preview storeOrigin.ts sends FHB previews to)
+	const { STORE_PREVIEW } = { STORE_PREVIEW: 'https://dev.spirit-media-publishing.pages.dev' };
+	for (const b of ['/books/*', '/bibles/*', '/print', '/print/*']) {
+		assert.ok(blocks[b], `${b} block exists`);
+		assert.match(blocks[b], /! Content-Security-Policy/, `${b} replaces the site policy`);
+		assert.ok(connect(blocks[b]).includes(' https://spiritmediapublishing.com ') && connect(blocks[b]).includes(STORE_PREVIEW), `${b}: may connect to the store`);
+	}
+	assert.ok(fs.readFileSync(new URL('../src/lib/storeOrigin.ts', import.meta.url), 'utf8').includes(`'${STORE_PREVIEW}'`), 'CSP preview host = storeOrigin preview');
+});
+
+// DUPLICATE RULE (store-168 item 2; Kevin 2026-11-16 "SMP not FHB will be #1 retailer and distributor of FHB bibles,
+// books, and SMP books"; brief: FH Bibles + FH books KEEP the FHB canonical for now — FHB has the measured reach; the SMP
+// page for an FH book is the retail listing with rel=canonical -> FHB, asserted in SMP scripts/store-checkout.test.mjs).
+// Revisit trigger (weekly store ledger): SMP Google impressions > FHB for 4 weeks -> flip that product.
+// canonicalErrs() is the ONE check; the failure-path test proves it rejects a wrong canonical.
+const canonicalErrs = (url, html, { product }) => {
+	const got = [...html.matchAll(/<link rel="canonical" href="([^"]+)"/g)].map((m) => m[1]);
+	const errs = [];
+	if (got.length !== 1) errs.push(`${url}: ${got.length} canonical tags`);
+	else if (got[0] !== url) errs.push(`${url}: canonical ${got[0]} (must be self)`);
+	if (product && !/"@type":\["Book","Product"\]/.test(html)) errs.push(`${url}: no Book+Product node`);
+	if (product && !/"@type":"Offer"/.test(html)) errs.push(`${url}: no Offer`);
+	return errs;
+};
+test('duplicate rule check FAILS on a wrong canonical or missing Product (proof the gate can reject)', () => {
+	const u = 'https://fathersheartbible.com/books/who-am-i/';
+	const ok = `<link rel="canonical" href="${u}"><script>{"@type":["Book","Product"],"offers":{"@type":"Offer"}}</script>`;
+	assert.deepEqual(canonicalErrs(u, ok, { product: true }), []);
+	assert.equal(canonicalErrs(u, ok.replace(u, 'https://spiritmediapublishing.com/books/who-am-i/'), { product: true }).length, 1, 'canonical -> SMP must fail');
+	assert.equal(canonicalErrs(u, ok.replace('["Book","Product"]', '"Book"').replace('"Offer"', '"X"'), { product: true }).length, 2, 'no Product/Offer must fail');
+	assert.equal(canonicalErrs(u, '<p></p>', { product: false }).length, 1, 'no canonical must fail');
+});
+test('FH books + FH Bible editions keep the FHB canonical (built pages)', { skip: !fs.existsSync(new URL('../dist/bibles/', import.meta.url)) && 'no dist' }, () => {
+	const built = cat.books.filter((b) => fs.existsSync(new URL(`../dist/books/${b.slug}/index.html`, import.meta.url)));
+	assert.ok(built.length >= 1, 'at least one FH book page built');
+	for (const b of built) {
+		const html = fs.readFileSync(new URL(`../dist/books/${b.slug}/index.html`, import.meta.url), 'utf8');
+		const errs = canonicalErrs(`https://fathersheartbible.com/books/${b.slug}/`, html, { product: b.status === 'live' });
+		assert.deepEqual(errs, [], errs.join('; '));
+	}
+	const bibles = fs.readdirSync(new URL('../dist/bibles/', import.meta.url)).filter((d) => /-bible$/.test(d));
+	assert.ok(bibles.length >= 50, `only ${bibles.length} edition pages`);
+	for (const d of bibles) {
+		const html = fs.readFileSync(new URL(`../dist/bibles/${d}/index.html`, import.meta.url), 'utf8');
+		const errs = canonicalErrs(`https://fathersheartbible.com/bibles/${d}/`, html, { product: false });
+		assert.deepEqual(errs, [], errs.join('; '));
+	}
+});
+
+// SELLABLE-39 (pmprint 2026-11-16, Kevin "1 store SMP. 2 shop windows FHB and SMP"): every registry row another site
+// owns (owner_site smp) is SOLD by the engine with no books.json gate, so the row itself must carry what checkout needs:
+// the 18 keys, a 13-digit ISBN, an integer list price > 0, and a checkout image that answers HTTP 200 at build time
+// (Stripe shows it; a 404 is a broken checkout). Pure checker first so the failure path is proven offline.
+const SMP_ROW_KEYS = ['owner_site', 'format', 'schema_format', 'isbn', 'isbn_display', 'list_cents', 'pages', 'trim', 'binding', 'checkout_title', 'checkout_name', 'checkout_desc', 'checkout_img', 'ingram_title', 'spec', 'floor_usd', 'cost_key', 'book'];
+const smpRowErrs = (sku, r) => {
+	const e = [];
+	for (const k of SMP_ROW_KEYS) if (!(k in r)) e.push(`${sku}: missing key ${k}`);
+	if (!/^97[89]\d{10}$/.test(String(r.isbn ?? ''))) e.push(`${sku}: isbn ${r.isbn}`);
+	if (!Number.isInteger(r.list_cents) || r.list_cents <= 0) e.push(`${sku}: list_cents ${r.list_cents}`);
+	if (!/^https:\/\/\S+$/.test(String(r.checkout_img ?? ''))) e.push(`${sku}: checkout_img ${r.checkout_img}`);
+	return e;
+};
+const smpRows = Object.entries(SKU).filter(([, r]) => r.owner_site && r.owner_site !== 'fhb');
+test('smp registry row checker FAILS on a missing ISBN, zero price or bad image (proof the gate can reject)', () => {
+	const [sku, r] = smpRows[0];
+	assert.deepEqual(smpRowErrs(sku, r), []);
+	assert.equal(smpRowErrs(sku, { ...r, isbn: null }).length, 1, 'no ISBN must fail');
+	assert.equal(smpRowErrs(sku, { ...r, list_cents: 0 }).length, 1, 'price 0 must fail');
+	assert.equal(smpRowErrs(sku, { ...r, checkout_img: '' }).length, 1, 'no image must fail');
+	const { book, ...short } = r;
+	assert.equal(smpRowErrs(sku, short).length, 1, 'a missing key must fail');
+});
+test('every owner_site smp registry row: 18 keys, ISBN, list_cents > 0, unique ISBN', () => {
+	assert.ok(smpRows.length >= 80, `only ${smpRows.length} smp rows`);
+	const errs = smpRows.flatMap(([sku, r]) => smpRowErrs(sku, r));
+	assert.deepEqual(errs, [], errs.join('; '));
+	const isbns = Object.values(SKU).map((r) => r.isbn).filter(Boolean);
+	assert.equal(new Set(isbns).size, isbns.length, 'an ISBN sits on two registry rows');
+	// a cost_key with no per-country landed cost makes checkoutForm refuse every country but the US (one engine broken):
+	// unmeasured = null (Bible-cost fallback); a US-only measured cost lives in book-us-costs.json, not in cost_key
+	const ship = fs.readFileSync(new URL('../src/data/ship-countries.json', import.meta.url), 'utf8');
+	const orphan = smpRows.filter(([, r]) => r.cost_key != null && !ship.includes(`"${r.cost_key}"`)).map(([k]) => k);
+	assert.deepEqual(orphan, [], `cost_key with no landed cost: ${orphan.join(', ')}`);
+});
+test('every owner_site smp checkout_img answers HTTP 200 (build-time network check)', async () => {
+	const urls = [...new Set(smpRows.map(([, r]) => r.checkout_img))];
+	const bad = [];
+	for (let i = 0; i < urls.length; i += 8)
+		await Promise.all(
+			urls.slice(i, i + 8).map(async (u) => {
+				let st = 0;
+				for (let a = 0; a < 3 && st !== 200; a++)
+					st = await fetch(u, { method: 'HEAD', signal: AbortSignal.timeout(10000) }).then((r) => r.status, () => 0);
+				if (st !== 200) bad.push(`${u} -> ${st}`);
+			}),
+		);
+	assert.deepEqual(bad, [], bad.join('; '));
 });

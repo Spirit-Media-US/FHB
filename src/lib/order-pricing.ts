@@ -105,6 +105,8 @@ export interface BookFormatRow {
 	floorUsd: number;
 	costKey: string;
 	format: string;
+	/** the row's own binding text (e.g. 'Case laminate', 'Perfect bound'); with `format`, what isHardbackRow reads */
+	binding: string;
 	bookSlug: string;
 	/** Measured US per-copy print + ship cost (the US has no country-list cost row); null = unmeasured. */
 }
@@ -118,6 +120,7 @@ export const BOOK_SKUS: Record<string, BookFormatRow> = Object.fromEntries(
 			floorUsd: (f.floor_usd as number) ?? 0,
 			costKey: f.cost_key as string,
 			format: f.format as string,
+			binding: (f.binding as string) ?? '',
 			bookSlug: f.book as string,
 		},
 	]),
@@ -133,10 +136,20 @@ export const isDiscountExempt = (slug: string): boolean => DISCOUNT_EXEMPT.inclu
 // discounts a book (books add nothing to it), so a volume pct leaves a book at list.
 export const paidUnit = (slug: string, cents: number, pct: number, firstOrder = false): number =>
 	isDiscountExempt(slug) || (BOOK_SKUS[slug] && !firstOrder) ? cents : unitAfter(cents, pct);
+/** A book row is a hardback by its OWN format/binding fields (format Hardcover/Hardback, or binding case/cloth/
+ *  hardcover), never by its SKU suffix: 2026-11-16 the engine sized "Hardback, Colored" rows whose SKU does not end
+ *  in -hb (Only God Works, Home) on the PAPERBACK cost and undercharged their shipping. */
+export const isHardbackRow = (row: Pick<BookFormatRow, 'format' | 'binding'>): boolean =>
+	/hard(back|cover)/i.test(row.format ?? '') ||
+	/\b(case|cloth|hardcover|hardback)\b/i.test(row.binding ?? '');
 /** Landed-cost key for a SKU: a book uses its OWN measured cost (books.json landed_key, e.g. 'bi' for Beloved
- *  Identity); a Bible is its binding from the SKU key (<slug>-hb | <slug>-pb). */
-export const bindingFor = (slug: string): string =>
-	BOOK_SKUS[slug]?.costKey ?? (slug.endsWith('-hb') ? 'hc' : 'pb');
+ *  Identity), else the cost of its own binding read from the row; a Bible is its binding from the SKU key
+ *  (<slug>-hb | <slug>-pb; every Bible SKU is keyed that way). */
+export const bindingFor = (slug: string): string => {
+	const book = BOOK_SKUS[slug];
+	if (book) return book.costKey ?? (isHardbackRow(book) ? 'hc' : 'pb');
+	return slug.endsWith('-hb') ? 'hc' : 'pb';
+};
 /** Key into IntlRow.fees: the fee depends on binding, volumes in the box and the paid unit price. */
 export const feeKey = (slug: string, paidCents: number): string =>
 	`${bindingFor(slug)}${volumesFor(slug)}:${paidCents}`;

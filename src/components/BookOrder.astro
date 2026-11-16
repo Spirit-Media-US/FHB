@@ -219,6 +219,7 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 </style>
 
 <script>
+	import { storeOrigin, storeUtm } from '../lib/storeOrigin';
 	// The same arithmetic the server charges: list x qty + the country's per-copy handling fee x qty.
 	for (const form of document.querySelectorAll<HTMLFormElement>('form[data-box]')) {
 		const cfg = JSON.parse(form.dataset.fees || '{"list":{},"fee":{}}') as {
@@ -281,20 +282,11 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 				msg.textContent = 'Choose at least one copy.';
 				return;
 			}
-			const q = new URLSearchParams(location.search);
-			const utm = Object.fromEntries(
-				['source', 'medium', 'campaign', 'content']
-					.map((k) => [k, q.get(`utm_${k}`) ?? ''])
-					.filter(([, v]) => v),
-			);
+			const utm = storeUtm(location.search, 'book-order-form', form.dataset.slug ?? '');
 			const site = 'fhb';
-			if (!utm.source) Object.assign(utm, { source: 'fathersheartbible.com', medium: 'referral', campaign: 'book-order-form', content: form.dataset.slug ?? '' });
 			// SMP is the store (contract 3fe): production orders on spiritmediapublishing.com; an FHB preview orders on the
-			// SMP store PREVIEW so a test never touches production (the old FHB book box's rule, kept).
-			const STORE =
-				location.hostname.endsWith('.pages.dev') && location.hostname !== 'fathersheartbible.pages.dev'
-					? 'https://feat-smp-store.spirit-media-publishing.pages.dev'
-					: 'https://spiritmediapublishing.com';
+			// SMP store PREVIEW so a test never touches production. One rule for every FHB order box: src/lib/storeOrigin.ts.
+			const STORE = storeOrigin(location.hostname);
 			(window as any).gtag?.('event', 'begin_checkout', {
 				currency: 'USD',
 				items: Object.entries(counts)

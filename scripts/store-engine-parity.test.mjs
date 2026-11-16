@@ -99,8 +99,20 @@ test('store engine parity: every fixed cart sends the byte-identical Stripe requ
 	// one field that legitimately moves, so it is compared as a shape, never as a value (2026-11-14: the golden written
 	// 11-13 failed every build after midnight UTC on the date alone).
 	const day = (v) => JSON.parse(JSON.stringify(v).replace(/date%3D\d{4}-\d\d-\d\d|date=\d{4}-\d\d-\d\d/g, 'date=<day>'));
-	for (const id of Object.keys(want)) assert.deepEqual(day(got[id]), day(want[id]), `cart ${id} changed`);
+	// OPTION C (Kevin 2026-11-16): the ONLY permitted difference is the three new store tags, appended at the end of the
+	// form. They are asserted present on every session, then removed, and what is left must equal the golden byte for byte.
+	for (const id of Object.keys(want)) {
+		const g = structuredClone(got[id]);
+		if (g.body) {
+			const tags = g.body.match(STORE_TAGS_TAIL);
+			assert.ok(tags, `cart ${id}: session carries site + window + family at the end`);
+			assert.match(tags[0], /^&metadata%5Bsite%5D=fhb&metadata%5Bwindow%5D=fhb&metadata%5Bfamily%5D=[a-z_+%2B]+$/);
+			g.body = g.body.replace(STORE_TAGS_TAIL, '');
+		}
+		assert.deepEqual(day(g), day(want[id]), `cart ${id} changed`);
+	}
 });
+export const STORE_TAGS_TAIL = /&metadata%5Bsite%5D=[^&]*&metadata%5Bwindow%5D=[^&]*&metadata%5Bfamily%5D=[^&]*$/;
 
 test('store engine parity: the golden covers a session, a refusal and every rule path', () => {
 	const want = JSON.parse(fs.readFileSync(GOLDEN, 'utf8'));

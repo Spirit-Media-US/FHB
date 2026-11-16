@@ -1423,6 +1423,56 @@ export function encodeForm(obj: Record<string, string | number>): string {
 		.join('&');
 }
 
+// ── OPTION C TAGS (Kevin 2026-11-16 "1 store SMP. 2 shop windows FHB and SMP") ─────────────────────────────────────
+// ONE store (this engine, one Stripe account), TWO shop windows. Every store Checkout Session says where it was sold
+// (site: fhb | smp | vaneure), which shop window that is (window: fhb | smp; vaneure is an SMP author site, so smp) and
+// what was sold (family: bible | fh_book | smp_book | bible_ebook, '+'-joined in that order for a mixed cart).
+// FH book = a book in the FHB catalogue (src/data/books.json); every other registry book is an SMP book.
+// storeTagErrors() is the ONE check: every function that creates a session refuses (no Stripe call) when it fails.
+export const STORE_TAG_KEYS = ['metadata[site]', 'metadata[window]', 'metadata[family]'] as const;
+export const STORE_SITES: Record<string, 'fhb' | 'smp'> = {
+	fhb: 'fhb',
+	smp: 'smp',
+	vaneure: 'smp',
+};
+export const PRODUCT_FAMILIES = ['bible', 'fh_book', 'smp_book', 'bible_ebook'] as const;
+export type ProductFamily = (typeof PRODUCT_FAMILIES)[number];
+const FH_BOOK_SLUGS = new Set((booksCatalog.books as { slug: string }[]).map((b) => b.slug));
+/** The product family of one engine SKU, or null for a SKU the engine does not sell. */
+export function familyOfSku(sku: string): ProductFamily | null {
+	if (BOOK_SKUS[sku]) return FH_BOOK_SLUGS.has(BOOK_SKUS[sku].bookSlug) ? 'fh_book' : 'smp_book';
+	return EDITIONS[sku] ? 'bible' : null;
+}
+/** The family tag of a cart: every family with a quantity, in PRODUCT_FAMILIES order, '+'-joined ('' when empty). */
+export function familyOf(counts: Record<string, number>): string {
+	const got = new Set<string>();
+	for (const [sku, n] of Object.entries(counts)) if (Number(n) > 0) got.add(familyOfSku(sku) ?? '');
+	return PRODUCT_FAMILIES.filter((f) => got.has(f)).join('+');
+}
+/** The three Option C tags for a session sold on `site` (an unknown site is not tagged: storeTagErrors fails it). */
+export function storeTags(site: string, family: string): Record<string, string> {
+	return {
+		'metadata[site]': site,
+		'metadata[window]': STORE_SITES[site] ?? '',
+		'metadata[family]': family,
+	};
+}
+/** Why a session form is NOT properly tagged ([] = tagged). A session with any error must never reach Stripe. */
+export function storeTagErrors(form: Record<string, string | number>): string[] {
+	const errs: string[] = [];
+	const site = String(form['metadata[site]'] ?? '');
+	const win = String(form['metadata[window]'] ?? '');
+	const fam = String(form['metadata[family]'] ?? '');
+	if (!STORE_SITES[site]) errs.push(`site '${site}' is not a store site`);
+	else if (win !== STORE_SITES[site])
+		errs.push(`window '${win}' is not ${STORE_SITES[site]} for site ${site}`);
+	if (!fam || fam.split('+').some((f) => !(PRODUCT_FAMILIES as readonly string[]).includes(f)))
+		errs.push(`family '${fam}' is not a product family`);
+	if (Object.keys(form).filter((k) => k.startsWith('metadata[')).length > STRIPE_META_KEYS_MAX)
+		errs.push(`more than ${STRIPE_META_KEYS_MAX} metadata keys`);
+	return errs;
+}
+
 // The Stripe-backed first-order lookups (moved verbatim from functions/dvc-checkout.ts, Phase 3: one copy for
 // every checkout that uses the engine). Read-only GETs against the store's Stripe account.
 // A FIRST ORDER = this email has never bought from the STORE (Kevin 2026-11-14: "Someone who has never purchased
@@ -1742,7 +1792,10 @@ export async function checkoutForm(
 			destCode,
 			intl ? dest : null,
 			unitPctFinal,
-			STRIPE_META_KEYS_MAX - Object.keys(form).filter((k) => k.startsWith('metadata[')).length,
+			// the three Option C store tags are added by the caller after this, so their keys are reserved here
+			STRIPE_META_KEYS_MAX -
+				STORE_TAG_KEYS.length -
+				Object.keys(form).filter((k) => k.startsWith('metadata[')).length,
 		),
 	);
 
