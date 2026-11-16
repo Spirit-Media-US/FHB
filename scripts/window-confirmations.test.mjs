@@ -129,3 +129,266 @@ test('SMP-window emails carry NO window line above the signature; FHB-window ema
 	assert.ok(fhb.buyer.text.endsWith(`\n\nFather’s Heart Bible · Spirit Media Publishing\n\n${SIGNATURE}\n`), 'FHB: keeps its line');
 	assert.equal(buyerBrand({ window: 'smp' }, '$1').signoff, '');
 });
+
+// ── DIRECT EBOOK SALES (Kevin 2026-11-16 "We point to our own ebook sales") ──────────────────────────────────────────
+// The eBook email is one of the window confirmations, so its proof lives here. There is NO Stripe test-mode key for the
+// store account (every key on Bethel is live), so nothing here charges a card: the flow is proven against a recorded
+// checkout.session.completed fixture (scripts/fixtures/ebook-session-completed.json) with Stripe, Mailgun and R2
+// stubbed. Proves: the engine's eBook form (no shipping, first-order 15%, tags, mixed-cart and KDP Select refusals); the
+// webhook emails the buyer a SIGNED link on the SMP window; that link downloads the file; and the download REFUSES an
+// unpaid session, an unknown session, a tampered signature (with no Stripe call) and a signature lifted onto another
+// SKU. The Bible eBook's v1 path is unchanged.
+import ebookFiles from '../src/data/ebook-files.json' with { type: 'json' };
+import bookSkus from '../src/data/book-skus.json' with { type: 'json' };
+import EBOOK from '../functions/ebook-current.json' with { type: 'json' };
+import { onRequestGet as download } from '../functions/ebook-download.ts';
+import { sessionGrantsEbook, signEbookLink, verifyEbookLink, windowOrigin } from '../src/lib/ebookLink.ts';
+import {
+	EBOOK_SKUS,
+	ebookCheckoutForm,
+	ebookForBook,
+	ebookOnSale,
+	familyOf,
+	storeTagErrors,
+	storeTags,
+} from '../src/lib/storeEngine.ts';
+
+const FIX = JSON.parse(fs.readFileSync(new URL('./fixtures/ebook-session-completed.json', import.meta.url), 'utf8'));
+const SESSION = FIX.data.object;
+const SID = SESSION.id;
+const SKU = 'fixture-book-ebook';
+const WHSEC = 'whsec_fixture_only';
+// the test-only registry row + file the fixture sells (never in the committed data)
+EBOOK_SKUS[SKU] = { title: 'Fixture Book', isbn: '9790000000000', listCents: 599, bookSlug: 'fixture-book', img: null, selectUntil: null };
+ebookFiles.files[SKU] = { key: 'fixture-book-v1.epub', filename: 'Fixture-Book.epub' };
+const EPUB_BYTES = 'PK\u0003\u0004fixture-epub';
+const deps = (first = false) => ({ enabled: true, isFirstOrder: async () => first, firstOrderPromo: async () => (first ? 'promo_WELCOME15' : null) });
+
+// stubs: Stripe (sessions by id), Mailgun (records), R2 (one bucket)
+function stubs(sessions) {
+	const calls = { stripe: [], mail: [] };
+	const real = globalThis.fetch;
+	globalThis.fetch = async (url, init) => {
+		const u = String(url);
+		if (u.includes('mailgun')) {
+			calls.mail.push(Object.fromEntries(init.body));
+			return new Response('{}', { status: 200 });
+		}
+		if (u.startsWith('https://api.stripe.com/v1/checkout/sessions/')) {
+			calls.stripe.push(u);
+			const id = u.split('/').pop().split('?')[0];
+			if (init?.method === 'POST') return new Response('{}', { status: 200 }); // markNotified
+			return sessions[id] ? new Response(JSON.stringify(sessions[id]), { status: 200 }) : new Response('{"error":{}}', { status: 404 });
+		}
+		throw new Error(`unexpected fetch ${u}`);
+	};
+	return { calls, restore: () => (globalThis.fetch = real) };
+}
+const R2 = { get: async (k) => (k === ebookFiles.files[SKU].key || k === EBOOK.key ? { body: `${EPUB_BYTES}:${k}` } : null) };
+const ENV = { STRIPE_FHB_SECRET_KEY: 'rk_test_stub', STRIPE_PRINT_WEBHOOK_SECRET: WHSEC, FHB_EBOOK: R2 };
+const get = (p, env = ENV) => download({ request: new Request(`https://spiritmediapublishing.com${p}`), env });
+
+test('EBOOK fixture is EXACTLY what the engine sends Stripe for its order (it cannot drift)', async () => {
+	const o = FIX._order;
+	const r = await ebookCheckoutForm(o, 'https://spiritmediapublishing.com/store-checkout', deps(o.firstOrder), new Date(o.now));
+	assert.ok('form' in r, JSON.stringify(r));
+	Object.assign(r.form, storeTags(o.site, familyOf(o.counts)));
+	const meta = Object.fromEntries(Object.entries(r.form).filter(([k]) => k.startsWith('metadata[')).map(([k, v]) => [k.slice(9, -1), String(v)]));
+	assert.deepEqual(meta, SESSION.metadata);
+	assert.equal(r.form.success_url, SESSION.success_url);
+	assert.equal(r.form.cancel_url, SESSION.cancel_url);
+	assert.equal(r.form['line_items[0][price_data][unit_amount]'], SESSION.amount_subtotal);
+});
+
+test('EBOOK ENGINE: no shipping, carries the tags, takes the first-order 15%', async () => {
+	const r = await ebookCheckoutForm({ counts: { [SKU]: 1 }, email: 'new@example.com', returnPath: '/books/fixture-book/' }, 'https://spiritmediapublishing.com/store-checkout', deps(true));
+	assert.ok('form' in r);
+	const f = { ...r.form, ...storeTags('smp', familyOf({ [SKU]: 1 })) };
+	assert.deepEqual(storeTagErrors(f), [], 'tagged');
+	assert.equal(f['metadata[family]'], 'smp_ebook');
+	assert.equal(f['metadata[kind]'], 'ebook_direct');
+	assert.equal(f['discounts[0][promotion_code]'], 'promo_WELCOME15', 'first order: WELCOME15 pre-applied');
+	assert.equal(f['metadata[offer]'], 'first_order');
+	assert.match(f['metadata[book_1]'], /unit_cents=509\|/, '15% off 5.99 recorded for author reporting');
+	assert.ok(!Object.keys(f).some((k) => /shipping|phone_number/.test(k)), 'no shipping, no phone: nothing ships');
+	assert.equal(f['line_items[0][price_data][product_data][tax_code]'], 'txcd_10202001', 'e-book tax code');
+	assert.equal(f.billing_address_collection, 'required');
+	const rep = await ebookCheckoutForm({ counts: { [SKU]: 1 }, email: 'old@example.com' }, 'https://x.pages.dev/store-checkout', deps(false));
+	assert.equal(rep.form['discounts[0][promotion_code]'], undefined, 'repeat buyer: list price');
+	assert.equal(rep.form.cancel_url, 'https://x.pages.dev/bookstore/?order=canceled', 'unknown return path: the bookstore, never an open redirect');
+	const prod = await ebookCheckoutForm({ counts: { [SKU]: 1 } }, 'https://spirit-media-publishing.pages.dev/store-checkout', deps());
+	assert.match(prod.form.success_url, /^https:\/\/spiritmediapublishing\.com\/ebook-download\?s=/, 'the production Pages host returns to the .com');
+});
+
+test('EBOOK ENGINE REFUSES: a mixed cart, two copies, an unknown SKU, an eBook in an active KDP Select term', async () => {
+	const url = 'https://spiritmediapublishing.com/store-checkout';
+	const pb = Object.keys(bookSkus.skus)[0];
+	assert.equal((await ebookCheckoutForm({ counts: { [SKU]: 1, [pb]: 1 } }, url, deps())).body.error, 'ebook_separate');
+	assert.equal((await ebookCheckoutForm({ counts: { [SKU]: 2 } }, url, deps())).body.error, 'invalid_selection');
+	assert.equal((await ebookCheckoutForm({ counts: { 'no-such-ebook': 1 } }, url, deps())).body.error, 'invalid_selection');
+	assert.equal((await ebookCheckoutForm({ counts: {} }, url, deps())).body.error, 'invalid_selection');
+	EBOOK_SKUS['select-book-ebook'] = { ...EBOOK_SKUS[SKU], bookSlug: 'select-book', selectUntil: '2026-12-20' };
+	try {
+		const before = new Date('2026-12-19T23:00:00Z');
+		assert.equal(ebookOnSale('select-book-ebook', before), false, 'in its Select term: not on sale');
+		assert.equal(ebookForBook('select-book', before), null, 'its page keeps the Amazon button');
+		assert.equal((await ebookCheckoutForm({ counts: { 'select-book-ebook': 1 } }, url, deps(), before)).body.error, 'not_on_sale');
+		const after = new Date('2026-12-20T00:00:01Z');
+		assert.equal(ebookOnSale('select-book-ebook', after), true, 'the day the term ends it joins our store');
+		assert.ok('form' in (await ebookCheckoutForm({ counts: { 'select-book-ebook': 1 } }, url, deps(), after)));
+	} finally {
+		delete EBOOK_SKUS['select-book-ebook'];
+	}
+	const off = await ebookCheckoutForm({ counts: { [SKU]: 1 } }, url, { ...deps(), enabled: false });
+	assert.equal(off.body.disabled, true, 'no Stripe key: disabled, never a session');
+});
+
+test('EBOOK SIGNED LINK: verifies only for its own session + SKU + secret; tampering fails', async () => {
+	const t = await signEbookLink(WHSEC, SID, SKU);
+	assert.match(t, /^[A-Za-z0-9_-]{43}$/);
+	assert.equal(await verifyEbookLink(WHSEC, SID, SKU, t), true);
+	const flip = t.slice(0, 10) + (t[10] === 'A' ? 'B' : 'A') + t.slice(11);
+	assert.equal(await verifyEbookLink(WHSEC, SID, SKU, flip), false, 'one character changed');
+	assert.equal(await verifyEbookLink(WHSEC, SID, 'other-book-ebook', t), false, 'lifted onto another SKU');
+	assert.equal(await verifyEbookLink(WHSEC, `${SID.slice(0, -1)}X`, SKU, t), false, 'lifted onto another session');
+	assert.equal(await verifyEbookLink('whsec_other', SID, SKU, t), false, 'another secret');
+	assert.equal(await verifyEbookLink(undefined, SID, SKU, t), false, 'no secret bound: never verifies');
+	assert.equal(await verifyEbookLink(WHSEC, SID, SKU, ''), false, 'no signature');
+	assert.equal(await signEbookLink(WHSEC, 'cs_bad', SKU), null, 'malformed session: unsignable');
+	// the derived-key construction, re-computed independently (bin/fhb-order-reconcile.py mirrors exactly this)
+	const k = crypto.createHmac('sha256', WHSEC).update('smp-ebook-download-link-v1').digest();
+	assert.equal(crypto.createHmac('sha256', k).update(`${SID}.${SKU}`).digest('base64url'), t);
+	assert.equal(sessionGrantsEbook(SESSION, SID, SKU), true);
+	assert.equal(sessionGrantsEbook({ ...SESSION, payment_status: 'unpaid' }, SID, SKU), false);
+	assert.equal(sessionGrantsEbook(SESSION, SID, 'other-book-ebook'), false);
+	assert.equal(windowOrigin('smp'), 'https://spiritmediapublishing.com');
+	assert.equal(windowOrigin('fhb'), 'https://fathersheartbible.com');
+});
+
+async function deliver(event = FIX) {
+	const raw = JSON.stringify(event);
+	const ts = Math.floor(Date.now() / 1000);
+	const v1 = crypto.createHmac('sha256', WHSEC).update(`${ts}.${raw}`).digest('hex');
+	const st = stubs({});
+	try {
+		const res = await webhook({
+			request: new Request('https://fathersheartbible.com/print-webhook', { method: 'POST', body: raw, headers: { 'stripe-signature': `t=${ts},v1=${v1}` } }),
+			env: { STRIPE_PRINT_WEBHOOK_SECRET: WHSEC, STRIPE_FHB_SECRET_KEY: 'rk_test_stub', MAILGUN_API_KEY: 'k', PRINT_ORDER_NOTIFY_TO: 'orders@test' },
+		});
+		return { status: res.status, buyer: st.calls.mail.find((m) => m.to === 'buyer@example.com'), kevin: st.calls.mail.find((m) => m.to === 'orders@test') };
+	} finally {
+		st.restore();
+	}
+}
+
+test('EBOOK WEBHOOK (recorded fixture): a SIGNED link on the SMP window, no window line, address signature', async () => {
+	const { status, buyer, kevin } = await deliver();
+	assert.equal(status, 200);
+	assert.equal(buyer.subject, 'Your eBook — Fixture Book');
+	assert.equal(buyer.from, 'SMP Orders <orders@send.spiritmediapublishing.com>');
+	const link = buyer.text.match(/https:\/\/\S+/)[0];
+	assert.match(link, /^https:\/\/spiritmediapublishing\.com\/ebook-download\?s=cs_test_[^&]+&e=fixture-book-ebook&t=[A-Za-z0-9_-]{43}$/);
+	const u = new URL(link);
+	assert.equal(await verifyEbookLink(WHSEC, u.searchParams.get('s'), u.searchParams.get('e'), u.searchParams.get('t')), true);
+	assert.ok(endsWithSeven(buyer.text), 'ends with the 7-line address signature');
+	assert.doesNotMatch(buyer.text, /Spirit Media Publishing · spiritmediapublishing\.com|Father’s Heart Bible · Spirit Media Publishing/, 'SMP window: no window line');
+	assert.match(kevin.text, /eBook SKU: fixture-book-ebook · window: smp/);
+});
+
+test('EBOOK DOWNLOAD: the emailed link serves the page and the EPUB for the paid session', async () => {
+	const { buyer } = await deliver();
+	const link = new URL(buyer.text.match(/https:\/\/\S+/)[0]);
+	const st = stubs({ [SID]: SESSION });
+	try {
+		const pg = await get(`${link.pathname}${link.search}`);
+		assert.equal(pg.status, 200);
+		const html = await pg.text();
+		assert.match(html, /Fixture Book/);
+		assert.match(html, /&amp;dl=epub">Download EPUB/);
+		const file = await get(`${link.pathname}${link.search}&dl=epub`);
+		assert.equal(file.status, 200);
+		assert.equal(file.headers.get('content-type'), 'application/epub+zip');
+		assert.equal(file.headers.get('content-disposition'), 'attachment; filename="Fixture-Book.epub"');
+		assert.equal(await file.text(), `${EPUB_BYTES}:fixture-book-v1.epub`);
+		// Stripe's success redirect carries only the session: it is re-read and signed, then sent to the signed link
+		const ok = await get(`/ebook-download?s=${SID}`);
+		assert.equal(ok.status, 302);
+		assert.equal(ok.headers.get('location'), `${link.pathname}${link.search}`);
+	} finally {
+		st.restore();
+	}
+});
+
+test('EBOOK DOWNLOAD REFUSES: unpaid session, unknown session, tampered signature (no Stripe call), SKU swap, no secret', async () => {
+	const t = await signEbookLink(WHSEC, SID, SKU);
+	const at = (sid, sku, sig, dl = '') => `/ebook-download?s=${sid}&e=${sku}&t=${sig}${dl}`;
+	// unpaid: a real session that has not been paid
+	let st = stubs({ [SID]: { ...SESSION, payment_status: 'unpaid', status: 'open' } });
+	try {
+		for (const dl of ['', '&dl=epub']) {
+			const r = await get(at(SID, SKU, t, dl));
+			assert.equal(r.status, 403, `unpaid${dl}`);
+			assert.match(await r.text(), /couldn’t verify that purchase/);
+		}
+		assert.equal((await get(`/ebook-download?s=${SID}`)).status, 403, 'unpaid success redirect');
+	} finally {
+		st.restore();
+	}
+	// unknown: Stripe has no such session (a correctly SIGNED link for it still gets nothing)
+	const ghost = 'cs_test_a1NoSuchSession000000000000000000000000000000000';
+	const tg = await signEbookLink(WHSEC, ghost, SKU);
+	st = stubs({});
+	try {
+		assert.equal((await get(at(ghost, SKU, tg, '&dl=epub'))).status, 403, 'unknown session');
+		assert.equal((await get(`/ebook-download?s=${ghost}`)).status, 403, 'unknown session, success redirect');
+	} finally {
+		st.restore();
+	}
+	// tampered signature: refused BEFORE Stripe is asked
+	st = stubs({ [SID]: SESSION });
+	try {
+		const bad = t.slice(0, -1) + (t.endsWith('A') ? 'B' : 'A');
+		for (const sig of [bad, '', 'x'.repeat(43), t.toUpperCase()]) {
+			assert.equal((await get(at(SID, SKU, sig, '&dl=epub'))).status, 403, `tampered "${sig.slice(0, 6)}…"`);
+		}
+		assert.equal(st.calls.stripe.length, 0, 'a tampered link never reaches Stripe');
+		// SKU swap: a valid signature for a SKU the session did not buy (the signer never issues it; the session refuses it)
+		ebookFiles.files['other-book-ebook'] = { key: 'other-book-v1.epub', filename: 'Other.epub' };
+		const t2 = await signEbookLink(WHSEC, SID, 'other-book-ebook');
+		assert.equal((await get(at(SID, 'other-book-ebook', t2, '&dl=epub'))).status, 403, 'SKU swap');
+		delete ebookFiles.files['other-book-ebook'];
+		// no signing secret bound on the deployment: nothing verifies
+		assert.equal((await get(at(SID, SKU, t, '&dl=epub'), { ...ENV, STRIPE_PRINT_WEBHOOK_SECRET: undefined })).status, 403, 'no secret');
+	} finally {
+		st.restore();
+	}
+});
+
+test('EBOOK: the Bible eBook v1 path is unchanged (session link, no signature)', async () => {
+	const bid = 'cs_live_a1BibleEbookSession000000000000000000000000000000';
+	const st = stubs({ [bid]: { id: bid, payment_status: 'paid', metadata: { kind: 'ebook_direct', site: 'fhb', window: 'fhb', family: 'bible_ebook' } } });
+	try {
+		const pg = await get(`/ebook-download?s=${bid}`);
+		assert.equal(pg.status, 200);
+		assert.match(await pg.text(), /Father’s Heart Bible eBook is ready/);
+		assert.equal(await (await get(`/ebook-download?s=${bid}&dl=epub`)).text(), `${EPUB_BYTES}:${EBOOK.key}`);
+	} finally {
+		st.restore();
+	}
+});
+
+test('EBOOK REGISTRY: every committed eBook row is complete, priced, has its private file, never sits in skus', () => {
+	const rows = bookSkus.ebooks ?? {};
+	const files = JSON.parse(fs.readFileSync(new URL('../src/data/ebook-files.json', import.meta.url), 'utf8')).files;
+	for (const [sku, r] of Object.entries(rows)) {
+		assert.equal(r.format, 'eBook', sku);
+		assert.ok(Number.isInteger(r.list_cents) && r.list_cents > 0, `${sku}: a price`);
+		assert.match(r.price_source?.asin ?? '', /^B0[A-Z0-9]{8}$/, `${sku}: priced from a live Kindle listing`);
+		assert.ok(r.book && r.checkout_name, `${sku}: book + title`);
+		assert.ok(files[sku]?.key && /\.epub$/.test(files[sku].key), `${sku}: a private EPUB on R2`);
+		assert.ok(!bookSkus.skus[sku], `${sku}: never a print sku`);
+		if (r.select_until) assert.match(r.select_until, /^\d{4}-\d{2}-\d{2}$/, `${sku}: Select term end date`);
+	}
+	for (const sku of Object.keys(files)) assert.ok(rows[sku], `${sku}: a file with no registry row`);
+	for (const sku of Object.keys(bookSkus.skus)) assert.equal(EBOOK_SKUS[sku], undefined, `${sku}: a print sku is never an eBook`);
+});
