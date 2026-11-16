@@ -1,0 +1,44 @@
+---
+// The offer line + black country marquee (Kevin 2026-11-14/15), shared by every page that shows them.
+// Moved out of EditionOrder.astro unchanged (2026-11-16) so SMP can carry the SAME component: Kevin 2026-11-16
+// ~15:0xZ "Add the 15% off first order + free standard shipping to 223 countries and country marquee to SMP."
+// SMP holds a byte-identical copy at src/components/ShipCountryMarquee.astro; this file is the master.
+// No imports on purpose: the caller passes the LIVE ship-country names (src/lib/shipCountries.ts on FHB,
+// src/store-engine/lib/shipCountries.ts on SMP), so the list is never retyped.
+// The list is the LIVE ship list. Screen readers get one plain list; the moving copy is decorative.
+// Motion stops for prefers-reduced-motion.
+interface Props {
+	/** the offer line shown centered above the marquee */
+	offerLine?: string;
+	/** country names, already in display order */
+	names: string[];
+	/** accessible name of the band, e.g. "Free standard shipping to 223 countries" */
+	label: string;
+}
+const { offerLine, names, label } = Astro.props;
+---
+{offerLine && <p class="eo-offer">{offerLine}</p>}
+<div class="eo-marquee" role="region" aria-label={label}>
+	<p class="eo-sr">{names.join(', ')}</p>
+	<div class="eo-marquee__track" aria-hidden="true" data-nosnippet style={`--eo-marquee-dur: ${names.length * 2}s;`}>
+		{[0, 1].map(() => (
+			<ul class="eo-marquee__list">
+				{names.map((n) => <li>{n}</li>)}
+			</ul>
+		))}
+	</div>
+</div>
+
+<style>
+	.eo-offer { margin: 1.6rem auto 0; text-align: center; font-family: var(--font-sans); color: var(--color-primary, #b60057); font-size: 1rem; font-weight: 700; }
+	/* Country marquee: full-bleed black band (breaks out of the page column). */
+	.eo-marquee { position: relative; width: 100vw; margin: 0.8rem 0 0 calc(50% - 50vw); background: #1a1714; color: #f5f5f4; overflow: hidden; font-family: var(--font-body); font-size: 1rem; line-height: 1.4rem; font-weight: 600; } /* same band as the YouVersion bar (Kevin 2026-11-15) */
+	.eo-marquee__track { display: flex; width: max-content; animation: eo-marquee var(--eo-marquee-dur, 600s) linear infinite; /* ~90px/s: livelier, still readable (Kevin 2026-11-15) */ }
+	.eo-marquee__list { display: flex; gap: 0; margin: 0; padding: 0.5rem 0; list-style: none; white-space: nowrap; }
+	.eo-marquee__list li { padding: 0 1.1rem; }
+	.eo-marquee__list li::after { content: '•'; margin-left: 2.2rem; color: #e4006f; }
+	.eo-marquee:hover .eo-marquee__track { animation-play-state: paused; }
+	@keyframes eo-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+	@media (prefers-reduced-motion: reduce) { .eo-marquee__track { animation: none; flex-wrap: wrap; width: auto; } }
+	.eo-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
