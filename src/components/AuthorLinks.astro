@@ -47,7 +47,7 @@ const lead = (s: { label: string; name?: string }) =>
 			<ul class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-stone-600" aria-label={`${author} on social media`}>
 				{social.map((s) => (
 					<li>
-						<a href={s.url} {...how(s.url).attrs} class="underline decoration-stone-300 underline-offset-4 hover:text-ink hover:decoration-ink" data-author-site={s.label}>{s.label}<Fragment set:html={how(s.url).tail} /></a>
+						<a href={s.url} {...how(s.url).attrs} class="text-stone-600 underline decoration-stone-300 underline-offset-4 hover:text-ink hover:decoration-ink" data-author-site={s.label}>{s.label}<Fragment set:html={how(s.url).tail} /></a>
 					</li>
 				))}
 			</ul>
