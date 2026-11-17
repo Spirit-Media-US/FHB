@@ -15,6 +15,7 @@ import { merchantReturnPolicy } from '../src/lib/merchantReturnPolicy.ts';
 const allPending = PENDING_COUNTRIES.map((c) => c.code);
 // A pending row named in `liveWave` is live (promoted at runtime); the rest are WAITING.
 const pendingCodes = allPending.filter((c) => !SHIP_CODES.includes(c));
+const FEED_CODES = JSON.parse(fs.readFileSync('src/data/merchant-feed-countries.json', 'utf8')).countries.filter((c) => SHIP_CODES.includes(c));
 
 test('config: live rows are complete, pending rows are not live and do not overlap', () => {
 	assert.ok(LIVE_COUNTRIES.length >= 1);
@@ -112,15 +113,16 @@ test('dist: every shipping/return country in JSON-LD is live; no pending country
 	}
 	assert.ok(pages > 0, 'no shipping JSON-LD found');
 });
-test('dist: Merchant feed ships to exactly the live list, per item', () => {
+test('dist: Merchant feed ships to the ranked feed countries that are live, max 100 rows per item', () => {
 	const feed = fs.readFileSync('dist/merchant-feed.xml', 'utf8');
 	const items = [...feed.matchAll(/<item>([\s\S]*?)<\/item>/g)];
 	assert.ok(items.length > 0);
 	for (const [, body] of items) {
 		const cs = [...body.matchAll(/<g:shipping><g:country>([A-Z]{2})<\/g:country><g:service>([^<]*)<\/g:service><g:price>([\d.]+) ([A-Z]{3})<\/g:price>/g)];
-		assert.deepEqual([...new Set(cs.map((m) => m[1]))].sort(), [...SHIP_CODES].sort(), 'feed countries != live list');
+		assert.ok(cs.length <= 100, `feed item has ${cs.length} shipping rows; Google allows 100`);
+		assert.deepEqual([...new Set(cs.map((m) => m[1]))], FEED_CODES, 'feed countries != ranked feed list ∩ live list');
 		for (const m of cs.filter((x) => x[2] === 'Standard')) assert.ok(Number(m[3]) >= Number(countryFor(m[1]).shippingRate.value), 'Standard = free rate + handling at list price (never below the base rate)');
-		for (const code of SHIP_CODES) assert.equal(cs.filter((m) => m[1] === code && m[2] === 'Standard').length, 1, `${code} needs exactly one Standard feed row`);
+		for (const code of FEED_CODES) assert.equal(cs.filter((m) => m[1] === code && m[2] === 'Standard').length, 1, `${code} needs exactly one Standard feed row`);
 	}
 	for (const code of pendingCodes) assert.ok(!new RegExp(`<g:country>${code}</g:country>`).test(feed), `${code} leaked into feed`);
 });
