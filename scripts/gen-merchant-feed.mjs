@@ -21,6 +21,7 @@
  * Usage: node scripts/gen-merchant-feed.mjs [--out dist/merchant-feed.xml]
  */
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import FEED_COUNTRIES from '../src/data/merchant-feed-countries.json' with { type: 'json' };
 
 const DIST = 'dist';
 const OUT = process.argv.includes('--out') ? process.argv[process.argv.indexOf('--out') + 1] : `${DIST}/merchant-feed.xml`;
@@ -85,11 +86,18 @@ for (const { dir, type } of SECTIONS) {
 const num = (q, k) => q?.[k] ?? '';
 const rows = [...items.values()].map((i) => {
 	// One <g:shipping> per OfferShippingDetails, i.e. one per LIVE country in
-	// src/data/ship-countries.json (the page JSON-LD is built from it). No shipping in the page = no
+	// src/data/ship-countries.json (the page JSON-LD is built from it), capped below. No shipping in the page = no
 	// shipping in the feed: fail loudly rather than invent a US default.
 	const details = [].concat(i.ship ?? []);
 	if (!details.length) throw new Error(`merchant-feed: ${i.id} has no shippingDetails in its page JSON-LD`);
-	const ship = details
+	// Google caps [shipping] at 100 per product (src/data/merchant-feed-countries.json has the source):
+	// keep only the ranked feed countries, in that order, and refuse to emit more than 100 rows.
+	const rank = new Map(FEED_COUNTRIES.countries.map((c, n) => [c, n]));
+	const cc = (d) => [].concat(d.shippingDestination)[0]?.addressCountry;
+	const kept = details.filter((d) => rank.has(cc(d))).sort((a, b) => rank.get(cc(a)) - rank.get(cc(b)));
+	if (!kept.length) throw new Error(`merchant-feed: ${i.id} ships to none of merchant-feed-countries.json`);
+	if (kept.length > 100) throw new Error(`merchant-feed: ${i.id} has ${kept.length} shipping rows; Google allows 100`);
+	const ship = kept
 		.map((d) => {
 			const dt = d.deliveryTime;
 			const cc = [].concat(d.shippingDestination)[0]?.addressCountry;
