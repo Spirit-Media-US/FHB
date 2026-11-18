@@ -7,7 +7,8 @@ Disallow: /settings
 Disallow: /profile
 Disallow: /moderation
 Disallow: /api/
-Disallow: /login
+# /login is NOT disallowed: it carries <meta name="robots" content="noindex, follow">, and Google can only
+# honour a noindex it is allowed to crawl (developers.google.com/search/docs/crawling-indexing/block-indexing).
 # Sanity Studio — an app, not a page; nothing for a crawler to index.
 Disallow: /studio
 
