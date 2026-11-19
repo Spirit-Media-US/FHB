@@ -19,7 +19,10 @@ export function checkPolicy(p) {
 	if (p.returnMethod) assert.match(p.returnMethod, /Return(AtKiosk|ByMail|InStore)$/);
 	assert.equal(p.merchantReturnDays, 30, 'Kevin 1A: 30 days');
 	// Kevin 2026-11-14 item 7: markup states only what /returns states (no method, fees or refund type there).
-	for (const k of ['returnMethod', 'returnFees', 'customerRemorseReturnFees', 'itemDefectReturnFees', 'refundType'])
+	// returnFees EXCEPTION (GSC 2026-11-14 'Missing field "returnFees"'; builder hand-off 2026-11-18, Kevin D130 "return and
+	// destroy" + /returns "don't send anything back until we have replied"): the buyer never pays a return = FreeReturn only.
+	assert.equal(p.returnFees, 'https://schema.org/FreeReturn', 'returnFees must be FreeReturn (GSC requires it)');
+	for (const k of ['returnMethod', 'customerRemorseReturnFees', 'itemDefectReturnFees', 'refundType'])
 		assert.equal(p[k], undefined, `${k} is not stated on /returns, so it must not be declared`);
 	assert.match(p.merchantReturnLink, /^https:\/\/fathersheartbible\.com\/returns\/$/);
 }
@@ -58,7 +61,7 @@ test('failure path: Unspecified, KeepProduct, missing days, missing policy all f
 	assert.throws(() => checkPolicy({ ...P, returnPolicyCategory: 'https://schema.org/MerchantReturnUnspecified' }), /Unspecified/);
 	assert.throws(() => checkPolicy({ ...P, returnMethod: 'https://schema.org/KeepProduct' }), /KeepProduct/);
 	assert.throws(() => checkPolicy({ ...P, merchantReturnDays: undefined }), /merchantReturnDays/);
-	assert.throws(() => checkPolicy({ ...P, returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility' }), /not stated on \/returns/);
+	assert.throws(() => checkPolicy({ ...P, returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility' }), /must be FreeReturn/);
 	assert.throws(() => checkPolicy({ ...P, returnMethod: 'https://schema.org/ReturnByMail' }), /not stated on \/returns/);
 	assert.throws(() => checkPolicy({ ...P, merchantReturnDays: 14 }), /30 days/);
 	assert.throws(() => checkPolicy(undefined), /missing/);

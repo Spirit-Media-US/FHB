@@ -44,6 +44,9 @@ export const returnPolicyFor = (list: readonly string[]) => ({
 	applicableCountry: countryValue(list),
 	returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
 	merchantReturnDays: RETURN_DAYS,
+	// returnFees (GSC 2026-11-14 'Missing field "returnFees"'; builder hand-off 2026-11-18, Kevin D130 + the /returns
+	// promise "don't send anything back until we have replied"): the buyer never pays to return = FreeReturn.
+	returnFees: 'https://schema.org/FreeReturn',
 	merchantReturnLink: RETURNS_URL,
 });
 export const returnPolicyChunks = (
