@@ -419,3 +419,75 @@ test('EBOOK REGISTRY: every committed eBook row is complete, priced, has its pri
 	for (const sku of Object.keys(files)) assert.ok(rows[sku], `${sku}: a file with no registry row`);
 	for (const sku of Object.keys(bookSkus.skus)) assert.equal(EBOOK_SKUS[sku], undefined, `${sku}: a print sku is never an eBook`);
 });
+
+// ── RIAB GIFT TO CHARITY (Kevin 2026-11-20 ~16:25Z "Each order with donation receives 2 emails one for purchase
+// confirmation. One for donation confirmation to be used as tax deductible receipt."). A mocked paid session through the
+// REAL webhook: the purchase confirmation (SMP, one gift line, no receipt language), the SEPARATE Spirit Media Charities
+// receipt (donor, date, amount, designation + halves, EIN, no goods or services), and the designation on kevin@'s notice.
+async function confirmAll(metadata, { amount = 3198 + 10299 } = {}) {
+	const event = JSON.stringify({
+		type: 'checkout.session.completed',
+		data: { object: { id: 'cs_test_gift', created: 1795190400, amount_total: amount, currency: 'usd', customer_details: { email: 'donor@test', name: 'Ann Donor', phone: '+15555550123' },
+			metadata: { kind: 'dvc_print', brand: 'riab', site: 'vaneure', window: 'smp', family: 'smp_book', total: '1', pct_off: '0', offer: 'none', breakdown: 'raised-in-a-barn-hb:1', ...metadata },
+			collected_information: { shipping_details: { name: 'Ann Donor', address: { line1: '1 Main St', city: 'Austin', state: 'TX', postal_code: '78701', country: 'US' } } } } },
+	});
+	const t = Math.floor(Date.now() / 1000);
+	const sig = crypto.createHmac('sha256', secret).update(`${t}.${event}`).digest('hex');
+	const sent = [];
+	const real = globalThis.fetch;
+	globalThis.fetch = async (url, init) => {
+		if (String(url).includes('mailgun')) sent.push(Object.fromEntries(init.body));
+		return new Response('{}', { status: 200 });
+	};
+	try {
+		const res = await webhook({
+			request: new Request('https://x/print-webhook', { method: 'POST', body: event, headers: { 'stripe-signature': `t=${t},v1=${sig}` } }),
+			env: { STRIPE_PRINT_WEBHOOK_SECRET: secret, MAILGUN_API_KEY: 'k', PRINT_ORDER_NOTIFY_TO: 'orders@test' },
+		});
+		return { status: res.status, sent };
+	} finally {
+		globalThis.fetch = real;
+	}
+}
+const GIFT_META = { donation_cents: '10000', designation: 'split', fee_covered: 'true', donation_fee_cover_cents: '299', donation_total_cents: '10299', donation_transfer_cents: '10000' };
+
+test('RIAB gift: an order WITH a gift sends TWO buyer emails (SMP purchase + SMC tax receipt) and the notice shows the designation', async () => {
+	const r = await confirmAll(GIFT_META);
+	assert.equal(r.status, 200);
+	const buyer = r.sent.filter((m) => m.to === 'donor@test');
+	assert.equal(buyer.length, 2, 'two separate buyer emails');
+	const [purchase, receipt] = buyer;
+	assert.equal(purchase.from, NOTIFY_FROM);
+	assert.match(purchase.subject, /^Your Spirit Media Publishing order/);
+	assert.match(purchase.text, /This includes your \$102\.99 gift to charity; Spirit Media Charities is emailing you its receipt separately\./);
+	assert.doesNotMatch(purchase.text, /501\(c\)\(3\)|EIN|tax-deductible|No goods or services/, 'no receipt language in the purchase email');
+	assert.equal(receipt.from, 'Spirit Media Charities <receipts@send.spiritmediapublishing.com>');
+	assert.equal(receipt.bcc, 'orders@test', 'a copy for SMC books');
+	assert.equal(receipt.subject, 'Your gift receipt from Spirit Media Charities — $102.99');
+	for (const re of [/Donor: Ann Donor/, /Date of gift: November \d+, 2026/, /Amount of gift: \$102\.99 \(your gift of \$100\.00 plus \$2\.99/, /Designation: Split 50\/50/, /Cheyenne Foundation: \$51\.50/, /Foundation of Hope: \$51\.49/, /EIN 88-4352701/, /501\(c\)\(3\)/, /No goods or services were provided in exchange for this gift/, /100% of the amount Spirit Media Charities receives goes to the charity you choose/])
+		assert.match(receipt.text, re);
+	assert.doesNotMatch(`${receipt.subject}\n${receipt.text}`, /Father|FHB/, 'never FHB');
+	const notice = r.sent.find((m) => m.to === 'orders@test');
+	assert.match(notice.text, /GIFT TO CHARITY/);
+	assert.match(notice.text, /Designation: split = Split 50\/50/);
+	assert.match(notice.text, /Transferred to Spirit Media Charities: \$100\.00/);
+	assert.match(notice.text, /Books total \(Total minus the gift\): \$31\.98/);
+	if (process.env.SHOW_MESSAGE) for (const m of [notice, purchase, receipt]) console.log(`\n--- to ${m.to} from ${m.from ?? ''} | ${m.subject} ---\n${m.text}`);
+});
+
+test('RIAB gift: a gift-free order sends ONE buyer email and no gift lines anywhere', async () => {
+	const r = await confirmAll({}, { amount: 2999 });
+	assert.equal(r.status, 200);
+	const buyer = r.sent.filter((m) => m.to === 'donor@test');
+	assert.equal(buyer.length, 1);
+	assert.doesNotMatch(buyer[0].text, /gift to charity|Spirit Media Charities/i);
+	assert.doesNotMatch(r.sent.find((m) => m.to === 'orders@test').text, /GIFT TO CHARITY/);
+});
+
+test('RIAB gift: uncovered fee and a single designation print the right charity and transfer', async () => {
+	const r = await confirmAll({ donation_cents: '2500', designation: 'cf', fee_covered: 'false', donation_fee_cover_cents: '0', donation_total_cents: '2500', donation_transfer_cents: '2428' }, { amount: 5499 });
+	const receipt = r.sent.find((m) => m.subject?.startsWith('Your gift receipt'));
+	assert.match(receipt.text, /Amount of gift: \$25\.00\n/);
+	assert.match(receipt.text, /Designation: Cheyenne Foundation\n  Cheyenne Foundation: \$25\.00/);
+	assert.match(r.sent.find((m) => m.to === 'orders@test').text, /\(fee not covered\)\nTransferred to Spirit Media Charities: \$24\.28/);
+});

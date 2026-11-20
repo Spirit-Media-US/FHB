@@ -62,6 +62,91 @@ export function buyerBrand(m: Record<string, string> | null | undefined, amount:
 }
 export const signoffBlock = (signoff: string) => (signoff ? `${signoff}\n\n` : '');
 
+// GIFT TO CHARITY on a RIAB order (SMP src/lib/riabOrder.ts (c); Kevin 2026-11-20 ~16:10Z optional gift designated CF /
+// FOH / 50-50, ~16:20Z "receipted from spirit media charities with 100% going to the charities", ~16:25Z "Each order
+// with donation receives 2 emails one for purchase confirmation. One for donation confirmation to be used as tax
+// deductible receipt.", ~16:30Z "100% of the amount received"). The session carries metadata donation_cents (the gift),
+// designation (cf|foh|split), fee_covered, donation_fee_cover_cents, donation_total_cents (what the donor gave = the
+// receipt amount), donation_transfer_cents (what Spirit Media Charities receives). The gift is transferred to SMC's
+// Stripe account by the charge itself; this webhook only tells people.
+export const SMC_NAME = 'Spirit Media Charities';
+export const SMC_EIN = '88-4352701';
+export const SMC_FROM = 'Spirit Media Charities <receipts@send.spiritmediapublishing.com>';
+export const SMC_ADDRESS = ['205 S Academy St Unit 3251', 'Cary, NC 27519', 'USA'].join('\n');
+export const GIFT_COPY =
+	'Receipted by Spirit Media Charities, a 501(c)(3). 100% of the amount Spirit Media Charities receives goes to the charity you choose (Cheyenne Foundation, Foundation of Hope, or split 50/50).';
+const DESIGNATION: Record<string, string> = {
+	cf: 'Cheyenne Foundation',
+	foh: 'Foundation of Hope',
+	split: 'Split 50/50: Cheyenne Foundation and Foundation of Hope',
+};
+const usd = (c: number) =>
+	(c / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+export type Gift = {
+	gift: number;
+	cover: number;
+	total: number;
+	transfer: number;
+	designation: string;
+	label: string;
+	cf: number;
+	foh: number;
+};
+/** The gift on a session, or null (no gift, or metadata that does not describe one). */
+export function giftOf(m: Record<string, string> | null | undefined): Gift | null {
+	const gift = Number(m?.donation_cents);
+	const d = String(m?.designation ?? '');
+	if (!Number.isInteger(gift) || gift <= 0 || !DESIGNATION[d]) return null;
+	const cover = Number(m?.donation_fee_cover_cents) || 0;
+	const total = Number(m?.donation_total_cents) || gift + cover;
+	const transfer = Number(m?.donation_transfer_cents) || gift;
+	const foh = d === 'foh' ? total : d === 'split' ? Math.floor(total / 2) : 0;
+	return {
+		gift,
+		cover,
+		total,
+		transfer,
+		designation: d,
+		label: DESIGNATION[d],
+		cf: total - foh,
+		foh,
+	};
+}
+/** The designation as the receipt and the notice print it: each charity's part of what the donor gave. */
+export const giftSplit = (g: Gift) =>
+	g.designation === 'split'
+		? `  Cheyenne Foundation: ${usd(g.cf)}\n  Foundation of Hope: ${usd(g.foh)}`
+		: `  ${g.label}: ${usd(g.total)}`;
+/** The SEPARATE tax receipt from Spirit Media Charities. Stands alone: name, date, amount, designation, EIN, IRS line. */
+export function giftReceipt(
+	g: Gift,
+	donor: string,
+	date: string,
+	ref: string,
+): { subject: string; text: string } {
+	return {
+		subject: `Your gift receipt from Spirit Media Charities — ${usd(g.total)}`,
+		text:
+			`Thank you for your gift.\n\n` +
+			`DONATION RECEIPT\n` +
+			`Donor: ${donor}\n` +
+			`Date of gift: ${date}\n` +
+			`Amount of gift: ${usd(g.total)}` +
+			(g.cover > 0
+				? ` (your gift of ${usd(g.gift)} plus ${usd(g.cover)} you added to cover the card processing fee)`
+				: '') +
+			`\n` +
+			`Designation: ${g.label}\n${giftSplit(g)}\n` +
+			`Receipt reference: ${ref}\n\n` +
+			`${GIFT_COPY}\n\n` +
+			`No goods or services were provided in exchange for this gift. (Any books on the same order were purchased\n` +
+			`separately from Spirit Media Publishing and are not part of this gift.)\n\n` +
+			`Spirit Media Charities is a tax-exempt organization under section 501(c)(3) of the Internal Revenue Code,\n` +
+			`EIN ${SMC_EIN}. Your gift is tax-deductible to the extent allowed by law. Please keep this receipt for your records.\n\n` +
+			`${SMC_NAME}\n${SMC_ADDRESS}\n`,
+	};
+}
+
 function hexToBytes(hex: string): Uint8Array | null {
 	if (hex.length % 2 !== 0) return null;
 	const out = new Uint8Array(hex.length / 2);
@@ -271,6 +356,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 			})
 		: '$0.00';
 	const m = s.metadata ?? {};
+	const gift = giftOf(m);
 	const phone: string | undefined = s.customer_details?.phone || undefined;
 	const destCode: string | undefined = ship.address?.country;
 	const site = countryFor(destCode);
@@ -300,11 +386,18 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
 	// Returns whether the message was actually accepted, so a failed send can be
 	// escalated rather than swallowed (see the retry note at the end of the handler).
-	const send = async (to: string, subject: string, body: string, replyTo?: string) => {
+	const send = async (
+		to: string,
+		subject: string,
+		body: string,
+		replyTo?: string,
+		opts: { from?: string; bcc?: string } = {},
+	) => {
 		if (!env.MAILGUN_API_KEY) return false;
 		const domain = env.MAILGUN_SENDING_DOMAIN || 'send.spiritmediapublishing.com';
 		const form = new URLSearchParams();
-		form.set('from', NOTIFY_FROM);
+		form.set('from', opts.from ?? NOTIFY_FROM);
+		if (opts.bcc) form.set('bcc', opts.bcc);
 		form.set('to', to);
 		form.set('subject', subject);
 		form.set('text', body);
@@ -388,7 +481,15 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		`Customer email: ${email}\n` +
 		`Phone (pass to the Ingram order, carriers call international buyers): ${phone ?? '*** MISSING: email the buyer before placing the order ***'}\n` +
 		`Ingram print site for ${destCode ?? '?'}: ${site ? `${site.printSite} (${site.name}, config rate ${site.shippingRate.value} ${site.shippingRate.currency})` : '*** country not in the live ship list: check before ordering ***'}\n` +
-		`Stripe session: ${s.id ?? '?'}\n`;
+		`Stripe session: ${s.id ?? '?'}\n` +
+		(gift
+			? `\nGIFT TO CHARITY (Spirit Media Charities receipts it; NOT SMP revenue)\n` +
+				`Designation: ${gift.designation} = ${gift.label}\n${giftSplit(gift)}\n` +
+				`Donor gave: ${usd(gift.total)}${gift.cover > 0 ? ` (gift ${usd(gift.gift)} + fee cover ${usd(gift.cover)})` : ' (fee not covered)'}\n` +
+				`Transferred to Spirit Media Charities: ${usd(gift.transfer)}\n` +
+				`Books total (Total minus the gift): ${usd((s.amount_total ?? 0) - gift.total)}\n` +
+				`Tax receipt emailed to the donor from Spirit Media Charities (copy to this address).\n`
+			: '');
 	// The buyer's own confirmation. Until 2026-09-03 we sent the customer NOTHING —
 	// Stripe's payment receipt was the only thing they ever received, so a buyer had
 	// no confirmation their ORDER (as opposed to their payment) existed.
@@ -397,6 +498,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		`Thank you — we've received your order.\n\n` +
 		`What you ordered:\n${fmtOrder(readBreakdown(m))}\n\n` +
 		`Total paid: ${amount}\n` +
+		(gift
+			? `This includes your ${usd(gift.total)} gift to charity; Spirit Media Charities is emailing you its receipt separately.\n`
+			: '') +
 		`Order reference: ${s.id ?? '?'}\n\n` +
 		`Shipping to:\n${name}\n${fmtAddr(ship.address)}\n` +
 		`Phone for the delivery carrier: ${phone ?? '(none on file, please reply with one)'}\n\n` +
@@ -415,8 +519,36 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	);
 	const okCust =
 		email === '(no email)' || (await send(email, brand.subject, custText, BUYER_REPLY_TO));
+	// An order WITH a gift: a SECOND, separate email, the tax receipt from Spirit Media Charities; a copy goes to the
+	// order notice address for SMC's books. A gift-free order sends nothing more.
+	let okGift = true;
+	if (gift) {
+		const donor = s.customer_details?.name || name;
+		const date = new Date(
+			((s.created as number) || Math.floor(Date.now() / 1000)) * 1000,
+		).toLocaleDateString('en-US', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+			timeZone: 'America/New_York',
+		});
+		const r = giftReceipt(gift, donor, date, s.id ?? '?');
+		okGift =
+			email === '(no email)'
+				? await send(
+						env.PRINT_ORDER_NOTIFY_TO || NOTIFY_TO_DEFAULT,
+						`[no donor email] ${r.subject}`,
+						r.text,
+						undefined,
+						{ from: SMC_FROM },
+					)
+				: await send(email, r.subject, r.text, BUYER_REPLY_TO, {
+						from: SMC_FROM,
+						bcc: env.PRINT_ORDER_NOTIFY_TO || NOTIFY_TO_DEFAULT,
+					});
+	}
 
-	if (okKevin && okCust) {
+	if (okKevin && okCust && okGift) {
 		await markNotified();
 		return ack();
 	}
