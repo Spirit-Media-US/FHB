@@ -388,13 +388,29 @@ test('EBOOK: the Bible eBook v1 path is unchanged (session link, no signature)',
 	}
 });
 
+// Price provenance: a live Kindle ASIN, OR (a book with no Kindle edition / off SMP's KDP shelf, SMP batch 3 2026-11-20
+// "Find them. Add them for sale now.") asin null with the recorded basis of the live-listing read and its date.
+const priceProven = (r) => {
+	const p = r.price_source ?? {};
+	if (/^B0[A-Z0-9]{8}$/.test(p.asin ?? '')) return true;
+	return p.asin === null && typeof p.basis === 'string' && p.basis.trim().length >= 10 && /^\d{4}-\d{2}-\d{2}T/.test(p.checked ?? '');
+};
+test('EBOOK REGISTRY: price provenance refuses a row with no ASIN and no recorded basis (failure path)', () => {
+	assert.equal(priceProven({ price_source: { asin: 'B0BT9ZBSQF', checked: '2026-11-20T00:00:00Z' } }), true);
+	assert.equal(priceProven({ price_source: { asin: null, basis: 'off-shelf live listing read (amazon-book.mjs)', checked: '2026-11-20T16:12:03+00:00' } }), true);
+	assert.equal(priceProven({ price_source: { asin: null, checked: '2026-11-20T16:12:03+00:00' } }), false, 'no basis');
+	assert.equal(priceProven({ price_source: { asin: null, basis: 'off-shelf live listing read' } }), false, 'no check date');
+	assert.equal(priceProven({ price_source: { asin: 'not-an-asin', basis: 'x'.repeat(20), checked: '2026-11-20T00:00:00Z' } }), false, 'bad ASIN is never excused');
+	assert.equal(priceProven({}), false, 'no provenance');
+});
+
 test('EBOOK REGISTRY: every committed eBook row is complete, priced, has its private file, never sits in skus', () => {
 	const rows = bookSkus.ebooks ?? {};
 	const files = JSON.parse(fs.readFileSync(new URL('../src/data/ebook-files.json', import.meta.url), 'utf8')).files;
 	for (const [sku, r] of Object.entries(rows)) {
 		assert.equal(r.format, 'eBook', sku);
 		assert.ok(Number.isInteger(r.list_cents) && r.list_cents > 0, `${sku}: a price`);
-		assert.match(r.price_source?.asin ?? '', /^B0[A-Z0-9]{8}$/, `${sku}: priced from a live Kindle listing`);
+		assert.ok(priceProven(r), `${sku}: priced from a live Kindle listing (or a recorded no-Kindle basis + check date)`);
 		assert.ok(r.book && r.checkout_name, `${sku}: book + title`);
 		assert.ok(files[sku]?.key && /\.epub$/.test(files[sku].key), `${sku}: a private EPUB on R2`);
 		assert.ok(!bookSkus.skus[sku], `${sku}: never a print sku`);
