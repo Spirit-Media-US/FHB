@@ -88,7 +88,7 @@ test('constant time: fast work is padded to the floor', async () => {
 });
 
 test('handler never logs a raw email and gates before Stripe', () => {
-	const src = fs.readFileSync(new URL('../functions/dvc-checkout.ts', import.meta.url), 'utf8');
+	const src = fs.readFileSync(new URL('./lib/dvc-checkout-harness.ts', import.meta.url), 'utf8');
 	const blk = src.slice(src.indexOf('if (payload.firstOrderCheck)'), src.indexOf('const r = await checkoutForm('));
 	assert.ok(blk.length > 0 && src.includes('const r = await checkoutForm('), 'the first-order lookup block ends where the order is handed to the store engine');
 	assert.ok(blk.indexOf('sameOrigin') < blk.indexOf('isFirstOrder'));
@@ -98,7 +98,7 @@ test('handler never logs a raw email and gates before Stripe', () => {
 
 // ---- the real handler, end to end (Stripe mocked, caches faked) ----
 const callHandler = async ({ origin, email = 'a@b.co', ip = '7.7.7.7' }) => {
-	const { onRequestPost } = await import('../functions/dvc-checkout.ts');
+	const { onRequestPost } = await import('./lib/dvc-checkout-harness.ts');
 	const headers = { 'cf-connecting-ip': ip };
 	if (origin) headers.origin = origin;
 	return onRequestPost({

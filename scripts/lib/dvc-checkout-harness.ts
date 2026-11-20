@@ -1,3 +1,9 @@
+// RETIRED ROUTE (store move 5, map smp-store-one-home-v1, Kevin 2026-11-20 ~18:51Z "2 this needs to be moved. You are
+// inheriting OLD instead of making it new"): this WAS functions/dvc-checkout.ts, FHB's own Bible checkout. Every FHB order
+// box now checks out on the ONE store, SMP /store-checkout, so the route is gone (moved out of functions/, it is no
+// longer served). The file stays ONLY as the test harness the FHB engine-copy tests drive (margin guard, far band,
+// first-order guard, intl handling, golden parity) for as long as FHB carries the engine copy; it goes with that copy.
+// It is never deployed as an endpoint.
 // /dvc-checkout — Divine Voice Color print orders (Cloudflare Pages Function).
 //
 //   POST /dvc-checkout  { counts: { teen: 2, dads: 1, journaling: 1, … } }
@@ -26,7 +32,7 @@ import {
 	emailTag,
 	type FirstStatus,
 	sameOrigin,
-} from '../src/lib/firstOrderGuard.ts';
+} from '../../src/lib/firstOrderGuard.ts';
 import {
 	checkoutForm,
 	EMAIL_RE,
@@ -37,7 +43,7 @@ import {
 	type OrderPayload,
 	storeTagErrors,
 	storeTags,
-} from '../src/lib/storeEngine.ts';
+} from '../../src/lib/storeEngine.ts';
 
 // The catalogue, prices and sale metadata live in the SMP store engine (plan 3fb Phase 2); re-exported so every
 // existing importer of this file keeps working.
@@ -47,7 +53,7 @@ export {
 	bookSaleMetadata,
 	STRIPE_META_KEYS_MAX,
 	setSavings,
-} from '../src/lib/storeEngine.ts';
+} from '../../src/lib/storeEngine.ts';
 
 interface Env {
 	STRIPE_FHB_SECRET_KEY?: string;

@@ -19,7 +19,7 @@ import {
 	bibleSkuIsbn,
 	bookSaleMetadata,
 	onRequestPost,
-} from '../functions/dvc-checkout.ts';
+} from './lib/dvc-checkout-harness.ts';
 import { BOOK_SKUS, DISCOUNT_EXEMPT } from '../src/lib/order-pricing.ts';
 
 const cat = JSON.parse(fs.readFileSync(new URL('../src/data/books.json', import.meta.url), 'utf8'));
