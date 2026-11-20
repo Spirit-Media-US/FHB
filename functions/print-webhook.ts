@@ -147,6 +147,52 @@ export function giftReceipt(
 	};
 }
 
+// DUPLICATE SAFETY (map smp-store-one-home-v1 §4 move 1, Kevin 2026-11-20 ~18:51Z "2 this needs to be moved"): while
+// the store's after-payment code MOVES to SMP /store-webhook, Stripe sends every event to BOTH endpoints. Each CLAIMS the
+// session first: one Idempotency-Key per session, a body naming the endpoint. Stripe runs the first claim and refuses
+// the other (400 idempotency_error), so exactly one endpoint emails; a redelivery to the owner replays its claim.
+// Byte-for-byte the SMP claimSession (SMP functions/store-webhook.ts), with this endpoint's name.
+export const CLAIM_BY = 'fhb-print-webhook';
+export const claimKey = (sid: string) => `store-notify-claim-${sid}`;
+export type Claim = 'ours' | 'theirs' | 'done' | 'retry';
+export async function claimSession(
+	key: string | undefined,
+	sid: string,
+	by = CLAIM_BY,
+): Promise<Claim> {
+	if (!key || !sid) return 'ours'; // no key bound (tests, preview without Stripe): nothing to coordinate with
+	const auth = { Authorization: `Bearer ${key}` };
+	try {
+		const g = await fetch(
+			`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sid)}`,
+			{ headers: auth },
+		);
+		if (g.ok) {
+			const m = ((await g.json()) as { metadata?: Record<string, string> }).metadata ?? {};
+			if (m.notified_at) return 'done';
+			if (m.notify_claim && m.notify_claim !== by) return 'theirs';
+		}
+		const r = await fetch(
+			`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sid)}`,
+			{
+				method: 'POST',
+				headers: {
+					...auth,
+					'Content-Type': 'application/x-www-form-urlencoded',
+					'Idempotency-Key': claimKey(sid),
+				},
+				body: new URLSearchParams({ 'metadata[notify_claim]': by }),
+			},
+		);
+		if (r.ok) return 'ours';
+		const e = ((await r.json().catch(() => ({}))) as { error?: { type?: string } }).error;
+		if (r.status === 400 && e?.type === 'idempotency_error') return 'theirs';
+		return 'retry'; // 409 (the other claim is in flight) or Stripe unreachable: let Stripe redeliver
+	} catch {
+		return 'retry';
+	}
+}
+
 function hexToBytes(hex: string): Uint8Array | null {
 	if (hex.length % 2 !== 0) return null;
 	const out = new Uint8Array(hex.length / 2);
@@ -360,6 +406,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	const phone: string | undefined = s.customer_details?.phone || undefined;
 	const destCode: string | undefined = ship.address?.country;
 	const site = countryFor(destCode);
+
+	// Duplicate safety: exactly one endpoint (this one or SMP /store-webhook) sends for a session.
+	const claim = await claimSession(env.STRIPE_FHB_SECRET_KEY, s.id ?? '');
+	if (claim === 'done' || claim === 'theirs') return ack();
+	if (claim === 'retry') return new Response('claim pending — please retry', { status: 503 });
 
 	// Stamp the session once its emails are away. This is what makes an un-notified
 	// order *findable*: fhb-order-reconcile.py sweeps paid sessions missing

@@ -491,3 +491,46 @@ test('RIAB gift: uncovered fee and a single designation print the right charity 
 	assert.match(receipt.text, /Designation: Cheyenne Foundation\n  Cheyenne Foundation: \$25\.00/);
 	assert.match(r.sent.find((m) => m.to === 'orders@test').text, /\(fee not covered\)\nTransferred to Spirit Media Charities: \$24\.28/);
 });
+
+// ── DUPLICATE SAFETY (map smp-store-one-home-v1 §4 move 1, Kevin 2026-11-20 ~18:51Z "2 this needs to be moved"): while
+// SMP /store-webhook and this endpoint both receive every event, the one that loses the Stripe claim sends NOTHING.
+import { CLAIM_BY, claimSession } from '../functions/print-webhook.ts';
+test('DUPLICATE-SAFE: a session SMP /store-webhook already claimed (or notified) gets no email from FHB', async () => {
+	const meta = {};
+	const idem = new Map();
+	const sent = [];
+	const real = globalThis.fetch;
+	globalThis.fetch = async (url, init = {}) => {
+		const u = String(url);
+		if (u.includes('mailgun')) {
+			sent.push(Object.fromEntries(init.body));
+			return new Response('{}', { status: 200 });
+		}
+		if ((init.method ?? 'GET') === 'GET') return new Response(JSON.stringify({ metadata: { ...meta } }));
+		const key = init.headers?.['Idempotency-Key'];
+		const body = String(init.body);
+		if (key && idem.has(key) && idem.get(key) !== body) return new Response(JSON.stringify({ error: { type: 'idempotency_error' } }), { status: 400 });
+		if (key) idem.set(key, body);
+		for (const [k, v] of new URLSearchParams(body)) if (/^metadata\[/.test(k)) meta[k.slice(9, -1)] = v;
+		return new Response('{}', { status: 200 });
+	};
+	const event = JSON.stringify({ type: 'checkout.session.completed', data: { object: { id: 'cs_test_dupFHB000001', amount_total: 3198, currency: 'usd', customer_details: { email: 'buyer@test' }, metadata: { kind: 'dvc_print', breakdown: 'moms-pb:2' } } } });
+	const post = () => {
+		const t = Math.floor(Date.now() / 1000);
+		const sig = crypto.createHmac('sha256', secret).update(`${t}.${event}`).digest('hex');
+		return webhook({ request: new Request('https://x/print-webhook', { method: 'POST', body: event, headers: { 'stripe-signature': `t=${t},v1=${sig}` } }), env: { STRIPE_PRINT_WEBHOOK_SECRET: secret, STRIPE_FHB_SECRET_KEY: 'rk_stub', MAILGUN_API_KEY: 'k', PRINT_ORDER_NOTIFY_TO: 'orders@test' } });
+	};
+	try {
+		assert.equal(await claimSession('rk_stub', 'cs_test_dupFHB000001', 'smp-store-webhook'), 'ours', 'SMP claims first');
+		delete meta.notify_claim; // even when the metadata read misses it, Stripe's idempotency refusal keeps FHB out
+		assert.equal((await post()).status, 200);
+		assert.equal(sent.length, 0, 'FHB sent nothing');
+		meta.notify_claim = 'smp-store-webhook';
+		meta.notified_at = '2026-11-20T00:00:00Z';
+		assert.equal((await post()).status, 200);
+		assert.equal(sent.length, 0);
+		assert.equal(CLAIM_BY, 'fhb-print-webhook');
+	} finally {
+		globalThis.fetch = real;
+	}
+});
