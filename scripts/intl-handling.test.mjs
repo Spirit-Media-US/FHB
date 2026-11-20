@@ -162,7 +162,7 @@ async function checkout({ country, counts, email = 'a@b.co', repeat = false }) {
 		if (u.includes('checkout/sessions')) return j({ data: repeat ? [{ payment_status: 'paid', metadata: { kind: 'dvc_print' } }] : [] }); // a store order (Kevin 2026-11-14)
 		return j({ data: [] });
 	};
-	const { onRequestPost } = await import('../functions/dvc-checkout.ts');
+	const { onRequestPost } = await import('./lib/dvc-checkout-harness.ts');
 	const res = await onRequestPost({ request: new Request('https://x.test/dvc-checkout', { method: 'POST', body: JSON.stringify({ counts, email, country }) }), env: { STRIPE_FHB_SECRET_KEY: 'sk_test' } });
 	const out = { status: res.status, json: await res.json(), form: body ? decode(body) : null };
 	return out;
@@ -394,7 +394,7 @@ test('server: the first-order check answers yes/no from the same rule checkout u
 		};
 		const store = new Map();
 		globalThis.caches = { default: { match: async (q) => (store.has(q.url) ? new Response(store.get(q.url)) : undefined), put: async (q, res) => { store.set(q.url, await res.text()); } } };
-		const { onRequestPost } = await import('../functions/dvc-checkout.ts');
+		const { onRequestPost } = await import('./lib/dvc-checkout-harness.ts');
 		const r = await onRequestPost({ request: new Request('https://x.test/dvc-checkout', { method: 'POST', headers: { origin: 'https://fathersheartbible.com' }, body: JSON.stringify({ firstOrderCheck: true, email }) }), env: { STRIPE_FHB_SECRET_KEY: 'sk_test' } });
 		return { body: await r.json(), posted, cache: r.headers.get('cache-control') };
 	};

@@ -36,7 +36,7 @@ test('the order-form checkout click path calls the beacon before the POST', () =
 });
 
 // ── 3ef-1 (pmseoaeo 2026-11-13): /dvc-checkout reports every POST server-side, tagged site|qa ────────────────
-import { checkoutTag, onRequestPost } from '../functions/dvc-checkout.ts';
+import { checkoutTag, onRequestPost } from './lib/dvc-checkout-harness.ts';
 
 test('3ef-1 checkoutTag: preview host, example email, x-fhb-qa, scripted UA -> qa; a browser -> site', () => {
 	const chrome = 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/130 Mobile Safari/537.36';

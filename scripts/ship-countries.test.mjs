@@ -59,7 +59,7 @@ test('checkout: allowed_countries, rate and phone come from the list; pending/un
 	for (const bad of [...pendingCodes, 'ZZ', '', undefined, null, 'US,GB', ['US']]) assert.equal(checkoutShippingForm(bad), null, String(bad));
 });
 test('checkout functions use the list, no hard-coded country', () => {
-	for (const f of ['src/lib/storeEngine.ts', 'functions/print-checkout.ts']) {
+	for (const f of ['src/lib/storeEngine.ts']) { // functions/print-checkout.ts retired (store move 5, 2026-11-20)
 		const src = fs.readFileSync(f, 'utf8');
 		assert.match(src, /checkoutShippingForm\(/, f);
 		assert.doesNotMatch(src, /allowed_countries\]\[0\]'\s*:\s*'[A-Z]{2}'/, `${f} hard-codes a country`);

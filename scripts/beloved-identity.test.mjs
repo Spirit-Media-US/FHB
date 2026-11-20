@@ -3,11 +3,9 @@
 // no discount of any kind, no effect on any Bible tier, and a fulfilment email that carries the Ingram ISBN.
 
 import assert from 'node:assert/strict';
-import crypto from 'node:crypto';
 import fs from 'node:fs';
 import test from 'node:test';
-import { onRequestPost } from '../functions/dvc-checkout.ts';
-import { onRequestPost as webhook } from '../functions/print-webhook.ts';
+import { onRequestPost } from './lib/dvc-checkout-harness.ts';
 import { handlingFeeCents, marginCheck, netPerItemUsd } from '../src/lib/marginGuard.ts';
 import { BELOVED_SKU, BOOK_SKUS, unitAfter } from '../src/lib/order-pricing.ts';
 import { LIVE_COUNTRIES } from '../src/lib/shipCountries.ts';
@@ -178,99 +176,8 @@ test('every live country can size the book (own cost or the Bible fallback)', as
 	for (const c of LIVE_COUNTRIES) if (c.code !== 'US') assert.ok(landedUnitCost(BI, c.landed_cost_usd) > 0, c.code);
 });
 
-// ── the paid order becomes an Ingram order ──
-async function fulfilment(breakdown, country = 'US') {
-	const secret = 'whsec_test';
-	const event = JSON.stringify({
-		type: 'checkout.session.completed',
-		data: {
-			object: {
-				id: 'cs_test_beloved',
-				amount_total: 2997,
-				currency: 'usd',
-				total_details: { amount_tax: 0 },
-				metadata: {
-					kind: 'dvc_print',
-					total: '3',
-					ladder_total: '0',
-					pct_off: '0',
-					offer: 'none',
-					breakdown,
-				},
-				customer_details: {
-					email: 'reader@example.com',
-					phone: '+15555550123',
-					name: 'Ann Reader',
-				},
-				collected_information: {
-					shipping_details: {
-						name: 'Ann Reader',
-						address: {
-							line1: '1 Main St',
-							city: 'Austin',
-							state: 'TX',
-							postal_code: '78701',
-							country,
-						},
-					},
-				},
-			},
-		},
-	});
-	const t = Math.floor(Date.now() / 1000);
-	const sig = crypto.createHmac('sha256', secret).update(`${t}.${event}`).digest('hex');
-	const sent = [];
-	const realFetch = globalThis.fetch;
-	globalThis.fetch = async (url, init) => {
-		if (String(url).includes('mailgun')) {
-			sent.push(Object.fromEntries(init.body));
-			return new Response('{}', { status: 200 });
-		}
-		return new Response('{}', { status: 200 });
-	};
-	try {
-		const res = await webhook({
-			request: new Request('https://x/print-webhook', {
-				method: 'POST',
-				body: event,
-				headers: { 'stripe-signature': `t=${t},v1=${sig}` },
-			}),
-			env: {
-				STRIPE_PRINT_WEBHOOK_SECRET: secret,
-				MAILGUN_API_KEY: 'k',
-				PRINT_ORDER_NOTIFY_TO: 'orders@test',
-			},
-		});
-		return { status: res.status, sent };
-	} finally {
-		globalThis.fetch = realFetch;
-	}
-}
-test('webhook: the fulfilment email carries ISBN, quantity, address, phone and the Ingram print site', async () => {
-	const { status, sent } = await fulfilment(`${BI}:3`);
-	assert.equal(status, 200);
-	const body = sent.find((m) => m.to === 'orders@test').text;
-	if (process.env.SHOW_MESSAGE)
-		console.log(`\n----- FULFILMENT EMAIL -----\nSubject: ${sent[0].subject}\n\n${body}`);
-	for (const want of [
-		'ISBN 9798893072396 × 3',
-		'Beloved Identity',
-		'96pp, 5 x 8 in',
-		'Ann Reader',
-		'1 Main St',
-		'Austin, TX 78701',
-		'+15555550123',
-		'Ingram print site for US: US',
-		'Copies: 3',
-	])
-		assert.ok(body.includes(want), want);
-	assert.ok(!body.includes('MISSING'));
-	assert.match(sent[0].subject, /3 copies/);
-});
-test('webhook: a Bible-only order has no Ingram book lines (unchanged)', async () => {
-	const { sent } = await fulfilment('teen-pb:1');
-	assert.ok(!sent[0].text.includes('Ingram order lines'));
-});
+// ── the paid order becomes an Ingram order: MOVED with the store webhook to SMP (scripts/store-webhook.test.mjs,
+// store move 5, Kevin 2026-11-20 ~18:51Z "2 this needs to be moved"). ──
 
 // ── OVERSEAS = per-country BREAK-EVEN fee (Kevin 2026-11-10, kevin-decisions L1735 "2 A") ──
 const WANT = {

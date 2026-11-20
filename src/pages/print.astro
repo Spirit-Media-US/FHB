@@ -1315,7 +1315,11 @@ const bookPriceLine = (skus: string[]) =>
 			const label = btn.textContent;
 			btn.disabled = true; btn.textContent = 'Starting checkout…';
 			try {
-				const r = await fetch('/ebook-checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
+				// THE ONE STORE sells the Bible eBook (SMP /store-checkout; FHB /ebook-checkout retired, store move 5,
+				// Kevin 2026-11-20). Same rule as src/lib/storeOrigin.ts: an FHB preview orders on the SMP dev preview.
+				const h = location.hostname;
+				const store = h.endsWith('.pages.dev') && h !== 'fathersheartbible.pages.dev' ? 'https://dev.spirit-media-publishing.pages.dev' : 'https://spiritmediapublishing.com';
+				const r = await fetch(`${store}/store-checkout`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ bibleEbook: true }) });
 				const d = await r.json();
 				if (d.url) { window.location.href = d.url; return; }
 				if (msg) { msg.style.display = 'block'; msg.textContent = d.disabled ? 'Direct download is opening soon — please try again shortly or order the print edition direct from us.' : 'Sorry, something went wrong. Please try again.'; }

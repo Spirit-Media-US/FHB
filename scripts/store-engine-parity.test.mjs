@@ -70,7 +70,7 @@ async function run(c) {
 			return j({ data: c.repeat ? [{ payment_status: 'paid', metadata: { kind: 'dvc_print' } }] : [] });
 		return j({ data: [] });
 	};
-	const { onRequestPost } = await import('../functions/dvc-checkout.ts');
+	const { onRequestPost } = await import('./lib/dvc-checkout-harness.ts');
 	const res = await onRequestPost({
 		request: new Request('https://fathersheartbible.pages.dev/dvc-checkout', {
 			method: 'POST',

@@ -44,7 +44,7 @@ test('the FHB Bible box session (dvc-checkout) is tagged site=fhb window=fhb fam
 		if (init?.method === 'POST') body = init.body;
 		return new Response(JSON.stringify(init?.method === 'POST' ? { url: 'https://stripe.test/x' } : { data: [] }));
 	};
-	const { onRequestPost } = await import('../functions/dvc-checkout.ts');
+	const { onRequestPost } = await import('./lib/dvc-checkout-harness.ts');
 	const res = await onRequestPost({
 		request: new Request('https://fathersheartbible.com/dvc-checkout', { method: 'POST', body: JSON.stringify({ counts: { 'moms-hb': 2 }, country: 'US' }) }),
 		env: { STRIPE_FHB_SECRET_KEY: 'sk_test' },
@@ -60,7 +60,9 @@ test('EVERY function that creates a Checkout Session runs the tag check before t
 		const s = fs.readFileSync(new URL(f, dir), 'utf8');
 		return /fetch\('https:\/\/api\.stripe\.com\/v1\/checkout\/sessions',\s*\{\s*method: 'POST'/.test(s);
 	});
-	assert.deepEqual(makers.sort(), ['dvc-checkout.ts', 'ebook-checkout.ts', 'print-checkout.ts']);
+	// Store move 5 (Kevin 2026-11-20 ~18:51Z "2 this needs to be moved"): FHB creates NO Checkout Session any more; every
+	// session is made by SMP /store-checkout (whose createSession runs the same tag check). A maker coming back fails here.
+	assert.deepEqual(makers.sort(), []);
 	for (const f of makers) {
 		const s = fs.readFileSync(new URL(f, dir), 'utf8');
 		const gate = s.indexOf('if (storeTagErrors(form).length)');

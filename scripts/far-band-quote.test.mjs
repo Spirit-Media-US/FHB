@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { bulkQuoteRequired, tierPctFor, bulkQuoteMailto, BULK_QUOTE_MIN, BULK_QUOTE_EMAIL } from '../src/lib/farBand.ts';
 import { LIVE_COUNTRIES } from '../src/lib/shipCountries.ts';
-import { onRequestPost } from '../functions/dvc-checkout.ts';
+import { onRequestPost } from './lib/dvc-checkout-harness.ts';
 
 const FAR = LIVE_COUNTRIES.filter((c) => c.farBand).map((c) => c.code);
 const NEAR = LIVE_COUNTRIES.filter((c) => !c.farBand && c.code !== 'US').map((c) => c.code);
