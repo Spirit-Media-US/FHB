@@ -114,7 +114,7 @@ const esc = (s: string) =>
 // `tail` lands just before </body>; only the paid-order view passes one (Google Customer Reviews, unit 2qy).
 const page = (body: string, status = 200, tail = '') =>
 	new Response(
-		`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Your order — Father's Heart Bible</title><style>
+		`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Your order — Spirit Media Publishing</title><style>
 body{font-family:system-ui,-apple-system,sans-serif;background:#faf6f2;color:#1a1c1c;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0;padding:1.5rem}
 .card{max-width:38rem;width:100%;background:#fff;border:1px solid #e4bdc4;border-radius:1rem;padding:2.5rem}
 h1{font-size:1.6rem;margin:0 0 .5rem;line-height:1.25}

@@ -44,25 +44,21 @@ const NOTIFY_TO_DEFAULT = 'kevin@spiritmediapublishing.com';
 // keeps its own Reply-To (the buyer) and its own recipient.
 export const BUYER_REPLY_TO = 'hello@spiritmediapublishing.com';
 
-// Two window-branded confirmations (Kevin 2026-11-16 "1A"; Option C: one store, two shop windows). The window is the
-// session's Option C tag (metadata[window]); a session from before the tags falls back on its site (an SMP-store
-// session carried site=smp|vaneure), else FHB. Only the subject and the sign-off change; the body is the same.
-// The SMP window has NO window line (Kevin 2026-11-16 15:42Z "we do not need: Spirit Media Publishing ·
-// spiritmediapublishing.com above the signature which gives the same thing!"); FHB keeps its line.
-// signoffBlock() is the one place the line is written: '' or 'line\n\n', always followed by SIGNATURE.
+// ONE STORE = Spirit Media Publishing for every order, FHB or not (Kevin 2026-11-20 ~16:07Z: "This needs to be cleaned up
+// NOW and everywhere as the store is NOW Spirit Media Publishing whether it is FHB or not. It is confusing for SMP books
+// to show order confrimation FHB."). Supersedes the 2026-11-16 "1A" two-window subjects/sign-offs: every buyer email is
+// "Your Spirit Media Publishing order" with NO window line above the address signature (Kevin 2026-11-16 15:42Z: the
+// signature already says it). Product names (Father's Heart Bible editions) stay in the line items.
+// `window` is still computed (session Option C tag, else site) because it routes the SIGNED eBook link to its own site
+// (windowOrigin) and is logged on Kevin's notice; it no longer brands anything the buyer reads.
+// signoffBlock() stays the one place a window line could be written: it now always receives ''.
 export function buyerBrand(m: Record<string, string> | null | undefined, amount: string) {
 	const w = m?.window || (m?.site && m.site !== 'fhb' ? 'smp' : 'fhb');
-	return w === 'smp'
-		? {
-				window: 'smp',
-				subject: `Your Spirit Media Publishing order — ${amount}`,
-				signoff: '',
-			}
-		: {
-				window: 'fhb',
-				subject: `Your Father’s Heart Bible order — ${amount}`,
-				signoff: 'Father’s Heart Bible · Spirit Media Publishing',
-			};
+	return {
+		window: w === 'smp' ? 'smp' : 'fhb',
+		subject: `Your Spirit Media Publishing order — ${amount}`,
+		signoff: '',
+	};
 }
 export const signoffBlock = (signoff: string) => (signoff ? `${signoff}\n\n` : '');
 
@@ -363,7 +359,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 			email === '(no email)' ||
 			(await send(
 				email,
-				ebookSku ? `Your eBook — ${bookTitle}` : 'Your Father’s Heart Bible eBook',
+				`Your eBook — ${ebookSku ? bookTitle : 'Father’s Heart Bible'}`,
 				`Thank you — your eBook is ready.\n\n` +
 					(ebookSku ? `${bookTitle}\n\n` : '') +
 					`Download it here (the link stays valid, so keep this email):\n${link}\n\n` +
@@ -380,9 +376,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		return retry();
 	}
 
-	// Heading names the shop window the order came from (pmseoaeo 11-20: SMP/RIAB orders were headed FHB).
+	// One store (Kevin 2026-11-20 ~16:07Z): every order notice is headed Spirit Media Publishing; the window is logged below.
 	const text =
-		`New print order — ${buyerBrand(m, amount).window === 'smp' ? 'Spirit Media Publishing' : "Father's Heart Bible"}\n\n` +
+		`New print order — Spirit Media Publishing\n\n` +
+		`Shop window: ${buyerBrand(m, amount).window === 'smp' ? 'spiritmediapublishing.com' : 'fathersheartbible.com'}\n` +
 		`Total: ${amount} (incl. tax ${tax})\n` +
 		`Copies: ${m.total ?? '?'}  ·  Discount: ${m.pct_off ?? '?'}% off${m.offer === 'first_order' ? ' (first order, WELCOME15)' : m.offer === 'volume' ? ' (volume)' : ''}\n` +
 		`Editions:\n${fmtOrder(readBreakdown(m))}\n` +
