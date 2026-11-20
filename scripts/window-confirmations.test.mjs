@@ -79,30 +79,22 @@ test('item 9: buyer emails Reply-To hello@; Kevin’s notification unchanged (hi
 	assert.equal(e.kevin['h:Reply-To'], 'buyer@test');
 });
 
-// ---- item 9: /order shows a Contact us BUTTON; the address is never printed ----
+// ---- item 9 + MOVE 4 (map smp-store-one-home-v1, Kevin 2026-11-20 ~18:51Z "2 this needs to be moved"): the order page
+// (Contact us button, address never printed) is SMP's ONE /order now (SMP scripts/store-checkout.test.mjs); FHB /order
+// redirects there with its query, production to production and a preview to SMP's dev preview.
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ord-'));
 const out = path.join(dir, 'order.mjs');
 await build({ entryPoints: ['functions/order.ts'], bundle: true, format: 'esm', platform: 'neutral', outfile: out, logLevel: 'silent', loader: { '.json': 'json' } });
 const { onRequestGet } = await import(out);
-const printedAddress = (html) => html.replace(/href="[^"]*"/g, '').includes('@spiritmediapublishing.com');
-test('item 9: every /order state has the Contact us button and never prints the address', async () => {
-	const f = globalThis.fetch;
-	globalThis.fetch = async () => new Response(JSON.stringify({ id: 'cs_test_a1B2c3', payment_status: 'paid', amount_total: 3198, currency: 'usd', customer_details: { email: 'b@example.com' }, metadata: { breakdown: 'moms-pb:2' } }));
-	try {
-		const pages = {
-			paid: await onRequestGet({ request: new Request('https://x.test/order?s=cs_test_a1B2c3'), env: { STRIPE_FHB_SECRET_KEY: 'k' } }),
-			lookup: await onRequestGet({ request: new Request('https://x.test/order'), env: { STRIPE_FHB_SECRET_KEY: 'k' } }),
-			nokey: await onRequestGet({ request: new Request('https://x.test/order?s=cs_test_a1B2c3'), env: {} }),
-		};
-		for (const [k, r] of Object.entries(pages)) {
-			const html = await r.text();
-			assert.match(html, /<a class="contact" href="mailto:hello@spiritmediapublishing\.com[^"]*">Contact us<\/a>/, `${k}: button`);
-			assert.equal(printedAddress(html), false, `${k}: address printed`);
-		}
-		assert.equal(printedAddress('<p>Email <a href="mailto:hello@spiritmediapublishing.com">hello@spiritmediapublishing.com</a></p>'), true, 'the check catches a printed address');
-	} finally {
-		globalThis.fetch = f;
-	}
+test('move 4: FHB /order redirects to SMP /order keeping every query param; previews go to the SMP dev preview', async () => {
+	const at = async (u) => (await onRequestGet({ request: new Request(u), env: {} })).headers.get('location');
+	assert.equal(await at('https://fathersheartbible.com/order?s=cs_live_a1B2c3&x=1'), 'https://spiritmediapublishing.com/order?s=cs_live_a1B2c3&x=1');
+	assert.equal(await at('https://fathersheartbible.com/order'), 'https://spiritmediapublishing.com/order', 'no reference: the lookup form');
+	assert.equal(await at('https://fathersheartbible.pages.dev/order?s=cs_live_z'), 'https://spiritmediapublishing.com/order?s=cs_live_z');
+	assert.equal(await at('https://dev.fathersheartbible.pages.dev/order?s=cs_test_z'), 'https://dev.spirit-media-publishing.pages.dev/order?s=cs_test_z');
+	const r = await onRequestGet({ request: new Request('https://fathersheartbible.com/order?s=a'), env: {} });
+	assert.equal(r.status, 302);
+	assert.equal(r.headers.get('cache-control'), 'no-store');
 });
 
 // ---- item 10 (Kevin 2026-11-16): From "SMP Orders" on every order email; the 7-line address signature on every buyer email

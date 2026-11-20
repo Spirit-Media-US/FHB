@@ -60,35 +60,17 @@ test('snippet cannot be broken out of by a hostile value', () => {
 	assert.ok(!s.includes('<img'));
 });
 
-// ---- the real /order function against a mocked Stripe ----
+// ---- /order MOVED to SMP (map smp-store-one-home-v1 move 4, Kevin 2026-11-20 ~18:51Z "2 this needs to be moved") ----
+// The order page, and its Google Customer Reviews opt-in, now render on spiritmediapublishing.com/order (SMP
+// scripts/customer-reviews.test.mjs). FHB /order only redirects there, so it can never carry the opt-in itself.
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'gcr-'));
 const out = path.join(dir, 'order.mjs');
 await build({ entryPoints: ['functions/order.ts'], bundle: true, format: 'esm', platform: 'neutral', outfile: out, logLevel: 'silent', loader: { '.json': 'json' } });
 const { onRequestGet } = await import(out);
-const render = async (session, { status = 200 } = {}) => {
-	const seen = [];
-	const f = globalThis.fetch;
-	globalThis.fetch = async (u, init) => { seen.push({ u: String(u), init }); return new Response(JSON.stringify(session), { status }); };
-	try {
-		const r = await onRequestGet({ request: new Request('https://x.test/order?s=cs_live_a1B2c3'), env: { STRIPE_FHB_SECRET_KEY: 'sk_test_dummy' } });
-		return { html: await r.text(), seen };
-	} finally { globalThis.fetch = f; }
-};
-
-test('/order renders the module once, with server-side values, after the card', async () => {
-	const { html, seen } = await render(sess());
-	assert.match(html, /^<!doctype html>/);
-	assert.equal((html.match(/apis\.google\.com\/js\/platform\.js\?onload=renderOptIn/g) || []).length, 1);
-	assert.match(html, /gapi\.surveyoptin\.render\(\{"merchant_id":5891954461,"order_id":"cs_live_a1B2c3","email":"buyer@example\.com","delivery_country":"US","estimated_delivery_date":"2026-11-24"\}\)/);
-	assert.ok(html.indexOf('platform.js') > html.indexOf('Order reference') && html.indexOf('platform.js') < html.indexOf('</body>'));
-	assert.match(seen[0].u, /\/checkout\/sessions\/cs_live_a1B2c3\?expand\[\]=shipping_cost\.shipping_rate$/);
-});
-
-test('/order with a test-mode session, an unpaid one, the lookup form, or a missing session carries no Google script', async () => {
-	assert.ok(!(await render(sess({ livemode: false }))).html.includes('apis.google.com'));
-	assert.ok(!(await render(sess({ payment_status: 'unpaid' }))).html.includes('apis.google.com'));
-	assert.ok(!(await render({}, { status: 404 })).html.includes('apis.google.com'));
-	const r = await onRequestGet({ request: new Request('https://x.test/order'), env: {} });
+test('/order on FHB redirects to the one SMP order page (query kept) and renders no page, so no Google script', async () => {
+	const r = await onRequestGet({ request: new Request('https://fathersheartbible.com/order?s=cs_live_a1B2c3'), env: {} });
+	assert.equal(r.status, 302);
+	assert.equal(r.headers.get('location'), 'https://spiritmediapublishing.com/order?s=cs_live_a1B2c3');
 	assert.ok(!(await r.text()).includes('apis.google.com'));
 });
 
