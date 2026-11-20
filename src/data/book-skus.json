@@ -4402,5 +4402,43 @@
 				"checked": "2026-11-16T18:09:48Z"
 			}
 		}
+	},
+	"_about_pending": "PENDING (Kevin 2026-11-20, Outrageously Loved: \"build SMP page for this book with bulk pricing discount\"): one row per book FORMAT whose book has its SMP page but is NOT sold yet (no Ingram title). NEVER under \"skus\": every print path, the merchant feed and the checkout read skus, so a pending row is never sold, fed or given an Offer. The page reads it for its price and its own bulk_tiers ([{min, pct}], that SKU's quantity only, US only). Going on sale = moving the row into skus with its ingram_title, spec and a measured US cost in book-us-costs.json (the engine charges a tier only at or above floor_usd on that measured cost: storeEngine.bookTierFor).",
+	"pending": {
+		"outrageously-loved-pb": {
+			"owner_site": "smp",
+			"format": "Paperback",
+			"schema_format": "https://schema.org/Paperback",
+			"isbn": "9798893075694",
+			"isbn_display": "979-8-89307-569-4",
+			"list_cents": 999,
+			"pages": null,
+			"trim": "4.0 x 6.0 in",
+			"binding": "Perfect bound",
+			"checkout_title": "Outrageously Loved — Paperback",
+			"checkout_name": "Outrageously Loved: Meet the Father Jesus Came to Show You",
+			"checkout_desc": "Paperback · by George La Du · free shipping",
+			"checkout_img": "https://assets.spiritmediapublishing.com/spirit-media-publishing/covers/outrageously-loved-1200.jpg",
+			"ingram_title": null,
+			"spec": null,
+			"floor_usd": 0,
+			"cost_key": null,
+			"book": "outrageously-loved",
+			"bulk_tiers": [
+				{
+					"min": 10,
+					"pct": 20
+				},
+				{
+					"min": 25,
+					"pct": 30
+				},
+				{
+					"min": 100,
+					"pct": 40
+				}
+			],
+			"sku_status": "pending"
+		}
 	}
 }

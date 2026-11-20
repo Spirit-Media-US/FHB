@@ -125,6 +125,34 @@ export const BOOK_SKUS: Record<string, BookFormatRow> = Object.fromEntries(
 		},
 	]),
 );
+// PER-BOOK BULK TIERS (Kevin 2026-11-20, Outrageously Loved: "build SMP page for this book with bulk pricing discount";
+// tiers approved the same day: 10-24 copies 20% off, 25-99 30%, 100+ 40%). A book format may carry its OWN quantity
+// ladder in book-skus.json (`bulk_tiers: [{min, pct}]`), counted on THAT SKU's quantity only. It is not the Bible ladder
+// (books still add nothing to it) and never combines with the first-order 15%: the engine applies whichever the order
+// gets, never both (storeEngine.checkoutForm). US only, like the store's "US bulk order discounts" line. The engine
+// charges a tier only where the measured US cost keeps the copy at its floor (storeEngine.bookTierFor, fail closed).
+//
+// PENDING BOOKS: a row under book-skus.json `pending` (not `skus`) is a book with its page but NO sale yet (no Ingram
+// title: Outrageously Loved 2026-11-20). Nothing that sells, feeds or builds an Offer reads `pending`; marking the book
+// live = moving its row into `skus` (+ a measured US cost); the checkout then charges the tiers by itself, but the
+// page's order box (BookOrder) does not display tier totals yet: add that before the book goes on sale.
+type RegistryRow = { bulk_tiers?: Tier[] | null };
+const PENDING_ROWS = ((bookSkus as { pending?: Record<string, RegistryRow> }).pending ??
+	{}) as Record<string, RegistryRow>;
+/** SKUs whose book has a page but is not sold yet (book-skus.json `pending`). */
+export const PENDING_SKUS: readonly string[] = Object.keys(PENDING_ROWS);
+/** sku -> its own bulk ladder, highest first, for sold AND pending rows (a pending book's page shows its offer). */
+export const BOOK_BULK_TIERS: Record<string, Tier[]> = Object.fromEntries(
+	Object.entries({ ...(bookSkus.skus as Record<string, RegistryRow>), ...PENDING_ROWS })
+		.filter(([, r]) => Array.isArray(r.bulk_tiers) && r.bulk_tiers.length > 0)
+		.map(([sku, r]) => [sku, [...(r.bulk_tiers as Tier[])].sort((a, b) => b.min - a.min)]),
+);
+/** The per-book bulk percent for `qty` copies of `sku` shipped to `country`: 0 without a ladder, below it, or abroad. */
+export const bookTierPct = (sku: string, qty: number, country = 'US'): number =>
+	String(country).toUpperCase() === 'US' && BOOK_BULK_TIERS[sku]
+		? tierPct(BOOK_BULK_TIERS[sku], qty)
+		: 0;
+
 /** Discounts are Bibles-only (Kevin 2026-11-10): every book SKU is charged at list under every offer. */
 // SAME OFFER ON BOTH SITES (Kevin 2026-11-14: "we can do 15% on first order everywhere ... we offer same offer on
 // both sites"): books take the first-order 15% like Bibles (supersedes "15% Bibles only", 2026-11-10). Books still add

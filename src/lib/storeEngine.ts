@@ -24,7 +24,9 @@ import {
 	volumesFor,
 } from './marginGuard.ts';
 import {
+	BOOK_BULK_TIERS,
 	BOOK_SKUS,
+	bookTierPct,
 	FIRST_ORDER_CODE,
 	FIRST_ORDER_PCT,
 	isDiscountExempt,
@@ -32,6 +34,7 @@ import {
 	META_VALUE_MAX,
 	packBreakdown,
 	paidUnit,
+	type Tier,
 	unitAfter,
 } from './order-pricing.ts';
 import { checkoutShippingForm, countryFor } from './shipCountries.ts';
@@ -1185,6 +1188,36 @@ for (const [sku, e] of Object.entries(CATALOG_LANG_EDITIONS))
 // line is unchanged. A book whose status is not "live" is not sellable here.
 const US_CARD_PCT = 0.029;
 const US_CARD_FIXED_USD = 0.3;
+/** US net per copy of a book at `unitCents` with a measured US landed cost: Stripe's US card fee (2.9% + 30c) off. */
+export const usBookNet = (unitCents: number, costUsd: number): number =>
+	unitCents / 100 - (unitCents / 100) * US_CARD_PCT - US_CARD_FIXED_USD - costUsd;
+/** PER-BOOK BULK TIER, MARGIN-CHECKED (order-pricing.ts BOOK_BULK_TIERS; Kevin 2026-11-20 Outrageously Loved: 10-24
+ *  20%, 25-99 30%, 100+ 40%). The percent `qty` copies of `slug` shipped to `destCode` take off list: the book's OWN
+ *  ladder (US only, that SKU's quantity only), and only while the book's MEASURED US landed cost (book-us-costs.json)
+ *  keeps the discounted copy at its floor (floor_usd) after Stripe's US card fee. A rung that fails steps down to the
+ *  next; no measured cost, or a SKU the store does not sell (a `pending` row has no EDITIONS entry) = 0. Fail closed,
+ *  never a guess. `costs` is injectable for the tests. */
+export function bookTierFor(
+	slug: string,
+	qty: number,
+	destCode = 'US',
+	costs: Record<string, number> = bookUsCosts.usd as Record<string, number>,
+): { pct: number; reason: string } {
+	const want = bookTierPct(slug, qty, destCode);
+	if (want <= 0) return { pct: 0, reason: 'no tier' };
+	const book = BOOK_SKUS[slug];
+	const retail = EDITIONS[slug]?.retail;
+	if (!book || retail == null) return { pct: 0, reason: `${slug} is not sold` };
+	const cost = costs[slug];
+	if (cost == null) return { pct: 0, reason: `${slug} has no measured US cost` };
+	for (const t of (BOOK_BULK_TIERS[slug] ?? []) as Tier[]) {
+		if (t.pct > want) continue;
+		const net = usBookNet(unitAfter(retail, t.pct), cost);
+		if (net >= book.floorUsd) return { pct: t.pct, reason: `net ${net.toFixed(2)}` };
+	}
+	return { pct: 0, reason: `${slug} under its floor at every tier` };
+}
+
 /** FHB-BOOKS: Stripe metadata for every book line in a cart, for author reporting (Kevin 2026-11-13: title,
  *  ISBN, format, country, date, net). net_usd = per-copy net after Stripe's fee and the book's MEASURED landed
  *  cost for that country (marginGuard.netPerItemUsd, the same figure the margin floor uses), times qty.
@@ -1196,13 +1229,17 @@ export function bookSaleMetadata(
 	pct: number,
 	now = new Date(),
 	firstOrder = false,
+	/** sku -> the per-book bulk percent the line is charged at (bookTierFor); absent = the order's own offer */
+	bookPct: Record<string, number> = {},
 ): Record<string, string> {
 	const out: Record<string, string> = {};
 	let k = 0;
 	for (const [slug, qty] of Object.entries(counts)) {
 		const b = BOOK_SKUS[slug];
 		if (!b || qty <= 0) continue;
-		const unit = paidUnit(slug, EDITIONS[slug].retail, pct, firstOrder);
+		const unit = bookPct[slug]
+			? unitAfter(EDITIONS[slug].retail, bookPct[slug])
+			: paidUnit(slug, EDITIONS[slug].retail, pct, firstOrder);
 		const fee = dest ? handlingFeeCents(slug, unit, dest) : 0;
 		// US: no country-list cost row, so the book's own MEASURED US cost (book-skus.json us_cost_usd) and
 		// Stripe's standard US card fee (2.9% + 30c); unmeasured stays 'unmeasured', never a guess.
@@ -1661,7 +1698,36 @@ export async function checkoutForm(
 	// fee cannot reach it, or the landed cost is unknown).
 	// Far band: no volume ladder at all, so the first-order 15% is the only discount on offer.
 	const tierPctNow = tierPctFor(dest?.bulkQuote, tier.pct);
-	if (discountable && validEmail && FIRST_ORDER_PCT > tierPctNow) {
+	// PER-BOOK BULK TIERS (order-pricing.ts BOOK_BULK_TIERS, Kevin 2026-11-20): a book with its own ladder takes its tier
+	// on THAT SKU's quantity (US only, margin-checked by bookTierFor). It never stacks with the first-order 15%: the
+	// buyer gets whichever saves more on the whole order (a tie goes to the tiers, which need no first-order lookup),
+	// so a first-order lookup runs only when 15% of the order would beat the tiers plus the Bible volume tier.
+	const bookPct: Record<string, number> = {};
+	let bookSaving = 0;
+	for (const [slug, n] of Object.entries(counts)) {
+		if (n <= 0 || !BOOK_SKUS[slug]) continue;
+		const t = bookTierFor(slug, n, destCode);
+		if (t.pct <= 0) continue;
+		bookPct[slug] = t.pct;
+		bookSaving += (EDITIONS[slug].retail - unitAfter(EDITIONS[slug].retail, t.pct)) * n;
+	}
+	const bookTiersWin =
+		bookSaving > 0 &&
+		bookSaving +
+			Object.entries(counts).reduce(
+				(s, [slug, n]) =>
+					s +
+					(BOOK_SKUS[slug]
+						? 0
+						: (EDITIONS[slug].retail - unitAfter(EDITIONS[slug].retail, tierPctNow)) * n),
+				0,
+			) >=
+			Math.round(
+				(Object.entries(counts).reduce((s, [slug, n]) => s + EDITIONS[slug].retail * n, 0) *
+					FIRST_ORDER_PCT) /
+					100,
+			);
+	if (discountable && validEmail && FIRST_ORDER_PCT > tierPctNow && !bookTiersWin) {
 		const m = marginCheck(lines, FIRST_ORDER_PCT, destCode, undefined, undefined, true);
 		if (!m.ok) {
 			console.log(`margin-guard: dropped ${FIRST_ORDER_CODE}: ${m.reason}`);
@@ -1669,6 +1735,8 @@ export async function checkoutForm(
 			promo = await deps.firstOrderPromo();
 		}
 	}
+	// the first-order 15% won: no book tier on top of it (never both)
+	if (promo) for (const slug of Object.keys(bookPct)) delete bookPct[slug];
 	let pct = promo ? 0 : discountable ? tierPctNow : 0;
 	if (!promo && pct > 0) {
 		const m = marginCheck(lines, pct, destCode);
@@ -1784,7 +1852,22 @@ export async function checkoutForm(
 		'metadata[ladder_total]': total,
 		'metadata[pct_off]': promo ? FIRST_ORDER_PCT : pct,
 		'metadata[handling_cents]': handling.reduce((t, h) => t + h.fee * h.qty, 0),
-		'metadata[offer]': promo ? 'first_order' : pct > 0 ? 'volume' : 'none',
+		'metadata[offer]': promo
+			? 'first_order'
+			: pct > 0
+				? 'volume'
+				: Object.keys(bookPct).length
+					? 'book_bulk'
+					: 'none',
+		// which book lines took their own bulk tier, at what percent (absent when none did)
+		...(Object.keys(bookPct).length
+			? {
+					'metadata[book_bulk]': Object.entries(bookPct)
+						.map(([s, p]) => `${s}:${p}`)
+						.join(',')
+						.slice(0, 500),
+				}
+			: {}),
 		// Split under Stripe's 500-char value cap (an 82-SKU cart was one 1,138-char value: 502).
 		...packBreakdown(counts),
 		// FHB-BOOKS (Kevin 2026-11-13): every BOOK sale carries title / ISBN / format / country / date / net
@@ -1796,6 +1879,7 @@ export async function checkoutForm(
 			unitPctFinal,
 			undefined,
 			Boolean(promo),
+			bookPct,
 		),
 	};
 	// 3ee-1: Bible lines carry the same sale fields, packed into whatever keys Stripe's 50-key limit leaves.
@@ -1817,7 +1901,9 @@ export async function checkoutForm(
 	for (const [slug, qty] of Object.entries(counts)) {
 		if (qty <= 0) continue;
 		const e = EDITIONS[slug];
-		const unit = paidUnit(slug, e.retail, unitPctFinal, Boolean(promo));
+		const unit = bookPct[slug]
+			? unitAfter(e.retail, bookPct[slug])
+			: paidUnit(slug, e.retail, unitPctFinal, Boolean(promo));
 		form[`line_items[${li}][quantity]`] = qty;
 		form[`line_items[${li}][price_data][currency]`] = 'usd';
 		form[`line_items[${li}][price_data][unit_amount]`] = unit;
@@ -1825,7 +1911,7 @@ export async function checkoutForm(
 		form[`line_items[${li}][price_data][product_data][name]`] =
 			e.name ?? `Father’s Heart Bible™ — ${e.title}`;
 		form[`line_items[${li}][price_data][product_data][description]`] =
-			e.desc ??
+			(e.desc && bookPct[slug] ? `${e.desc} · ${bookPct[slug]}% bulk discount` : e.desc) ??
 			(perUnitPromo && promo
 				? `Divine Voice Color · Complete Bible · ${FIRST_ORDER_PCT}% off your first order · free shipping`
 				: pct > 0
