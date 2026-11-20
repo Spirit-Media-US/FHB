@@ -66,6 +66,8 @@ test('item 9: buyer emails Reply-To hello@; Kevin’s notification unchanged (hi
 	assert.equal(r.kevin['h:Reply-To'], 'buyer@test');
 	assert.match(r.kevin.subject, /^📚 Print order — 2 copies · \$31\.98$/);
 	assert.ok(r.kevin.text.startsWith('New print order — Father\'s Heart Bible'));
+	const smp = await confirm({ site: 'vaneure', window: 'smp', family: 'book' });
+	assert.ok(smp.kevin.text.startsWith('New print order — Spirit Media Publishing'), 'an SMP-window order (RIAB) is headed SMP, not FHB');
 	const e = await confirm({ site: 'fhb', window: 'fhb', family: 'bible_ebook' }, { kind: 'ebook_direct', amount: 749 });
 	assert.equal(e.buyer['h:Reply-To'], 'hello@spiritmediapublishing.com');
 	assert.equal(e.buyer.subject, 'Your Father’s Heart Bible eBook');

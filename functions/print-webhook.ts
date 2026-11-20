@@ -380,8 +380,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		return retry();
 	}
 
+	// Heading names the shop window the order came from (pmseoaeo 11-20: SMP/RIAB orders were headed FHB).
 	const text =
-		`New print order — Father's Heart Bible\n\n` +
+		`New print order — ${buyerBrand(m, amount).window === 'smp' ? 'Spirit Media Publishing' : "Father's Heart Bible"}\n\n` +
 		`Total: ${amount} (incl. tax ${tax})\n` +
 		`Copies: ${m.total ?? '?'}  ·  Discount: ${m.pct_off ?? '?'}% off${m.offer === 'first_order' ? ' (first order, WELCOME15)' : m.offer === 'volume' ? ' (volume)' : ''}\n` +
 		`Editions:\n${fmtOrder(readBreakdown(m))}\n` +
