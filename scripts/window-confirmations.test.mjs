@@ -38,17 +38,20 @@ export async function confirm(metadata, { email = 'buyer@test', amount = 3198, k
 	}
 }
 
-test('item 8: FH window -> Father’s Heart Bible subject + sign-off; SMP window -> Spirit Media Publishing', async () => {
+// ONE STORE (Kevin 2026-11-20 ~16:07Z "the store is NOW Spirit Media Publishing whether it is FHB or not"): every buyer
+// confirmation, from either shop window, is "Your Spirit Media Publishing order" with no window line; product names stay.
+test('one store: FHB-window AND SMP-window orders both -> Spirit Media Publishing subject, no window line', async () => {
 	const fhb = await confirm({ site: 'fhb', window: 'fhb', family: 'bible' });
 	assert.equal(fhb.status, 200);
-	assert.equal(fhb.buyer.subject, 'Your Father’s Heart Bible order — $31.98');
-	assert.ok(fhb.buyer.text.endsWith(`\n\nFather’s Heart Bible · Spirit Media Publishing\n\n${SIGNATURE}\n`));
 	const smp = await confirm({ site: 'smp', window: 'smp', family: 'smp_book' });
-	assert.equal(smp.buyer.subject, 'Your Spirit Media Publishing order — $31.98');
-	// SMP window: NO window line, the address signature follows the body directly (Kevin 15:42Z)
-	assert.ok(smp.buyer.text.endsWith(`straight to us — please include your order reference above.\n\n${SIGNATURE}\n`));
-	// body unchanged: only the sign-off line differs between the two windows
-	assert.equal(fhb.buyer.text.replace(`Father’s Heart Bible · Spirit Media Publishing\n\n${SIGNATURE}\n`, ''), smp.buyer.text.replace(`${SIGNATURE}\n`, ''));
+	const riab = await confirm({}, {}); // an untagged session (the RIAB case that read FHB)
+	for (const r of [fhb, smp, riab]) {
+		assert.equal(r.buyer.subject, 'Your Spirit Media Publishing order — $31.98');
+		assert.ok(r.buyer.text.endsWith(`straight to us — please include your order reference above.\n\n${SIGNATURE}\n`), 'no window line');
+		assert.doesNotMatch(`${r.buyer.subject}\n${r.buyer.text.split('What you ordered:')[0]}`, /Father.s Heart Bible/, 'FHB never named as the seller');
+		assert.doesNotMatch(r.buyer.text, /Father’s Heart Bible · Spirit Media Publishing/);
+	}
+	assert.equal(fhb.buyer.text, smp.buyer.text, 'same body from both windows');
 	if (process.env.SHOW_MESSAGE) for (const m of [fhb.buyer, smp.buyer]) console.log(`\n--- ${m.subject} ---\n${m.text}`);
 });
 
@@ -65,11 +68,14 @@ test('item 9: buyer emails Reply-To hello@; Kevin’s notification unchanged (hi
 	assert.equal(r.buyer['h:Reply-To'], 'hello@spiritmediapublishing.com');
 	assert.equal(r.kevin['h:Reply-To'], 'buyer@test');
 	assert.match(r.kevin.subject, /^📚 Print order — 2 copies · \$31\.98$/);
-	assert.ok(r.kevin.text.startsWith('New print order — Father\'s Heart Bible'));
+	assert.ok(r.kevin.text.startsWith('New print order — Spirit Media Publishing\n\nShop window: fathersheartbible.com\n'), 'FHB-window order: one store heading');
+	const smp = await confirm({ site: 'vaneure', window: 'smp', family: 'book' });
+	assert.ok(smp.kevin.text.startsWith('New print order — Spirit Media Publishing\n\nShop window: spiritmediapublishing.com\n'), 'an SMP-window order (RIAB) is headed SMP, not FHB');
+	assert.doesNotMatch(`${r.kevin.text}${smp.kevin.text}`.split('Editions:')[0], /Father.s Heart Bible/, 'notice heading never names FHB as the store');
 	const e = await confirm({ site: 'fhb', window: 'fhb', family: 'bible_ebook' }, { kind: 'ebook_direct', amount: 749 });
 	assert.equal(e.buyer['h:Reply-To'], 'hello@spiritmediapublishing.com');
-	assert.equal(e.buyer.subject, 'Your Father’s Heart Bible eBook');
-	assert.ok(e.buyer.text.endsWith(`\n\nFather’s Heart Bible · Spirit Media Publishing\n\n${SIGNATURE}\n`));
+	assert.equal(e.buyer.subject, 'Your eBook — Father’s Heart Bible', 'product named, not the store');
+	assert.ok(e.buyer.text.endsWith(`Trouble opening it? Just reply to this email.\n\n${SIGNATURE}\n`), 'no FHB window line');
 	assert.equal(e.kevin['h:Reply-To'], 'buyer@test');
 });
 
@@ -121,13 +127,18 @@ test('item 10: every order email is From "SMP Orders"; every buyer email ends wi
 });
 
 // ---- Kevin 2026-11-16 15:42Z "we do not need: Spirit Media Publishing · spiritmediapublishing.com above the signature"
-test('SMP-window emails carry NO window line above the signature; FHB-window emails keep theirs', async () => {
-	const smp = await confirm({ site: 'smp', window: 'smp', family: 'smp_book' });
-	const fhb = await confirm({ site: 'fhb', window: 'fhb', family: 'bible' });
-	assert.doesNotMatch(smp.buyer.text, /Spirit Media Publishing · spiritmediapublishing\.com/, 'SMP: no window line');
-	assert.equal(smp.buyer.text.split('Spirit Media Publishing\n205 S Academy').length, 2, 'SMP: the signature once');
-	assert.ok(fhb.buyer.text.endsWith(`\n\nFather’s Heart Bible · Spirit Media Publishing\n\n${SIGNATURE}\n`), 'FHB: keeps its line');
+test('NO window line above the signature on ANY buyer email (both windows, print and eBook)', async () => {
+	const all = [
+		await confirm({ site: 'smp', window: 'smp', family: 'smp_book' }),
+		await confirm({ site: 'fhb', window: 'fhb', family: 'bible' }),
+		await confirm({ site: 'fhb', window: 'fhb', family: 'bible_ebook' }, { kind: 'ebook_direct', amount: 749 }),
+	];
+	for (const r of all) {
+		assert.doesNotMatch(r.buyer.text, /Spirit Media Publishing · spiritmediapublishing\.com|Father’s Heart Bible · Spirit Media Publishing/, `${r.buyer.subject}: no window line`);
+		assert.equal(r.buyer.text.split('Spirit Media Publishing\n205 S Academy').length, 2, `${r.buyer.subject}: the signature once`);
+	}
 	assert.equal(buyerBrand({ window: 'smp' }, '$1').signoff, '');
+	assert.equal(buyerBrand({ window: 'fhb' }, '$1').signoff, '');
 });
 
 // ── DIRECT EBOOK SALES (Kevin 2026-11-16 "We point to our own ebook sales") ──────────────────────────────────────────
