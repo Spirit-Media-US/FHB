@@ -4,6 +4,7 @@ import path from 'node:path';
 import EditionOrder from '../../components/EditionOrder.astro';
 import LangCover from '../../components/LangCover.astro';
 import LookInside from '../../components/LookInside.astro';
+import MailtoLink from '../../components/MailtoLink.astro';
 import Section from '../../components/Section.astro';
 import { cardUrl, hasLangCard } from '../../data/card-art';
 import coverColors from '../../data/cover-colors.json';
@@ -216,7 +217,8 @@ const orderIds = langEd
 // No ISBN yet = nothing the checkout can sell: an empty order set, by declaration, not by accident.
 const reserveOnly = ed.orderable === false;
 const orderRows = reserveOnly ? [] : catalogRows.filter((r) => orderIds.includes(r.id));
-const RESERVE_MAIL = `mailto:hello@spiritmediapublishing.com?subject=${encodeURIComponent(`Reserve: ${ed.english ?? ed.name} Father's Heart Bible`)}`;
+// Kevin 2026-11-20 RULE: no address in the page source — MailtoLink builds the mailto: at load.
+const RESERVE_SUBJECT = `Reserve: ${ed.english ?? ed.name} Father's Heart Bible`;
 if (!orderRows.length && !reserveOnly)
 	throw new Error(
 		`/bibles/${ed.slug}-bible/: no print-catalog row for [${orderIds.join(', ')}] — this edition page would have no order form`,
@@ -757,7 +759,7 @@ const metaDescription =
 				<div id="order" class="max-w-3xl mx-auto rounded-2xl p-6 md:p-7 mt-10 text-center" style="background: #fff; border: 1px solid var(--color-hairline); scroll-margin-top: 90px;">
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.5rem;">Order the {ed.english} Edition direct</h2>
 					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.6; margin: 0 0 1.1rem;">This edition is in preparation: its ISBN, page count and price are assigned when the book is typeset. Reserve a copy now and we will write to you the day it can be ordered, direct from us with free shipping.</p>
-					<a href={RESERVE_MAIL} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; padding: 0.75rem 1.6rem; text-decoration: none; font-size: 0.95rem;">Reserve a copy by email</a>
+					<MailtoLink email="hello@spiritmediapublishing.com" subject={RESERVE_SUBJECT} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; padding: 0.75rem 1.6rem; text-decoration: none; font-size: 0.95rem;">Reserve a copy by email</MailtoLink>
 				</div>
 			) : (
 				<EditionOrder offerLine={orderLang === 'en' || !orderLang ? `15% off first order + free standard shipping to ${LIVE_COUNTRIES.length} countries` : orderT('hero.freeShipValue')} titleStyle={coverTitle ? titleStyle : undefined} rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} lang={orderLang} note={preorder ? orderT('o.preorder') : undefined} />

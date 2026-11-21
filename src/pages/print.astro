@@ -4,6 +4,7 @@ import CatalogOrderForm from '../components/CatalogOrderForm.astro';
 import HearTheFather from '../components/HearTheFather.astro';
 import LangCover from '../components/LangCover.astro';
 import LookInside from '../components/LookInside.astro';
+import MailtoLink from '../components/MailtoLink.astro';
 import Section from '../components/Section.astro';
 import VideoHeroInner from '../components/VideoHeroInner.astro';
 import VoiceChips from '../components/VoiceChips.astro';
@@ -238,7 +239,9 @@ type DigitalLink = { store: string; url: string; price: string; label?: string }
 // Data-driven: the chain writes lookinside.json when a print artifact publishes, and the card
 // picks it up on the next build.
 const TRANSLATION_URL = '/the-fathers-heart-bible/translation-philosophy/';
-const CONTACT = 'mailto:hello@spiritmediapublishing.com?subject=Father%27s%20Heart%20Bible%20print';
+// Kevin 2026-11-20 RULE: no address in the page source. These FAQ links carry the address split; the
+// site MailtoLink script (on every page via the Layout footer) writes the mailto: href at load.
+const CONTACT_ATTRS = `href="#contact" data-mu="hello" data-md="spiritmediapublishing.com" data-ms="Father's Heart Bible print"`;
 // SCREEN divine-voice palette — the same values /read has always used, adopted here so a
 // visitor sees one red on the product page and on the reader. Print ink is unchanged:
 // the interiors keep 3563ae / f04933 / 91278f. Kevin approved screen-only, 2026-08-24.
@@ -304,7 +307,7 @@ const printFaq = [
 		// quoted in an earlier brief, found present, and read as confirmation. Matching the
 		// wrong authority returns a true answer to the wrong question. The task register
 		// carries the quote WITH its timestamp; that is the authority, not a brief.
-		a: `Yes. For orders placed directly with us, <a href="${CONTACT}" style="${LINK}">reach out</a> and we'll make it right. Our <a href="/returns/" style="${LINK}">return policy</a> covers 30 days from delivery. Copies bought from other retailers follow their return policy.`,
+		a: `Yes. For orders placed directly with us, <a ${CONTACT_ATTRS} style="${LINK}">reach out</a> and we'll make it right. Our <a href="/returns/" style="${LINK}">return policy</a> covers 30 days from delivery. Copies bought from other retailers follow their return policy.`,
 	},
 	{
 		q: 'How is Father’s Heart Bible™ different from other translations?',
@@ -312,7 +315,7 @@ const printFaq = [
 	},
 	{
 		q: 'How long does shipping take?',
-		a: `Order direct from us today and shipping is free — most orders arrive in 7–10 days, and larger bulk orders in 3–4 weeks. Ordering direct from us includes free shipping. <a href="${CONTACT}" style="${LINK}">Reach out</a> if you need them by a particular date.`,
+		a: `Order direct from us today and shipping is free — most orders arrive in 7–10 days, and larger bulk orders in 3–4 weeks. Ordering direct from us includes free shipping. <a ${CONTACT_ATTRS} style="${LINK}">Reach out</a> if you need them by a particular date.`,
 	},
 	// International answer exists ONLY when more than one country is live (src/data/ship-countries.json);
 	// at US-only it would claim shipping we do not do. Built from the list, never typed.
@@ -320,7 +323,7 @@ const printFaq = [
 		? [
 				{
 					q: 'Do you ship outside the United States?',
-					a: `Yes. ${shipsLine()} We currently ship to: ${shipsToList()}. Your delivery estimate and any shipping charge appear in checkout once you choose your country, and the delivery carrier may call the phone number you give at checkout, so please include your country code. <a href="${CONTACT}" style="${LINK}">Reach out</a> if your country is not listed.`,
+					a: `Yes. ${shipsLine()} We currently ship to: ${shipsToList()}. Your delivery estimate and any shipping charge appear in checkout once you choose your country, and the delivery carrier may call the phone number you give at checkout, so please include your country code. <a ${CONTACT_ATTRS} style="${LINK}">Reach out</a> if your country is not listed.`,
 				},
 			]
 		: []),
@@ -1054,7 +1057,7 @@ const bookPriceLine = (skus: string[]) =>
 					</div>
 				</section>
 			))}
-			<p data-lang-none hidden class="text-center" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; margin: 1rem auto 0; max-width: 36rem;">No language matches that yet. Every one of our 80 languages is on this page — try its English name or a country, or <a href={CONTACT} style={LINK}>ask us</a>.</p>
+			<p data-lang-none hidden class="text-center" style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.95rem; margin: 1rem auto 0; max-width: 36rem;">No language matches that yet. Every one of our 80 languages is on this page — try its English name or a country, or <MailtoLink email="hello@spiritmediapublishing.com" subject="Father's Heart Bible print" style={LINK}>ask us</MailtoLink>.</p>
 			<script>
 				// The language finder (Kevin 2026-10-29: "Use wisdom to help people find their language").
 				// Matches every word typed against each card's data-search (English name, the edition's

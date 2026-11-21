@@ -22,6 +22,7 @@ import { FIRST_ORDER_PCT } from '../lib/order-pricing';
 import { formatCount, ORDER_STRINGS, tr } from '../lib/orderStrings';
 import { LIVE_COUNTRIES, shipsLine, shipsParts, shipsToSentence } from '../lib/shipCountries';
 import BiblesBooksToggle from './BiblesBooksToggle.astro';
+import MailtoLink from './MailtoLink.astro';
 import OrderRow from './OrderRow.astro';
 import OrderSummary from './OrderSummary.astro';
 import ShipsDisclosure from './ShipsDisclosure.astro';
@@ -80,7 +81,7 @@ const config = JSON.stringify({
 				</section>
 			))}
 			<ShipsDisclosure cls="cat__more" full={`${shipsLine()} ${shipsToSentence()}`} summary={tr(ORDER_STRINGS.en, 'o.shipsSummary', { n: formatCount('en', LIVE_COUNTRIES.length) })} ships={JSON.stringify(shipsParts())} n={LIVE_COUNTRIES.length} />
-			<p class="cat__more"><span data-t="c.need500">Need 500 or more?</span> <a href="mailto:hello@spiritmediapublishing.com?subject=FHB%20bulk%20order%20(500%2B)" data-t="c.contact">Contact us</a>.</p>
+			<p class="cat__more"><span data-t="c.need500">Need 500 or more?</span> <MailtoLink email="hello@spiritmediapublishing.com" subject="FHB bulk order (500+)" data-t="c.contact">Contact us</MailtoLink>.</p>
 		</div>
 
 		<aside class="cat__aside" aria-label="Order summary" data-t-aria-label="c.summaryAria">

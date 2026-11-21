@@ -8,14 +8,15 @@
  * — most webmail users — where setting location to a mailto: is a no-op. A
  * customer reported "I clicked CONTACT and nothing happens" on 2026-09-03.
  *
- * Now: a real mailto: href (works with a mail client, and is right-click
- * copyable without one), plus a clipboard fallback that surfaces the address
- * inline when the mailto doesn't take the visitor anywhere.
+ * Now: a real mailto: href written at page load (works with a mail client, and
+ * is right-click copyable without one), plus a clipboard fallback that surfaces
+ * the address inline, after a click, when the mailto doesn't take the visitor anywhere.
  *
  * Usage:
  *   <MailtoLink email="info@spiritmedia.us" class="text-red hover:underline">
- *     info@spiritmedia.us
+ *     Email us
  *   </MailtoLink>
+ * The slot is WORDS, never the address (Kevin 2026-11-20).
  *
  * No default aria-label: the visible text names the link. A default "Email <address>" on a
  * link that READS "Contact" fails Lighthouse label-content-name-mismatch (voice users say
@@ -23,18 +24,27 @@
  */
 interface Props {
 	email: string;
+	subject?: string;
 	class?: string;
 	'aria-label'?: string;
 	[key: string]: any;
 }
 
-const { email, class: className, 'aria-label': ariaLabel, ...rest } = Astro.props;
+// Kevin 2026-11-20 RULE: "we DO NOT ever post emails directly on any of our websites ... I always says
+// mailto: link." The address must not sit in the built HTML (no text, no href="mailto:addr", no data
+// attribute holding it whole). It ships split (data-mu / data-md) and the script below writes the real
+// mailto: href once the page loads, so the link still works like a normal mailto: (and stays
+// right-click copyable) for every visitor. bin/no-visible-email-guard.py fails the deploy otherwise.
+const { email, subject, class: className, 'aria-label': ariaLabel, ...rest } = Astro.props;
+const [mu, md] = String(email).split('@');
 ---
 
 <a
-  href={`mailto:${email}`}
+  href="#contact"
   class={className}
-  data-mailto={email}
+  data-mu={mu}
+  data-md={md}
+  data-ms={subject}
   aria-label={ariaLabel}
   {...rest}
 ><slot /></a>
@@ -43,10 +53,10 @@ const { email, class: className, 'aria-label': ariaLabel, ...rest } = Astro.prop
   // Fallback: if the browser has no mail handler the click does nothing visible.
   // Detect that (the page is still here, unblurred, a moment later) and reveal
   // the address so the visitor can copy it instead of hitting a dead link.
-  document.querySelectorAll<HTMLAnchorElement>('a[data-mailto]').forEach((el) => {
+  document.querySelectorAll<HTMLAnchorElement>('a[data-mu][data-md]').forEach((el) => {
+    const addr = `${el.dataset.mu}@${el.dataset.md}`;
+    el.href = `mailto:${addr}${el.dataset.ms ? `?subject=${encodeURIComponent(el.dataset.ms)}` : ''}`;
     el.addEventListener('click', () => {
-      const addr = el.dataset.mailto;
-      if (!addr) return;
       let left = false;
       const mark = () => { left = true; };
       window.addEventListener('blur', mark, { once: true });
