@@ -9,6 +9,7 @@ import { cardUrl, hasLangCard } from '../../data/card-art';
 import coverColors from '../../data/cover-colors.json';
 import frontmatter from '../../data/editions/frontmatter.json';
 import shared from '../../data/editions/shared.json';
+import googleBooks from '../../data/google-books-listings.json';
 import isbnList from '../../data/isbn-list.json';
 import { langSlug, orderableLanguages } from '../../data/language-editions';
 import { catalogRows } from '../../data/print-catalog';
@@ -539,6 +540,13 @@ const variants = (preorder ? [] : orderRows).flatMap((r) => {
 		title: orderRows.length > 1 ? r.title : schemaName,
 	}));
 });
+// Google Books listing for a binding, by its ISBN-13 (unit 3kq). Id form only; empty when none is known.
+const gbUrlFor = (isbn?: string): string[] => {
+	const id = isbn
+		? (googleBooks.listings as Record<string, string>)[isbn.replace(/-/g, '')]
+		: undefined;
+	return id ? [`https://books.google.com/books?id=${id}`] : [];
+};
 const offerFor = (v: (typeof variants)[number]) => ({
 	'@type': 'Offer',
 	price: v.price.toFixed(2),
@@ -598,9 +606,15 @@ const productSchema = {
 	image: coverImageObject,
 	url,
 	// The same edition on YouVersion, when fhb-partner-link-watch has FOUND it (one map, one line per language).
-	...(ed.lang && (youversion.versions as Record<string, string>)[ed.lang]
-		? { sameAs: [(youversion.versions as Record<string, string>)[ed.lang]] }
-		: {}),
+	...(() => {
+		const same = [
+			...(ed.lang && (youversion.versions as Record<string, string>)[ed.lang]
+				? [(youversion.versions as Record<string, string>)[ed.lang]]
+				: []),
+			...gbUrlFor(mainVariant?.isbn ?? ed.isbn),
+		];
+		return same.length ? { sameAs: same } : {};
+	})(),
 	publisher: {
 		'@type': 'Organization',
 		'@id': 'https://spiritmediapublishing.com/#organization',
@@ -634,6 +648,7 @@ const productSchema = {
 		image: coverImageObject,
 		inLanguage: nativeMeta ? inLang : (ed.lang ?? 'en'),
 		brand: { '@type': 'Brand', name: "Father's Heart Bible" },
+		...(gbUrlFor(v.isbn).length ? { sameAs: gbUrlFor(v.isbn) } : {}),
 		offers: offerFor(v),
 	})),
 };
