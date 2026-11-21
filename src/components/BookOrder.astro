@@ -29,6 +29,9 @@ interface Props {
 	firstOrder: boolean;
 	firstOrderPct: number;
 	returnDays: number;
+	/** the book's eBook on sale from the ONE store today (engine ebookForBook), or undefined: one more row beside print,
+	 *  chosen INSTEAD of print (an eBook checks out alone), the same row as the SMP book page (Kevin 2026-11-16). */
+	ebook?: { sku: string; list_cents: number };
 }
 const {
 	slug,
@@ -40,6 +43,7 @@ const {
 	firstOrder,
 	firstOrderPct,
 	returnDays,
+	ebook,
 } = Astro.props;
 const money = (c: number) => `$${(c / 100).toFixed(2)}`;
 const n = countries.length;
@@ -74,7 +78,7 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 		</ul>
 	)}
 </div>
-<form id="order" class="bo-wrap" data-box data-slug={slug} data-status="live" data-fees={feeCfg} data-first={firstOrder ? firstOrderPct : 0}>
+<form id="order" class="bo-wrap" data-box data-slug={slug} data-status="live" data-fees={feeCfg} data-first={firstOrder ? firstOrderPct : 0} data-ebook={ebook?.sku}>
 	<div class="bo-acc">
 		<details class="bo-acc__item">
 			<summary data-choice>{shipLine}</summary>
@@ -119,6 +123,21 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 					</div>
 				</div>
 			))}
+			{ebook && (
+				<div class="bo-row bo-row--ebook" data-line-sku={ebook.sku}>
+					<div class="bo-row__info">
+						<span class="bo-row__binding">eBook</span>
+						<b class="bo-row__list">{money(ebook.list_cents)}</b>
+						{firstOrderPct > 0 && <span class="bo-row__first">{money(firstUnit(ebook.list_cents))} on your first order</span>}
+						<span class="bo-row__note">Instant download · DRM-free EPUB</span>
+					</div>
+					<div class="bo-qty">
+						<button type="button" class="bo-step" data-step="-1" data-sku={ebook.sku} aria-label="One fewer eBook">−</button>
+						<input class="bo-qty__in" type="number" inputmode="numeric" name={ebook.sku} min="0" max="1" value="0" data-ebook-in aria-label="eBook quantity" />
+						<button type="button" class="bo-step" data-step="1" data-sku={ebook.sku} aria-label="One more eBook">+</button>
+					</div>
+				</div>
+			)}
 		</div>
 		<div class="bo-panel">
 			<ul class="bo-items" data-items></ul>
@@ -126,17 +145,19 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 				<div data-fee-line hidden><dt>Shipping &amp; handling</dt><dd data-fee>$0.00</dd></div>
 				<div class="bo-total"><dt>Total</dt><dd data-total aria-live="polite">{money(formats[0]?.list_cents ?? 0)}</dd></div>
 			</dl>
-			{firstOrder && <p class="bo-first" data-first-save hidden></p>}
+			{(firstOrder || ebook) && <p class="bo-first" data-first-save hidden></p>}
+			<div data-ship>
 			<label class="bo-label" for={`bo-${slug}-country`}>Ship to</label>
 			<select id={`bo-${slug}-country`} name="country" class="bo-select" autocomplete="country">
 				{countries.map((c) => <option value={c.code} selected={c.code === 'US'}>{c.name}</option>)}
 			</select>
+			</div>
 			{/* a first order can only be recognised by its email (the engine's isFirstOrder): the FHB edition box asks the same way */}
 			<label class="bo-label" for={`bo-${slug}-email`}>Email</label>
-			{firstOrder && <p class="bo-hint" id={`bo-${slug}-email-hint`}>For your receipt, and to check your first-order saving.</p>}
-			<input id={`bo-${slug}-email`} class="bo-select" type="email" name="email" autocomplete="email" inputmode="email" required aria-describedby={firstOrder ? `bo-${slug}-email-hint` : undefined} data-email />
+			{(firstOrder || ebook) && <p class="bo-hint" id={`bo-${slug}-email-hint`}>For your receipt, and to check your first-order saving.</p>}
+			<input id={`bo-${slug}-email`} class="bo-select" type="email" name="email" autocomplete="email" inputmode="email" required aria-describedby={firstOrder || ebook ? `bo-${slug}-email-hint` : undefined} data-email />
 		</div>
-		<p class="bo-note">Free standard shipping · tax calculated at checkout</p>
+		<p class="bo-note" data-note data-print-note="Free standard shipping · tax calculated at checkout" data-ebook-note="Instant download after checkout · tax calculated at checkout">Free standard shipping · tax calculated at checkout</p>
 		<button type="submit" class="bo-checkout">Checkout →</button>
 		<p id="buy-msg" class="bo-msg" role="status"></p>
 		<p class="bo-help"><MailtoLink email="hello@spiritmediapublishing.com" class="bo-help-btn">Contact us</MailtoLink></p>
@@ -183,6 +204,7 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 	.bo-row__binding { font-size: 0.95rem; font-weight: 600; }
 	.bo-row__list { font-size: 1.05rem; font-weight: 800; color: var(--color-ink); }
 	.bo-row__first { color: #9d174d; font-size: 0.8rem; font-weight: 600; }
+	.bo-row__note { color: #57534e; font-size: 0.78rem; }
 	.bo-qty { display: inline-flex; flex: none; align-items: center; gap: 0.35rem; }
 	.bo-step { width: 44px; height: 44px; border: 1.5px solid #d9d0c4; border-radius: 999px; background: #fff; color: var(--color-ink); font-size: 1.2rem; line-height: 1; cursor: pointer; }
 	.bo-qty__in { width: 2.75rem; min-height: 44px; background: #fff; border: 1.5px solid #d9d0c4; border-radius: 0.6rem; font: inherit; font-size: 1rem; text-align: center; -moz-appearance: textfield; }
@@ -227,11 +249,19 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 			list: Record<string, number>;
 			fee: Record<string, Record<string, number>>;
 		};
-		const pct = Number(form.dataset.first || 0);
+		// an eBook row counts the first-order 15% too (the engine applies it to eBooks)
+		const pct = Number(form.dataset.first || 0) || (form.dataset.ebook ? 15 : 0);
+		const ebookIn = form.querySelector<HTMLInputElement>('[data-ebook-in]');
 		const cents = (c: number) => `$${(c / 100).toFixed(2)}`;
 		const sel = form.querySelector('select[name=country]') as HTMLSelectElement;
 		const inputs = [...form.querySelectorAll<HTMLInputElement>('input[type=number]')];
-		const qty = (i: HTMLInputElement) => Math.max(0, Math.min(999, Math.floor(Number(i.value) || 0)));
+		const qty = (i: HTMLInputElement) =>
+			Math.max(0, Math.min(i === ebookIn ? 1 : 999, Math.floor(Number(i.value) || 0)));
+		// An eBook checks out on its own (nothing ships): choosing it clears print, choosing print clears it.
+		const exclusive = (changed: HTMLInputElement) => {
+			if (!ebookIn || qty(changed) < 1) return;
+			for (const i of inputs) if ((changed === ebookIn) !== (i === ebookIn)) i.value = '0';
+		};
 		const label = (i: HTMLInputElement) =>
 			(i.closest('.bo-row')?.querySelector('.bo-row__binding')?.textContent ?? i.name).trim();
 		const render = () => {
@@ -256,6 +286,11 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 			(form.querySelector('[data-fee]') as HTMLElement).textContent = cents(fees);
 			(form.querySelector('[data-fee-line]') as HTMLElement).hidden = fees <= 0;
 			(form.querySelector('[data-total]') as HTMLElement).textContent = cents(sub + fees);
+			const eb = Boolean(ebookIn && qty(ebookIn) > 0);
+			const ship = form.querySelector<HTMLElement>('[data-ship]');
+			if (ship) ship.hidden = eb;
+			const note = form.querySelector<HTMLElement>('[data-note]');
+			if (note && ebookIn) note.textContent = (eb ? note.dataset.ebookNote : note.dataset.printNote) ?? '';
 			const save = form.querySelector<HTMLElement>('[data-first-save]');
 			if (save) {
 				const off = sub - Math.round((sub * (100 - pct)) / 100);
@@ -267,11 +302,15 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 			b.addEventListener('click', () => {
 				const i = form.querySelector<HTMLInputElement>(`input[name="${b.dataset.sku}"]`);
 				if (!i) return;
-				i.value = String(Math.max(0, Math.min(999, qty(i) + Number(b.dataset.step))));
+				i.value = String(Math.max(0, Math.min(i === ebookIn ? 1 : 999, qty(i) + Number(b.dataset.step))));
+				exclusive(i);
 				render();
 			});
 		}
-		form.addEventListener('input', render);
+		form.addEventListener('input', (ev) => {
+			if (ev.target instanceof HTMLInputElement && inputs.includes(ev.target)) exclusive(ev.target);
+			render();
+		});
 		sel.addEventListener('change', render);
 		render();
 		form.addEventListener('submit', async (ev) => {

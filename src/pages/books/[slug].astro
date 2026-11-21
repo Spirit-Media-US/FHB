@@ -31,6 +31,7 @@ import {
 import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
 import { FIRST_ORDER_PCT, isDiscountExempt } from '../../lib/order-pricing';
 import { LIVE_COUNTRIES } from '../../lib/shipCountries';
+import { EBOOK_SKUS, ebookForBook } from '../../lib/storeEngine';
 
 type Format = {
 	sku: string;
@@ -260,8 +261,17 @@ const headshot = ax.headshot
 const countries = formats[0].dests
 	.filter((d) => formats.every((f) => f.dests.some((x) => x.code === d.code)))
 	.map((d) => ({ code: d.code, name: d.name }));
+// EBOOKS (Kevin 2026-11-16 "We point to our own ebook sales"; "1 store SMP. 2 shop windows FHB and SMP"): the book's eBook
+// when the ONE store sells it today (engine ebookForBook: a current EPUB, no active KDP Select term) is one more row in the
+// order box, the same row as the SMP book page. 2026-11-21: Karen Hailstones' Who Am I? eBook had no page selling it
+// (Kevin 2026-11-20 "Do NOT remove any book!").
+const ebookSku = ebookForBook(book.slug);
+const ebook = ebookSku ? { sku: ebookSku, list_cents: EBOOK_SKUS[ebookSku].listCents } : undefined;
 const feeCfg = JSON.stringify({
-	list: Object.fromEntries(formats.map((f) => [f.sku, f.list_cents])),
+	list: Object.fromEntries([
+		...formats.map((f) => [f.sku, f.list_cents]),
+		...(ebook ? [[ebook.sku, ebook.list_cents]] : []),
+	]),
 	fee: Object.fromEntries(
 		countries
 			.filter((c) => c.code !== 'US')
@@ -344,7 +354,7 @@ const faqLd = faq.length
 			// THE ORDER AREA (the same as the SMP book page and the FHB edition box): offer line, country marquee, the box,
 			// Keep shopping. It orders on the SMP store (contract 3fe).
 			<section class="bk-order" aria-label={`Order ${book.title}`}>
-				<BookOrder slug={book.slug} title={book.title} titleStyle={titleStyle} formats={formats.map((f) => ({ sku: f.sku, format: f.format, list_cents: f.list_cents }))} countries={countries} feeCfg={feeCfg} firstOrder={firstOrder} firstOrderPct={FIRST_ORDER_PCT} returnDays={RETURN_DAYS} />
+				<BookOrder slug={book.slug} title={book.title} titleStyle={titleStyle} formats={formats.map((f) => ({ sku: f.sku, format: f.format, list_cents: f.list_cents }))} countries={countries} feeCfg={feeCfg} firstOrder={firstOrder} firstOrderPct={FIRST_ORDER_PCT} returnDays={RETURN_DAYS} ebook={ebook} />
 			</section>
 		) : (
 			<section class="bk-order">
