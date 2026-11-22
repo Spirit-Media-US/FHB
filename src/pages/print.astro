@@ -42,6 +42,7 @@ import {
 	shipsLine,
 	shipsToList,
 } from '../lib/shipCountries';
+import { tblBook } from '../lib/tbl.mjs';
 
 // THE DIVINE VOICE™ COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
 // edition. Every subtitle in the trade metadata ends with the same tail ("Red Letter -
@@ -762,7 +763,8 @@ const bookPriceLine = (skus: string[]) =>
 								<div class="flex flex-wrap justify-center gap-2 w-full">
 								<BuyControls compact showDirect={false} stores={[
 									...digitalEn.ebook.map((d) => ({ logo: storeLogo(d.store), label: 'eBook', price: d.price, href: d.url })),
-									{ label: 'Buy Direct', price: EBOOK_DIRECT, ebookDirect: true },
+									// TBL switch-over (src/lib/tbl.mjs): Buy Direct opens the TBL eBook page; switch off = the direct checkout
+									tblBook('bible-ebook') ? { label: 'Buy Direct', price: EBOOK_DIRECT, href: tblBook('bible-ebook') as string } : { label: 'Buy Direct', price: EBOOK_DIRECT, ebookDirect: true },
 								]} />
 								</div>
 								<p data-ebook-msg style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.4rem 0 0; display: none;"></p>

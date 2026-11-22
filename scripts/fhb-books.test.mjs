@@ -13,6 +13,7 @@
 import surface from '../src/data/books-surface.json' with { type: 'json' };
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { TBL_ORIGIN, tblBook } from '../src/lib/tbl.mjs';
 import test from 'node:test';
 import {
 	bibleSaleMetadata,
@@ -302,6 +303,13 @@ test('every live book page has its order form ON the page: per-format price line
 	// The RIAB-standard order area (Kevin 2026-11-14 "This is the standard"; the SMP book page's box in FHB colours).
 	for (const slug of ['beloved-identity', 'who-am-i'].filter((x) => surface.live || surface.liveSlugs.includes(x))) {
 		const html = fs.readFileSync(new URL(`../dist/books/${slug}/index.html`, import.meta.url), 'utf8');
+		// TBL switch-over (src/lib/tbl.mjs): a book with a TBL page is bought there: ONE same-tab "Buy now", no form
+		if (tblBook(slug)) {
+			assert.ok(html.includes(`<a class="bi__buy" href="${tblBook(slug)}" data-tbl`), `${slug}: Buy now -> ${tblBook(slug)}`);
+			assert.doesNotMatch(html, /<form id="order"/, `${slug}: no SMP order form beside the TBL link`);
+			assert.doesNotMatch(html, new RegExp(`href="${TBL_ORIGIN}[^"]*"[^>]*target="_blank"`), `${slug}: TBL in the same tab`);
+			continue;
+		}
 		assert.match(html, /<form id="order"[^>]*data-slug="[a-z0-9-]+"[^>]*data-status="live"/, `${slug}: order form on the page`);
 		const skus = [...html.matchAll(/class="bo-qty__in"[^>]*name="([a-z0-9-]+)"/g)].map((m) => m[1]);
 		assert.ok(skus.length >= 1, `${slug}: a quantity per format`);
@@ -541,4 +549,16 @@ test('og size INJECTED: missing tags and a wrong size are both rejected', { skip
 	const wrong = html.replace(/(<meta property="og:image:height" content=")\d+/, '$1600');
 	assert.ok(ogDimErrs(s, wrong, size).some((x) => x.includes('og says')), 'a wrong height must fail');
 	assert.equal(imageSize(Buffer.from('not an image')), null);
+});
+
+// TBL switch-over (src/lib/tbl.mjs; CONTRACT v2 decision 61): the /print eBook "Buy Direct" opens the TBL eBook page in
+// the same tab; switch off = the direct-checkout button as before.
+test('TBL switch-over: /print eBook Buy Direct -> the TBL eBook page (same tab), else the direct checkout', () => {
+	const html = fs.readFileSync(new URL('../dist/print/index.html', import.meta.url), 'utf8');
+	const box = html.slice(html.indexOf('id="ebook"'), html.indexOf('data-ebook-msg'));
+	if (tblBook('bible-ebook')) {
+		assert.match(box, new RegExp(`<a href="${tblBook('bible-ebook')}"[^>]*data-tbl`), 'Buy Direct links TBL');
+		assert.doesNotMatch(box, /data-ebook-buy/, 'no checkout button beside it');
+		assert.doesNotMatch(box, new RegExp(`href="${TBL_ORIGIN}[^"]*"[^>]*target="_blank"`), 'same tab');
+	} else assert.match(box, /data-ebook-buy/, 'switch off: the direct checkout');
 });
