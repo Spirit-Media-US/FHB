@@ -18,7 +18,9 @@ export const TBL_HOST = new URL(TBL_ORIGIN).host;
 export const TBL_BOOKS = {
 	'who-am-i': 'who-am-i',
 	'beloved-identity': 'beloved-identity',
-	'bible-ebook': 'fathers-heart-bible-ebook',
+	// 'bible-ebook' deliberately NOT mapped (lane C 2026-11-22): the FHB eBook is not in the store engine's eBook SKUs, so
+	// TBL cannot sell it yet and its TBL page Buy points back to /print — mapping it now would loop the buyer. Add
+	// 'bible-ebook': 'fathers-heart-bible-ebook' once TBL sells it (engine EBOOK_SKUS entry in SMP src/store-engine).
 };
 /** the TBL book page for an FHB product, or null (switch off / no TBL page) */
 export const tblBook = (product) =>
