@@ -10,13 +10,14 @@ const day = (s) => {
 	return m && !Number.isNaN(Date.parse(m[1])) ? m[1] : undefined;
 };
 
-// A chapter's change date = the LATEST of updatedAt (translation pipeline) and lockedAt (the lock).
+// A chapter's change date = the LATEST of updatedAt (translation pipeline), lockedAt (the lock) and
+// wordingModifiedAt (3jb: English chapters, day of the last real WORDING change from tools-api git).
 // This is the SAME rule the page's JSON-LD dateModified uses (community src/lib/fhb-org.ts
 // chapterDateModified, unit 2gh). The sitemap read updatedAt alone, so all 1,189 English chapters
 // (locked 2026-08-04, updatedAt June) advertised June while the page said 08-04.
 export function chapterLastmod(ch) {
 	if (!ch || typeof ch !== 'object') return undefined;
-	const days = [day(ch.updatedAt), day(ch.lockedAt)].filter(Boolean);
+	const days = [day(ch.updatedAt), day(ch.lockedAt), day(ch.wordingModifiedAt)].filter(Boolean);
 	return days.length ? days.sort().at(-1) : undefined;
 }
 

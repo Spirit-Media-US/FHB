@@ -12,6 +12,13 @@ test('chapter lastmod = latest of updatedAt and lockedAt (same rule as page date
 	assert.equal(chapterLastmod({ updatedAt: '2026-10-29', lockedAt: '2026-08-04' }), '2026-10-29');
 });
 
+test('3jc: wordingModifiedAt (3jb English wording-change date) counts, latest of the three wins', () => {
+	assert.equal(chapterLastmod({ updatedAt: '2026-06-09T14:41:10+00:00', lockedAt: '2026-08-04T17:10:03+00:00', wordingModifiedAt: '2026-09-08' }), '2026-09-08');
+	assert.equal(chapterLastmod({ lockedAt: '2026-08-04', wordingModifiedAt: '2026-10-17' }), '2026-10-17');
+	assert.equal(chapterLastmod({ lockedAt: '2026-08-04', wordingModifiedAt: '2026-08-04' }), '2026-08-04');
+	assert.equal(chapterLastmod({ lockedAt: '2026-08-04', wordingModifiedAt: 'garbage' }), '2026-08-04');
+});
+
 test('FAILURE PATH: no real stamp means NO lastmod (never invented, never today)', () => {
 	assert.equal(chapterLastmod({}), undefined);
 	assert.equal(chapterLastmod(null), undefined);
