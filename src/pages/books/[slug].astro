@@ -1,4 +1,5 @@
 ---
+import AuthorLinks from '../../components/AuthorLinks.astro';
 import BiblesBooksToggle from '../../components/BiblesBooksToggle.astro';
 import BookMirror from '../../components/BookMirror.astro';
 import BookOrder from '../../components/BookOrder.astro';
@@ -19,6 +20,8 @@ import catalog from '../../data/books.json';
 import booksSurface from '../../data/books-surface.json';
 import lookinside from '../../data/lookinside.json';
 import Layout from '../../layouts/Layout.astro';
+import { authorLd } from '../../lib/author-sites.mjs';
+import { heroSizes, heroSrcset, heroStyle } from '../../lib/cover-hero.mjs';
 import {
 	handlingFeeCents,
 	handlingLabel,
@@ -28,6 +31,7 @@ import {
 import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
 import { FIRST_ORDER_PCT, isDiscountExempt } from '../../lib/order-pricing';
 import { LIVE_COUNTRIES } from '../../lib/shipCountries';
+import { EBOOK_SKUS, ebookForBook } from '../../lib/storeEngine';
 
 type Format = {
 	sku: string;
@@ -161,6 +165,8 @@ const jsonLd = [
 			'@type': 'Person',
 			name: book.author.name,
 			...(book.author.url ? { url: book.author.url } : {}),
+			// url + sameAs = the author's CERTAIN sites (src/data/author-sites.json), the same set the bio's link row shows.
+			...authorLd(book.author.name),
 		},
 		publisher: {
 			'@type': 'Organization',
@@ -235,6 +241,7 @@ const hero = ax.hero3d
 	? {
 			src: ax.hero3d.w600,
 			w300: ax.hero3d.w300,
+			w1200: ax.hero3d.w1200, // the 1200 file of the 3D render, when one exists
 			w: ax.hero3d.width,
 			h: ax.hero3d.height,
 			is3d: true,
@@ -242,6 +249,7 @@ const hero = ax.hero3d
 	: {
 			src: book.cover.w600,
 			w300: book.cover.w300,
+			w1200: book.cover.w1200,
 			w: book.cover.width,
 			h: book.cover.height,
 			is3d: false,
@@ -253,8 +261,17 @@ const headshot = ax.headshot
 const countries = formats[0].dests
 	.filter((d) => formats.every((f) => f.dests.some((x) => x.code === d.code)))
 	.map((d) => ({ code: d.code, name: d.name }));
+// EBOOKS (Kevin 2026-11-16 "We point to our own ebook sales"; "1 store SMP. 2 shop windows FHB and SMP"): the book's eBook
+// when the ONE store sells it today (engine ebookForBook: a current EPUB, no active KDP Select term) is one more row in the
+// order box, the same row as the SMP book page. 2026-11-21: Karen Hailstones' Who Am I? eBook had no page selling it
+// (Kevin 2026-11-20 "Do NOT remove any book!").
+const ebookSku = ebookForBook(book.slug);
+const ebook = ebookSku ? { sku: ebookSku, list_cents: EBOOK_SKUS[ebookSku].listCents } : undefined;
 const feeCfg = JSON.stringify({
-	list: Object.fromEntries(formats.map((f) => [f.sku, f.list_cents])),
+	list: Object.fromEntries([
+		...formats.map((f) => [f.sku, f.list_cents]),
+		...(ebook ? [[ebook.sku, ebook.list_cents]] : []),
+	]),
 	fee: Object.fromEntries(
 		countries
 			.filter((c) => c.code !== 'US')
@@ -299,7 +316,7 @@ const faqLd = faq.length
 	: null;
 ---
 
-<Layout title={book.page_title} description={book.short} image={ax.og?.src ?? book.cover.jpg} imageAlt={book.cover.alt} jsonLd={faqLd ? [...jsonLd, faqLd] : jsonLd}>
+<Layout title={book.page_title} description={book.short} image={ax.og?.src ?? book.cover.jpg} imageWidth={ax.og?.w} imageHeight={ax.og?.h} imageAlt={book.cover.alt} jsonLd={faqLd ? [...jsonLd, faqLd] : jsonLd}>
 	<main id="main-content">
 		{/* HERO = the RIAB hero (itself the FHB grandparents edition hero): 3D cover | eyebrow, title in the cover colour,
 		    subtitle, who it is for, chips, Look inside. All from the page object. */}
@@ -310,8 +327,10 @@ const faqLd = faq.length
 				</nav>
 				<div class="grid items-start gap-8 md:grid-cols-2 md:gap-10">
 					<div class="flex justify-center">
-						<a href="#order" aria-label={`Order ${book.title}`} class="block w-full max-w-[240px] md:max-w-[340px]">
-							<img src={hero.src} srcset={`${hero.w300} 300w, ${hero.src} 600w`} sizes="(min-width: 768px) 340px, 240px" width={hero.w} height={hero.h} alt={book.cover.alt} fetchpriority="high" decoding="async" class={hero.is3d ? 'h-auto w-full' : 'h-auto w-full rounded shadow-lg'} />
+						{/* ONE common cover height, width by its own aspect (Kevin 2026-11-16 "Perfer larger as possible"): the
+						    numbers live in src/lib/cover-hero.mjs (mirrors SMP's), checked in scripts/fhb-books.test.mjs */}
+						<a href="#order" aria-label={`Order ${book.title}`} class="block w-full">
+							<img src={hero.src} srcset={heroSrcset(hero)} sizes={heroSizes(hero.w, hero.h)} width={hero.w} height={hero.h} alt={book.cover.alt} fetchpriority="high" decoding="async" data-hero-cover style={heroStyle(hero.w, hero.h)} class={hero.is3d ? 'book-cover' : 'book-cover rounded shadow-lg'} />
 						</a>
 					</div>
 					<div>
@@ -335,7 +354,7 @@ const faqLd = faq.length
 			// THE ORDER AREA (the same as the SMP book page and the FHB edition box): offer line, country marquee, the box,
 			// Keep shopping. It orders on the SMP store (contract 3fe).
 			<section class="bk-order" aria-label={`Order ${book.title}`}>
-				<BookOrder slug={book.slug} title={book.title} titleStyle={titleStyle} formats={formats.map((f) => ({ sku: f.sku, format: f.format, list_cents: f.list_cents }))} countries={countries} feeCfg={feeCfg} firstOrder={firstOrder} firstOrderPct={FIRST_ORDER_PCT} returnDays={RETURN_DAYS} />
+				<BookOrder slug={book.slug} title={book.title} titleStyle={titleStyle} formats={formats.map((f) => ({ sku: f.sku, format: f.format, list_cents: f.list_cents }))} countries={countries} feeCfg={feeCfg} firstOrder={firstOrder} firstOrderPct={FIRST_ORDER_PCT} returnDays={RETURN_DAYS} ebook={ebook} />
 			</section>
 		) : (
 			<section class="bk-order">
@@ -353,6 +372,7 @@ const faqLd = faq.length
 			<Section variant="soft">
 				<div class="bi__desc" set:html={book.long_html} />
 				{book.author_bio && <p class="bi__desc">{book.author_bio}</p>}
+				{book.author_bio && <AuthorLinks author={book.author.name} />}
 			</Section>
 		)}
 	</main>
@@ -360,6 +380,10 @@ const faqLd = faq.length
 
 <style>
 	.bk-hero { background: #faf8f5; padding: 2rem 1rem; }
+	/* HERO COVER (src/lib/cover-hero.mjs HERO_H / HERO_BP): one common height, width = height x the cover's own aspect,
+	   never wider than its column. Fixed px, never vh. */
+	.book-cover { --hh: 336px; display: block; margin: 0 auto; width: min(100%, calc(var(--hh) * var(--ar, 0.6667))); max-width: 100%; height: auto; }
+	@media (min-width: 768px) { .book-cover { --hh: 550px; } }
 	@media (min-width: 1024px) { .bk-hero { padding: 3.5rem 2rem; } }
 	.bk-order { background: #faf8f5; padding-bottom: 2.5rem; }
 	.bk__crumb { margin: 0 0 1.25rem; font-family: var(--font-sans); font-size: 0.875rem; color: #57534e; display: flex; gap: 0.4rem; flex-wrap: wrap; }

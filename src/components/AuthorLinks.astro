@@ -1,0 +1,56 @@
+---
+// The author's own sites under the About-the-author bio (Kevin 2026-11-16 "Can you search and link to other sites
+// including author businesses"). Third-party links: new tab + "(opens in a new tab)" in the accessible name (the
+// cross-site rule, src/lib/xsite.ts); a link to the sister site opens in the SAME tab with its destination label; a
+// link to this site itself opens in the same tab, no label. CERTAIN entries only (src/lib/author-sites.mjs). Calm SMP
+// style, no buttons. Identical file in the SMP and FHB repos.
+import { authorSites, SOCIAL } from '../lib/author-sites.mjs';
+import { destHtml, newTabHtml, SISTER_HOST, sisterHost } from '../lib/xsite';
+
+interface Props {
+	author: string;
+	class?: string;
+}
+const { author, class: cls = '' } = Astro.props;
+const sites = authorSites(author);
+const main = sites.filter((s) => !SOCIAL.has(s.label));
+const social = sites.filter((s) => SOCIAL.has(s.label));
+const first = author.split(/\s+/)[0];
+const SELF_HOST =
+	SISTER_HOST === 'fathersheartbible.com' ? 'spiritmediapublishing.com' : 'fathersheartbible.com';
+const host = (u: string) => (/^https?:\/\/(?:www\.)?([^/:?#]+)/i.exec(u)?.[1] ?? '').toLowerCase();
+/** target/rel + the label that goes inside the link, by where it points. */
+const how = (u: string) =>
+	host(u) === SELF_HOST
+		? { attrs: {}, tail: '' }
+		: sisterHost(u)
+			? { attrs: {}, tail: destHtml(SISTER_HOST) }
+			: { attrs: { target: '_blank', rel: 'noopener' }, tail: newTabHtml };
+const lead = (s: { label: string; name?: string }) =>
+	s.label === 'Website'
+		? `Visit ${author}'s website`
+		: s.name || `${first}'s ${s.label.toLowerCase()}`;
+---
+
+{sites.length > 0 && (
+	<div class={`mt-4 text-[0.95rem] ${cls}`} data-author-sites={author}>
+		{main.length > 0 && (
+			<ul class="flex flex-wrap gap-x-5 gap-y-1.5">
+				{main.map((s) => (
+					<li>
+						<a href={s.url} {...how(s.url).attrs} class="font-semibold text-ink underline decoration-stone-400 underline-offset-4 hover:decoration-ink" data-author-site={s.label}>{lead(s)}<span aria-hidden="true"> &rarr;</span><Fragment set:html={how(s.url).tail} /></a>
+					</li>
+				))}
+			</ul>
+		)}
+		{social.length > 0 && (
+			<ul class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-stone-600" aria-label={`${author} on social media`}>
+				{social.map((s) => (
+					<li>
+						<a href={s.url} {...how(s.url).attrs} class="text-stone-600 underline decoration-stone-300 underline-offset-4 hover:text-ink hover:decoration-ink" data-author-site={s.label}>{s.label}<Fragment set:html={how(s.url).tail} /></a>
+					</li>
+				))}
+			</ul>
+		)}
+	</div>
+)}

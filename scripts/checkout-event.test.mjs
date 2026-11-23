@@ -29,11 +29,14 @@ test('the order-form checkout click path calls the beacon before the POST', () =
 	const s = fs.readFileSync(new URL('../src/scripts/order-form.ts', import.meta.url), 'utf8');
 	const i = s.indexOf('sendCheckoutEvent(buildCheckoutEvent') >= 0 ? s.indexOf('sendCheckoutEvent(') : s.indexOf('sendCheckoutEvent(\n');
 	assert.ok(i > 0, 'order-form.ts must call sendCheckoutEvent');
-	assert.ok(i < s.indexOf("fetch('/dvc-checkout', {\n\t\t\t\tmethod: 'POST',\n\t\t\t\theaders: { 'content-type': 'application/json' },\n\t\t\t\tbody: JSON.stringify({\n\t\t\t\t\tcounts"));
+	// ONE STORE (Option C, 2026-11-16): the checkout POST goes to the SMP store engine (STORE_CHECKOUT)
+	const post = s.indexOf("fetch(STORE_CHECKOUT, {\n\t\t\t\tmethod: 'POST',\n\t\t\t\theaders: { 'content-type': 'application/json' },\n\t\t\t\tbody: JSON.stringify({\n\t\t\t\t\tcounts");
+	assert.ok(post > 0, 'order-form.ts posts the order to the SMP store');
+	assert.ok(i < post);
 });
 
 // ── 3ef-1 (pmseoaeo 2026-11-13): /dvc-checkout reports every POST server-side, tagged site|qa ────────────────
-import { checkoutTag, onRequestPost } from '../functions/dvc-checkout.ts';
+import { checkoutTag, onRequestPost } from './lib/dvc-checkout-harness.ts';
 
 test('3ef-1 checkoutTag: preview host, example email, x-fhb-qa, scripted UA -> qa; a browser -> site', () => {
 	const chrome = 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/130 Mobile Safari/537.36';

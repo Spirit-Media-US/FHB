@@ -19,7 +19,7 @@ import {
 	bibleSkuIsbn,
 	bookSaleMetadata,
 	onRequestPost,
-} from '../functions/dvc-checkout.ts';
+} from './lib/dvc-checkout-harness.ts';
 import { BOOK_SKUS, DISCOUNT_EXEMPT } from '../src/lib/order-pricing.ts';
 
 const cat = JSON.parse(fs.readFileSync(new URL('../src/data/books.json', import.meta.url), 'utf8'));
@@ -314,7 +314,10 @@ test('every live book page has its order form ON the page: per-format price line
 		assert.doesNotMatch(html, /spiritmediapublishing\.com\/books\/[a-z0-9-]+\/buy\//, `${slug}: no hand-off to the SMP buy page`);
 	}
 	const src = fs.readFileSync(new URL('../src/components/BookOrder.astro', import.meta.url), 'utf8');
-	assert.match(src, /https:\/\/spiritmediapublishing\.com'/, 'production orders on the SMP store');
+	// one store address for every FHB order box (Option C 2026-11-16): src/lib/storeOrigin.ts
+	const store = fs.readFileSync(new URL('../src/lib/storeOrigin.ts', import.meta.url), 'utf8');
+	assert.match(store, /https:\/\/spiritmediapublishing\.com'/, 'production orders on the SMP store');
+	assert.match(src, /storeOrigin\(location\.hostname\)/, 'the book box uses the one store address');
 	assert.match(src, /\/store-checkout`/, 'posts to SMP /store-checkout');
 	assert.match(src, /const site = 'fhb'/, 'the sale records site=fhb');
 	assert.match(src, /email: \(form\.querySelector\('\[data-email\]'\)/, 'the order sends the email');
@@ -332,4 +335,210 @@ test('CSP: /books/* may connect to the SMP store; the site-wide policy may not',
 	assert.match(blocks['/books/*'], /! Content-Security-Policy/);
 	assert.match(connect(blocks['/books/*']), /https:\/\/spiritmediapublishing\.com/);
 	assert.doesNotMatch(connect(blocks['/*']), /https:\/\/spiritmediapublishing\.com|spirit-media-publishing\.pages\.dev/);
+	// Option C (2026-11-16): the Bible box pages order on the same store, so they carry the same allowance (prod + the
+	// SMP dev preview storeOrigin.ts sends FHB previews to)
+	const { STORE_PREVIEW } = { STORE_PREVIEW: 'https://dev.spirit-media-publishing.pages.dev' };
+	for (const b of ['/books/*', '/bibles/*', '/print', '/print/*']) {
+		assert.ok(blocks[b], `${b} block exists`);
+		assert.match(blocks[b], /! Content-Security-Policy/, `${b} replaces the site policy`);
+		assert.ok(connect(blocks[b]).includes(' https://spiritmediapublishing.com ') && connect(blocks[b]).includes(STORE_PREVIEW), `${b}: may connect to the store`);
+	}
+	assert.ok(fs.readFileSync(new URL('../src/lib/storeOrigin.ts', import.meta.url), 'utf8').includes(`'${STORE_PREVIEW}'`), 'CSP preview host = storeOrigin preview');
+});
+
+// DUPLICATE RULE (store-168 item 2; Kevin 2026-11-16 "SMP not FHB will be #1 retailer and distributor of FHB bibles,
+// books, and SMP books"; brief: FH Bibles + FH books KEEP the FHB canonical for now — FHB has the measured reach; the SMP
+// page for an FH book is the retail listing with rel=canonical -> FHB, asserted in SMP scripts/store-checkout.test.mjs).
+// Revisit trigger (weekly store ledger): SMP Google impressions > FHB for 4 weeks -> flip that product.
+// canonicalErrs() is the ONE check; the failure-path test proves it rejects a wrong canonical.
+const canonicalErrs = (url, html, { product }) => {
+	const got = [...html.matchAll(/<link rel="canonical" href="([^"]+)"/g)].map((m) => m[1]);
+	const errs = [];
+	if (got.length !== 1) errs.push(`${url}: ${got.length} canonical tags`);
+	else if (got[0] !== url) errs.push(`${url}: canonical ${got[0]} (must be self)`);
+	if (product && !/"@type":\["Book","Product"\]/.test(html)) errs.push(`${url}: no Book+Product node`);
+	if (product && !/"@type":"Offer"/.test(html)) errs.push(`${url}: no Offer`);
+	return errs;
+};
+test('duplicate rule check FAILS on a wrong canonical or missing Product (proof the gate can reject)', () => {
+	const u = 'https://fathersheartbible.com/books/who-am-i/';
+	const ok = `<link rel="canonical" href="${u}"><script>{"@type":["Book","Product"],"offers":{"@type":"Offer"}}</script>`;
+	assert.deepEqual(canonicalErrs(u, ok, { product: true }), []);
+	assert.equal(canonicalErrs(u, ok.replace(u, 'https://spiritmediapublishing.com/books/who-am-i/'), { product: true }).length, 1, 'canonical -> SMP must fail');
+	assert.equal(canonicalErrs(u, ok.replace('["Book","Product"]', '"Book"').replace('"Offer"', '"X"'), { product: true }).length, 2, 'no Product/Offer must fail');
+	assert.equal(canonicalErrs(u, '<p></p>', { product: false }).length, 1, 'no canonical must fail');
+});
+test('FH books + FH Bible editions keep the FHB canonical (built pages)', { skip: !fs.existsSync(new URL('../dist/bibles/', import.meta.url)) && 'no dist' }, () => {
+	const built = cat.books.filter((b) => fs.existsSync(new URL(`../dist/books/${b.slug}/index.html`, import.meta.url)));
+	assert.ok(built.length >= 1, 'at least one FH book page built');
+	for (const b of built) {
+		const html = fs.readFileSync(new URL(`../dist/books/${b.slug}/index.html`, import.meta.url), 'utf8');
+		const errs = canonicalErrs(`https://fathersheartbible.com/books/${b.slug}/`, html, { product: b.status === 'live' });
+		assert.deepEqual(errs, [], errs.join('; '));
+	}
+	const bibles = fs.readdirSync(new URL('../dist/bibles/', import.meta.url)).filter((d) => /-bible$/.test(d));
+	assert.ok(bibles.length >= 50, `only ${bibles.length} edition pages`);
+	for (const d of bibles) {
+		const html = fs.readFileSync(new URL(`../dist/bibles/${d}/index.html`, import.meta.url), 'utf8');
+		const errs = canonicalErrs(`https://fathersheartbible.com/bibles/${d}/`, html, { product: false });
+		assert.deepEqual(errs, [], errs.join('; '));
+	}
+});
+
+// SELLABLE-39 (pmprint 2026-11-16, Kevin "1 store SMP. 2 shop windows FHB and SMP"): every registry row another site
+// owns (owner_site smp) is SOLD by the engine with no books.json gate, so the row itself must carry what checkout needs:
+// the 18 keys, a 13-digit ISBN, an integer list price > 0, and a checkout image that answers HTTP 200 at build time
+// (Stripe shows it; a 404 is a broken checkout). Pure checker first so the failure path is proven offline.
+const SMP_ROW_KEYS = ['owner_site', 'format', 'schema_format', 'isbn', 'isbn_display', 'list_cents', 'pages', 'trim', 'binding', 'checkout_title', 'checkout_name', 'checkout_desc', 'checkout_img', 'ingram_title', 'spec', 'floor_usd', 'cost_key', 'book'];
+const smpRowErrs = (sku, r) => {
+	const e = [];
+	for (const k of SMP_ROW_KEYS) if (!(k in r)) e.push(`${sku}: missing key ${k}`);
+	if (!/^97[89]\d{10}$/.test(String(r.isbn ?? ''))) e.push(`${sku}: isbn ${r.isbn}`);
+	if (!Number.isInteger(r.list_cents) || r.list_cents <= 0) e.push(`${sku}: list_cents ${r.list_cents}`);
+	if (!/^https:\/\/\S+$/.test(String(r.checkout_img ?? ''))) e.push(`${sku}: checkout_img ${r.checkout_img}`);
+	return e;
+};
+const smpRows = Object.entries(SKU).filter(([, r]) => r.owner_site && r.owner_site !== 'fhb');
+test('smp registry row checker FAILS on a missing ISBN, zero price or bad image (proof the gate can reject)', () => {
+	const [sku, r] = smpRows[0];
+	assert.deepEqual(smpRowErrs(sku, r), []);
+	assert.equal(smpRowErrs(sku, { ...r, isbn: null }).length, 1, 'no ISBN must fail');
+	assert.equal(smpRowErrs(sku, { ...r, list_cents: 0 }).length, 1, 'price 0 must fail');
+	assert.equal(smpRowErrs(sku, { ...r, checkout_img: '' }).length, 1, 'no image must fail');
+	const { book, ...short } = r;
+	assert.equal(smpRowErrs(sku, short).length, 1, 'a missing key must fail');
+});
+test('every owner_site smp registry row: 18 keys, ISBN, list_cents > 0, unique ISBN', () => {
+	assert.ok(smpRows.length >= 80, `only ${smpRows.length} smp rows`);
+	const errs = smpRows.flatMap(([sku, r]) => smpRowErrs(sku, r));
+	assert.deepEqual(errs, [], errs.join('; '));
+	const isbns = Object.values(SKU).map((r) => r.isbn).filter(Boolean);
+	assert.equal(new Set(isbns).size, isbns.length, 'an ISBN sits on two registry rows');
+	// a cost_key with no per-country landed cost makes checkoutForm refuse every country but the US (one engine broken):
+	// unmeasured = null (Bible-cost fallback); a US-only measured cost lives in book-us-costs.json, not in cost_key
+	const ship = fs.readFileSync(new URL('../src/data/ship-countries.json', import.meta.url), 'utf8');
+	const orphan = smpRows.filter(([, r]) => r.cost_key != null && !ship.includes(`"${r.cost_key}"`)).map(([k]) => k);
+	assert.deepEqual(orphan, [], `cost_key with no landed cost: ${orphan.join(', ')}`);
+});
+test('every owner_site smp checkout_img answers HTTP 200 (build-time network check)', async () => {
+	const urls = [...new Set(smpRows.map(([, r]) => r.checkout_img))];
+	const bad = [];
+	for (let i = 0; i < urls.length; i += 8)
+		await Promise.all(
+			urls.slice(i, i + 8).map(async (u) => {
+				let st = 0;
+				for (let a = 0; a < 3 && st !== 200; a++)
+					st = await fetch(u, { method: 'HEAD', signal: AbortSignal.timeout(10000) }).then((r) => r.status, () => 0);
+				if (st !== 200) bad.push(`${u} -> ${st}`);
+			}),
+		);
+	assert.deepEqual(bad, [], bad.join('; '));
+});
+
+// HERO COVER SIZE (Kevin 2026-11-16 "Perfer larger as possible"): every built book page draws its hero cover at the ONE
+// common height (src/lib/cover-hero.mjs, mirrors SMP's): img[data-hero-cover].book-cover with --ar = its own
+// width/height, sizes from heroSizes, and the 3D render's 1200 file in srcset when book-page-assets.json has one.
+import { HERO_H, heroAspect, heroSizes } from '../src/lib/cover-hero.mjs';
+const heroAssets = JSON.parse(fs.readFileSync(new URL('../src/data/book-page-assets.json', import.meta.url), 'utf8'));
+const hAttr = (t, a) => t.match(new RegExp(`\\s${a}="([^"]*)"`))?.[1]?.replace(/&amp;/g, '&') ?? null;
+export function heroCoverErrors(html, slug) {
+	const tags = html.match(/<img\b[^>]*\bdata-hero-cover\b[^>]*>/g) ?? [];
+	if (tags.length !== 1) return [`${slug}: ${tags.length} img[data-hero-cover]`];
+	const t = tags[0];
+	const w = Number(hAttr(t, 'width'));
+	const h = Number(hAttr(t, 'height'));
+	const e = [];
+	if (!/\bbook-cover\b/.test(hAttr(t, 'class') ?? '')) e.push(`${slug}: no book-cover class`);
+	const ar = (hAttr(t, 'style') ?? '').match(/--ar:\s*([\d.]+)/);
+	if (!ar || Math.abs(Number(ar[1]) - heroAspect(w, h)) > 0.001) e.push(`${slug}: --ar wrong`);
+	if (hAttr(t, 'sizes') !== heroSizes(w, h)) e.push(`${slug}: sizes "${hAttr(t, 'sizes')}" != "${heroSizes(w, h)}"`);
+	const x = heroAssets[slug]?.hero3d?.w1200;
+	if (x && !(hAttr(t, 'srcset') ?? '').includes(`${x} 1200w`)) e.push(`${slug}: 1200 file not in srcset`);
+	return e;
+}
+const heroDist = new URL('../dist/books/', import.meta.url);
+const heroSlugs = fs.existsSync(heroDist)
+	? fs.readdirSync(heroDist, { withFileTypes: true }).filter((d) => d.isDirectory() && fs.existsSync(new URL(`${d.name}/index.html`, heroDist))).map((d) => d.name).filter((s) => heroAssets[s] || fs.readFileSync(new URL(`${s}/index.html`, heroDist), 'utf8').includes('data-hero-cover'))
+	: [];
+test('hero cover: every built book page uses the one common-height rule (+ CSS in px, never vh)', { skip: !heroSlugs.length && 'no dist/books' }, () => {
+	const errs = heroSlugs.flatMap((s) => heroCoverErrors(fs.readFileSync(new URL(`${s}/index.html`, heroDist), 'utf8'), s));
+	assert.deepEqual(errs, []);
+	const astro = new URL('../dist/_astro/', import.meta.url);
+	const css = fs.readdirSync(astro).filter((f) => f.endsWith('.css')).map((f) => fs.readFileSync(new URL(f, astro), 'utf8')).join('\n') + heroSlugs.map((s) => fs.readFileSync(new URL(`${s}/index.html`, heroDist), 'utf8')).join('\n');
+	const rules = css.match(/\.book-cover[^{]*\{[^}]*\}/g) ?? [];
+	assert.ok(rules.some((r) => new RegExp(`--hh:\\s*${HERO_H.desktop}px`).test(r)) && rules.some((r) => new RegExp(`--hh:\\s*${HERO_H.mobile}px`).test(r)), 'common heights missing from the built CSS');
+	assert.ok(!rules.some((r) => /\d(s|d|l)?vh\b/.test(r)), 'vh in the hero cover rule');
+});
+test('hero cover INJECTED: the old fixed 340px box is rejected', { skip: !heroSlugs.length && 'no dist/books' }, () => {
+	const s = heroSlugs[0];
+	const html = fs.readFileSync(new URL(`${s}/index.html`, heroDist), 'utf8').replace(/(<img\b[^>]*\bdata-hero-cover\b[^>]*>)/, (t) => t.replace(/\sclass="[^"]*"/, ' class="h-auto w-full"').replace(/\ssizes="[^"]*"/, ' sizes="(min-width: 768px) 340px, 240px"'));
+	const e = heroCoverErrors(html, s);
+	assert.ok(e.some((x) => x.includes('book-cover')) && e.some((x) => x.includes('sizes')), e.join('\n'));
+});
+
+// OG SIZE (pmseoaeo metadata audit 2026-11-16: /books/who-am-i/ had no og:image:width/height, Layout's URL guess missed
+// /FHB/print/books/). Every built book page states og:image:width + og:image:height, and they equal the pixel size of
+// the image itself, read from the file's own header at build time (JPEG SOF / PNG IHDR / WebP VP8*). Pure checker first.
+const imageSize = (buf) => {
+	if (buf[0] === 0x89 && buf.toString('ascii', 1, 4) === 'PNG') return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+	if (buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') {
+		const k = buf.toString('ascii', 12, 16);
+		if (k === 'VP8X') return { w: 1 + buf.readUIntLE(24, 3), h: 1 + buf.readUIntLE(27, 3) };
+		if (k === 'VP8L') { const b = buf.readUInt32LE(21); return { w: (b & 0x3fff) + 1, h: ((b >> 14) & 0x3fff) + 1 }; }
+		return { w: buf.readUInt16LE(26) & 0x3fff, h: buf.readUInt16LE(28) & 0x3fff };
+	}
+	for (let i = 2; i < buf.length - 9; ) {
+		if (buf[i] !== 0xff) { i++; continue; }
+		const m = buf[i + 1];
+		if (m >= 0xc0 && m <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(m)) return { w: buf.readUInt16BE(i + 7), h: buf.readUInt16BE(i + 5) };
+		i += 2 + buf.readUInt16BE(i + 2);
+	}
+	return null;
+};
+const metaProp = (html, p) => html.match(new RegExp(`<meta property="${p}" content="([^"]*)"`))?.[1] ?? null;
+const ogDimErrs = (slug, html, size) => {
+	const e = [];
+	const w = metaProp(html, 'og:image:width');
+	const h = metaProp(html, 'og:image:height');
+	if (!metaProp(html, 'og:image')) e.push(`${slug}: no og:image`);
+	if (w == null) e.push(`${slug}: no og:image:width`);
+	if (h == null) e.push(`${slug}: no og:image:height`);
+	if (!size) e.push(`${slug}: og:image size unreadable`);
+	else if (w != null && h != null && (Number(w) !== size.w || Number(h) !== size.h))
+		e.push(`${slug}: og says ${w}x${h}, image is ${size.w}x${size.h}`);
+	return e;
+};
+const ogDist = new URL('../dist/books/', import.meta.url);
+const ogSlugs = fs.existsSync(ogDist)
+	? fs.readdirSync(ogDist, { withFileTypes: true }).filter((d) => d.isDirectory() && fs.existsSync(new URL(`${d.name}/index.html`, ogDist))).map((d) => d.name)
+	: [];
+const ogFetched = new Map();
+const ogImageSize = async (u) => {
+	if (!ogFetched.has(u)) {
+		const r = await fetch(u);
+		assert.equal(r.status, 200, `og:image ${u} -> HTTP ${r.status}`);
+		ogFetched.set(u, imageSize(Buffer.from(await r.arrayBuffer())));
+	}
+	return ogFetched.get(u);
+};
+test('og size: every built book page states og:image:width/height = the image\'s real pixel size', { skip: !ogSlugs.length && 'no dist/books' }, async () => {
+	const errs = [];
+	for (const s of ogSlugs) {
+		const html = fs.readFileSync(new URL(`${s}/index.html`, ogDist), 'utf8');
+		const u = metaProp(html, 'og:image');
+		errs.push(...ogDimErrs(s, html, u ? await ogImageSize(u.replace(/&amp;/g, '&')) : null));
+	}
+	assert.deepEqual(errs, []);
+});
+test('og size INJECTED: missing tags and a wrong size are both rejected', { skip: !ogSlugs.length && 'no dist/books' }, async () => {
+	const s = ogSlugs[0];
+	const html = fs.readFileSync(new URL(`${s}/index.html`, ogDist), 'utf8');
+	const size = await ogImageSize(metaProp(html, 'og:image').replace(/&amp;/g, '&'));
+	assert.deepEqual(ogDimErrs(s, html, size), []);
+	const stripped = html.replace(/<meta property="og:image:(width|height)"[^>]*>/g, '');
+	const e1 = ogDimErrs(s, stripped, size);
+	assert.ok(e1.some((x) => x.includes('no og:image:width')) && e1.some((x) => x.includes('no og:image:height')), e1.join('\n'));
+	const wrong = html.replace(/(<meta property="og:image:height" content=")\d+/, '$1600');
+	assert.ok(ogDimErrs(s, wrong, size).some((x) => x.includes('og says')), 'a wrong height must fail');
+	assert.equal(imageSize(Buffer.from('not an image')), null);
 });

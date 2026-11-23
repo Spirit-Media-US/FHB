@@ -27,6 +27,7 @@ import {
 	bindingFor,
 	FIRST_ORDER_PCT,
 	type IntlRow,
+	isHardbackRow,
 	paidUnit,
 	unitAfter,
 	volumesFor,
@@ -100,7 +101,7 @@ export function landedUnitCost(
 	if (typeof own === 'number') return own;
 	const book = BOOK_SKUS[slug];
 	if (!book) return null;
-	const fallback = lc[/hard/i.test(book.format) ? 'hc' : 'pb'];
+	const fallback = lc[isHardbackRow(book) ? 'hc' : 'pb'];
 	return typeof fallback === 'number' ? fallback : null;
 }
 

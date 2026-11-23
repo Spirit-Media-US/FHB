@@ -55,6 +55,7 @@ test('every src/pages folder of a covered type is registered', () => {
 		books: 'book pages are registered individually',
 		data: 'CSV/JSON endpoints (.ts), not pages; the CSV downloads are listed via DATA_FILES',
 		legacy: 'noindex redirect shims',
+		watch: 'one film watch page (3jq), registered individually under Books, ordering and publisher pages',
 		'glossary-review': 'noindex native-reviewer pages, excluded from the sitemap',
 	};
 	for (const d of fs

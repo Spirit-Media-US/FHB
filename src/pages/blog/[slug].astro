@@ -15,6 +15,7 @@ import Layout from '../../layouts/Layout.astro';
 import { canonHref } from '../../lib/canon-href';
 import { sanityClient, urlFor } from '../../lib/sanity';
 import { fitDescription, fitTitle } from '../../lib/seoFit';
+import { destHtml, newTabHtml, sisterHost } from '../../lib/xsite';
 
 export async function getStaticPaths() {
 	const posts = await sanityClient.fetch(`*[_type == "blogPost"] { "slug": slug.current }`);
@@ -99,8 +100,11 @@ function sentenceSpans(children: any[], linkByKey: Record<string, string>): stri
 		if (linkKey) {
 			const href = linkByKey[linkKey];
 			const isExternal = /^https?:\/\//i.test(href);
-			const targetAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
-			t = `<a href="${href}" style="color: var(--color-brand);" class="hover:underline"${targetAttrs}>${t}</a>`;
+			// Cross-site rule (src/lib/xsite.ts): spiritmediapublishing.com = same tab + its destination; elsewhere = new tab, said.
+			const sister = sisterHost(href);
+			const targetAttrs = isExternal && !sister ? ' target="_blank" rel="noopener noreferrer"' : '';
+			const tail = sister ? destHtml(sister) : isExternal ? newTabHtml : '';
+			t = `<a href="${href}" style="color: var(--color-brand);" class="hover:underline"${targetAttrs}>${t}${tail}</a>`;
 		}
 		return t;
 	};
@@ -157,8 +161,12 @@ function renderPortableText(blocks: any[]): string {
 					if (linkKey) {
 						const href = linkByKey[linkKey];
 						const isExternal = /^https?:\/\//i.test(href);
-						const targetAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
-						text = `<a href="${href}" style="color: var(--color-brand);" class="hover:underline"${targetAttrs}>${text}</a>`;
+						// Cross-site rule (src/lib/xsite.ts): spiritmediapublishing.com = same tab + its destination; elsewhere = new tab, said.
+						const sister = sisterHost(href);
+						const targetAttrs =
+							isExternal && !sister ? ' target="_blank" rel="noopener noreferrer"' : '';
+						const tail = sister ? destHtml(sister) : isExternal ? newTabHtml : '';
+						text = `<a href="${href}" style="color: var(--color-brand);" class="hover:underline"${targetAttrs}>${text}${tail}</a>`;
 					}
 				}
 				return text;

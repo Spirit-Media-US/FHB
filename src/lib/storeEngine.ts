@@ -6,6 +6,8 @@
 // SMP checkout service in Phase 3) supplies the Stripe-backed first-order lookups and POSTs the form.
 // Moved VERBATIM out of functions/dvc-checkout.ts; scripts/store-engine-parity.test.mjs proves the Stripe
 // request for 11 fixed carts is byte-identical to the pre-extraction golden.
+// MASTER = SMP src/store-engine/ (Kevin 2026-11-16 "1 store SMP. 2 shop windows FHB and SMP"). FHB's src/lib + src/data
+// copy is byte-identical, written ONLY by FHB's node scripts/sync-store-engine.mjs; its prebuild fails on drift.
 import bookSkus from '../data/book-skus.json' with { type: 'json' };
 // SERVER-ONLY measured US costs (kept out of book-skus.json, which order-pricing.ts carries into the browser).
 import bookUsCosts from '../data/book-us-costs.json' with { type: 'json' };
@@ -22,7 +24,9 @@ import {
 	volumesFor,
 } from './marginGuard.ts';
 import {
+	BOOK_BULK_TIERS,
 	BOOK_SKUS,
+	bookTierPct,
 	FIRST_ORDER_CODE,
 	FIRST_ORDER_PCT,
 	isDiscountExempt,
@@ -30,6 +34,8 @@ import {
 	META_VALUE_MAX,
 	packBreakdown,
 	paidUnit,
+	type Tier,
+	unitAfter,
 } from './order-pricing.ts';
 import { checkoutShippingForm, countryFor } from './shipCountries.ts';
 
@@ -1182,6 +1188,36 @@ for (const [sku, e] of Object.entries(CATALOG_LANG_EDITIONS))
 // line is unchanged. A book whose status is not "live" is not sellable here.
 const US_CARD_PCT = 0.029;
 const US_CARD_FIXED_USD = 0.3;
+/** US net per copy of a book at `unitCents` with a measured US landed cost: Stripe's US card fee (2.9% + 30c) off. */
+export const usBookNet = (unitCents: number, costUsd: number): number =>
+	unitCents / 100 - (unitCents / 100) * US_CARD_PCT - US_CARD_FIXED_USD - costUsd;
+/** PER-BOOK BULK TIER, MARGIN-CHECKED (order-pricing.ts BOOK_BULK_TIERS; Kevin 2026-11-20 Outrageously Loved: 10-24
+ *  20%, 25-99 30%, 100+ 40%). The percent `qty` copies of `slug` shipped to `destCode` take off list: the book's OWN
+ *  ladder (US only, that SKU's quantity only), and only while the book's MEASURED US landed cost (book-us-costs.json)
+ *  keeps the discounted copy at its floor (floor_usd) after Stripe's US card fee. A rung that fails steps down to the
+ *  next; no measured cost, or a SKU the store does not sell (a `pending` row has no EDITIONS entry) = 0. Fail closed,
+ *  never a guess. `costs` is injectable for the tests. */
+export function bookTierFor(
+	slug: string,
+	qty: number,
+	destCode = 'US',
+	costs: Record<string, number> = bookUsCosts.usd as Record<string, number>,
+): { pct: number; reason: string } {
+	const want = bookTierPct(slug, qty, destCode);
+	if (want <= 0) return { pct: 0, reason: 'no tier' };
+	const book = BOOK_SKUS[slug];
+	const retail = EDITIONS[slug]?.retail;
+	if (!book || retail == null) return { pct: 0, reason: `${slug} is not sold` };
+	const cost = costs[slug];
+	if (cost == null) return { pct: 0, reason: `${slug} has no measured US cost` };
+	for (const t of (BOOK_BULK_TIERS[slug] ?? []) as Tier[]) {
+		if (t.pct > want) continue;
+		const net = usBookNet(unitAfter(retail, t.pct), cost);
+		if (net >= book.floorUsd) return { pct: t.pct, reason: `net ${net.toFixed(2)}` };
+	}
+	return { pct: 0, reason: `${slug} under its floor at every tier` };
+}
+
 /** FHB-BOOKS: Stripe metadata for every book line in a cart, for author reporting (Kevin 2026-11-13: title,
  *  ISBN, format, country, date, net). net_usd = per-copy net after Stripe's fee and the book's MEASURED landed
  *  cost for that country (marginGuard.netPerItemUsd, the same figure the margin floor uses), times qty.
@@ -1193,13 +1229,17 @@ export function bookSaleMetadata(
 	pct: number,
 	now = new Date(),
 	firstOrder = false,
+	/** sku -> the per-book bulk percent the line is charged at (bookTierFor); absent = the order's own offer */
+	bookPct: Record<string, number> = {},
 ): Record<string, string> {
 	const out: Record<string, string> = {};
 	let k = 0;
 	for (const [slug, qty] of Object.entries(counts)) {
 		const b = BOOK_SKUS[slug];
 		if (!b || qty <= 0) continue;
-		const unit = paidUnit(slug, EDITIONS[slug].retail, pct, firstOrder);
+		const unit = bookPct[slug]
+			? unitAfter(EDITIONS[slug].retail, bookPct[slug])
+			: paidUnit(slug, EDITIONS[slug].retail, pct, firstOrder);
 		const fee = dest ? handlingFeeCents(slug, unit, dest) : 0;
 		// US: no country-list cost row, so the book's own MEASURED US cost (book-skus.json us_cost_usd) and
 		// Stripe's standard US card fee (2.9% + 30c); unmeasured stays 'unmeasured', never a guess.
@@ -1423,13 +1463,74 @@ export function encodeForm(obj: Record<string, string | number>): string {
 		.join('&');
 }
 
+// ── OPTION C TAGS (Kevin 2026-11-16 "1 store SMP. 2 shop windows FHB and SMP") ─────────────────────────────────────
+// ONE store (this engine, one Stripe account), TWO shop windows. Every store Checkout Session says where it was sold
+// (site: fhb | smp | vaneure), which shop window that is (window: fhb | smp; vaneure is an SMP author site, so smp) and
+// what was sold (family: bible | fh_book | smp_book | bible_ebook, '+'-joined in that order for a mixed cart).
+// FH book = a book in the FHB catalogue (src/data/books.json); every other registry book is an SMP book.
+// storeTagErrors() is the ONE check: every function that creates a session refuses (no Stripe call) when it fails.
+export const STORE_TAG_KEYS = ['metadata[site]', 'metadata[window]', 'metadata[family]'] as const;
+export const STORE_SITES: Record<string, 'fhb' | 'smp'> = {
+	fhb: 'fhb',
+	smp: 'smp',
+	vaneure: 'smp',
+};
+// fh_ebook / smp_ebook (Kevin 2026-11-16 "We point to our own ebook sales"): a book's eBook (EBOOK_SKUS below).
+export const PRODUCT_FAMILIES = [
+	'bible',
+	'fh_book',
+	'smp_book',
+	'bible_ebook',
+	'fh_ebook',
+	'smp_ebook',
+] as const;
+export type ProductFamily = (typeof PRODUCT_FAMILIES)[number];
+const FH_BOOK_SLUGS = new Set((booksCatalog.books as { slug: string }[]).map((b) => b.slug));
+/** The product family of one engine SKU, or null for a SKU the engine does not sell. */
+export function familyOfSku(sku: string): ProductFamily | null {
+	if (BOOK_SKUS[sku]) return FH_BOOK_SLUGS.has(BOOK_SKUS[sku].bookSlug) ? 'fh_book' : 'smp_book';
+	if (EBOOK_SKUS[sku])
+		return FH_BOOK_SLUGS.has(EBOOK_SKUS[sku].bookSlug) ? 'fh_ebook' : 'smp_ebook';
+	return EDITIONS[sku] ? 'bible' : null;
+}
+/** The family tag of a cart: every family with a quantity, in PRODUCT_FAMILIES order, '+'-joined ('' when empty). */
+export function familyOf(counts: Record<string, number>): string {
+	const got = new Set<string>();
+	for (const [sku, n] of Object.entries(counts)) if (Number(n) > 0) got.add(familyOfSku(sku) ?? '');
+	return PRODUCT_FAMILIES.filter((f) => got.has(f)).join('+');
+}
+/** The three Option C tags for a session sold on `site` (an unknown site is not tagged: storeTagErrors fails it). */
+export function storeTags(site: string, family: string): Record<string, string> {
+	return {
+		'metadata[site]': site,
+		'metadata[window]': STORE_SITES[site] ?? '',
+		'metadata[family]': family,
+	};
+}
+/** Why a session form is NOT properly tagged ([] = tagged). A session with any error must never reach Stripe. */
+export function storeTagErrors(form: Record<string, string | number>): string[] {
+	const errs: string[] = [];
+	const site = String(form['metadata[site]'] ?? '');
+	const win = String(form['metadata[window]'] ?? '');
+	const fam = String(form['metadata[family]'] ?? '');
+	if (!STORE_SITES[site]) errs.push(`site '${site}' is not a store site`);
+	else if (win !== STORE_SITES[site])
+		errs.push(`window '${win}' is not ${STORE_SITES[site]} for site ${site}`);
+	if (!fam || fam.split('+').some((f) => !(PRODUCT_FAMILIES as readonly string[]).includes(f)))
+		errs.push(`family '${fam}' is not a product family`);
+	if (Object.keys(form).filter((k) => k.startsWith('metadata[')).length > STRIPE_META_KEYS_MAX)
+		errs.push(`more than ${STRIPE_META_KEYS_MAX} metadata keys`);
+	return errs;
+}
+
 // The Stripe-backed first-order lookups (moved verbatim from functions/dvc-checkout.ts, Phase 3: one copy for
 // every checkout that uses the engine). Read-only GETs against the store's Stripe account.
 // A FIRST ORDER = this email has never bought from the STORE (Kevin 2026-11-14: "Someone who has never purchased
 // anything off our new SMP store"). Only paid Checkout sessions the store itself created count: kind dvc_print
 // (this engine, Bibles + books) and print_bulk (the retired /print bulk path). Other payments on the same Stripe
 // account (publishing invoices, pre-release sales, app charges) no longer make a buyer a "repeat".
-export const STORE_ORDER_KINDS: readonly string[] = ['dvc_print', 'print_bulk'];
+// ebook_direct (2026-11-16): an eBook bought from the store is a store purchase too, so it ends the first order.
+export const STORE_ORDER_KINDS: readonly string[] = ['dvc_print', 'print_bulk', 'ebook_direct'];
 export async function isFirstOrder(email: string, key: string): Promise<boolean> {
 	const get = async (path: string) => {
 		const r = await fetch(`https://api.stripe.com/v1/${path}`, {
@@ -1597,7 +1698,36 @@ export async function checkoutForm(
 	// fee cannot reach it, or the landed cost is unknown).
 	// Far band: no volume ladder at all, so the first-order 15% is the only discount on offer.
 	const tierPctNow = tierPctFor(dest?.bulkQuote, tier.pct);
-	if (discountable && validEmail && FIRST_ORDER_PCT > tierPctNow) {
+	// PER-BOOK BULK TIERS (order-pricing.ts BOOK_BULK_TIERS, Kevin 2026-11-20): a book with its own ladder takes its tier
+	// on THAT SKU's quantity (US only, margin-checked by bookTierFor). It never stacks with the first-order 15%: the
+	// buyer gets whichever saves more on the whole order (a tie goes to the tiers, which need no first-order lookup),
+	// so a first-order lookup runs only when 15% of the order would beat the tiers plus the Bible volume tier.
+	const bookPct: Record<string, number> = {};
+	let bookSaving = 0;
+	for (const [slug, n] of Object.entries(counts)) {
+		if (n <= 0 || !BOOK_SKUS[slug]) continue;
+		const t = bookTierFor(slug, n, destCode);
+		if (t.pct <= 0) continue;
+		bookPct[slug] = t.pct;
+		bookSaving += (EDITIONS[slug].retail - unitAfter(EDITIONS[slug].retail, t.pct)) * n;
+	}
+	const bookTiersWin =
+		bookSaving > 0 &&
+		bookSaving +
+			Object.entries(counts).reduce(
+				(s, [slug, n]) =>
+					s +
+					(BOOK_SKUS[slug]
+						? 0
+						: (EDITIONS[slug].retail - unitAfter(EDITIONS[slug].retail, tierPctNow)) * n),
+				0,
+			) >=
+			Math.round(
+				(Object.entries(counts).reduce((s, [slug, n]) => s + EDITIONS[slug].retail * n, 0) *
+					FIRST_ORDER_PCT) /
+					100,
+			);
+	if (discountable && validEmail && FIRST_ORDER_PCT > tierPctNow && !bookTiersWin) {
 		const m = marginCheck(lines, FIRST_ORDER_PCT, destCode, undefined, undefined, true);
 		if (!m.ok) {
 			console.log(`margin-guard: dropped ${FIRST_ORDER_CODE}: ${m.reason}`);
@@ -1605,6 +1735,8 @@ export async function checkoutForm(
 			promo = await deps.firstOrderPromo();
 		}
 	}
+	// the first-order 15% won: no book tier on top of it (never both)
+	if (promo) for (const slug of Object.keys(bookPct)) delete bookPct[slug];
 	let pct = promo ? 0 : discountable ? tierPctNow : 0;
 	if (!promo && pct > 0) {
 		const m = marginCheck(lines, pct, destCode);
@@ -1720,7 +1852,22 @@ export async function checkoutForm(
 		'metadata[ladder_total]': total,
 		'metadata[pct_off]': promo ? FIRST_ORDER_PCT : pct,
 		'metadata[handling_cents]': handling.reduce((t, h) => t + h.fee * h.qty, 0),
-		'metadata[offer]': promo ? 'first_order' : pct > 0 ? 'volume' : 'none',
+		'metadata[offer]': promo
+			? 'first_order'
+			: pct > 0
+				? 'volume'
+				: Object.keys(bookPct).length
+					? 'book_bulk'
+					: 'none',
+		// which book lines took their own bulk tier, at what percent (absent when none did)
+		...(Object.keys(bookPct).length
+			? {
+					'metadata[book_bulk]': Object.entries(bookPct)
+						.map(([s, p]) => `${s}:${p}`)
+						.join(',')
+						.slice(0, 500),
+				}
+			: {}),
 		// Split under Stripe's 500-char value cap (an 82-SKU cart was one 1,138-char value: 502).
 		...packBreakdown(counts),
 		// FHB-BOOKS (Kevin 2026-11-13): every BOOK sale carries title / ISBN / format / country / date / net
@@ -1732,6 +1879,7 @@ export async function checkoutForm(
 			unitPctFinal,
 			undefined,
 			Boolean(promo),
+			bookPct,
 		),
 	};
 	// 3ee-1: Bible lines carry the same sale fields, packed into whatever keys Stripe's 50-key limit leaves.
@@ -1742,7 +1890,10 @@ export async function checkoutForm(
 			destCode,
 			intl ? dest : null,
 			unitPctFinal,
-			STRIPE_META_KEYS_MAX - Object.keys(form).filter((k) => k.startsWith('metadata[')).length,
+			// the three Option C store tags are added by the caller after this, so their keys are reserved here
+			STRIPE_META_KEYS_MAX -
+				STORE_TAG_KEYS.length -
+				Object.keys(form).filter((k) => k.startsWith('metadata[')).length,
 		),
 	);
 
@@ -1750,7 +1901,9 @@ export async function checkoutForm(
 	for (const [slug, qty] of Object.entries(counts)) {
 		if (qty <= 0) continue;
 		const e = EDITIONS[slug];
-		const unit = paidUnit(slug, e.retail, unitPctFinal, Boolean(promo));
+		const unit = bookPct[slug]
+			? unitAfter(e.retail, bookPct[slug])
+			: paidUnit(slug, e.retail, unitPctFinal, Boolean(promo));
 		form[`line_items[${li}][quantity]`] = qty;
 		form[`line_items[${li}][price_data][currency]`] = 'usd';
 		form[`line_items[${li}][price_data][unit_amount]`] = unit;
@@ -1758,7 +1911,7 @@ export async function checkoutForm(
 		form[`line_items[${li}][price_data][product_data][name]`] =
 			e.name ?? `Father’s Heart Bible™ — ${e.title}`;
 		form[`line_items[${li}][price_data][product_data][description]`] =
-			e.desc ??
+			(e.desc && bookPct[slug] ? `${e.desc} · ${bookPct[slug]}% bulk discount` : e.desc) ??
 			(perUnitPromo && promo
 				? `Divine Voice Color · Complete Bible · ${FIRST_ORDER_PCT}% off your first order · free shipping`
 				: pct > 0
@@ -1790,5 +1943,147 @@ export async function checkoutForm(
 	// its redemptions. Units above are at list price when it applies — the two never stack.
 	if (promo && useCode) form['discounts[0][promotion_code]'] = promo;
 
+	return { form };
+}
+
+// ── EBOOKS (Kevin 2026-11-16 "We point to our own ebook sales") ────────────────────────────────────────────────────
+// A book's eBook sells from the ONE store like every product: same Stripe account, same first-order 15% (WELCOME15),
+// same Option C tags, no shipping and no country limit beyond Stripe's. Its rows live in book-skus.json under `ebooks`
+// (never `skus`: every print path, the merchant feed and the book pages read `skus`, so an eBook can never be sized,
+// shipped or fed as print). A row exists only for a title with a CURRENT EPUB on R2 (where it is: the server-only
+// src/data/ebook-files.json, read by functions/ebook-download.ts alone). `select_until` = the end of an active KDP
+// Select term: until that date the eBook is NOT on sale here (exclusivity) and its page keeps the Amazon button.
+// Generated by bin/fhb-ebook-config.py --smp (item 3 files + item 4 Select terms + the live Kindle price).
+export interface EbookRow {
+	title: string;
+	isbn: string;
+	listCents: number;
+	bookSlug: string;
+	img: string | null;
+	/** YYYY-MM-DD the KDP Select term ends; null = not enrolled */
+	selectUntil: string | null;
+}
+export const EBOOK_SKUS: Record<string, EbookRow> = Object.fromEntries(
+	Object.entries(
+		((bookSkus as { ebooks?: Record<string, Record<string, unknown>> }).ebooks ?? {}) as Record<
+			string,
+			Record<string, unknown>
+		>,
+	).map(([sku, f]) => [
+		sku,
+		{
+			title: f.checkout_name as string,
+			isbn: (f.isbn as string) ?? '',
+			listCents: f.list_cents as number,
+			bookSlug: f.book as string,
+			img: (f.checkout_img as string) ?? null,
+			selectUntil: (f.select_until as string) ?? null,
+		},
+	]),
+);
+export const isEbookSku = (sku: string): boolean => Boolean(EBOOK_SKUS[sku]);
+/** On sale from our store today: a row (= a current EPUB) and no active KDP Select term. */
+export function ebookOnSale(sku: string, now = new Date()): boolean {
+	const e = EBOOK_SKUS[sku];
+	if (!e || !Number.isInteger(e.listCents) || e.listCents <= 0) return false;
+	return !e.selectUntil || now.toISOString().slice(0, 10) >= e.selectUntil;
+}
+/** The eBook SKU a book page sells today, or null. */
+export function ebookForBook(bookSlug: string, now = new Date()): string | null {
+	for (const [sku, e] of Object.entries(EBOOK_SKUS))
+		if (e.bookSlug === bookSlug && ebookOnSale(sku, now)) return sku;
+	return null;
+}
+// Stripe tax code for electronically supplied books (the same code FHB /ebook-checkout uses for the Bible eBook).
+const EBOOK_TAX_CODE = 'txcd_10202001';
+
+/** One eBook order -> the Stripe Checkout Session form, or the refusal. Exactly one eBook per checkout (a download is
+ *  one copy); a cart mixing an eBook with print is refused (`ebook_separate`): print needs shipping, an eBook never. */
+export async function ebookCheckoutForm(
+	payload: OrderPayload,
+	requestUrl: string,
+	deps: EngineDeps,
+	now = new Date(),
+): Promise<EngineResult> {
+	const reply = (body: unknown, status = 200): EngineResult => ({ status, body });
+	const lines = Object.entries(payload.counts ?? {}).filter(([, n]) => Number(n) > 0);
+	if (lines.some(([sku]) => !isEbookSku(sku))) {
+		return lines.some(([sku]) => isEbookSku(sku))
+			? reply(
+					{
+						error: 'ebook_separate',
+						message: 'Please check out the eBook on its own; print copies ship separately.',
+					},
+					400,
+				)
+			: reply({ error: 'invalid_selection' }, 400);
+	}
+	if (lines.length !== 1 || Number(lines[0][1]) !== 1)
+		return reply({ error: 'invalid_selection' }, 400);
+	const sku = lines[0][0];
+	const e = EBOOK_SKUS[sku];
+	if (!ebookOnSale(sku, now)) return reply({ error: 'not_on_sale' }, 400);
+	if (!deps.enabled) return reply({ disabled: true, message: 'Checkout is not enabled yet.' });
+
+	const email = String(payload.email ?? '').trim();
+	const validEmail = email.length <= 254 && EMAIL_RE.test(email);
+	// the first-order 15% applies like every product (no shipping, so no margin floor to size against)
+	const promo =
+		validEmail && (await deps.isFirstOrder(email)) ? await deps.firstOrderPromo() : null;
+	const unit = promo ? unitAfter(e.listCents, FIRST_ORDER_PCT) : e.listCents;
+	const reqUrl = new URL(requestUrl);
+	const origin =
+		reqUrl.hostname === 'fathersheartbible.pages.dev'
+			? 'https://fathersheartbible.com'
+			: reqUrl.hostname === 'spirit-media-publishing.pages.dev'
+				? 'https://spiritmediapublishing.com'
+				: reqUrl.origin;
+	const page = `/books/${e.bookSlug}/`;
+	// the eBook's own book page (or its /buy/ alias) is the only accepted return path: never an open redirect
+	const back =
+		payload.returnPath === page || payload.returnPath === `${page}buy/`
+			? `${origin}${payload.returnPath}?order=canceled#order`
+			: `${origin}/bookstore/?order=canceled`;
+	const form: Record<string, string | number> = {
+		mode: 'payment',
+		// lands on /ebook-download, which re-reads the session from Stripe and hands over the signed download link
+		success_url: `${origin}/ebook-download?s={CHECKOUT_SESSION_ID}`,
+		cancel_url: back,
+		'automatic_tax[enabled]': 'true',
+		billing_address_collection: 'required', // digital goods: the billing address drives tax
+		customer_creation: 'always',
+		'metadata[kind]': 'ebook_direct',
+		'metadata[ebook_sku]': sku,
+		'metadata[pct_off]': promo ? FIRST_ORDER_PCT : 0,
+		'metadata[offer]': promo ? 'first_order' : 'none',
+		// author reporting, the same fields as a print book line; the country is the billing address on the session
+		'metadata[book_1]': [
+			`title=${e.title}`,
+			`isbn=${e.isbn || 'none'}`,
+			'format=eBook',
+			'qty=1',
+			`unit_cents=${unit}`,
+			'fee_cents=0',
+			'country=billing_address',
+			`date=${now.toISOString().slice(0, 10)}`,
+			`net_usd=${(unit / 100 - (unit / 100) * US_CARD_PCT - US_CARD_FIXED_USD).toFixed(2)}`,
+		]
+			.join('|')
+			.slice(0, META_VALUE_MAX),
+		'metadata[book_lines]': '1',
+		'line_items[0][quantity]': 1,
+		'line_items[0][price_data][currency]': 'usd',
+		'line_items[0][price_data][unit_amount]': e.listCents,
+		'line_items[0][price_data][tax_behavior]': 'exclusive',
+		'line_items[0][price_data][product_data][name]': `${e.title} — eBook`,
+		'line_items[0][price_data][product_data][description]':
+			'eBook · instant download · DRM-free EPUB',
+		'line_items[0][price_data][product_data][tax_code]': EBOOK_TAX_CODE,
+		'after_expiration[recovery][enabled]': 'true',
+	};
+	if (e.img) form['line_items[0][price_data][product_data][images][0]'] = e.img;
+	if (validEmail) form.customer_email = email;
+	// pre-applied, so Stripe shows WELCOME15 on the summary and counts its redemptions (the line stays at list price)
+	if (promo) form['discounts[0][promotion_code]'] = promo;
 	return { form };
 }

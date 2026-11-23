@@ -11,6 +11,8 @@
 //   exists (soft) -> more books + questions (light).
 // Every section renders ONLY from its field (copy by pmseoaeo, field list in jobs/seat-status/builder.md); nothing is
 // written here. One column, phone first.
+import AuthorLinks from './AuthorLinks.astro';
+
 interface Props {
 	/** true when the hero carries the FHB page viewer: no Look inside section below (Kevin 2026-11-14) */
 	hideLookInside?: boolean;
@@ -167,6 +169,7 @@ const asList = (a: string) => {
 					<div class="min-w-0">
 						{author && <h3 class="text-xl font-bold text-ink">{author}</h3>}
 						<p class="mt-2 text-stone-700">{g.author.bio}</p>
+						{(authorName || author) && <AuthorLinks author={authorName || author} />}
 					</div>
 				</div>
 			)}

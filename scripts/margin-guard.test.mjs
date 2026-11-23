@@ -68,7 +68,7 @@ test('dvc-checkout US first order still gets WELCOME15 (unchanged)', async () =>
 		if (u.includes('checkout/sessions') && init?.method === 'POST') { body = init.body; return j({ url: 'https://stripe.test/x' }); }
 		return j({ data: [] });
 	};
-	const { onRequestPost } = await import('../functions/dvc-checkout.ts');
+	const { onRequestPost } = await import('./lib/dvc-checkout-harness.ts');
 	const mk = (country) => onRequestPost({ request: new Request('https://x.test/dvc-checkout', { method: 'POST', body: JSON.stringify({ counts: { 'moms-pb': 1 }, email: 'a@b.co', country }) }), env: { STRIPE_FHB_SECRET_KEY: 'sk_test' } });
 	const r = await mk('US');
 	assert.equal((await r.json()).url, 'https://stripe.test/x');

@@ -4,11 +4,13 @@ import path from 'node:path';
 import EditionOrder from '../../components/EditionOrder.astro';
 import LangCover from '../../components/LangCover.astro';
 import LookInside from '../../components/LookInside.astro';
+import MailtoLink from '../../components/MailtoLink.astro';
 import Section from '../../components/Section.astro';
 import { cardUrl, hasLangCard } from '../../data/card-art';
 import coverColors from '../../data/cover-colors.json';
 import frontmatter from '../../data/editions/frontmatter.json';
 import shared from '../../data/editions/shared.json';
+import googleBooks from '../../data/google-books-listings.json';
 import isbnList from '../../data/isbn-list.json';
 import { langSlug, orderableLanguages } from '../../data/language-editions';
 import { catalogRows } from '../../data/print-catalog';
@@ -216,7 +218,8 @@ const orderIds = langEd
 // No ISBN yet = nothing the checkout can sell: an empty order set, by declaration, not by accident.
 const reserveOnly = ed.orderable === false;
 const orderRows = reserveOnly ? [] : catalogRows.filter((r) => orderIds.includes(r.id));
-const RESERVE_MAIL = `mailto:hello@spiritmediapublishing.com?subject=${encodeURIComponent(`Reserve: ${ed.english ?? ed.name} Father's Heart Bible`)}`;
+// Kevin 2026-11-20 RULE: no address in the page source — MailtoLink builds the mailto: at load.
+const RESERVE_SUBJECT = `Reserve: ${ed.english ?? ed.name} Father's Heart Bible`;
 if (!orderRows.length && !reserveOnly)
 	throw new Error(
 		`/bibles/${ed.slug}-bible/: no print-catalog row for [${orderIds.join(', ')}] — this edition page would have no order form`,
@@ -539,6 +542,13 @@ const variants = (preorder ? [] : orderRows).flatMap((r) => {
 		title: orderRows.length > 1 ? r.title : schemaName,
 	}));
 });
+// Google Books listing for a binding, by its ISBN-13 (unit 3kq). Id form only; empty when none is known.
+const gbUrlFor = (isbn?: string): string[] => {
+	const id = isbn
+		? (googleBooks.listings as Record<string, string>)[isbn.replace(/-/g, '')]
+		: undefined;
+	return id ? [`https://books.google.com/books?id=${id}`] : [];
+};
 const offerFor = (v: (typeof variants)[number]) => ({
 	'@type': 'Offer',
 	price: v.price.toFixed(2),
@@ -598,9 +608,15 @@ const productSchema = {
 	image: coverImageObject,
 	url,
 	// The same edition on YouVersion, when fhb-partner-link-watch has FOUND it (one map, one line per language).
-	...(ed.lang && (youversion.versions as Record<string, string>)[ed.lang]
-		? { sameAs: [(youversion.versions as Record<string, string>)[ed.lang]] }
-		: {}),
+	...(() => {
+		const same = [
+			...(ed.lang && (youversion.versions as Record<string, string>)[ed.lang]
+				? [(youversion.versions as Record<string, string>)[ed.lang]]
+				: []),
+			...gbUrlFor(mainVariant?.isbn ?? ed.isbn),
+		];
+		return same.length ? { sameAs: same } : {};
+	})(),
 	publisher: {
 		'@type': 'Organization',
 		'@id': 'https://spiritmediapublishing.com/#organization',
@@ -634,6 +650,7 @@ const productSchema = {
 		image: coverImageObject,
 		inLanguage: nativeMeta ? inLang : (ed.lang ?? 'en'),
 		brand: { '@type': 'Brand', name: "Father's Heart Bible" },
+		...(gbUrlFor(v.isbn).length ? { sameAs: gbUrlFor(v.isbn) } : {}),
 		offers: offerFor(v),
 	})),
 };
@@ -748,7 +765,7 @@ const metaDescription =
 						{/* Kevin 2026-11-14: "Seems useless to have order button directly above the order box" - removed; the box follows. */}
 						<LookInside slug={ed.lookInsideKey ?? ed.slug} title={ed.name} size="lg" />
 						{yvUrl && (
-							<a href={yvUrl} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 2px solid #3f3f46; padding: 0.7rem 1.6rem; text-decoration: none; font-size: 1rem;">Read on Bible.com</a>
+							<a href={yvUrl} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: #fff; color: #3f3f46; border: 2px solid #3f3f46; padding: 0.7rem 1.6rem; text-decoration: none; font-size: 1rem;">Read on Bible.com<span class="xsite-sr"> (opens in a new tab)</span></a>
 						)}
 					</div>
 				</div>
@@ -757,7 +774,7 @@ const metaDescription =
 				<div id="order" class="max-w-3xl mx-auto rounded-2xl p-6 md:p-7 mt-10 text-center" style="background: #fff; border: 1px solid var(--color-hairline); scroll-margin-top: 90px;">
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.5rem;">Order the {ed.english} Edition direct</h2>
 					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.6; margin: 0 0 1.1rem;">This edition is in preparation: its ISBN, page count and price are assigned when the book is typeset. Reserve a copy now and we will write to you the day it can be ordered, direct from us with free shipping.</p>
-					<a href={RESERVE_MAIL} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; padding: 0.75rem 1.6rem; text-decoration: none; font-size: 0.95rem;">Reserve a copy by email</a>
+					<MailtoLink email="hello@spiritmediapublishing.com" subject={RESERVE_SUBJECT} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; padding: 0.75rem 1.6rem; text-decoration: none; font-size: 0.95rem;">Reserve a copy by email</MailtoLink>
 				</div>
 			) : (
 				<EditionOrder offerLine={orderLang === 'en' || !orderLang ? `15% off first order + free standard shipping to ${LIVE_COUNTRIES.length} countries` : orderT('hero.freeShipValue')} titleStyle={coverTitle ? titleStyle : undefined} rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} lang={orderLang} note={preorder ? orderT('o.preorder') : undefined} />
@@ -885,7 +902,7 @@ const metaDescription =
 						<div class="flex flex-wrap gap-2 px-5 py-3" style={`font-family: var(--font-sans); font-size: 0.9rem; ${n % 2 ? 'background: #fafafa;' : ''}`}>
 							<span style="color: #71717a; min-width: 7.5rem;">{k}</span>
 							{k === 'Publisher' ? (
-								<a href="https://spiritmediapublishing.com" target="_blank" rel="noopener" style="flex: 1; line-height: 0;"><img src="https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp" alt="" width="200" height="20" loading="lazy" decoding="async" style="width: 200px; max-width: 100%; height: auto;" /><span class="sr-only">Spirit Media Publishing</span></a>
+								<a href="https://spiritmediapublishing.com" style="flex: 1; line-height: 0;"><img src="https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp" alt="" width="200" height="20" loading="lazy" decoding="async" style="width: 200px; max-width: 100%; height: auto;" /><span class="sr-only">Spirit Media Publishing</span><span class="xsite-line" style="margin-top: 0.25rem; color: #52525b; font-size: 0.85rem;"><span class="xsite-dest"> <span aria-hidden="true">·</span> spiritmediapublishing.com</span></span></a>
 							) : (
 								<span style={`color: ${k === 'Edition' ? smallTitleColor : 'var(--color-ink)'}; font-weight: 600; flex: 1;${k.includes('ISBN') ? ' white-space: nowrap;' : ''}`}>{v}</span>
 							)}
@@ -926,7 +943,7 @@ const metaDescription =
 							<p style="font-family: var(--font-sans); color: #71717a; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 0.3rem;">{k}</p>
 							{k === 'Published by' && v === 'Spirit Media Publishing' ? (
 								/* Kevin 2026-11-14: "use smp logo ... here: Published by Spirit Media Publishing" */
-								<a href="https://spiritmediapublishing.com" target="_blank" rel="noopener" style="display: inline-block; line-height: 0;"><img src="https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp" alt="" width="220" height="22" loading="lazy" decoding="async" style="width: 220px; max-width: 100%; height: auto;" /><span class="sr-only">Spirit Media Publishing</span></a>
+								<a href="https://spiritmediapublishing.com" style="display: inline-block; line-height: 0;"><img src="https://assets.spiritmediapublishing.com/spirit-media-publishing/smp-logo.webp" alt="" width="220" height="22" loading="lazy" decoding="async" style="width: 220px; max-width: 100%; height: auto;" /><span class="sr-only">Spirit Media Publishing</span><span class="xsite-line" style="margin-top: 0.25rem; color: #52525b; font-size: 0.85rem;"><span class="xsite-dest"> <span aria-hidden="true">·</span> spiritmediapublishing.com</span></span></a>
 							) : (
 								<p style="font-family: var(--font-sans); color: var(--color-ink); font-weight: 600; margin: 0;">{v}</p>
 							)}
