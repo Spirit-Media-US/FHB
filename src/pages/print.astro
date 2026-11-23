@@ -66,7 +66,7 @@ const AUDIENCE_TOTAL = AUDIENCE_EDITION_TOTAL;
 
 // Digital editions. Every eBook / audiobook store link comes from src/data/digital-listings.json —
 // the one master, each entry added only after its store page answered with the right title
-// (2026-10-10). The English eBook is also sold direct here ($7.49, our own fulfillment). Apple
+// (2026-10-10). The English eBook is also sold direct here ($9.99, Kevin 2026-11-23 D95; our own fulfillment). Apple
 // Books and Nook were removed 2026-10-10: both listings 404 since D2D refused distribution.
 const digitalEn = digital.en;
 const EBOOK_COVER =
@@ -74,7 +74,7 @@ const EBOOK_COVER =
 const EBOOK_COVER_2X =
 	'https://assets.spiritmediapublishing.com/FHB/print/fhb-ebook-cover-2026-6-1200.webp';
 const storeLogo = (store: string) => (store === 'Kobo' ? ('kobo' as const) : ('google' as const));
-const EBOOK_DIRECT = '$7.49';
+const EBOOK_DIRECT = '$9.99'; // Kevin 2026-11-23 D95 (was $7.49)
 
 // ───────────────────────── GENERAL AUDIENCE ─────────────────────────
 // The same Divine Voice™ Color Bible without an audience on the cover, in three cover
@@ -382,7 +382,7 @@ const faqSchema = {
 };
 
 // Book + Offer structured data — the /print page is the commerce surface, so the
-// purchasable price range lives here: ebook direct $7.49 → the journaling 8x10 at $124.99.
+// purchasable price range lives here: ebook direct $9.99 → the journaling 8x10 at $124.99.
 // NOT "Large Print hardback $124.99", as this line read until 2026-09-17: the LP hardbacks
 // are $114.99 here and in dvc-checkout.ts, and Ingram's US retail drops to $114.99 effective
 // 18-SEP-26 (Kevin). $124.99 is the journaling edition's price, and always was.
@@ -408,7 +408,7 @@ const bookSchema = {
 		hasMerchantReturnPolicy: merchantReturnPolicy,
 		shippingDetails: shippingDetailsForOffers(),
 		priceCurrency: 'USD',
-		lowPrice: '7.49',
+		lowPrice: '9.99',
 		highPrice: '124.99',
 		offerCount: 29,
 		availability: 'https://schema.org/InStock',
