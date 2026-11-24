@@ -88,13 +88,18 @@ export async function loadTblShelf({ url, snapshotPath, shelf = 'smp', fetchImpl
  * ctx.pageBuilt(key)  an SMP /books/<key>/ page builds on this build (the card opens it; the switch-over later sends it to TBL)
  * ctx.ownEbook(key)   our store sells the eBook from that page
  * ctx.cover(key)      a pre-sized 300px cover for the card, if one exists
- * ctx.fhPage(key)     the FHB page of a Father Heart book (Option C: FH books open on fathersheartbible.com)
+ * ctx.fhPage(key)     the FHB page of a Father Heart book, or null when FHB has none (Option C: FH books open on FHB)
  */
 export function tblCards(feed, ctx) {
 	return feed.works.map((w) => {
 		// the SMP page of the book: its key, or meta.smp_page where TBL keys it differently (your-time-audiobook -> your-time)
 		const page = w.smp_page || w.key;
-		const own = w.fh_book ? ctx.fhPage(w.key) : ctx.pageBuilt(page) ? `/books/${page}/` : w.url;
+		// an FH book opens its FHB page when FHB has one (ctx.fhPage -> null when not), else its TBL page
+		const own = w.fh_book
+			? (ctx.fhPage(w.key) ?? w.url)
+			: ctx.pageBuilt(page)
+				? `/books/${page}/`
+				: w.url;
 		const f = w.formats ?? {};
 		// where a format's badge goes when we sell it: our page; an FH book's eBook / audiobook sells on TBL (FHB sells print only)
 		const sells = (fmt) => (w.fh_book && fmt !== 'print' ? w.url : own);
