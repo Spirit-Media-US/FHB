@@ -1530,7 +1530,16 @@ export function storeTagErrors(form: Record<string, string | number>): string[] 
 // (this engine, Bibles + books) and print_bulk (the retired /print bulk path). Other payments on the same Stripe
 // account (publishing invoices, pre-release sales, app charges) no longer make a buyer a "repeat".
 // ebook_direct (2026-11-16): an eBook bought from the store is a store purchase too, so it ends the first order.
-export const STORE_ORDER_KINDS: readonly string[] = ['dvc_print', 'print_bulk', 'ebook_direct'];
+// audiobook_direct, tbl_ebook, ebook_bundle (I22 2026-11-23): TBL's audiobook, FHB language eBook and series bundle
+// sales are store orders too (one store, TBL window), so they end the first order.
+export const STORE_ORDER_KINDS: readonly string[] = [
+	'dvc_print',
+	'print_bulk',
+	'ebook_direct',
+	'audiobook_direct',
+	'tbl_ebook',
+	'ebook_bundle',
+];
 export async function isFirstOrder(email: string, key: string): Promise<boolean> {
 	const get = async (path: string) => {
 		const r = await fetch(`https://api.stripe.com/v1/${path}`, {
@@ -1672,10 +1681,11 @@ export async function checkoutForm(
 			400,
 		);
 	}
-	// ONE ENGINE (Kevin 2026-11-15): a book is sized on its own measured landed cost, else the country's Bible
-	// cost for the same binding (marginGuard.landedUnitCost). Refused only when the country has no cost at all.
+	// ONE ENGINE (Kevin 2026-11-15): a book is sized on its own measured landed cost, else the per-book cost model
+	// (Kevin 2026-11-24), capped at the country's Bible cost (marginGuard.landedUnitCost). Refused only when nothing prices it.
 	const unsized = Object.entries(counts).some(
-		([slug, n]) => n > 0 && BOOK_SKUS[slug] && landedUnitCost(slug, dest?.landed_cost_usd) == null,
+		([slug, n]) =>
+			n > 0 && BOOK_SKUS[slug] && landedUnitCost(slug, dest?.landed_cost_usd, dest?.code) == null,
 	);
 	if (intl && unsized) {
 		return reply(
