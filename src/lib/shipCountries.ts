@@ -227,7 +227,12 @@ export function checkoutShippingForm(
 		// The expedited disclaimer, beside the buyer's final click (only where the option exists).
 		// The expedited disclaimer, beside the buyer's final click (only where the option exists). No email address is
 		// ever printed (Kevin 2026-11-15: "We do not post our emails").
-		...(c.fast ? { 'custom_text[submit][message]': EXPEDITED_DISCLAIMER } : {}),
+		// + Kevin 2026-11-24 seller line (the engine form sets it alone when there is no disclaimer).
+		...(c.fast
+			? {
+					'custom_text[submit][message]': `${EXPEDITED_DISCLAIMER} Sold and shipped by Spirit Media Publishing.`,
+				}
+			: {}),
 	};
 }
 

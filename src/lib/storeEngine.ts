@@ -34,6 +34,8 @@ import {
 	META_VALUE_MAX,
 	packBreakdown,
 	paidUnit,
+	preorderShipAfter,
+	releaseDateText,
 	type Tier,
 	unitAfter,
 } from './order-pricing.ts';
@@ -1530,7 +1532,16 @@ export function storeTagErrors(form: Record<string, string | number>): string[] 
 // (this engine, Bibles + books) and print_bulk (the retired /print bulk path). Other payments on the same Stripe
 // account (publishing invoices, pre-release sales, app charges) no longer make a buyer a "repeat".
 // ebook_direct (2026-11-16): an eBook bought from the store is a store purchase too, so it ends the first order.
-export const STORE_ORDER_KINDS: readonly string[] = ['dvc_print', 'print_bulk', 'ebook_direct'];
+// audiobook_direct, tbl_ebook, ebook_bundle (I22 2026-11-23): TBL's audiobook, FHB language eBook and series bundle
+// sales are store orders too (one store, TBL window), so they end the first order.
+export const STORE_ORDER_KINDS: readonly string[] = [
+	'dvc_print',
+	'print_bulk',
+	'ebook_direct',
+	'audiobook_direct',
+	'tbl_ebook',
+	'ebook_bundle',
+];
 export async function isFirstOrder(email: string, key: string): Promise<boolean> {
 	const get = async (path: string) => {
 		const r = await fetch(`https://api.stripe.com/v1/${path}`, {
@@ -1672,10 +1683,11 @@ export async function checkoutForm(
 			400,
 		);
 	}
-	// ONE ENGINE (Kevin 2026-11-15): a book is sized on its own measured landed cost, else the country's Bible
-	// cost for the same binding (marginGuard.landedUnitCost). Refused only when the country has no cost at all.
+	// ONE ENGINE (Kevin 2026-11-15): a book is sized on its own measured landed cost, else the per-book cost model
+	// (Kevin 2026-11-24), capped at the country's Bible cost (marginGuard.landedUnitCost). Refused only when nothing prices it.
 	const unsized = Object.entries(counts).some(
-		([slug, n]) => n > 0 && BOOK_SKUS[slug] && landedUnitCost(slug, dest?.landed_cost_usd) == null,
+		([slug, n]) =>
+			n > 0 && BOOK_SKUS[slug] && landedUnitCost(slug, dest?.landed_cost_usd, dest?.code) == null,
 	);
 	if (intl && unsized) {
 		return reply(
@@ -1809,6 +1821,24 @@ export async function checkoutForm(
 		);
 	}
 
+	// PRE-ORDER (book-skus.json `_about_preorder`): a line still before its ship_after date is charged now and ships at
+	// release. The whole order waits for the LATEST ship_after in it (one shipment), which the session carries for the
+	// shipping desk and the buyer email; the Stripe line says so too.
+	const preorder: Record<string, string> = {};
+	for (const [slug, n] of Object.entries(counts)) {
+		const d = n > 0 ? preorderShipAfter(slug) : null;
+		if (d) preorder[slug] = d;
+	}
+	const shipAfter = Object.values(preorder).sort().pop() ?? null;
+	// a business-day estimate counts from today, which is wrong for a book not yet released: the shipping options name
+	// the release instead and carry no estimate
+	if (shipAfter)
+		for (const k of Object.keys(shipForm)) {
+			if (k.includes('[delivery_estimate]')) delete shipForm[k];
+			else if (k.endsWith('[display_name]'))
+				shipForm[k] = `${shipForm[k]} (ships at release · Releasing ${releaseDateText(shipAfter)})`;
+		}
+
 	const reqUrl = new URL(requestUrl);
 	const origin =
 		reqUrl.hostname === 'fathersheartbible.pages.dev'
@@ -1845,6 +1875,11 @@ export async function checkoutForm(
 		// come from src/data/ship-countries.json via checkoutShippingForm (unit 2js). US ships free
 		// (baked into the unit price); a country with a rate adds it as the Stripe shipping option.
 		...shipForm,
+		// Kevin 2026-11-24 ~19:4xZ ("d b"): the seller line on every checkout. Expedited carts already carry it after their
+		// disclaimer (shipCountries.ts); RIAB's own checkout replaces it with its book line + the same words.
+		...('custom_text[submit][message]' in shipForm
+			? {}
+			: { 'custom_text[submit][message]': 'Sold and shipped by Spirit Media Publishing.' }),
 		'metadata[kind]': 'dvc_print',
 		// Physical copies, as the fulfilment email's subject and its "9+ copies" wording read it; the
 		// Bible ladder count (which a discount-exempt book does not touch) travels as ladder_total.
@@ -1866,6 +1901,13 @@ export async function checkoutForm(
 						.map(([s, p]) => `${s}:${p}`)
 						.join(',')
 						.slice(0, 500),
+				}
+			: {}),
+		...(shipAfter
+			? {
+					'metadata[preorder]': 'true',
+					'metadata[ship_after]': shipAfter,
+					'metadata[preorder_skus]': Object.keys(preorder).join(',').slice(0, 500),
 				}
 			: {}),
 		// Split under Stripe's 500-char value cap (an 82-SKU cart was one 1,138-char value: 502).
@@ -1911,7 +1953,11 @@ export async function checkoutForm(
 		form[`line_items[${li}][price_data][product_data][name]`] =
 			e.name ?? `Father’s Heart Bible™ — ${e.title}`;
 		form[`line_items[${li}][price_data][product_data][description]`] =
-			(e.desc && bookPct[slug] ? `${e.desc} · ${bookPct[slug]}% bulk discount` : e.desc) ??
+			(e.desc && preorder[slug]
+				? `${e.desc} · Pre-order: ships at release. Releasing ${releaseDateText(preorder[slug])}`
+				: e.desc && bookPct[slug]
+					? `${e.desc} · ${bookPct[slug]}% bulk discount`
+					: e.desc) ??
 			(perUnitPromo && promo
 				? `Divine Voice Color · Complete Bible · ${FIRST_ORDER_PCT}% off your first order · free shipping`
 				: pct > 0
@@ -2046,6 +2092,7 @@ export async function ebookCheckoutForm(
 			: `${origin}/bookstore/?order=canceled`;
 	const form: Record<string, string | number> = {
 		mode: 'payment',
+		'custom_text[submit][message]': 'Sold by Spirit Media Publishing.', // Kevin 2026-11-24 seller line (eBook: nothing ships)
 		// lands on /ebook-download, which re-reads the session from Stripe and hands over the signed download link
 		success_url: `${origin}/ebook-download?s={CHECKOUT_SESSION_ID}`,
 		cancel_url: back,

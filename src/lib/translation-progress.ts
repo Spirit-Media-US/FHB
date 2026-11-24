@@ -93,7 +93,13 @@ function scriptByRange(cp: number): string {
 const regionLabel = new Map(
 	(roster.regions as { key: string; label: string }[]).map((r) => [r.key, r.label]),
 );
-const live = new Set((readerLanguages.languages as { code: string }[]).map((l) => l.code));
+// The roster files two languages under a different code than the reader (Twi ak = reader tw; Kituba ktu =
+// reader mkw — fhb-chain.py ED_ROSTER_ALIAS). Without the map both read "in preparation" while /read serves them.
+const live = new Set(
+	(readerLanguages.languages as { code: string }[]).flatMap((l) =>
+		l.code === 'tw' ? ['tw', 'ak'] : l.code === 'mkw' ? ['mkw', 'ktu'] : [l.code],
+	),
+);
 const printed = new Set(
 	(registry.editions as { code: string; soon?: boolean }[])
 		.filter((e) => !e.soon)

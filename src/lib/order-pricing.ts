@@ -108,6 +108,12 @@ export interface BookFormatRow {
 	/** the row's own binding text (e.g. 'Case laminate', 'Perfect bound'); with `format`, what isHardbackRow reads */
 	binding: string;
 	bookSlug: string;
+	/** Physical spec the per-book cost model reads (marginGuard.modelledLandedUsd, Kevin 2026-11-24): page count
+	 *  (null = unknown, then the model borrows the same book's other format), trim text, and the optional
+	 *  `interior` override ('bw' | 'color'); absent = derived from the row (see marginGuard.interiorOf). */
+	pages: number | null;
+	trim: string | null;
+	interior: string | null;
 	/** Measured US per-copy print + ship cost (the US has no country-list cost row); null = unmeasured. */
 }
 export const BOOK_SKUS: Record<string, BookFormatRow> = Object.fromEntries(
@@ -122,6 +128,9 @@ export const BOOK_SKUS: Record<string, BookFormatRow> = Object.fromEntries(
 			format: f.format as string,
 			binding: (f.binding as string) ?? '',
 			bookSlug: f.book as string,
+			pages: typeof f.pages === 'number' ? (f.pages as number) : null,
+			trim: (f.trim as string) ?? null,
+			interior: (f.interior as string) ?? null,
 		},
 	]),
 );
@@ -141,6 +150,27 @@ const PENDING_ROWS = ((bookSkus as { pending?: Record<string, RegistryRow> }).pe
 	{}) as Record<string, RegistryRow>;
 /** SKUs whose book has a page but is not sold yet (book-skus.json `pending`). */
 export const PENDING_SKUS: readonly string[] = Object.keys(PENDING_ROWS);
+// PRE-ORDER (Kevin 2026-11-24 MMFI, book-skus.json `_about_preorder`): a SOLD row (`skus`) may carry `ship_after`
+// (YYYY-MM-DD). Before that date it sells as a pre-order (charged now, ships at release); from that date on it is an
+// ordinary sale. Unlike `pending`, a pre-order row IS sold, fed and given an Offer (availability PreOrder).
+const SHIP_AFTER: Record<string, string> = Object.fromEntries(
+	Object.entries(bookSkus.skus as Record<string, { ship_after?: string | null }>)
+		.filter(([, r]) => typeof r.ship_after === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(r.ship_after))
+		.map(([sku, r]) => [sku, r.ship_after as string]),
+);
+/** The release date `sku` ships after while it is still a pre-order on `now` (UTC date), else null. */
+export const preorderShipAfter = (sku: string, now = new Date()): string | null => {
+	const d = SHIP_AFTER[sku];
+	return d && now.toISOString().slice(0, 10) < d ? d : null;
+};
+/** "2027-01-07" -> "January 7, 2027" (the buyer-facing form of a ship_after date). */
+export const releaseDateText = (iso: string): string =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+		timeZone: 'UTC',
+	});
 /** sku -> its own bulk ladder, highest first, for sold AND pending rows (a pending book's page shows its offer). */
 export const BOOK_BULK_TIERS: Record<string, Tier[]> = Object.fromEntries(
 	Object.entries({ ...(bookSkus.skus as Record<string, RegistryRow>), ...PENDING_ROWS })
@@ -178,9 +208,14 @@ export const bindingFor = (slug: string): string => {
 	if (book) return book.costKey ?? (isHardbackRow(book) ? 'hc' : 'pb');
 	return slug.endsWith('-hb') ? 'hc' : 'pb';
 };
-/** Key into IntlRow.fees: the fee depends on binding, volumes in the box and the paid unit price. */
-export const feeKey = (slug: string, paidCents: number): string =>
-	`${bindingFor(slug)}${volumesFor(slug)}:${paidCents}`;
+/** Key into IntlRow.fees: the fee depends on binding, volumes in the box and the paid unit price. A book WITHOUT its own
+ *  measured cost key is keyed by its own SKU (Kevin 2026-11-24 per-book cost model): its fee comes from its OWN specs, so
+ *  two books at the same price no longer share one fee (before, they shared the Bible's 'pb1:<price>' row). */
+export const feeKey = (slug: string, paidCents: number): string => {
+	const book = BOOK_SKUS[slug];
+	const k = book && !book.costKey ? slug : bindingFor(slug);
+	return `${k}${volumesFor(slug)}:${paidCents}`;
+};
 
 export interface IntlRow {
 	name: string;

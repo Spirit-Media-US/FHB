@@ -8,6 +8,7 @@
 // filtered out).
 import { allLanguageEditions } from './language-editions';
 import roster from './language-roster.json' with { type: 'json' };
+import readerLanguages from './reader-languages.json' with { type: 'json' };
 import { readOnlyLanguages } from './receive';
 
 // GENERATED, no longer typed (2026-10-30): the roster's own name, the language's primary-country
@@ -40,7 +41,23 @@ const LIVE_NAMES = [
 const liveIds = new Set(LIVE_NAMES.map(identity));
 
 /** Roster languages not yet live, alphabetical: [name, flag, region]. */
-export const upcomingLanguages = upcomingAll.filter(([name]) => !liveIds.has(identity(name)));
+// Also live by CODE: names alone missed azb, kmr, zh-hant (roster labels differ from the reader's) and the
+// two codes the roster files differently (ak = reader tw, ktu = reader mkw), so /legacy kept a "More to
+// come" list while /read serves all 80.
+const readerCodes = new Set(
+	(readerLanguages.languages as { code: string }[]).flatMap((l) =>
+		l.code === 'tw' ? ['tw', 'ak'] : l.code === 'mkw' ? ['mkw', 'ktu'] : [l.code],
+	),
+);
+const rosterCodeByName = new Map(
+	(roster.languages as { code: string; roster?: string }[]).map((l) => [
+		l.roster ?? l.code,
+		l.code,
+	]),
+);
+export const upcomingLanguages = upcomingAll.filter(
+	([name]) => !liveIds.has(identity(name)) && !readerCodes.has(rosterCodeByName.get(name) ?? ''),
+);
 
 /** The whole commitment (Kevin 2026-10-14: "let's just declare: 80 Languages"; 2026-11-08: "80 everywhere
  * not 83 anywhere"). Counted from the roster itself: read-online languages outside the roster
