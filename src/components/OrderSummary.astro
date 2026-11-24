@@ -86,6 +86,8 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	{edition && en && <p class="osum__hint" id={`${idp}-email-hint`}>For your receipt, and to check your first-order saving.</p>}
 	<input id={`${idp}-email`} class="osum__email" type="email" name="email" autocomplete="email" inputmode="email" required data-email aria-describedby={edition && en ? `${idp}-email-hint` : undefined} />
 	<button type="button" class="osum__checkout" data-checkout data-t="s.checkout">{t('s.checkout')}</button>
+	{/* Kevin 2026-11-24 seller line on every checkout form (same as SMP BookOrder) */}
+	<p class="osum__seller" data-t="s.seller">{t('s.seller')}</p>
 	{multiCountry && (
 	<div class="osum__quote" data-quote hidden>
 		<p class="osum__note" data-quote-note data-t="q.note">{quoteNote}</p>
@@ -151,6 +153,7 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	.osum__quote[hidden] { display: none; }
 	.osum__quote-btn { display: flex; align-items: center; justify-content: center; box-sizing: border-box; text-decoration: none; }
 	.osum__checkout:disabled { opacity: 0.6; cursor: wait; }
+	.osum__seller { margin: 0.5rem 0 0; color: #57534e; font-size: 0.78rem; text-align: center; }
 	.osum__help { margin: 0.6rem 0 0; text-align: center; font-size: 0.85rem; color: #52525b; }
 	.osum__help :global(.osum__help-btn) { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1.2rem; border: 1px solid #c4c4cc; border-radius: 999px; background: #fff; color: #3f3f46; font-weight: 600; text-decoration: none; }
 	.osum__msg { color: var(--color-muted); font-size: 0.85rem; margin: 0.6rem 0 0; }
