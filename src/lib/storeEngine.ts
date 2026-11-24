@@ -1836,7 +1836,7 @@ export async function checkoutForm(
 		for (const k of Object.keys(shipForm)) {
 			if (k.includes('[delivery_estimate]')) delete shipForm[k];
 			else if (k.endsWith('[display_name]'))
-				shipForm[k] = `${shipForm[k]} (ships at release, ${releaseDateText(shipAfter)})`;
+				shipForm[k] = `${shipForm[k]} (ships at release · Releasing ${releaseDateText(shipAfter)})`;
 		}
 
 	const reqUrl = new URL(requestUrl);
@@ -1954,7 +1954,7 @@ export async function checkoutForm(
 			e.name ?? `Father’s Heart Bible™ — ${e.title}`;
 		form[`line_items[${li}][price_data][product_data][description]`] =
 			(e.desc && preorder[slug]
-				? `${e.desc} · Pre-order: ships at release, target ${releaseDateText(preorder[slug])}`
+				? `${e.desc} · Pre-order: ships at release. Releasing ${releaseDateText(preorder[slug])}`
 				: e.desc && bookPct[slug]
 					? `${e.desc} · ${bookPct[slug]}% bulk discount`
 					: e.desc) ??
