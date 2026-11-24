@@ -150,6 +150,27 @@ const PENDING_ROWS = ((bookSkus as { pending?: Record<string, RegistryRow> }).pe
 	{}) as Record<string, RegistryRow>;
 /** SKUs whose book has a page but is not sold yet (book-skus.json `pending`). */
 export const PENDING_SKUS: readonly string[] = Object.keys(PENDING_ROWS);
+// PRE-ORDER (Kevin 2026-11-24 MMFI, book-skus.json `_about_preorder`): a SOLD row (`skus`) may carry `ship_after`
+// (YYYY-MM-DD). Before that date it sells as a pre-order (charged now, ships at release); from that date on it is an
+// ordinary sale. Unlike `pending`, a pre-order row IS sold, fed and given an Offer (availability PreOrder).
+const SHIP_AFTER: Record<string, string> = Object.fromEntries(
+	Object.entries(bookSkus.skus as Record<string, { ship_after?: string | null }>)
+		.filter(([, r]) => typeof r.ship_after === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(r.ship_after))
+		.map(([sku, r]) => [sku, r.ship_after as string]),
+);
+/** The release date `sku` ships after while it is still a pre-order on `now` (UTC date), else null. */
+export const preorderShipAfter = (sku: string, now = new Date()): string | null => {
+	const d = SHIP_AFTER[sku];
+	return d && now.toISOString().slice(0, 10) < d ? d : null;
+};
+/** "2027-01-07" -> "January 7, 2027" (the buyer-facing form of a ship_after date). */
+export const releaseDateText = (iso: string): string =>
+	new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+		timeZone: 'UTC',
+	});
 /** sku -> its own bulk ladder, highest first, for sold AND pending rows (a pending book's page shows its offer). */
 export const BOOK_BULK_TIERS: Record<string, Tier[]> = Object.fromEntries(
 	Object.entries({ ...(bookSkus.skus as Record<string, RegistryRow>), ...PENDING_ROWS })
