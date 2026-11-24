@@ -11,8 +11,9 @@
 // THE SMP SHELF READS TBL. Every SMP author book on /bookstore/ and the homepage "New from Spirit Media Authors" comes from
 // The Believer's Library catalog (TBL GET /api/library/shelf.json?shelf=smp, community src/lib/library-shelf.ts). A book
 // added on TBL is carded here at the next build, with no SMP commit.
-//   REFRESH: every build reads the feed live (Bethel, Cloudflare, the Sanity webhook build alike); the watcher
-//   bin/tbl-shelf-watch.sh rebuilds when the feed changes. The edge caches the feed 15 min (s-maxage=900).
+//   REFRESH: every build reads the feed live (Bethel, Cloudflare, the Sanity webhook build alike), so the shelf is as
+//   of the site's last build; the edge caches the feed 15 min (s-maxage=900). A rebuild-on-TBL-change watcher is
+//   PROPOSED, not built (new tool + it would trigger production builds: needs approval; brief tbl-shelves report).
 //   FALLBACK: a build that cannot read the feed (3 tries) uses src/data/tbl-shelf.json, the last good feed this code wrote.
 //   No feed AND no snapshot = the build FAILS (never an empty shelf). A preview feed (*.pages.dev, or carrying preview
 //   test rows) is never written to the snapshot.
