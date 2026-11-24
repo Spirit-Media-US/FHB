@@ -1,13 +1,15 @@
 ---
-import BiblesBooksToggle from '../../components/BiblesBooksToggle.astro';
 // /books/ — the Father Heart books catalogue (Kevin 2026-11-13, kevin-decisions L1959: "Perhaps we start a separate
 // page like our current /print page for /books that get's linked on /print but builds a listing of books ... our FHB
-// is #1 priority"). Every card comes from src/data/books.json; adding a book is a data row. The Father's Heart Bible
-// editions lead the page, so the Bibles stay first.
+// is #1 priority"). WHICH books it lists comes from The Believer's Library (below); a book's FHB page copy + order form
+// stay in src/data/books.json. The Father's Heart Bible editions lead the page, so the Bibles stay first.
+import path from 'node:path';
+import BiblesBooksToggle from '../../components/BiblesBooksToggle.astro';
 import Section from '../../components/Section.astro';
 import bookSkus from '../../data/book-skus.json';
 import catalog from '../../data/books.json';
 import Layout from '../../layouts/Layout.astro';
+import { loadTblShelf } from '../../lib/tbl-shelf.mjs';
 
 type Book = {
 	slug: string;
@@ -21,9 +23,85 @@ type Book = {
 	cover: { w600: string; w300: string; width: number; height: number; alt: string; jpg: string };
 	formats: { format: string; list_cents: number; isbn: string }[];
 };
-const books = (catalog.books as Book[]).slice().sort((a, b) => a.order - b.order);
-const URL_ = 'https://fathersheartbible.com/books/';
+const BOOK_SKU_ROWS = bookSkus.skus as Record<string, { format: string; list_cents: number }>;
+/** "Paperback $15.99 · Hardback $24.99" for a book's format SKUs (FHB-BOOKS, src/data/book-skus.json). */
+const bookPriceLine = (skus: string[]) =>
+	skus
+		.map(
+			(sku) => `${BOOK_SKU_ROWS[sku].format} $${(BOOK_SKU_ROWS[sku].list_cents / 100).toFixed(2)}`,
+		)
+		.join(' · ');
 const money = (c: number) => `$${(c / 100).toFixed(2)}`;
+// THE SHELF READS TBL (Kevin 2026-11-21: "We need 1 update and it shows on FHB, TBL, Apps."; brief
+// tbl-shelves-from-catalog-20261123): WHICH books this shelf lists = The Believer's Library's Father Heart books (TBL GET
+// /api/library/shelf.json?shelf=fh: every TBL book flagged meta.fh_book), read at every build; the committed snapshot
+// src/data/tbl-fh-shelf.json when TBL cannot answer (src/lib/tbl-shelf.mjs). A book flagged on TBL appears here with no
+// FHB commit. A book that also has its FHB page (src/data/books.json: the page copy + the order form FHB sells print
+// from) keeps that page's card; any other opens its TBL page (TBL is the one store; Kevin 2026-11-16 "2yes").
+const TBL_FH_URL =
+	process.env.TBL_SHELF_URL_FH || 'https://thebelieverslibrary.com/api/library/shelf.json?shelf=fh';
+const { feed: fhFeed } = await loadTblShelf({
+	url: TBL_FH_URL,
+	shelf: 'fh',
+	snapshotPath: path.resolve('src/data/tbl-fh-shelf.json'),
+});
+const pageBooks = new Map((catalog.books as Book[]).map((b) => [b.slug, b]));
+type Card = {
+	slug: string;
+	href: string;
+	title: string;
+	subtitle?: string;
+	author: string;
+	short?: string;
+	cover: { w300: string; w600: string; width: number; height: number; alt: string };
+	price: string;
+	page?: Book;
+};
+const tblPrice = (w: any) =>
+	[
+		...((w.formats?.print?.skus ?? []) as any[])
+			.filter((k) => Number.isInteger(k.list_cents))
+			.map((k) => `${k.format ?? 'Print'} ${money(k.list_cents)}`),
+		...(w.formats?.ebook?.buyable && w.formats.ebook.price_cents
+			? [`eBook ${money(w.formats.ebook.price_cents)}`]
+			: []),
+	].join(' · ');
+const books: Card[] = (fhFeed.works as any[])
+	.map((w): Card => {
+		const b = pageBooks.get(w.key);
+		if (b)
+			return {
+				slug: b.slug,
+				href: `/books/${b.slug}/`,
+				title: b.title,
+				subtitle: b.subtitle,
+				author: b.author.name,
+				short: b.short,
+				cover: b.cover,
+				price: bookPriceLine(b.formats as any),
+				page: b,
+			};
+		const d = w.cover_dims ?? { w: 600, h: 900 };
+		return {
+			slug: w.key,
+			href: w.url,
+			title: w.title,
+			subtitle: w.subtitle ?? undefined,
+			author: w.author ?? '',
+			cover: {
+				w300: w.cover_url,
+				w600: w.cover_url,
+				width: d.w,
+				height: d.h,
+				alt: `${w.title} book cover`,
+			},
+			price: tblPrice(w),
+		};
+	})
+	.sort(
+		(a, b) => (a.page?.order ?? 1e9) - (b.page?.order ?? 1e9) || a.title.localeCompare(b.title),
+	);
+const URL_ = 'https://fathersheartbible.com/books/';
 const jsonLd = [
 	{
 		'@context': 'https://schema.org',
@@ -37,8 +115,8 @@ const jsonLd = [
 			itemListElement: books.map((b, i) => ({
 				'@type': 'ListItem',
 				position: i + 1,
-				url: `${URL_}${b.slug}/`,
-				name: b.full_title,
+				url: b.href.startsWith('/') ? `${URL_}${b.slug}/` : b.href,
+				name: b.page?.full_title ?? b.title,
 			})),
 		},
 	},
@@ -51,14 +129,6 @@ const jsonLd = [
 		],
 	},
 ];
-const BOOK_SKU_ROWS = bookSkus.skus as Record<string, { format: string; list_cents: number }>;
-/** "Paperback $15.99 · Hardback $24.99" for a book's format SKUs (FHB-BOOKS, src/data/book-skus.json). */
-const bookPriceLine = (skus: string[]) =>
-	skus
-		.map(
-			(sku) => `${BOOK_SKU_ROWS[sku].format} $${(BOOK_SKU_ROWS[sku].list_cents / 100).toFixed(2)}`,
-		)
-		.join(' · ');
 ---
 
 <Layout
@@ -79,16 +149,16 @@ const bookPriceLine = (skus: string[]) =>
 				<div class="bks__grid">
 					{books.map((b, i) => (
 						<article class="bks__card">
-							<a href={`/books/${b.slug}/`} class="bks__cover" aria-label={`${b.title}: full details`}>
+							<a href={b.href} class="bks__cover" aria-label={`${b.title}: full details`}>
 								<img src={b.cover.w300} srcset={`${b.cover.w300} 300w, ${b.cover.w600} 600w`} sizes="160px" width={b.cover.width} height={b.cover.height} alt={b.cover.alt} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
 							</a>
 							<div>
-								<h2 class="bks__title"><a href={`/books/${b.slug}/`}>{b.title}</a></h2>
+								<h2 class="bks__title"><a href={b.href}>{b.title}</a></h2>
 								{b.subtitle && <p class="bks__sub">{b.subtitle}</p>}
-								<p class="bks__by">By {b.author.name}</p>
-								<p class="bks__short">{b.short}</p>
-								<p class="bks__price">{bookPriceLine(b.formats)}</p>
-								<a href={`/books/${b.slug}/`} class="bks__link">Full details &rarr;</a>
+								<p class="bks__by">By {b.author}</p>
+								{b.short && <p class="bks__short">{b.short}</p>}
+								{b.price && <p class="bks__price">{b.price}</p>}
+								<a href={b.href} class="bks__link">Full details &rarr;</a>
 							</div>
 						</article>
 					))}
