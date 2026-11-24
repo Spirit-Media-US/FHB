@@ -40,7 +40,7 @@ const REACH_BILLIONS = (REACH_TOTAL / 1e9).toFixed(1);
 // that). The page gathers people around a shared legacy: sharing our Father to the ends of the
 // earth. Giving lives on /give/; this page carries a short line + Give now button to it (Kevin 2026-11-16). Title/description live in code, not the old Sanity partner doc.
 const seoTitle = "Father's Heart Legacy — Sharing Our Father";
-const seoDescription = `There is no greater legacy than sharing the Father — the greatest desire in every soul. Father's Heart Bible™ (FHB) is soon in 80 languages.`;
+const seoDescription = `There is no greater legacy than sharing the Father — the greatest desire in every soul. Father's Heart Bible™ (FHB) is in 80 languages.`;
 const heroHeading = 'Sharing Our Father';
 
 // Featured blog card ("The Father's Vision") shown under the give-by-check box.
@@ -370,6 +370,7 @@ const upcoming = upcomingLanguages;
 			</div>
 
 			<!-- More to come — the rest of the 80 (open: it sits at the bottom of the page now, Kevin 2026-10-13) -->
+			{upcoming.length > 0 && (<>
 			<h2 class="text-center text-xl md:text-2xl font-light" style="margin: 2.5rem 0 1rem; font-family: var(--font-serif); color: var(--color-ink);">More to come &mdash; 80 languages in all</h2>
 			<div class="lang-grid">
 				{upcoming.map(([name, flag]) => (
@@ -379,6 +380,7 @@ const upcoming = upcomingLanguages;
 					</div>
 				))}
 			</div>
+			</>)}
 			<p class="text-center" style="font-family: var(--font-sans); margin: 2rem 0 0;"><a href="/isbn/" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">Available Worldwide in 200+ ISBNs &rarr;</a></p>
 		</Section>
 

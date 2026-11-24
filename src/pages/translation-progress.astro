@@ -17,7 +17,7 @@ import {
 
 const TITLE = fitTitle('Bible Translation Progress: Languages and Scripts');
 const DESCRIPTION = fitDescription(
-	`Father's Heart Bible™ is being published in ${counts.roster} languages: ${counts.readOnline} readable free online now, ${counts.printEditions} in print. Every language, script and ISO code, with free JSON and CSV.`,
+	`Father's Heart Bible™ is in ${counts.roster} languages: ${counts.readOnline} readable free online now, ${counts.printEditions} in print. Every language, script and ISO code, with free JSON and CSV.`,
 );
 const CITE = `Spirit Media Publishing. “Father’s Heart Bible™ translation progress: languages, scripts and editions.” ${PAGE_URL} (data: ${JSON_URL}), data as of ${dateModified}.`;
 const ORG = {
@@ -96,7 +96,7 @@ const LINK = 'color: var(--color-brand);';
 		<section class="px-6 py-10 lg:px-8 lg:py-14" style="background-color: var(--color-surface);">
 			<div class="mx-auto max-w-3xl">
 				<p class="text-lg leading-relaxed mb-5" style={P}>
-					<strong style="color: var(--color-ink);">Father&rsquo;s Heart Bible&trade; is being published in {counts.roster} languages.</strong> {N(counts.readOnline)} can be read free online today, {N(counts.printEditions)} have a print edition, and {N(counts.inPreparation)} are in preparation. They are written in {counts.scripts} scripts. Below is every language, with its native name, script, ISO code and status, and a link into our <a href="/read/" style={LINK} class="hover:underline">free online reader</a>. Download the same table as <a href="/data/fhb-languages.json" style={LINK} class="hover:underline" download>JSON</a> or <a href="/data/fhb-languages.csv" style={LINK} class="hover:underline" download>CSV</a>.
+					<strong style="color: var(--color-ink);">Father&rsquo;s Heart Bible&trade; is in {counts.roster} languages.</strong> {N(counts.readOnline)} can be read free online today, {N(counts.printEditions)} have a print edition{counts.inPreparation > 0 ? `, and ${N(counts.inPreparation)} are in preparation` : ''}. They are written in {counts.scripts} scripts. Below is every language, with its native name, script, ISO code and status, and a link into our <a href="/read/" style={LINK} class="hover:underline">free online reader</a>. Download the same table as <a href="/data/fhb-languages.json" style={LINK} class="hover:underline" download>JSON</a> or <a href="/data/fhb-languages.csv" style={LINK} class="hover:underline" download>CSV</a>.
 				</p>
 
 				<h2 id="counts" class="text-2xl md:text-3xl font-light mt-12 mb-4 scroll-mt-28" style={H2}>The counts, and why they differ</h2>
@@ -104,7 +104,7 @@ const LINK = 'color: var(--color-brand);';
 					<li><strong style="color: var(--color-ink);">{counts.roster} languages</strong> is the whole commitment: every language in the publishing roster, live or not.</li>
 					<li><strong style="color: var(--color-ink);">{N(counts.readOnline)} readable online</strong> are live in the reader at fathersheartbible.com/read/. A language goes live only when the whole text has passed our checks.</li>
 					<li><strong style="color: var(--color-ink);">{N(counts.printEditions)} print editions</strong> are languages whose print files have been submitted to our printer. Print and reading online are separate steps, so a language can be in one and not the other ({N(counts.both)} are in both).</li>
-					<li><strong style="color: var(--color-ink);">{N(counts.inPreparation)} in preparation</strong> are neither yet.</li>
+					{counts.inPreparation > 0 && <li><strong style="color: var(--color-ink);">{N(counts.inPreparation)} in preparation</strong> are neither yet.</li>}
 				</ul>
 				<p class="text-base leading-relaxed mb-5" style={P}>
 					These figures are computed from the same data as the table each time the site is built, so they move when a language goes live. Translated by Spirit Media Publishing, edited by Kevin White. The table does not give a launch date per language because we do not record one.
