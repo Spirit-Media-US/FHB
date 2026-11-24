@@ -108,6 +108,12 @@ export interface BookFormatRow {
 	/** the row's own binding text (e.g. 'Case laminate', 'Perfect bound'); with `format`, what isHardbackRow reads */
 	binding: string;
 	bookSlug: string;
+	/** Physical spec the per-book cost model reads (marginGuard.modelledLandedUsd, Kevin 2026-11-24): page count
+	 *  (null = unknown, then the model borrows the same book's other format), trim text, and the optional
+	 *  `interior` override ('bw' | 'color'); absent = derived from the row (see marginGuard.interiorOf). */
+	pages: number | null;
+	trim: string | null;
+	interior: string | null;
 	/** Measured US per-copy print + ship cost (the US has no country-list cost row); null = unmeasured. */
 }
 export const BOOK_SKUS: Record<string, BookFormatRow> = Object.fromEntries(
@@ -122,6 +128,9 @@ export const BOOK_SKUS: Record<string, BookFormatRow> = Object.fromEntries(
 			format: f.format as string,
 			binding: (f.binding as string) ?? '',
 			bookSlug: f.book as string,
+			pages: typeof f.pages === 'number' ? (f.pages as number) : null,
+			trim: (f.trim as string) ?? null,
+			interior: (f.interior as string) ?? null,
 		},
 	]),
 );
@@ -178,9 +187,14 @@ export const bindingFor = (slug: string): string => {
 	if (book) return book.costKey ?? (isHardbackRow(book) ? 'hc' : 'pb');
 	return slug.endsWith('-hb') ? 'hc' : 'pb';
 };
-/** Key into IntlRow.fees: the fee depends on binding, volumes in the box and the paid unit price. */
-export const feeKey = (slug: string, paidCents: number): string =>
-	`${bindingFor(slug)}${volumesFor(slug)}:${paidCents}`;
+/** Key into IntlRow.fees: the fee depends on binding, volumes in the box and the paid unit price. A book WITHOUT its own
+ *  measured cost key is keyed by its own SKU (Kevin 2026-11-24 per-book cost model): its fee comes from its OWN specs, so
+ *  two books at the same price no longer share one fee (before, they shared the Bible's 'pb1:<price>' row). */
+export const feeKey = (slug: string, paidCents: number): string => {
+	const book = BOOK_SKUS[slug];
+	const k = book && !book.costKey ? slug : bindingFor(slug);
+	return `${k}${volumesFor(slug)}:${paidCents}`;
+};
 
 export interface IntlRow {
 	name: string;

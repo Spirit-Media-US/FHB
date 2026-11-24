@@ -26,6 +26,7 @@ import {
 	BOOK_SKUS,
 	bindingFor,
 	FIRST_ORDER_PCT,
+	feeKey,
 	type IntlRow,
 	isHardbackRow,
 	paidUnit,
@@ -91,18 +92,201 @@ export const floorFor = (c: Pick<ShipCountry, 'farBand'>): number =>
 export const floorForSku = (slug: string, c: Pick<ShipCountry, 'farBand'>): number =>
 	BOOK_SKUS[slug]?.floorUsd ?? floorFor(c);
 
-/** Landed cost for one unit of `slug`: its own measured cost, else the Bible cost of the same binding. */
+// PER-BOOK COST MODEL (Kevin 2026-11-24: "This needs to get fixed NOW! Our site is saying ships to 223 countries but then
+// is it charging $50 a book to do so?"). Until today a book with no measured cost for a country was sized at that
+// country's 6x9 BIBLE cost (~890 pp): Forever Changed (214 pp) was charged as a Bible, UK $37.01 a copy against a real
+// ~$10. Now a book without its own measured landed_cost_usd.<cost_key> is priced from its OWN specs by the model in
+// ship-countries.json landedCost.model (its _readme has the method + sources): Ingram print by site x binding x
+// interior x page count, plus the country's MEASURED shipping at the book's estimated weight; a country outside the
+// measured grid takes the max over its zone's grid countries. The Bible cost of the same binding stays the CEILING
+// (a book never costs more than a Bible), and a book the model cannot read (no page count, no trim) keeps the Bible
+// cost, the old conservative bound. Calibration against every measured cost: scripts/book-cost-model.test.mjs.
+interface PrintSite {
+	cur: string;
+	handling: number;
+	pb_bw: [number, number];
+	hb_bw: [number, number];
+	pb_color: [number, number];
+	hb_color: [number, number];
+	jacket: number;
+}
+export interface CostModel {
+	printSafety: number;
+	print: Record<string, PrintSite>;
+	gsm: { bw: number; color: number };
+	cover: { pb: number; hb: number; hbj: number };
+	defaultTrimIn2: number;
+	heavySlope: number;
+	grid: Record<string, { site: string; knots: [number, number][] }>;
+	zones: Record<string, string[]>;
+	/** Server-only spec facts for a row whose book-skus.json fields are blank (source per entry in its `basis`). */
+	specs?: Record<
+		string,
+		{ pages?: number; trim?: string; interior?: 'bw' | 'color'; basis?: string }
+	>;
+}
+const LC = raw.landedCost as unknown as {
+	fx: Record<string, number>;
+	model?: CostModel;
+};
+export const COST_MODEL: CostModel | undefined = LC.model;
+const FX: Record<string, number> = {
+	USD: 1,
+	GBP: LC.fx.USD_GBP,
+	EUR: LC.fx.USD_EUR,
+	AUD: LC.fx.USD_AUD,
+};
+/** code -> { zone, landed_cost_usd } for every country row (pending holds every country, live or not). */
+const ROWS = new Map(
+	(
+		raw.pending as unknown as {
+			code: string;
+			zone?: string;
+			landed_cost_usd?: Record<string, unknown>;
+		}[]
+	).map((r) => [r.code, r]),
+);
+/** 'pb' | 'hb' | 'hbj' (jacketed case laminate) from the row's own format/binding text. */
+export function bookKind(slug: string): 'pb' | 'hb' | 'hbj' | null {
+	const b = BOOK_SKUS[slug];
+	if (!b) return null;
+	if (/jacket/i.test(b.binding) && !/no jacket/i.test(b.binding)) return 'hbj';
+	return isHardbackRow(b) ? 'hb' : 'pb';
+}
+const dims = (t: string | null): [number, number] | null => {
+	const m = String(t ?? '').match(/[\d.]+/g);
+	return m && m.length >= 2 ? [Number(m[0]), Number(m[1])] : null;
+};
+/** Interior class: the row's explicit `interior`, else colour when its spec/format says so, else colour for a
+ *  picture-book shape (both sides >= 8 in, <= 120 pp: the costlier class, so an unknown never under-prices), else B&W. */
+export function interiorOf(slug: string): 'bw' | 'color' {
+	const b = BOOK_SKUS[slug];
+	const o = COST_MODEL?.specs?.[slug]?.interior;
+	if (o === 'bw' || o === 'color') return o;
+	if (b?.interior === 'bw' || b?.interior === 'color') return b.interior;
+	if (/colou?r/i.test(`${b?.spec ?? ''} ${b?.format ?? ''}`)) return 'color';
+	const d = dims(trimOf(slug));
+	const p = pagesOf(slug);
+	return d && Math.min(d[0], d[1]) >= 8 && p != null && p <= 120 ? 'color' : 'bw';
+}
+/** The row's page count, else the same book's other format's (a hardback row often omits it). */
+export function pagesOf(slug: string): number | null {
+	const b = BOOK_SKUS[slug];
+	if (!b) return null;
+	const o = COST_MODEL?.specs?.[slug]?.pages;
+	if (o) return o;
+	if (b.pages) return b.pages;
+	const sib = Object.values(BOOK_SKUS).find((r) => r.bookSlug === b.bookSlug && r.pages);
+	return sib?.pages ?? null;
+}
+/** The row's trim, else the model's spec fact, else the same book's other format's trim (formats share a trim). */
+export function trimOf(slug: string): string | null {
+	const b = BOOK_SKUS[slug];
+	if (!b) return null;
+	const o = COST_MODEL?.specs?.[slug]?.trim;
+	if (o) return o;
+	if (dims(b.trim)) return b.trim;
+	const sib = Object.values(BOOK_SKUS).find((r) => r.bookSlug === b.bookSlug && dims(r.trim));
+	return sib?.trim ?? null;
+}
+/** Estimated shipped weight in kg: interior leaves + cover/case, from trim, pages and interior class. */
+export function bookWeightKg(slug: string, m: CostModel | undefined = COST_MODEL): number | null {
+	const kind = bookKind(slug);
+	const p = pagesOf(slug);
+	const d = dims(trimOf(slug));
+	if (!m || !kind || !p || !d) return null;
+	const a = d[0] * d[1] * 0.00064516;
+	return (p / 2) * a * m.gsm[interiorOf(slug)] + 2 * a * m.cover[kind];
+}
+/** Ingram print + handling for one copy at a print site, USD (model x printSafety). */
+export function modelPrintUsd(
+	slug: string,
+	site: string,
+	m: CostModel | undefined = COST_MODEL,
+): number | null {
+	const kind = bookKind(slug);
+	const p = pagesOf(slug);
+	const s = m?.print[site];
+	if (!m || !s || !kind || !p || !dims(trimOf(slug))) return null;
+	const [fixed, per] = s[`${kind === 'pb' ? 'pb' : 'hb'}_${interiorOf(slug)}`];
+	const local = (fixed + per * p + (kind === 'hbj' ? s.jacket : 0)) * m.printSafety + s.handling;
+	return local / FX[s.cur];
+}
+/** Measured shipping for weight `w` in a grid country: interpolate the knots, flat below the first, +heavySlope past the last. */
+export function shipAtKg(knots: [number, number][], w: number, heavySlope: number): number {
+	if (w <= knots[0][0]) return knots[0][1];
+	for (let i = 1; i < knots.length; i++) {
+		const [w0, s0] = knots[i - 1];
+		const [w1, s1] = knots[i];
+		if (w <= w1) return s0 + ((s1 - s0) * (w - w0)) / (w1 - w0);
+	}
+	const [wl, sl] = knots[knots.length - 1];
+	return sl + heavySlope * (w - wl);
+}
+/** Modelled landed cost in a GRID country (one with measured book shipping), USD; null = not modelled. */
+export function gridLandedUsd(
+	slug: string,
+	code: string,
+	m: CostModel | undefined = COST_MODEL,
+): number | null {
+	const g = m?.grid[code];
+	const w = bookWeightKg(slug, m);
+	if (!m || !g || w == null) return null;
+	const print = modelPrintUsd(slug, g.site, m);
+	return print == null ? null : print + shipAtKg(g.knots, w, m.heavySlope);
+}
+const round2 = (n: number) => Math.round(n * 100) / 100;
+/**
+ * Landed cost for a book with NO own measured cost in `code`, USD: the grid model there, else the MAX over the
+ * country's zone grid countries (each member: the book's own measured cost there, else its model). null = cannot model.
+ */
+export function modelledLandedUsd(
+	slug: string,
+	code: string,
+	m: CostModel | undefined = COST_MODEL,
+): number | null {
+	const book = BOOK_SKUS[slug];
+	if (!m || !book) return null;
+	const cc = code.toUpperCase();
+	const members = m.grid[cc] ? [cc] : (m.zones[ROWS.get(cc)?.zone ?? ''] ?? []);
+	const costs = members.map((mc) => memberCost(slug, book.costKey, mc, cc, m));
+	// no partial max: a member the book cannot be priced in leaves the country unmodelled
+	if (!costs.length || costs.some((v) => v == null)) return null;
+	return round2(Math.max(...(costs as number[])));
+}
+/** One zone member's cost for the book: its own measured cost there (outside the asked country), else the grid model. */
+function memberCost(
+	slug: string,
+	costKey: string | null | undefined,
+	member: string,
+	asked: string,
+	m: CostModel,
+): number | null {
+	const own =
+		costKey && member !== asked ? ROWS.get(member)?.landed_cost_usd?.[costKey] : undefined;
+	return typeof own === 'number' ? own : gridLandedUsd(slug, member, m);
+}
+
+/**
+ * Landed cost for one unit of `slug`: its own measured cost; else (a book, with the destination `code`) the per-book
+ * model, never above the country's Bible cost of the same binding; else that Bible cost (the old conservative bound).
+ */
 export function landedUnitCost(
 	slug: string,
 	lc: Record<string, unknown> | undefined,
+	code?: string,
 ): number | null {
 	if (!lc) return null;
-	const own = lc[bindingFor(slug)];
-	if (typeof own === 'number') return own;
 	const book = BOOK_SKUS[slug];
+	// own = a Bible's binding row, or a book's OWN cost key; a book without one never reads the Bible row as "own"
+	const own = book ? (book.costKey ? lc[book.costKey] : undefined) : lc[bindingFor(slug)];
+	if (typeof own === 'number') return own;
 	if (!book) return null;
 	const fallback = lc[isHardbackRow(book) ? 'hc' : 'pb'];
-	return typeof fallback === 'number' ? fallback : null;
+	const bible = typeof fallback === 'number' ? fallback : null;
+	const modelled = code ? modelledLandedUsd(slug, code) : null;
+	if (modelled == null) return bible;
+	return bible == null ? modelled : Math.min(modelled, bible);
 }
 
 /** Net USD for ONE SKU unit charged at `priceCents` plus `feeCents` handling; null = landed cost unknown. */
@@ -118,9 +302,9 @@ export function netPerItemUsd(
 	const charged = (priceCents + feeCents) / 100;
 	const duty = country.code && isEu(country.code) ? EU_DUTY_USD * v : 0;
 	// ONE ENGINE (Kevin 2026-11-15: "we do what our engine does per the engine not per book"): a book uses its
-	// own measured landed cost where one exists, else the country's measured BIBLE cost for the same binding.
-	// A 6x9 Bible (~890 pp) outweighs almost every book, so the fallback is a conservative upper bound.
-	const unitCost = landedUnitCost(slug, lc);
+	// own measured landed cost where one exists, else the per-book cost model (its own specs, Kevin 2026-11-24),
+	// capped at the country's Bible cost for the same binding.
+	const unitCost = landedUnitCost(slug, lc, country.code);
 	if (unitCost == null) return null;
 	return charged - (charged * STRIPE_INTL_PCT + STRIPE_FIXED_USD) - unitCost * v - duty;
 }
@@ -162,7 +346,7 @@ export function handlingTable(
 		for (const [slug, list] of Object.entries(skuCents))
 			for (const pct of new Set([0, ...pcts])) {
 				const paid = paidUnit(slug, list, pct, pct === FIRST_ORDER_PCT);
-				fees[`${bindingFor(slug)}${volumesFor(slug)}:${paid}`] = handlingFeeCents(slug, paid, c);
+				fees[feeKey(slug, paid)] = handlingFeeCents(slug, paid, c);
 			}
 		out[c.code] = { name: c.name, label: handlingLabel(c.code), fees };
 	}

@@ -59,7 +59,285 @@
 				"pb": 63.17
 			}
 		},
-		"smp_source": "landed_cost_usd.<sku> for SMP store books (owner_site smp): pmpublish MEASURED IngramSpark calculator, projects/pmpublish/checks/smp-books-landed-20261113/landed-cost.json (measured 2026-11-13, 22/22 title-formats, 20 countries), matched to book-skus.json by ISBN. Same method as bi/wai. floor_usd 0 = break-even shipping (Kevin 2026-11-10, scope Doc F)."
+		"smp_source": "landed_cost_usd.<sku> for SMP store books (owner_site smp): pmpublish MEASURED IngramSpark calculator, projects/pmpublish/checks/smp-books-landed-20261113/landed-cost.json (measured 2026-11-13, 22/22 title-formats, 20 countries), matched to book-skus.json by ISBN. Same method as bi/wai. floor_usd 0 = break-even shipping (Kevin 2026-11-10, scope Doc F).",
+		"model": {
+			"_readme": "PER-BOOK COST MODEL (Kevin 2026-11-24 'This needs to get fixed NOW! Our site is saying ships to 223 countries but then is it charging $50 a book to do so?'). marginGuard.modelledLandedUsd prices a book WITHOUT its own measured landed_cost_usd.<cost_key> from its OWN specs: print = fixed + per-page by print site x binding x interior (Ingram calculator, economy, qty 1, fitted to the cent on pmpublish smp-books-landed-20261113 + smp-store-costs-20261115) x printSafety (FC/RIAB pb read 11-23/24 ~6-7% above the 11-13 fit) + site handling, converted at fx; shipping = the grid country's MEASURED cheapest-tracked shipping as a function of the book's estimated weight (pages/2 x trim area x gsm + 2 x trim area x cover), interpolated between measured knots (upper envelope; Bible rows anchor the heavy end where measured; beyond the last knot +heavySlope USD/kg). A country outside the grid takes the MAX over its zone's grid countries (the rule ZONE_MAX Bible rows already use). The result never exceeds the country's Bible cost for the same binding. Fitted + calibrated by projects/store-intl-cost-model/fit_model.py (noah, 2026-11-24); proof scripts/book-cost-model.test.mjs.",
+			"printSafety": 1.07,
+			"print": {
+				"US": {
+					"cur": "USD",
+					"handling": 0.0,
+					"pb_bw": [1.32, 0.014633],
+					"hb_bw": [5.296, 0.013279],
+					"pb_color": [0.8, 0.07375],
+					"hb_color": [4.776, 0.07375],
+					"jacket": 2.8
+				},
+				"UK": {
+					"cur": "GBP",
+					"handling": 1.65,
+					"pb_bw": [1.3655, 0.011606],
+					"hb_bw": [5.06, 0.01161],
+					"pb_color": [0.75, 0.0575],
+					"hb_color": [4.44, 0.0575],
+					"jacket": 1.27
+				},
+				"AU": {
+					"cur": "AUD",
+					"handling": 2.2,
+					"pb_bw": [2.497, 0.024817],
+					"hb_bw": [9.34, 0.02339],
+					"pb_color": [1.3, 0.1025],
+					"hb_color": [8.14, 0.1025],
+					"jacket": 2.32
+				}
+			},
+			"gsm": {
+				"bw": 0.075,
+				"color": 0.104
+			},
+			"cover": {
+				"pb": 0.3,
+				"hb": 1.6,
+				"hbj": 1.75
+			},
+			"defaultTrimIn2": 54.0,
+			"heavySlope": 23.18,
+			"grid": {
+				"GB": {
+					"site": "UK",
+					"knots": [
+						[0.1084, 3.09],
+						[0.3292, 3.09],
+						[0.3574, 4.56],
+						[0.4198, 4.56],
+						[0.4233, 4.58],
+						[0.4303, 4.58],
+						[1.1836, 5.18],
+						[1.2742, 5.25]
+					]
+				},
+				"DE": {
+					"site": "US",
+					"knots": [
+						[0.1084, 8.48],
+						[0.1589, 8.48],
+						[0.1725, 8.66],
+						[0.2488, 8.66],
+						[0.28, 8.89],
+						[0.2933, 9.39],
+						[0.3292, 9.39],
+						[0.3574, 9.75],
+						[0.3658, 9.89],
+						[0.3867, 10.23],
+						[0.4198, 11.69],
+						[0.4303, 11.69],
+						[1.1836, 25.28],
+						[1.2742, 26.54]
+					]
+				},
+				"FR": {
+					"site": "US",
+					"knots": [[0.1084, 8.73], [0.4303, 8.73]]
+				},
+				"ES": {
+					"site": "US",
+					"knots": [
+						[0.1084, 9.48],
+						[0.3658, 9.48],
+						[0.3867, 9.6],
+						[0.4198, 10.84],
+						[0.4303, 10.84],
+						[1.1836, 22.33],
+						[1.2742, 23.39]
+					]
+				},
+				"IT": {
+					"site": "US",
+					"knots": [[0.1084, 8.4], [0.3658, 8.4], [0.3867, 8.53], [0.4198, 9.78], [0.4303, 9.78]]
+				},
+				"IE": {
+					"site": "US",
+					"knots": [
+						[0.1084, 10.81],
+						[0.3658, 10.81],
+						[0.3867, 10.95],
+						[0.4198, 12.17],
+						[0.4303, 12.17]
+					]
+				},
+				"NL": {
+					"site": "US",
+					"knots": [
+						[0.1084, 9.56],
+						[0.3658, 9.56],
+						[0.3867, 9.69],
+						[0.4198, 10.93],
+						[0.4303, 10.93]
+					]
+				},
+				"NO": {
+					"site": "US",
+					"knots": [
+						[0.1084, 9.56],
+						[0.3658, 9.56],
+						[0.3867, 9.69],
+						[0.4198, 10.93],
+						[0.4303, 10.93]
+					]
+				},
+				"CH": {
+					"site": "US",
+					"knots": [
+						[0.1084, 9.56],
+						[0.3658, 9.56],
+						[0.3867, 9.69],
+						[0.4198, 10.93],
+						[0.4303, 10.93]
+					]
+				},
+				"CA": {
+					"site": "US",
+					"knots": [
+						[0.1084, 10.72],
+						[0.3658, 10.72],
+						[0.3867, 10.81],
+						[0.4198, 11.52],
+						[0.4303, 11.52],
+						[1.1836, 14.38]
+					]
+				},
+				"AU": {
+					"site": "AU",
+					"knots": [[0.1084, 4.32], [0.1589, 4.32], [0.1725, 5.15], [0.4303, 5.15], [1.1836, 6.82]]
+				},
+				"NZ": {
+					"site": "US",
+					"knots": [
+						[0.1084, 12.88],
+						[0.3658, 12.88],
+						[0.3867, 13.12],
+						[0.4198, 15.56],
+						[0.4303, 15.56]
+					]
+				},
+				"MX": {
+					"site": "US",
+					"knots": [
+						[0.1084, 10.4],
+						[0.3658, 10.4],
+						[0.3867, 10.58],
+						[0.4198, 12.27],
+						[0.4303, 12.27],
+						[1.1836, 28.01],
+						[1.2742, 29.47]
+					]
+				},
+				"BR": {
+					"site": "US",
+					"knots": [
+						[0.1084, 10.31],
+						[0.3658, 10.31],
+						[0.3867, 10.42],
+						[0.4198, 11.42],
+						[0.4303, 11.42]
+					]
+				},
+				"IN": {
+					"site": "US",
+					"knots": [
+						[0.1084, 12.88],
+						[0.3658, 12.88],
+						[0.3867, 13.12],
+						[0.4198, 15.56],
+						[0.4303, 15.56],
+						[1.1836, 38.25],
+						[1.2742, 40.35]
+					]
+				},
+				"PH": {
+					"site": "US",
+					"knots": [
+						[0.1084, 12.88],
+						[0.3658, 12.88],
+						[0.3867, 13.12],
+						[0.4198, 15.56],
+						[0.4303, 15.56],
+						[1.1836, 38.25],
+						[1.2742, 40.35]
+					]
+				},
+				"ZA": {
+					"site": "US",
+					"knots": [
+						[0.1084, 12.88],
+						[0.3658, 12.88],
+						[0.3867, 13.12],
+						[0.4198, 15.56],
+						[0.4303, 15.56],
+						[1.1836, 38.25],
+						[1.2742, 40.35]
+					]
+				},
+				"JP": {
+					"site": "US",
+					"knots": [
+						[0.1084, 10.9],
+						[0.3658, 10.9],
+						[0.3867, 11.04],
+						[0.4198, 12.41],
+						[0.4303, 12.41]
+					]
+				},
+				"SG": {
+					"site": "US",
+					"knots": [
+						[0.1084, 8.73],
+						[0.3658, 8.73],
+						[0.3867, 8.86],
+						[0.4198, 10.16],
+						[0.4303, 10.16]
+					]
+				}
+			},
+			"zones": {
+				"Europe+UK": ["GB", "DE", "FR", "ES", "IT", "IE", "NL", "NO", "CH"],
+				"Americas (non-US)": ["CA", "MX", "BR"],
+				"Asia-Pacific": ["AU", "NZ", "IN", "PH", "JP", "SG"],
+				"Africa": ["ZA", "IN", "PH"],
+				"Middle East": ["ZA", "IN", "PH"]
+			},
+			"specs": {
+				"raised-in-a-barn-pb": {
+					"pages": 296,
+					"basis": "Ingram CSS9599921 record 296pp B&W Creme 5.5x8.5 (pmpublish checks/raised-in-a-barn-ingram-20261104.md); PB interior = same file; Cannon order SPK-15049724-1 print $6.07 = model"
+				},
+				"raised-in-a-barn-hb": {
+					"pages": 296,
+					"basis": "Ingram CSS9599921: 296pp, Jacketed Case Laminate, B&W Creme (checks/raised-in-a-barn-ingram-20261104.md)"
+				},
+				"the-fairies-and-the-elf-king-pb": {
+					"pages": 90,
+					"interior": "color",
+					"basis": "interior/out/elf-king-INTERIOR.pdf 90 pages (pdfinfo 2026-11-24); illustrated children's book, colour = the costlier class"
+				},
+				"the-fairies-and-the-elf-king-hb": {
+					"pages": 90,
+					"interior": "color",
+					"basis": "same interior as the PB (90 pages)"
+				},
+				"gifts-pb": {
+					"trim": "6.0 x 9.0 in",
+					"basis": "projects/gifts/specsheet (trim 6.0 x 9.0, TrimBox) + interior 441x666pt"
+				},
+				"gifts-hb": {
+					"trim": "6.0 x 9.0 in",
+					"pages": 138,
+					"basis": "projects/gifts specsheet, same interior as the PB (138 pages)"
+				}
+			}
+		},
+		"fc_source": "landed_cost_usd.forever-changed-pb / -hb = Forever Changed (Mary Mowoe; PB 9798893073669 214pp 5.5x8.5, HB 9798893073683 jacketed) per-copy landed USD, qty 1, economy print + handling + cheapest TRACKED (duty-paid/domestic preferred). MEASURED 2026-11-24 by pmpublish, IngramSpark Print and Ship Calculator (read-only): projects/pmpublish/checks/fc-landed-costs-20261124/raw-calculator.jsonl, selected with smp-books-landed-20261113/build-landed.py measure() (Kevin 2026-11-24 'load Forever Changed real costs')."
 	},
 	"liveWave": [
 		"GB",
@@ -728,7 +1006,9 @@
 				"spring-birds-pb": 8.91,
 				"can-i-pray-for-you-pb": 12.02,
 				"humble-influence-pb": 10.52,
-				"humble-influence-hb": 15.88
+				"humble-influence-hb": 15.88,
+				"forever-changed-pb": 12.31,
+				"forever-changed-hb": 18.12
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -1168,7 +1448,9 @@
 				"spring-birds-pb": 12.81,
 				"can-i-pray-for-you-pb": 14.75,
 				"humble-influence-pb": 14.18,
-				"humble-influence-hb": 17.92
+				"humble-influence-hb": 17.92,
+				"forever-changed-pb": 15.06,
+				"forever-changed-hb": 21.29
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -1448,7 +1730,9 @@
 				"spring-birds-pb": 13.22,
 				"can-i-pray-for-you-pb": 15.16,
 				"humble-influence-pb": 14.59,
-				"humble-influence-hb": 18.33
+				"humble-influence-hb": 18.33,
+				"forever-changed-pb": 15.47,
+				"forever-changed-hb": 21.69
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -2352,7 +2636,9 @@
 				"spring-birds-pb": 11.23,
 				"can-i-pray-for-you-pb": 13.17,
 				"humble-influence-pb": 12.6,
-				"humble-influence-hb": 16.34
+				"humble-influence-hb": 16.34,
+				"forever-changed-pb": 13.48,
+				"forever-changed-hb": 19.64
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -2560,7 +2846,9 @@
 				"spring-birds-pb": 10.98,
 				"can-i-pray-for-you-pb": 13.24,
 				"humble-influence-pb": 12.35,
-				"humble-influence-hb": 17.0
+				"humble-influence-hb": 17.0,
+				"forever-changed-pb": 13.23,
+				"forever-changed-hb": 21.08
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -3054,7 +3342,9 @@
 				"spring-birds-pb": 15.38,
 				"can-i-pray-for-you-pb": 17.32,
 				"humble-influence-pb": 16.75,
-				"humble-influence-hb": 20.49
+				"humble-influence-hb": 20.49,
+				"forever-changed-pb": 17.63,
+				"forever-changed-hb": 23.94
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -3176,7 +3466,9 @@
 				"spring-birds-pb": 13.31,
 				"can-i-pray-for-you-pb": 15.25,
 				"humble-influence-pb": 14.68,
-				"humble-influence-hb": 18.42
+				"humble-influence-hb": 18.42,
+				"forever-changed-pb": 15.56,
+				"forever-changed-hb": 21.81
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -3262,7 +3554,9 @@
 				"spring-birds-pb": 10.9,
 				"can-i-pray-for-you-pb": 12.84,
 				"humble-influence-pb": 12.27,
-				"humble-influence-hb": 16.01
+				"humble-influence-hb": 16.01,
+				"forever-changed-pb": 13.15,
+				"forever-changed-hb": 19.39
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -3326,7 +3620,9 @@
 				"spring-birds-pb": 13.4,
 				"can-i-pray-for-you-pb": 15.34,
 				"humble-influence-pb": 14.77,
-				"humble-influence-hb": 18.51
+				"humble-influence-hb": 18.51,
+				"forever-changed-pb": 15.65,
+				"forever-changed-hb": 21.9
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -4342,7 +4638,9 @@
 				"spring-birds-pb": 12.9,
 				"can-i-pray-for-you-pb": 14.84,
 				"humble-influence-pb": 14.27,
-				"humble-influence-hb": 18.01
+				"humble-influence-hb": 18.01,
+				"forever-changed-pb": 15.15,
+				"forever-changed-hb": 21.42
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -4716,7 +5014,9 @@
 				"spring-birds-pb": 12.06,
 				"can-i-pray-for-you-pb": 14.0,
 				"humble-influence-pb": 13.43,
-				"humble-influence-hb": 17.17
+				"humble-influence-hb": 17.17,
+				"forever-changed-pb": 14.31,
+				"forever-changed-hb": 20.55
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -4780,7 +5080,9 @@
 				"spring-birds-pb": 15.38,
 				"can-i-pray-for-you-pb": 17.32,
 				"humble-influence-pb": 16.75,
-				"humble-influence-hb": 20.49
+				"humble-influence-hb": 20.49,
+				"forever-changed-pb": 17.63,
+				"forever-changed-hb": 23.94
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -4948,7 +5250,9 @@
 				"spring-birds-pb": 12.06,
 				"can-i-pray-for-you-pb": 14.0,
 				"humble-influence-pb": 13.43,
-				"humble-influence-hb": 17.17
+				"humble-influence-hb": 17.17,
+				"forever-changed-pb": 14.31,
+				"forever-changed-hb": 20.55
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -5218,7 +5522,9 @@
 				"spring-birds-pb": 15.38,
 				"can-i-pray-for-you-pb": 17.32,
 				"humble-influence-pb": 16.75,
-				"humble-influence-hb": 20.49
+				"humble-influence-hb": 20.49,
+				"forever-changed-pb": 17.63,
+				"forever-changed-hb": 23.94
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -5888,7 +6194,9 @@
 				"spring-birds-pb": 11.23,
 				"can-i-pray-for-you-pb": 13.17,
 				"humble-influence-pb": 12.6,
-				"humble-influence-hb": 16.34
+				"humble-influence-hb": 16.34,
+				"forever-changed-pb": 13.48,
+				"forever-changed-hb": 19.72
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -6076,7 +6384,9 @@
 				"spring-birds-pb": 15.38,
 				"can-i-pray-for-you-pb": 17.32,
 				"humble-influence-pb": 16.75,
-				"humble-influence-hb": 20.49
+				"humble-influence-hb": 20.49,
+				"forever-changed-pb": 17.63,
+				"forever-changed-hb": 23.94
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -6138,7 +6448,9 @@
 				"spring-birds-pb": 11.98,
 				"can-i-pray-for-you-pb": 13.92,
 				"humble-influence-pb": 13.35,
-				"humble-influence-hb": 17.09
+				"humble-influence-hb": 17.09,
+				"forever-changed-pb": 14.23,
+				"forever-changed-hb": 20.46
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -6410,7 +6722,9 @@
 				"spring-birds-pb": 12.06,
 				"can-i-pray-for-you-pb": 14.0,
 				"humble-influence-pb": 13.43,
-				"humble-influence-hb": 17.17
+				"humble-influence-hb": 17.17,
+				"forever-changed-pb": 14.31,
+				"forever-changed-hb": 20.55
 			},
 			"shippingRate": null,
 			"handlingDays": null,
@@ -7024,7 +7338,9 @@
 				"spring-birds-pb": 8.38,
 				"can-i-pray-for-you-pb": 10.45,
 				"humble-influence-pb": 9.84,
-				"humble-influence-hb": 14.78
+				"humble-influence-hb": 14.78,
+				"forever-changed-pb": 10.79,
+				"forever-changed-hb": 18.56
 			},
 			"shippingRate": null,
 			"handlingDays": null,
