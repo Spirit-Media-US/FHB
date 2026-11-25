@@ -44,6 +44,7 @@ import { execSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { handlingFeeCents } from '../src/lib/marginGuard.ts';
 import { LIVE_COUNTRIES } from '../src/lib/shipCountries.ts';
+import { shipsOnPublication } from '../src/lib/storeEngine.ts';
 
 const ISBNS = '/home/deploy/projects/fhb-print-bible/editions/ISBNS.json';
 const CHECKOUT = 'src/lib/storeEngine.ts'; // the catalogue moved into the SMP store engine (plan 3fb Phase 2)
@@ -572,8 +573,10 @@ function merchantErrs(pages, srv) {
 			else if (cents(o.price) !== sv.cents)
 				errs.push(`${tag}: schema price ${o.price}, server charges ${usd(sv.cents)}`);
 			if (o.priceCurrency !== 'USD') errs.push(`${tag}: priceCurrency ${o.priceCurrency}`);
-			if (o.availability !== 'https://schema.org/InStock')
-				errs.push(`${tag}: availability ${o.availability}`);
+			// PreOrder exactly when the store engine says this SKU ships on publication (direct-sale edition not yet on
+			// sale at Ingram, pmseoaeo 2026-11-25), InStock otherwise. Asked of the engine itself, never re-derived.
+			const wantAvail = shipsOnPublication(o.sku) ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock';
+			if (o.availability !== wantAvail) errs.push(`${tag}: availability ${o.availability}, want ${wantAvail}`);
 			if (o.url !== pageUrl) errs.push(`${tag}: offer url ${o.url} is not this page (${pageUrl})`);
 			// One OfferShippingDetails per LIVE country in src/data/ship-countries.json, each with that
 			// country's configured rate; nothing else (unit 2js).
