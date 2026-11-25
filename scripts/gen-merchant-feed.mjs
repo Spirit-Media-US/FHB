@@ -38,12 +38,7 @@ const walk = (n, ctx) => {
 	// /books/ pages put sku + gtin13 on the Book/Product node, not the Offer (src/pages/books/[slug].astro): read either
 	const sku = offer?.sku || (ctx.type === 'Books' ? n.sku : undefined);
 	const gtin = offer?.gtin13 || (ctx.type === 'Books' ? n.gtin13 : undefined);
-	// SHIPS-ON-PUBLICATION editions are LEFT OUT of both feeds (pmseoaeo decision B, 2026-11-25). Their page Offer is
-	// schema.org PreOrder, and Google Merchant + the OpenAI feed require availability_date for 'preorder', which these
-	// editions do not have (they ship when Ingram reaches Title Available). No date is invented, and out_of_stock would
-	// misstate an orderable item. They REJOIN AUTOMATICALLY: when the ISBN master flips on_sale, shipsOnPublication()
-	// goes false, the Offer turns InStock and this test lets the item through on the next build.
-	if (offer && sku && gtin && !offer.availability?.endsWith('PreOrder')) {
+	if (offer && sku && gtin) {
 		const fmt = BIND[n.bookFormat];
 		if (!items.has(sku))
 			items.set(sku, {

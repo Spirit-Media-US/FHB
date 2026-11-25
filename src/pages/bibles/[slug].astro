@@ -560,11 +560,7 @@ const offerFor = (v: (typeof variants)[number]) => ({
 	'@type': 'Offer',
 	price: v.price.toFixed(2),
 	priceCurrency: 'USD',
-	// PreOrder for a direct-sale edition not yet on sale at Ingram (its Stripe line says "ships on publication"), so
-	// product snippets never read it as in stock (pmseoaeo 2026-11-25). Same source as the checkout: shipsOnPublication.
-	availability: shipsOnPublication(v.sku)
-		? 'https://schema.org/PreOrder'
-		: 'https://schema.org/InStock',
+	availability: 'https://schema.org/InStock',
 	itemCondition: 'https://schema.org/NewCondition',
 	url,
 	sku: v.sku,
