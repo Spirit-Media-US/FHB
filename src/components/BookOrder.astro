@@ -159,6 +159,8 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 		</div>
 		<p class="bo-note" data-note data-print-note="Free standard shipping · tax calculated at checkout" data-ebook-note="Instant download after checkout · tax calculated at checkout">Free standard shipping · tax calculated at checkout</p>
 		<button type="submit" class="bo-checkout">Checkout →</button>
+		{/* Kevin 2026-11-24 seller line (eBook-only: nothing ships) */}
+		<p class="bo-seller" data-seller data-print-seller="Sold and shipped by Spirit Media Publishing" data-ebook-seller="Sold by Spirit Media Publishing">Sold and shipped by Spirit Media Publishing</p>
 		<p id="buy-msg" class="bo-msg" role="status"></p>
 		<p class="bo-help"><MailtoLink email="hello@spiritmediapublishing.com" class="bo-help-btn">Contact us</MailtoLink></p>
 	</div>
@@ -225,6 +227,7 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 	.bo-label { display: block; margin: 0.6rem 0 0.3rem; font-size: 0.85rem; font-weight: 600; }
 	.bo-select { box-sizing: border-box; width: 100%; min-height: 44px; padding: 0.55rem 0.8rem; border: 1.5px solid #d9d0c4; border-radius: 0.6rem; background: #fff; font: inherit; font-size: 1rem; }
 	.bo-note { margin: 0.4rem 0 0; color: #57534e; font-size: 0.78rem; }
+	.bo-seller { margin: 0.5rem 0 0; color: #57534e; font-size: 0.78rem; text-align: center; }
 	/* SMP's own primary button (global .btn-primary: --color-red, hover --color-red-deep). Kevin 2026-11-14: "We don't
 	   use black buttons. KNOW your site! Know and follow SMP style." */
 	.bo-checkout { width: 100%; margin-top: 0.75rem; min-height: 48px; padding: 0.7rem 1.8rem; border: 2px solid var(--color-primary, #b60057); border-radius: 999px; background: var(--color-primary, #b60057); color: #fff; font: inherit; font-weight: 600; font-size: 1rem; cursor: pointer; }
@@ -291,6 +294,8 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 			if (ship) ship.hidden = eb;
 			const note = form.querySelector<HTMLElement>('[data-note]');
 			if (note && ebookIn) note.textContent = (eb ? note.dataset.ebookNote : note.dataset.printNote) ?? '';
+			const seller = form.querySelector<HTMLElement>('[data-seller]');
+			if (seller && ebookIn) seller.textContent = (eb ? seller.dataset.ebookSeller : seller.dataset.printSeller) ?? '';
 			const save = form.querySelector<HTMLElement>('[data-first-save]');
 			if (save) {
 				const off = sub - Math.round((sub * (100 - pct)) / 100);
