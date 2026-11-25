@@ -44,6 +44,7 @@ import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
 import { ORDER_STRINGS, orderLangFor, tr as trOrder } from '../../lib/orderStrings';
 import { fitDescription, fitTitle } from '../../lib/seoFit';
 import { LIVE_COUNTRIES } from '../../lib/shipCountries';
+import { shipsOnPublication } from '../../lib/storeEngine';
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
 const READ_URL = 'https://fathersheartbible.com/read/';
@@ -532,6 +533,12 @@ const BIND = {
 } as const;
 // A pre-order (no ISBN yet) sells through the form but declares no Product/Offer: no GTIN to give.
 const preorder = ed.preorder === true && !ed.isbn;
+// SHIPS ON PUBLICATION (pmshipping 2026-11-25 option 2; Kevin 10-29 L1126 direct sale stands): a direct-sale edition with an
+// ISBN that is not on sale yet sells now and ships when Ingram can print it; the form says so with the EXISTING pre-order
+// line (o.preorder, every order language). Same source as the Stripe line: the store engine's shipsOnPublication.
+const awaitingPublication =
+	!preorder &&
+	orderRows.some((r) => shipsOnPublication(`${r.id}-hb`) || shipsOnPublication(`${r.id}-pb`));
 const variants = (preorder ? [] : orderRows).flatMap((r) => {
 	const pair = pairFor(r.id);
 	return (['hb', 'pb'] as const).map((b) => ({
@@ -777,7 +784,7 @@ const metaDescription =
 					<MailtoLink email="hello@spiritmediapublishing.com" subject={RESERVE_SUBJECT} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; padding: 0.75rem 1.6rem; text-decoration: none; font-size: 0.95rem;">Reserve a copy by email</MailtoLink>
 				</div>
 			) : (
-				<EditionOrder offerLine={orderLang === 'en' || !orderLang ? `15% off first order + free standard shipping to ${LIVE_COUNTRIES.length} countries` : orderT('hero.freeShipValue')} titleStyle={coverTitle ? titleStyle : undefined} rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} lang={orderLang} note={preorder ? orderT('o.preorder') : undefined} />
+				<EditionOrder offerLine={orderLang === 'en' || !orderLang ? `15% off first order + free standard shipping to ${LIVE_COUNTRIES.length} countries` : orderT('hero.freeShipValue')} titleStyle={coverTitle ? titleStyle : undefined} rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} lang={orderLang} note={preorder || awaitingPublication ? orderT('o.preorder') : undefined} />
 			)}
 		</Section>
 		<Section variant="warm">
