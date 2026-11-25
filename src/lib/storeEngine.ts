@@ -1176,6 +1176,23 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 for (const [sku, e] of Object.entries(CATALOG_LANG_EDITIONS))
 	if (!(sku in EDITIONS)) EDITIONS[sku] = e;
 // END CATALOG LANGUAGE EDITIONS
+// SHIPS ON PUBLICATION (pmshipping 2026-11-25 ruling, option 2; Kevin 10-29 L1126 / 10-30 L1197 "Buy now on all 80"):
+// a DIRECT-SALE language edition Ingram cannot print yet (isbn-list.json onSale:false = not yet Title Available; the
+// ISBN master flips on_sale at Title Available) is still sold, but its Stripe line and order record SAY it ships on
+// publication, so neither the buyer nor the shipper desk mistakes it for an order that can print today. Applied HERE,
+// outside fhb-chain.py edition-roster's two generated regions, from data the engine already ships: a roster re-run
+// cannot drop it, and it disappears by itself the day the language goes on sale. Never doubled, never on a pre-order.
+export const SHIPS_ON_PUBLICATION = ' (ships on publication)';
+for (const l of (isbnList as unknown as { languages: { code?: string; onSale?: boolean }[] })
+	.languages)
+	for (const b of ['hb', 'pb'] as const) {
+		const e = l.code && l.onSale === false ? EDITIONS[`lang-${l.code}-${b}`] : undefined;
+		if (e && !/\((pre-order|ships on publication)\)$/.test(e.title))
+			EDITIONS[`lang-${l.code}-${b}`] = { ...e, title: e.title + SHIPS_ON_PUBLICATION };
+	}
+/** True when this SKU is a direct-sale language edition not yet on sale (its line says "ships on publication"). */
+export const shipsOnPublication = (sku: string): boolean =>
+	Boolean(EDITIONS[sku]?.title.endsWith(SHIPS_ON_PUBLICATION));
 
 // BOOKS THAT ARE NOT BIBLES, sold through this same checkout (Kevin 2026-11-10: "point Beloved Identity to
 // FHB too. Build a checkout page to be fulfilled through ingram"). Kept in its own block, outside EDITIONS,
