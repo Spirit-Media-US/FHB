@@ -59,9 +59,6 @@ interface Config {
 	/** the page's order language and its string table (absent = English) */
 	lang?: OrderLang;
 	s?: Strings;
-	/** FORWARDER CREDIT (Ukraine / Nova Poshta, Kevin 2026-11-25): country code -> the per-ORDER credit a Bible cart
-	 *  gets there (ship-countries.json `forwarder`). The server gives that cart the credit and NO first-order 15%. */
-	credit?: Record<string, { cents: number; name: string; note: string }>;
 }
 
 function init(root: HTMLElement) {
@@ -242,16 +239,8 @@ function init(root: HTMLElement) {
 	// confirms; only 'first' counts the 15%. Before that the total is list price + fee, and the form
 	// says "First order? 15% off at checkout." A repeat buyer sees no offer at all.
 	let firstState: 'unknown' | 'first' | 'repeat' = 'unknown';
-	// A forwarder country (Ukraine): the server never applies the first-order 15% to its Bible carts, so the form
-	// never offers it there (no 15% line, no first-order unit prices); the per-order credit shows instead.
-	const creditNow = () => cfg.credit?.[countryRow().code];
-	const firstNow = () => (creditNow() ? 'repeat' : firstState);
 	function paintOffer() {
-		for (const el of qa('[data-offer]')) el.hidden = firstNow() === 'repeat';
-		const noFirst = Boolean(creditNow());
-		for (const el of qa('[data-first]'))
-			(el.closest<HTMLElement>('.eo-row__first') ?? el).hidden = noFirst;
-		for (const el of qa('s[data-list]')) el.style.textDecoration = noFirst ? 'none' : '';
+		for (const el of qa('[data-offer]')) el.hidden = firstState === 'repeat';
 		set('[data-offer-label]', firstState === 'first' ? firstLabel() : t('s.offerUnknown'));
 	}
 	// A country's name in the page's language (English keeps the name the data file carries).
@@ -292,19 +281,11 @@ function init(root: HTMLElement) {
 		const far = isFar();
 		// The total is the price everyone pays until the email confirms a first order (Kevin 2026-11-14 "1A", best
 		// practice: Google promotions rule + no price that rises at checkout).
-		const r = quote(lines(), far ? [] : cfg.tiers, code !== 'US', firstNow() === 'first');
+		const r = quote(lines(), far ? [] : cfg.tiers, code !== 'US', firstState === 'first');
 		const base = r.best === 'first' ? r.firstTotal : r.bulkTotal;
 		const appliedPct = r.best === 'first' ? FIRST_ORDER_PCT : r.best === 'bulk' ? r.bulkPct : 0;
 		const h = handlingFor(lines(), appliedPct, row);
-		// the forwarder credit: ONE per order, never more than the amount due (Stripe caps an amount_off coupon there)
-		const cr = creditNow();
-		const creditCents = cr && r.copies > 0 ? Math.min(cr.cents, base + h.total) : 0;
-		const total = base + h.total - creditCents;
-		for (const d of qa('[data-sum-credit]')) d.hidden = creditCents <= 0;
-		set(
-			'[data-sum-credit-label]',
-			cr ? `${cr.name}: -$${(cr.cents / 100).toFixed(2)} (${cr.note})` : '',
-		);
+		const total = base + h.total;
 		// The edition box sizes each row's fee on the discount the total actually applies (audit 11-14: at 10+ copies
 		// the row said the first-order fee while the summary charged the volume-tier fee); the catalog keeps 15%.
 		paintFees(q('[data-pick]') ? appliedPct : FIRST_ORDER_PCT);
@@ -325,7 +306,7 @@ function init(root: HTMLElement) {
 		const firstSave = total - firstAll;
 		const quoting = bulkQuoteRequired(far, volumes());
 		for (const el of qa('[data-first-save]')) {
-			el.hidden = firstNow() !== 'unknown' || r.copies < 1 || firstSave <= 0 || quoting;
+			el.hidden = firstState !== 'unknown' || r.copies < 1 || firstSave <= 0 || quoting;
 			el.textContent =
 				lang === 'en'
 					? `First order? −${money(firstSave)} (${FIRST_ORDER_PCT}%) comes off at checkout`
