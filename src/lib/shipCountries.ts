@@ -19,35 +19,6 @@ export interface ShipCountry {
 	bulkQuote?: boolean;
 	/** Optional buyer-paid "Expedited delivery"; absent/null = not offered for this country. */
 	fast?: FastOption | null;
-	/** A forwarder route for Bibles where Ingram cannot ship (Ukraine: Nova Poshta via a US address, Kevin 2026-11-25). */
-	forwarder?: Forwarder;
-}
-/**
- * FORWARDER ROUTE (Kevin 2026-11-25, Ukraine / Nova Poshta; the row's `forwarder._readme` has the full rule). Ingram ships
- * the order inside the US to the buyer's forwarder address; the forwarder carries it on and the buyer pays its fee, which a
- * per-ORDER Stripe credit covers. No first-order 15% (`first_order: false`). Only `scope` SKUs ride it ('bibles').
- */
-export interface Forwarder {
-	id: string;
-	name: string;
-	printSite: string;
-	method: string;
-	ship_usd: number;
-	ship_set_usd: number;
-	sales_tax_rate: number;
-	/** the per-ORDER credit, cents (Stripe amount_off coupon `coupon`) */
-	credit_cents: number;
-	coupon: string;
-	credit_name: string;
-	credit_note: string;
-	register_url: string;
-	/** net floor per copy AFTER the credit and Stripe's fee; a SKU below it is refused, never given a fee */
-	floor_usd: number;
-	first_order: boolean;
-	scope: 'bibles';
-	source: string;
-	/** MEASURED landed USD per SKU (print + ship) x (1 + sales tax). A Bible SKU absent here is refused (fail closed). */
-	landed_usd: Record<string, number>;
 }
 export interface FastOption {
 	label: string;
@@ -85,7 +56,6 @@ export interface PendingCountry {
 	ingram_cost_status?: 'MEASURED' | 'UNMEASURED';
 	landed_cost_usd?: LandedCost;
 	far_band?: boolean;
-	forwarder?: Forwarder;
 	/** Key into deliveryRoutes: dispatch + transit estimate + optional faster option. */
 	route?: string;
 	note?: string;
@@ -122,21 +92,6 @@ export function buildLive(
 			throw new Error(`liveWave: ${code} is listed twice or already live`);
 		const r = p.route ? routes[p.route] : undefined;
 		if (!r || !p.printSite) throw new Error(`liveWave: ${code} has no route/printSite`);
-		const fw = p.forwarder;
-		if (
-			fw &&
-			!(
-				Number.isInteger(fw.credit_cents) &&
-				fw.credit_cents > 0 &&
-				fw.coupon &&
-				fw.credit_name &&
-				fw.scope === 'bibles' &&
-				typeof fw.floor_usd === 'number' &&
-				fw.landed_usd &&
-				Object.values(fw.landed_usd).every((v) => typeof v === 'number' && v > 0)
-			)
-		)
-			throw new Error(`liveWave: ${code} has a malformed forwarder route`);
 		out.push({
 			code: p.code,
 			name: p.name,
@@ -149,7 +104,6 @@ export function buildLive(
 			// Kevin 2026-11-15: opened for 1-9 copies; 10+ = contact us for bulk rates (phase 2).
 			bulkQuote: p.far_band === true || wave2.includes(code),
 			fast: r.fast,
-			...(p.forwarder ? { forwarder: p.forwarder } : {}),
 		});
 	}
 	return out;
