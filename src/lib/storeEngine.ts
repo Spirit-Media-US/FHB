@@ -16,6 +16,7 @@ import isbnList from '../data/isbn-list.json' with { type: 'json' };
 
 import { BULK_QUOTE_COPY, bulkQuoteRequired, tierPctFor } from './farBand.ts';
 import {
+	forwarderFor,
 	handlingFeeCents,
 	handlingLabel,
 	landedUnitCost,
@@ -39,7 +40,7 @@ import {
 	type Tier,
 	unitAfter,
 } from './order-pricing.ts';
-import { checkoutShippingForm, countryFor } from './shipCountries.ts';
+import { checkoutShippingForm, countryFor, type Forwarder } from './shipCountries.ts';
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
 // Re-rendered 3-D cards live under NEW keys rather than over the live ones, so the edge
@@ -1605,6 +1606,9 @@ export type EngineDeps = {
 	enabled: boolean;
 	isFirstOrder: (email: string) => Promise<boolean>;
 	firstOrderPromo: () => Promise<string | null>;
+	/** The live Stripe coupon id for a forwarder route's per-order credit, only if it still says the route's amount
+	 *  (absent or null = the credit cannot be given, so a forwarder order is refused: never sold without its credit). */
+	forwarderCoupon?: (f: Forwarder) => Promise<string | null>;
 };
 export type EngineResult =
 	| { status: number; body: unknown }
@@ -1704,6 +1708,16 @@ export async function checkoutForm(
 	// A cart holding an exempt book takes the first-order 15% per Bible unit instead of Stripe's
 	// order-wide coupon, exactly like international carts, because the coupon would discount the book.
 	const perUnitPromo = intl;
+	// FORWARDER ROUTE (Ukraine / Nova Poshta, Kevin 2026-11-25, ship-countries.json UA `forwarder`): a cart holding a
+	// Bible to a forwarder country ships to the buyer's forwarder address in the US. Decision 1: NO first-order 15% (the
+	// per-order credit replaces it); decision 2: the credit is a Stripe amount_off coupon named on the Stripe page, with
+	// the explanation in custom_text; decision 3: Bibles only (a book-only cart to the country is unchanged).
+	const fw = intl
+		? (Object.entries(counts)
+				.filter(([, n]) => n > 0)
+				.map(([slug]) => forwarderFor(slug, dest))
+				.find(Boolean) ?? null)
+		: null;
 	let promo: string | null = null;
 	// 1A (Kevin 2026-11-08): WELCOME15 is offered to EVERYONE, every country. The margin check is
 	// now only the backstop (handling is sized to the floor, so it drops a discount only when the
@@ -1739,7 +1753,7 @@ export async function checkoutForm(
 					FIRST_ORDER_PCT) /
 					100,
 			);
-	if (discountable && validEmail && FIRST_ORDER_PCT > tierPctNow && !bookTiersWin) {
+	if (discountable && validEmail && FIRST_ORDER_PCT > tierPctNow && !bookTiersWin && !fw) {
 		const m = marginCheck(lines, FIRST_ORDER_PCT, destCode, undefined, undefined, true);
 		if (!m.ok) {
 			console.log(`margin-guard: dropped ${FIRST_ORDER_CODE}: ${m.reason}`);
@@ -1785,6 +1799,19 @@ export async function checkoutForm(
 	}
 	const unitPctFinal = perUnitPromo && promo ? FIRST_ORDER_PCT : pct;
 	const useCode = Boolean(promo) && !perUnitPromo;
+	// The forwarder credit must exist in Stripe with the route's amount, or the order is refused (fail closed): the buyer
+	// was promised the credit on the order form, so a session without it is never created.
+	const credit = fw ? ((await deps.forwarderCoupon?.(fw)) ?? null) : null;
+	if (fw && !credit) {
+		console.log(`forwarder: ${fw.id} coupon ${fw.coupon} unavailable: order refused`);
+		return reply(
+			{
+				error: 'credit_unavailable',
+				message: `Orders to ${dest?.name ?? destCode} are paused for a moment. Please try again later.`,
+			},
+			503,
+		);
+	}
 	// `copies` = physical volumes (a Large Print set is three), which scales the expedited price.
 	const shipForm = checkoutShippingForm(payload.country ?? 'US', copies);
 	if (!shipForm) {
@@ -1832,6 +1859,17 @@ export async function checkoutForm(
 	const shipAfter = Object.values(preorder).sort().pop() ?? null;
 	// a business-day estimate counts from today, which is wrong for a book not yet released: the shipping options name
 	// the release instead and carry no estimate
+	// FORWARDER ROUTE: Ingram ships Standard Ground inside the US, so there is no expedited option (its price is a DDP
+	// method this route never uses), and the Stripe page says what the credit is and how the buyer's parcel reaches them.
+	if (fw) {
+		for (const k of Object.keys(shipForm))
+			if (k.startsWith('shipping_options[1]')) delete shipForm[k];
+		const credit$ = `$${(fw.credit_cents / 100).toFixed(2)}`;
+		shipForm['custom_text[shipping_address][message]'] =
+			`Enter your address in ${dest?.name ?? destCode}. We ship through ${fw.name}: after payment, register free at ${fw.register_url} and reply to your order confirmation email with your ${fw.name} US address (with your ${fw.name} account code). We send your order there and ${fw.name} delivers it to your branch.`;
+		shipForm['custom_text[submit][message]'] =
+			`${fw.credit_name}: -${credit$} (${fw.credit_note}). You pay ${fw.name}'s fee when you collect your parcel. Sold and shipped by Spirit Media Publishing.`;
+	}
 	if (shipAfter)
 		for (const k of Object.keys(shipForm)) {
 			if (k.includes('[delivery_estimate]')) delete shipForm[k];
@@ -1887,6 +1925,8 @@ export async function checkoutForm(
 		'metadata[ladder_total]': total,
 		'metadata[pct_off]': promo ? FIRST_ORDER_PCT : pct,
 		'metadata[handling_cents]': handling.reduce((t, h) => t + h.fee * h.qty, 0),
+		// the shipper desk parks a forwarder order until the buyer's forwarder address arrives (desk.py NEED_NP_ADDRESS)
+		...(fw ? { 'metadata[ship_via]': fw.id, 'metadata[credit_cents]': fw.credit_cents } : {}),
 		'metadata[offer]': promo
 			? 'first_order'
 			: pct > 0
@@ -1988,8 +2028,31 @@ export async function checkoutForm(
 	// Pre-applied, so the buyer never types it; Stripe shows WELCOME15 on the summary and counts
 	// its redemptions. Units above are at list price when it applies — the two never stack.
 	if (promo && useCode) form['discounts[0][promotion_code]'] = promo;
+	// the forwarder credit: ONE per order (never per book); promo is always null here (no first-order on this route)
+	if (credit) form['discounts[0][coupon]'] = credit;
 
 	return { form };
+}
+
+/** The live Stripe coupon for a forwarder route's credit, only if it is valid and still says the route's amount in USD. */
+export async function forwarderCoupon(key: string, f: Forwarder): Promise<string | null> {
+	try {
+		const r = await fetch(`https://api.stripe.com/v1/coupons/${encodeURIComponent(f.coupon)}`, {
+			headers: { authorization: `Bearer ${key}` },
+		});
+		if (!r.ok) return null;
+		const c = (await r.json()) as {
+			id?: string;
+			valid?: boolean;
+			amount_off?: number;
+			currency?: string;
+		};
+		return c.valid && c.amount_off === f.credit_cents && c.currency === 'usd'
+			? (c.id ?? null)
+			: null;
+	} catch {
+		return null;
+	}
 }
 
 // ── EBOOKS (Kevin 2026-11-16 "We point to our own ebook sales") ────────────────────────────────────────────────────
