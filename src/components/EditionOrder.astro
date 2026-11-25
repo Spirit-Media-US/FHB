@@ -83,23 +83,6 @@ const config = JSON.stringify({
 	returnPath,
 	// Far-band countries (unit 2kx): no volume ladder, and 10+ copies go to a bulk quote, not checkout.
 	farBand: LIVE_COUNTRIES.filter((c) => c.bulkQuote).map((c) => c.code),
-	// Forwarder credit per country (Ukraine / Nova Poshta, Kevin 2026-11-25): buyer-facing name/amount/note only.
-	credit: Object.fromEntries(
-		LIVE_COUNTRIES.flatMap((c) =>
-			c.forwarder?.scope === 'bibles'
-				? [
-						[
-							c.code,
-							{
-								cents: c.forwarder.credit_cents,
-								name: c.forwarder.credit_name,
-								note: c.forwarder.credit_note,
-							},
-						],
-					]
-				: [],
-		),
-	),
 	// International handling per country (Kevin 2026-11-08), shown beside each price before checkout.
 	intl: handlingTable(
 		Object.fromEntries(Object.entries(skuPrices).map(([k, v]) => [k, Math.round(v * 100)])),
