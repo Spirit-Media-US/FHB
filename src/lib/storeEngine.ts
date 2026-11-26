@@ -1002,15 +1002,15 @@ const CATALOG_LANG_EDITIONS: Record<string, { title: string; retail: number; img
 		retail: 7999,
 		img: `${ASSETS}/lang/v2/lang-rn-600.webp`,
 	},
-	'lang-ktu-hb': {
+	'lang-mkw-hb': {
 		title: 'Biblia ya Kituba (Kituba) — Hardback (pre-order)',
 		retail: 9999,
-		img: `${ASSETS}/lang/v2/lang-ktu-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-mkw-600.webp`,
 	},
-	'lang-ktu-pb': {
+	'lang-mkw-pb': {
 		title: 'Biblia ya Kituba (Kituba) — Paperback (pre-order)',
 		retail: 7999,
-		img: `${ASSETS}/lang/v2/lang-ktu-600.webp`,
+		img: `${ASSETS}/lang/v2/lang-mkw-600.webp`,
 	},
 	'lang-kmr-hb': {
 		title: 'Kitêba Pîroz a Kurmancî (Kurmanji Kurdish) — Hardback',
