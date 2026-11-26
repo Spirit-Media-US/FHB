@@ -136,6 +136,10 @@ const first = formats[0];
 
 const offerFor = (f: (typeof formats)[number]) => ({
 	'@type': 'Offer',
+	// sku + gtin13 ON THE OFFER (pmseoaeo 2026-11-25): merchant-feed-verify (and the bibles/[slug] pages) key a feed
+	// item to its page Offer by offers.sku; with sku only on the Book node, 3 feed items matched nothing.
+	sku: f.sku,
+	...(f.isbn ? { gtin13: f.isbn } : {}),
 	url: URL_,
 	price: (f.list_cents / 100).toFixed(2),
 	priceCurrency: 'USD',
