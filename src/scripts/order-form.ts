@@ -59,9 +59,13 @@ interface Config {
 	/** the page's order language and its string table (absent = English) */
 	lang?: OrderLang;
 	s?: Strings;
-	/** FORWARDER CREDIT (Ukraine / Nova Poshta, Kevin 2026-11-25): country code -> the per-ORDER credit a Bible cart
-	 *  gets there (ship-countries.json `forwarder`). The server gives that cart the credit and NO first-order 15%. */
-	credit?: Record<string, { cents: number; name: string; note: string }>;
+}
+/** A ship-to credit as the SERVER answers it (store engine shipToCredit; Kevin 2026-11-26 L3025): never in the page. */
+interface ShipCredit {
+	country: string;
+	cents: number;
+	label: string;
+	eligible: string[];
 }
 
 function init(root: HTMLElement) {
@@ -242,9 +246,36 @@ function init(root: HTMLElement) {
 	// confirms; only 'first' counts the 15%. Before that the total is list price + fee, and the form
 	// says "First order? 15% off at checkout." A repeat buyer sees no offer at all.
 	let firstState: 'unknown' | 'first' | 'repeat' = 'unknown';
-	// A forwarder country (Ukraine): the server never applies the first-order 15% to its Bible carts, so the form
-	// never offers it there (no 15% line, no first-order unit prices); the per-order credit shows instead.
-	const creditNow = () => cfg.credit?.[countryRow().code];
+	// SHIP-TO CREDIT (Kevin 2026-11-26 L3025: "ONLY Ukhraine checkout forms should show this credit. NO other buyer should
+	// even know"): the page carries nothing about it. When the ship-to changes the form asks the store, which answers
+	// null for every country but a forwarder country; the server applies the credit again at checkout from the ship-to.
+	// There the server never applies the first-order 15%, so the form never offers it; the per-order credit shows instead.
+	let credit: ShipCredit | null = null;
+	let creditAsk = 0;
+	async function askCredit() {
+		const id = ++creditAsk;
+		const code = countryRow().code;
+		credit = null;
+		if (code === 'US') return;
+		try {
+			const res = await fetch(`${storeOrigin(location.hostname)}/store-checkout`, {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ shipToCredit: true, country: code, skus: Object.keys(cfg.prices) }),
+			});
+			const d = (await res.json()) as { credit?: ShipCredit | null };
+			if (id === creditAsk && d.credit && d.credit.country === code) credit = d.credit;
+		} catch {
+			// no answer = no credit shown; checkout still applies it (the total can only read higher, never lower)
+		}
+		if (id === creditAsk) render();
+	}
+	const creditNow = () =>
+		credit &&
+		credit.country === countryRow().code &&
+		lines().some((l) => credit?.eligible.includes(l.slug))
+			? credit
+			: undefined;
 	const firstNow = () => (creditNow() ? 'repeat' : firstState);
 	function paintOffer() {
 		for (const el of qa('[data-offer]')) el.hidden = firstNow() === 'repeat';
@@ -301,10 +332,7 @@ function init(root: HTMLElement) {
 		const creditCents = cr && r.copies > 0 ? Math.min(cr.cents, base + h.total) : 0;
 		const total = base + h.total - creditCents;
 		for (const d of qa('[data-sum-credit]')) d.hidden = creditCents <= 0;
-		set(
-			'[data-sum-credit-label]',
-			cr ? `${cr.name}: -$${(cr.cents / 100).toFixed(2)} (${cr.note})` : '',
-		);
+		set('[data-sum-credit-label]', cr ? cr.label : '');
 		// The edition box sizes each row's fee on the discount the total actually applies (audit 11-14: at 10+ copies
 		// the row said the first-order fee while the summary charged the volume-tier fee); the catalog keeps 15%.
 		paintFees(q('[data-pick]') ? appliedPct : FIRST_ORDER_PCT);
@@ -367,7 +395,11 @@ function init(root: HTMLElement) {
 			chip.toggleAttribute('data-on', Number(chip.dataset.tier) === r.bulkPct && r.bulkPct > 0);
 	}
 
-	q<HTMLSelectElement>('[data-country]')?.addEventListener('change', render);
+	q<HTMLSelectElement>('[data-country]')?.addEventListener('change', () => {
+		render();
+		askCredit();
+	});
+	if (countryRow().code !== 'US') askCredit();
 	q<HTMLInputElement>('[data-quote-name]')?.addEventListener('input', render);
 
 	// ── checkout ──

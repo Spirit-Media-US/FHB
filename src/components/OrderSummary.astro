@@ -63,7 +63,7 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 		<div class={edition ? 'osum__copies' : undefined}><dt><span data-sum-copies>0</span> <span data-sum-copies-word>{t('s.copies')}</span></dt><dd data-sum-subtotal>{formatUsd(lang, 0)}</dd></div>
 		<div data-sum-disc hidden><dt data-sum-disc-label></dt><dd data-sum-disc-amt></dd></div>
 		<div data-sum-fee hidden><dt data-sum-fee-label></dt><dd data-sum-fee-amt></dd></div>
-		{/* Ukraine / Nova Poshta (Kevin 2026-11-25): the per-order credit as one full-width line, set by order-form.ts */}
+		{/* Ship-to credit (Kevin 2026-11-26 L3025, text from the server only): the per-order credit as one full-width line, set by order-form.ts */}
 		<div class="osum__credit" data-sum-credit hidden><dt data-sum-credit-label></dt></div>
 		<div class="osum__total"><dt data-t="s.total">{t('s.total')}</dt><dd data-sum-total aria-live="polite">{formatUsd(lang, 0)}</dd></div>
 	</dl>

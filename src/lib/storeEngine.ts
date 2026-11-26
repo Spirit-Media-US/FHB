@@ -17,6 +17,7 @@ import isbnList from '../data/isbn-list.json' with { type: 'json' };
 import { BULK_QUOTE_COPY, bulkQuoteRequired, tierPctFor } from './farBand.ts';
 import {
 	forwarderFor,
+	forwarderLandedUsd,
 	handlingFeeCents,
 	handlingLabel,
 	landedUnitCost,
@@ -1733,10 +1734,13 @@ export async function checkoutForm(
 	}
 	// ONE ENGINE (Kevin 2026-11-15): a book is sized on its own measured landed cost, else the per-book cost model
 	// (Kevin 2026-11-24), capped at the country's Bible cost (marginGuard.landedUnitCost). Refused only when nothing prices it.
-	const unsized = Object.entries(counts).some(
-		([slug, n]) =>
-			n > 0 && BOOK_SKUS[slug] && landedUnitCost(slug, dest?.landed_cost_usd, dest?.code) == null,
-	);
+	const unsized = Object.entries(counts).some(([slug, n]) => {
+		if (n <= 0 || !BOOK_SKUS[slug]) return false;
+		const via = forwarderFor(slug, dest);
+		return via
+			? forwarderLandedUsd(slug, via) == null
+			: landedUnitCost(slug, dest?.landed_cost_usd, dest?.code) == null;
+	});
 	if (intl && unsized) {
 		return reply(
 			{ error: 'country_not_served', message: 'We do not ship that book to that country yet.' },
@@ -1753,9 +1757,10 @@ export async function checkoutForm(
 	// order-wide coupon, exactly like international carts, because the coupon would discount the book.
 	const perUnitPromo = intl;
 	// FORWARDER ROUTE (Ukraine / Nova Poshta, Kevin 2026-11-25, ship-countries.json UA `forwarder`): a cart holding a
-	// Bible to a forwarder country ships to the buyer's forwarder address in the US. Decision 1: NO first-order 15% (the
-	// per-order credit replaces it); decision 2: the credit is a Stripe amount_off coupon named on the Stripe page, with
-	// the explanation in custom_text; decision 3: Bibles only (a book-only cart to the country is unchanged).
+	// SKU in the route's scope, SHIPPED TO the forwarder country (whoever the buyer is: the ship-to decides, Kevin 2026-11-26
+	// L3025), ships to the buyer's forwarder address in the US. Decision 1: NO first-order 15% (the per-order credit
+	// replaces it); decision 2: the credit is a Stripe amount_off coupon named on the Stripe page, with the explanation in
+	// custom_text; scope = the route's ONE setting ('all' physical products, L3025 | 'bibles').
 	const fw = intl
 		? (Object.entries(counts)
 				.filter(([, n]) => n > 0)
@@ -2076,6 +2081,34 @@ export async function checkoutForm(
 	if (credit) form['discounts[0][coupon]'] = credit;
 
 	return { form };
+}
+
+/**
+ * The ship-to credit an order form may show, answered by the SERVER only (Kevin 2026-11-26 L3025: "ONLY Ukhraine checkout
+ * forms should show this credit. NO other buyer should even know"): null for every country without a forwarder route, so
+ * no static page or bundle carries the route's name or credit. `skus` = the form's SKUs; `eligible` = those in the route's
+ * scope (the form shows the credit only while its cart holds one: exactly when checkoutForm applies it).
+ */
+export function shipToCredit(
+	country: unknown,
+	skus: readonly unknown[] = [],
+	/** test seam: the country row to answer from (default: the live list) */
+	row?: Parameters<typeof forwarderFor>[1] & { code?: string },
+): { country: string; cents: number; label: string; eligible: string[] } | null {
+	const code = String(country ?? '').toUpperCase();
+	if (!code || code === 'US') return null;
+	const c = row ?? countryFor(code);
+	const fw = c?.forwarder;
+	if (!fw) return null;
+	const eligible = skus
+		.map((k) => String(k))
+		.filter((k) => !isEbookSku(k) && EDITIONS[canonicalSku(k)] && forwarderFor(canonicalSku(k), c));
+	return {
+		country: code,
+		cents: fw.credit_cents,
+		label: `${fw.credit_name}: -$${(fw.credit_cents / 100).toFixed(2)} (${fw.credit_note})`,
+		eligible,
+	};
 }
 
 /** The live Stripe coupon for a forwarder route's credit, only if it is valid and still says the route's amount in USD. */
