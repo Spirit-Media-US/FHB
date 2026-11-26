@@ -32,6 +32,7 @@ import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
 import { FIRST_ORDER_PCT, isDiscountExempt } from '../../lib/order-pricing';
 import { LIVE_COUNTRIES } from '../../lib/shipCountries';
 import { EBOOK_SKUS, ebookForBook } from '../../lib/storeEngine';
+import { tblBook } from '../../lib/tbl.mjs';
 
 type Format = {
 	sku: string;
@@ -74,6 +75,9 @@ export function getStaticPaths() {
 const { book } = Astro.props as { book: Book };
 const URL_ = `https://fathersheartbible.com/books/${book.slug}/`;
 const live = book.status === 'live';
+// TBL switch-over (src/lib/tbl.mjs; CONTRACT v2 decision 61): a book with a live TBL page is bought THERE; the order
+// box becomes one "Buy now" link to it (same tab). Switch off / no TBL page = the order form as before.
+const tblHref = live ? tblBook(book.slug) : null;
 const money = (c: number) => `$${(c / 100).toFixed(2)}`;
 // 3es F2 (pmseoaeo 2026-11-13): the JSON-LD description is PLAIN text — every HTML entity decoded (&bull; &ndash; sat in
 // it raw), no tags, no newlines. scripts/fhb-books.test.mjs fails the build on any entity or tag left in a built page.
@@ -354,7 +358,16 @@ const faqLd = faq.length
 				</div>
 			</div>
 		</section>
-		{live ? (
+		{tblHref ? (
+			<section class="bk-order" aria-label={`Order ${book.title}`}>
+				<div class="mx-auto max-w-xl px-4">
+					<div id="order" class="bi__order">
+						{formats.map((f) => <p class="bi__price">{f.format} {money(f.list_cents)}</p>)}
+						<a class="bi__buy" href={tblHref} data-tbl>Buy now</a>
+					</div>
+				</div>
+			</section>
+		) : live ? (
 			// THE ORDER AREA (the same as the SMP book page and the FHB edition box): offer line, country marquee, the box,
 			// Keep shopping. It orders on the SMP store (contract 3fe).
 			<section class="bk-order" aria-label={`Order ${book.title}`}>
@@ -402,5 +415,8 @@ const faqLd = faq.length
 	.bi__order { margin: 1.4rem auto 0; padding: 1.25rem; background: #fff; border: 1px solid var(--color-hairline); border-radius: 1rem; max-width: 30rem; font-family: var(--font-sans); }
 	.bi__price { margin: 0 0 0.9rem; font-size: 1.5rem; font-weight: 800; color: var(--color-ink); }
 	.bi__fine { margin: 0.8rem 0 0; font-size: 0.8rem; color: #3f3f46; }
+	/* the TBL "Buy now" (switch-over): the light-pink FHB buy button (BuyControls .buy-btn), 44px tap height */
+	.bi__buy { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0.5rem 0.75rem; border-radius: 999px; background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); font-weight: 600; text-decoration: none; }
+	.bi__buy:hover { filter: brightness(0.97); }
 	.bi__desc { max-width: 44rem; margin: 2.5rem auto 0; font-family: var(--font-sans); color: #27272a; line-height: 1.7; }
 </style>
