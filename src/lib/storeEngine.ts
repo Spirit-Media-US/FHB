@@ -1917,7 +1917,7 @@ export async function checkoutForm(
 		shipForm['custom_text[shipping_address][message]'] =
 			`Enter your address in ${dest?.name ?? destCode}. We ship through ${fw.name}: after payment, register free at ${fw.register_url} and reply to your order confirmation email with your ${fw.name} US address (with your ${fw.name} account code). We send your order there and ${fw.name} delivers it to your branch.`;
 		shipForm['custom_text[submit][message]'] =
-			`${fw.credit_name}: -${credit$} (${fw.credit_note}). You pay ${fw.name}'s fee when you collect your parcel. Sold and shipped by Spirit Media Publishing.`;
+			`${fw.credit_name}: -${credit$} (${fw.credit_note}). You pay ${fw.name}'s fee when you collect your parcel. Spirit Media Publishing, delivered through The Believer's Library.`;
 	}
 	if (shipAfter)
 		for (const k of Object.keys(shipForm)) {
@@ -1966,7 +1966,10 @@ export async function checkoutForm(
 		// disclaimer (shipCountries.ts); RIAB's own checkout replaces it with its book line + the same words.
 		...('custom_text[submit][message]' in shipForm
 			? {}
-			: { 'custom_text[submit][message]': 'Sold and shipped by Spirit Media Publishing.' }),
+			: {
+					'custom_text[submit][message]':
+						"Spirit Media Publishing, delivered through The Believer's Library.",
+				}), // Kevin L3150 2026-11-26 "52B" seller line
 		'metadata[kind]': 'dvc_print',
 		// Physical copies, as the fulfilment email's subject and its "9+ copies" wording read it; the
 		// Bible ladder count (which a discount-exempt book does not touch) travels as ladder_total.
@@ -2232,7 +2235,8 @@ export async function ebookCheckoutForm(
 			: `${origin}/bookstore/?order=canceled`;
 	const form: Record<string, string | number> = {
 		mode: 'payment',
-		'custom_text[submit][message]': 'Sold by Spirit Media Publishing.', // Kevin 2026-11-24 seller line (eBook: nothing ships)
+		'custom_text[submit][message]':
+			"Spirit Media Publishing, delivered through The Believer's Library.", // Kevin L3150 2026-11-26 "52B" (was 11-24 "Sold by")
 		// lands on /ebook-download, which re-reads the session from Stripe and hands over the signed download link
 		success_url: `${origin}/ebook-download?s={CHECKOUT_SESSION_ID}`,
 		cancel_url: back,

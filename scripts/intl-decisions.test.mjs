@@ -66,8 +66,8 @@ test('EXPEDITED: ONE paid option after the free one, in every live country, with
 		assert.equal(f[key(1, '[type]')], 'fixed_amount', c.code);
 		assert.equal(Object.keys(f).filter((k) => /^shipping_options\[2\]/.test(k)).length, 0, 'never a third option');
 		assert.equal(f[key(1, '[display_name]')], 'Expedited delivery', c.code);
-		// + the seller line after the disclaimer (Kevin 2026-11-24, SMP 188b1a8, engine shipCountries.ts)
-		assert.equal(f['custom_text[submit][message]'], `${EXPEDITED_DISCLAIMER} Sold and shipped by Spirit Media Publishing.`, `${c.code} disclaimer at checkout`);
+		// + the seller line after the disclaimer (Kevin L3150 2026-11-26 "52B", engine shipCountries.ts)
+		assert.equal(f['custom_text[submit][message]'], `${EXPEDITED_DISCLAIMER} Spirit Media Publishing, delivered through The Believer's Library.`, `${c.code} disclaimer at checkout`);
 		assert.doesNotMatch(JSON.stringify(f), /@spiritmediapublishing\.com/, `${c.code}: never an email address on Stripe's page`);
 		assert.ok(f[key(1, '[display_name]')].length <= 100, `${c.code} Stripe display_name cap`);
 		assert.equal(f[key(1, '[fixed_amount][amount]')], fastPriceCents(c.fast.extra_usd, 1));

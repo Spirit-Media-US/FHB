@@ -281,7 +281,7 @@ export function checkoutShippingForm(
 		// + Kevin 2026-11-24 seller line (the engine form sets it alone when there is no disclaimer).
 		...(c.fast
 			? {
-					'custom_text[submit][message]': `${EXPEDITED_DISCLAIMER} Sold and shipped by Spirit Media Publishing.`,
+					'custom_text[submit][message]': `${EXPEDITED_DISCLAIMER} Spirit Media Publishing, delivered through The Believer's Library.`,
 				}
 			: {}),
 	};

@@ -20,6 +20,9 @@ const WAVE = ORDER_LANGS.filter((l) => l !== 'en');
 const ph = (s) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join(',');
 // English words that must not survive in another language's string (placeholders stripped first).
 const ENGLISH = /\b(the|your|free|shipping|copies|order|please|checkout|handling|delivery|returns|refund|quote|choose|email address)\b/i;
+// Brand names stay English in every language (Kevin L3150 "52B" seller line: "The Believer's Library"); stripped
+// before the boilerplate check so "The" in the name is not read as an untranslated article. Names only, not sentences.
+const BRAND_NAMES = /The Believer's Library|Spirit Media Publishing/g;
 // Strings that are the same word in English and that language (reviewed by eye, not a loophole for sentences).
 const SAME_OK = { fr: ['s.total'], es: ['s.total', 'c.cat.general'], nl: ['p.paperback'], de: [], it: [], pt: ['s.total'], ja: [] };
 
@@ -31,7 +34,7 @@ function problems(lang, table) {
 		if (typeof v !== 'string' || !v.trim()) { out.push(`${lang}: missing key ${k}`); continue; }
 		if (ph(v) !== ph(EN[k])) out.push(`${lang}: ${k} placeholders {${ph(v)}} != English {${ph(EN[k])}}`);
 		if (v === EN[k] && !SAME_OK[lang]?.includes(k)) out.push(`${lang}: ${k} is untranslated English`);
-		if (ENGLISH.test(v.replace(/\{\w+\}/g, ''))) out.push(`${lang}: ${k} contains English boilerplate: ${v}`);
+		if (ENGLISH.test(v.replace(/\{\w+\}/g, '').replace(BRAND_NAMES, ''))) out.push(`${lang}: ${k} contains English boilerplate: ${v}`);
 	}
 	for (const k of Object.keys(table)) if (!(k in EN)) out.push(`${lang}: extra key ${k}`);
 	return out;
