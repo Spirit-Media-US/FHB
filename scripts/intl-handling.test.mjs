@@ -83,7 +83,14 @@ test('fee is exactly .99, is the SMALLEST that holds the floor, and scales per c
 });
 
 test('floors met for HC and PB, WITH the 15% and WITHOUT it (repeat buyer), every live country', () => {
-	for (const c of LIVE_COUNTRIES.filter((x) => x.code !== 'US')) {
+	// A forwarder-route country (Ukraine / Nova Poshta, Kevin 2026-11-25) is not on this rule: its Bibles take NO 15%, NO
+	// handling fee, and net >= the route's own floor AFTER the $30 credit (SMP 66fcea0; its store-checkout tests pin it).
+	for (const c of LIVE_COUNTRIES.filter((x) => x.forwarder))
+		for (const [slug, list] of [[HC, 9999], [PB, 7999]]) {
+			assert.equal(handlingFeeCents(slug, list, c), 0, `${c.code} ${slug}: no fee on the forwarder route`);
+			assert.ok(netPerItemUsd(slug, list, c, 0) >= c.forwarder.floor_usd, `${c.code} ${slug}: route floor met at list`);
+		}
+	for (const c of LIVE_COUNTRIES.filter((x) => x.code !== 'US' && !x.forwarder)) {
 		for (const [slug, list] of [[HC, 9999], [PB, 7999]]) {
 			for (const paid of [unitAfter(list, 15), list]) {
 				const net = netPerItemUsd(slug, paid, c, handlingFeeCents(slug, paid, c));
@@ -301,14 +308,15 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	const hb = Object.keys(cfg.prices).find((k) => k.endsWith('-hb')), pb = Object.keys(cfg.prices).find((k) => k.endsWith('-pb'));
 	// The edition box (Kevin 2026-11-14): a format button picks the binding, one quantity field counts it.
 	const setQty = (sku, n) => { const el = d.querySelector(`[data-pick-qty][data-fmt="${sku.endsWith('-pb') ? 'pb' : 'hb'}"]`); el.value = String(n); el.dispatchEvent(new w.Event('input', { bubbles: true })); };
-	const pick = (code) => { const s = d.querySelector('[data-country]'); s.value = code; s.dispatchEvent(new w.Event('change', { bubbles: true })); };
+	const pick = async (code) => { const s = d.querySelector('[data-country]'); s.value = code; s.dispatchEvent(new w.Event('change', { bubbles: true })); await new Promise((r) => setTimeout(r, 10)); };
 	const feeEl = (sku) => [...d.querySelectorAll(`[data-fee-sku="${sku}"][data-fee-full]`)][0];
 	const txt = (sel) => d.querySelector(sel).textContent;
 	const hbList = Math.round(cfg.prices[hb] * 100), pbList = Math.round(cfg.prices[pb] * 100);
 
 	const answers = { value: { status: 'first' } };
 	let asked = [];
-	w.fetch = async (url, init) => { asked.push(JSON.parse(init.body)); return { json: async () => answers.value }; };
+	// the ship-to credit ask (L3025) answers null outside a forwarder country; this test counts only the first-order asks
+	w.fetch = async (url, init) => { const b = JSON.parse(init.body); if (b.shipToCredit) return { json: async () => ({ credit: null }) }; asked.push(b); return { json: async () => answers.value }; };
 	const email = d.querySelector('[data-email]');
 	const typeEmail = async (v) => { email.value = v; email.dispatchEvent(new w.Event('change', { bubbles: true })); await new Promise((r) => setTimeout(r, 20)); };
 	// Edition box (Kevin 2026-11-14): ONE first-order line (data-offer) replaces the old changing label;
@@ -379,6 +387,63 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	assert.equal(feeEl(hb).hidden, true, 'GB: floor met, no fee');
 	assert.equal(d.querySelector('[data-sum-fee]').hidden, true);
 	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(firstHb * 2)}`);
+});
+
+// Ukraine / Nova Poshta (Kevin 2026-11-24/25; SHIP-TO country rule, Kevin 2026-11-26 L3025): the server gives a UA cart ONE
+// $30 credit and NO first-order 15%; the form shows it before checkout, with its text from the SERVER's answer only (the
+// page carries nothing about it). Other countries are untouched and never see it.
+test('dist + jsdom: Ukraine shows the server-answered credit line, the credited total and no 15%; the page names no route', async (t) => {
+	assert.ok(fs.existsSync(DIST_PAGE), 'dist/ missing: run the build first');
+	let JSDOM, build;
+	try { ({ JSDOM } = await import('jsdom')); ({ build } = await import('esbuild')); } catch { return t.skip('jsdom/esbuild not installed'); }
+	const out = await build({ entryPoints: ['src/scripts/order-form.ts'], bundle: true, write: false, format: 'iife', platform: 'browser' });
+	const html = fs.readFileSync(DIST_PAGE, 'utf8').replace(/<script[\s\S]*?<\/script>/g, '');
+	const dom = new JSDOM(html, { runScripts: 'outside-only', url: 'https://fathersheartbible.com/bibles/fathers-heart-bible/' });
+	const w = dom.window, d = w.document;
+	const LINE = 'Nova Poshta delivery credit: -$30.00 (covers your Nova Poshta fee from the US to Ukraine)';
+	assert.doesNotMatch(fs.readFileSync(DIST_PAGE, 'utf8'), /Nova Poshta|npshopping/i, 'the static page never names the route');
+	assert.doesNotMatch(out.outputFiles[0].text, /Nova Poshta|npshopping/i, 'nor does the form bundle');
+	const creditAsks = [];
+	// the store's answer, as functions/store-checkout.ts gives it (shipToCredit: UA only, null elsewhere)
+	w.fetch = async (u, init) => {
+		const b = JSON.parse(init.body);
+		if (b.shipToCredit) {
+			creditAsks.push(b.country);
+			return { json: async () => ({ credit: b.country === 'UA' ? { country: 'UA', cents: 3000, label: LINE, eligible: b.skus } : null }) };
+		}
+		return { json: async () => ({ status: 'first' }) };
+	};
+	w.eval(out.outputFiles[0].text);
+	const cfg = JSON.parse(d.querySelector('[data-order]').dataset.order);
+	assert.equal(cfg.credit, undefined, 'no credit in the page config');
+	const hb = Object.keys(cfg.prices).find((k) => k.endsWith('-hb')), pb = Object.keys(cfg.prices).find((k) => k.endsWith('-pb'));
+	const setQty = (sku, n) => { const el = d.querySelector(`[data-pick-qty][data-fmt="${sku.endsWith('-pb') ? 'pb' : 'hb'}"]`); el.value = String(n); el.dispatchEvent(new w.Event('input', { bubbles: true })); };
+	const pick = async (code) => { const s = d.querySelector('[data-country]'); s.value = code; s.dispatchEvent(new w.Event('change', { bubbles: true })); await new Promise((r) => setTimeout(r, 10)); };
+	const txt = (sel) => d.querySelector(sel).textContent;
+	const credit = d.querySelector('[data-sum-credit]');
+	const email = d.querySelector('[data-email]');
+	const list = (k) => Math.round(cfg.prices[k] * 100);
+	setQty(pb, 1); setQty(hb, 1);
+	for (const confirmed of [false, true]) {
+		if (confirmed) { email.value = 'new@buyer.co'; email.dispatchEvent(new w.Event('change', { bubbles: true })); await new Promise((r) => setTimeout(r, 20)); }
+		await pick('UA');
+		assert.equal(credit.hidden, false);
+		assert.equal(txt('[data-sum-credit-label]'), LINE);
+		assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(list(pb) + list(hb) - 3000)}`, 'total = list - $30, no 15%');
+		assert.equal(d.querySelector('[data-sum-disc]').hidden, true, `no 15% discount line (email confirmed: ${confirmed})`);
+		assert.equal(d.querySelector('[data-first-save]').hidden, true, 'no "First order?" line');
+		for (const el of d.querySelectorAll('[data-first]')) assert.equal((el.closest('.eo-row__first') ?? el).hidden, true, 'no first-order unit price');
+		// leaving Ukraine restores the ordinary form
+		await pick('GB');
+		assert.equal(credit.hidden, true);
+		assert.equal(txt('[data-sum-credit-label]'), '', 'GB: no credit text anywhere in the form');
+		for (const el of d.querySelectorAll('[data-first]')) assert.equal((el.closest('.eo-row__first') ?? el).hidden, false);
+		const gbTotal = confirmed ? unitAfter(list(pb), 15) + unitAfter(list(hb), 15) : list(pb) + list(hb);
+		assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(gbTotal)}`, 'GB total unchanged');
+	}
+	await pick('US');
+	assert.equal(credit.hidden, true, 'US: no credit');
+	assert.ok(!creditAsks.includes('US'), 'US never even asks');
 });
 
 test('server: the first-order check answers yes/no from the same rule checkout uses, and creates nothing', async () => {
@@ -476,4 +541,39 @@ test('dist: the expedited disclaimer is on the order form and /returns; no "2 da
 		const t = fs.readFileSync(f, 'utf8').replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, '');
 		assert.doesNotMatch(t, /1-2 (business )?days|instead of 5-10|2 days (vs|versus|instead)/i, f);
 	}
+});
+
+// SHIP-TO COUNTRY RULE (Kevin 2026-11-26 L3025: "a country provision for all products ... ONLY Ukhraine checkout forms
+// should show this credit"): the engine FHB serves from gives a Ukraine ship-to ONE -$30 credit on a BOOK and on a BIBLE
+// alike, and nothing for US/GB/DE. Fails if the UA forwarder scope is reverted to 'bibles' (the book loses it).
+test('engine shipToCredit: UA ship-to on a book AND a Bible = ONE -$30 credit each; US/GB/DE none', async () => {
+	const { shipToCredit } = await import('../src/lib/storeEngine.ts');
+	const LINE = 'Nova Poshta delivery credit: -$30.00 (covers your Nova Poshta fee from the US to Ukraine)';
+	for (const sku of ['the-pyramid-principle-hb', 'athletes-hb']) {
+		const c = shipToCredit('UA', [sku]);
+		assert.ok(c, `${sku}: UA gets the credit`);
+		assert.equal(c.cents, 3000, sku);
+		assert.equal(c.label, LINE, sku);
+		assert.deepEqual(c.eligible, [sku], `${sku}: one credit, this product eligible`);
+		for (const other of ['US', 'GB', 'DE']) assert.equal(shipToCredit(other, [sku]), null, `${sku} -> ${other}`);
+	}
+	// both products in ONE order: still ONE credit (a per-order amount, not per product)
+	const both = shipToCredit('UA', ['the-pyramid-principle-hb', 'athletes-hb']);
+	assert.equal(both.cents, 3000);
+	assert.deepEqual(both.eligible, ['the-pyramid-principle-hb', 'athletes-hb']);
+});
+
+// No built FHB page or bundle names the route: its text reaches a page only from the server's answer for a UA ship-to.
+test('dist: 0 "Nova Poshta" in any built static page or bundle', (t) => {
+	if (!fs.existsSync('dist')) return t.skip('dist/ missing: run the build first');
+	const hits = [];
+	const walk = (d) => {
+		for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+			const p = `${d}/${e.name}`;
+			if (e.isDirectory()) walk(p);
+			else if (/\.(html|js|mjs|json|xml|txt)$/.test(e.name) && /Nova Poshta|npshopping/i.test(fs.readFileSync(p, 'utf8'))) hits.push(p);
+		}
+	};
+	walk('dist');
+	assert.deepEqual(hits, [], 'static output must carry 0 "Nova Poshta"');
 });

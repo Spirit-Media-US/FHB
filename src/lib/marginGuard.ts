@@ -33,7 +33,12 @@ import {
 	unitAfter,
 	volumesFor,
 } from './order-pricing.ts';
-import { LIVE_COUNTRIES, offerShippingDetails, type ShipCountry } from './shipCountries.ts';
+import {
+	type Forwarder,
+	LIVE_COUNTRIES,
+	offerShippingDetails,
+	type ShipCountry,
+} from './shipCountries.ts';
 
 export { bindingFor, volumesFor };
 
@@ -88,9 +93,43 @@ export const handlingLabel = (code: string): string =>
 export const floorFor = (c: Pick<ShipCountry, 'farBand'>): number =>
 	c.farBand === true ? MIN_NET_FAR_USD : MIN_NET_USD;
 
-/** The net floor for one SKU in a destination: the country's floor, except a book with its own (Beloved Identity: break-even). */
-export const floorForSku = (slug: string, c: Pick<ShipCountry, 'farBand'>): number =>
-	BOOK_SKUS[slug]?.floorUsd ?? floorFor(c);
+/**
+ * FORWARDER ROUTE (Ukraine / Nova Poshta, Kevin 2026-11-25; a SHIP-TO COUNTRY rule, Kevin 2026-11-26 L3025): the route
+ * when `slug` rides it to `c`, else null. The route's `scope` is the one product setting: 'all' = every physical SKU
+ * (books + Bibles), 'bibles' = every SKU that is not a book (BOOK_SKUS); outside the scope a SKU keeps the country's costs.
+ */
+export const forwarderFor = (
+	slug: string,
+	c: { forwarder?: Forwarder } | undefined,
+): Forwarder | null => {
+	const fw = c?.forwarder;
+	if (!fw) return null;
+	if (fw.scope === 'all') return fw;
+	return fw.scope === 'bibles' && !BOOK_SKUS[slug] ? fw : null;
+};
+
+/**
+ * Landed USD for one copy of `slug` sent to the forwarder: its MEASURED row in `landed_usd`; else, for a book, the
+ * per-book model (Ingram print at the route's print site + the route's ship_usd) x (1 + sales tax); else null (refused).
+ */
+export function forwarderLandedUsd(slug: string, fw: Forwarder): number | null {
+	const own = fw.landed_usd[slug];
+	if (typeof own === 'number') return own;
+	if (!BOOK_SKUS[slug]) return null;
+	const print = modelPrintUsd(slug, fw.printSite);
+	return print == null ? null : round2((print + fw.ship_usd) * (1 + fw.sales_tax_rate));
+}
+
+/** The net floor for one SKU in a destination: the country's floor, except a book with its own (Beloved Identity: break-even)
+ *  and a forwarder-route SKU (a book's own floor, else the route's floor, AFTER the per-order credit). */
+export const floorForSku = (
+	slug: string,
+	c: Pick<ShipCountry, 'farBand'> & { forwarder?: Forwarder },
+): number => {
+	const fw = forwarderFor(slug, c);
+	if (fw) return BOOK_SKUS[slug]?.floorUsd ?? fw.floor_usd;
+	return BOOK_SKUS[slug]?.floorUsd ?? floorFor(c);
+};
 
 // PER-BOOK COST MODEL (Kevin 2026-11-24: "This needs to get fixed NOW! Our site is saying ships to 223 countries but then
 // is it charging $50 a book to do so?"). Until today a book with no measured cost for a country was sized at that
@@ -293,9 +332,19 @@ export function landedUnitCost(
 export function netPerItemUsd(
 	slug: string,
 	priceCents: number,
-	country: Pick<ShipCountry, 'landed_cost_usd'> & { code?: string },
+	country: Pick<ShipCountry, 'landed_cost_usd'> & { code?: string; forwarder?: Forwarder },
 	feeCents = 0,
 ): number | null {
+	// FORWARDER ROUTE: the SKU's own MEASURED landed cost to the forwarder (tax included), Stripe's fee on the list price
+	// and the WHOLE per-order credit, exactly the method of the route's source CSV (conservative for a multi-copy order:
+	// each copy carries the full credit). A Bible with no measured route cost has no net: the sale is refused.
+	const fw = forwarderFor(slug, country);
+	if (fw) {
+		const landed = forwarderLandedUsd(slug, fw);
+		if (landed == null) return null;
+		const list = (priceCents + feeCents) / 100;
+		return list - (list * STRIPE_INTL_PCT + STRIPE_FIXED_USD) - landed - fw.credit_cents / 100;
+	}
 	const lc = country.landed_cost_usd;
 	if (!lc) return null;
 	const v = volumesFor(slug);
@@ -317,9 +366,16 @@ export function netPerItemUsd(
 export function handlingFeeCents(
 	slug: string,
 	paidCents: number,
-	country: Pick<ShipCountry, 'landed_cost_usd' | 'farBand'> & { code?: string },
+	country: Pick<ShipCountry, 'landed_cost_usd' | 'farBand'> & {
+		code?: string;
+		forwarder?: Forwarder;
+	},
 ): number {
 	if (country.code?.toUpperCase() === 'US' || !country.landed_cost_usd) return 0;
+	// a forwarder-route Bible never carries a handling fee: below its floor it is refused (marginCheck), not priced up.
+	// A forwarder-route BOOK (scope 'all') keeps the books' handling fee, sized on its net AFTER the credit (PENDING RULING
+	// pmshipping 2026-11-26: without it 59 of 60 book SKUs net < $0 to Ukraine and would be refused).
+	if (forwarderFor(slug, country) && !BOOK_SKUS[slug]) return 0;
 	const noFee = netPerItemUsd(slug, paidCents, country, 0);
 	if (noFee == null) return 0; // no cost for this SKU here: the caller refuses the sale (fail closed)
 	const short = floorForSku(slug, country) - noFee; // USD of net still missing

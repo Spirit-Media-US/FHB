@@ -60,6 +60,13 @@ interface Config {
 	lang?: OrderLang;
 	s?: Strings;
 }
+/** A ship-to credit as the SERVER answers it (store engine shipToCredit; Kevin 2026-11-26 L3025): never in the page. */
+interface ShipCredit {
+	country: string;
+	cents: number;
+	label: string;
+	eligible: string[];
+}
 
 function init(root: HTMLElement) {
 	const cfg = JSON.parse(root.dataset.order ?? '{}') as Config;
@@ -239,8 +246,43 @@ function init(root: HTMLElement) {
 	// confirms; only 'first' counts the 15%. Before that the total is list price + fee, and the form
 	// says "First order? 15% off at checkout." A repeat buyer sees no offer at all.
 	let firstState: 'unknown' | 'first' | 'repeat' = 'unknown';
+	// SHIP-TO CREDIT (Kevin 2026-11-26 L3025: "ONLY Ukhraine checkout forms should show this credit. NO other buyer should
+	// even know"): the page carries nothing about it. When the ship-to changes the form asks the store, which answers
+	// null for every country but a forwarder country; the server applies the credit again at checkout from the ship-to.
+	// There the server never applies the first-order 15%, so the form never offers it; the per-order credit shows instead.
+	let credit: ShipCredit | null = null;
+	let creditAsk = 0;
+	async function askCredit() {
+		const id = ++creditAsk;
+		const code = countryRow().code;
+		credit = null;
+		if (code === 'US') return;
+		try {
+			const res = await fetch(`${storeOrigin(location.hostname)}/store-checkout`, {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ shipToCredit: true, country: code, skus: Object.keys(cfg.prices) }),
+			});
+			const d = (await res.json()) as { credit?: ShipCredit | null };
+			if (id === creditAsk && d.credit && d.credit.country === code) credit = d.credit;
+		} catch {
+			// no answer = no credit shown; checkout still applies it (the total can only read higher, never lower)
+		}
+		if (id === creditAsk) render();
+	}
+	const creditNow = () =>
+		credit &&
+		credit.country === countryRow().code &&
+		lines().some((l) => credit?.eligible.includes(l.slug))
+			? credit
+			: undefined;
+	const firstNow = () => (creditNow() ? 'repeat' : firstState);
 	function paintOffer() {
-		for (const el of qa('[data-offer]')) el.hidden = firstState === 'repeat';
+		for (const el of qa('[data-offer]')) el.hidden = firstNow() === 'repeat';
+		const noFirst = Boolean(creditNow());
+		for (const el of qa('[data-first]'))
+			(el.closest<HTMLElement>('.eo-row__first') ?? el).hidden = noFirst;
+		for (const el of qa('s[data-list]')) el.style.textDecoration = noFirst ? 'none' : '';
 		set('[data-offer-label]', firstState === 'first' ? firstLabel() : t('s.offerUnknown'));
 	}
 	// A country's name in the page's language (English keeps the name the data file carries).
@@ -281,11 +323,16 @@ function init(root: HTMLElement) {
 		const far = isFar();
 		// The total is the price everyone pays until the email confirms a first order (Kevin 2026-11-14 "1A", best
 		// practice: Google promotions rule + no price that rises at checkout).
-		const r = quote(lines(), far ? [] : cfg.tiers, code !== 'US', firstState === 'first');
+		const r = quote(lines(), far ? [] : cfg.tiers, code !== 'US', firstNow() === 'first');
 		const base = r.best === 'first' ? r.firstTotal : r.bulkTotal;
 		const appliedPct = r.best === 'first' ? FIRST_ORDER_PCT : r.best === 'bulk' ? r.bulkPct : 0;
 		const h = handlingFor(lines(), appliedPct, row);
-		const total = base + h.total;
+		// the forwarder credit: ONE per order, never more than the amount due (Stripe caps an amount_off coupon there)
+		const cr = creditNow();
+		const creditCents = cr && r.copies > 0 ? Math.min(cr.cents, base + h.total) : 0;
+		const total = base + h.total - creditCents;
+		for (const d of qa('[data-sum-credit]')) d.hidden = creditCents <= 0;
+		set('[data-sum-credit-label]', cr ? cr.label : '');
 		// The edition box sizes each row's fee on the discount the total actually applies (audit 11-14: at 10+ copies
 		// the row said the first-order fee while the summary charged the volume-tier fee); the catalog keeps 15%.
 		paintFees(q('[data-pick]') ? appliedPct : FIRST_ORDER_PCT);
@@ -306,7 +353,7 @@ function init(root: HTMLElement) {
 		const firstSave = total - firstAll;
 		const quoting = bulkQuoteRequired(far, volumes());
 		for (const el of qa('[data-first-save]')) {
-			el.hidden = firstState !== 'unknown' || r.copies < 1 || firstSave <= 0 || quoting;
+			el.hidden = firstNow() !== 'unknown' || r.copies < 1 || firstSave <= 0 || quoting;
 			el.textContent =
 				lang === 'en'
 					? `First order? −${money(firstSave)} (${FIRST_ORDER_PCT}%) comes off at checkout`
@@ -348,7 +395,11 @@ function init(root: HTMLElement) {
 			chip.toggleAttribute('data-on', Number(chip.dataset.tier) === r.bulkPct && r.bulkPct > 0);
 	}
 
-	q<HTMLSelectElement>('[data-country]')?.addEventListener('change', render);
+	q<HTMLSelectElement>('[data-country]')?.addEventListener('change', () => {
+		render();
+		askCredit();
+	});
+	if (countryRow().code !== 'US') askCredit();
 	q<HTMLInputElement>('[data-quote-name]')?.addEventListener('input', render);
 
 	// ── checkout ──
