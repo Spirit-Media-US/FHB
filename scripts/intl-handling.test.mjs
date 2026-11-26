@@ -83,7 +83,14 @@ test('fee is exactly .99, is the SMALLEST that holds the floor, and scales per c
 });
 
 test('floors met for HC and PB, WITH the 15% and WITHOUT it (repeat buyer), every live country', () => {
-	for (const c of LIVE_COUNTRIES.filter((x) => x.code !== 'US')) {
+	// A forwarder-route country (Ukraine / Nova Poshta, Kevin 2026-11-25) is not on this rule: its Bibles take NO 15%, NO
+	// handling fee, and net >= the route's own floor AFTER the $30 credit (SMP 66fcea0; its store-checkout tests pin it).
+	for (const c of LIVE_COUNTRIES.filter((x) => x.forwarder))
+		for (const [slug, list] of [[HC, 9999], [PB, 7999]]) {
+			assert.equal(handlingFeeCents(slug, list, c), 0, `${c.code} ${slug}: no fee on the forwarder route`);
+			assert.ok(netPerItemUsd(slug, list, c, 0) >= c.forwarder.floor_usd, `${c.code} ${slug}: route floor met at list`);
+		}
+	for (const c of LIVE_COUNTRIES.filter((x) => x.code !== 'US' && !x.forwarder)) {
 		for (const [slug, list] of [[HC, 9999], [PB, 7999]]) {
 			for (const paid of [unitAfter(list, 15), list]) {
 				const net = netPerItemUsd(slug, paid, c, handlingFeeCents(slug, paid, c));
@@ -379,6 +386,50 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 	assert.equal(feeEl(hb).hidden, true, 'GB: floor met, no fee');
 	assert.equal(d.querySelector('[data-sum-fee]').hidden, true);
 	assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(firstHb * 2)}`);
+});
+
+// Ukraine / Nova Poshta (Kevin 2026-11-24/25, pmshipping 26f22a67): the server gives a UA Bible cart ONE $30 credit and
+// NO first-order 15%; the form says exactly that before checkout. Other countries are untouched.
+test('dist + jsdom: Ukraine shows the Nova Poshta credit line, the credited total and no 15% anywhere', async (t) => {
+	assert.ok(fs.existsSync(DIST_PAGE), 'dist/ missing: run the build first');
+	let JSDOM, build;
+	try { ({ JSDOM } = await import('jsdom')); ({ build } = await import('esbuild')); } catch { return t.skip('jsdom/esbuild not installed'); }
+	const out = await build({ entryPoints: ['src/scripts/order-form.ts'], bundle: true, write: false, format: 'iife', platform: 'browser' });
+	const html = fs.readFileSync(DIST_PAGE, 'utf8').replace(/<script[\s\S]*?<\/script>/g, '');
+	const dom = new JSDOM(html, { runScripts: 'outside-only', url: 'https://fathersheartbible.com/bibles/fathers-heart-bible/' });
+	const w = dom.window, d = w.document;
+	w.fetch = async () => ({ json: async () => ({ status: 'first' }) });
+	w.eval(out.outputFiles[0].text);
+	const cfg = JSON.parse(d.querySelector('[data-order]').dataset.order);
+	assert.deepEqual(Object.keys(cfg.credit), ['UA'], 'only forwarder countries carry a credit');
+	assert.doesNotMatch(JSON.stringify(cfg.credit), /landed|ship_usd|coupon/, 'no costs or coupon id on the page');
+	const hb = Object.keys(cfg.prices).find((k) => k.endsWith('-hb')), pb = Object.keys(cfg.prices).find((k) => k.endsWith('-pb'));
+	const setQty = (sku, n) => { const el = d.querySelector(`[data-pick-qty][data-fmt="${sku.endsWith('-pb') ? 'pb' : 'hb'}"]`); el.value = String(n); el.dispatchEvent(new w.Event('input', { bubbles: true })); };
+	const pick = (code) => { const s = d.querySelector('[data-country]'); s.value = code; s.dispatchEvent(new w.Event('change', { bubbles: true })); };
+	const txt = (sel) => d.querySelector(sel).textContent;
+	const credit = d.querySelector('[data-sum-credit]');
+	const email = d.querySelector('[data-email]');
+	const list = (k) => Math.round(cfg.prices[k] * 100);
+	setQty(pb, 1); setQty(hb, 1);
+	const LINE = 'Nova Poshta delivery credit: -$30.00 (covers your Nova Poshta fee from the US to Ukraine)';
+	for (const confirmed of [false, true]) {
+		if (confirmed) { email.value = 'new@buyer.co'; email.dispatchEvent(new w.Event('change', { bubbles: true })); await new Promise((r) => setTimeout(r, 20)); }
+		pick('UA');
+		assert.equal(credit.hidden, false);
+		assert.equal(txt('[data-sum-credit-label]'), LINE);
+		assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(list(pb) + list(hb) - 3000)}`, 'total = list - $30, no 15%');
+		assert.equal(d.querySelector('[data-sum-disc]').hidden, true, `no 15% discount line (email confirmed: ${confirmed})`);
+		assert.equal(d.querySelector('[data-first-save]').hidden, true, 'no "First order?" line');
+		for (const el of d.querySelectorAll('[data-first]')) assert.equal((el.closest('.eo-row__first') ?? el).hidden, true, 'no first-order unit price');
+		// leaving Ukraine restores the ordinary form
+		pick('GB');
+		assert.equal(credit.hidden, true);
+		for (const el of d.querySelectorAll('[data-first]')) assert.equal((el.closest('.eo-row__first') ?? el).hidden, false);
+		const gbTotal = confirmed ? unitAfter(list(pb), 15) + unitAfter(list(hb), 15) : list(pb) + list(hb);
+		assert.equal(txt('[data-sum-total]').replace(/,/g, ''), `$${usd(gbTotal)}`, 'GB total unchanged');
+	}
+	pick('US');
+	assert.equal(credit.hidden, true, 'US: no credit');
 });
 
 test('server: the first-order check answers yes/no from the same rule checkout uses, and creates nothing', async () => {
