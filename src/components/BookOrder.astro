@@ -143,6 +143,8 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 			<ul class="bo-items" data-items></ul>
 			<dl class="bo-lines">
 				<div data-fee-line hidden><dt>Shipping &amp; handling</dt><dd data-fee>$0.00</dd></div>
+				{/* a ship-to credit (Kevin 2026-11-26 L3025): EMPTY in the page; its text comes only from the server */}
+				<div class="bo-credit" data-credit-line hidden><dt data-credit></dt></div>
 				<div class="bo-total"><dt>Total</dt><dd data-total aria-live="polite">{money(formats[0]?.list_cents ?? 0)}</dd></div>
 			</dl>
 			{(firstOrder || ebook) && <p class="bo-first" data-first-save hidden></p>}
@@ -242,6 +244,9 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 	.bo-shop a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1rem; border: 1px solid #f0c4d8; border-radius: 999px; background: #fbe7f0; color: #52525b; font-size: 0.88rem; font-weight: 600; text-decoration: none; }
 	.bo-shop a:hover { border-color: var(--color-ink); }
 	@media (min-width: 641px) { .bo-box { padding: 1.25rem 1.25rem 1.1rem; } }
+	.bo-lines > .bo-credit { display: block; color: #166534; font-weight: 600; line-height: 1.45; }
+	.bo-lines > .bo-credit[hidden] { display: none; }
+	.bo-credit dt { margin: 0; }
 </style>
 
 <script>
@@ -267,6 +272,29 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 		};
 		const label = (i: HTMLInputElement) =>
 			(i.closest('.bo-row')?.querySelector('.bo-row__binding')?.textContent ?? i.name).trim();
+		// SHIP-TO CREDIT (Kevin 2026-11-26 L3025): asked of the store when the ship-to changes; null for every country but
+		// a forwarder country, so this page never carries the credit's text. The server applies it again at checkout.
+		let credit: { country: string; cents: number; label: string; eligible: string[] } | null = null;
+		let creditAsk = 0;
+		const askCredit = async () => {
+			const id = ++creditAsk;
+			const code = sel.value;
+			credit = null;
+			render();
+			if (code === 'US') return;
+			try {
+				const r = await fetch(`${storeOrigin(location.hostname)}/store-checkout`, {
+					method: 'POST',
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify({ shipToCredit: true, country: code, skus: inputs.map((i) => i.name) }),
+				});
+				const d = (await r.json()) as { credit?: typeof credit };
+				if (id === creditAsk && d.credit && d.credit.country === code) credit = d.credit;
+			} catch {
+				// no answer = no credit shown; checkout still applies it (the total can only read higher, never lower)
+			}
+			if (id === creditAsk) render();
+		};
 		const render = () => {
 			let sub = 0;
 			let fees = 0;
@@ -288,7 +316,17 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 			}
 			(form.querySelector('[data-fee]') as HTMLElement).textContent = cents(fees);
 			(form.querySelector('[data-fee-line]') as HTMLElement).hidden = fees <= 0;
-			(form.querySelector('[data-total]') as HTMLElement).textContent = cents(sub + fees);
+			const cr =
+				credit && credit.country === sel.value &&
+				inputs.some((i) => qty(i) > 0 && i !== ebookIn && credit?.eligible.includes(i.name))
+					? credit
+					: null;
+			const creditOff = cr ? Math.min(cr.cents, sub + fees) : 0;
+			const crLine = form.querySelector<HTMLElement>('[data-credit-line]');
+			if (crLine) crLine.hidden = creditOff <= 0;
+			const crText = form.querySelector<HTMLElement>('[data-credit]');
+			if (crText) crText.textContent = cr ? cr.label : '';
+			(form.querySelector('[data-total]') as HTMLElement).textContent = cents(sub + fees - creditOff);
 			const eb = Boolean(ebookIn && qty(ebookIn) > 0);
 			const ship = form.querySelector<HTMLElement>('[data-ship]');
 			if (ship) ship.hidden = eb;
@@ -299,7 +337,7 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 			const save = form.querySelector<HTMLElement>('[data-first-save]');
 			if (save) {
 				const off = sub - Math.round((sub * (100 - pct)) / 100);
-				save.hidden = !(pct > 0 && off > 0);
+				save.hidden = !(pct > 0 && off > 0) || Boolean(cr);
 				save.textContent = `First order? -${cents(off)} (${pct}%) comes off at checkout`;
 			}
 		};
@@ -316,8 +354,9 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 			if (ev.target instanceof HTMLInputElement && inputs.includes(ev.target)) exclusive(ev.target);
 			render();
 		});
-		sel.addEventListener('change', render);
+		sel.addEventListener('change', askCredit);
 		render();
+		if (sel.value !== 'US') askCredit();
 		form.addEventListener('submit', async (ev) => {
 			ev.preventDefault();
 			const msg = form.querySelector('#buy-msg') as HTMLElement;

@@ -25,8 +25,12 @@ export interface ShipCountry {
 /**
  * FORWARDER ROUTE (Kevin 2026-11-25, Ukraine / Nova Poshta; the row's `forwarder._readme` has the full rule). Ingram ships
  * the order inside the US to the buyer's forwarder address; the forwarder carries it on and the buyer pays its fee, which a
- * per-ORDER Stripe credit covers. No first-order 15% (`first_order: false`). Only `scope` SKUs ride it ('bibles').
+ * per-ORDER Stripe credit covers. No first-order 15% (`first_order: false`). Only `scope` SKUs ride it.
+ * SCOPE is the ONE product setting (pmbuilder 2026-11-26, Kevin L3025 "a country provision for all products"):
+ * 'all' = every physical product shipped to the country (books + Bibles, whoever the buyer is); 'bibles' = FHB Bible SKUs only.
  */
+export type ForwarderScope = 'all' | 'bibles';
+export const FORWARDER_SCOPES: readonly ForwarderScope[] = ['all', 'bibles'];
 export interface Forwarder {
 	id: string;
 	name: string;
@@ -44,9 +48,10 @@ export interface Forwarder {
 	/** net floor per copy AFTER the credit and Stripe's fee; a SKU below it is refused, never given a fee */
 	floor_usd: number;
 	first_order: boolean;
-	scope: 'bibles';
+	scope: ForwarderScope;
 	source: string;
-	/** MEASURED landed USD per SKU (print + ship) x (1 + sales tax). A Bible SKU absent here is refused (fail closed). */
+	/** MEASURED landed USD per SKU (print + ship) x (1 + sales tax). A Bible SKU absent here is refused (fail closed);
+	 *  a book absent here is MODELLED (marginGuard.forwarderLandedUsd: US print model + ship_usd, x (1 + sales_tax_rate)). */
 	landed_usd: Record<string, number>;
 }
 export interface FastOption {
@@ -130,7 +135,7 @@ export function buildLive(
 				fw.credit_cents > 0 &&
 				fw.coupon &&
 				fw.credit_name &&
-				fw.scope === 'bibles' &&
+				FORWARDER_SCOPES.includes(fw.scope) &&
 				typeof fw.floor_usd === 'number' &&
 				fw.landed_usd &&
 				Object.values(fw.landed_usd).every((v) => typeof v === 'number' && v > 0)
