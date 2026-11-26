@@ -260,9 +260,7 @@ test('Bible pricing and floor are byte-identical: fee/net numbers pinned', () =>
 	const pin = { GB: [3701, 2099], DE: [5020, 2999], PH: [6317, 1799] }; // [pb landed cents, expected fee at $79.99 list only if > 0]
 	for (const [c, [cents]] of Object.entries(pin))
 		assert.equal(Math.round(byCode(c).landed_cost_usd.pb * 100), cents);
-	// forwarder-route countries (Ukraine / Nova Poshta, Kevin 2026-11-25) price Bibles on their route's own floor after
-	// the per-order credit, never with a fee (intl-handling.test.mjs + SMP store-checkout tests cover that route)
-	for (const c of LIVE_COUNTRIES.filter((r) => r.code !== 'US' && !r.forwarder)) {
+	for (const c of LIVE_COUNTRIES.filter((r) => r.code !== 'US')) {
 		const f = handlingFeeCents(BIBLE, BIBLE_LIST, c);
 		const floor = c.farBand ? 10 : 20;
 		assert.ok(netPerItemUsd(BIBLE, BIBLE_LIST, c, f) >= floor - 1e-9, c.code);
