@@ -2,6 +2,7 @@
 import MailtoLink from '../components/MailtoLink.astro';
 import Section from '../components/Section.astro';
 import Layout from '../layouts/Layout.astro';
+import { SMP_PHONE, SMP_PHONE_TEL } from '../lib/contact';
 import { RETURN_DAYS } from '../lib/merchantReturnPolicy';
 import { EXPEDITED_DISCLAIMER } from '../lib/order-pricing';
 ---
@@ -55,7 +56,7 @@ import { EXPEDITED_DISCLAIMER } from '../lib/order-pricing';
           <div>
             <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">How to Reach Us</h2>
             <ol class="list-decimal pl-6 space-y-2 leading-relaxed">
-              <li><MailtoLink email="hello@spiritmediapublishing.com" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">Email us</MailtoLink> with your order number and the edition you ordered.</li>
+              <li><MailtoLink email="hello@spiritmediapublishing.com" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">Email us</MailtoLink> or call <a href={SMP_PHONE_TEL} style="color: var(--color-brand); font-weight: 600; text-decoration: none; white-space: nowrap;">{SMP_PHONE}</a> with your order number and the edition you ordered.</li>
               <li>Tell us what is wrong. For a damaged or misprinted copy, a photo helps.</li>
               <li>We reply by email with your resolution and any next steps.</li>
             </ol>
@@ -73,7 +74,7 @@ import { EXPEDITED_DISCLAIMER } from '../lib/order-pricing';
 
           <div>
             <h2 class="text-xl font-bold mb-3" style="font-family: var(--font-serif); color: var(--color-ink);">Contact</h2>
-            <p class="leading-relaxed">Questions? <MailtoLink email="hello@spiritmediapublishing.com" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">Email us</MailtoLink> or write to:</p>
+            <p class="leading-relaxed">Questions? Call <a href={SMP_PHONE_TEL} style="color: var(--color-brand); font-weight: 600; text-decoration: none; white-space: nowrap;">{SMP_PHONE}</a>, <MailtoLink email="hello@spiritmediapublishing.com" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">email us</MailtoLink> or write to:</p>
             <p class="leading-relaxed mt-2">Spirit Media Publishing<br/>205 Academy Street #3251<br/>Cary, NC 27519<br/>United States</p>
           </div>
 

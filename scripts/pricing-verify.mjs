@@ -45,6 +45,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { handlingFeeCents } from '../src/lib/marginGuard.ts';
 import { LIVE_COUNTRIES } from '../src/lib/shipCountries.ts';
 import { shipsOnPublication } from '../src/lib/storeEngine.ts';
+import { tblEdition } from '../src/lib/tbl.mjs';
 
 const ISBNS = '/home/deploy/projects/fhb-print-bible/editions/ISBNS.json';
 const CHECKOUT = 'src/lib/storeEngine.ts'; // the catalogue moved into the SMP store engine (plan 3fb Phase 2)
@@ -148,7 +149,9 @@ check(
 // The built forms. Missing dist/ is a FAILURE, not a skip: this gate exists to compare what
 // ships, and it runs after `astro build` in npm run build.
 const forms = {};
-for (const f of [...FULL_FORMS, LANG_FORM]) {
+// the language sample form is checked here only while the edition is sold on FHB; a TBL-sold edition page carries the
+// TBL box instead (checked in editionPageErrs below)
+for (const f of [...FULL_FORMS, ...(tblEdition('spanish-bible') ? [] : [LANG_FORM])]) {
 	if (!existsSync(f)) {
 		check(false, `${f} not built — run after astro build (${DIST}/ is what this gate checks)`);
 		continue;
@@ -471,7 +474,18 @@ function editionPageErrs(pages, srv) {
 	const errs = [];
 	for (const [f, html] of Object.entries(pages)) {
 		const nForms = (html.match(/data-order="/g) ?? []).length;
-		if (nForms !== 1) errs.push(`${f}: expected ONE order form, found ${nForms}`);
+		// TBL switch-over (src/lib/tbl.mjs tblEdition, kevin seat 2026-11-26 23:42Z, L3147): an edition TBL sells carries
+		// ONE TBL box instead of the order form: no FHB form, and its Buy is exactly this edition's TBL page. The price
+		// line below is checked against the server the same way.
+		const slug = /\/bibles\/([a-z0-9-]+)\/index\.html$/.exec(f)?.[1];
+		const tblUrl = slug ? tblEdition(slug) : null;
+		if (tblUrl) {
+			const nTbl = (html.match(/data-tbl-order/g) ?? []).length;
+			if (nTbl !== 1 || nForms !== 0)
+				errs.push(`${f}: expected ONE TBL order box and no FHB form, found ${nTbl} + ${nForms}`);
+			if (!html.includes(`href="${tblUrl}" data-tbl`))
+				errs.push(`${f}: Buy now must open ${tblUrl}`);
+		} else if (nForms !== 1) errs.push(`${f}: expected ONE order form, found ${nForms}`);
 		const at = html.indexOf('id="order"');
 		if (at < 0) {
 			errs.push(`${f}: no #order — the hero's Order button jumps nowhere`);

@@ -1,4 +1,5 @@
 ---
+import { SMP_PHONE, SMP_PHONE_TEL } from '../lib/contact';
 /* THE ORDER SUMMARY every print order form ends in (Kevin 2026-10-03): copies, subtotal, the
  * ONE discount that applies (volume tier or 15% off a first order — never both), the total,
  * the buyer's email and the Checkout button. Driven by src/scripts/order-form.ts.
@@ -101,7 +102,7 @@ const ladder = [...tiers].filter((t) => t.pct > 0).sort((a, b) => a.min - b.min)
 	<p class="osum__msg" data-msg hidden role="status"></p>
 	{/* Support on every order form as a BUTTON, never a printed address (Kevin 2026-11-15: "We do not post our
 	    emails ... mailto: show a button not the email"). MailtoLink = the site's standard email link. */}
-	<p class="osum__help"><MailtoLink email="hello@spiritmediapublishing.com" class="osum__help-btn">{t('c.contact')}</MailtoLink></p>
+	<p class="osum__help"><MailtoLink email="hello@spiritmediapublishing.com" class="osum__help-btn">{t('c.contact')}</MailtoLink> <a href={SMP_PHONE_TEL} class="osum__help-btn" aria-label={`Call ${SMP_PHONE}`}>{SMP_PHONE}</a></p>
 </div>
 
 <style>

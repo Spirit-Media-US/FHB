@@ -8,6 +8,7 @@ import globalNav from '../chrome/nav.generated.json';
 import MailtoLink from '../components/MailtoLink.astro';
 import WelcomeTour from '../components/WelcomeTour.astro';
 import { clampDescription } from '../lib/clamp-description';
+import { SMP_PHONE, SMP_PHONE_SCHEMA } from '../lib/contact';
 import { ogLocale, ogLocaleAlternates } from '../lib/og-locale';
 import { sanityClient } from '../lib/sanity';
 import '../styles/global.css';
@@ -256,7 +257,7 @@ const ORGANIZATION_SCHEMA = {
 		'https://www.instagram.com/spiritmediapublishing/',
 	],
 	// Kevin 2026-10-21: this address and this phone ONLY, everywhere.
-	telephone: '+1-888-800-3744',
+	telephone: SMP_PHONE_SCHEMA,
 	address: {
 		'@type': 'PostalAddress',
 		streetAddress: '205 S Academy Street, Unit 3251',
@@ -522,8 +523,9 @@ const allJsonLd = [...pageJsonLd, ORGANIZATION_SCHEMA];
 			legalLinks={fhbFooterLegal}
 			copyrightName="Spirit Media Publishing, the imprint of Spirit Media Inc"
 			year={currentYear}
+			phone={SMP_PHONE}
 		>
-			<MailtoLink slot="contact" email="hello@spiritmediapublishing.com" style="text-decoration: none; color: var(--color-inverse-on-surface, #f1f1f1); opacity: 0.65; font-family: var(--font-body); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;">Contact</MailtoLink>
+			<MailtoLink slot="contact" email="hello@spiritmediapublishing.com" style="text-decoration: none; color: var(--color-inverse-on-surface, #f1f1f1); opacity: 0.65; font-family: var(--font-body); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;">Contact us</MailtoLink>
 		</Footer>
 		<WelcomeTour />
 		<script>

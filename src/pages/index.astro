@@ -19,6 +19,7 @@ import {
 	LANGUAGE_TOTAL,
 } from '../data/receive';
 import Layout from '../layouts/Layout.astro';
+import { SMP_PHONE_SCHEMA } from '../lib/contact';
 import { FHB_ORG_CORE, withBrandVariants } from '../lib/fhb-org';
 import { merchantReturnPolicy } from '../lib/merchantReturnPolicy';
 import { sanityClient, urlFor } from '../lib/sanity';
@@ -202,6 +203,8 @@ const homeVoices: VoiceGroup[] = [
 				// NO "email" here: Kevin 2026-11-20 RULE, no address in page source/schema (contact = MailtoLink on those pages).
 				"contactPoint": {
 					"@type": "ContactPoint",
+					// Kevin L3174 2026-11-27: the phone, never an email (11-20 rule).
+					"telephone": SMP_PHONE_SCHEMA,
 					"contactType": "customer service",
 					"availableLanguage": "English"
 				},
@@ -482,6 +485,9 @@ const homeVoices: VoiceGroup[] = [
 				</p>
 				<p class="text-base leading-loose mt-3" style="font-family: var(--font-body); color: var(--color-muted);">
 					In season: <a href="/verses/christmas/" style="color: var(--color-brand); text-decoration: none; font-weight: 600; white-space: nowrap;">Christmas Bible verses</a> <span aria-hidden="true" style="color: var(--color-hairline);">&middot;</span> <a href="/verses/advent/" style="color: var(--color-brand); text-decoration: none; font-weight: 600; white-space: nowrap;">Advent Scripture readings</a>
+				</p>
+				<p class="text-base leading-loose mt-3" style="font-family: var(--font-body); color: var(--color-muted);">
+					New to the faith? Here is the <a href="/bible-for/new-believers/" style="color: var(--color-brand); text-decoration: none; font-weight: 600;">best Bible to give a new believer</a>, one that shows who is speaking.
 				</p>
 			</div>
 		</section>

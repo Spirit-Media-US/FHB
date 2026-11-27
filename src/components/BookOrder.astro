@@ -1,4 +1,5 @@
 ---
+import { SMP_PHONE, SMP_PHONE_TEL } from '../lib/contact';
 import { destHtml, SISTER_HOST } from '../lib/xsite';
 // THE ORDER AREA ON AN FHB BOOK PAGE (/books/<slug>/#order) — the SAME area as the SMP book page (Kevin 2026-11-14:
 // Who Am I? + Beloved Identity "same content but on 2 different sites"; RIAB is the standard), in FHB's colours,
@@ -164,7 +165,7 @@ const firstUnit = (c: number) => Math.round((c * (100 - firstOrderPct)) / 100);
 		{/* Kevin 2026-11-24 seller line (eBook-only: nothing ships) */}
 		<p class="bo-seller" data-seller data-print-seller="Sold and shipped by Spirit Media Publishing" data-ebook-seller="Sold by Spirit Media Publishing">Sold and shipped by Spirit Media Publishing</p>
 		<p id="buy-msg" class="bo-msg" role="status"></p>
-		<p class="bo-help"><MailtoLink email="hello@spiritmediapublishing.com" class="bo-help-btn">Contact us</MailtoLink></p>
+		<p class="bo-help"><MailtoLink email="hello@spiritmediapublishing.com" class="bo-help-btn">Contact us</MailtoLink> <a href={SMP_PHONE_TEL} class="bo-help-btn">Call {SMP_PHONE}</a></p>
 	</div>
 </form>
 <nav class="bo-shop" aria-label="Keep shopping">

@@ -11,6 +11,7 @@ import { LIVE_ORDER_LANGS, ORDER_LANGS, ORDER_STRINGS, orderLangFor, tr, shipsTe
 import { EXPEDITED_DISCLAIMER, FIRST_ORDER_FINE, FIRST_ORDER_LABEL, FIRST_ORDER_PCT } from '../src/lib/order-pricing.ts';
 import { BULK_QUOTE_COPY } from '../src/lib/farBand.ts';
 import { shipsLine, shipsParts, shipsToSentence } from '../src/lib/shipCountries.ts';
+import { tblEdition } from '../src/lib/tbl.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dir = path.join(root, 'src/data/order-strings');
@@ -118,6 +119,17 @@ const built = fs.existsSync(dist('bibles/german-bible/index.html'));
 for (const [slug, lang] of [['german-bible', 'de'], ['french-bible', 'fr'], ['spanish-bible', 'es'], ['italian-bible', 'it'], ['dutch-bible', 'nl'], ['portuguese-bible', 'pt'], ['japanese-bible', 'ja']]) {
 	test(`built /bibles/${slug}/: order block in ${lang} once live (English until then), html lang and canonical untouched`, { skip: !built && 'no dist' }, () => {
 		const h = fs.readFileSync(dist(`bibles/${slug}/index.html`), 'utf8');
+		// TBL switch-over (src/lib/tbl.mjs tblEdition, L3147): the edition is sold on TBL; its box keeps the localized
+		// binding names and links its TBL page
+		if (tblEdition(slug)) {
+			const box = h.slice(h.indexOf('data-tbl-order'), h.indexOf('data-tbl-order') + 6000);
+			assert.ok(box.includes(`href="${tblEdition(slug)}" data-tbl`), 'Buy now -> its TBL page');
+			if (LIVE_ORDER_LANGS.includes(lang)) assert.ok(box.includes(ORDER_STRINGS[lang]['p.paperback']), 'localized binding');
+			if (LIVE_ORDER_LANGS.includes(lang)) assert.ok(box.includes(`>${ORDER_STRINGS[lang]['o.buyNow']}</a>`), 'localized Buy now');
+			assert.match(h, /^<!DOCTYPE html><html lang="en"/);
+			assert.ok(h.includes(`rel="canonical" href="https://fathersheartbible.com/bibles/${slug}/"`));
+			return;
+		}
 		if (!LIVE_ORDER_LANGS.includes(lang)) {
 			assert.ok(h.includes('Buying 10 or more?') && !h.includes(`data-lang="${lang}"`), `${lang} not live: block must stay English`);
 			return;
@@ -136,7 +148,8 @@ for (const [slug, lang] of [['german-bible', 'de'], ['french-bible', 'fr'], ['sp
 }
 test('built: a language we do not translate yet stays English, and /print/order/ ships English with the hooks', { skip: !built && 'no dist' }, () => {
 	const h = fs.readFileSync(dist('bibles/korean-bible/index.html'), 'utf8');
-	assert.ok(h.includes('Buying 10 or more?') && h.includes('Checkout →') && !h.includes('data-lang="ko"'));
+	if (tblEdition('korean-bible')) assert.ok(h.includes('data-tbl-order') && !h.includes('data-lang="ko"'), 'TBL box, English');
+	else assert.ok(h.includes('Buying 10 or more?') && h.includes('Checkout →') && !h.includes('data-lang="ko"'));
 	const o = fs.readFileSync(dist('print/order/index.html'), 'utf8');
 	assert.ok(o.includes('Catalog Order Form') && o.includes('data-t="c.h1"') && o.includes('data-ships='));
 	assert.ok(!o.includes('hreflang="de"'));
