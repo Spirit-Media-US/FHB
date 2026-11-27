@@ -23,6 +23,10 @@ export const TBL_BOOKS = {
 	// The FHB eBook: TBL sells it itself from 2026-11-27 (community: the tbl_ebook path, delivered in My Library; kevin
 	// seat 2026-11-26 23:42Z, L3147). SHIP ORDER: community first. History below.
 	'bible-ebook': 'fathers-heart-bible-regular-print?f=ebook',
+	// The FHB English audiobook: TBL sells OUR Charon /read narration, 1,189 chapters, at $24.99 (Kevin L3176 '2 B' + L3175
+	// Q75 A), row library_items fathers-heart-bible-audiobook (fhb-ebook-config.py --library-audio, private fhb-ebook bucket).
+	// Its own TBL work page (no smp_slug, not in FORMAT_JOIN). SHIP ORDER: the TBL row live (+ community files() paging) first.
+	'bible-audiobook': 'fathers-heart-bible-audiobook',
 	// (was) 'bible-ebook' deliberately NOT mapped (lane C 2026-11-22): the FHB eBook is not in the store engine's eBook SKUs, so
 	// TBL cannot sell it yet and its TBL page Buy points back to /print — mapping it now would loop the buyer. Add
 	// 'bible-ebook': 'fathers-heart-bible-ebook' once TBL sells it (engine EBOOK_SKUS entry in SMP src/store-engine).
@@ -31,7 +35,7 @@ export const TBL_BOOKS = {
 	//     (not in engine EBOOK_SKUS); live TBL /books/fathers-heart-bible-regular-print?f=ebook Buy -> fathersheartbible.com/print/.
 	//   - FHB print Bibles (general + audience + language editions): the TBL edition block always renders
 	//     <a href={external_url ?? ed.fhbUrl}> (never the checkout form); live Buy -> fathersheartbible.com/bibles/<x>-bible/.
-	//   - FHB English audiobook: no paid TBL row exists (fathers-heart-bible-john-audio is free, sale_allowed=false).
+	//   - (was, until 2026-11-27) FHB English audiobook: no paid TBL row existed (fathers-heart-bible-john-audio is free).
 };
 /** the TBL book page for an FHB product, or null (switch off / no TBL page) */
 export const tblBook = (product) =>
