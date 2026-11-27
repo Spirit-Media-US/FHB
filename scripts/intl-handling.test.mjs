@@ -7,6 +7,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import raw from '../src/data/ship-countries.json' with { type: 'json' };
+import { tblEdition } from '../src/lib/tbl.mjs';
 import {
 	LIVE_COUNTRIES, PENDING_COUNTRIES, buildLive, checkoutShippingForm, fastPriceCents, shipsLine,
 } from '../src/lib/shipCountries.ts';
@@ -272,7 +273,12 @@ test('copy: no "duty paid" promise, the fee is disclosed, never Amazon or Barnes
 // ---- built output: the fee is on the page BEFORE checkout ----
 // An ENGLISH edition page: language editions now render their order block in their own language (unit 2kz,
 // scripts/order-i18n.test.mjs covers those).
-const DIST_PAGE = 'dist/bibles/fathers-heart-bible/index.html';
+// TBL switch-over (src/lib/tbl.mjs tblEdition, kevin seat 2026-11-26 23:42Z, L3147): an edition TBL sells carries the TBL
+// box, not the FHB order form, so the edition order-form checks run on an edition page FHB still sells (Kituba: TBL cannot sell
+// its lang-ktu SKU yet).
+const DIST_PAGE = tblEdition('fathers-heart-bible')
+	? `dist/bibles/${['kituba-bible'].find((x) => !tblEdition(x)) ?? 'fathers-heart-bible'}/index.html`
+	: 'dist/bibles/fathers-heart-bible/index.html';
 test('dist: edition order block carries the fee table, the per-price fee slots and the fee summary line', () => {
 	assert.ok(fs.existsSync(DIST_PAGE), 'dist/ missing: run the build first');
 	const h = fs.readFileSync(DIST_PAGE, 'utf8');

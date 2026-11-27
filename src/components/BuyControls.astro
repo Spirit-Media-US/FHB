@@ -1,5 +1,5 @@
 ---
-import { isTbl } from '../lib/tbl.mjs';
+import { isTbl, tblEdition } from '../lib/tbl.mjs';
 import { newTabHtml } from '../lib/xsite';
 
 // The buy controls every product card on /print carries, in one place.
@@ -123,6 +123,9 @@ const priceRows = [
 	pbPrice !== undefined ? { label: 'Paperback', price: `$${pbPrice.toFixed(2)}` } : null,
 ].filter((r): r is { label: string; price: string } => r !== null);
 const btnClass = compact ? 'buy-btn buy-btn-compact' : 'buy-btn';
+// TBL switch-over (src/lib/tbl.mjs tblEdition, L3147): an edition's Buy now opens its TBL book page (same tab, our own store)
+const nowTbl = buyNowHref ? tblEdition(buyNowHref, pick) : null;
+const nowHref = nowTbl ?? buyNowHref;
 const spare = Math.max(0, reserveSlots - stores.length);
 ---
 
@@ -144,7 +147,7 @@ const spare = Math.max(0, reserveSlots - stores.length);
 }
 {
 	buyNowHref ? (
-		<a href={buyNowHref} class="buy-btn buy-now" style="text-decoration: none;" data-buy-now>
+		<a href={nowHref} class="buy-btn buy-now" style="text-decoration: none;" data-buy-now data-tbl={nowTbl ? '' : undefined}>
 			<span>Buy now</span>
 		</a>
 	) : (

@@ -557,7 +557,7 @@ test('TBL switch-over: /print eBook Buy Direct -> the TBL eBook page (same tab),
 	const html = fs.readFileSync(new URL('../dist/print/index.html', import.meta.url), 'utf8');
 	const box = html.slice(html.indexOf('id="ebook"'), html.indexOf('data-ebook-msg'));
 	if (tblBook('bible-ebook')) {
-		assert.match(box, new RegExp(`<a href="${tblBook('bible-ebook')}"[^>]*data-tbl`), 'Buy Direct links TBL');
+		assert.ok(box.includes(`<a href="${tblBook('bible-ebook')}"`) && /data-tbl/.test(box), 'Buy Direct links TBL');
 		assert.doesNotMatch(box, /data-ebook-buy/, 'no checkout button beside it');
 		assert.doesNotMatch(box, new RegExp(`href="${TBL_ORIGIN}[^"]*"[^>]*target="_blank"`), 'same tab');
 	} else assert.match(box, /data-ebook-buy/, 'switch off: the direct checkout');

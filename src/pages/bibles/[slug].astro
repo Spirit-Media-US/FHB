@@ -41,10 +41,12 @@ import { alternatesFrom, bcp47 } from '../../lib/bibles-hreflang.mjs';
 import { FHB_ORG_ID } from '../../lib/fhb-org';
 import { shippingDetailsFor } from '../../lib/marginGuard';
 import { merchantReturnPolicy } from '../../lib/merchantReturnPolicy';
-import { ORDER_STRINGS, orderLangFor, tr as trOrder } from '../../lib/orderStrings';
+import { FIRST_ORDER_PCT, firstOrderUnit } from '../../lib/order-pricing';
+import { formatUsd, ORDER_STRINGS, orderLangFor, tr as trOrder } from '../../lib/orderStrings';
 import { fitDescription, fitTitle } from '../../lib/seoFit';
 import { LIVE_COUNTRIES } from '../../lib/shipCountries';
 import { shipsOnPublication } from '../../lib/storeEngine';
+import { tblEdition } from '../../lib/tbl.mjs';
 
 const ASSETS = 'https://assets.spiritmediapublishing.com/FHB/print';
 const READ_URL = 'https://fathersheartbible.com/read/';
@@ -786,6 +788,28 @@ const metaDescription =
 					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.5rem;">Order the {ed.english} Edition direct</h2>
 					<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 1rem; line-height: 1.6; margin: 0 0 1.1rem;">This edition is in preparation: its ISBN, page count and price are assigned when the book is typeset. Reserve a copy now and we will write to you the day it can be ordered, direct from us with free shipping.</p>
 					<MailtoLink email="hello@spiritmediapublishing.com" subject={RESERVE_SUBJECT} class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary, #b60057); color: #fff; padding: 0.75rem 1.6rem; text-decoration: none; font-size: 0.95rem;">Reserve a copy by email</MailtoLink>
+				</div>
+			) : tblEdition(`${ed.slug}-bible`) ? (
+				// TBL switch-over (src/lib/tbl.mjs tblEdition, kevin seat 2026-11-26 23:42Z, L3147): the edition is SOLD on The
+				// Believer's Library (one store, SMP the seller); this page stays on FHB and its order box becomes one same-tab
+				// Buy now to the edition's TBL page. The prices shown are the same engine prices TBL charges.
+				<div id="order" class="max-w-xl mx-auto rounded-2xl p-6 md:p-7 mt-10 text-center" style="background: #fff; border: 1px solid var(--color-hairline); scroll-margin-top: 90px;" data-tbl-order>
+					<h2 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.75rem;">{orderHeading}</h2>
+					{/* the same price line EditionOrder shows (paperback, then hardback; first-order unit + regular), read back by
+					    scripts/pricing-verify.mjs against the server */}
+					<div data-price-line>
+						{[
+							{ binding: orderT('p.paperback'), sku: `${orderRows[0].id}-pb`, usd: orderRows[0].pb },
+							{ binding: orderT('p.hardback'), sku: `${orderRows[0].id}-hb`, usd: orderRows[0].hb },
+						].map((l) => (
+							<p data-line-sku={l.sku} style="font-family: var(--font-sans); color: var(--color-ink); font-size: 1rem; margin: 0 0 0.35rem;">
+								<b>{l.binding}</b>{' '}<span data-first>{formatUsd(orderLang, firstOrderUnit(Math.round(l.usd * 100)))}</span>{' '}{orderLang === 'en' ? 'on your first order' : `· ${trOrder(ORDER_STRINGS[orderLang], 'p.firstOrder', { pct: FIRST_ORDER_PCT })}`}{' '}<s style="color: var(--color-muted);" data-reg>{formatUsd(orderLang, Math.round(l.usd * 100))}</s>
+							</p>
+						))}
+					</div>
+					<a href={tblEdition(`${ed.slug}-bible`)} data-tbl class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); min-height: 44px; padding: 0.5rem 1.6rem; text-decoration: none; font-size: 1rem; margin-top: 0.6rem;">Buy now</a>
+					{(preorder || awaitingPublication) && <p data-preorder-note style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; margin: 0.7rem 0 0;">{orderT('o.preorder')}</p>}
+					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; margin: 0.8rem 0 0;">{orderLang === 'en' || !orderLang ? `15% off first order + free standard shipping to ${LIVE_COUNTRIES.length} countries` : orderT('hero.freeShipValue')}</p>
 				</div>
 			) : (
 				<EditionOrder offerLine={orderLang === 'en' || !orderLang ? `15% off first order + free standard shipping to ${LIVE_COUNTRIES.length} countries` : orderT('hero.freeShipValue')} titleStyle={coverTitle ? titleStyle : undefined} rows={orderRows} heading={orderHeading} returnPath={`/bibles/${ed.slug}-bible/`} lang={orderLang} note={preorder || awaitingPublication ? orderT('o.preorder') : undefined} />
