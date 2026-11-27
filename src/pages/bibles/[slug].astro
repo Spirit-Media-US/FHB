@@ -701,7 +701,8 @@ const faqSchema = {
 	mainEntity: faqList.map((f) => ({
 		'@type': 'Question',
 		name: f.q,
-		acceptedAnswer: { '@type': 'Answer', text: f.a },
+		// Schema text is plain: strip <a> wrappers (keep their words); the visible FAQ keeps its links (W8-FIX-2).
+		acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/<a\s[^>]*>(.*?)<\/a>/gi, '$1') },
 	})),
 };
 // Meta description, 140-165 chars on English pages (house AEO spec A12): when the sheet text is cut short at a
