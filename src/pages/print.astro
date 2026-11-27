@@ -77,6 +77,7 @@ const EBOOK_COVER_2X =
 	'https://assets.spiritmediapublishing.com/FHB/print/fhb-ebook-cover-2026-6-1200.webp';
 const storeLogo = (store: string) => (store === 'Kobo' ? ('kobo' as const) : ('google' as const));
 const EBOOK_DIRECT = '$9.99'; // Kevin 2026-11-23 D95 (was $7.49)
+const AUDIOBOOK_DIRECT = '$24.99'; // Kevin 2026-11-27 L3175 Q75 A (FHB audiobook on TBL at 24.99 USD, same as Google Play)
 
 // ───────────────────────── GENERAL AUDIENCE ─────────────────────────
 // The same Divine Voice™ Color Bible without an audience on the cover, in three cover
@@ -790,14 +791,27 @@ const bookPriceLine = (skus: string[]) =>
 								</details>
 							</p>
 						</div>
-						<div class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline);">
+						<div id="audiobook" class="flex flex-col items-center text-center rounded-2xl p-4 md:p-5" style="background: var(--color-soft, #faf6f2); border: 1px solid var(--color-hairline); scroll-margin-top: 90px;">
 							<img src={EBOOK_COVER} srcset={`${EBOOK_COVER} 600w, ${EBOOK_COVER_2X} 1200w`} sizes="(min-width: 640px) 200px, 50vw" alt="Father's Heart Bible (FHB) audiobook cover" width="600" height="900" loading="lazy" decoding="async" class="block w-full h-auto" style="max-width: 170px; border: 1px solid var(--color-hairline);" />
 							<h3 style="font-family: var(--font-headline); color: var(--color-ink); font-size: 1.15rem; font-weight: 600; margin: 0.9rem 0 0.35rem;">Audiobook</h3>
 							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">The complete Bible, narrated — or listen free, chapter by chapter.</p>
 							<div class="flex flex-col gap-2 w-full">
 								<div class="flex flex-wrap justify-center gap-2 w-full">
-								<BuyControls compact showDirect={false} stores={digitalEn.audiobook.map((d) => ({ logo: storeLogo(d.store), label: 'Audio', price: d.price, href: d.url }))} />
+								{/* Kevin L3150 2026-11-26 ("55 Buy from SMP"): our own sale (fulfilled through TBL) is THE button; Google Play
+								    stays as a smaller "Also on" link. Switch off / no TBL row: the retailer buttons as before. */}
+								{tblBook('bible-audiobook') ? (
+									<BuyControls compact showDirect={false} stores={[{ label: 'Buy from SMP', price: AUDIOBOOK_DIRECT, href: tblBook('bible-audiobook') as string }]} />
+								) : (
+									<BuyControls compact showDirect={false} stores={digitalEn.audiobook.map((d) => ({ logo: storeLogo(d.store), label: 'Audio', price: d.price, href: d.url }))} />
+								)}
 								</div>
+								{tblBook('bible-audiobook') && digitalEn.audiobook.length > 0 && (
+									<p class="also-on" data-also-on="audiobook">Also on{' '}
+										{digitalEn.audiobook.map((d, i) => (
+											<>{i > 0 && <span aria-hidden="true"> · </span>}<a href={d.url} target="_blank" rel="noopener">{d.store}<Fragment set:html={newTabHtml} /></a></>
+										))}
+									</p>
+								)}
 							</div>
 							<p style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-ink); font-weight: 600; margin: 0.9rem 0 0.4rem;">Listen free, chapter by chapter</p>
 							<div class="flex flex-wrap justify-center gap-2 w-full">
