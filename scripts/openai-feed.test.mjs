@@ -3,6 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { tblRedirected } from '../src/lib/tbl.mjs';
 
 const REQUIRED = ['item_id', 'title', 'description', 'url', 'brand', 'seller_name', 'image_url', 'availability', 'price'];
 const AVAIL = ['in_stock', 'out_of_stock', 'pre_order', 'backorder', 'unknown'];
@@ -87,6 +88,9 @@ test('FHB feed = Bible editions + the FH books (Option C)', () => {
 	assert.ok(g.some((i) => i.link.includes('/bibles/')), 'Bible editions in the feed');
 	for (const b of FH_BOOKS) {
 		if (!fs.existsSync(`dist/books/${b.slug}/index.html`)) continue; // page not live on FHB yet
+		// TBL switch-over (src/lib/tbl.mjs, kevin seat 2026-11-26): a book whose FHB page 301s to TBL is sold on TBL, so its
+		// FHB feed item would land on a redirect to another domain: it is LEFT OUT (fhb-books.test.mjs asserts that).
+		if (tblRedirected(`/books/${b.slug}/`)) continue;
 		const html = fs.readFileSync(`dist/books/${b.slug}/index.html`, 'utf8');
 		for (const sku of b.formats)
 			if (new RegExp(`"sku":"${sku}"`).test(html)) assert.ok(g.some((i) => i.id === sku), `${sku} (FH book) missing from the FHB feed`);

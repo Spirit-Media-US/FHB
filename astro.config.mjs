@@ -6,6 +6,7 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 import { sitemapLinksFor } from './src/lib/bibles-hreflang-fs.mjs';
+import { tblRedirected } from './src/lib/tbl.mjs';
 import { addIndexLastmod, editionFilesBySlug, editionLastmod, maxLastmod } from './scripts/lib/sitemap-lastmod.mjs';
 
 const SITE = 'https://fathersheartbible.com';
@@ -154,6 +155,7 @@ export default defineConfig({
 				!page.includes('/blog/preview') &&
 				!page.includes('/join') &&
 				!page.includes('/glossary-review') &&
+				!tblRedirected(page) && // TBL switch-over: these 301 to TBL (public/_redirects)
 				!isNoindex(page),
 			serialize(item) {
 				const url = item.url;

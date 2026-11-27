@@ -22,6 +22,7 @@
  */
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import FEED_COUNTRIES from '../src/data/merchant-feed-countries.json' with { type: 'json' };
+import { tblRedirected } from '../src/lib/tbl.mjs';
 
 const DIST = 'dist';
 const OUT = process.argv.includes('--out') ? process.argv[process.argv.indexOf('--out') + 1] : `${DIST}/merchant-feed.xml`;
@@ -79,6 +80,8 @@ for (const { dir, type } of SECTIONS) {
 	for (const d of readdirSync(`${DIST}/${dir}`).sort()) {
 		const f = `${DIST}/${dir}/${d}/index.html`;
 		if (!existsSync(f)) continue;
+		// TBL switch-over: a book page that 301s to TBL (public/_redirects) is sold there, so it is no FHB feed item
+		if (dir === 'books' && tblRedirected(`/books/${d}/`)) continue;
 		const html = readFileSync(f, 'utf8');
 		for (const m of html.matchAll(/<script type="application\/ld\+json"[^>]*>(.*?)<\/script>/gs)) {
 			let j;

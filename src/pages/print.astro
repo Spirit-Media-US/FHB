@@ -42,6 +42,8 @@ import {
 	shipsLine,
 	shipsToList,
 } from '../lib/shipCountries';
+import { tblBook } from '../lib/tbl.mjs';
+import { newTabHtml } from '../lib/xsite';
 
 // THE DIVINE VOICE™ COLOR LINE — 15 targeted 6x9 editions + the 8x10 journaling
 // edition. Every subtitle in the trade metadata ends with the same tail ("Red Letter -
@@ -760,11 +762,20 @@ const bookPriceLine = (skus: string[]) =>
 							<p style="font-family: var(--font-body); color: var(--color-muted); font-size: 0.76rem; line-height: 1.45; margin: 0 0 0.9rem;">Read on any device. The complete translation, reflowable with pop-up footnotes.</p>
 							<div class="flex flex-col gap-2 w-full mt-auto">
 								<div class="flex flex-wrap justify-center gap-2 w-full">
+								{/* Kevin L3150 2026-11-26 ("55 Buy from SMP") + L2190 ("We point to our own ebook sales."): our own sale
+								    is THE button; the retailers stay, as smaller "Also on" links under it. TBL switch-over (src/lib/tbl.mjs):
+								    it opens the TBL eBook page once TBL sells it; until then the SMP direct checkout. */}
 								<BuyControls compact showDirect={false} stores={[
-									...digitalEn.ebook.map((d) => ({ logo: storeLogo(d.store), label: 'eBook', price: d.price, href: d.url })),
-									{ label: 'Buy Direct', price: EBOOK_DIRECT, ebookDirect: true },
+									tblBook('bible-ebook') ? { label: 'Buy from SMP', price: EBOOK_DIRECT, href: tblBook('bible-ebook') as string } : { label: 'Buy from SMP', price: EBOOK_DIRECT, ebookDirect: true },
 								]} />
 								</div>
+								{digitalEn.ebook.length > 0 && (
+									<p class="also-on" data-also-on="ebook">Also on{' '}
+										{digitalEn.ebook.map((d, i) => (
+											<>{i > 0 && <span aria-hidden="true"> · </span>}<a href={d.url} target="_blank" rel="noopener">{d.store}<Fragment set:html={newTabHtml} /></a></>
+										))}
+									</p>
+								)}
 								<p data-ebook-msg style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-muted); margin: 0.4rem 0 0; display: none;"></p>
 								<p style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--color-ink); font-weight: 600; margin: 0.7rem 0 0;">Listening Edition (for read-aloud apps)</p>
 								<div class="flex flex-wrap justify-center gap-2 w-full">
@@ -1145,6 +1156,9 @@ const bookPriceLine = (skus: string[]) =>
 </Layout>
 
 <style>
+	/* "Also on" (Kevin L3150): the retailers as small text links under our own Buy button; 24px tap height. */
+	.also-on { font-family: var(--font-sans); font-size: 0.78rem; color: var(--color-muted); margin: 0.15rem 0 0; }
+	.also-on a { display: inline-flex; align-items: center; min-height: 24px; color: #3f3f46; text-decoration: underline; text-underline-offset: 2px; }
 	/* ALL 80 LANGUAGE CARDS THE SAME (Kevin 2026-10-30: "All cards should be aligned the same").
 	   Each text block gets a FIXED number of lines (reserved by min-height, capped by line-clamp),
 	   so every card has the same height and its links and buttons sit at the same place; the
