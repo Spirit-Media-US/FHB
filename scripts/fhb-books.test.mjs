@@ -568,6 +568,25 @@ test('TBL switch-over: /print eBook Buy Direct -> the TBL eBook page (same tab),
 	assert.match(box, /data-also-on="ebook"[\s\S]*href="https:\/\/(play\.google|www\.kobo)/, 'retailers kept as Also on links');
 });
 
+// Kevin L3150 "55 Buy from SMP" + L3175/L3176: the /print audiobook own-sale button opens the TBL audiobook page ($24.99, same
+// tab); Google Play only as a small "Also on" link. Switch off = the retailer buttons as before.
+test('TBL switch-over: /print audiobook Buy from SMP -> the TBL audiobook page, retailers as Also on', () => {
+	const html = fs.readFileSync(new URL('../dist/print/index.html', import.meta.url), 'utf8');
+	const at = html.indexOf('id="audiobook"');
+	assert.ok(at > 0, 'audiobook card');
+	const box = html.slice(at, html.indexOf('Listen free, chapter by chapter', at));
+	if (tblBook('bible-audiobook')) {
+		assert.equal(tblBook('bible-audiobook'), `${TBL_ORIGIN}/books/fathers-heart-bible-audiobook`);
+		assert.ok(box.includes(`<a href="${tblBook('bible-audiobook')}"`) && /data-tbl/.test(box), 'Buy from SMP links TBL');
+		assert.match(box, /Buy from SMP/, 'the own-sale button reads Buy from SMP');
+		assert.match(box, /\$24\.99/, 'price $24.99 (L3175)');
+		assert.doesNotMatch(box, new RegExp(`href="${TBL_ORIGIN}[^"]*"[^>]*target="_blank"`), 'same tab');
+		assert.doesNotMatch(box, /href="https:\/\/play\.google[^"]*"[^>]*class="buy-btn/, 'no retailer pill beside it');
+		assert.doesNotMatch(box, /class="buy-btn[^"]*"[^>]*href="https:\/\/play\.google/, 'no retailer pill beside it');
+		assert.match(box, /data-also-on="audiobook"[\s\S]*href="https:\/\/play\.google/, 'Google Play kept as an Also on link');
+	} else assert.match(box, /href="https:\/\/play\.google/, 'switch off: the retailer buttons');
+});
+
 // TBL switch-over: every FH book with a TBL page 301s there in ONE hop (both slash forms, a no-slash target, which answers
 // 200 on TBL; its slash form 301s = a chain), and is left out of the sitemap + merchant feed; no other /books/ rule -> TBL.
 test('TBL switch-over: /books/<slug> 301 -> its TBL page, one hop, not in sitemap or merchant feed', () => {
