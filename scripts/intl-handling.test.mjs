@@ -7,7 +7,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import raw from '../src/data/ship-countries.json' with { type: 'json' };
-import { tblEdition } from '../src/lib/tbl.mjs';
 import {
 	LIVE_COUNTRIES, PENDING_COUNTRIES, buildLive, checkoutShippingForm, fastPriceCents, shipsLine,
 } from '../src/lib/shipCountries.ts';
@@ -273,13 +272,21 @@ test('copy: no "duty paid" promise, the fee is disclosed, never Amazon or Barnes
 // ---- built output: the fee is on the page BEFORE checkout ----
 // An ENGLISH edition page: language editions now render their order block in their own language (unit 2kz,
 // scripts/order-i18n.test.mjs covers those).
-// TBL switch-over (src/lib/tbl.mjs tblEdition, kevin seat 2026-11-26 23:42Z, L3147): an edition TBL sells carries the TBL
-// box, not the FHB order form, so the edition order-form checks run on an edition page FHB still sells (Kituba: TBL cannot sell
-// its lang-ktu SKU yet).
-const DIST_PAGE = tblEdition('fathers-heart-bible')
-	? `dist/bibles/${['kituba-bible'].find((x) => !tblEdition(x)) ?? 'fathers-heart-bible'}/index.html`
-	: 'dist/bibles/fathers-heart-bible/index.html';
-test('dist: edition order block carries the fee table, the per-price fee slots and the fee summary line', () => {
+// TBL switch-over (src/lib/tbl.mjs tblEdition, kevin seat 2026-11-26/27, L3147): an edition TBL sells carries the TBL box, not
+// the FHB order form. These checks run on an edition page that still renders the FHB order form; when every edition sells on
+// TBL there is none, and the edition-form checks SKIP saying so (the catalog form /print/order/ is still checked below).
+const editionFormPage = () => {
+	if (!fs.existsSync('dist/bibles')) return 'dist/bibles/fathers-heart-bible/index.html';
+	for (const d of fs.readdirSync('dist/bibles').sort()) {
+		const f = `dist/bibles/${d}/index.html`;
+		if (fs.existsSync(f) && fs.readFileSync(f, 'utf8').includes('data-order="')) return f;
+	}
+	return null;
+};
+const DIST_PAGE = editionFormPage();
+const NO_EDITION_FORM = 'every edition sells on TBL (src/lib/tbl.mjs tblEdition): no FHB edition page renders the order form';
+test('dist: edition order block carries the fee table, the per-price fee slots and the fee summary line', (t) => {
+	if (!DIST_PAGE) return t.skip(NO_EDITION_FORM);
 	assert.ok(fs.existsSync(DIST_PAGE), 'dist/ missing: run the build first');
 	const h = fs.readFileSync(DIST_PAGE, 'utf8');
 	const cfg = JSON.parse(h.match(/data-order="([^"]*)"/)[1].replaceAll('&#34;', '"').replaceAll('&quot;', '"').replaceAll('&#38;', '&').replaceAll('&amp;', '&'));
@@ -301,6 +308,7 @@ test('dist: edition order block carries the fee table, the per-price fee slots a
 });
 
 test('dist + jsdom: choosing a country shows "+ $fee international handling (Country)" and the total, before checkout', async (t) => {
+	if (!DIST_PAGE) return t.skip(NO_EDITION_FORM);
 	assert.ok(fs.existsSync(DIST_PAGE), 'dist/ missing: run the build first');
 	let JSDOM, build;
 	try { ({ JSDOM } = await import('jsdom')); ({ build } = await import('esbuild')); } catch { return t.skip('jsdom/esbuild not installed'); }
@@ -399,6 +407,7 @@ test('dist + jsdom: choosing a country shows "+ $fee international handling (Cou
 // $30 credit and NO first-order 15%; the form shows it before checkout, with its text from the SERVER's answer only (the
 // page carries nothing about it). Other countries are untouched and never see it.
 test('dist + jsdom: Ukraine shows the server-answered credit line, the credited total and no 15%; the page names no route', async (t) => {
+	if (!DIST_PAGE) return t.skip(NO_EDITION_FORM);
 	assert.ok(fs.existsSync(DIST_PAGE), 'dist/ missing: run the build first');
 	let JSDOM, build;
 	try { ({ JSDOM } = await import('jsdom')); ({ build } = await import('esbuild')); } catch { return t.skip('jsdom/esbuild not installed'); }
@@ -536,14 +545,16 @@ test('client bundle for the order form carries no cost, markup or formula', asyn
 });
 
 test('dist: the expedited disclaimer is on the order form and /returns; no "2 days vs 10 days" promise', () => {
-	const form = fs.readFileSync(DIST_PAGE, 'utf8');
+	// the edition order form, or (every edition on TBL) the catalog order form, which carries the same option
+	const FORM = DIST_PAGE ?? 'dist/print/order/index.html';
+	const form = fs.readFileSync(FORM, 'utf8');
 	const dec = (t) => t.replaceAll('&#39;', "'").replaceAll('&#x27;', "'").replaceAll('&amp;', '&');
 	const D = EXPEDITED_DISCLAIMER;
 	assert.ok(form.includes('data-expedited-note'));
 	assert.ok(dec(form).includes(D), 'disclaimer text beside the option on the order form');
 	assert.match(form, /shown when you choose it at checkout/);
 	assert.ok(dec(fs.readFileSync('dist/returns/index.html', 'utf8')).includes(D), '/returns carries the disclaimer');
-	for (const f of [DIST_PAGE, 'dist/returns/index.html', 'dist/print/order/index.html']) {
+	for (const f of [...new Set([FORM, 'dist/returns/index.html', 'dist/print/order/index.html'])]) {
 		const t = fs.readFileSync(f, 'utf8').replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, '');
 		assert.doesNotMatch(t, /1-2 (business )?days|instead of 5-10|2 days (vs|versus|instead)/i, f);
 	}

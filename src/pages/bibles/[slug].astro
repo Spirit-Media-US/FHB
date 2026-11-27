@@ -807,7 +807,7 @@ const metaDescription =
 							</p>
 						))}
 					</div>
-					<a href={tblEdition(`${ed.slug}-bible`)} data-tbl class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); min-height: 44px; padding: 0.5rem 1.6rem; text-decoration: none; font-size: 1rem; margin-top: 0.6rem;">Buy now</a>
+					<a href={tblEdition(`${ed.slug}-bible`)} data-tbl class="inline-flex items-center justify-center rounded-full font-semibold" style="font-family: var(--font-sans); background: var(--color-primary-fixed, #ffd9e0); color: var(--color-ink, #1a1c1c); border: 1.5px solid var(--color-primary, #b60057); min-height: 44px; padding: 0.5rem 1.6rem; text-decoration: none; font-size: 1rem; margin-top: 0.6rem;">{orderT('o.buyNow')}</a>
 					{(preorder || awaitingPublication) && <p data-preorder-note style="font-family: var(--font-sans); color: var(--color-ink); font-size: 0.9rem; margin: 0.7rem 0 0;">{orderT('o.preorder')}</p>}
 					<p style="font-family: var(--font-sans); color: var(--color-muted); font-size: 0.85rem; margin: 0.8rem 0 0;">{orderLang === 'en' || !orderLang ? `15% off first order + free standard shipping to ${LIVE_COUNTRIES.length} countries` : orderT('hero.freeShipValue')}</p>
 				</div>

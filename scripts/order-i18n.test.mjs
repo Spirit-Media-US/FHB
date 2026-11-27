@@ -125,6 +125,7 @@ for (const [slug, lang] of [['german-bible', 'de'], ['french-bible', 'fr'], ['sp
 			const box = h.slice(h.indexOf('data-tbl-order'), h.indexOf('data-tbl-order') + 6000);
 			assert.ok(box.includes(`href="${tblEdition(slug)}" data-tbl`), 'Buy now -> its TBL page');
 			if (LIVE_ORDER_LANGS.includes(lang)) assert.ok(box.includes(ORDER_STRINGS[lang]['p.paperback']), 'localized binding');
+			if (LIVE_ORDER_LANGS.includes(lang)) assert.ok(box.includes(`>${ORDER_STRINGS[lang]['o.buyNow']}</a>`), 'localized Buy now');
 			assert.match(h, /^<!DOCTYPE html><html lang="en"/);
 			assert.ok(h.includes(`rel="canonical" href="https://fathersheartbible.com/bibles/${slug}/"`));
 			return;
